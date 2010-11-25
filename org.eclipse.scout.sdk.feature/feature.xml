@@ -30,7 +30,6 @@ BSI Business Systems Integration AG - initial API and implementation
 
    <requires>
       <import feature="org.eclipse.pde" version="3.5.0" match="compatible"/>
-      <import feature="org.eclipse.pde" version="3.5.0" match="compatible"/>
       <import feature="org.eclipse.platform" version="3.5.0" match="compatible"/>
       <import feature="org.eclipse.jdt" version="3.5.0" match="compatible"/>
       <import feature="org.eclipse.scout.rt.feature" version="3.5.2" match="compatible"/>
