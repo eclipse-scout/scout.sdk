@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.scout.sdk.feature"
+      label="Scout SDK Feature"
+      version="3.5.2.qualifier"
+      provider-name="Eclipse Scout Project">
+
+   <description>
+      Scout SDK
+   </description>
+
+   <copyright>
+      Copyright (c) 2010 BSI Business Systems Integration AG.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License
+v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+Contributors:
+BSI Business Systems Integration AG - initial API and implementation
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <discovery label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.5"/>
+   </url>
+
+   <requires>
+      <import feature="org.eclipse.pde" version="3.5.0" match="compatible"/>
+      <import feature="org.eclipse.pde" version="3.5.0" match="compatible"/>
+      <import feature="org.eclipse.platform" version="3.5.0" match="compatible"/>
+      <import feature="org.eclipse.jdt" version="3.5.0" match="compatible"/>
+      <import feature="org.eclipse.scout.rt.feature" version="3.5.2" match="compatible"/>
+      <import feature="org.eclipse.scout.rt.feature.source" version="3.5.2" match="compatible"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.scout.nls.sdk"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

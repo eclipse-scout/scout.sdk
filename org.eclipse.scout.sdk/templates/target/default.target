@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.2"?>
+
+<target name="@@ALIAS@@">
+
+   <location path="${eclipse_home}/plugins"/>
+
+   <content useAllPlugins="true">
+      <plugins>
+      </plugins>
+      <features>
+      </features>
+      <extraLocations>
+         <location path="${project_path}/scout-rt/eclipse"/>
+         <location path="${eclipse_home}/links/emf-sdk/eclipse"/>
+         <location path="${eclipse_home}/links/birt-sdk/eclipse"/>
+         <location path="${eclipse_home}/links/scout-sdk/eclipse"/>
+         <location path="${eclipse_home}/links/gef-sdk/eclipse"/>
+         <location path="${eclipse_home}/links/wtp-sdk/eclipse"/>
+         <location path="${eclipse_home}/links/usefulPlugins/eclipse"/>
+         <location path="${eclipse_home}/links/dtp-sdk/eclipse"/>
+      </extraLocations>
+   </content>
+
+</target>

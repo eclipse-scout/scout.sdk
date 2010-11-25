@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.eclipse.scout.service.services">
+    <service class="org.eclipse.scout.rt.server.services.common.bookmark.FileSystemBookmarkStorageService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="test.server.ServerSession"/>
+    <service class="org.eclipse.scout.rt.server.services.common.workflow.WorkflowProviderService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="test.server.ServerSession"/>
+    <service class="test.server.services.process.CompanyProcessService" session="test.server.ServerSession" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory"/>
+  </extension>
+  <extension point="org.eclipse.equinox.http.registry.servlets">
+    <servlet alias="/process" class="org.eclipse.scout.rt.server.ServiceTunnelServlet">
+      <init-param name="min-version" value="0.0.0"/>
+    </servlet>
+    <servlet alias="/remotefiles" class="org.eclipse.scout.rt.server.RemoteFileServlet">
+     </servlet>
+    <servlet alias="/updatesite" class="org.eclipse.scout.rt.server.RemoteFileServlet">
+      <init-param name="folder" value="/updatesite"/>
+    </servlet>
+    <servlet alias="/" class="org.eclipse.scout.rt.server.RemoteFileServlet">
+      <init-param name="folder" value="/html">
+        </init-param>
+    </servlet>
+  </extension>
+  <extension point="org.eclipse.scout.http.servletfilter.filters">
+    <filter aliases="/" class="org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter" ranking="20">
+      <init-param name="realm" value="BSIAG Development"/>
+      <init-param name="users" value="admin=manager,allen=allen,blake=blake"/>
+    </filter>
+  </extension>
+  <extension id="app" name="Server Application" point="org.eclipse.core.runtime.applications">
+    <application>
+      <run class="test.server.ServerApplication"/>
+    </application>
+  </extension>
+  <extension id="product" point="org.eclipse.core.runtime.products">
+    <product application="test.server.app" name="test Server">
+      <property name="appName" value="test Server">
+       </property>
+    </product>
+  </extension>
+</plugin>

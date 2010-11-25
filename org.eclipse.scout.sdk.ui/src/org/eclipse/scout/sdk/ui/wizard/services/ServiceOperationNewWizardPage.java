@@ -1,0 +1,189 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.sdk.ui.wizard.services;
+
+import java.util.ArrayList;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.operation.service.ParameterArgument;
+import org.eclipse.scout.sdk.operation.service.ServiceOperationNewOperation;
+import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.fields.TextField;
+import org.eclipse.scout.sdk.ui.internal.fields.code.IParameterFieldListener;
+import org.eclipse.scout.sdk.ui.internal.fields.code.ParameterField;
+import org.eclipse.scout.sdk.ui.internal.fields.code.ReturnParameterField;
+import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
+
+public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
+
+  // ui fields
+  private TextField m_operationNameField;
+  private ReturnParameterField m_returnParameterField;
+
+  // fields
+  private String m_operationName;
+  private ParameterArgument m_returnParameter;
+  private ParameterArgument m_parameterArg1;
+  private ParameterArgument m_parameterArg2;
+  private ParameterArgument m_parameterArg3;
+  private ParameterArgument m_parameterArg4;
+  private ParameterArgument m_parameterArg5;
+
+  // local fields
+  private final IType[] m_serviceImplementations;
+  private final IType m_serviceInterface;
+  private ParameterField m_parameterArg1Field;
+  private ParameterField m_parameterArg2Field;
+
+  public ServiceOperationNewWizardPage(IType serviceInterface, IType[] serviceImplementations) {
+    super(ServiceOperationNewWizardPage.class.getName());
+    m_serviceInterface = serviceInterface;
+    m_serviceImplementations = serviceImplementations;
+    setTitle("New Service Operation");
+    setDefaultMessage("create a new Service Operation.");
+  }
+
+  @Override
+  protected void createContent(Composite parent) {
+    m_operationNameField = new TextField(parent, 20);
+    m_operationNameField.setLabelText("Operation Name");
+    m_operationNameField.addModifyListener(new ModifyListener() {
+
+      public void modifyText(ModifyEvent e) {
+        m_operationName = m_operationNameField.getText();
+        pingStateChanging();
+      }
+    });
+    IScoutBundle interfaceBundle = ScoutSdk.getScoutWorkspace().getScoutBundle(m_serviceInterface.getJavaProject().getProject());
+
+    m_returnParameterField = new ReturnParameterField(parent, 20, m_returnParameter, interfaceBundle.getSearchScope());
+    m_returnParameterField.setLabel("Return type");
+    m_returnParameterField.addParameterFieldListener(new IParameterFieldListener() {
+      public void parameterChanged(ParameterArgument argument) {
+        m_returnParameter = argument;
+        pingStateChanging();
+      }
+    });
+
+    m_parameterArg1Field = new ParameterField(parent, m_parameterArg1, interfaceBundle.getSearchScope());
+    m_parameterArg1Field.setLabelParameterName("Name Arg 1");
+    m_parameterArg1Field.setLabelParameterType("Type");
+    m_parameterArg1Field.addParameterFieldListener(new IParameterFieldListener() {
+      public void parameterChanged(ParameterArgument argument) {
+        m_parameterArg1 = argument;
+        pingStateChanging();
+      }
+    });
+
+    m_parameterArg2Field = new ParameterField(parent, m_parameterArg1, interfaceBundle.getSearchScope());
+    m_parameterArg2Field.setLabelParameterName("Name Arg 2");
+    m_parameterArg2Field.setLabelParameterType("Type");
+    m_parameterArg2Field.addParameterFieldListener(new IParameterFieldListener() {
+      public void parameterChanged(ParameterArgument argument) {
+        m_parameterArg2 = argument;
+        pingStateChanging();
+      }
+    });
+
+    parent.setLayout(new GridLayout(1, true));
+    m_operationNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_returnParameterField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_parameterArg1Field.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_parameterArg2Field.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+
+  }
+
+  @Override
+  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+    ServiceOperationNewOperation op = new ServiceOperationNewOperation();
+    ArrayList<ParameterArgument> args = new ArrayList<ParameterArgument>();
+    if (m_parameterArg1 != null && !StringUtility.isNullOrEmpty(m_parameterArg1.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg1.getType())) {
+      args.add(m_parameterArg1);
+    }
+    if (m_parameterArg2 != null && !StringUtility.isNullOrEmpty(m_parameterArg2.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg2.getType())) {
+      args.add(m_parameterArg2);
+    }
+    if (m_parameterArg3 != null && !StringUtility.isNullOrEmpty(m_parameterArg3.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg3.getType())) {
+      args.add(m_parameterArg3);
+    }
+    if (m_parameterArg4 != null && !StringUtility.isNullOrEmpty(m_parameterArg4.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg4.getType())) {
+      args.add(m_parameterArg4);
+    }
+    if (m_parameterArg5 != null && !StringUtility.isNullOrEmpty(m_parameterArg5.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg5.getType())) {
+      args.add(m_parameterArg5);
+    }
+    op.setArguments(args.toArray(new ParameterArgument[args.size()]));
+    op.setMethodName(m_operationName);
+    op.setReturnType(m_returnParameter);
+    op.setServiceImplementations(m_serviceImplementations);
+    op.setServiceInterface(m_serviceInterface);
+    op.run(monitor, manager);
+    return true;
+  }
+
+  @Override
+  protected void validatePage(MultiStatus multiStatus) {
+    multiStatus.add(getOperationNameStatus());
+    multiStatus.add(getReturnParameterStatus());
+    if (m_parameterArg1 != null) {
+      multiStatus.add(getParameterStatus(m_parameterArg1, m_parameterArg1Field.getLabel()));
+    }
+    if (m_parameterArg2 != null) {
+      multiStatus.add(getParameterStatus(m_parameterArg1, m_parameterArg2Field.getLabel()));
+    }
+    // if(m_parameterArg3 != null){
+    // multiStatus.add(getParameterStatus(m_parameterArg1, m_parameterArg3Field.getLabel()));
+    // }
+    super.validatePage(multiStatus);
+  }
+
+  protected IStatus getOperationNameStatus() {
+    if (m_operationName == null || m_operationName.length() == 0) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Operation name missing.");
+    }
+    else {
+      return Status.OK_STATUS;
+    }
+  }
+
+  protected IStatus getReturnParameterStatus() {
+    if (m_returnParameter == null || StringUtility.isNullOrEmpty(m_returnParameter.getType())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "return type missing");
+    }
+    else {
+      return Status.OK_STATUS;
+    }
+  }
+
+  protected IStatus getParameterStatus(ParameterArgument arg, String fieldName) {
+    if (StringUtility.isNullOrEmpty(arg.getName()) && !StringUtility.isNullOrEmpty(arg.getType())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "parameter " + fieldName + " not valid");
+    }
+    else if (!StringUtility.isNullOrEmpty(arg.getName()) && StringUtility.isNullOrEmpty(arg.getType())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "parameter " + fieldName + " not valid");
+    }
+    return Status.OK_STATUS;
+  }
+}

@@ -1,0 +1,4 @@
+Method override Operation
+-------------------------
+org.eclipse.jdt.ui.text.java.CompletionProposalCollector.createMethodDeclarationProposal(CompletionProposal)
+org.eclipse.jdt.internal.corext.util.MethodOverrideTester.isSubsignature(IMethod, IMethod)

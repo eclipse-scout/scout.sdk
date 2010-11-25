@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+   <extension-point id="nlsImporter" name="NLS Importer" schema="schema/nlsImporter.exsd"/>
+   <extension-point id="nlsExporter" name="NLS Exporter" schema="schema/nlsExporter.exsd"/>
+
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.scout.nls.sdk.internal.ui.editor.NlsEditor"
+            extensions="nls"
+            filenames="NlsImpl.java"
+            icon="resources/icons/view_nls.gif"
+            id="org.eclipse.scout.nls.sdk.nlsEditor"
+            name="Multilanguage Editor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <file-association
+            content-type="com.bsiag.nls.contentTypeBinding"
+            file-names="NlsImpl.java"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.bsiag.nls.category"
+            name="NLS"/>
+      <wizard
+            category="com.bsiag.nls.category"
+            class="org.eclipse.scout.nls.sdk.internal.ui.wizard.NewNlsFileWizard"
+            icon="resources/icons/file.gif"
+            id="com.bsiag.nls.file"
+            name="New NLS File"
+            project="false"/>
+   </extension>
+   <extension
+         id="NlsTextCompletionProposalComputer"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.scout.nls.sdk.nlsTextProposalCategory"
+            class="org.eclipse.scout.nls.sdk.internal.ui.action.NlsTextCompletionProposalComputer">
+         <partition
+               type="__java_string">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         id="nlsTextProposalCategory"
+         name="NLS Text Proposals"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <proposalCategory
+            icon="resources/icons/message.png">
+      </proposalCategory>
+   </extension>
+   <extension
+         id="undefinedNlsKey"
+         name="NLS Marker"
+         point="org.eclipse.core.resources.markers">
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <persistent
+            value="false">
+      </persistent>
+   </extension>
+
+</plugin>

@@ -1,0 +1,133 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.multi;
+
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.sdk.ScoutIdeProperties;
+import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
+import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiValuePresenter;
+import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.forms.widgets.FormToolkit;
+
+/**
+ * <h3>MultiLongPresenter</h3> ...
+ */
+public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
+
+  public MultiLongPresenter(FormToolkit toolkit, Composite parent) {
+    super(toolkit, parent, "[-+0-9\\'Eeinf]*");
+  }
+
+  @Override
+  protected void init(ConfigurationMethodSet methodSet) throws CoreException {
+    super.init(methodSet);
+
+    MethodBean<Long>[] methodBeans = getMethodBeans();
+    long[] ar = new long[methodBeans.length];
+    for (int i = 0; i < methodBeans.length; i++) {
+      ar[i] = methodBeans[i].getCurrentSourceValue();
+    }
+    if (!allEqual(ar)) {
+      getTextComponent().setText(ScoutIdeProperties.INPUT_MULTI_UNDEFINED);
+    }
+    else {
+      getTextComponent().setText(formatDisplayValue(ar[0]));
+    }
+  }
+
+  @Override
+  protected int getTextAlignment() {
+    return SWT.RIGHT;
+  }
+
+  @Override
+  protected String formatSourceValue(Long value) throws CoreException {
+    if (value.longValue() == Long.MAX_VALUE) {
+      return "Long.MAX_VALUE";
+    }
+    else if (value.longValue() == Long.MIN_VALUE) {
+      return "Long.MIN_VALUE";
+    }
+    return DecimalFormat.getNumberInstance().format(value);
+  }
+
+  @Override
+  protected String formatDisplayValue(Long value) throws CoreException {
+    if (value.longValue() == Long.MAX_VALUE) {
+      return ScoutIdeProperties.NUMBER_MAX;
+    }
+    else if (value.longValue() == Long.MIN_VALUE) {
+      return ScoutIdeProperties.NUMBER_MIN;
+    }
+    return DecimalFormat.getNumberInstance().format(value);
+  }
+
+  @Override
+  protected Long parseSourceInput(String input, ConfigurationMethod method) throws CoreException {
+    Long d = PropertyMethodSourceUtilities.parseReturnParameterLong(input, method.peekMethod(), method.getSuperTypeHierarchy());
+    return d;
+  }
+
+  @Override
+  protected Long parseDisplayInput(String input) throws CoreException {
+    Long d = PropertyMethodSourceUtilities.parseReturnParameterLong(input);
+    return d;
+  }
+
+  @Override
+  protected synchronized void storeMethods(MethodBean<Long>[] beans, Long value) {
+    ArrayList<IOperation> list = new ArrayList<IOperation>();
+    for (MethodBean<Long> bean : beans) {
+      try {
+        String sourceValue = formatSourceValue(value);
+        ConfigurationMethod method = bean.getMethod();
+        if (ScoutSdkUtility.equals(bean.getDefaultValue(), sourceValue)) {
+          if (method.isImplemented()) {
+            list.add(new ScoutMethodDeleteOperation(method.peekMethod()));
+          }
+        }
+        else {
+          list.add(new ConfigPropertyMethodUpdateOperation(method.getType(), method.getMethodName(), "return " + sourceValue + ";", true));
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError("could not format source value", e);
+      }
+    }
+    new OperationJob(list).schedule();
+  }
+
+  private boolean allEqual(long[] ar) {
+    if (ar.length > 0) {
+      long ref = ar[0];
+      for (long b : ar) {
+        if (b != ref) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+}
