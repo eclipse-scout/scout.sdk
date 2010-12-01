@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,7 +33,7 @@ public class TreeNodePage extends AbstractScoutTypePage {
     m_hasDeleteAction = hasDeleteAction;
     setParent(parent);
     setType(type);
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TREE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Tree));
 
   }
 
@@ -61,6 +61,7 @@ public class TreeNodePage extends AbstractScoutTypePage {
     if (m_hasDeleteAction) {
       action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getType().getElementName()), getOutlineView().getSite().getShell());
       action.addMemberToDelete(getType());
+      action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TreeRemove));
     }
     return action;
   }

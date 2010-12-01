@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.TreeMap;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.ScoutSdk;
@@ -53,7 +54,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     setParent(parent);
     setType(type);
     m_interfaceType = interfaceType;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_SERVICE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Service));
 
   }
 
@@ -91,9 +92,18 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
   }
 
   @Override
+  public Action createDeleteAction() {
+    Action deleteAction = super.createDeleteAction();
+    if (deleteAction != null) {
+      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceRemove));
+    }
+    return deleteAction;
+  }
+
+  @Override
   public void fillContextMenu(IMenuManager manager) {
     super.fillContextMenu(manager);
-    manager.add(new WizardAction("New Service Operation...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), new ServiceOperationNewWizard(getInterfaceType(), new IType[]{getType()})));
+    manager.add(new WizardAction("New Service Operation...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperationAdd), new ServiceOperationNewWizard(getInterfaceType(), new IType[]{getType()})));
     manager.add(new Separator());
     manager.add(new AxisWebServiceProviderPublishAction(getOutlineView().getSite().getShell(), getType(), getInterfaceType()));
   }

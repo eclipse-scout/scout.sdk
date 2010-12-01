@@ -37,7 +37,7 @@ public class SharedNodePage extends AbstractPage {
     setParent(parent);
     m_sharedProject = sharedProject;
     setName(getScoutResource().getSimpleName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_SHARED));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundle));
   }
 
   @Override

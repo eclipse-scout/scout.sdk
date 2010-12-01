@@ -239,7 +239,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
-        return ScoutSdkUi.getImage(ScoutSdkUi.IMG_FIELD_DEFAULT);
+        return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
       }
       return null;
     }

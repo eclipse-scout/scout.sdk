@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -194,7 +194,7 @@ public class SignatureProposalProvider implements IContentProposalProvider {
       }
 
       public Image getImage(boolean selected, boolean expertMode) {
-        return ScoutSdkUi.getImage(ScoutSdkUi.IMG_TYPE_SEPARATOR);
+        return ScoutSdkUi.getImage(ScoutSdkUi.Separator);
       }
 
       public int getCursorPosition(boolean selected, boolean expertMode) {

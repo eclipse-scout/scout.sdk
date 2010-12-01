@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -58,7 +58,7 @@ public class PageFilterPresenter extends AbstractPresenter {
   private void createContent(Composite container) {
     m_filterExpressionField = getToolkit().createText(container, "", SWT.BORDER);
     m_resetFilter = getToolkit().createImageHyperlink(container, SWT.PUSH);
-    m_resetFilter.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_TOOL_DELETE));
+    m_resetFilter.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDelete));
     m_regexButton = getToolkit().createButton(container, "Regex", SWT.CHECK);
     // listeners
     m_filterExpressionField.addModifyListener(new ModifyListener() {

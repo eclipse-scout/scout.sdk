@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
@@ -33,7 +34,7 @@ public class WizardNodePage extends AbstractScoutTypePage {
   public WizardNodePage(IPage parent, IType wizardType) {
     setParent(parent);
     setType(wizardType);
-
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Wizard));
   }
 
   @Override
@@ -72,7 +73,9 @@ public class WizardNodePage extends AbstractScoutTypePage {
   @Override
   public Action createDeleteAction() {
     TypeDeleteOperation delOp = new TypeDeleteOperation(getType());
-    return new DeleteAction("Delete...", getOutlineView().getSite().getShell(), delOp);
+    DeleteAction deleteAction = new DeleteAction("Delete...", getOutlineView().getSite().getShell(), delOp);
+    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardRemove));
+    return deleteAction;
   }
 
 }

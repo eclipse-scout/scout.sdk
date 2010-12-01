@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,7 @@ public class SignatureProposal implements IContentProposalEx {
   @Override
   public Image getImage(boolean selected, boolean expertMode) {
     Image img = null;
-    img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_FIELD_PUBLIC);
+    img = ScoutSdkUi.getImage(ScoutSdkUi.FieldPublic);
     return img;
   }
 

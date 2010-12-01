@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -53,7 +53,7 @@ public class LinkWithEditorAction extends Action {
   public LinkWithEditorAction(ScoutExplorerPart viewPart) {
     super(null, AS_CHECK_BOX);
     m_viewPart = viewPart;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_SYNCHONIZE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolSynchronize));
     setToolTipText("link with editor");
     m_updateSelectionJob = new P_UpdateSelectionJob();
     init();

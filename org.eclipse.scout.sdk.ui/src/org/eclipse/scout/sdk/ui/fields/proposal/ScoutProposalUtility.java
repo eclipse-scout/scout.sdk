@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -186,10 +186,10 @@ public class ScoutProposalUtility {
     if (m_buttonDisplayTypeProposals == null) {
       IType buttonType = ScoutSdk.getType(RuntimeClasses.IButton);
       m_buttonDisplayTypeProposals = new ConstantFieldProposal[]{
-          new ConstantFieldProposal<Integer>("Default", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("DISPLAY_STYLE_DEFAULT"), 0),
-          new ConstantFieldProposal<Integer>("Radio", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("DISPLAY_STYLE_RADIO"), 2),
-          new ConstantFieldProposal<Integer>("Toggle", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("DISPLAY_STYLE_TOGGLE"), 1),
-          new ConstantFieldProposal<Integer>("Link", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("DISPLAY_STYLE_LINK"), 3)};
+          new ConstantFieldProposal<Integer>("Default", ScoutSdkUi.getImage(ScoutSdkUi.ButtonStyle), buttonType.getField("DISPLAY_STYLE_DEFAULT"), 0),
+          new ConstantFieldProposal<Integer>("Radio", ScoutSdkUi.getImage(ScoutSdkUi.ButtonStyle), buttonType.getField("DISPLAY_STYLE_RADIO"), 2),
+          new ConstantFieldProposal<Integer>("Toggle", ScoutSdkUi.getImage(ScoutSdkUi.ButtonStyle), buttonType.getField("DISPLAY_STYLE_TOGGLE"), 1),
+          new ConstantFieldProposal<Integer>("Link", ScoutSdkUi.getImage(ScoutSdkUi.ButtonStyle), buttonType.getField("DISPLAY_STYLE_LINK"), 3)};
     }
     return m_buttonDisplayTypeProposals;
   }
@@ -205,21 +205,21 @@ public class ScoutProposalUtility {
     if (m_formViewIdTypeProposals == null) {
       IType iformType = ScoutSdk.getType(RuntimeClasses.IForm);
       m_formViewIdTypeProposals = new ConstantFieldProposal[]{
-          new ConstantFieldProposal<String>("Outline", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_OUTLINE"), "OUTLINE"),
-          new ConstantFieldProposal<String>("Outline Selector", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_OUTLINE_SELECTOR"), "OUTLINE_SELECTOR"),
-          new ConstantFieldProposal<String>("Page Table", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_PAGE_TABLE"), "PAGE_TABLE"),
-          new ConstantFieldProposal<String>("Page Detail", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_PAGE_DETAIL"), "PAGE_DETAIL"),
-          new ConstantFieldProposal<String>("Page Search", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_PAGE_SEARCH"), "PAGE_SEARCH"),
-          new ConstantFieldProposal<String>("Editor", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("EDITOR_ID"), "EDITOR"),
-          new ConstantFieldProposal<String>("North", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_N"), "N"),
-          new ConstantFieldProposal<String>("North-East", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_NE"), "NE"),
-          new ConstantFieldProposal<String>("East", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_E"), "E"),
-          new ConstantFieldProposal<String>("South-East", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_SE"), "SE"),
-          new ConstantFieldProposal<String>("South", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_S"), "S"),
-          new ConstantFieldProposal<String>("South-West", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_SW"), "SW"),
-          new ConstantFieldProposal<String>("West", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_W"), "W"),
-          new ConstantFieldProposal<String>("NorthWest", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_NW"), "NW"),
-          new ConstantFieldProposal<String>("Center", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), iformType.getField("VIEW_ID_CENTER"), "C")};
+          new ConstantFieldProposal<String>("Outline", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_OUTLINE"), "OUTLINE"),
+          new ConstantFieldProposal<String>("Outline Selector", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_OUTLINE_SELECTOR"), "OUTLINE_SELECTOR"),
+          new ConstantFieldProposal<String>("Page Table", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_PAGE_TABLE"), "PAGE_TABLE"),
+          new ConstantFieldProposal<String>("Page Detail", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_PAGE_DETAIL"), "PAGE_DETAIL"),
+          new ConstantFieldProposal<String>("Page Search", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_PAGE_SEARCH"), "PAGE_SEARCH"),
+          new ConstantFieldProposal<String>("Editor", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("EDITOR_ID"), "EDITOR"),
+          new ConstantFieldProposal<String>("North", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_N"), "N"),
+          new ConstantFieldProposal<String>("North-East", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_NE"), "NE"),
+          new ConstantFieldProposal<String>("East", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_E"), "E"),
+          new ConstantFieldProposal<String>("South-East", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_SE"), "SE"),
+          new ConstantFieldProposal<String>("South", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_S"), "S"),
+          new ConstantFieldProposal<String>("South-West", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_SW"), "SW"),
+          new ConstantFieldProposal<String>("West", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_W"), "W"),
+          new ConstantFieldProposal<String>("NorthWest", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_NW"), "NW"),
+          new ConstantFieldProposal<String>("Center", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_CENTER"), "C")};
     }
     return m_formViewIdTypeProposals;
   }
@@ -234,7 +234,18 @@ public class ScoutProposalUtility {
   private ConstantFieldProposal<Integer>[] getButtonSystemTypeProposalsImpl() {
     if (m_buttonSystemTypeProposals == null) {
       IType buttonType = ScoutSdk.getType(RuntimeClasses.IButton);
-      m_buttonSystemTypeProposals = new ConstantFieldProposal[]{new ConstantFieldProposal<Integer>("None", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_NONE"), 0), new ConstantFieldProposal<Integer>("Cancel", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_CANCEL"), 1), new ConstantFieldProposal<Integer>("Close", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_CLOSE"), 2), new ConstantFieldProposal<Integer>("Ok", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_OK"), 3), new ConstantFieldProposal<Integer>("Reset", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_RESET"), 4), new ConstantFieldProposal<Integer>("Save", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_SAVE"), 5), new ConstantFieldProposal<Integer>("Save Search", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), 6), new ConstantFieldProposal<Integer>("Back", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_WIZARD_BACK"), 7), new ConstantFieldProposal<Integer>("Next", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_WIZARD_NEXT"), 8), new ConstantFieldProposal<Integer>("Finish", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_WIZARD_FINISH"), 9), new ConstantFieldProposal<Integer>("Suspend", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), buttonType.getField("SYSTEM_TYPE_WIZARD_SUSPEND"), 10)};
+      m_buttonSystemTypeProposals = new ConstantFieldProposal[]{
+          new ConstantFieldProposal<Integer>("None", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_NONE"), 0),
+          new ConstantFieldProposal<Integer>("Cancel", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_CANCEL"), 1),
+          new ConstantFieldProposal<Integer>("Close", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_CLOSE"), 2),
+          new ConstantFieldProposal<Integer>("Ok", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_OK"), 3),
+          new ConstantFieldProposal<Integer>("Reset", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_RESET"), 4),
+          new ConstantFieldProposal<Integer>("Save", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_SAVE"), 5),
+          new ConstantFieldProposal<Integer>("Save Search", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), 6),
+          new ConstantFieldProposal<Integer>("Back", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_WIZARD_BACK"), 7),
+          new ConstantFieldProposal<Integer>("Next", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_WIZARD_NEXT"), 8),
+          new ConstantFieldProposal<Integer>("Finish", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_WIZARD_FINISH"), 9),
+          new ConstantFieldProposal<Integer>("Suspend", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_WIZARD_SUSPEND"), 10)};
       Arrays.sort(m_buttonSystemTypeProposals, new ContentProposalExComparator(false));
     }
     return m_buttonSystemTypeProposals;
@@ -251,8 +262,8 @@ public class ScoutProposalUtility {
     if (m_formDisplayHintProposals == null) {
       IType formType = ScoutSdk.getType(RuntimeClasses.IForm);
       m_formDisplayHintProposals = new ConstantFieldProposal[]{
-          new ConstantFieldProposal<Integer>("Dialog", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), formType.getField("DISPLAY_HINT_DIALOG"), 0),
-          new ConstantFieldProposal<Integer>("View", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), formType.getField("DISPLAY_HINT_VIEW"), 20),};
+          new ConstantFieldProposal<Integer>("Dialog", ScoutSdkUi.getImage(ScoutSdkUi.Default), formType.getField("DISPLAY_HINT_DIALOG"), 0),
+          new ConstantFieldProposal<Integer>("View", ScoutSdkUi.getImage(ScoutSdkUi.Default), formType.getField("DISPLAY_HINT_VIEW"), 20),};
     }
     return m_formDisplayHintProposals;
   }
@@ -270,9 +281,9 @@ public class ScoutProposalUtility {
   private ConstantFieldProposal<Integer>[] getVerticalAlignmentProposalsImpl() {
     if (m_verticalAlignmentProposals == null) {
       m_verticalAlignmentProposals = new ConstantFieldProposal[]{
-          new ConstantFieldProposal<Integer>("Top", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), null, -1),
-          new ConstantFieldProposal<Integer>("Center", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), null, 0),
-          new ConstantFieldProposal<Integer>("Bottom", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), null, 1)};
+          new ConstantFieldProposal<Integer>("Top", ScoutSdkUi.getImage(ScoutSdkUi.VerticalTop), null, -1),
+          new ConstantFieldProposal<Integer>("Center", ScoutSdkUi.getImage(ScoutSdkUi.VerticalCenter), null, 0),
+          new ConstantFieldProposal<Integer>("Bottom", ScoutSdkUi.getImage(ScoutSdkUi.VerticalBottom), null, 1)};
     }
     return m_verticalAlignmentProposals;
   }
@@ -290,9 +301,9 @@ public class ScoutProposalUtility {
   private ConstantFieldProposal<Integer>[] getHorizontalAlignmentProposalsImpl() {
     if (m_horizontalAlignmentProposals == null) {
       m_horizontalAlignmentProposals = new ConstantFieldProposal[]{
-          new ConstantFieldProposal<Integer>("Left", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), null, -1),
-          new ConstantFieldProposal<Integer>("Center", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), null, 0),
-          new ConstantFieldProposal<Integer>("Right", ScoutSdkUi.getImage(ScoutSdkUi.IMG_BUTTON_STYLE), null, 1)};
+          new ConstantFieldProposal<Integer>("Left", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft), null, -1),
+          new ConstantFieldProposal<Integer>("Center", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalCenter), null, 0),
+          new ConstantFieldProposal<Integer>("Right", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight), null, 1)};
     }
     return m_horizontalAlignmentProposals;
   }

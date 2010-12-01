@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,8 +21,6 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.CompositeLong;
@@ -50,16 +48,14 @@ public class ClientNodePage extends AbstractPage {
   private ICachedTypeHierarchy m_desktopHierarchy;
 
   private final IScoutBundle m_clientProject;
-  private IType m_iClientSession;
-  private IType m_iDesktop;
+  private IType iClientSession = ScoutSdk.getType(RuntimeClasses.IClientSession);
+  private IType iDesktop = ScoutSdk.getType(RuntimeClasses.IDesktop);
 
   public ClientNodePage(AbstractPage parent, IScoutBundle clientProject) {
     setParent(parent);
     m_clientProject = clientProject;
     setName(getScoutResource().getSimpleName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_CLIENT));
-    m_iClientSession = ScoutSdk.getType(RuntimeClasses.IClientSession);
-    m_iDesktop = ScoutSdk.getType(RuntimeClasses.IDesktop);
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientBundle));
   }
 
   @Override
@@ -85,6 +81,12 @@ public class ClientNodePage extends AbstractPage {
   }
 
   @Override
+  public boolean isFolder() {
+    return true;
+
+  }
+
+  @Override
   public boolean isInitiallyLoaded() {
     return true;
   }
@@ -92,15 +94,15 @@ public class ClientNodePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_clientSessionHierarchy == null) {
-      m_clientSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(m_iClientSession);
+      m_clientSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iClientSession);
       m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     if (m_desktopHierarchy == null) {
-      m_desktopHierarchy = ScoutSdk.getPrimaryTypeHierarchy(m_iDesktop);
+      m_desktopHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iDesktop);
       m_desktopHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     // client session
-    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(m_iClientSession, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
     if (clientSessions.length > 1) {
       ScoutSdkUi.logWarning("more than one client session found.");
     }
@@ -111,7 +113,7 @@ public class ClientNodePage extends AbstractPage {
       new ClientSessionNodePage(this, clientSession);
     }
     // desktop
-    IType[] desktops = m_desktopHierarchy.getAllSubtypes(m_iDesktop, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
     if (desktops.length > 1) {
       ScoutSdkUi.logWarning("more than one desktop found.");
     }
@@ -137,17 +139,12 @@ public class ClientNodePage extends AbstractPage {
   }
 
   @Override
-  public boolean isFolder() {
-    return true;
-  }
-
-  @Override
   public void fillContextMenu(final IMenuManager manager) {
     super.fillContextMenu(manager);
     if (m_clientSessionHierarchy != null) {
       IType[] clientSessions = m_clientSessionHierarchy.getAllClasses(TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), null);
       if (clientSessions.length == 0) {
-        manager.add(new OperationAction(Texts.get("Action_newTypeX", "Client Session"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS),
+        manager.add(new OperationAction(Texts.get("Action_newTypeX", "Client Session"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientSessionAdd),
             new InstallJavaFileOperation("templates/client/src/ClientSession.java", "ClientSession.java", getScoutResource())));
       }
     }

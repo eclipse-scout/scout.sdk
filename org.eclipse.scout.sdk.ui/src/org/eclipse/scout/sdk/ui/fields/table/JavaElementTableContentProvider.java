@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -43,20 +43,20 @@ public class JavaElementTableContentProvider implements IStructuredContentProvid
         switch (((IJavaElement) element).getElementType()) {
           case IJavaElement.TYPE:
             if (((IType) element).isInterface()) {
-              img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_INTERFACE);
+              img = ScoutSdkUi.getImage(ScoutSdkUi.Interface);
             }
             else {
-              img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS);
+              img = ScoutSdkUi.getImage(ScoutSdkUi.Class);
             }
             break;
           case IJavaElement.METHOD:
-            img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_PUBLIC);
+            img = ScoutSdkUi.getImage(ScoutSdkUi.Public);
             break;
           case IJavaElement.FIELD:
-            img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_FIELD_PRIVATE);
+            img = ScoutSdkUi.getImage(ScoutSdkUi.FieldPrivate);
             break;
           default:
-            img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_DEFAULT);
+            img = ScoutSdkUi.getImage(ScoutSdkUi.Default);
             break;
         }
       }

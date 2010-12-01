@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,7 @@ public class CodeTypeTablePage extends AbstractPage {
   public CodeTypeTablePage(IPage parent) {
     setParent(parent);
     setName(Texts.get("EnumerationTablePage"));
-
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeTypes));
   }
 
   @Override
@@ -97,7 +97,7 @@ public class CodeTypeTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Codetpye"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD),
+    return new WizardAction(Texts.get("Action_newTypeX", "Codetpye"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeTypeAdd),
         new CodeTypeNewWizard(getScoutResource()));
   }
 

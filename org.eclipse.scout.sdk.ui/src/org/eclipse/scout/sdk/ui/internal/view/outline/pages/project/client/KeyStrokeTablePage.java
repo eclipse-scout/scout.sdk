@@ -4,19 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -40,6 +39,7 @@ public class KeyStrokeTablePage extends AbstractPage {
     m_declaringType = declaringType;
     setName(Texts.get("KeyStrokesTablePage"));
     setParent(parentPage);
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Keystrokes));
   }
 
   @Override
@@ -85,7 +85,7 @@ public class KeyStrokeTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Key stroke"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS), new KeyStrokeNewWizard(getDeclaringType()));
+    return new WizardAction(Texts.get("Action_newTypeX", "Key stroke"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.KeystrokeAdd), new KeyStrokeNewWizard(getDeclaringType()));
 
   }
 

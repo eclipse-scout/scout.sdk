@@ -19,7 +19,7 @@ public class JavaCodeFieldLabelProvider extends LabelProvider {
 
   @Override
   public Image getImage(Object element) {
-    return ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS);
+    return ScoutSdkUi.getImage(ScoutSdkUi.Class);
   }
 
   @Override

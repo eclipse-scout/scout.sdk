@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,6 +42,7 @@ public class CustomServicePackageNodePage extends AbstractPage {
     setParent(parent);
     m_packageContentListener = new PackageContentChangedListener(this, m_package);
     JavaCore.addElementChangedListener(m_packageContentListener);
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Package));
   }
 
   @Override
@@ -90,7 +91,7 @@ public class CustomServicePackageNodePage extends AbstractPage {
   @Override
   public Action createNewAction() {
     CustomServiceNewWizard wizard = new CustomServiceNewWizard(getScoutResource(), m_package);
-    return new WizardAction(Texts.get("Action_newTypeX", "Custom Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard);
+    return new WizardAction(Texts.get("Action_newTypeX", "Custom Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), wizard);
     /*
      * return new ProcessAction(Texts.get("Action_newTypeX", Texts.get("CustomServiceTablePage")), Icons.getDescriptor(Icons.IMG_TOOL_ADD),
      * new ServiceNewProcess(getBsiCaseProjectGroup(),

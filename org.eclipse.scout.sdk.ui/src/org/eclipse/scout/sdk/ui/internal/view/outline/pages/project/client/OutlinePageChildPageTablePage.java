@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,6 +48,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
     m_outlineType = outlineType;
     setParent(parent);
     setName("Child Pages");
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Outlines));
   }
 
   @Override
@@ -96,7 +97,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   public Action createNewAction() {
     PageNewWizard wizard = new PageNewWizard(getScoutResource());
     wizard.setHolderType(getOutlineType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard);
+    return new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageAdd), wizard);
 
   }
 
@@ -106,7 +107,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
     PageLinkWizard wizard = new PageLinkWizard(getScoutResource());
     wizard.setHolderType(getOutlineType());
     wizard.setHolderEnabled(false);
-    manager.add(new WizardAction("Add Page", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard));
+    manager.add(new WizardAction("Add Page", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), wizard));
   }
 
   public IType getOutlineType() {

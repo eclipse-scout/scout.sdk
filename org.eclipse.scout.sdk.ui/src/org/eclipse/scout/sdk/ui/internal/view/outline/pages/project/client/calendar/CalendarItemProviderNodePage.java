@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
@@ -25,6 +26,10 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * <h3>CalendarItemProviderNodePage</h3> ...
  */
 public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
+
+  public CalendarItemProviderNodePage() {
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProvider));
+  }
 
   /**
    * client bundle
@@ -54,6 +59,7 @@ public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
   public Action createDeleteAction() {
     MemberListDeleteAction action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell());
     action.setTypesToDelete(new IMember[]{getType()});
+    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviderRemove));
     return action;
   }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,7 +44,7 @@ public class FormNodePage extends AbstractScoutTypePage {
 
     setParent(parent);
     setType(type);
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_FORM));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Form));
   }
 
   @Override
@@ -95,8 +95,8 @@ public class FormNodePage extends AbstractScoutTypePage {
   public void fillContextMenu(IMenuManager manager) {
     super.fillContextMenu(manager);
     manager.add(new Separator());
-    manager.add(new OperationAction("Wellform Form", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_LOADING), new WellformScoutTypeOperation(getType(), true)));
-    manager.add(new OperationAction("Update Form Data", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_LOADING), new FormDataUpdateOperation(getType())));
+    manager.add(new OperationAction("Wellform Form", null, new WellformScoutTypeOperation(getType(), true)));
+    manager.add(new OperationAction("Update Form Data", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new FormDataUpdateOperation(getType())));
   }
 
   @Override

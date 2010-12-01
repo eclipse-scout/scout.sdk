@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -40,6 +40,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public AbstractBoxNodePage() {
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Groupbox));
   }
 
   @Override
@@ -81,7 +82,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
 
   @Override
   public void fillContextMenu(IMenuManager manager) {
-    manager.add(new WizardAction(Texts.get("Action_newTypeX", "Form Field"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_FIELD_DEFAULT_ADD),
+    manager.add(new WizardAction(Texts.get("Action_newTypeX", "Form Field"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldAdd),
         new FormFieldNewWizard(getType())));
     manager.add(new Separator());
     super.fillContextMenu(manager);

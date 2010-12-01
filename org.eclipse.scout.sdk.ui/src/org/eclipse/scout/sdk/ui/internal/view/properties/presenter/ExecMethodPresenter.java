@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,7 +48,7 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
   protected void fillButtonArea(Composite buttonArea) {
     super.fillButtonArea(buttonArea);
     m_addButton = getToolkit().createImageHyperlink(buttonArea, SWT.PUSH);
-    m_addButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_TOOL_ADD));
+    m_addButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolAdd));
     m_addButton.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {

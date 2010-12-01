@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -71,10 +71,10 @@ public class CheckableTree extends Composite {
   private ITreeNode m_rootNode;
   private HashMap<ITreeNode, Rectangle> m_checkableNodeBounds = new HashMap<ITreeNode, Rectangle>();
   private HashSet<ITreeNode> m_checkedNodes = new HashSet<ITreeNode>();
-  private Image m_imgCheckboxYes = ScoutSdkUi.getImage(ScoutSdkUi.IMG_CHECKBOX_YES);
-  private Image m_imgCheckboxNo = ScoutSdkUi.getImage(ScoutSdkUi.IMG_CHECKBOX_NO);
-  private Image m_imgCheckboxYesDisabled = ScoutSdkUi.getImage(ScoutSdkUi.IMG_CHECKBOX_YES_DISABLED);
-  private Image m_imgCheckboxNoDisabled = ScoutSdkUi.getImage(ScoutSdkUi.IMG_CHECKBOX_NO_DISABLED);
+  private Image m_imgCheckboxYes = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYes);
+  private Image m_imgCheckboxNo = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNo);
+  private Image m_imgCheckboxYesDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYesDisabled);
+  private Image m_imgCheckboxNoDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNoDisabled);
   private EventListenerList m_eventListeners = new EventListenerList();
   private ArrayList<ITreeNodeFilter> m_filters = new ArrayList<ITreeNodeFilter>();
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,7 +37,7 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public ComposerFieldNodePage() {
-
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerField));
   }
 
   @Override
@@ -81,7 +81,7 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
     super.fillContextMenu(manager);
     manager.add(new Separator());
     if (!m_hasTree) {
-      manager.add(new WizardAction("Override default tree...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_FIELD_DEFAULT_ADD), new ComposerFieldOverrideTreeWizard(getType())));
+      manager.add(new WizardAction("Override default tree...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd), new ComposerFieldOverrideTreeWizard(getType())));
     }
   }
 

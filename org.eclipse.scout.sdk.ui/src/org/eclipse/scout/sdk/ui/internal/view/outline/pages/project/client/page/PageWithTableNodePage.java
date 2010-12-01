@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -53,7 +53,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
   public PageWithTableNodePage(IPage parent, IType type) {
     setParent(parent);
     setType(type);
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_PAGE_WITH_TABLE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageTable));
   }
 
   @Override
@@ -111,11 +111,11 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
     super.fillContextMenu(manager);
     if (!TypeUtility.exists(TypeUtility.getMethod(getType(), METHOD_EXEC_CREATE_CHILD_PAGE))) {
       PageNewWizard wizard = new PageNewWizard(getScoutResource());
-      manager.add(new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard));
+      manager.add(new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageAdd), wizard));
       PageLinkWizard linkWizard = new PageLinkWizard(getScoutResource());
       linkWizard.setHolderType(getType());
       linkWizard.setHolderEnabled(false);
-      manager.add(new WizardAction("Add Page...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), linkWizard));
+      manager.add(new WizardAction("Add Page...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
     }
 
     manager.add(new Separator());
@@ -130,7 +130,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
         ScoutSdkUi.logWarning("could not parse nls entry for method '" + titleMethod.getElementName() + "'.", e);
       }
     }
-    manager.add(new WizardAction("Create Search Form", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard));
+    manager.add(new WizardAction("Create Search Form", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchFormAdd), wizard));
   }
 
   private class P_MethodChangedListener extends ElementChangedListenerEx {

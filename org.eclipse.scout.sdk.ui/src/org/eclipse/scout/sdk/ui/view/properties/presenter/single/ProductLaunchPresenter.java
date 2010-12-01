@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -34,6 +34,7 @@ import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
@@ -146,13 +147,13 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     Label l = getToolkit().createLabel(m_mainGroup, "");
     switch (getProductType()) {
       case IScoutBundle.BUNDLE_SERVER:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_LAUNCHER_SERVER));
+        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherServer));
         break;
       case IScoutBundle.BUNDLE_UI_SWING:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_LAUNCHER_SWING));
+        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwing));
         break;
       case IScoutBundle.BUNDLE_UI_SWT:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_LAUNCHER_SWT));
+        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwt));
         break;
     }
     Control linkPart = createLinkPart(m_mainGroup);
@@ -185,7 +186,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       if (path == null) {
         path = info.getPath(null);
       }
-      if (path != null) {
+      if (!StringUtility.isNullOrEmpty(path)) {
         IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
         model.addGlobalLink(new FileOpenLink(configIniFile, 20, EditorsUI.DEFAULT_TEXT_EDITOR_ID));
       }
@@ -200,7 +201,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   protected Control createActionPart(Composite parent) {
     Composite container = getToolkit().createComposite(parent);
     m_runLink = getToolkit().createImageHyperlink(container, SWT.NONE);
-    m_runLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_PRODUCT_RUN));
+    m_runLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolRun));
     m_runLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
@@ -208,7 +209,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       }
     });
     m_debugLink = getToolkit().createImageHyperlink(container, SWT.NONE);
-    m_debugLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_PRODUCT_DEBUG));
+    m_debugLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDebug));
     m_debugLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
@@ -216,7 +217,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       }
     });
     m_stopLink = getToolkit().createImageHyperlink(container, SWT.NONE);
-    m_stopLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_PRODUCT_STOP));
+    m_stopLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolStop));
     m_stopLink.setEnabled(false);
     m_stopLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override

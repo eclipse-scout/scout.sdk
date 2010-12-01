@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -43,6 +43,7 @@ public class ProcessServiceTablePage extends AbstractPage {
     m_packageContentListener = new PackageContentChangedListener(this, m_processServicePackage);
     JavaCore.addElementChangedListener(m_packageContentListener);
     setName(Texts.get("ProcessServiceTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Services));
   }
 
   @Override
@@ -103,7 +104,7 @@ public class ProcessServiceTablePage extends AbstractPage {
   @Override
   public Action createNewAction() {
     ProcessServiceNewWizard wizard = new ProcessServiceNewWizard(getScoutResource());
-    return new WizardAction(Texts.get("Action_newTypeX", "Process Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD),
+    return new WizardAction(Texts.get("Action_newTypeX", "Process Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd),
         wizard);
   }
 

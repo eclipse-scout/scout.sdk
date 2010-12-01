@@ -46,7 +46,7 @@ public class SiblingProposal implements IContentProposalEx, ITypeSibling {
   }
 
   public Image getImage(boolean selected, boolean expertMode) {
-    return ScoutSdkUi.getImage(ScoutSdkUi.IMG_FIELD_DEFAULT);
+    return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
   }
 
   public String getLabel(boolean selected, boolean expertMode) {

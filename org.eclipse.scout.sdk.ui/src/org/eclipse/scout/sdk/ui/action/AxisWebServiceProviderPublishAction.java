@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,7 +24,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.ScoutSdk;
@@ -41,7 +40,6 @@ import org.eclipse.scout.sdk.util.ApacheAxisUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.ISharedImages;
 
 public class AxisWebServiceProviderPublishAction extends Action {
 
@@ -54,7 +52,7 @@ public class AxisWebServiceProviderPublishAction extends Action {
     m_implementationType = implementationType;
     m_interfaceType = interfaceType;
     setText("Publish as WebService...");
-    setImageDescriptor(JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_DEF_VIEW));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd));
   }
 
   @Override

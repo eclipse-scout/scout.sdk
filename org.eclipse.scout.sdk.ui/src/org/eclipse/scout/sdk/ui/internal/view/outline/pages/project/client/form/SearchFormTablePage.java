@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,6 +39,7 @@ public class SearchFormTablePage extends AbstractPage {
   public SearchFormTablePage(AbstractPage parent) {
     setParent(parent);
     setName(Texts.get("SearchFormTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchForms));
   }
 
   @Override
@@ -84,7 +85,8 @@ public class SearchFormTablePage extends AbstractPage {
     }
     IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType searchForm : searchForms) {
-      new FormNodePage(this, searchForm);
+      FormNodePage form = new FormNodePage(this, searchForm);
+      form.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchForm));
     }
   }
 
@@ -103,7 +105,7 @@ public class SearchFormTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Search Form"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD),
+    return new WizardAction(Texts.get("Action_newTypeX", "Search Form"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchFormAdd),
         new SearchFormNewWizard(getScoutResource()));
   }
 

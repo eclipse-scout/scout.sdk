@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,6 +37,7 @@ public class ClientLookupCallTablePage extends AbstractPage {
   public ClientLookupCallTablePage(AbstractPage parent) {
     setParent(parent);
     setName(Texts.get("LocalLookupCallTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LookupCalls));
   }
 
   @Override
@@ -95,6 +96,6 @@ public class ClientLookupCallTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction("new Local LookupCall", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), new LocalLookupCallNewWizard(getScoutResource()));
+    return new WizardAction("new Local LookupCall", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LookupCallAdd), new LocalLookupCallNewWizard(getScoutResource()));
   }
 }

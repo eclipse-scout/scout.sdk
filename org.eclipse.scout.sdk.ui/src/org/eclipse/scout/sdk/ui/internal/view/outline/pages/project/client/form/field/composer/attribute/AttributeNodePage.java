@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -32,6 +33,7 @@ public class AttributeNodePage extends AbstractScoutTypePage {
   public AttributeNodePage(IPage parentPage, IType declaringType) {
     setType(declaringType);
     setParent(parentPage);
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerAttribute));
   }
 
   @Override
@@ -47,6 +49,8 @@ public class AttributeNodePage extends AbstractScoutTypePage {
   @Override
   public Action createDeleteAction() {
     IDeleteOperation op = new TypeDeleteOperation(getType());
-    return new DeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell(), op);
+    DeleteAction deleteAction = new DeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell(), op);
+    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerAttributeRemove));
+    return deleteAction;
   }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -34,6 +34,7 @@ public class PermissionTablePage extends AbstractPage {
   public PermissionTablePage(AbstractPage parent) {
     setParent(parent);
     setName(Texts.get("PermissionTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Permissions));
 
   }
 
@@ -88,7 +89,7 @@ public class PermissionTablePage extends AbstractPage {
   @Override
   public Action createNewAction() {
     PermissionNewWizard newWizard = new PermissionNewWizard(getScoutResource());
-    return new WizardAction(Texts.get("Action_newTypeX", "Permission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_PERMISSION_ADD), newWizard);
+    return new WizardAction(Texts.get("Action_newTypeX", "Permission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PermissionAdd), newWizard);
   }
 
 }

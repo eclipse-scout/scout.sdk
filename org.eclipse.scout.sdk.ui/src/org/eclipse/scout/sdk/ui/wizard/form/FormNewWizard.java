@@ -96,42 +96,42 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
 
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(getClientBundle()));
     // form
-    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_FORM, "Form", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_FORM);
+    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_FORM, "Form", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_FORM);
     formNode.setEnabled(false);
     // form buttons
-    TreeUtility.createNode(formNode, TYPE_FORM_BUTTON_OK, "Ok Button", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_FORM_BUTTON_OK);
-    TreeUtility.createNode(formNode, TYPE_FORM_BUTTON_CANCEL, "Cancel Button", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_FORM_BUTTON_CANCEL);
+    TreeUtility.createNode(formNode, TYPE_FORM_BUTTON_OK, "Ok Button", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_FORM_BUTTON_OK);
+    TreeUtility.createNode(formNode, TYPE_FORM_BUTTON_CANCEL, "Cancel Button", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_FORM_BUTTON_CANCEL);
 
     // newHandler
-    TreeUtility.createNode(formNode, TYPE_HANDLER_NEW, "NewHandler", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_HANDLER_NEW);
+    TreeUtility.createNode(formNode, TYPE_HANDLER_NEW, "NewHandler", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_HANDLER_NEW);
     // modifyHandler
-    TreeUtility.createNode(formNode, TYPE_HANDLER_MODIFY, "ModifyHandler", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_HANDLER_MODIFY);
+    TreeUtility.createNode(formNode, TYPE_HANDLER_MODIFY, "ModifyHandler", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_HANDLER_MODIFY);
     if (sharedBundle != null && serverBundle != null) {
       // service client reg
-      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImage(ScoutSdkUi.IMG_PUBLIC), TYPE_SERVICE_REG_CLIENT);
+      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
     }
 
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // formData
-      TreeUtility.createNode(sharedNode, TYPE_FORM_DATA, "FormData", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_FORM_DATA);
+      TreeUtility.createNode(sharedNode, TYPE_FORM_DATA, "FormData", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_FORM_DATA);
       // permission create
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, "CreatePermission", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_PERMISSION_CREATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, "CreatePermission", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_PERMISSION_CREATE);
       // permission read
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, "ReadPermission", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_PERMISSION_READ);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, "ReadPermission", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_PERMISSION_READ);
       // permission update
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, "UpdatePermission", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_PERMISSION_UPDATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, "UpdatePermission", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_PERMISSION_UPDATE);
       if (serverBundle != null) {
         // service interface
-        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImage(ScoutSdkUi.IMG_INTERFACE), TYPE_SERVICE_INTERFACE);
+        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImage(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
       }
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_SERVICE_IMPLEMENTATION);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.IMG_PUBLIC), TYPE_SERVICE_REG_SERVER);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
     }
     return rootNode;
   }

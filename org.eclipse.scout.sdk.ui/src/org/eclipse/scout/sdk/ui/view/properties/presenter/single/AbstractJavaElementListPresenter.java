@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -129,7 +129,7 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
   private Control createControlArea(Composite parent) {
     Composite pane = getToolkit().createComposite(parent);
     m_addButton = getToolkit().createButton(pane, "", SWT.PUSH);
-    m_addButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_TOOL_ADD));
+    m_addButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolAdd));
     m_addButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -138,7 +138,7 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
     });
     m_addButton.setEnabled(false);
     m_removeButton = getToolkit().createButton(pane, "", SWT.PUSH);
-    m_removeButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_TOOL_DELETE));
+    m_removeButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolRemove));
     m_removeButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

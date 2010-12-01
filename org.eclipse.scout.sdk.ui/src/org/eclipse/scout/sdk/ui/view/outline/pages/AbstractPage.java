@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,10 +51,10 @@ public abstract class AbstractPage implements IPage {
   public AbstractPage() {
     // m_name = "...";
     if (isFolder()) {
-      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_FOLDER);
+      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FolderOpen);
     }
     else {
-      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_DEFAULT);
+      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default);
     }
     m_pageDirtyListener = new PageDirtyListener(this);
     m_children = new ArrayList<IPage>();

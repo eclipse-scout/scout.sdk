@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -52,6 +52,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
     m_nodePageType = nodePageType;
     setParent(parent);
     setName("Child Pages");
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Pages));
   }
 
   @Override
@@ -105,7 +106,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
   public Action createNewAction() {
     PageNewWizard wizard = new PageNewWizard(getScoutResource());
     wizard.setHolderType(getNodePageType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard);
+    return new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageAdd), wizard);
   }
 
   @Override
@@ -114,7 +115,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
     PageLinkWizard linkWizard = new PageLinkWizard(getScoutResource());
     linkWizard.setHolderType(getNodePageType());
     linkWizard.setHolderEnabled(false);
-    manager.add(new WizardAction("Add Page", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), linkWizard));
+    manager.add(new WizardAction("Add Page", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
     // TODO LINK Action
     // manager.add(new ProcessAction("Add Page", SDEUI.getImageDescriptor(SDEUI.IMG_TOOL_ADD),
     // new LinkChildPageOfPageWithNodesProcess(getBsiCaseProjectGroup(), getNodePageType())));

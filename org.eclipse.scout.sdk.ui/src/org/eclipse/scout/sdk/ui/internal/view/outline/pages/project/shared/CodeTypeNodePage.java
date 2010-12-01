@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,7 +37,7 @@ public class CodeTypeNodePage extends AbstractScoutTypePage {
     setType(type);
 
     setName(ScoutSourceUtilities.getTranslatedMethodStringValue(getType(), "getConfiguredText"));
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_CODE_TYPE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeType));
   }
 
   @Override
@@ -84,7 +84,9 @@ public class CodeTypeNodePage extends AbstractScoutTypePage {
   @Override
   public Action createDeleteAction() {
     MemberListDeleteAction typeDeleteAction = new MemberListDeleteAction("Delete", ScoutSdkUi.getShell());
+    typeDeleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeTypeRemove));
     typeDeleteAction.addMemberToDelete(getType());
+
     return typeDeleteAction;
   }
 
@@ -92,7 +94,7 @@ public class CodeTypeNodePage extends AbstractScoutTypePage {
   public Action createNewAction() {
     CodeNewWizard wizard = new CodeNewWizard();
     wizard.initWizard(getType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Code"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard);
+    return new WizardAction(Texts.get("Action_newTypeX", "Code"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeAdd), wizard);
   }
 
 }

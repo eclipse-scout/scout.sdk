@@ -30,11 +30,11 @@ public class TypeOpenLink extends AbstractLink {
   public TypeOpenLink(IType type) {
     super(type.getElementName());
     m_type = type;
-    Image img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS);
+    Image img = ScoutSdkUi.getImage(ScoutSdkUi.Class);
 
     try {
       if (Flags.isInterface(m_type.getFlags())) {
-        img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_INTERFACE);
+        img = ScoutSdkUi.getImage(ScoutSdkUi.Interface);
       }
     }
     catch (JavaModelException e) {

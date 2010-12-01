@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -80,7 +80,7 @@ public class InvisibleRootNodePage extends AbstractPage {
   @Override
   public void fillContextMenu(IMenuManager manager) {
     super.fillContextMenu(manager);
-    manager.add(new WizardAction("Import Plugin...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), new BundleImportWizard()));
+    manager.add(new WizardAction("Import Plugin...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd), new BundleImportWizard()));
     manager.add(new ScoutProjectNewAction(getOutlineView().getViewSite().getShell()));
 
   }

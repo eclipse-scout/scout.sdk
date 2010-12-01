@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -47,6 +48,7 @@ public class ToolButtonTablePage extends AbstractPage {
     m_toolbuttons = toolbuttons;
     setName(Texts.get("ToolTablePage"));
     setParent(parentPage);
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Buttons));
   }
 
   @Override

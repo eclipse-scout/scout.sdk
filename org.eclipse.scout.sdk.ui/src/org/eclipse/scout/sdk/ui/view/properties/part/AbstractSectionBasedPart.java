@@ -268,13 +268,13 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
         Image img = null;
         switch (status.getSeverity()) {
           case IStatus.ERROR:
-            img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_ERROR);
+            img = ScoutSdkUi.getImage(ScoutSdkUi.StatusError);
             break;
           case IStatus.WARNING:
-            img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_WARNING);
+            img = ScoutSdkUi.getImage(ScoutSdkUi.StatusWarning);
             break;
           case IStatus.INFO:
-            img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_INFO);
+            img = ScoutSdkUi.getImage(ScoutSdkUi.StatusInfo);
             break;
         }
         m_statusIcon.setImage(img);

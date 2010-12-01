@@ -195,7 +195,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
 
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
-        return ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS);
+        return ScoutSdkUi.getImage(ScoutSdkUi.Class);
       }
       return null;
     }

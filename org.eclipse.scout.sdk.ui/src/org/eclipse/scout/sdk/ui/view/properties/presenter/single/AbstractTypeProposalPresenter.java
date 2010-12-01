@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
 
   private String m_labelMethodName;
   private boolean m_includeNullProposal;
-  private static final JavaClassProposal NULL_PROPOSAL = new JavaClassProposal(ScoutIdeProperties.NULL, ScoutSdkUi.getImage(ScoutSdkUi.IMG_DEFAULT), null);
+  private static final JavaClassProposal NULL_PROPOSAL = new JavaClassProposal(ScoutIdeProperties.NULL, ScoutSdkUi.getImage(ScoutSdkUi.Default), null);
 
   public AbstractTypeProposalPresenter(FormToolkit toolkit, Composite parent, String labelMethodName, boolean includeNullProposal) {
     super(toolkit, parent);
@@ -56,7 +56,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
     ArrayList<JavaClassProposal> proposals = new ArrayList<JavaClassProposal>();
     TuningUtility.startTimer();
     for (IType t : provideScoutTypes(method.getType().getJavaProject(), method.getType())) {
-      proposals.add(new JavaClassProposal(ScoutProposalUtility.getFieldName(t, m_labelMethodName), ScoutSdkUi.getImage(ScoutSdkUi.IMG_DEFAULT), t));
+      proposals.add(new JavaClassProposal(ScoutProposalUtility.getFieldName(t, m_labelMethodName), ScoutSdkUi.getImage(ScoutSdkUi.Default), t));
     }
     if (m_includeNullProposal) {
       proposals.add(NULL_PROPOSAL);
@@ -116,7 +116,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
     if (getCurrentSourceValue() != null) {
       final IType t = getCurrentSourceValue().getJavaClass();
       if (t != null) {
-        manager.add(new Action("Go to " + t.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_INFO)) {
+        manager.add(new Action("Go to " + t.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
           @Override
           public void run() {
             showJavaElementInEditor(t);

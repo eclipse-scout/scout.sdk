@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,7 +29,7 @@ public class PermissionNodePage extends AbstractScoutTypePage {
     // String name=type.getSimpleName();
     // setName(name.substring(0, name.lastIndexOf("Permission")));
 
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_PERMISSION));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Permission));
   }
 
   @Override
@@ -50,7 +50,7 @@ public class PermissionNodePage extends AbstractScoutTypePage {
   @Override
   public Action createDeleteAction() {
     DeleteAction action = new DeleteAction("Delete...", ScoutSdkUi.getShell(), new TypeDeleteOperation(getType()));
-    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_PERMISSION_DELETE));
+    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PermissionRemove));
     return action;
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,7 +32,6 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -46,7 +45,7 @@ import org.osgi.framework.Version;
 /**
  * The activator class controls the plug-in life cycle
  */
-public class ScoutSdkUi extends AbstractUIPlugin {
+public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ui";
 
@@ -62,84 +61,83 @@ public class ScoutSdkUi extends AbstractUIPlugin {
   public static final String COLOR_INACTIVE_FOREGROUND = "inactiveForeground";
 
   // IMAGES
-  public static final String IMG_TOOL_ADD = "tool/add.gif";
-  public static final String IMG_TOOL_DELETE = "tool/remove.gif";
-  public static final String IMG_TOOL_DOWN = "tool/down.gif";
-  public static final String IMG_TOOL_LOADING = "tool/tool_loading.gif";
-  public static final String IMG_TOOL_PROGRESS = "tool/progress_monitor.gif";
-  public static final String IMG_TOOL_SYNCHONIZE = "tool/synced.gif";
-
-  public static final String IMG_DEFAULT = "build_var_obj.gif";
-  public static final String IMG_TYPE_SEPARATOR = "type_separator.gif";
-  public static final String IMG_FOLDER = "folder";
-  public static final String IMG_FILE = "file";
-  public static final String IMG_SOURCE_FILE = "sourceEditor.gif";
-  public static final String IMG_CLASS = "obj_class";
-  public static final String IMG_INTERFACE = "obj_interface";
-  public static final String IMG_PUBLIC = "obj_public";
-  public static final String IMG_FIELD_PRIVATE = "field_private";
-  public static final String IMG_FIELD_PROTECTED = "field_protected";
-  public static final String IMG_FIELD_PUBLIC = "field_public";
-  public static final String IMG_TOOL_RENAME = "field_rename";
-  public static final String IMG_DIALOG_WIZARD = "dialog_wizard";
-
-  public static final String IMG_CASE_PROJECT = "cake.png";
-  public static final String IMG_UI_BUNDLE = "plugin.png";
-  public static final String IMG_CLIENT = "plugin.png";
-  public static final String IMG_SHARED = "plugin.png";
-  public static final String IMG_SERVER = "plugin.png";
-  public static final String IMG_ICONS = "javaassist_co.gif";
-  public static final String IMG_FORM = "window_dialog.png";
-  public static final String IMG_FORM_HANDLER = IMG_DEFAULT;
-  public static final String IMG_PERMISSION = "key.png";
-  public static final String IMG_PERMISSION_ADD = "key_add.png";
-  public static final String IMG_PERMISSION_DELETE = "key_delete.png";
-  public static final String IMG_CODE_TYPE = IMG_DEFAULT;
-
-  public static final String IMG_FIELD_GROUP_BOX = "bricks.png";
-  public static final String IMG_FIELD_DEFAULT = "brick.png";
-  public static final String IMG_FIELD_DEFAULT_ADD = "brick_add.png";
-  public static final String IMG_FIELD_DEFAULT_DELETE = "brick_delete.png";
-  public static final String IMG_RANGEBOX_FROM = "navigation_back.gif";
-  public static final String IMG_RANGEBOX_TO = "navigation_forward.gif";
-  public static final String IMG_BUTTON_STYLE = IMG_DEFAULT;
-  public static final String IMG_OUTLINE = "layout_co.gif";
-
-  public static final String IMG_SMART_FIELD = "magnifier.png";
-  public static final String IMG_DATE_FIELD = "date_time.png";
-  public static final String IMG_TABLE_FIELD = "tablenode.gif";
-  public static final String IMG_COLUMN = "add_column.gif";
-  public static final String IMG_SERVICE = "connect_alias.gif";
-  public static final String IMG_SERVICE_DISABLED = "serviceDisabled";
-  public static final String IMG_SERVICE_METHOD = IMG_DEFAULT;
-  public static final String IMG_LAUNCHER_SWING = "swingLauncher.gif";
-  public static final String IMG_LAUNCHER_SWT = "swtLauncher.gif";
-  public static final String IMG_LAUNCHER_SERVER = "serverLauncher.gif";
-
-  public static final String IMG_WARNING = "warning.gif";
-  public static final String IMG_ERROR = "error.gif";
-  public static final String IMG_INFO = "info.gif";
-  public static final String IMG_FIND = "search.gif";
-  public static final String IMG_TEXT_CODE = "text.gif";
-  public static final String IMG_CHOOSE = "magnifier.png";
-  public static final String IMG_TABLE = "tablenode.gif";
-  public static final String IMG_TREE = "tree_mode.gif";
-  public static final String IMG_CONTENT_ASSIST = "content_assist_cue.gif";
-  public static final String IMG_PAGE_WITH_TABLE = "copy_r_co.gif";
-  public static final String IMG_PAGE_WITH_NODES = IMG_PAGE_WITH_TABLE;
-
-  public static final String IMG_CHECKBOX_YES = "output_yes.gif";
-  public static final String IMG_CHECKBOX_NO = "output_no.gif";
-  public static final String IMG_CHECKBOX_NO_DISABLED = "output_no_disabled";
-  public static final String IMG_CHECKBOX_YES_DISABLED = "output_yes_disabled";
-
-  public static final String IMG_KEYGROUP = "keygroups_obj.gif";
-  public static final String IMG_TOOL_EDIT = "tool/usereditor.gif";
-  public static final String IMG_PRODUCT_RUN = "tool/run_exc.gif";
-  public static final String IMG_PRODUCT_DEBUG = "tool/debug_exc.gif";
-  public static final String IMG_PRODUCT_STOP = "tool/stop.gif";
-  public static final String IMG_PACKAGE = "package_obj.gif";
-  public static final String IMG_PACKAGE_OBJECT_DISABLED = "package_objDisabled";
+//  public static final String IMG_TOOL_ADD = "tool/add.gif";
+//  public static final String IMG_TOOL_DELETE = "tool/remove.gif";
+//  public static final String IMG_TOOL_DOWN = "tool/down.gif";
+//  public static final String IMG_TOOL_LOADING = "tool/tool_loading.gif";
+//  public static final String IMG_TOOL_PROGRESS = "tool/progress_monitor.gif";
+//  public static final String IMG_TOOL_SYNCHONIZE = "tool/synced.gif";
+//
+//  public static final String IMG_DEFAULT = "build_var_obj.gif";
+//  public static final String IMG_TYPE_SEPARATOR = "type_separator.gif";
+//  public static final String IMG_FOLDER = "folder";
+//  public static final String IMG_FILE = "file";
+//  public static final String IMG_SOURCE_FILE = "sourceEditor.gif";
+//  public static final String IMG_CLASS = "obj_class";
+//  public static final String IMG_INTERFACE = "obj_interface";
+//  public static final String IMG_PUBLIC = "obj_public";
+//  public static final String IMG_FIELD_PRIVATE = "field_private";
+//  public static final String IMG_FIELD_PROTECTED = "field_protected";
+//  public static final String IMG_FIELD_PUBLIC = "field_public";
+//  public static final String IMG_TOOL_RENAME = "field_rename";
+//  public static final String IMG_DIALOG_WIZARD = "dialog_wizard";
+//
+//  public static final String IMG_CASE_PROJECT = "cake.png";
+//  public static final String IMG_UI_BUNDLE = "plugin.png";
+//  public static final String IMG_CLIENT = "plugin.png";
+//  public static final String IMG_SHARED = "plugin.png";
+//  public static final String IMG_SERVER = "plugin.png";
+//  public static final String IMG_ICONS = "javaassist_co.gif";
+//  public static final String IMG_FORM = "window_dialog.png";
+//  public static final String IMG_FORM_HANDLER = IMG_DEFAULT;
+//  public static final String IMG_PERMISSION = "key.png";
+//  public static final String IMG_PERMISSION_ADD = "key_add.png";
+//  public static final String IMG_PERMISSION_DELETE = "key_delete.png";
+//  public static final String IMG_CODE_TYPE = IMG_DEFAULT;
+//
+//  public static final String IMG_FIELD_GROUP_BOX = "bricks.png";
+//  public static final String IMG_FIELD_DEFAULT = "brick.png";
+//  public static final String IMG_FIELD_DEFAULT_ADD = "brick_add.png";
+//  public static final String IMG_FIELD_DEFAULT_DELETE = "brick_delete.png";
+//  public static final String IMG_RANGEBOX_FROM = "navigation_back.gif";
+//  public static final String IMG_RANGEBOX_TO = "navigation_forward.gif";
+//  public static final String IMG_OUTLINE = "layout_co.gif";
+//
+//  public static final String IMG_SMART_FIELD = "magnifier.png";
+//  public static final String IMG_DATE_FIELD = "date_time.png";
+//  public static final String IMG_TABLE_FIELD = "tablenode.gif";
+//  public static final String IMG_COLUMN = "add_column.gif";
+//  public static final String IMG_SERVICE = "connect_alias.gif";
+//  public static final String IMG_SERVICE_DISABLED = "serviceDisabled";
+//  public static final String IMG_SERVICE_METHOD = IMG_DEFAULT;
+//  public static final String IMG_LAUNCHER_SWING = "swingLauncher.gif";
+//  public static final String IMG_LAUNCHER_SWT = "swtLauncher.gif";
+//  public static final String IMG_LAUNCHER_SERVER = "serverLauncher.gif";
+//
+//  public static final String IMG_WARNING = "warning.gif";
+//  public static final String IMG_ERROR = "error.gif";
+//  public static final String IMG_INFO = "info.gif";
+//  public static final String IMG_FIND = "search.gif";
+//  public static final String IMG_TEXT_CODE = "text.gif";
+//  public static final String IMG_CHOOSE = "magnifier.png";
+//  public static final String IMG_TABLE = "tablenode.gif";
+//  public static final String IMG_TREE = "tree_mode.gif";
+//  public static final String IMG_CONTENT_ASSIST = "content_assist_cue.gif";
+//  public static final String IMG_PAGE_WITH_TABLE = "copy_r_co.gif";
+//  public static final String IMG_PAGE_WITH_NODES = IMG_PAGE_WITH_TABLE;
+//
+//  public static final String IMG_CHECKBOX_YES = "output_yes.gif";
+//  public static final String IMG_CHECKBOX_NO = "output_no.gif";
+//  public static final String IMG_CHECKBOX_NO_DISABLED = "output_no_disabled";
+//  public static final String IMG_CHECKBOX_YES_DISABLED = "output_yes_disabled";
+//
+//  public static final String IMG_KEYGROUP = "keygroups_obj.gif";
+//  public static final String IMG_TOOL_EDIT = "tool/usereditor.gif";
+//  public static final String IMG_PRODUCT_RUN = "tool/run_exc.gif";
+//  public static final String IMG_PRODUCT_DEBUG = "tool/debug_exc.gif";
+//  public static final String IMG_PRODUCT_STOP = "tool/stop.gif";
+//  public static final String IMG_PACKAGE = "package_obj.gif";
+//  public static final String IMG_PACKAGE_OBJECT_DISABLED = "package_objDisabled";
 
   private ColorRegistry m_colorRegistry;
 
@@ -351,25 +349,10 @@ public class ScoutSdkUi extends AbstractUIPlugin {
 
   @Override
   protected void initializeImageRegistry(org.eclipse.jface.resource.ImageRegistry reg) {
-    org.eclipse.jdt.ui.ISharedImages javaImages = JavaUI.getSharedImages();
-    ISharedImages workbenchImages = getWorkbench().getSharedImages();
-    reg.put(IMG_DIALOG_WIZARD, workbenchImages.getImageDescriptor(ISharedImages.IMG_TOOL_NEW_WIZARD));
-    reg.put(IMG_FOLDER, workbenchImages.getImageDescriptor(ISharedImages.IMG_OBJ_FOLDER));
-    reg.put(IMG_FILE, workbenchImages.getImageDescriptor(ISharedImages.IMG_OBJ_FILE));
 
-    ImageDescriptor imgDesc = ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + IMG_PACKAGE);
-    reg.put(IMG_PACKAGE_OBJECT_DISABLED, ImageDescriptor.createWithFlags(imgDesc, SWT.IMAGE_DISABLE));
+    reg.put(CheckboxYesDisabled, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + CheckboxYes), SWT.IMAGE_DISABLE));
+    reg.put(CheckboxNoDisabled, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + CheckboxNo), SWT.IMAGE_DISABLE));
 
-    reg.put(IMG_CLASS, javaImages.getImageDescriptor(org.eclipse.jdt.ui.ISharedImages.IMG_OBJS_CLASS));
-    reg.put(IMG_INTERFACE, javaImages.getImageDescriptor(org.eclipse.jdt.ui.ISharedImages.IMG_OBJS_INTERFACE));
-    reg.put(IMG_FIELD_PRIVATE, javaImages.getImageDescriptor(org.eclipse.jdt.ui.ISharedImages.IMG_FIELD_PRIVATE));
-    reg.put(IMG_FIELD_PROTECTED, javaImages.getImageDescriptor(org.eclipse.jdt.ui.ISharedImages.IMG_FIELD_PROTECTED));
-    reg.put(IMG_FIELD_PUBLIC, javaImages.getImageDescriptor(org.eclipse.jdt.ui.ISharedImages.IMG_FIELD_PUBLIC));
-    reg.put(IMG_PUBLIC, javaImages.getImageDescriptor(org.eclipse.jdt.ui.ISharedImages.IMG_OBJS_PUBLIC));
-    reg.put(IMG_CHECKBOX_NO_DISABLED, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + IMG_CHECKBOX_NO), SWT.IMAGE_DISABLE));
-    reg.put(IMG_CHECKBOX_YES_DISABLED, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + IMG_CHECKBOX_YES), SWT.IMAGE_DISABLE));
-
-    reg.put(IMG_SERVICE_DISABLED, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + IMG_SERVICE), SWT.IMAGE_DISABLE));
   }
 
   @Override

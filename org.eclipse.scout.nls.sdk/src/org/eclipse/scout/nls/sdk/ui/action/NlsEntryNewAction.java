@@ -4,14 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.ui.action;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsEntryNewDialog;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
@@ -29,17 +28,14 @@ public class NlsEntryNewAction extends AbstractWorkspaceAction {
 
   public NlsEntryNewAction(boolean interactWithUi, INlsProject project) {
     this(null, interactWithUi, project);
+
   }
 
   public NlsEntryNewAction(NlsEntry entry, boolean interactWithUi, INlsProject project) {
     super("New Entry...", interactWithUi);
     m_initialEntry = entry;
     m_project = project;
-  }
-
-  @Override
-  public ImageDescriptor getImageDescriptor() {
-    return NlsCore.getImageDescriptor(NlsCore.ICON_TOOL_ADD);
+    setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.TextAdd));
   }
 
   @Override

@@ -164,13 +164,13 @@ public class MethodErrorPresenterContent extends Composite {
     if (status != null) {
       switch (status.getSeverity()) {
         case IStatus.ERROR:
-          image = ScoutSdkUi.getImage(ScoutSdkUi.IMG_ERROR);
+          image = ScoutSdkUi.getImage(ScoutSdkUi.StatusError);
           break;
         case IStatus.WARNING:
-          image = ScoutSdkUi.getImage(ScoutSdkUi.IMG_WARNING);
+          image = ScoutSdkUi.getImage(ScoutSdkUi.StatusWarning);
           break;
         case IStatus.INFO:
-          image = ScoutSdkUi.getImage(ScoutSdkUi.IMG_INFO);
+          image = ScoutSdkUi.getImage(ScoutSdkUi.StatusInfo);
           break;
       }
       message = status.getMessage();

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -55,7 +55,7 @@ import org.osgi.framework.BundleContext;
  * The activator class controls the plug-in life cycle
  */
 @SuppressWarnings("restriction")
-public class NlsCore extends AbstractUIPlugin {
+public class NlsCore extends AbstractUIPlugin implements INlsIcons{
 
   // static vars
   // colors
@@ -67,15 +67,7 @@ public class NlsCore extends AbstractUIPlugin {
 
   public static final String FILE_NAME_UNKNOWN = "unknown";
 
-  public static final String ICON_SORT_ASC = "sortUp";
-  public static final String ICON_MAGNIFIER = "magnifier";
-  public static final String ICON_COMMENT = "comment";
-  public static final String ICON_SORT_DESC = "sortDown";
-  public static final String ICON_WARNING_8 = "warning8";
-  public static final String ICON_TOOL_ADD = "add";
-  public static final String ICON_TOOL_REFRESH = "refresh";
-  public static final String ICON_TOOL_UPDATE = "updates_obj";
-  public static final String ICON_TOOL_EXPORT = "export";
+
 
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.nls.sdk";

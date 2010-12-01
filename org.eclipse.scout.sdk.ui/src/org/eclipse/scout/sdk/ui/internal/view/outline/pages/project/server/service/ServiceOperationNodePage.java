@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,7 +37,7 @@ public class ServiceOperationNodePage extends AbstractPage {
     m_interfaceOpMethod = method;
     m_implementationOpMethod = implementationMethod;
     setName(m_implementationOpMethod.getElementName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_SERVICE_METHOD));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperation));
   }
 
   @Override
@@ -60,6 +60,7 @@ public class ServiceOperationNodePage extends AbstractPage {
       delAction.addMemberToDelete(getInterfaceOpMethod());
     }
     delAction.addMemberToDelete(getImplementationOpMethod());
+    delAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperationRemove));
     return delAction;
   }
 

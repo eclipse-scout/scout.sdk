@@ -162,7 +162,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
 
   protected void createContextMenu(MenuManager manager) {
     if (getMethod() != null && getMethod().isImplemented()) {
-      manager.add(new OperationAction("set default value", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_INFO), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
+      manager.add(new OperationAction("set default value", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
     }
   }
 

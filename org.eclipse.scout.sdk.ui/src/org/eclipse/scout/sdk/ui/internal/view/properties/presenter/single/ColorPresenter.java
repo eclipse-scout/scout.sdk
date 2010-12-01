@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -71,7 +71,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
     m_currentColorPresenter.setLayoutData(curValData);
     Control text = super.createContent(rootPane);
     m_chooserButton = getToolkit().createButton(rootPane, "", SWT.PUSH);
-    m_chooserButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_CHOOSE));
+    m_chooserButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolMagnifier));
     m_chooserButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

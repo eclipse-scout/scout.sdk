@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.Action;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.delete.AxisWebServiceUndeployAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -23,6 +24,7 @@ public class AxisWebServiceProviderNodePage extends AbstractScoutTypePage {
   public AxisWebServiceProviderNodePage(IPage parent, IType type) {
     setParent(parent);
     setType(type);
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Webservice));
   }
 
   @Override

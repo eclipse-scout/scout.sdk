@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.Action;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.TableNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -21,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 public class TableFieldNodePage extends AbstractFormFieldNodePage {
 
   public TableFieldNodePage() {
-    
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableField));
   }
 
   @Override
@@ -46,6 +47,15 @@ public class TableFieldNodePage extends AbstractFormFieldNodePage {
     // XXX
     return null;
     // return new EditAction(new EntityEditOrder(new TableFieldEntity(getType())));
+  }
+
+  @Override
+  public Action createDeleteAction() {
+    Action deleteAction = super.createDeleteAction();
+    if (deleteAction != null) {
+      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableFieldRemove));
+    }
+    return deleteAction;
   }
 
 }

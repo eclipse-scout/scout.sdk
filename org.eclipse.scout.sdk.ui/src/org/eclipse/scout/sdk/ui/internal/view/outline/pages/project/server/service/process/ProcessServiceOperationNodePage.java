@@ -29,7 +29,7 @@ public class ProcessServiceOperationNodePage extends ServiceOperationNodePage {
   // manager.add(new Separator());
   // FormFromServiceOpNewWizard wizard=new FormFromServiceOpNewWizard(getImplementationOpMethod(), getInterfaceOpMethod());
   // wizard.setClientBundles(getScoutResource().getScoutProject().getClientBundles());
-  // manager.add(new WizardAction("Auto-generate Form", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard));
+  // manager.add(new WizardAction("Auto-generate Form", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd), wizard));
   //
   // }
 }

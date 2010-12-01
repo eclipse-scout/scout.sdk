@@ -1,16 +1,5 @@
 The following icons are provided by http://www.famfamfam.com
-- brick_add.png
-- brick_delete.png
-- brick_edit.png
-- brick.png
-- bricks.png
-- cake.png
-- key_add.png
-- key_delete.png
-- key.png
 - magnifier.png
-- plugin.png
-
 
 And are published under Creative Commons Attribution 3.0 License:
 http://creativecommons.org/licenses/by/3.0/

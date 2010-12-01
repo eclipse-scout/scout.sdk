@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,6 +37,7 @@ public class CalendarItemProviderTablePage extends AbstractPage {
     super.setParent(parent);
     m_calendarType = calendarType;
     setName(Texts.get("CalendarItemProducerTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviders));
   }
 
   @Override
@@ -69,7 +70,7 @@ public class CalendarItemProviderTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Item Provider"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD),
+    return new WizardAction(Texts.get("Action_newTypeX", "Item Provider"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviderAdd),
         new CalendarItemProviderNewWizard(getCalendarType()));
   }
 

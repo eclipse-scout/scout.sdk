@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,7 +24,7 @@ public class NlsTextsNodePage extends AbstractPage {
   public NlsTextsNodePage(IPage parentPage) {
     setParent(parentPage);
     setName("Texts");
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TEXT_CODE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Texts));
   }
 
   @Override

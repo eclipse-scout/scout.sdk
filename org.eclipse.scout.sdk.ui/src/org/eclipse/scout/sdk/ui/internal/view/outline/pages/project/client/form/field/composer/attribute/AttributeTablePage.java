@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,6 +42,7 @@ public class AttributeTablePage extends AbstractPage {
     m_declaringType = declaringType;
     setParent(parent);
     setName("Attributes");
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerAttributes));
   }
 
   @Override
@@ -76,7 +77,7 @@ public class AttributeTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Attribute"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), new AttributeNewWizard(getDeclaringType()));
+    return new WizardAction(Texts.get("Action_newTypeX", "Attribute"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerAttributeAdd), new AttributeNewWizard(getDeclaringType()));
   }
 
   public IType getDeclaringType() {

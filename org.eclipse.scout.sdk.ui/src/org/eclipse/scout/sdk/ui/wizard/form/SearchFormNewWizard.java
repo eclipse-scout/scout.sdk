@@ -98,14 +98,14 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
     // form
-    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_SEARCH_FORM, "SearchForm", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_SEARCH_FORM);
+    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_SEARCH_FORM, "SearchForm", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SEARCH_FORM);
     // searchHandler
-    TreeUtility.createNode(formNode, TYPE_HANDLER_SEARCH, "SearchHandler", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_HANDLER_SEARCH);
+    TreeUtility.createNode(formNode, TYPE_HANDLER_SEARCH, "SearchHandler", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_HANDLER_SEARCH);
 
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // formData
-      TreeUtility.createNode(sharedNode, TYPE_SEARCH_FORM_DATA, "SearchFormData", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_SEARCH_FORM_DATA);
+      TreeUtility.createNode(sharedNode, TYPE_SEARCH_FORM_DATA, "SearchFormData", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SEARCH_FORM_DATA);
     }
     return rootNode;
   }

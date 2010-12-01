@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,7 +37,7 @@ public class PropertyBeanDeleteAction extends Action {
     super(title);
     m_beanDesc = beanDesc;
     m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_DELETE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove));
   }
 
   @Override

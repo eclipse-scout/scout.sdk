@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -77,13 +77,13 @@ public class TreeUtility {
       scoutProject = scoutProject.getParentProject();
     }
     if (scoutProject.getClientBundle() != null) {
-      recAddChildNodes(rootNode, new IScoutBundle[]{scoutProject.getClientBundle()}, IScoutBundle.BUNDLE_CLIENT, ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLIENT), 1000, filter);
+      recAddChildNodes(rootNode, new IScoutBundle[]{scoutProject.getClientBundle()}, IScoutBundle.BUNDLE_CLIENT, ScoutSdkUi.getImage(ScoutSdkUi.ClientBundle), 1000, filter);
     }
     if (scoutProject.getSharedBundle() != null) {
-      recAddChildNodes(rootNode, new IScoutBundle[]{scoutProject.getSharedBundle()}, IScoutBundle.BUNDLE_SHARED, ScoutSdkUi.getImage(ScoutSdkUi.IMG_SHARED), 2000, filter);
+      recAddChildNodes(rootNode, new IScoutBundle[]{scoutProject.getSharedBundle()}, IScoutBundle.BUNDLE_SHARED, ScoutSdkUi.getImage(ScoutSdkUi.SharedBundle), 2000, filter);
     }
     if (scoutProject.getServerBundle() != null) {
-      recAddChildNodes(rootNode, new IScoutBundle[]{scoutProject.getServerBundle()}, IScoutBundle.BUNDLE_SERVER, ScoutSdkUi.getImage(ScoutSdkUi.IMG_SERVER), 3000, filter);
+      recAddChildNodes(rootNode, new IScoutBundle[]{scoutProject.getServerBundle()}, IScoutBundle.BUNDLE_SERVER, ScoutSdkUi.getImage(ScoutSdkUi.ServerBundle), 3000, filter);
     }
     return rootNode;
   }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -157,7 +157,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
   protected void fillButtonArea(Composite buttonArea) {
     m_deleteButton = getToolkit().createImageHyperlink(buttonArea, SWT.PUSH);
-    m_deleteButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_TOOL_DELETE));
+    m_deleteButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolRemove));
     m_deleteButton.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {

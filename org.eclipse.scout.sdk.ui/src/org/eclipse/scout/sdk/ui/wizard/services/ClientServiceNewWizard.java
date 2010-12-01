@@ -71,9 +71,9 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
     ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle.getScoutProject(), NodeFilters.getByType(IScoutBundle.BUNDLE_CLIENT));
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
     // service client reg
-    TreeUtility.createNode(clientNode, TYPE_SERVICE_REGISTRATION, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.IMG_PUBLIC), TYPE_SERVICE_IMPLEMENTATION);
-    TreeUtility.createNode(clientNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImage(ScoutSdkUi.IMG_INTERFACE), TYPE_SERVICE_INTERFACE);
-    TreeUtility.createNode(clientNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS), TYPE_SERVICE_IMPLEMENTATION);
+    TreeUtility.createNode(clientNode, TYPE_SERVICE_REGISTRATION, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_IMPLEMENTATION);
+    TreeUtility.createNode(clientNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImage(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
+    TreeUtility.createNode(clientNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
     return rootNode;
   }
 

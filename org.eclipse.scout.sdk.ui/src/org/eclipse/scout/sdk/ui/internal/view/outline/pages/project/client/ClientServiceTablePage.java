@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -34,6 +34,7 @@ public class ClientServiceTablePage extends AbstractPage {
   public ClientServiceTablePage(IPage parentPage) {
     setParent(parentPage);
     setName(Texts.get("ClientServicesNodePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Services));
   }
 
   @Override
@@ -88,7 +89,7 @@ public class ClientServiceTablePage extends AbstractPage {
   @Override
   public Action createNewAction() {
     ClientServiceNewWizard wizard = new ClientServiceNewWizard(getScoutResource());
-    return new WizardAction(Texts.get("Action_newTypeX", "Client Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD),
+    return new WizardAction(Texts.get("Action_newTypeX", "Client Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd),
         wizard);
   }
 }

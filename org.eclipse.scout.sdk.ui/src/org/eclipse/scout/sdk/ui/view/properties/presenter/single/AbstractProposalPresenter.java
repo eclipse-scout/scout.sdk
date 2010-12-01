@@ -121,7 +121,7 @@ public abstract class AbstractProposalPresenter<T extends IContentProposalEx> ex
 
   protected void createContextMenu(MenuManager manager) {
     if (getMethod().isImplemented()) {
-      manager.add(new OperationAction("set default value", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_INFO), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
+      manager.add(new OperationAction("set default value", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
     }
   }
 

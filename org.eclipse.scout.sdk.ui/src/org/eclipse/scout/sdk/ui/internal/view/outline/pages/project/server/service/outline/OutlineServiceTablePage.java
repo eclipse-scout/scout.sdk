@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,7 +51,7 @@ public class OutlineServiceTablePage extends AbstractPage {
 //    };
     JavaCore.addElementChangedListener(m_packageContentListener);
 //    }
-
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Services));
     setName(Texts.get("OutlineServiceTablePage"));
   }
 
@@ -111,6 +111,6 @@ public class OutlineServiceTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Outline Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), new OutlineServiceNewWizard(getScoutResource()));
+    return new WizardAction(Texts.get("Action_newTypeX", "Outline Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), new OutlineServiceNewWizard(getScoutResource()));
   }
 }

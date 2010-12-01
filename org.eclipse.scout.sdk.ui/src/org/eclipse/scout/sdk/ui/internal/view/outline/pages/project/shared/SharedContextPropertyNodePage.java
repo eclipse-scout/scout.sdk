@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,10 +14,7 @@ import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.NamingUtility;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
@@ -40,16 +37,12 @@ public class SharedContextPropertyNodePage extends AbstractPage {
       desc = getClientDesc();
     }
     setName(NamingUtility.toVariableName(desc.getBeanName()) + " (" + Signature.getSignatureSimpleName(desc.getBeanSignature()) + ")");
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Variable));
   }
 
   @Override
   public String getPageId() {
     return IScoutPageConstants.SHARED_CONTEXT_PROPERTY_NODE_PAGE;
-  }
-
-  @Override
-  public ImageDescriptor getBaseImageDescriptor() {
-    return JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_PUBLIC);
   }
 
   @Override
@@ -77,6 +70,7 @@ public class SharedContextPropertyNodePage extends AbstractPage {
         action.addMemberToDelete(m);
       }
     }
+    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove));
     return action;
   }
 

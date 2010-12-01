@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -143,11 +143,11 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   private ITreeNode buildBundleTree() {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWING, "ui.swing", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLIENT), TYPE_BUNDLE_SWING);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWT, "ui.swt", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLIENT), TYPE_BUNDLE_SWT);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_CLIENT, "client", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLIENT), TYPE_BUNDLE_CLIENT);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SHARED, "shared", ScoutSdkUi.getImage(ScoutSdkUi.IMG_SHARED), TYPE_BUNDLE_SHARED);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SERVER, "server", ScoutSdkUi.getImage(ScoutSdkUi.IMG_SERVER), TYPE_BUNDLE_SERVER);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWING, "ui.swing", ScoutSdkUi.getImage(ScoutSdkUi.SwingBundle), TYPE_BUNDLE_SWING);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWT, "ui.swt", ScoutSdkUi.getImage(ScoutSdkUi.SwtBundle), TYPE_BUNDLE_SWT);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_CLIENT, "client", ScoutSdkUi.getImage(ScoutSdkUi.ClientBundle), TYPE_BUNDLE_CLIENT);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SHARED, "shared", ScoutSdkUi.getImage(ScoutSdkUi.SharedBundle), TYPE_BUNDLE_SHARED);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SERVER, "server", ScoutSdkUi.getImage(ScoutSdkUi.ServerBundle), TYPE_BUNDLE_SERVER);
     return rootNode;
   }
 

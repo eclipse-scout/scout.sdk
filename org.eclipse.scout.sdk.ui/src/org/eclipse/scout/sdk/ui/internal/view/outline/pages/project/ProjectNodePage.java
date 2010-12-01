@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -47,7 +47,7 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
     setParent(parent);
     m_scoutProject = p;
     setName(p.getProjectName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_CASE_PROJECT));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ScoutProject));
     ScoutSdk.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
   }
 
@@ -139,7 +139,7 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
   public void fillContextMenu(IMenuManager manager) {
     super.fillContextMenu(manager);
     manager.add(new OrganizeAllImportsAction(getScoutResource()));
-    manager.add(new WizardAction("Import Plugin...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), new BundleImportWizard(getScoutResource())));
+    manager.add(new WizardAction("Import Plugin...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundleAdd), new BundleImportWizard(getScoutResource())));
     manager.add(new Action("Print Hierarchy") {
       @Override
       public void run() {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,8 +20,8 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.
 public class SmartFieldNodePage extends AbstractFormFieldNodePage {
 
   public SmartFieldNodePage() {
-    
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_SMART_FIELD));
+
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SmartField));
   }
 
   @Override
@@ -42,4 +42,12 @@ public class SmartFieldNodePage extends AbstractFormFieldNodePage {
     //    return new EditAction(new EntityEditOrder(new SmartFieldEntity(getType())));
   }
 
+  @Override
+  public Action createDeleteAction() {
+    Action deleteAction = super.createDeleteAction();
+    if (deleteAction != null) {
+      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SmartFieldRemove));
+    }
+    return deleteAction;
+  }
 }

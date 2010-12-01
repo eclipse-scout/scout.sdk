@@ -60,7 +60,7 @@ public class ServerNodePage extends AbstractPage {
     setParent(parent);
     m_serverBundle = serverBundle;
     setName(getScoutResource().getSimpleName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_SERVER));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle));
     m_serverSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iServerSession);
     m_serverSessionHierarchy.addHierarchyListener(getPageDirtyListener());
   }

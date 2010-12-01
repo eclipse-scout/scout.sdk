@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,6 +36,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
 //  IPrimaryTypeTypeHierarchy formfieldHierarchy = ScoutSdk.getTypeHierarchyPrimaryTypes(igroupBox);
 
   public TabBoxNodePage() {
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Tabbox));
 
   }
 
@@ -54,6 +55,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
       if (nodePage != null) {
         nodePage.setParent(this);
         nodePage.setType(groupBox);
+        nodePage.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxTab));
       }
     }
   }
@@ -67,7 +69,16 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   public Action createNewAction() {
     GroupBoxNewWizard wizard = new GroupBoxNewWizard();
     wizard.initWizard(getType());
-    return new WizardAction(Texts.get("Process_newTypeX", "GroupBox"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD),
+    return new WizardAction(Texts.get("Process_newTypeX", "GroupBox"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxTabAdd),
         wizard);
+  }
+
+  @Override
+  public Action createDeleteAction() {
+    Action deleteAction = super.createDeleteAction();
+    if (deleteAction != null) {
+      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxRemove));
+    }
+    return deleteAction;
   }
 }

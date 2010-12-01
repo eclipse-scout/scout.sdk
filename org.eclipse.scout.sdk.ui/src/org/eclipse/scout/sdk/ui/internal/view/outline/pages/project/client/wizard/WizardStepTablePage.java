@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,6 +39,7 @@ public class WizardStepTablePage extends AbstractPage {
     m_wizardType = wizardType;
     setParent(parent);
     setName(Texts.get("WizardStepTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardSteps));
   }
 
   @Override
@@ -79,7 +80,7 @@ public class WizardStepTablePage extends AbstractPage {
   public Action createNewAction() {
     WizardStepNewWizard wizard = new WizardStepNewWizard();
     wizard.initWizard(getWizardType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Wizard step"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), wizard);
+    return new WizardAction(Texts.get("Action_newTypeX", "Wizard step"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStepAdd), wizard);
   }
 
   public IType getWizardType() {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -61,7 +61,7 @@ public class ProposalTextField extends TextField {
     }
 
     public Image getImage(boolean selected, boolean expertMode) {
-      return ScoutSdkUi.getImage(ScoutSdkUi.IMG_TOOL_PROGRESS);
+      return ScoutSdkUi.getImage(ScoutSdkUi.ToolProgress);
     }
 
     public int getCursorPosition(boolean selected, boolean expertMode) {
@@ -163,7 +163,7 @@ public class ProposalTextField extends TextField {
     Label label = getLabelComponent();
     StyledText text = getTextComponent();
     m_popupButton = new Button(parent, SWT.PUSH);
-    m_popupButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_TOOL_DOWN));
+    m_popupButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDropdown));
     m_popupButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

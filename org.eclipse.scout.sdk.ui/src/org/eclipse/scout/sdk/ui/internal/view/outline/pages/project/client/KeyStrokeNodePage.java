@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,8 +26,7 @@ public class KeyStrokeNodePage extends AbstractScoutTypePage {
 
   public KeyStrokeNodePage() {
     super();
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_KEYGROUP));
-
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Keystroke));
   }
 
   @Override
@@ -56,7 +55,9 @@ public class KeyStrokeNodePage extends AbstractScoutTypePage {
   @Override
   public Action createDeleteAction() {
     IDeleteOperation op = new TypeDeleteOperation(getType());
-    return new DeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell(), op);
+    DeleteAction deleteAction = new DeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell(), op);
+    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.KeystrokeRemove));
+    return deleteAction;
   }
 
 }

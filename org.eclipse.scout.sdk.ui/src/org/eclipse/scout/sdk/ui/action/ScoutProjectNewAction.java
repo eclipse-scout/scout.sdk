@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,7 +30,7 @@ public class ScoutProjectNewAction extends Action {
   public ScoutProjectNewAction(Shell shell) {
     super("New Scout Project...");
     m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ScoutProjectAdd));
   }
 
   @Override

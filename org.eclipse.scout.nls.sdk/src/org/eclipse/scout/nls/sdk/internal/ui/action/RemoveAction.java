@@ -29,6 +29,7 @@ public class RemoveAction extends Action {
     super(name);
     m_nlsProject = project;
     m_key = key;
+    setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.TextRemove));
   }
 
   @Override

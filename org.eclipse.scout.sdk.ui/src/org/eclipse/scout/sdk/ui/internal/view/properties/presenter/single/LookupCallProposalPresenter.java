@@ -48,7 +48,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
         String entityName = NamingUtility.removeSuffixes(lookupCall.getElementName(), "Call");
         final IType lookupServiceInterface = ScoutSdk.getType(lookupCall.getPackageFragment().getElementName() + ".I" + entityName + "Service");
         if (lookupServiceInterface != null) {
-          manager.add(new Action("Go to " + lookupServiceInterface.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_INFO)) {
+          manager.add(new Action("Go to " + lookupServiceInterface.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
             @Override
             public void run() {
               showJavaElementInEditor(lookupServiceInterface);
@@ -57,7 +57,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
         }
         final IType lookupServiceImplementation = ScoutSdk.getType(lookupCall.getPackageFragment().getElementName().replace(".shared.", ".server.") + "." + entityName + "Service");
         if (lookupServiceImplementation != null) {
-          manager.add(new Action("Go to " + lookupServiceImplementation.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_INFO)) {
+          manager.add(new Action("Go to " + lookupServiceImplementation.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
             @Override
             public void run() {
               showJavaElementInEditor(lookupServiceImplementation);

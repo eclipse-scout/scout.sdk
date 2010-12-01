@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -31,6 +32,7 @@ public class DesktopNodePage extends AbstractScoutTypePage {
     setParent(parentPage);
     setType(desktopType);
     setName(Texts.get("DesktopNodePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Desktop));
   }
 
   @Override
@@ -66,6 +68,7 @@ public class DesktopNodePage extends AbstractScoutTypePage {
   public Action createDeleteAction() {
     MemberListDeleteAction action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getType().getElementName()), getOutlineView().getSite().getShell());
     action.setTypesToDelete(new IMember[]{getType()});
+
     return action;
   }
 

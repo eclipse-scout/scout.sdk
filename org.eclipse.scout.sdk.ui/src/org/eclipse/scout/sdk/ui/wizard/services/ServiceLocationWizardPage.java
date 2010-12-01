@@ -90,22 +90,22 @@
 //    if(bundleSet.getSharedBundle() != null){
 //      ITreeNode sharedNode = TreeUtility.findNode(m_rootNode, NodeFilters.getByData( bundleSet.getSharedBundle()));
 //      // permission create
-//      ITreeNode permissionCreateNode = createNode(sharedNode, TYPE_PERMISSION_CREATE, "CreatePermission", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS));
+//      ITreeNode permissionCreateNode = createNode(sharedNode, TYPE_PERMISSION_CREATE, "CreatePermission", ScoutSdkUi.getImage(ScoutSdkUi.Class));
 //      checkedNodes.add(permissionCreateNode);
 //      // permission read
-//      ITreeNode permissionReadNode = createNode(sharedNode,TYPE_PERMISSION_READ, "ReadPermission", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS));
+//      ITreeNode permissionReadNode = createNode(sharedNode,TYPE_PERMISSION_READ, "ReadPermission", ScoutSdkUi.getImage(ScoutSdkUi.Class));
 //      checkedNodes.add(permissionReadNode);
 //      // permission update
-//      ITreeNode permissionUpdateNode = createNode(sharedNode, TYPE_PERMISSION_UPDATE, "UpdatePermission", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS));
+//      ITreeNode permissionUpdateNode = createNode(sharedNode, TYPE_PERMISSION_UPDATE, "UpdatePermission", ScoutSdkUi.getImage(ScoutSdkUi.Class));
 //      checkedNodes.add(permissionUpdateNode);
 //      // service interface
-//      ITreeNode serviceInterfaceNode = createNode(sharedNode, TYPE_SERVICE_INTERFACE,"IService", ScoutSdkUi.getImage(ScoutSdkUi.IMG_INTERFACE));
+//      ITreeNode serviceInterfaceNode = createNode(sharedNode, TYPE_SERVICE_INTERFACE,"IService", ScoutSdkUi.getImage(ScoutSdkUi.Interface));
 //      checkedNodes.add(serviceInterfaceNode);
 //    }
 //    if(bundleSet.getServerBundle() != null){
 //      ITreeNode serverNode = TreeUtility.findNode(m_rootNode, NodeFilters.getByData( bundleSet.getServerBundle()));
 //      // service implementation
-//      ITreeNode serviceNode = createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION,"Service", ScoutSdkUi.getImage(ScoutSdkUi.IMG_CLASS));
+//      ITreeNode serviceNode = createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION,"Service", ScoutSdkUi.getImage(ScoutSdkUi.Class));
 //      checkedNodes.add(serviceNode);
 //      // service implementation
 //      ITreeNode serviceRegistrationServer = createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.IMG_OBJ_PUBLIC));

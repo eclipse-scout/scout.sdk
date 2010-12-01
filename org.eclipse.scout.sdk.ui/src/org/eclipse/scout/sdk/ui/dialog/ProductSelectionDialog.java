@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -112,15 +112,15 @@ public class ProductSelectionDialog extends TitleAreaDialog {
         bundleNode = new TreeNode(bundle.getType(), bundle.getBundleName(), bundle);
         switch (bundle.getType()) {
           case IScoutBundle.BUNDLE_UI_SWING:
-            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_UI_BUNDLE));
+            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.SwingBundle));
             ((TreeNode) bundleNode).setOrderNr(1000);
             break;
           case IScoutBundle.BUNDLE_UI_SWT:
-            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_UI_BUNDLE));
+            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.SwtBundle));
             ((TreeNode) bundleNode).setOrderNr(2000);
             break;
           case IScoutBundle.BUNDLE_SERVER:
-            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.IMG_SERVER));
+            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.ServerBundle));
             ((TreeNode) bundleNode).setOrderNr(3000);
             break;
         }
@@ -130,7 +130,7 @@ public class ProductSelectionDialog extends TitleAreaDialog {
       TreeNode productNode = new TreeNode(TYPE_PRODUCT_NODE, file.getName() + " (" + file.getParent().getName() + ")", file);
       productNode.setCheckable(true);
       productNode.setBold(true);
-      Image img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_FILE);
+      Image img = ScoutSdkUi.getImage(ScoutSdkUi.File);
       IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) file.getAdapter(IWorkbenchAdapter.class);
       if (wbAdapter != null) {
         ImageDescriptor imageDescriptor = wbAdapter.getImageDescriptor(file);

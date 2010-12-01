@@ -4,20 +4,19 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
@@ -40,6 +39,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
     super();
     setParent(parentPage);
     setType(menuType);
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Menu));
 
   }
 
@@ -109,6 +109,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
   public Action createDeleteAction() {
     MemberListDeleteAction action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getType().getElementName()), getOutlineView().getSite().getShell());
     action.addMemberToDelete(getType());
+    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuRemove));
     return action;
   }
 
@@ -116,7 +117,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
   public Action createNewAction() {
     MenuNewWizard wizard = new MenuNewWizard();
     wizard.initWizard(getType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Menu"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS),
+    return new WizardAction(Texts.get("Action_newTypeX", "Menu"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuAdd),
         wizard);
   }
 

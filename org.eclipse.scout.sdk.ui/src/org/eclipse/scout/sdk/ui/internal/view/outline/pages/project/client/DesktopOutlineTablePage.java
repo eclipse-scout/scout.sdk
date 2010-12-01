@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
@@ -44,6 +42,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
     super.setParent(parentPage);
     setName(Texts.get("OutlineTablePage"));
     m_desktopType = desktopType;
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Outlines));
   }
 
   @Override
@@ -113,7 +112,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
   @Override
   public Action createNewAction() {
     OutlineNewWizard wizard = new OutlineNewWizard(getScoutResource(), getDesktopType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Outline"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS),
+    return new WizardAction(Texts.get("Action_newTypeX", "Outline"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.OutlineAdd),
         wizard);
   }
 

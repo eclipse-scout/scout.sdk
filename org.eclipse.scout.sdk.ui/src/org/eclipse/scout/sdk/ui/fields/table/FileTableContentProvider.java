@@ -36,7 +36,7 @@ public class FileTableContentProvider implements IStructuredContentProvider, ITa
   public Image getColumnImage(Object element, int columnIndex) {
     Image img = null;
     if (columnIndex == 0) {
-      img = ScoutSdkUi.getImage(ScoutSdkUi.IMG_FILE);
+      img = ScoutSdkUi.getImage(ScoutSdkUi.File);
     }
     return img;
   }

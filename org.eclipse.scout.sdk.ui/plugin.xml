@@ -77,7 +77,7 @@
       <editor
             class="org.eclipse.scout.sdk.ui.internal.view.icons.IconsEditor"
             extensions="icons"
-            icon="resources/icons/generic_elements.gif"
+            icon="resources/icons/old/generic_elements.gif"
             id="org.eclipse.scout.sdk.ui.internal.view.icons.IconsEditor"
             name="Icons">
       </editor>
@@ -92,7 +92,7 @@
             class="org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizard"
             finalPerspective="org.eclipse.pde.ui.PDEPerspective"
             hasPages="true"
-            icon="resources/icons/newjprj_wiz.gif"
+            icon="resources/icons/projectGroup_add.png"
             id="bsicase.development.newProjectWizard"
             name="Scout Project"
             project="true"/>
@@ -507,7 +507,7 @@
          name="SQL Bind Proposals"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
       <proposalCategory
-            icon="resources/icons/sourceEditor.gif">
+            icon="resources/icons/default.gif">
       </proposalCategory>
    </extension>
    <extension

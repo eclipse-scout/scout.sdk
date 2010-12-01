@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,7 +35,7 @@ public class BoxDeleteAction extends Action {
     super(Texts.get("Process_deleteX", ScoutSourceUtilities.getTranslatedMethodStringValue(boxType, "getConfiguredLabel")));
     m_boxType = boxType;
     m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_DELETE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.GroupboxRemove));
   }
 
   @Override

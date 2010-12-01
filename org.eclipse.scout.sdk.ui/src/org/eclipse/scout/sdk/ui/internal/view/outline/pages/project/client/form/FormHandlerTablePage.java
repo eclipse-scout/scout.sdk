@@ -4,19 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -39,6 +38,7 @@ public class FormHandlerTablePage extends AbstractPage {
     m_formType = formType;
     setParent(parent);
     setName(Texts.get("FormHandlersTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormHandlers));
   }
 
   @Override
@@ -64,7 +64,6 @@ public class FormHandlerTablePage extends AbstractPage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormHandler);
-      ;
       ScoutSdk.addInnerTypeChangedListener(getFormType(), m_innerTypeListener);
     }
     for (IType formHandlerType : TypeUtility.getInnerTypesOrdered(getFormType(), iFormHandler, TypeComparators.getTypeNameComparator())) {
@@ -76,8 +75,7 @@ public class FormHandlerTablePage extends AbstractPage {
   @Override
   public Action createNewAction() {
 
-    return new WizardAction(Texts.get("Action_newTypeX", "Handler"), JavaUI.getSharedImages().getImageDescriptor(
-        ISharedImages.IMG_OBJS_CLASS), new FormHandlerNewWizard(getFormType()));
+    return new WizardAction(Texts.get("Action_newTypeX", "Handler"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormHandlerAdd), new FormHandlerNewWizard(getFormType()));
   }
 
   public IType getFormType() {

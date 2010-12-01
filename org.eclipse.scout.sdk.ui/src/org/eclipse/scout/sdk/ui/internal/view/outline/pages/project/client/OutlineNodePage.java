@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,7 +31,7 @@ public class OutlineNodePage extends AbstractScoutTypePage {
   public OutlineNodePage(IPage parentPage, IType outlineType) {
     setParent(parentPage);
     setType(outlineType);
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_OUTLINE));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Outline));
   }
 
   @Override
@@ -71,6 +71,7 @@ public class OutlineNodePage extends AbstractScoutTypePage {
   public Action createDeleteAction() {
     MemberListDeleteAction action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell());
     action.setTypesToDelete(new IMember[]{getType()});
+    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.OutlineRemove));
     return action;
   }
 

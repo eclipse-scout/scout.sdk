@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,7 +50,7 @@ public class PrimitiveTypePresenter extends AbstractProposalPresenter<PrimitiveT
     PrimitiveTypeProposal[] proposals = new PrimitiveTypeProposal[PRIMITIVE_TYPES.length];
 
     for (int i = 0; i < proposals.length; i++) {
-      proposals[i] = new PrimitiveTypeProposal(ScoutSdkUi.getImage(ScoutSdkUi.IMG_DEFAULT), ScoutSdk.getType(PRIMITIVE_TYPES[i].getName()));
+      proposals[i] = new PrimitiveTypeProposal(ScoutSdkUi.getImage(ScoutSdkUi.Default), ScoutSdk.getType(PRIMITIVE_TYPES[i].getName()));
     }
     setProposals(proposals);
 

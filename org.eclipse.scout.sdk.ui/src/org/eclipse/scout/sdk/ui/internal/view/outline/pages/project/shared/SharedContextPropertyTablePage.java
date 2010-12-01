@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,6 +48,7 @@ public class SharedContextPropertyTablePage extends AbstractPage {
     m_clientSession = clientSession;
     m_serverSession = serverSession;
     setName(Texts.get("SharedContextTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Variables));
   }
 
   @Override
@@ -96,7 +97,7 @@ public class SharedContextPropertyTablePage extends AbstractPage {
 
   @Override
   public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Shared Context Property"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IMG_TOOL_ADD), new SharedContextBeanPropertyNewWizard(m_serverSession, m_clientSession));
+    return new WizardAction(Texts.get("Action_newTypeX", "Shared Context Property"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableAdd), new SharedContextBeanPropertyNewWizard(m_serverSession, m_clientSession));
   }
 
   private class P_PropertyMethodFilter implements IMethodFilter {

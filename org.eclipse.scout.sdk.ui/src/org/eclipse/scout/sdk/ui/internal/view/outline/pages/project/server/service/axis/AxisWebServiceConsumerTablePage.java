@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AxisWebServiceConsumerNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -51,6 +52,7 @@ public class AxisWebServiceConsumerTablePage extends AbstractPage {
     // parent.getBsiCaseProjectGroup().getServerProject().getRootPackageName()+".services.wsconsumer"
     // );
     setName(Texts.get("AxisWebServiceConsumerTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceLocators));
   }
 
   @Override

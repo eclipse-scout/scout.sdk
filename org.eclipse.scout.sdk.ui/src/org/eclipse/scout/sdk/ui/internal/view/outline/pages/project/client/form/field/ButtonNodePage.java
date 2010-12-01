@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
@@ -24,7 +25,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.
 public class ButtonNodePage extends AbstractFormFieldNodePage {
 
   public ButtonNodePage() {
-
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Button));
   }
 
   @Override
@@ -36,6 +37,13 @@ public class ButtonNodePage extends AbstractFormFieldNodePage {
   public void loadChildrenImpl() {
     new KeyStrokeTablePage(this, getType());
     new MenuTablePage(this, getType());
+  }
+
+  @Override
+  public Action createDeleteAction() {
+    Action deleteAction = super.createDeleteAction();
+    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ButtonRemove));
+    return deleteAction;
   }
 
   @Override
