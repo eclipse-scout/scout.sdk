@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.Method;
 import java.net.URL;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,6 +41,7 @@ import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.internal.text.html.HTMLPrinter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -49,6 +51,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
 /**
  * Renders JavaDoc of a given {@link IMember}.
@@ -266,9 +269,31 @@ public class JavadocTooltip extends AbstractTooltip {
       }
     }
 
-    StringBuffer buf = new StringBuffer();
-    JavadocHover.addImageAndLabel(buf, imageName, 16, 16, 8, 5, label.toString(), 22, 0);
-    return buf.toString();
+    return addImageAndLabel(member, imageName, label.toString());
+
+//    return buf.toString();
+  }
+
+  private String addImageAndLabel(IJavaElement member, String imageName, String label) {
+    StringBuffer buffer = new StringBuffer();
+
+    Version frameworkVersion = new Version(ScoutSdkUi.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
+    if (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() == 5) {
+      try {
+        Method method = JavadocHover.class.getMethod("addImageAndLabel", StringBuffer.class, String.class, int.class, int.class, int.class, int.class, String.class, int.class, int.class);
+        method.invoke(null, buffer, imageName, 16, 16, 8, 5, label, 22, 0);
+      }
+      catch (Exception e) {
+        ScoutSdkUi.logError("could not access method 'addImageAndLabel' on 'JavaHoover'.", e);
+      }
+    }
+    else {
+
+      System.out.println("33333.5555555");
+      JavadocHover.addImageAndLabel(buffer, imageName, 16, 16, 8, 5, label, 22, 0);
+    }
+
+    return buffer.toString();
   }
 
   private static String loadStyleSheet() {
