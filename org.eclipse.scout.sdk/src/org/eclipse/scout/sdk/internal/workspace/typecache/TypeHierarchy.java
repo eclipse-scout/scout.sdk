@@ -68,6 +68,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
    * @return
    * @see org.eclipse.jdt.core.ITypeHierarchy#getAllClasses()
    */
+  @Override
   public IType[] getAllClasses() {
     return getAllClasses(null);
   }

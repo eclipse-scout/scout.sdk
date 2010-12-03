@@ -90,10 +90,10 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
       JavaCore.addElementChangedListener(m_methodChangedListener);
     }
     IType[] allSubtypes = SdkTypeUtility.getTables(getType());
-    for (IType table : allSubtypes) {
+    if (allSubtypes.length > 0) {
       TableNodePage tableNodePage = new TableNodePage();
       tableNodePage.setParent(this);
-      tableNodePage.setType(table);
+      tableNodePage.setType(allSubtypes[0]);
     }
 
     new BeanPropertyTablePage(this, getType());

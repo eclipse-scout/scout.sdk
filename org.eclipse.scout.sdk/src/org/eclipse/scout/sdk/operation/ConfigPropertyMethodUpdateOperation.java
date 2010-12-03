@@ -80,7 +80,7 @@ public class ConfigPropertyMethodUpdateOperation implements IOperation {
           return ConfigPropertyMethodUpdateOperation.this.createMethodBody(getMethod(), validator);
         }
       };
-      op.setFormatSource(m_formatSource);
+      op.setFormatSource(isFormatSource());
       op.run(monitor, workingCopyManager);
     }
     else {
@@ -92,7 +92,7 @@ public class ConfigPropertyMethodUpdateOperation implements IOperation {
       };
       op.setSibling(computeSibling());
 
-      op.setFormatSource(m_formatSource);
+      op.setFormatSource(isFormatSource());
       op.run(monitor, workingCopyManager);
       method = op.getCreatedMethod();
     }

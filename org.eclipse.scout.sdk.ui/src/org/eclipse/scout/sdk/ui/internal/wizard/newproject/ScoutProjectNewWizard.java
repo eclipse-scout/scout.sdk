@@ -112,12 +112,6 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
   private class P_ScoutPerspectiveConfigElement implements IConfigurationElement {
 
     @Override
-    public Object createExecutableExtension(String propertyName) throws CoreException {
-      // TODO Auto-generated method stub
-      return null;
-    }
-
-    @Override
     public String getAttribute(String name) throws InvalidRegistryObjectException {
       if (name.equals("finalPerspective")) {
         return IScoutConstants.SCOUT_PERSPECTIVE_ID;
@@ -129,80 +123,84 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
     }
 
     @Override
+    public Object createExecutableExtension(String propertyName) throws CoreException {
+      return null;
+    }
+
+    public String getAttribute(String attrName, String locale) throws InvalidRegistryObjectException {
+      return null;
+    }
+
+    public String getValue(String locale) throws InvalidRegistryObjectException {
+      return null;
+    }
+
+    @Override
     public String getAttributeAsIs(String name) throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public String[] getAttributeNames() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public IConfigurationElement[] getChildren() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public IConfigurationElement[] getChildren(String name) throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public IContributor getContributor() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public IExtension getDeclaringExtension() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public String getName() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public String getNamespace() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public String getNamespaceIdentifier() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public Object getParent() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
+
       return null;
     }
 
     @Override
     public String getValue() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
+
       return null;
     }
 
     @Override
     public String getValueAsIs() throws InvalidRegistryObjectException {
-      // TODO Auto-generated method stub
+
       return null;
     }
 
     @Override
     public boolean isValid() {
-      // TODO Auto-generated method stub
+
       return false;
     }
 

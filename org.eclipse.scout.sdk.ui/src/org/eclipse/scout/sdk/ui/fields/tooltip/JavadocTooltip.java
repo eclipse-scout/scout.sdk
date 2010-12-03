@@ -268,29 +268,32 @@ public class JavadocTooltip extends AbstractTooltip {
         imageName = imageUrl.toExternalForm();
       }
     }
-
     return addImageAndLabel(member, imageName, label.toString());
-
-//    return buf.toString();
   }
 
   private String addImageAndLabel(IJavaElement member, String imageName, String label) {
+    // workaround to make internal 3.X code accessible with API changes.
     StringBuffer buffer = new StringBuffer();
-
     Version frameworkVersion = new Version(ScoutSdkUi.getDefault().getBundle().getBundleContext().getProperty("osgi.framework.version"));
-    if (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() == 5) {
-      try {
-        Method method = JavadocHover.class.getMethod("addImageAndLabel", StringBuffer.class, String.class, int.class, int.class, int.class, int.class, String.class, int.class, int.class);
-        method.invoke(null, buffer, imageName, 16, 16, 8, 5, label, 22, 0);
+    if (frameworkVersion.getMajor() == 3) {
+      if (frameworkVersion.getMinor() <= 5) {
+        try {
+          Method method = JavadocHover.class.getMethod("addImageAndLabel", StringBuffer.class, String.class, int.class, int.class, int.class, int.class, String.class, int.class, int.class);
+          method.invoke(null, buffer, imageName, 16, 16, 8, 5, label, 22, 0);
+        }
+        catch (Exception e) {
+          ScoutSdkUi.logError("could not access method 'addImageAndLabel' on 'JavaHoover'.", e);
+        }
       }
-      catch (Exception e) {
-        ScoutSdkUi.logError("could not access method 'addImageAndLabel' on 'JavaHoover'.", e);
+      else {
+        try {
+          Method method = JavadocHover.class.getMethod("addImageAndLabel", StringBuffer.class, IJavaElement.class, String.class, int.class, int.class, String.class, int.class, int.class);
+          method.invoke(null, buffer, member, imageName, 16, 16, label, 22, 0);
+        }
+        catch (Exception e) {
+          ScoutSdkUi.logError("could not access method 'addImageAndLabel' on 'JavaHoover'.", e);
+        }
       }
-    }
-    else {
-
-      System.out.println("33333.5555555");
-      JavadocHover.addImageAndLabel(buffer, imageName, 16, 16, 8, 5, label, 22, 0);
     }
 
     return buffer.toString();
