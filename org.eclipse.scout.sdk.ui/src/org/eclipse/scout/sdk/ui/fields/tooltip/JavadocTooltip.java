@@ -285,6 +285,15 @@ public class JavadocTooltip extends AbstractTooltip {
           ScoutSdkUi.logError("could not access method 'addImageAndLabel' on 'JavaHoover'.", e);
         }
       }
+      else if (frameworkVersion.getMinor() <= 6) {
+        try {
+          Method method = JavadocHover.class.getMethod("addImageAndLabel", StringBuffer.class, String.class, int.class, int.class, String.class, int.class, int.class);
+          method.invoke(null, buffer, imageName, 16, 16, label, 22, 0);
+        }
+        catch (Exception e) {
+          ScoutSdkUi.logError("could not access method 'addImageAndLabel' on 'JavaHoover'.", e);
+        }
+      }
       else {
         try {
           Method method = JavadocHover.class.getMethod("addImageAndLabel", StringBuffer.class, IJavaElement.class, String.class, int.class, int.class, String.class, int.class, int.class);
