@@ -514,11 +514,9 @@
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
-            application="org.eclipse.ui.ide.workbench"
-            name="SCOUT SDK">
+            application="org.eclipse.ui.ide.workbench" name="Scout SDK">
          <property
-               name="appName"
-               value="SCOUT SDK">
+               name="appName" value="Scout SDK">
          </property>
          <property
                name="preferenceCustomization"

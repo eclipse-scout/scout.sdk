@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.sdk.feature"
       label="Scout SDK Feature"
-      version="3.5.2.qualifier"
+      version="3.5.5.qualifier"
       provider-name="Eclipse Scout Project">
 
    <description>
@@ -25,6 +25,7 @@ BSI Business Systems Integration AG - initial API and implementation
    </license>
 
    <url>
+      <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/I20101104194033/repository"/>
       <discovery label="The Eclipse Project Updates" url="http://download.eclipse.org/eclipse/updates/3.5"/>
    </url>
 
