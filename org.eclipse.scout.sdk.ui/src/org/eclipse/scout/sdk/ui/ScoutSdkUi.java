@@ -155,12 +155,17 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     plugin = this;
     // version++ -> releasenotes
     IEclipsePreferences node = new InstanceScope().getNode(getBundle().getSymbolicName());
-    Version lastVersion = Version.parseVersion(node.get(PROPERTY_PLUGIN_VERSION, "0.0.0"));
-    lastVersion = new Version(lastVersion.getMajor(), lastVersion.getMinor(), lastVersion.getMicro());
+    Version lastVersion = Version.emptyVersion;
+    if (node != null) {
+      lastVersion = Version.parseVersion(node.get(PROPERTY_PLUGIN_VERSION, "0.0.0"));
+      lastVersion = new Version(lastVersion.getMajor(), lastVersion.getMinor(), lastVersion.getMicro());
+    }
     Version newVersion = Version.parseVersion((String) context.getBundle().getHeaders().get("Bundle-Version"));
     newVersion = new Version(newVersion.getMajor(), newVersion.getMinor(), newVersion.getMicro());
     if (newVersion.compareTo(lastVersion) > 0) {
-      node.put(PROPERTY_PLUGIN_VERSION, newVersion.toString());
+      if (node != null) {
+        node.put(PROPERTY_PLUGIN_VERSION, newVersion.toString());
+      }
       ShowReleaseNotesJob job = new ShowReleaseNotesJob(newVersion);
       job.schedule(100);
     }
