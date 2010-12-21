@@ -4,17 +4,21 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.bug.beforeopensource;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.internal.workspace.ScoutProjectIcons;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -32,12 +36,12 @@ public class Bug87486Test extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("bugsBeforeOpensource/87486", "a.shared");
+    setupWorkspace("bugsBeforeOpensource/87486", "a.client", "a.shared");
   }
 
   @AfterClass
   public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("a.shared");
+    deleteProjects("a.client", "a.shared");
   }
 
   @Test
@@ -76,10 +80,14 @@ public class Bug87486Test extends AbstractScoutSdkTest {
   }
 
   private void checkResolveName(String iconName, boolean assertIconExists) {
+    ScoutSdk.getScoutWorkspace().getRootProjects();
+
     IType icons = ScoutSdk.getType("a.shared.Icons");
     Assert.assertNotNull(icons);
-
-    ScoutProjectIcons projectIcons = new ScoutProjectIcons(icons);
+    Assert.assertTrue(TypeUtility.exists(icons));
+    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("a.shared");
+    IScoutProject scoutProject = ScoutSdk.getScoutWorkspace().getScoutBundle(project).getScoutProject();
+    IIconProvider projectIcons = scoutProject.getIconProvider();
     ScoutIconDesc iconDesc = projectIcons.getIcon("\"" + iconName + "\"");
 
     Assert.assertNotNull(iconDesc);
