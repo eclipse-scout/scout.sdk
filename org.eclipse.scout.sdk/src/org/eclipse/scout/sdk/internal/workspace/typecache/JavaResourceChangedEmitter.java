@@ -252,11 +252,14 @@ public class JavaResourceChangedEmitter {
     }
   }
 
-  private void releaseCompilationUnit(ICompilationUnit icu, boolean fireChanges) {
+  private void releaseCompilationUnit(ICompilationUnit icu) {
+    boolean fireChanges = false;
     JdtEvent[] jdtEvents = new JdtEvent[0];
     synchronized (m_resourceLock) {
       JdtEventCollector eventSet = m_jdtEvents.remove(icu.getResource());
       if (eventSet != null && eventSet.hasEvents()) {
+        System.out.println("ts = \n'" + icu.getResource().getModificationStamp() + "'\n'" + eventSet.getLastModification() + "'\n-------------------------");
+        fireChanges = (icu == null) || icu.getResource().getModificationStamp() != eventSet.getLastModification();
         jdtEvents = eventSet.getEvents();
       }
     }
@@ -402,7 +405,7 @@ public class JavaResourceChangedEmitter {
               IResource resource = visitDelta.getResource();
               if (resource.getType() == IFile.FILE) {
                 if (resource.getFileExtension().equalsIgnoreCase("java") && ((visitDelta.getFlags() & IResourceDelta.CONTENT) != 0)) {
-                  releaseCompilationUnit((ICompilationUnit) JavaCore.create(resource), true);
+                  releaseCompilationUnit((ICompilationUnit) JavaCore.create(resource));
                 }
                 return false;
               }
@@ -425,7 +428,7 @@ public class JavaResourceChangedEmitter {
       ICompilationUnit icu = (ICompilationUnit) event.getBuffer().getOwner();
       if (!event.getBuffer().hasUnsavedChanges() && TypeUtility.exists(icu)) {
         m_ast.put(icu.getPath().toString(), createAst(icu));
-        releaseCompilationUnit(icu, false);
+        releaseCompilationUnit(icu);
       }
 
     }

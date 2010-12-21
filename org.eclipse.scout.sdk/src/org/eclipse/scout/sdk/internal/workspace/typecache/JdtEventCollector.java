@@ -23,9 +23,11 @@ public class JdtEventCollector {
 
   private final IResource m_resouce;
   private HashMap<IJavaElement, JdtEvent> m_events;
+  private long m_lastModification;
 
   JdtEventCollector(IResource resouce) {
     m_resouce = resouce;
+    m_lastModification = m_resouce.getModificationStamp();
     m_events = new HashMap<IJavaElement, JdtEvent>();
   }
 
@@ -47,5 +49,9 @@ public class JdtEventCollector {
 
   public IResource getResouce() {
     return m_resouce;
+  }
+
+  public long getLastModification() {
+    return m_lastModification;
   }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,7 +33,6 @@ public class TypeFilters {
    * @return
    * @note this filter is expensive - for every candidate a super type hierarchy will be created. Use
    *       {@link TypeFilters#getSubtypeFilter(IType, ITypeHierarchy)} when ever possible.
-   * 
    */
   public static ITypeFilter getSubtypeFilter(final IType type) {
     return new ITypeFilter() {
@@ -115,9 +114,11 @@ public class TypeFilters {
   public static ITypeFilter getInScoutBundles(final IScoutBundle... bundles) {
     return new ITypeFilter() {
       public boolean accept(IType type) {
-        for (IScoutBundle b : bundles) {
-          if (b.contains(type)) {
-            return true;
+        if (bundles != null) {
+          for (IScoutBundle b : bundles) {
+            if (b.contains(type)) {
+              return true;
+            }
           }
         }
         return false;

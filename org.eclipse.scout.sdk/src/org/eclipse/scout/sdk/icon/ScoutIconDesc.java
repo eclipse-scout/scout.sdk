@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,15 +17,14 @@ public class ScoutIconDesc {
 
   private final String m_id;
   private final String m_iconName;
-  private final ImageDescriptor m_imgDesc;
+  private ImageDescriptor m_imgDesc;
   private IField m_constantField;
   private boolean m_inherited;
 
-  public ScoutIconDesc(String id, String iconName, ImageDescriptor imgDesc, IField constantField, boolean inherited) {
+  public ScoutIconDesc(String id, String iconName, IField constantField, boolean inherited) {
     m_inherited = inherited;
     m_id = id;
     m_iconName = iconName;
-    m_imgDesc = imgDesc;
     m_constantField = constantField;
   }
 
@@ -39,6 +38,14 @@ public class ScoutIconDesc {
 
   public ImageDescriptor getImageDescriptor() {
     return m_imgDesc;
+  }
+
+  /**
+   * @param imgDesc
+   *          the imgDesc to set
+   */
+  public void setImgDesc(ImageDescriptor imgDesc) {
+    m_imgDesc = imgDesc;
   }
 
   public String getIconName() {

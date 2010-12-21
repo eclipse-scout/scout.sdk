@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,21 +17,17 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.INlsConstants;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 public class ScoutProject implements IScoutProject {
 
@@ -239,15 +235,19 @@ public class ScoutProject implements IScoutProject {
   }
 
   public IIconProvider getIconProvider() {
-    if (m_iconProvider == null && getSharedBundle() != null) {
-      IType abstractIcons = ScoutSdk.getType(RuntimeClasses.AbstractIcons);
-      ICachedTypeHierarchy iconsHierarchy = ScoutSdk.getPrimaryTypeHierarchy(abstractIcons);
-      IType[] allIconTypes = iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getClassesInProject(getSharedBundle().getJavaProject()), null);
-      if (allIconTypes != null && allIconTypes.length > 0) {
-        m_iconProvider = new ScoutProjectIcons(allIconTypes[0]);
-      }
+    if (m_iconProvider == null) {
+      m_iconProvider = new ScoutProjectIcons(this);
     }
     return m_iconProvider;
+
+//    if (m_iconProvider == null && getSharedBundle() != null) {
+//      IType abstractIcons = ScoutSdk.getType(RuntimeClasses.AbstractIcons);
+//      ICachedTypeHierarchy iconsHierarchy = ScoutSdk.getPrimaryTypeHierarchy(abstractIcons);
+//      IType[] allIconTypes = iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getClassesInProject(getSharedBundle().getJavaProject()), null);
+//      if (allIconTypes != null && allIconTypes.length > 0) {
+//      }
+//    }
+//    return m_iconProvider;
   }
 
 }

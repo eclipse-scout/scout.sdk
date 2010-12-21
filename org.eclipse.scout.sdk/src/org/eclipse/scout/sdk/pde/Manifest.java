@@ -49,7 +49,7 @@ public class Manifest extends RawManifest {
     if (!file.exists()) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not find manifest of " + file.getProject().getName()));
     }
-    file.refreshLocal(0, null);
+    file.refreshLocal(IResource.DEPTH_ONE, null);
     InputStreamReader reader = null;
     try {
       reader = new InputStreamReader(file.getContents());
