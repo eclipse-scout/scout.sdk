@@ -30,8 +30,8 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.forms.widgets.Form;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.part.EditorPart;
 import org.eclipse.ui.part.FileEditorInput;
 
@@ -42,7 +42,7 @@ public class IconsEditor extends EditorPart {
 
   public static final String ID = IconsEditor.class.getName();
   private FormToolkit m_toolkit;
-  private ScrolledForm m_form;
+  private Form m_form;
   private Table m_table;
   private TableViewer m_viewer;
   private IconTableContentProvider m_contentProvider;
@@ -51,12 +51,12 @@ public class IconsEditor extends EditorPart {
   @Override
   public void createPartControl(Composite parent) {
     m_toolkit = new FormToolkit(parent.getDisplay());
-    m_form = m_toolkit.createScrolledForm(parent);
+    m_form = m_toolkit.createForm(parent);
     m_form.setText("Icons");
     Composite body = m_form.getBody();
     body.setLayout(new FillLayout());
     createFormBody(body);
-    m_form.reflow(true);
+//    m_form.reflow(true);
   }
 
   private void createFormBody(Composite parent) {

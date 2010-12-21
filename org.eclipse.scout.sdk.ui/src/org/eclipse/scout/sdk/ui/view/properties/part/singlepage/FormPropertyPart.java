@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -72,15 +72,6 @@ public class FormPropertyPart extends JdtTypePropertyPart {
       if (TypeUtility.exists(formData)) {
         model.addGlobalLink(new TypeOpenLink(formData));
       }
-//      String formDataRegex = entityName + ScoutIdeProperties.SUFFIX_FORM_DATA;
-//      ITypeFilter formDataFilter = TypeFilters.getMultiTypeFilter(
-//          TypeFilters.getRegexSimpleNameFilter(formDataRegex),
-//          TypeFilters.getClassFilter(),
-//          TypeFilters.getInScoutProject(scoutBundle.getScoutProject())
-//          );
-//      for (IType candidate : ScoutSdk.getCachedTypeHierarchy(abstractFormData).getAllSubtypes(abstractFormData, formDataFilter, TypeComparators.getTypeNameComparator())) {
-//        model.addGlobalLink(new TypeOpenLink(candidate));
-//      }
       // service
       String formRegex = "(I)?" + entityName + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE;
       ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(

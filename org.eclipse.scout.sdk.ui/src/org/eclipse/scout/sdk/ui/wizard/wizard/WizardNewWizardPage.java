@@ -175,7 +175,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
-    if (ScoutSdk.getType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS) + "." + getTypeName()) != null) {
+    if (ScoutSdk.getType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_WIZARDS) + "." + getTypeName()) != null) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (getTypeName().matches(Regex.REGEX_WELLFORMD_JAVAFIELD)) {
