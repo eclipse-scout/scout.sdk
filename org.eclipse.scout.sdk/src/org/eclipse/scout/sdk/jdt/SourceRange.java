@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.jdt;
 
 import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jface.text.Document;
 
 public class SourceRange implements ISourceRange {
 
@@ -23,6 +24,11 @@ public class SourceRange implements ISourceRange {
 
   }
 
+  public static SourceRange getFullRange(Document document) {
+    return new SourceRange(0, document.getLength());
+  }
+
+  @Override
   public int getLength() {
     return m_length;
   }
@@ -31,6 +37,7 @@ public class SourceRange implements ISourceRange {
     m_length = length;
   }
 
+  @Override
   public int getOffset() {
     return m_offset;
   }

@@ -112,7 +112,12 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public INlsProject findBestMatchNlsProject() {
-    INlsProject nlsProject = m_workspaceGraph.getScoutProject(this).getNlsProject();
+    IScoutProject project = m_workspaceGraph.getScoutProject(this);
+    INlsProject nlsProject = null;
+    while (nlsProject == null && project != null) {
+      nlsProject = project.findNlsProject();
+      project = project.getParentProject();
+    }
     return nlsProject;
   }
 
