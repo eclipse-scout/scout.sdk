@@ -79,10 +79,13 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
         return row.getKey();
       }
       default: {
-        Language lang = getProject().getAllLanguages()[columnIndex - (NlsTable.AMOUNT_UTILITY_COLS + 1)];
-        String text = row.getTranslation(lang);
-        if (text == null) {
-          return "";
+        String text = "";
+        if (columnIndex > 0) {
+          Language lang = getProject().getAllLanguages()[columnIndex - (NlsTable.AMOUNT_UTILITY_COLS + 1)];
+          text = row.getTranslation(lang);
+          if (text == null) {
+            return "";
+          }
         }
         return text;
 
@@ -124,9 +127,9 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
     int index = m_sortIndex;
-    if (index < NlsTable.AMOUNT_UTILITY_COLS) {
-      index = NlsTable.AMOUNT_UTILITY_COLS;
-    }
+//    if (index < NlsTable.AMOUNT_UTILITY_COLS) {
+//      index = NlsTable.AMOUNT_UTILITY_COLS;
+//    }
     if (m_ascSorting) {
       return getColumnText(e2, index).toLowerCase().compareTo(getColumnText(e1, index).toLowerCase());
 

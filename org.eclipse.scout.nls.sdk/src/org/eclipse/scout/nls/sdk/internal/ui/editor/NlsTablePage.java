@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui.editor;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -17,6 +20,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.NlsTableModel;
@@ -28,6 +33,7 @@ import org.eclipse.scout.nls.sdk.internal.ui.action.RemoveAction;
 import org.eclipse.scout.nls.sdk.internal.ui.action.UpdateReferenceCountAction;
 import org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport.NlsExportAction;
 import org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport.NlsImportAction;
+import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProjectListener;
 import org.eclipse.scout.nls.sdk.model.workspace.project.NlsProjectEvent;
@@ -102,7 +108,7 @@ public class NlsTablePage extends Composite {
     // manager.add(new NewEntryAction(m_nlsProject, m_table));
     manager.add(new TranslationFileNewAction(m_table.getShell(), true, m_nlsProject));
     manager.add(new NlsImportAction(m_nlsProject, m_table.getShell()));
-    manager.add(new NlsExportAction(m_nlsProject,m_table.getShell()));
+    manager.add(new NlsExportAction(m_nlsProject, m_table.getShell()));
     // manager.add(new NewLanguageFileAction(m_nlsProject,m_table.getViewer()));
     // manager.add( new UpdateReferencesAction("Update ALL references [Shift+F6]",m_nlsProject,null));
   }
@@ -219,21 +225,35 @@ public class NlsTablePage extends Composite {
 
   private class P_MenuListener implements IMenuListener {
     public void menuAboutToShow(IMenuManager manager) {
-      MenuManager menuManager = (MenuManager) manager;
-      // TODO handle if no entries are available
-      Point cursorPos /* row, column */= m_table.getCursorLocation();
-      if (cursorPos.x < 0 && cursorPos.y < 0) return;
-      TableItem row = m_table.getViewer().getTable().getItem(cursorPos.x);
-      // TableItem row = m_cursor.getRow();
-      NlsEntry nlsRow = (NlsEntry) row.getData();
-
-      if (row != null) {
-        addHierarchyMenues(menuManager, nlsRow, cursorPos.y, row.getText(cursorPos.y));
+      IStructuredSelection selection = (IStructuredSelection) m_table.getViewer().getSelection();
+      ArrayList<INlsEntry> entries = new ArrayList<INlsEntry>();
+      for (Iterator it = selection.iterator(); it.hasNext();) {
+        entries.add((INlsEntry) it.next());
       }
+      MenuManager menuManager = (MenuManager) manager;
+      if (entries.size() == 1) {
+        Point cursorPos /* row, column */= m_table.getCursorLocation();
+        if (cursorPos.y < 0) {
+          cursorPos.y = -1;
+        }
+        TableItem row = null;
+        if(cursorPos.x > 0){
+          row = m_table.getViewer().getTable().getItem(cursorPos.x);
+        }
+        addSingleSelectMenues(menuManager, entries.get(0), cursorPos.y, row.getText(cursorPos.y));
+      }
+      else if (entries.size() > 1) {
+        addMultiSelectMenues(menuManager, entries.toArray(new INlsEntry[entries.size()]));
+      }
+      // anyway
+      manager.add(new Separator());
+      manager.add(new UpdateReferenceCountAction(m_nlsProject, m_table, m_tableModel));
+      // TODO check if the creation of a new file is legal (workspace vs. platform)
+      manager.add(new TranslationFileNewAction(m_table.getShell(), true, m_nlsProject));
     }
 
-    private void addHierarchyMenues(MenuManager manager, NlsEntry row, int cursorColumn, String cursorText) {
-      if (!(row instanceof InheritedNlsEntry)) {
+    private void addSingleSelectMenues(MenuManager manager, INlsEntry entry, int cursorColumn, String cursorText) {
+      if (!(entry instanceof InheritedNlsEntry)) {
         if (cursorColumn == NlsTable.INDEX_COLUMN_KEYS) {
           manager.add(new Action("Edit key") {
             @Override
@@ -242,27 +262,18 @@ public class NlsTablePage extends Composite {
             }
           });
         }
-        manager.add(new RemoveAction("Remove", m_nlsProject, row.getKey()));
+        manager.add(new RemoveAction("Remove "+entry.getKey(), m_nlsProject, entry));
         manager.add(new Separator());
       }
-      manager.add(new FindReferencesAction(m_nlsProject, row.getKey()));
-      manager.add(new UpdateReferenceCountAction(m_nlsProject, m_table, m_tableModel));
-      // IJavaElement je = getJavaElementOf(row.getKey());
-      // if (je != null) {
-      // manager.add(new FindReferencesForegroundAction("Find references in Workspace", PlatformUI.getWorkbench()
-      // .getActiveWorkbenchWindow().getActivePage().getActivePart().getSite(), je, false));
-      // manager.add(new FindReferencesForegroundAction("Find references...", PlatformUI.getWorkbench()
-      // .getActiveWorkbenchWindow().getActivePage().getActivePart().getSite(), je, true));
-      // }
-
-      manager.add(new CopyPasteAction("Copy", cursorText, m_table.getDisplay()));
-      // manager.add(new CopyPasteAction("Copy Java reference", getNlsClass().getSimpleClassName() + "." + row.getKey(),
-      // m_table.getDisplay()));
-
-      manager.add(new Separator());
-      // TODO check if the creation of a new file is legal (workspace vs. platform)
-      manager.add(new TranslationFileNewAction(m_table.getShell(), true, m_nlsProject));
+      manager.add(new FindReferencesAction(m_nlsProject, entry.getKey()));
+      manager.add(new CopyPasteAction("Copy",cursorText , m_table.getDisplay()));
     }
+
+    private void addMultiSelectMenues(MenuManager manager, INlsEntry[] entries) {
+      manager.add(new RemoveAction("Remove entries", m_nlsProject, entries));
+    }
+
+
   } // end class P_MenuListener
 
 }

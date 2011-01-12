@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -241,6 +241,7 @@ public class NlsTable extends Composite {
     colRefs.setWidth(45);
     colRefs.setText("*");
     colRefs.setToolTipText("* if the references are not sync!");
+    colRefs.addSelectionListener(new P_SortSelectionAdapter(0));
 
     int i = NlsTable.INDEX_COLUMN_KEYS;
     // nls java file column
@@ -279,7 +280,7 @@ public class NlsTable extends Composite {
   private void updateSortIcon() {
     int index = m_tableModel.getSortIndex();
 
-    if (index < NlsTable.INDEX_COLUMN_KEYS) {
+    if (index < 0) {
       index = NlsTable.INDEX_COLUMN_KEYS;
       m_tableModel.setSortIndex(index);
     }
