@@ -51,7 +51,7 @@
          name="NLS Text Proposals"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
       <proposalCategory
-            icon="resources/icons/message.png">
+            icon="resources/icons/comment.png">
       </proposalCategory>
    </extension>
    <extension
