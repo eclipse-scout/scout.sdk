@@ -113,8 +113,7 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
 
     }
     catch (Exception e) {
-      // TODO: handle exception
-      e.printStackTrace();
+      NlsCore.logWarning("could not compute nls proposals.",e);
     }
     return NO_PROPOSALS;
   }
