@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -208,6 +208,9 @@ public class NlsTableCursor {
   private TableTextEditor m_editingText;
 
   private void createEditableTextInternal(String defaultText) {
+    if(m_editingText != null && ! m_editingText.isDisposed()){
+      m_editingText.dispose();
+    }
     m_editingText = new TableTextEditor(m_cursor);
     String input = m_cursor.getRow().getText(m_cursor.getColumn());
     if (defaultText != null) {
