@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -227,5 +227,6 @@ public final class RuntimeClasses {
   public static final String ISmartColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn";
   public static final String IStringColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn";
   public static final String ITimeColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.ITimeColumn";
+  public static final String CopyWidthsOfColumnsMenu = "org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu";
 
 }

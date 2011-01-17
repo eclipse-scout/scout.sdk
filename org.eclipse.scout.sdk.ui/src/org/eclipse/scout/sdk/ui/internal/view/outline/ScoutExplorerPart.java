@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,6 +44,7 @@ import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
 import org.eclipse.scout.sdk.ui.action.ScoutProjectNewAction;
 import org.eclipse.scout.sdk.ui.extensions.IScoutSdkExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.ScoutExtensionsExtensionPoint;
+import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndPasteSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineProcess;
@@ -350,7 +351,16 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
                   ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
                     public void run() {
                       if (e.keyCode == SWT.F5) {
+                        // act on F5
                         page.refresh((e.stateMask == SWT.SHIFT));
+                      }
+                      else if (e.keyCode == 'v' && e.stateMask == SWT.CONTROL) {
+                        // act on CONTROL + V
+                        ExplorerCopyAndPasteSupport.performPaste(m_viewer, page);
+                      }
+                      else if (e.keyCode == 'c' && e.stateMask == SWT.CONTROL) {
+                        // act on CONTROL + C
+                        ExplorerCopyAndPasteSupport.performCopy(m_viewer, page);
                       }
                     }
                   });

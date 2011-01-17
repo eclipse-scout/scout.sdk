@@ -8,6 +8,7 @@
    <extension-point id="explorerPage" name="Scout Explorer Page" schema="schema/explorerPage.exsd"/>
    <extension-point id="propertyStructure" name="Scout Property View Structure" schema="schema/propertyStructure.exsd"/>
    <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
+   <extension-point id="outlineCopyAndPaste" name="Copy And Paste" schema="schema/outlineCopyAndPaste.exsd"/>
    <extension
          point="org.eclipse.ui.splashHandlers">
       <splashHandlerProductBinding
@@ -598,5 +599,11 @@
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ScoutProjectPropertyPart">
          </singlePart>
       </part>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.outlineCopyAndPaste">
+      <pasteSupport
+            pasteTargetDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.TableColumnWidthsPasteTargetDelegator">
+      </pasteSupport>
    </extension>
 </plugin>
