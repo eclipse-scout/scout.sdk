@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.eclipse.scout.sdk.feature"
-      label="Scout SDK Feature"
+      label="%featureName"
       version="3.5.5.qualifier"
-      provider-name="Eclipse Scout Project">
+      provider-name="%providerName">
 
    <description>
       Scout SDK
