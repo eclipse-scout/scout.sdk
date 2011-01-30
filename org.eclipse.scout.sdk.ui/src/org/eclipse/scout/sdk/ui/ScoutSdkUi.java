@@ -11,8 +11,6 @@
 package org.eclipse.scout.sdk.ui;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.ui.JavaUI;
@@ -22,7 +20,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.LogStatus;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
-import org.eclipse.scout.sdk.ui.internal.jobs.ShowReleaseNotesJob;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -40,7 +37,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.Version;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -154,27 +150,27 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     super.start(context);
     plugin = this;
     // version++ -> releasenotes
-    try {
-      IEclipsePreferences node = new InstanceScope().getNode(getBundle().getSymbolicName());
-      Version lastVersion = Version.emptyVersion;
-      if (node != null) {
-        lastVersion = Version.parseVersion(node.get(PROPERTY_PLUGIN_VERSION, "0.0.0"));
-        lastVersion = new Version(lastVersion.getMajor(), lastVersion.getMinor(), lastVersion.getMicro());
-      }
-      Version newVersion = Version.parseVersion((String) context.getBundle().getHeaders().get("Bundle-Version"));
-      newVersion = new Version(newVersion.getMajor(), newVersion.getMinor(), newVersion.getMicro());
-      ScoutSdkUi.logWarning("before compare new version '" + newVersion + "' to old version '" + lastVersion + "'");
-      if (newVersion.compareTo(lastVersion) > 0) {
-        if (node != null) {
-          node.put(PROPERTY_PLUGIN_VERSION, newVersion.toString());
-        }
-        ShowReleaseNotesJob job = new ShowReleaseNotesJob(newVersion);
-        job.schedule(100);
-      }
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logError("could not versioncheck...", e);
-    }
+//    try {
+//      IEclipsePreferences node = new InstanceScope().getNode(getBundle().getSymbolicName());
+//      Version lastVersion = Version.emptyVersion;
+//      if (node != null) {
+//        lastVersion = Version.parseVersion(node.get(PROPERTY_PLUGIN_VERSION, "0.0.0"));
+//        lastVersion = new Version(lastVersion.getMajor(), lastVersion.getMinor(), lastVersion.getMicro());
+//      }
+//      Version newVersion = Version.parseVersion((String) context.getBundle().getHeaders().get("Bundle-Version"));
+//      newVersion = new Version(newVersion.getMajor(), newVersion.getMinor(), newVersion.getMicro());
+//      ScoutSdkUi.logWarning("before compare new version '" + newVersion + "' to old version '" + lastVersion + "'");
+//      if (newVersion.compareTo(lastVersion) > 0) {
+//        if (node != null) {
+//          node.put(PROPERTY_PLUGIN_VERSION, newVersion.toString());
+//        }
+//        ShowReleaseNotesJob job = new ShowReleaseNotesJob(newVersion);
+//        job.schedule(100);
+//      }
+//    }
+//    catch (Exception e) {
+//      ScoutSdkUi.logError("could not versioncheck...", e);
+//    }
 //    m_formDataMarkerSupport = new FormDataMarkerSupport();
 //    JavaCore.addElementChangedListener(m_formDataMarkerSupport);
 

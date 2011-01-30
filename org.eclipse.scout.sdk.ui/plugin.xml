@@ -67,7 +67,7 @@
       <editor
             class="org.eclipse.scout.sdk.ui.internal.view.icons.IconsEditor"
             extensions="icons"
-            icon="resources/icons/old/generic_elements.gif"
+            icon="resources/icons/icons.png"
             id="org.eclipse.scout.sdk.ui.internal.view.icons.IconsEditor"
             name="Icons">
       </editor>
