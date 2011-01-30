@@ -10,17 +10,6 @@
    <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
    <extension-point id="outlineCopyAndPaste" name="Copy And Paste" schema="schema/outlineCopyAndPaste.exsd"/>
    <extension
-         point="org.eclipse.ui.splashHandlers">
-      <splashHandlerProductBinding
-            productId="org.eclipse.sdk.ide"
-            splashId="org.eclipse.scout.sde.ui.internal.SdeSplashHandler">
-      </splashHandlerProductBinding>
-      <splashHandler
-            class="org.eclipse.scout.sdk.ui.internal.SplashHandler"
-            id="org.eclipse.scout.sde.ui.internal.SdeSplashHandler">
-      </splashHandler>
-   </extension>
-   <extension
          point="org.eclipse.ui.perspectiveExtensions">
          <perspectiveExtension
             targetID="org.eclipse.scout.sdk.ui.internal.ScoutPerspective">
