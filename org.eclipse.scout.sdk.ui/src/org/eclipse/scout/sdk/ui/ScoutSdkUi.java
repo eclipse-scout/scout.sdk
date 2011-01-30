@@ -154,20 +154,26 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     super.start(context);
     plugin = this;
     // version++ -> releasenotes
-    IEclipsePreferences node = new InstanceScope().getNode(getBundle().getSymbolicName());
-    Version lastVersion = Version.emptyVersion;
-    if (node != null) {
-      lastVersion = Version.parseVersion(node.get(PROPERTY_PLUGIN_VERSION, "0.0.0"));
-      lastVersion = new Version(lastVersion.getMajor(), lastVersion.getMinor(), lastVersion.getMicro());
-    }
-    Version newVersion = Version.parseVersion((String) context.getBundle().getHeaders().get("Bundle-Version"));
-    newVersion = new Version(newVersion.getMajor(), newVersion.getMinor(), newVersion.getMicro());
-    if (newVersion.compareTo(lastVersion) > 0) {
+    try {
+      IEclipsePreferences node = new InstanceScope().getNode(getBundle().getSymbolicName());
+      Version lastVersion = Version.emptyVersion;
       if (node != null) {
-        node.put(PROPERTY_PLUGIN_VERSION, newVersion.toString());
+        lastVersion = Version.parseVersion(node.get(PROPERTY_PLUGIN_VERSION, "0.0.0"));
+        lastVersion = new Version(lastVersion.getMajor(), lastVersion.getMinor(), lastVersion.getMicro());
       }
-      ShowReleaseNotesJob job = new ShowReleaseNotesJob(newVersion);
-      job.schedule(100);
+      Version newVersion = Version.parseVersion((String) context.getBundle().getHeaders().get("Bundle-Version"));
+      newVersion = new Version(newVersion.getMajor(), newVersion.getMinor(), newVersion.getMicro());
+      ScoutSdkUi.logWarning("before compare new version '" + newVersion + "' to old version '" + lastVersion + "'");
+      if (newVersion.compareTo(lastVersion) > 0) {
+        if (node != null) {
+          node.put(PROPERTY_PLUGIN_VERSION, newVersion.toString());
+        }
+        ShowReleaseNotesJob job = new ShowReleaseNotesJob(newVersion);
+        job.schedule(100);
+      }
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not versioncheck...", e);
     }
 //    m_formDataMarkerSupport = new FormDataMarkerSupport();
 //    JavaCore.addElementChangedListener(m_formDataMarkerSupport);
