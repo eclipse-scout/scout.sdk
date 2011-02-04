@@ -31,11 +31,7 @@
    <plugins>
       <plugin id="@@BUNDLE_SERVER_NAME@@" fragment=""/>
       <plugin id="@@BUNDLE_SHARED_NAME@@" fragment=""/>
-      <plugin id="ch.qos.logback.core"/>
-      <plugin id="ch.qos.logback.slf4j" fragment="true"/>
-      <plugin id="javax.mail.jre16"/>
       <plugin id="javax.servlet"/>
-      <plugin id="jcifs"/>
       <plugin id="org.apache.commons.codec"/>
       <plugin id="org.eclipse.core.contenttype"/>
       <plugin id="org.eclipse.core.jobs"/>
@@ -58,10 +54,6 @@
       <plugin id="org.eclipse.scout.rt.shared"/>
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.update.configurator"/>
-      <plugin id="org.slf4j.api"/>
-      <plugin id="org.slf4j.jcl"/>
-      <plugin id="org.slf4j.jul"/>
-      <plugin id="org.slf4j.log4j"/>
    </plugins>
 
 

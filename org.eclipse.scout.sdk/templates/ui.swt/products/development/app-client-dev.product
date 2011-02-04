@@ -35,8 +35,6 @@
       <plugin id="@@BUNDLE_CLIENT_NAME@@" fragment=""/>
       <plugin id="@@BUNDLE_SHARED_NAME@@" fragment=""/>
       <plugin id="@@BUNDLE_SWT_NAME@@" fragment=""/>
-      <plugin id="ch.qos.logback.core"/>
-      <plugin id="ch.qos.logback.slf4j" fragment="true"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>
@@ -72,7 +70,6 @@
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.swt"/>
       <plugin id="org.eclipse.swt.@@OSGI_WS@@.@@OSGI_OS@@.@@OSGI_ARCH@@" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.extension"/>
       <plugin id="org.eclipse.text"/>
       <plugin id="org.eclipse.ui"/>
       <plugin id="org.eclipse.ui.forms"/>
@@ -80,10 +77,6 @@
       <plugin id="org.eclipse.ui.workbench"/>
       <plugin id="org.eclipse.ui.workbench.texteditor"/>
       <plugin id="org.eclipse.update.configurator"/>
-      <plugin id="org.slf4j.api"/>
-      <plugin id="org.slf4j.jcl"/>
-      <plugin id="org.slf4j.jul"/>
-      <plugin id="org.slf4j.log4j"/>
    </plugins>
 
 
