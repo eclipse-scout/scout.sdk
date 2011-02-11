@@ -14,15 +14,20 @@
     <servlet alias="/updatesite" class="org.eclipse.scout.rt.server.RemoteFileServlet">
       <init-param name="folder" value="/updatesite"/>
     </servlet>
-    <servlet alias="/" class="org.eclipse.scout.rt.server.RemoteFileServlet">
-      <init-param name="folder" value="/html">
-        </init-param>
+    <servlet alias="/" class="org.eclipse.scout.rt.server.ResourceServlet">
+      <init-param name="bundle-name" value="@@BUNDLE_SERVER_NAME@@"/>
+      <init-param name="bundle-path" value="/resources/html"/>
     </servlet>
   </extension>
   <extension point="org.eclipse.scout.http.servletfilter.filters">
     <filter aliases="/" class="org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter" ranking="20">
       <init-param name="realm" value="BSIAG Development"/>
       <init-param name="users" value="admin=manager,allen=allen,blake=blake"/>
+    </filter>
+    <filter
+          aliases="/"
+          class="org.eclipse.scout.rt.server.servlet.filter.AnonymousSecurityFilter"
+          ranking="30">
     </filter>
   </extension>
   <extension id="app" name="Server Application" point="org.eclipse.core.runtime.applications">

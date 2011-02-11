@@ -12,27 +12,27 @@
          point="org.eclipse.ui.views">
       <view
             class="@@BUNDLE_SWT_NAME@@.views.CenterView"
-            icon="icons/eclipse_scout.gif"
+            icon="resources/icons/eclipse_scout.gif"
             id="@@BUNDLE_SWT_NAME@@.views.CenterView"
             name="CenterView">
       </view>
       <view
             class="@@BUNDLE_SWT_NAME@@.views.OutlinePageView"
-            icon="icons/eclipse_scout.gif"
+            icon="resources/icons/eclipse_scout.gif"
             id="@@BUNDLE_SWT_NAME@@.views.OutlinePageView"
             name="Outline"
             restorable="true">
       </view>
       <view
             class="@@BUNDLE_SWT_NAME@@.views.TablePageView"
-            icon="icons/eclipse_scout.gif"
+            icon="resources/icons/eclipse_scout.gif"
             id="@@BUNDLE_SWT_NAME@@.views.TablePageView"
             name="Table Page"
             restorable="true">
       </view>
       <view
             class="@@BUNDLE_SWT_NAME@@.views.SearchView"
-            icon="icons/eclipse_scout.gif"
+            icon="resources/icons/eclipse_scout.gif"
             id="@@BUNDLE_SWT_NAME@@.views.SearchView"
             name="Search"
             restorable="true">
@@ -63,7 +63,7 @@
       point="org.eclipse.ui.views">
    <view
          class="org.eclipse.ui.internal.progress.ProgressView"
-         icon="icons/progress_none.gif"
+         icon="resources/icons/progress_none.gif"
          id="org.eclipse.ui.views.ProgressView"
          name="Progress View">
    </view>

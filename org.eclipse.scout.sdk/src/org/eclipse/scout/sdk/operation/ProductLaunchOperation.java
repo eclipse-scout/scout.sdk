@@ -64,8 +64,8 @@ public class ProductLaunchOperation implements IOperation {
     productModel.load();
 
     if (m_configIniFile == null) {
-      m_configIniFile = getProductFile().getParent().getFile(new Path("config.ini"));
     }
+    m_configIniFile = getProductFile().getParent().getFile(new Path("config.ini"));
     HashSet<String> allWorkspacePlugins = new HashSet<String>();
     for (IProject project : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
       allWorkspacePlugins.add(project.getName());

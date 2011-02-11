@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -165,14 +165,19 @@ public class MethodCreateOperation implements IOperation {
         builder.append(" ");
       }
     }
-    // body
-    builder.append("{\n");
-    String body = createMethodBody(validator);
-    if (body != null) {
-      builder.append(body);
-      builder.append("\n");
+    if (Flags.isInterface(getMethodFlags())) {
+      builder.append(";");
     }
-    builder.append("}\n");
+    else {
+      // body
+      builder.append("{\n");
+      String body = createMethodBody(validator);
+      if (body != null) {
+        builder.append(body);
+        builder.append("\n");
+      }
+      builder.append("}\n");
+    }
   }
 
   /**

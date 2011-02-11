@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -71,7 +71,7 @@ public class AxisWebServiceClientSetupOperation implements IOperation {
           };
       for (String s : additionalLibs) {
         if (!m_serverBundle.getProject().getFile(s).exists()) {
-          new InstallBinaryFileOperation("templates/server/" + s, s, m_serverBundle.getProject()).run(monitor, workingCopyManager);
+          new InstallBinaryFileOperation("templates/server/" + s, m_serverBundle.getProject(), s).run(monitor, workingCopyManager);
         }
       }
       PdeUtility.addBundleClasspaths(m_serverBundle.getProject(), additionalLibs);

@@ -147,6 +147,7 @@ public interface SdkIcons {
   String ServerBundle = "serverBundle.png";
   String ServerBundleAdd = "serverBundle_add.png";
   String ServerBundleRemove = "serverBundle_remove.png";
+  String ServerBundleExport = "serverBundle_export.png";
   String ServerSession = "serverSession.png";
   String ServerSessionAdd = "serverSession_add.png";
   String ServerSessionRemove = "serverSession_remove.png";

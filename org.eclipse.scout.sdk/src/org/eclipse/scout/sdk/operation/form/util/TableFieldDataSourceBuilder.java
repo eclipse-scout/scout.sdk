@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -139,7 +139,7 @@ public class TableFieldDataSourceBuilder extends AbstractSourceBuilder {
 
       StringBuilder setterBuf = new StringBuilder();
       setterBuf.append("@Override\n");
-      setterBuf.append("public void setValueAt(int row, int column, Object value) throws IllegalArgumentException{\n");
+      setterBuf.append("public void setValueAt(int row, int column, Object value) {\n");
       setterBuf.append("  switch(column){\n");
       for (int i = 0; i < m_columnSimpleNames.size(); i++) {
         String columnSimpleName = m_columnSimpleNames.get(i);

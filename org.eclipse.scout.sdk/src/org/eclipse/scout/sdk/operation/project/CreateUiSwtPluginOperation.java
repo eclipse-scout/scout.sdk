@@ -4,15 +4,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
+import java.net.MalformedURLException;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
@@ -44,12 +49,17 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
     super.run(monitor, workingCopyManager);
     IProject project = getCreatedProject();
     TemplateVariableSet bindings = TemplateVariableSet.createNew(project, m_templateBindings);
-    new InstallTextFileOperation("templates/ui.swt/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/ui.swt/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/ui.swt/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
-    new InstallBinaryFileOperation("templates/ui.swt/splash.bmp", "splash.bmp", project).run(monitor, workingCopyManager);
-    new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipse_scout.gif", "icons/resources/eclipse_scout.gif", project).run(monitor, workingCopyManager);
-    new InstallBinaryFileOperation("templates/ui.swt/resources/icons/progress_none.gif", "icons/resources/progress_none.gif", project).run(monitor, workingCopyManager);
+    try {
+      new InstallTextFileOperation("templates/ui.swt/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, bindings).run(monitor, workingCopyManager);
+      new InstallTextFileOperation("templates/ui.swt/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
+      new InstallTextFileOperation("templates/ui.swt/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
+      new InstallBinaryFileOperation("templates/ui.swt/splash.bmp", project, "splash.bmp").run(monitor, workingCopyManager);
+      new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
+      new InstallBinaryFileOperation("templates/ui.swt/resources/icons/progress_none.gif", project, "resources/icons/progress_none.gif").run(monitor, workingCopyManager);
+    }
+    catch (MalformedURLException e) {
+      throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));
+    }
 
     // products
     String projectAlias = bindings.getVariable(ITemplateVariableSet.VAR_PROJECT_ALIAS);

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -140,6 +140,32 @@ public final class HierarchyCache {
     }
   }
 
+  private void handleCompilationUnitChagnedExternal(ICompilationUnit icu) {
+    IRegion region = JavaCore.newRegion();
+    region.add(icu);
+    try {
+      ITypeHierarchy hierarchy = JavaCore.newTypeHierarchy(region, null, null);
+      for (IType t : icu.getTypes()) {
+        reqTypeChangedFromExternal(t, hierarchy);
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not find types in compilation unti '" + icu.getElementName() + "'.", e);
+    }
+  }
+
+  private void reqTypeChangedFromExternal(IType type, ITypeHierarchy hierarchy) {
+    handleTypeChange(type, hierarchy);
+    try {
+      for (IType subType : type.getTypes()) {
+        reqTypeChangedFromExternal(subType, hierarchy);
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not find subtypes of type '" + type.getElementName() + "'.", e);
+    }
+  }
+
   /**
    * will be notified before events are passed through the event listener list from {@link JavaResourceChangedEmitter}
    * 
@@ -163,6 +189,11 @@ public final class HierarchyCache {
         }
         break;
       }
+      case JavaResourceChangedEmitter.CHANGED_EXTERNAL:
+        if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+          handleCompilationUnitChagnedExternal((ICompilationUnit) e.getElement());
+        }
+        break;
     }
   }
 

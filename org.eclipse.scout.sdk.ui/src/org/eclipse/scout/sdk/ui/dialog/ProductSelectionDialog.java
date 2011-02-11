@@ -11,34 +11,29 @@
 package org.eclipse.scout.sdk.ui.dialog;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ICheckStateListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
+import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Resource;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
  * <h3>{@link ProductSelectionDialog}</h3> ...
@@ -47,19 +42,34 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * @since 1.0.8 09.09.2010
  */
 public class ProductSelectionDialog extends TitleAreaDialog {
-  private int TYPE_PRODUCT_NODE = 1;
-  private final IScoutProject m_project;
+  private IScoutProject m_project;
   private ITreeNode m_rootNode;
   private CheckableTree m_tree;
-  private ArrayList<Resource> m_allocatedResources = new ArrayList<Resource>();
   private IFile[] m_checkedFiles;
+  private boolean m_multiSelectionMode = true;
+  private boolean m_productSelectionRequired;
+  private IFile m_selectedProductFile;
+  private ITreeNodeFilter m_visibleNodeFilter;
 
   /**
    * @param parentShell
    */
   public ProductSelectionDialog(Shell parentShell, IScoutProject project) {
+    this(parentShell, project, NodeFilters.getAcceptAll());
+  }
+
+  public ProductSelectionDialog(Shell parentShell, IScoutProject project, ITreeNodeFilter visibleFilter) {
     super(parentShell);
     m_project = project;
+    m_visibleNodeFilter = visibleFilter;
+    setTitle("Select Product");
+    m_checkedFiles = new IFile[0];
+    setShellStyle(getShellStyle() | SWT.RESIZE);
+  }
+
+  public ProductSelectionDialog(Shell parentShell, ITreeNode rootNode) {
+    super(parentShell);
+    m_rootNode = rootNode;
     setTitle("Select Product");
     m_checkedFiles = new IFile[0];
     setShellStyle(getShellStyle() | SWT.RESIZE);
@@ -68,28 +78,21 @@ public class ProductSelectionDialog extends TitleAreaDialog {
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite rootPane = new Composite(parent, SWT.NONE);
-    parent.addDisposeListener(new DisposeListener() {
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        for (Resource r : m_allocatedResources) {
-          r.dispose();
-        }
-      }
-    });
-    m_rootNode = createProductTree();
-    m_tree = new CheckableTree(rootPane, m_rootNode);
+
+    m_tree = new CheckableTree(rootPane, getRootNode());
     m_tree.addCheckSelectionListener(new ICheckStateListener() {
       @Override
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
         ArrayList<IFile> checkedFiles = new ArrayList<IFile>();
         for (ITreeNode n : m_tree.getCheckedNodes()) {
-          if (n.getType() == TYPE_PRODUCT_NODE) {
+          if (n.getType() == TreeUtility.TYPE_PRODUCT_NODE) {
             checkedFiles.add((IFile) n.getData());
           }
         }
         m_checkedFiles = checkedFiles.toArray(new IFile[checkedFiles.size()]);
       }
     });
+    m_tree.getTreeViewer().addSelectionChangedListener(new P_TreeSelectionListener());
     m_tree.setChecked(TreeUtility.findNodes(m_rootNode, NodeFilters.getByData(m_checkedFiles)));
     if (parent.getLayout() instanceof GridLayout) {
       rootPane.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL | GridData.GRAB_VERTICAL));
@@ -99,124 +102,113 @@ public class ProductSelectionDialog extends TitleAreaDialog {
     return rootPane;
   }
 
-  private ITreeNode createProductTree() {
-    ArrayList<P_ProductFile> productFiles = new ArrayList<P_ProductFile>();
-    visitScoutProject(productFiles, m_project);
-    ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
-    rootNode.setVisible(false);
-    for (P_ProductFile productFile : productFiles) {
-      IScoutBundle bundle = productFile.getScoutBundle();
-      IFile file = productFile.getProductFile();
-      ITreeNode bundleNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(bundle));
-      if (bundleNode == null) {
-        bundleNode = new TreeNode(bundle.getType(), bundle.getBundleName(), bundle);
-        switch (bundle.getType()) {
-          case IScoutBundle.BUNDLE_UI_SWING:
-            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.SwingBundle));
-            ((TreeNode) bundleNode).setOrderNr(1000);
-            break;
-          case IScoutBundle.BUNDLE_UI_SWT:
-            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.SwtBundle));
-            ((TreeNode) bundleNode).setOrderNr(2000);
-            break;
-          case IScoutBundle.BUNDLE_SERVER:
-            ((TreeNode) bundleNode).setImage(ScoutSdkUi.getImage(ScoutSdkUi.ServerBundle));
-            ((TreeNode) bundleNode).setOrderNr(3000);
-            break;
-        }
-        bundleNode.setCheckable(false);
-        rootNode.addChild(bundleNode);
-      }
-      TreeNode productNode = new TreeNode(TYPE_PRODUCT_NODE, file.getName() + " (" + file.getParent().getName() + ")", file);
-      productNode.setCheckable(true);
-      productNode.setBold(true);
-      Image img = ScoutSdkUi.getImage(ScoutSdkUi.File);
-      IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) file.getAdapter(IWorkbenchAdapter.class);
-      if (wbAdapter != null) {
-        ImageDescriptor imageDescriptor = wbAdapter.getImageDescriptor(file);
-        if (imageDescriptor != null) {
-          img = imageDescriptor.createImage();
-          m_allocatedResources.add(img);
-        }
-      }
-      ((TreeNode) productNode).setImage(img);
-      bundleNode.addChild(productNode);
+  /**
+   * @return the rootNode
+   */
+  public ITreeNode getRootNode() {
+    if (m_rootNode == null) {
+      m_rootNode = TreeUtility.createProductTree(m_project, getVisibleNodeFilter(), isMultiSelectionMode());
     }
-    return rootNode;
+    return m_rootNode;
   }
 
-  private void visitScoutProject(List<P_ProductFile> productFileCollector, IScoutProject project) {
-    for (IScoutBundle b : project.getAllScoutBundles()) {
-      try {
-        b.getProject().accept(new P_ProductResourceVisitor(b, productFileCollector));
-      }
-      catch (CoreException e) {
-        ScoutSdkUi.logWarning("error during searching *.product in '" + b.getProject().getName() + "'.", e);
-      }
+  public IFile[] getCheckedProductFiles() {
+    if (isMultiSelectionMode()) {
+      return m_checkedFiles;
     }
-    for (IScoutProject childProject : project.getSubProjects()) {
-      visitScoutProject(productFileCollector, childProject);
+    else {
+      return new IFile[]{m_selectedProductFile};
     }
   }
 
-  public IFile[] getSelectedProducts() {
-    return m_checkedFiles;
+  /**
+   * @return the selectedProductFile
+   */
+  public IFile getSelectedProductFile() {
+    return m_selectedProductFile;
   }
 
   /**
    * @param array
    */
-  public void setSelectedProducts(IFile[] array) {
+  public void setCheckedProductFiles(IFile[] array) {
     m_checkedFiles = array;
     if (m_tree != null && !m_tree.isDisposed()) {
-      m_tree.setChecked(TreeUtility.findNodes(m_rootNode, NodeFilters.getByData(array)));
+      ITreeNode[] treeNodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByData(array));
+      if (isMultiSelectionMode()) {
+        m_tree.setChecked(treeNodes);
+      }
+      else {
+        if (treeNodes.length > 0) {
+          ArrayList<Object> pathElements = new ArrayList<Object>();
+          ITreeNode n = treeNodes[0];
+          while (n != null) {
+            pathElements.add(pathElements.size(), n);
+            n = n.getParent();
+          }
+          m_tree.getTreeViewer().setSelection(new TreeSelection(new TreePath(pathElements.toArray())));
+        }
+      }
     }
-
   }
 
-  private class P_ProductResourceVisitor implements IResourceVisitor {
-    private final List<P_ProductFile> m_productFileCollector;
-    private final IScoutBundle m_bundle;
+  /**
+   * @return the multiSelectionMode
+   */
+  public boolean isMultiSelectionMode() {
+    return m_multiSelectionMode;
+  }
 
-    private P_ProductResourceVisitor(IScoutBundle bundle, List<P_ProductFile> productFileCollector) {
-      m_bundle = bundle;
-      m_productFileCollector = productFileCollector;
+  /**
+   * @param multiSelectionMode
+   *          the multiSelectionMode to set
+   */
+  public void setMultiSelectionMode(boolean multiSelectionMode) {
+    m_multiSelectionMode = multiSelectionMode;
+  }
 
-    }
+  /**
+   * @return the productSelectionRequired
+   */
+  public boolean isProductSelectionRequired() {
+    return m_productSelectionRequired;
+  }
 
+  /**
+   * @param productSelectionRequired
+   *          the productSelectionRequired to set
+   */
+  public void setProductSelectionRequired(boolean productSelectionRequired) {
+    m_productSelectionRequired = productSelectionRequired;
+  }
+
+  /**
+   * @return the visibleNodeFilter
+   */
+  public ITreeNodeFilter getVisibleNodeFilter() {
+    return m_visibleNodeFilter;
+  }
+
+  private class P_TreeSelectionListener implements ISelectionChangedListener {
     @Override
-    public boolean visit(IResource resource) throws CoreException {
-      if (resource.getType() == IResource.FILE && resource.getName().matches(".*\\.product")) {
-        m_productFileCollector.add(new P_ProductFile(m_bundle, (IFile) resource));
+    public void selectionChanged(SelectionChangedEvent event) {
+      m_selectedProductFile = null;
+      boolean pageComplete = !isProductSelectionRequired();
+      if (!pageComplete) {
+        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+        if (!selection.isEmpty()) {
+          Object selectedElement = selection.getFirstElement();
+          if (selectedElement instanceof TreeNode) {
+            ITreeNode treeNode = (ITreeNode) selectedElement;
+            if (treeNode.getType() == TreeUtility.TYPE_PRODUCT_NODE) {
+              m_selectedProductFile = (IFile) treeNode.getData();
+              pageComplete = true;
+            }
+          }
+        }
       }
-      else if (resource.getType() == IResource.FOLDER) {
-        return true;
-      }
-      return true;
-    }
-  }
+      getButton(IDialogConstants.OK_ID).setEnabled(pageComplete);
 
-  private class P_ProductFile {
-    private IScoutBundle m_scoutBundle;
-    private IFile m_productFile;
-
-    public P_ProductFile(IScoutBundle bundle, IFile file) {
-      m_scoutBundle = bundle;
-      m_productFile = file;
-    }
-
-    /**
-     * @return the scoutBundle
-     */
-    public IScoutBundle getScoutBundle() {
-      return m_scoutBundle;
-    }
-
-    /**
-     * @return the productFile
-     */
-    public IFile getProductFile() {
-      return m_productFile;
     }
   }
 

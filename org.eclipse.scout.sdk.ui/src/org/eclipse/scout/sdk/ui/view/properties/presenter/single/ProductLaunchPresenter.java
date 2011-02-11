@@ -68,6 +68,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
 
   private String m_productName;
   private final IFile m_productFile;
+  private final IScoutBundle m_bundle;
 
   // internal
   private ImageHyperlink m_runLink;
@@ -77,16 +78,16 @@ public class ProductLaunchPresenter extends AbstractPresenter {
 
   private P_LaunchListener m_launchListener;
   private P_RecomputeLaunchStateJob m_stateUpdateJob;
-  private final int m_productType;
+  private WorkspaceProductModel m_productModel;
 
   /**
    * @param toolkit
    * @param parent
    */
-  public ProductLaunchPresenter(FormToolkit toolkit, Composite parent, IFile productFile, int productType) {
+  public ProductLaunchPresenter(FormToolkit toolkit, Composite parent, IFile productFile, IScoutBundle bundle) {
     super(toolkit, parent);
     m_productFile = productFile;
-    m_productType = productType;
+    m_bundle = bundle;
     String prodName = null;
     String regexp = "name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"";
     String productFileContent = "";
@@ -145,7 +146,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     m_mainGroup.setText(productFile.getParent().getName());
 
     Label l = getToolkit().createLabel(m_mainGroup, "");
-    switch (getProductType()) {
+    switch (getBundle().getType()) {
       case IScoutBundle.BUNDLE_SERVER:
         l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherServer));
         break;
@@ -155,6 +156,15 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       case IScoutBundle.BUNDLE_UI_SWT:
         l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwt));
         break;
+    }
+    m_productModel = null;
+    try {
+      m_productModel = new WorkspaceProductModel(getProductFile(), false);
+      m_productModel.load();
+    }
+    catch (CoreException e) {
+      ScoutSdkUi.logWarning("could not load product model of '" + getProductFile() + "'.", e);
+      return;
     }
     Control linkPart = createLinkPart(m_mainGroup);
     Control actionPart = createActionPart(m_mainGroup);
@@ -170,6 +180,8 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     l.setLayoutData(new GridData(GridData.FILL_VERTICAL));
     linkPart.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     GridData actionPartData = new GridData(GridData.FILL_VERTICAL | GridData.FILL_HORIZONTAL);
+    actionPartData.minimumWidth = actionPart.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
+//    actionPartData.minimumWidth = 50;
     actionPartData.horizontalAlignment = SWT.RIGHT;
     actionPart.setLayoutData(actionPartData);
   }
@@ -178,22 +190,16 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     LinksPresenterModel model = new LinksPresenterModel();
     model.addGlobalLink(new FileOpenLink(getProductFile(), 10, IPDEUIConstants.PRODUCT_EDITOR_ID));
     // find config.ini
-    WorkspaceProductModel productModel = new WorkspaceProductModel(getProductFile(), false);
-    try {
-      productModel.load();
-      IConfigurationFileInfo info = productModel.getProduct().getConfigurationFileInfo();
-      String path = info.getPath(Platform.getOS());
-      if (path == null) {
-        path = info.getPath(null);
-      }
-      if (!StringUtility.isNullOrEmpty(path)) {
-        IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
-        model.addGlobalLink(new FileOpenLink(configIniFile, 20, EditorsUI.DEFAULT_TEXT_EDITOR_ID));
-      }
+    IConfigurationFileInfo info = m_productModel.getProduct().getConfigurationFileInfo();
+    String path = info.getPath(Platform.getOS());
+    if (path == null) {
+      path = info.getPath(null);
     }
-    catch (CoreException e) {
-      ScoutSdkUi.logWarning("could not load product model of '" + getProductFile() + "'.", e);
+    if (!StringUtility.isNullOrEmpty(path)) {
+      IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
+      model.addGlobalLink(new FileOpenLink(configIniFile, 20, EditorsUI.DEFAULT_TEXT_EDITOR_ID));
     }
+
     LinksPresenter presenter = new LinksPresenter(getToolkit(), parent, model);
     return presenter.getContainer();
   }
@@ -202,6 +208,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     Composite container = getToolkit().createComposite(parent);
     m_runLink = getToolkit().createImageHyperlink(container, SWT.NONE);
     m_runLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolRun));
+    m_runLink.setToolTipText("Start product...");
     m_runLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
@@ -209,6 +216,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       }
     });
     m_debugLink = getToolkit().createImageHyperlink(container, SWT.NONE);
+    m_debugLink.setToolTipText("Start product in debug mode...");
     m_debugLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDebug));
     m_debugLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
@@ -218,6 +226,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     });
     m_stopLink = getToolkit().createImageHyperlink(container, SWT.NONE);
     m_stopLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolStop));
+    m_stopLink.setToolTipText("Stop product...");
     m_stopLink.setEnabled(false);
     m_stopLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
@@ -226,14 +235,33 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       }
     });
 
+//    // export war
+//    if (getBundle().getType() == IScoutBundle.BUNDLE_SERVER) {
+//      ImageHyperlink exportWar = getToolkit().createImageHyperlink(container, SWT.NONE);
+//      exportWar.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ServerBundleExport));
+//      exportWar.setToolTipText("Export war file...");
+//      exportWar.addHyperlinkListener(new HyperlinkAdapter() {
+//        @Override
+//        public void linkActivated(HyperlinkEvent e) {
+//          OperationJob job = new OperationJob(new ExportServerWarOperation(m_productModel));
+//          job.schedule();
+//        }
+//      });
+//      GridData layoutData = new GridData(GridData.FILL_BOTH);
+//      layoutData.heightHint = 16;
+//      exportWar.setLayoutData(layoutData);
+//    }
+
     //layout
     GridLayout layout = new GridLayout(1, false);
     layout.horizontalSpacing = 0;
     layout.verticalSpacing = 0;
     layout.marginHeight = 0;
     layout.marginWidth = 0;
+
     container.setLayout(layout);
     GridData layoutData = new GridData(GridData.FILL_BOTH);
+
     m_runLink.setLayoutData(layoutData);
     layoutData = new GridData(GridData.FILL_BOTH);
     m_debugLink.setLayoutData(layoutData);
@@ -251,10 +279,10 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   }
 
   /**
-   * @return the productType
+   * @return the bundle
    */
-  public int getProductType() {
-    return m_productType;
+  public IScoutBundle getBundle() {
+    return m_bundle;
   }
 
   /**

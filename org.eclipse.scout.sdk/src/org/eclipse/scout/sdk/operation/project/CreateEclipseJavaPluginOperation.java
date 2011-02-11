@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,7 +35,7 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
   @SuppressWarnings("restriction")
   public CreateEclipseJavaPluginOperation() {
     super();
-    m_execEnvId = "J2SE-1.5";
+    m_execEnvId = "JavaSE-1.6";
     addNature(org.eclipse.pde.internal.core.natures.PDE.PLUGIN_NATURE);
     addNature(JavaCore.NATURE_ID);
   }

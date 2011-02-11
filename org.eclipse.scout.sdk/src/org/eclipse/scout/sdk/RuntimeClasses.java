@@ -132,6 +132,9 @@ public final class RuntimeClasses {
   public static final String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty";
   public static final String ConfigOperation = "org.eclipse.scout.commons.annotations.ConfigOperation";
   public static final String ConfigPropertyValue = "org.eclipse.scout.commons.annotations.ConfigPropertyValue";
+  public static final String DefaultOutlineTableForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm";
+  public static final String DefaultOutlineTreeForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm";
+
   public static final String DynamicNls = "org.eclipse.scout.nls.DynamicNls";
   public static final String ExampleWorkflowTablePage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.workflow.ExampleWorkflowTablePage";
   public static final String IActivityMap = "org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap";
@@ -229,4 +232,5 @@ public final class RuntimeClasses {
   public static final String ITimeColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.ITimeColumn";
   public static final String CopyWidthsOfColumnsMenu = "org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu";
 
+  public static final String ResourceServlet = "org.eclipse.scout.rt.server.ResourceServlet";
 }

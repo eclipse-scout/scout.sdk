@@ -4,14 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -59,8 +63,14 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<Constant
       }
     }
     else {
-      String sourceValue = value.getField().getElementName();
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
+      final IField finalField = value.getField();
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName()) {
+        @Override
+        protected String createMethodBody(IMethod methodToOverride, IImportValidator validator) throws JavaModelException {
+          return "  return " + finalField.getElementName() + ";";
+        }
+
+      };
     }
     if (op != null) {
       new OperationJob(op).schedule();

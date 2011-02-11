@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -76,9 +76,9 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
     }
     return rootNode;
   }

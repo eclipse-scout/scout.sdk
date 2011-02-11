@@ -293,55 +293,6 @@ public class ProposalTextField extends TextField {
       notifyAcceptProposal(m_selectedProposal);
     }
     closePopup();
-    // if(m_selectedProposal == null){
-    // if(selectedProposal == null){
-    // return;
-    // }
-    // else{
-    // if(m_updateLock.aquire()){
-    // try{
-    // getTextComponent().setText(selectedProposal.getLabel(false, m_searchExpertMode));
-    // getTextComponent().setSelection(selectedProposal.getCursorPosition(m_searchExpertMode, false));
-    // }
-    // finally{
-    // m_updateLock.release();
-    // }
-    // }
-    // notifyAcceptProposalUpdateUi(selectedProposal);
-    //
-    // System.out.println("input: " + getText());
-    // // if((m_type & TYPE_FIRE_ON_FOCUS_LOST) == 0){
-    // notifyAcceptProposal(m_selectedProposal);
-    // // }
-    // }
-    // }
-    // else{
-    // // update text
-    //
-    // try{
-    // if(m_updateLock.aquire()){
-    // String text="";
-    // int cusorPosition=0;
-    // if(selectedProposal != null){
-    // text=selectedProposal.getLabel(m_searchExpertMode, false);
-    // cusorPosition=selectedProposal.getCursorPosition(m_searchExpertMode, false);
-    // }
-    // getTextComponent().setText(text);
-    // getTextComponent().setSelection(cusorPosition);
-    // }
-    // }
-    // finally{
-    // m_updateLock.release();
-    // }
-    // if(!m_selectedProposal.equals(selectedProposal)){
-    // m_selectedProposal=selectedProposal;
-    // // if((m_type & TYPE_FIRE_ON_FOCUS_LOST) == 0){
-    // notifyAcceptProposal(m_selectedProposal);
-    // // }
-    //
-    // }
-    // }
-
   }
 
   /**

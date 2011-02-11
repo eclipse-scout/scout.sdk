@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -68,7 +68,7 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
         }
         for (IFile productFile : productVisitor.getProductFiles()) {
           productCount++;
-          ProductLaunchPresenter p = new ProductLaunchPresenter(getFormToolkit(), parent, productFile, bundle.getType());
+          ProductLaunchPresenter p = new ProductLaunchPresenter(getFormToolkit(), parent, productFile, bundle);
           GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
           layoutData.widthHint = 200;
           p.getContainer().setLayoutData(layoutData);

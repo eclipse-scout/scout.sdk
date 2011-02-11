@@ -66,7 +66,6 @@ public class ScoutProjectIcons implements IIconProvider {
     m_iconsHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
       public void handleEvent(int eventType, IType type) {
-        System.out.println("Hierarchy changed");
         clearCache();
       }
     });
@@ -146,7 +145,6 @@ public class ScoutProjectIcons implements IIconProvider {
     if (TypeUtility.exists(iconType)) {
       boolean inherited = SdkTypeUtility.getScoutProject(iconType) == m_scoutProject;
       for (IField field : iconType.getFields()) {
-        System.out.println("found icon: '" + field.getElementName() + "'");
         if (Flags.isPublic(field.getFlags()) && field.getSource() != null && field.getSource().contains(" String ")) {
           String source = field.getSource();
           String iconDeclaration = ScoutUtility.removeComments(source);
@@ -167,7 +165,6 @@ public class ScoutProjectIcons implements IIconProvider {
           ImageDescriptor desc1 = ImageDescriptor.createFromImageData(new ImageData(is));
           if (desc1 != null) {
             desc.setImgDesc(desc1);
-            System.out.println("resolved '" + imgPath + "' in bundle '" + baseUrl + "'.");
           }
         }
       }

@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.operation.project.NewBsiCaseGroupStep1Operation;
-import org.eclipse.scout.sdk.operation.project.NewBsiCaseGroupStep2Operation;
+import org.eclipse.scout.sdk.operation.project.NewScoutProjectStep2Operation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -143,11 +143,11 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   private ITreeNode buildBundleTree() {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWING, "ui.swing", ScoutSdkUi.getImage(ScoutSdkUi.SwingBundle), TYPE_BUNDLE_SWING);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWT, "ui.swt", ScoutSdkUi.getImage(ScoutSdkUi.SwtBundle), TYPE_BUNDLE_SWT);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_CLIENT, "client", ScoutSdkUi.getImage(ScoutSdkUi.ClientBundle), TYPE_BUNDLE_CLIENT);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SHARED, "shared", ScoutSdkUi.getImage(ScoutSdkUi.SharedBundle), TYPE_BUNDLE_SHARED);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SERVER, "server", ScoutSdkUi.getImage(ScoutSdkUi.ServerBundle), TYPE_BUNDLE_SERVER);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWING, "ui.swing", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwingBundle), TYPE_BUNDLE_SWING);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWT, "ui.swt", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwtBundle), TYPE_BUNDLE_SWT);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_CLIENT, "client", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientBundle), TYPE_BUNDLE_CLIENT);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SHARED, "shared", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundle), TYPE_BUNDLE_SHARED);
+    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SERVER, "server", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle), TYPE_BUNDLE_SERVER);
     return rootNode;
   }
 
@@ -211,9 +211,10 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     op1.validate();
     op1.run(monitor, workingCopyManager);
 
-    NewBsiCaseGroupStep2Operation op2 = new NewBsiCaseGroupStep2Operation(op1, variables);
+    NewScoutProjectStep2Operation op2 = new NewScoutProjectStep2Operation(op1, variables);
     op2.validate();
     op2.run(monitor, workingCopyManager);
+
   }
 
   @Override

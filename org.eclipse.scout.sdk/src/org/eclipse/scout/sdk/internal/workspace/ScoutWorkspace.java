@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -304,7 +304,6 @@ public class ScoutWorkspace implements IScoutWorkspace {
 
     @Override
     public boolean visitDelta(IResourceDelta delta) {
-      // System.out.println(delta.getResource().getName()+" "+delta.getAffectedChildren().length);
       try {
         if (delta.getResource().getType() == IResource.PROJECT) {
           final IProject p = (IProject) delta.getResource();

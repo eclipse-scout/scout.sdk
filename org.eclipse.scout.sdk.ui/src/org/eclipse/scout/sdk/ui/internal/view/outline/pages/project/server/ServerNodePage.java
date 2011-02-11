@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.axis.AxisWebServiceConsumerTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.axis.AxisWebServiceProviderTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
@@ -38,6 +39,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.servi
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.outline.OutlineServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.process.ProcessServiceTablePage;
+import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWarWizard;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -159,6 +161,7 @@ public class ServerNodePage extends AbstractPage {
     super.fillContextMenu(manager);
     manager.add(new Separator());
     manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform server bundle...", new WellformServerBundleOperation(getScoutResource())));
+    manager.add(new WizardAction("Export as war file...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundleExport), new ExportServerWarWizard(getScoutResource())));
   }
 
   private IType resolveType(final String fqn) throws CoreException {

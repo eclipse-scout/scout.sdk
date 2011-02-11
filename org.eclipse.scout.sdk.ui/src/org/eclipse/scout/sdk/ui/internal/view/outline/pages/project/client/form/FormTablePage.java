@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import java.util.HashSet;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.Action;
@@ -20,7 +22,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
+import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformFormsOperation;
+import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
@@ -100,7 +107,36 @@ public class FormTablePage extends AbstractPage {
     super.fillContextMenu(manager);
     manager.add(new Separator());
     manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform all forms...", new WellformFormsOperation(getScoutResource())));
+    manager.add(new Action() {
+      @Override
+      public String getText() {
+        return "create dora form [test]";
+      }
 
+      @Override
+      public void run() {
+        IOperation o = new IOperation() {
+
+          @Override
+          public void validate() throws IllegalArgumentException {
+
+          }
+
+          @Override
+          public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+            TemplateVariableSet varSet = TemplateVariableSet.createNew(getScoutResource());
+            varSet.setVariable(TemplateVariableSet.VAR_BUNDLE_CLIENT_NAME, getScoutResource().getBundleName());
+            new InstallJavaFileOperation("templates/client.test/src/DoraForm.java", getScoutResource().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS).replaceAll("\\.", "/") + "/DoraForm.java", getScoutResource(), varSet).run(monitor, workingCopyManager);
+          }
+
+          @Override
+          public String getOperationName() {
+            return null;
+          }
+        };
+        new OperationJob(o).schedule();
+      }
+    });
   }
 
   @Override

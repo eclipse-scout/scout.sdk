@@ -262,11 +262,16 @@ public class JavadocTooltip extends AbstractTooltip {
     }
 
     String imageName = null;
-    if (allowImage) {
-      URL imageUrl = JavaPlugin.getDefault().getImagesOnFSRegistry().getImageURL(member);
-      if (imageUrl != null) {
-        imageName = imageUrl.toExternalForm();
+    try {
+      if (allowImage) {
+        URL imageUrl = JavaPlugin.getDefault().getImagesOnFSRegistry().getImageURL(member);
+        if (imageUrl != null) {
+          imageName = imageUrl.toExternalForm();
+        }
       }
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("could not load image for '" + member.getElementName() + "'.");
     }
     return addImageAndLabel(member, imageName, label.toString());
   }

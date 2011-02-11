@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.fields.bundletree;
 
 import java.util.List;
 
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.jface.resource.ImageDescriptor;
 
 /**
  * <h3>ITreeNode</h3> ...
@@ -49,7 +49,7 @@ public interface ITreeNode {
   /**
    * @return
    */
-  Image getImage();
+  ImageDescriptor getImage();
 
   /**
    * @param parent

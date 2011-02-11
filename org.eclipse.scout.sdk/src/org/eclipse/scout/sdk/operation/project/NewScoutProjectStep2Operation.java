@@ -21,12 +21,12 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 
-public class NewBsiCaseGroupStep2Operation implements IOperation {
+public class NewScoutProjectStep2Operation implements IOperation {
 
   private final NewBsiCaseGroupStep1Operation m_step1;
   private final ITemplateVariableSet m_templateBindings;
 
-  public NewBsiCaseGroupStep2Operation(NewBsiCaseGroupStep1Operation step1, ITemplateVariableSet templateBindings) {
+  public NewScoutProjectStep2Operation(NewBsiCaseGroupStep1Operation step1, ITemplateVariableSet templateBindings) {
     m_step1 = step1;
     m_templateBindings = templateBindings;
   }

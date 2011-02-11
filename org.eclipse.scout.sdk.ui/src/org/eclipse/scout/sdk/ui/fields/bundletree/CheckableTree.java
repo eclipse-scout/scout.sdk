@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.Map.Entry;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -42,6 +43,8 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.graphics.Font;
@@ -77,6 +80,9 @@ public class CheckableTree extends Composite {
   private Image m_imgCheckboxNoDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNoDisabled);
   private EventListenerList m_eventListeners = new EventListenerList();
   private ArrayList<ITreeNodeFilter> m_filters = new ArrayList<ITreeNodeFilter>();
+  private HashMap<ImageDescriptor, Image> m_icons = new HashMap<ImageDescriptor, Image>();
+
+  private P_TreePaintListener m_paintListener;
 
   /**
    * @param parent
@@ -87,6 +93,18 @@ public class CheckableTree extends Composite {
     m_rootNode = rootNode;
     setLayout(new FillLayout());
     createControl(this);
+    addDisposeListener(new DisposeListener() {
+
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        for (Image img : m_icons.values()) {
+          if (img != null && !img.isDisposed()) {
+            img.dispose();
+          }
+        }
+        m_icons.clear();
+      }
+    });
   }
 
   protected void createControl(Composite parent) {
@@ -105,10 +123,13 @@ public class CheckableTree extends Composite {
     P_CheckboxListener checkboxListener = new P_CheckboxListener();
     m_tree.addListener(SWT.MouseDown, checkboxListener);
     m_tree.addListener(SWT.MouseUp, checkboxListener);
-    P_TreePaintListener listener = new P_TreePaintListener();
-    m_tree.addListener(SWT.MeasureItem, listener);
-    m_tree.addListener(SWT.EraseItem, listener);
-    m_tree.addListener(SWT.PaintItem, listener);
+    if (m_paintListener == null) {
+      m_paintListener = new P_TreePaintListener();
+      m_tree.addListener(SWT.MeasureItem, m_paintListener);
+      m_tree.addListener(SWT.EraseItem, m_paintListener);
+      m_tree.addListener(SWT.PaintItem, m_paintListener);
+    }
+
     m_viewer.addDoubleClickListener(new IDoubleClickListener() {
       @Override
       public void doubleClick(DoubleClickEvent event) {
@@ -349,8 +370,13 @@ public class CheckableTree extends Composite {
         case SWT.MeasureItem: {
           Point size = new Point(2 * TEXT_MARGIN, 2 * TEXT_MARGIN);
           if (node.getImage() != null) {
-            size.x += (node.getImage().getBounds().width + TEXT_MARGIN);
-            size.y = Math.max(size.y, 2 * TEXT_MARGIN + node.getImage().getBounds().height);
+            Image img = m_icons.get(node.getImage());
+            if (img == null) {
+              img = node.getImage().createImage();
+              m_icons.put(node.getImage(), img);
+            }
+            size.x += (img.getBounds().width + TEXT_MARGIN);
+            size.y = Math.max(size.y, 2 * TEXT_MARGIN + img.getBounds().height);
           }
           if (node.isCheckable()) {
             size.x += (16 + TEXT_MARGIN);
@@ -401,9 +427,15 @@ public class CheckableTree extends Composite {
             event.gc.drawImage(img, x, y + TEXT_MARGIN);
             x += (img.getBounds().width + TEXT_MARGIN);
           }
+
           if (node.getImage() != null) {
-            event.gc.drawImage(node.getImage(), x, y + TEXT_MARGIN);
-            x += (node.getImage().getBounds().width + TEXT_MARGIN);
+            Image img = m_icons.get(node.getImage());
+            if (img == null) {
+              img = node.getImage().createImage();
+              m_icons.put(node.getImage(), img);
+            }
+            event.gc.drawImage(img, x, y + TEXT_MARGIN);
+            x += (img.getBounds().width + TEXT_MARGIN);
           }
           String text = item.getText(event.index);
           /* center column 1 vertically */

@@ -87,19 +87,19 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
       // service client reg
-      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
+      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
     }
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // service interface
-      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImage(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
+      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
     }
     return rootNode;
   }

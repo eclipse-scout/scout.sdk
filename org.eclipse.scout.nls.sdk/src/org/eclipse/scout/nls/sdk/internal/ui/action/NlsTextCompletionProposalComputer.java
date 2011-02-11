@@ -92,7 +92,6 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
     try {
       IRegion lineInfo = doc.getLineInformationOfOffset(offset);
       String linePart = doc.get(lineInfo.getOffset(), lineInfo.getLength());//offset - lineInfo.getOffset());
-      System.out.println("line part: " + linePart);
       Matcher m = Pattern.compile("([A-Za-z0-9\\_\\-]*)\\.get\\(\\\"([a-zA-Z0-9\\_\\-]*)").matcher(linePart);
       if (m.find()) {
         String prefix = linePart.substring(m.start(2), offset - lineInfo.getOffset());

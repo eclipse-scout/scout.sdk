@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -52,6 +52,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
  *
  */
 public class JavaResourceChangedEmitter {
+  public static final int CHANGED_EXTERNAL = 229;
 
   private P_ResourceListener m_resourceChangeListener;
   private P_JavaElementChangedListener m_javaElementListener;
@@ -258,7 +259,6 @@ public class JavaResourceChangedEmitter {
     synchronized (m_resourceLock) {
       JdtEventCollector eventSet = m_jdtEvents.remove(icu.getResource());
       if (eventSet != null && eventSet.hasEvents()) {
-        System.out.println("ts = \n'" + icu.getResource().getModificationStamp() + "'\n'" + eventSet.getLastModification() + "'\n-------------------------");
         fireChanges = (icu == null) || icu.getResource().getModificationStamp() != eventSet.getLastModification();
         jdtEvents = eventSet.getEvents();
       }
@@ -508,6 +508,10 @@ public class JavaResourceChangedEmitter {
                         add(new JdtEvent(JavaResourceChangedEmitter.this, kind, a.getElement()));
                       }
                     }
+                  }
+                  else {
+                    fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, CHANGED_EXTERNAL, e));
+                    return;
                   }
                   try {
                     m_ast.put(e.getPath().toString(), newAst);

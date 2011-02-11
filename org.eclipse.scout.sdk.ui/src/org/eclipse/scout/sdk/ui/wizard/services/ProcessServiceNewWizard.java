@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -86,25 +86,25 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
       // service client reg
-      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
+      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
     }
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // permission create
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, "CreatePermission", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_PERMISSION_CREATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, "CreatePermission", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_CREATE);
       // permission read
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, "ReadPermission", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_PERMISSION_READ);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, "ReadPermission", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_READ);
       // permission update
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, "UpdatePermission", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_PERMISSION_UPDATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, "UpdatePermission", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_UPDATE);
       // service interface
-      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImage(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
+      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
     }
     return rootNode;
   }

@@ -4,23 +4,36 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.pde.internal.core.iproduct.IConfigurationFileInfo;
+import org.eclipse.pde.internal.core.iproduct.IProductPlugin;
+import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
@@ -28,6 +41,9 @@ import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 public class ScoutSdkUtility {
+
+  public static String BUNDLE_ID_HTTP_REGISTRY = "org.eclipse.equinox.http.registry";
+  public static String BUNDLE_ID_HTTP_SERVLETBRIDGE = "org.eclipse.equinox.http.servletbridge";
 
   private static final ScoutSdkUtility instance = new ScoutSdkUtility();
 
@@ -43,12 +59,6 @@ public class ScoutSdkUtility {
    * getSimpleTypeSignature("Ljava.lang.String", emptyList) -> String ;List<java.lang.String>
    * getSimpleTypeSignature(Signature.SIG_LONG, emptyList) -> long ;List<>
    * getSimpleTypeSignature(
-   * 
-   * 
-   * 
-   * 
-   * 
-   * 
    * 
    * "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;"
    * , emptyList)
@@ -108,12 +118,6 @@ public class ScoutSdkUtility {
    * getSimpleTypeRefName("Ljava.lang.String", emptyList) -> String ;List<java.lang.String>
    * getSimpleTypeRefName(Signature.SIG_LONG, emptyList) -> long
    * getSimpleTypeRefName(
-   * 
-   * 
-   * 
-   * 
-   * 
-   * 
    * 
    * "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;"
    * , emptyList)
@@ -398,6 +402,79 @@ public class ScoutSdkUtility {
       }
     }
     return sortNo;
+  }
+
+  public static WorkspaceProductModel getProductModel(IFile productFile, boolean load) throws CoreException {
+    if (productFile != null) {
+      WorkspaceProductModel model = null;
+      model = new WorkspaceProductModel(productFile, false);
+      if (load) {
+        model.load();
+      }
+      return model;
+    }
+    return null;
+  }
+
+  /**
+   * @param productFile
+   * @return {@link Status#OK_STATUS} if the given product is valid to deploy on a app server using the servlet bridge
+   */
+  @SuppressWarnings("restriction")
+  public static IStatus getServletBridgeProductStatus(IFile productFile) {
+    if (productFile == null) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "product file is null.");
+    }
+    WorkspaceProductModel model = null;
+    try {
+      model = getProductModel(productFile, true);
+    }
+    catch (CoreException e) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not parse product file.");
+    }
+    if (!model.isValid()) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "product file is not valid.");
+    }
+    IConfigurationFileInfo configurationFileInfo = model.getProduct().getConfigurationFileInfo();
+    if (configurationFileInfo != null) {
+      try {
+        IProject project = productFile.getProject();
+        Properties props = new Properties();
+        IPath path = new Path(configurationFileInfo.getPath(Platform.getOS()));
+        path = path.removeFirstSegments(1);
+        props.load(project.getFile(path).getContents());
+        String osgiBundleEntry = props.getProperty("osgi.bundles");
+        if (osgiBundleEntry == null) {
+          return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "osgi.bundles entry in config.ini is missing.");
+        }
+        else {
+//            org.eclipse.equinox.common@2:start, org.eclipse.update.configurator@start, org.eclipse.equinox.http.servletbridge@start, org.eclipse.equinox.http.registry@start, org.eclipse.core.runtime@start
+          if (!osgiBundleEntry.contains(BUNDLE_ID_HTTP_SERVLETBRIDGE)) {
+            return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "osgi.bundles entry in config.ini file must conatin '" + BUNDLE_ID_HTTP_SERVLETBRIDGE + "' bundle.");
+          }
+          if (!osgiBundleEntry.contains(BUNDLE_ID_HTTP_REGISTRY)) {
+            return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "osgi.bundles entry in config.ini file must conatin '" + BUNDLE_ID_HTTP_REGISTRY + "' bundle.");
+          }
+        }
+
+      }
+      catch (Exception e) {
+        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "congig.ini file for product is not valid.");
+      }
+    }
+    // reqired plugins
+    HashSet<String> plugins = new HashSet<String>();
+    for (IProductPlugin p : model.getProduct().getPlugins()) {
+      plugins.add(p.getId());
+    }
+    if (!plugins.contains(BUNDLE_ID_HTTP_REGISTRY)) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "product must contain '" + BUNDLE_ID_HTTP_REGISTRY + "' as required bundle.");
+    }
+    if (!plugins.contains(BUNDLE_ID_HTTP_SERVLETBRIDGE)) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "product must contain '" + BUNDLE_ID_HTTP_SERVLETBRIDGE + "' as required bundle.");
+    }
+
+    return Status.OK_STATUS;
   }
 
   public static void main(String[] args) {

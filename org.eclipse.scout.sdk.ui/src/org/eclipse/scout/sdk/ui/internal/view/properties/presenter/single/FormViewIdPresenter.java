@@ -4,14 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
@@ -59,8 +58,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ConstantField
       }
     }
     else {
-      IType declaringType = value.getField().getDeclaringType();
-      String sourceValue = declaringType.getElementName() + "." + value.getField().getElementName();
+      String sourceValue = value.getField().getElementName();
       op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
     }
     if (op != null) {

@@ -90,7 +90,6 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
 
   public void apply(IDocument document, char trigger, int offset) {
     int offDiff = offset - m_offset;
-    System.out.println("off diff = "+offDiff);
     ReplaceEdit replaceEdit = new ReplaceEdit(m_offset - m_prefix.length(), m_prefix.length() + offDiff, m_nlsEntry.getKey());
     try {
       replaceEdit.apply(document);

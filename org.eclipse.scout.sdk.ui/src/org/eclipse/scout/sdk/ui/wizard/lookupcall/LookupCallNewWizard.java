@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -93,23 +93,23 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
       // service client reg
-      ITreeNode clientRegNode = TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
+      ITreeNode clientRegNode = TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
       clientRegNode.setEnabled(false);
     }
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // formData
-      TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, "LookupCall", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_LOOKUPCALL).setEnabled(false);
+      TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, "LookupCall", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_LOOKUPCALL).setEnabled(false);
       if (serverBundle != null) {
         // service interface
-        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImage(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE).setEnabled(false);
+        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE).setEnabled(false);
       }
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION).setEnabled(false);
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImage(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER).setEnabled(false);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION).setEnabled(false);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER).setEnabled(false);
     }
 
     return rootNode;

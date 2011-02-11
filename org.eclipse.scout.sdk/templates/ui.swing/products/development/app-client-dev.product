@@ -56,7 +56,6 @@
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.swt"/>
       <plugin id="org.eclipse.swt.@@OSGI_WS@@.@@OSGI_OS@@.@@OSGI_ARCH@@" fragment="true"/>
-      <plugin id="org.eclipse.swt.win32.extension"/>
       <plugin id="org.eclipse.update.configurator"/>
       <plugin id="org.slf4j.api"/>
       <plugin id="org.slf4j.jcl"/>

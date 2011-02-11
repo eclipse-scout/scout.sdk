@@ -76,9 +76,9 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
           productFiles.add(p.getProductFile());
         }
         ProductSelectionDialog dialog = new ProductSelectionDialog(getForm().getShell(), getScoutProject());
-        dialog.setSelectedProducts(productFiles.toArray(new IFile[productFiles.size()]));
+        dialog.setCheckedProductFiles(productFiles.toArray(new IFile[productFiles.size()]));
         if (dialog.open() == Dialog.OK) {
-          updateProducts(dialog.getSelectedProducts());
+          updateProducts(dialog.getCheckedProductFiles());
         }
       }
     };
@@ -109,12 +109,12 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
         if (scoutBundle != null) {
           productType = scoutBundle.getType();
         }
-        orderedProducts.put(new CompositeObject(-productType, productFile.getName(), productFile), new P_ProductFile(productFile, productType));
+        orderedProducts.put(new CompositeObject(-productType, productFile.getName(), productFile), new P_ProductFile(productFile, scoutBundle));
       }
     }
     for (Entry<CompositeObject, P_ProductFile> entry : orderedProducts.entrySet()) {
       P_ProductFile productFile = entry.getValue();
-      ProductLaunchPresenter presenter = new ProductLaunchPresenter(getFormToolkit(), sectionClient, productFile.getFile(), productFile.getBundleType());
+      ProductLaunchPresenter presenter = new ProductLaunchPresenter(getFormToolkit(), sectionClient, productFile.getFile(), productFile.getBundle());
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       presenter.getContainer().setLayoutData(layoutData);
@@ -161,19 +161,19 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
   }
 
   private class P_ProductFile {
-    private final int m_bundleType;
+    private final IScoutBundle m_bundle;
     private final IFile m_file;
 
-    public P_ProductFile(IFile file, int bundleType) {
+    public P_ProductFile(IFile file, IScoutBundle bundle) {
       m_file = file;
-      m_bundleType = bundleType;
+      m_bundle = bundle;
     }
 
     /**
      * @return the bundleType
      */
-    public int getBundleType() {
-      return m_bundleType;
+    public IScoutBundle getBundle() {
+      return m_bundle;
     }
 
     /**

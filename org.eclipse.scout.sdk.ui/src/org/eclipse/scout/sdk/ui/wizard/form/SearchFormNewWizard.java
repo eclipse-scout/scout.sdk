@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -98,14 +98,14 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
     // form
-    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_SEARCH_FORM, "SearchForm", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SEARCH_FORM);
+    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_SEARCH_FORM, "SearchForm", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SEARCH_FORM);
     // searchHandler
-    TreeUtility.createNode(formNode, TYPE_HANDLER_SEARCH, "SearchHandler", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_HANDLER_SEARCH);
+    TreeUtility.createNode(formNode, TYPE_HANDLER_SEARCH, "SearchHandler", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_HANDLER_SEARCH);
 
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // formData
-      TreeUtility.createNode(sharedNode, TYPE_SEARCH_FORM_DATA, "SearchFormData", ScoutSdkUi.getImage(ScoutSdkUi.Class), TYPE_SEARCH_FORM_DATA);
+      TreeUtility.createNode(sharedNode, TYPE_SEARCH_FORM_DATA, "SearchFormData", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SEARCH_FORM_DATA);
     }
     return rootNode;
   }

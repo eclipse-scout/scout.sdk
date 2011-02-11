@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,12 +18,20 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 public class ScoutWizardDialog extends WizardDialog implements IWizardPageContainer {
 
   public ScoutWizardDialog(IWizard newWizard) {
     this(ScoutSdkUi.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(), newWizard);
+  }
+
+  @Override
+  protected Control createContents(Composite parent) {
+    // settings
+    return super.createContents(parent);
   }
 
   public ScoutWizardDialog(Shell parentShell, IWizard newWizard) {
