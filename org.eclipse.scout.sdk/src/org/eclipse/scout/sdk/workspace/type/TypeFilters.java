@@ -28,6 +28,15 @@ import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
  */
 public class TypeFilters {
 
+  public static ITypeFilter invertFilter(final ITypeFilter filter) {
+    return new ITypeFilter() {
+      @Override
+      public boolean accept(IType type) {
+        return !filter.accept(type);
+      }
+    };
+  }
+
   /**
    * @param type
    * @return

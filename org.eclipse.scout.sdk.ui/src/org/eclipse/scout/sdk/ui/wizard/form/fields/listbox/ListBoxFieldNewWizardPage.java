@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -146,16 +146,14 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(SdkTypeUtility.getFormFields(m_declaringType));
-    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), "Sibling");
-    m_siblingField.acceptProposal(m_sibling);
-    m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
+    m_siblingField = getFieldToolkit().createFormFieldSiblingProposalField(parent, m_declaringType);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       public void proposalAccepted(ContentProposalEvent event) {
         m_sibling = (SiblingProposal) event.proposal;
         pingStateChanging();
       }
     });
+    m_sibling = (SiblingProposal) m_siblingField.getSelectedProposal();
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -222,7 +220,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
-    if(SdkTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0){
+    if (SdkTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (getTypeName().matches(Regex.REGEX_WELLFORMD_JAVAFIELD)) {

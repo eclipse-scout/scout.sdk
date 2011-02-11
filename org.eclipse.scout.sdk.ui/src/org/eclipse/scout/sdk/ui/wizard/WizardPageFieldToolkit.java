@@ -4,19 +4,26 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard;
 
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposalProvider;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 import org.eclipse.swt.widgets.Composite;
 
 public class WizardPageFieldToolkit {
@@ -43,6 +50,20 @@ public class WizardPageFieldToolkit {
     return createProposalField(parent, proposalProvider, label);
   }
 
+  public ProposalTextField createFormFieldSiblingProposalField(Composite parent, IType declaringType) {
+    ITypeHierarchy formFieldHierarchy = ScoutSdk.getLocalTypeHierarchy(declaringType);
+    IType[] formFields = SdkTypeUtility.getFormFields(declaringType, formFieldHierarchy);
+    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(formFields);
+    ProposalTextField siblingField = createProposalField(parent, new DefaultProposalProvider(availableSiblings), "Sibling");
+    siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 1);
+    SiblingProposal selectedProposal = SiblingProposal.SIBLING_END;
+    IType firstButton = SdkTypeUtility.getFistProcessButton(declaringType, formFieldHierarchy);
+    if (firstButton != null) {
+      selectedProposal = new SiblingProposal(firstButton);
+    }
+    siblingField.acceptProposal(selectedProposal);
+    return siblingField;
+  }
   // public ProposalTextField createBCTypeProposalField(Composite parent, IScoutProjectOld projectGroup, String label){
   // BcElementProposalProvider contentProvider=new BcElementProposalProvider(projectGroup, false, false);
   // return createProposalField(parent, contentProvider, label);

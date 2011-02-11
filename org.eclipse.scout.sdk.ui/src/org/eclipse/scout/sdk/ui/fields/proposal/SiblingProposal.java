@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -61,6 +61,19 @@ public class SiblingProposal implements IContentProposalEx, ITypeSibling {
   @Override
   public int getSiblingType() {
     return m_siblingType;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof SiblingProposal) {
+      return getScoutType().equals(((SiblingProposal) obj).getScoutType());
+    }
+    return false;
+  }
+
+  @Override
+  public int hashCode() {
+    return getScoutType().hashCode();
   }
 
 }

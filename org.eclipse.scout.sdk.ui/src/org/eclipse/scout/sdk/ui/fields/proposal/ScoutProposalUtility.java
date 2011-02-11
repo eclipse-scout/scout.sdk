@@ -62,6 +62,7 @@ public class ScoutProposalUtility {
     for (IType t : types) {
       siblings.add(new SiblingProposal(t));
     }
+    siblings.add(SiblingProposal.SIBLING_END);
     return siblings.toArray(new SiblingProposal[siblings.size()]);
   }
 

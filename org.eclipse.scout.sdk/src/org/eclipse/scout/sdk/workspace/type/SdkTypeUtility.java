@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -147,6 +148,16 @@ public class SdkTypeUtility {
 
   public static IType[] getFormFields(IType declaringType, ITypeHierarchy hierarchy) {
     return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IFormField), hierarchy, TypeComparators.getOrderAnnotationComparator());
+  }
+
+  public static IType[] getFormFieldsWithoutButtons(IType declaringType) {
+    return getFormFieldsWithoutButtons(declaringType, ScoutSdk.getLocalTypeHierarchy(declaringType));
+  }
+
+  public static IType[] getFormFieldsWithoutButtons(IType declaringType, ITypeHierarchy hierarchy) {
+    ITypeFilter notButtonFilter = TypeFilters.invertFilter(TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IButton), hierarchy));
+    ITypeFilter formFieldFilter = TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IFormField), hierarchy);
+    return TypeUtility.getInnerTypes(declaringType, TypeFilters.getMultiTypeFilter(formFieldFilter, notButtonFilter));
   }
 
   public static IType[] getTrees(IType declaringType) {
@@ -402,6 +413,31 @@ public class SdkTypeUtility {
       ScoutSdk.logError("could not build ConfigPropertyType for '" + methodName + "' in type '" + declaringType.getFullyQualifiedName() + "'.", e);
     }
     return newMethod;
+  }
+
+  public static IType getFistProcessButton(IType declaringType, ITypeHierarchy hierarchy) {
+    Pattern returnTrueMatcher = Pattern.compile("return\\s*true", Pattern.MULTILINE);
+    ITypeFilter buttonFilter = TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IButton), hierarchy);
+    for (IType field : getFormFields(declaringType, hierarchy)) {
+      if (buttonFilter.accept(field)) {
+        IMethod m = TypeUtility.getMethod(field, "getConfiguredProcessButton");
+        if (!TypeUtility.exists(m)) {
+          return field;
+        }
+        else {
+          try {
+            if (returnTrueMatcher.matcher(field.getSource()).find()) {
+              return field;
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdk.logError("could not get source of '" + m.getElementName() + "' on '" + m.getDeclaringType().getFullyQualifiedName() + "'.", e);
+          }
+        }
+
+      }
+    }
+    return null;
   }
 
   public static IStructuredType createStructuredType(IType type) {
