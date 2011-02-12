@@ -318,9 +318,9 @@ public interface SdkIcons {
   String TimeField = FormField; // TODO
   String TimeFieldAdd = ToolAdd; // TODO
   String TimeFieldRemove = ToolRemove; // TODO
-  String TreeBox = "treeField.png"; // TODO
-  String TreeBoxAdd = "treeField_add.png"; // TODO
-  String TreeBoxRemove = "treeField_remove.png"; // TODO
+  String TreeBox = "treefield.gif"; // TODO
+  String TreeBoxAdd = "treefield_add.gif"; // TODO
+  String TreeBoxRemove = "treefield_remove.gif"; // TODO
   String UnknownField = FormField; // TODO
   String UnknownFieldAdd = ToolAdd; // TODO
   String UnknownFieldRemove = ToolRemove; // TODO
