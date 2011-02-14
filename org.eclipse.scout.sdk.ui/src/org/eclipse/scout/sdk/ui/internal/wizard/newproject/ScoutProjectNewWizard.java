@@ -134,7 +134,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
     protected IStatus run(IProgressMonitor monitor) {
       P_CreateProjectOperation createProjectOperation = new P_CreateProjectOperation();
       OperationJob createProjectJob = new OperationJob(createProjectOperation);
-      if (scheduleAndWait(createProjectJob)) {
+      if (scheduleAndWait(createProjectJob, 0)) {
         IScoutProjectTemplateOperation template = m_page2.getSelectedTemplate();
         if (template != null) {
           IProject shared = createProjectOperation.getSharedProject();
@@ -142,7 +142,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
             template.setScoutProject(ScoutSdk.getDefault().getScoutWorkspace().getScoutBundle(shared).getScoutProject());
             OperationJob applyTemplateJob = new OperationJob(new P_ApplyTemplateOperation(template));
 
-            scheduleAndWait(applyTemplateJob);
+            scheduleAndWait(applyTemplateJob, 600);
           }
         }
         // switch to scout perspective
@@ -157,8 +157,8 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
       return Status.OK_STATUS;
     }
 
-    public boolean scheduleAndWait(OperationJob job) {
-      job.schedule();
+    public boolean scheduleAndWait(OperationJob job, long delay) {
+      job.schedule(delay);
       try {
         job.join();
         return job.getResult().isOK();
