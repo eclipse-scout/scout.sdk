@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
@@ -137,12 +138,20 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
       if (scheduleAndWait(createProjectJob, 0)) {
         IScoutProjectTemplateOperation template = m_page2.getSelectedTemplate();
         if (template != null) {
+          try {
+
+            Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_REFRESH, monitor);
+            Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor);
+          }
+          catch (Exception e) {
+            ScoutSdkUi.logError("error during waiting for auto build and refresh");
+          }
           IProject shared = createProjectOperation.getSharedProject();
           if (shared != null) {
             template.setScoutProject(ScoutSdk.getDefault().getScoutWorkspace().getScoutBundle(shared).getScoutProject());
             OperationJob applyTemplateJob = new OperationJob(new P_ApplyTemplateOperation(template));
 
-            scheduleAndWait(applyTemplateJob, 600);
+            scheduleAndWait(applyTemplateJob, 0);
           }
         }
         // switch to scout perspective

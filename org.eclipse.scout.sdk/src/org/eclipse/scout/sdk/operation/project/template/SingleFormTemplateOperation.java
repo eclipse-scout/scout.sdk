@@ -80,8 +80,20 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
     formOp.setTypeName("DesktopForm");
     formOp.run(monitor, workingCopyManager);
     final IType form = formOp.getCreatedFormType();
-
     workingCopyManager.reconcile(form.getCompilationUnit(), monitor);
+
+    final ScoutIconDesc icon = getScoutProject().getIconProvider().getIcon("eclipse_scout");
+    if (icon != null) {
+      MethodOverrideOperation iconIdOverrideOp = new MethodOverrideOperation(form, "getConfiguredIconId", true) {
+        @Override
+        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+          String iconRef = validator.getSimpleTypeRef(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
+          return "  return " + iconRef + "." + icon.getConstantField().getElementName() + ";";
+        }
+      };
+      iconIdOverrideOp.run(monitor, workingCopyManager);
+    }
+
     MethodOverrideOperation displayHintOp = new MethodOverrideOperation(form, "getConfiguredDisplayHint", false);
     displayHintOp.setSimpleBody("  return DISPLAY_HINT_VIEW;");
     displayHintOp.validate();
