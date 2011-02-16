@@ -161,7 +161,7 @@ public class ServerNodePage extends AbstractPage {
     super.fillContextMenu(manager);
     manager.add(new Separator());
     manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform server bundle...", new WellformServerBundleOperation(getScoutResource())));
-    manager.add(new WizardAction("Export as war file...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundleExport), new ExportServerWarWizard(getScoutResource())));
+    manager.add(new WizardAction("Export as WAR file...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundleExport), new ExportServerWarWizard(getScoutResource())));
   }
 
   private IType resolveType(final String fqn) throws CoreException {

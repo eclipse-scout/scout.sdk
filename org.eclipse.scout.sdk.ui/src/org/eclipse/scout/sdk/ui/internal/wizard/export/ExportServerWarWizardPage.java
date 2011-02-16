@@ -19,12 +19,15 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
@@ -67,6 +70,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
   private final String SETTINGS_WAR_FILE_NAME = "warFileName";
   private final String SETTINGS_OVERWRITE_WAR = "warOverwrite";
   private final String SETTINGS_INCLUDE_CLIENT = "includeClientExport";
+  private final String SETTINGS_CLIENT_PRODUCT = "clientProduct";
 
   static final String PROP_PRODUCT_FILE_SERVER = "serverProductFile";
   static final String PROP_PRODUCT_FILE_CLIENT = "clientProductFile";
@@ -171,7 +175,6 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected Control createIncludeClientBox(Composite parent) {
-    ResourceServletFolderTree tree = new ResourceServletFolderTree(getScoutProject());
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     Label description = new Label(group, SWT.WRAP);
     description.setText("If a client application is indluded it will be available for download under the rootUrl/download.");
@@ -181,7 +184,9 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
     setIncludingClientInternal(initialSelection);
     m_includeClientButton.setSelection(initialSelection);
     m_includeClientButton.addSelectionListener(new SelectionAdapter() {
+      @Override
       public void widgetSelected(SelectionEvent e) {
+        getDialogSettings().put(SETTINGS_INCLUDE_CLIENT, m_includeClientButton.getSelection());
         setIncludingClientInternal(m_includeClientButton.getSelection());
         m_clientProductField.setEnabled(m_includeClientButton.getSelection());
         pingStateChanging();
@@ -191,10 +196,29 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
     ITreeNode clientProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new P_ClientProductFilter(), false);
     m_clientProductField = new ProductSelectionField(group, clientProductTreeRoot);
     m_clientProductField.setLabelText("Client product to include");
-    m_clientProductField.addProductSelectionListener(new IProductSelectionListener() {
 
+    String clientProductFileName = getDialogSettings().get(SETTINGS_CLIENT_PRODUCT);
+    if (!StringUtility.isNullOrEmpty(clientProductFileName)) {
+      Path p = new Path(clientProductFileName);
+      if (p.segmentCount() > 1) {
+        IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(p.segment(0));
+        if (project != null) {
+          IFile productFile = project.getFile(p.removeFirstSegments(1));
+          if (productFile != null) {
+            m_clientProductField.setProductFile(productFile);
+            setClientProductFileInternal(productFile);
+          }
+        }
+      }
+    }
+    m_clientProductField.addProductSelectionListener(new IProductSelectionListener() {
       @Override
       public void productSelected(IFile productFile) {
+        String productFileName = null;
+        if (productFile != null) {
+          productFileName = productFile.getProject().getName() + "/" + productFile.getProjectRelativePath().toPortableString();
+        }
+        getDialogSettings().put(SETTINGS_CLIENT_PRODUCT, productFileName);
         setClientProductFileInternal(productFile);
         pingStateChanging();
       }
