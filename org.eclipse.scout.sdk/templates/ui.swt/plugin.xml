@@ -55,8 +55,10 @@
           name="@@ALIAS@@">
        <property
              name="appName"
-             value="@@ALIAS@@">
-       </property>
+             value="@@ALIAS@@"/>
+       <property
+          name="windowImages"
+          value="resources/icons/eclipseScout16x16.gif,resources/icons/eclipseScout32x32.gif"/>
     </product>
   </extension>
   <extension

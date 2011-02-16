@@ -55,6 +55,8 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
       new InstallTextFileOperation("templates/ui.swt/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/splash.bmp", project, "splash.bmp").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
+      new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipseScout16x16.gif", project, "resources/icons/eclipseScout16x16.gif").run(monitor, workingCopyManager);
+      new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipseScout32x32.gif", project, "resources/icons/eclipseScout32x32.gif").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/progress_none.gif", project, "resources/icons/progress_none.gif").run(monitor, workingCopyManager);
     }
     catch (MalformedURLException e) {

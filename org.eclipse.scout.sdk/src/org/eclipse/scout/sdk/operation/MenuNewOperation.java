@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -122,8 +122,11 @@ public class MenuNewOperation implements IOperation {
           String formTypeName = ScoutSignature.getTypeReference(Signature.createTypeSignature(getFormToOpen().getFullyQualifiedName(), true), getDeclaringType(), validator);
           sourceBuilder.append(formTypeName + " " + FORM_NAME + " = new " + formTypeName + "();\n");
           if (getFormHandler() != null) {
-            createFormParameterSource(getFormToOpen(), getFormHandler(), hierarchy, sourceBuilder, validator);
-            createStartFormSource(getFormToOpen(), getFormHandler(), sourceBuilder, validator);
+            IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.ITable), hierarchy));
+            if (TypeUtility.exists(table)) {
+              createFormParameterSource(getFormToOpen(), getFormHandler(), table, hierarchy, sourceBuilder, validator);
+              createStartFormSource(getFormToOpen(), getFormHandler(), table, sourceBuilder, validator);
+            }
           }
           else {
             sourceBuilder.append(ScoutUtility.getCommentBlock("start form here.") + "\n");
@@ -143,34 +146,30 @@ public class MenuNewOperation implements IOperation {
     return m_createdMenu;
   }
 
-  private void createFormParameterSource(IType form, IType formHandler, ITypeHierarchy hierarchy, StringBuilder builder, IImportValidator validator) {
-
-    IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.ITable), hierarchy));
-    if (table != null) {
-      IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IColumn), hierarchy));
-      for (IType col : columns) {
-        try {
-          IMethod primKeyMethod = TypeUtility.getMethod(col, "getConfiguredPrimaryKey");
-          if (TypeUtility.exists(primKeyMethod)) {
-            String isPrimaryKey = PropertyMethodSourceUtilities.getMethodReturnValue(primKeyMethod);
-            if (Boolean.valueOf(isPrimaryKey)) {
-              // find method on form
-              String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
-              IMethod writeMethodOnForm = TypeUtility.getMethod(form, "set" + colPropName);
-              if (TypeUtility.exists(writeMethodOnForm)) {
-                builder.append(FORM_NAME + "." + writeMethodOnForm.getElementName() + "(get" + col.getElementName() + "().getSelectedValue());\n");
-              }
+  private void createFormParameterSource(IType form, IType formHandler, IType table, ITypeHierarchy hierarchy, StringBuilder builder, IImportValidator validator) {
+    IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IColumn), hierarchy));
+    for (IType col : columns) {
+      try {
+        IMethod primKeyMethod = TypeUtility.getMethod(col, "getConfiguredPrimaryKey");
+        if (TypeUtility.exists(primKeyMethod)) {
+          String isPrimaryKey = PropertyMethodSourceUtilities.getMethodReturnValue(primKeyMethod);
+          if (Boolean.valueOf(isPrimaryKey)) {
+            // find method on form
+            String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
+            IMethod writeMethodOnForm = TypeUtility.getMethod(form, "set" + colPropName);
+            if (TypeUtility.exists(writeMethodOnForm)) {
+              builder.append(FORM_NAME + "." + writeMethodOnForm.getElementName() + "(get" + col.getElementName() + "().getSelectedValue());\n");
             }
           }
         }
-        catch (CoreException e) {
-          ScoutSdk.logError("cold not parse column '" + col.getFullyQualifiedName() + "' for primary key.", e);
-        }
+      }
+      catch (CoreException e) {
+        ScoutSdk.logError("cold not parse column '" + col.getFullyQualifiedName() + "' for primary key.", e);
       }
     }
   }
 
-  private void createStartFormSource(IType form, IType formHandler, StringBuilder builder, IImportValidator validator) {
+  private void createStartFormSource(IType form, IType formHandler, IType table, StringBuilder builder, IImportValidator validator) {
     String startMethodName = formHandler.getElementName().replaceAll("^(.*)Handler$", "start$1");
     IMethod startMethod = TypeUtility.getMethod(form, startMethodName);
     if (TypeUtility.exists(startMethod)) {
@@ -179,7 +178,7 @@ public class MenuNewOperation implements IOperation {
   }
 
   private void createReloadPage(IType form, IType formHandler, ITypeHierarchy hierarchy, StringBuilder builder, IImportValidator validator) {
-    IType pageWithTable = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IPageWithTable), hierarchy));
+    IType pageWithTable = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IPageWithTable), hierarchy));
     if (TypeUtility.exists(pageWithTable)) {
       builder.append("\n" + FORM_NAME + ".waitFor();\n");
       builder.append("if (" + FORM_NAME + ".isFormStored()) {\n");
