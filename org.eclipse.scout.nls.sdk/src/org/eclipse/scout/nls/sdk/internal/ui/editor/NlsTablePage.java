@@ -237,7 +237,7 @@ public class NlsTablePage extends Composite {
           cursorPos.y = -1;
         }
         TableItem row = null;
-        if(cursorPos.x > 0){
+        if(cursorPos.x >= 0){
           row = m_table.getViewer().getTable().getItem(cursorPos.x);
         }
         addSingleSelectMenues(menuManager, entries.get(0), cursorPos.y, row.getText(cursorPos.y));
