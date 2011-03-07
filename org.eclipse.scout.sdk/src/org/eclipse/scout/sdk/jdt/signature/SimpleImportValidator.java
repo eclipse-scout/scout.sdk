@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,22 +30,28 @@ public class SimpleImportValidator implements IImportValidator {
       prefix = "? extends ";
       singleTypeSignature = singleTypeSignature.replaceAll("^\\+", "");
     }
-    String pckName = Signature.getSignatureQualifier(singleTypeSignature);
-    String simpleName = Signature.getSignatureSimpleName(singleTypeSignature);
-    String plainSimpleName = Signature.getSignatureSimpleName(singleTypeSignature.replaceAll("^[\\[\\+]*", ""));
-    String usedPackageName = m_newImports.get(plainSimpleName);
-    if (usedPackageName != null) {
-      if (!usedPackageName.equals(pckName)) {
-        // fully quallified
-        return prefix + pckName + "." + simpleName;
-      }
-      else {
-        return prefix + simpleName;
-      }
+    if (singleTypeSignature.charAt(0) == Signature.C_UNRESOLVED) {
+      return Signature.getSignatureSimpleName(singleTypeSignature);
     }
     else {
-      m_newImports.put(plainSimpleName, pckName);
-      return prefix + simpleName;
+      String pckName = Signature.getSignatureQualifier(singleTypeSignature);
+      String simpleName = Signature.getSignatureSimpleName(singleTypeSignature);
+      String plainSimpleName = Signature.getSignatureSimpleName(singleTypeSignature.replaceAll("^[\\[\\+]*", ""));
+      String usedPackageName = m_newImports.get(plainSimpleName);
+      if (usedPackageName != null) {
+        if (!usedPackageName.equals(pckName)) {
+          // fully quallified
+          return prefix + pckName + "." + simpleName;
+        }
+        else {
+          return prefix + simpleName;
+        }
+      }
+      else {
+        m_newImports.put(plainSimpleName, pckName);
+        System.out.println(pckName);
+        return prefix + simpleName;
+      }
     }
   }
 
@@ -53,6 +59,7 @@ public class SimpleImportValidator implements IImportValidator {
   public void addImport(String fqn) {
     String packageName = Signature.getQualifier(fqn);
     String simpleName = Signature.getSimpleName(fqn);
+    System.out.println(packageName);
     m_newImports.put(simpleName, packageName);
   }
 

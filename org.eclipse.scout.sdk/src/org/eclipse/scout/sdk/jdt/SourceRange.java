@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,17 +18,15 @@ public class SourceRange implements ISourceRange {
   private int m_offset;
   private int m_length;
 
-  public SourceRange(int offset, int length) {
-    m_offset = offset;
-    m_length = length;
-
-  }
-
   public static SourceRange getFullRange(Document document) {
     return new SourceRange(0, document.getLength());
   }
 
-  @Override
+  public SourceRange(int offset, int length) {
+    m_offset = offset;
+    m_length = length;
+  }
+
   public int getLength() {
     return m_length;
   }
@@ -37,7 +35,6 @@ public class SourceRange implements ISourceRange {
     m_length = length;
   }
 
-  @Override
   public int getOffset() {
     return m_offset;
   }

@@ -1,0 +1,18 @@
+package formdata.shared.services.process;
+
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+
+public class AbstractExternalGroupBoxData extends AbstractFormField {
+  private static final long serialVersionUID = 1L;
+
+  public AbstractExternalGroupBoxData() {
+  }
+
+  public class ExternalString extends AbstractValueFieldData<String> {
+    private static final long serialVersionUID = 1L;
+
+    public ExternalString() {
+    }
+
+  }
+}

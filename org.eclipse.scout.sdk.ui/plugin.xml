@@ -609,4 +609,25 @@
             name="Scout Server Export">
       </wizard>
    </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="org.eclipse.scout.sdk.menu"
+               label="Scout">
+            <dynamic
+                  class="org.eclipse.scout.sdk.ui.menu.FormDataUpdateContributionItem"
+                  id="org.eclipse.scout.sdk.ui.menu.updateFormdataAutomatically">
+            </dynamic>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.eclipse.scout.sdk.ui.internal.marker.resolution.SqlFormDataMarkerResolutionGenerator"
+            markerType="org.eclipse.scout.sdk.formdata.sql.binding">
+      </markerResolutionGenerator>
+   </extension>
 </plugin>

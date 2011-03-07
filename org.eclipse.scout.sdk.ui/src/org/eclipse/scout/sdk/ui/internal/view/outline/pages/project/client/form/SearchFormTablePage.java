@@ -19,8 +19,10 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSearchFormsOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.wizard.form.SearchFormNewWizard;
@@ -79,21 +81,19 @@ public class SearchFormTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    if (m_searchFormHierarchy == null) {
-      m_searchFormHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iSearchForm);
-      m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());
-    }
-    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
-    for (IType searchForm : searchForms) {
+    for (IType searchForm : resolveSearchForms()) {
       FormNodePage form = new FormNodePage(this, searchForm);
       form.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchForm));
     }
   }
 
-  @Override
-  public void markStructureDirty() {
-    // TODO Auto-generated method stub
-    super.markStructureDirty();
+  protected IType[] resolveSearchForms() {
+    if (m_searchFormHierarchy == null) {
+      m_searchFormHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iSearchForm);
+      m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());
+    }
+    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    return searchForms;
   }
 
   @Override
@@ -101,6 +101,12 @@ public class SearchFormTablePage extends AbstractPage {
     super.fillContextMenu(manager);
     manager.add(new Separator());
     manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform all search forms...", new WellformSearchFormsOperation(getScoutResource())));
+    manager.add(new MultipleUpdateFormDataAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveSearchForms();
+      }
+    }));
   }
 
   @Override

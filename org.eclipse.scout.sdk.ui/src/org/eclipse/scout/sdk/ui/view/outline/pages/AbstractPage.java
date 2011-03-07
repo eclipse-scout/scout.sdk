@@ -50,12 +50,12 @@ public abstract class AbstractPage implements IPage {
 
   public AbstractPage() {
     // m_name = "...";
-    if (isFolder()) {
-      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FolderOpen);
-    }
-    else {
-      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default);
-    }
+//    if (isFolder()) {
+//      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FolderOpen);
+//    }
+//    else {
+//      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default);
+//    }
     m_pageDirtyListener = new PageDirtyListener(this);
     m_children = new ArrayList<IPage>();
   }
@@ -242,6 +242,14 @@ public abstract class AbstractPage implements IPage {
   }
 
   public ImageDescriptor getBaseImageDescriptor() {
+    if (m_imageDesc == null) {
+      if (isFolder()) {
+        m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FolderOpen);
+      }
+      else {
+        m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default);
+      }
+    }
     return m_imageDesc;
   }
 

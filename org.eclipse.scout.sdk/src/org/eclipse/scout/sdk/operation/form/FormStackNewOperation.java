@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.operation.PermissionNewOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceCreateMethodOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -94,6 +95,15 @@ public class FormStackNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    // create empty form data
+    String formDataSignature = null;
+    if (getFormDataBundle() != null) {
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getFormName() + "Data", getFormDataBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), getFormDataBundle());
+      formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
+      formDataOp.run(monitor, workingCopyManager);
+      m_outFormData = formDataOp.getCreatedType();
+      formDataSignature = Signature.createTypeSignature(m_outFormData.getFullyQualifiedName(), true);
+    }
     // form
     FormNewOperation formOp = new FormNewOperation();
     formOp.setClientBundle(getFormBundle());
@@ -101,7 +111,8 @@ public class FormStackNewOperation implements IOperation {
     formOp.setNlsEntry(getNlsEntry());
     formOp.setTypeName(getFormName());
     formOp.setSuperType(getFormSuperTypeSignature());
-    formOp.setAutoCreateFormData(getFormDataBundle() != null);
+    formOp.setFormDataSignature(formDataSignature);
+
     formOp.setCreateButtonOk(isCreateButtonOk());
     formOp.setCreateButtonCancel(isCreateButtonCancel());
     formOp.validate();
@@ -115,14 +126,14 @@ public class FormStackNewOperation implements IOperation {
       beanPropOp.setSiblingField(null);
       beanPropOp.run(monitor, workingCopyManager);
     }
-    // form data
-    if (getFormDataBundle() != null) {
-      FormDataUpdateOperation formDataOp = new FormDataUpdateOperation(getOutForm(), getFormDataBundle());
-      formDataOp.validate();
-      formDataOp.run(monitor, workingCopyManager);
-      m_outFormData = formDataOp.getFormDataType();
-
-    }
+//    // form data
+//    if (getFormDataBundle() != null) {
+//      FormDataUpdateOperation formDataOp = new FormDataUpdateOperation(getOutForm(), getFormDataBundle());
+//      formDataOp.validate();
+//      formDataOp.run(monitor, workingCopyManager);
+//      m_outFormData = formDataOp.getFormDataType();
+//
+//    }
     // permissions
     if (getPermissionCreateBundle() != null) {
       PermissionNewOperation permissionOp = new PermissionNewOperation(m_formatSource);

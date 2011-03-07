@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AxisWebServiceProviderPublishAction;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServiceOperationNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -106,6 +107,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     manager.add(new WizardAction("New Service Operation...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperationAdd), new ServiceOperationNewWizard(getInterfaceType(), new IType[]{getType()})));
     manager.add(new Separator());
     manager.add(new AxisWebServiceProviderPublishAction(getOutlineView().getSite().getShell(), getType(), getInterfaceType()));
+    manager.add(new FormDataSqlBindingValidateAction(getType()));
   }
 
   public IType getInterfaceType() {

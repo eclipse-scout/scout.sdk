@@ -3,49 +3,6 @@
 <plugin>
 
 
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               label="Scout">
-            <command
-                  commandId="com.bsiag.bsicase.search.formdata.propertybeans"
-                  label="Dump Form/FormData methods"
-                  style="push">
-            </command>
-            <command
-                  commandId="com.bsiag.bsicase.search.formdata.potentialPropertyBeans"
-                  label="Find Bean properties not marked existing in FormData and Form class..."
-                  style="push"
-                  tooltip="All bean methods existing in FormData and Form class.">
-            </command>
-            <command
-                  commandId="com.bsiag.bsicase.search.formdata.methodDiffsFormVsFormData"
-                  label="Find Diffs Form vs. FormData"
-                  style="push">
-            </command>
-         </menu>
-      </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <command
-            id="com.bsiag.bsicase.search.formdata.propertybeans"
-            name="Find...">
-      </command>
-      <command
-            id="com.bsiag.bsicase.search.formdata.potentialPropertyBeans"
-            name="Potential PropertyBeans">
-      </command>
-      <command
-            id="com.bsiag.bsicase.search.formdata.methodDiffsFormVsFormData"
-            name="Method Diffs Form vs. FormData">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.handlers">
-   </extension>
 <!--   <extension
          point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
@@ -113,6 +70,26 @@
       <super
             type="org.eclipse.core.resources.textmarker">
       </super>
+   </extension>
+   <extension
+         id="org.eclipse.scout.sdk.formdata.sql.binding"
+         name="SQL Binding"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="false">
+      </persistent>
+      <super
+            type="org.eclipse.core.resources.marker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <attribute
+            name="method">
+      </attribute>
    </extension>
 
 </plugin>

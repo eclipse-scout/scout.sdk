@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -58,7 +58,7 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
     AnnotationCreateOperation[] annotationOps = getAnnotations();
     if (annotationOps != null && annotationOps.length > 0) {
       for (int i = 0; i < annotationOps.length; i++) {
-        buf.append(annotationOps[i].createSource(validator) + "\n");
+        buf.append(annotationOps[i].createSource(validator, "\n") + "\n");
       }
     }
 

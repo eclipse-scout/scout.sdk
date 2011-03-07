@@ -21,12 +21,12 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.form.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.form.FormHandlerNewOperation;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
+import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -70,9 +70,15 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
 
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    String formName = "DesktopForm";
+    IScoutBundle sharedBundle = getScoutProject().getSharedBundle();
+    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
+    formDataOp.run(monitor, workingCopyManager);
+    final IType formData = formDataOp.getCreatedType();
+    String formDataSignature = Signature.createTypeSignature(formData.getFullyQualifiedName(), true);
     // form
     FormNewOperation formOp = new FormNewOperation();
-    formOp.setAutoCreateFormData(true);
+    formOp.setFormDataSignature(formDataSignature);
     formOp.setClientBundle(getScoutProject().getClientBundle());
     formOp.setCreateButtonCancel(false);
     formOp.setCreateButtonOk(false);
@@ -109,11 +115,11 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
     wellformFormOp.validate();
     wellformFormOp.run(monitor, workingCopyManager);
 
-    // formdata
-    FormDataUpdateOperation formDataOp = new FormDataUpdateOperation(form, getScoutProject().getSharedBundle());
-    formDataOp.validate();
-    formDataOp.run(monitor, workingCopyManager);
-    final IType formData = formDataOp.getFormDataType();
+//    // formdata
+//    FormDataUpdateOperation formDataOp = new FormDataUpdateOperation(form, sharedBundle);
+//    formDataOp.validate();
+//    formDataOp.run(monitor, workingCopyManager);
+//    final IType formData = formDataOp.getFormDataType();
 
     // process service
     ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation();
@@ -121,7 +127,7 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
     serviceOp.setServerServiceRegistryBundles(new IScoutBundle[]{getScoutProject().getServerBundle()});
     serviceOp.setServiceImplementationBundle(getScoutProject().getServerBundle());
     serviceOp.setServiceImplementationName("DesktopFormService");
-    serviceOp.setServiceInterfaceBundle(getScoutProject().getSharedBundle());
+    serviceOp.setServiceInterfaceBundle(sharedBundle);
     serviceOp.setServiceInterfaceName("IDesktopFormService");
     serviceOp.run(monitor, workingCopyManager);
     final IType serviceInterface = serviceOp.getCreatedServiceInterface();

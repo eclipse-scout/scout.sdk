@@ -1,0 +1,16 @@
+package formdata.client.ui.template.formfield;
+
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.FormData.Operation;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+
+import formdata.shared.services.process.AbstractExternalGroupBoxData;
+
+@FormData(value = Operation.CREATE, formDataClass = AbstractExternalGroupBoxData.class)
+public abstract class AbstractExternalGroupBox extends AbstractGroupBox {
+
+  public ExternalStringField getExternalStringField() {
+    return getFieldByClass(ExternalStringField.class);
+  }
+
+}

@@ -12,11 +12,14 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.wizard.services.SmtpServiceNewWizard;
@@ -76,12 +79,7 @@ public class SmtpServiceTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    if (m_serviceHierarchy == null) {
-      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iSMTPService);
-      m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
-    }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
-    for (IType service : services) {
+    for (IType service : resolveServices()) {
       IType serviceInterface = null;
       IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       if (interfaces.length > 0) {
@@ -89,6 +87,26 @@ public class SmtpServiceTablePage extends AbstractPage {
       }
       new SmtpServiceNodePage(this, service, serviceInterface);
     }
+  }
+
+  protected IType[] resolveServices() {
+    if (m_serviceHierarchy == null) {
+      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iSMTPService);
+      m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
+    }
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    return services;
+  }
+
+  @Override
+  public void fillContextMenu(IMenuManager manager) {
+    super.fillContextMenu(manager);
+    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveServices();
+      }
+    }));
   }
 
   @Override

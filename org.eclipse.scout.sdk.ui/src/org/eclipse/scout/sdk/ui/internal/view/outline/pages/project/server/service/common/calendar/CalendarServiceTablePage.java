@@ -14,11 +14,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.wizard.services.CalendarServiceNewWizard;
@@ -78,12 +81,7 @@ public class CalendarServiceTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    if (m_serviceHierarchy == null) {
-      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iCalendarService);
-      m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
-    }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iCalendarService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
-    for (IType service : services) {
+    for (IType service : resolveServices()) {
       IType serviceInterface = null;
       IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       if (interfaces.length > 0) {
@@ -91,6 +89,26 @@ public class CalendarServiceTablePage extends AbstractPage {
       }
       new CalendarServiceNodePage(this, service, serviceInterface);
     }
+  }
+
+  protected IType[] resolveServices() {
+    if (m_serviceHierarchy == null) {
+      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iCalendarService);
+      m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
+    }
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iCalendarService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    return services;
+  }
+
+  @Override
+  public void fillContextMenu(IMenuManager manager) {
+    super.fillContextMenu(manager);
+    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveServices();
+      }
+    }));
   }
 
   @Override

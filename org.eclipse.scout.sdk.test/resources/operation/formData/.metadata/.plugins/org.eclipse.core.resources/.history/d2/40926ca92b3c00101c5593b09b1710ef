@@ -1,0 +1,30 @@
+package formdata.client.ui.template.formfield;
+
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.FormData.Operation;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import formdata.shared.services.process.AbstractExternalGroupBoxData;
+import com.bsiag.miniapp.client.ui.fields.AbstractTestField;
+import formdata.client.ui.template.formfield.AbstractExternalGroupBox.Blubber;
+
+@FormData(value = Operation.CREATE, formDataClass = AbstractExternalGroupBoxData.class)
+public abstract class AbstractExternalGroupBox extends AbstractGroupBox {
+
+  public Blubber getBlubber() {
+    return getFieldByClass(Blubber.class);
+  }
+
+  public ExternalStringField getExternalStringField() {
+    return getFieldByClass(ExternalStringField.class);
+  }
+
+  @Order(10.0)
+  public class ExternalStringField extends AbstractStringField {
+  }
+
+  @Order(20.0)
+  public class Blubber extends AbstractTestField{
+  }
+}

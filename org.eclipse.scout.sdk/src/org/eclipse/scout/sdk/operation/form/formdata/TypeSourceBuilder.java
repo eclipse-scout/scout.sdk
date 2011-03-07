@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.TreeMap;
 
@@ -18,18 +19,21 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 
 /**
  *
  */
 public class TypeSourceBuilder implements ITypeSourceBuilder {
+
   public static final int CATEGORY_METHOD_PROPERTY = 0;
   public static final int CATEGORY_METHOD_FIELD_GETTER = 2;
   public static final int CATEGORY_MEHTOD = 3;
-  public static final int CATEGORY_TYPE_FIELD = 4;
-  public static final int CATEGORY_TYPE_TABLE_COLUMN = 5;
-  public static final int CATEGORY_TYPE_COMPOSER_ATTRIBUTE = 6;
-  public static final int CATEGORY_TYPE_COMPOSER_ENTITY = 7;
+  public static final int CATEGORY_TYPE_PROPERTY = 4;
+  public static final int CATEGORY_TYPE_FIELD = 5;
+  public static final int CATEGORY_TYPE_TABLE_COLUMN = 6;
+  public static final int CATEGORY_TYPE_COMPOSER_ATTRIBUTE = 7;
+  public static final int CATEGORY_TYPE_COMPOSER_ENTITY = 8;
 
   private TreeMap<CompositeObject, ISourceBuilder> m_children;
   private TreeMap<String, ITypeSourceBuilder> m_externalBuilder;
@@ -38,9 +42,11 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
   private int m_flags;
   private boolean m_createDefaultConstructor;
   private boolean m_createDefaultSerialVersionUid;
+  private ArrayList<AnnotationSourceBuilder> m_annotations;
 
   public TypeSourceBuilder() {
     m_children = new TreeMap<CompositeObject, ISourceBuilder>();
+    m_annotations = new ArrayList<AnnotationSourceBuilder>();
     // default
     m_flags = Flags.AccPublic;
     m_createDefaultConstructor = true;
@@ -49,6 +55,9 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
 
   public String createSource(IImportValidator validator) {
     StringBuilder builder = new StringBuilder();
+    for (AnnotationSourceBuilder as : getAnnotations()) {
+      builder.append(as.createSource(validator) + ScoutUtility.NL);
+    }
     if (Flags.isPublic(getFlags())) {
       builder.append("public ");
     }
@@ -72,18 +81,26 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
       builder.append("extends " + ScoutSdkUtility.getSimpleTypeRefName(getSuperTypeSignature(), validator) + " ");
     }
-    builder.append("{\n");
+    builder.append("{" + ScoutUtility.NL);
     if (isCreateDefaultSerialVersionUid()) {
-      builder.append("private static final long serialVersionUID=1L;\n\n");
+      builder.append("private static final long serialVersionUID=1L;" + ScoutUtility.NL + ScoutUtility.NL);
     }
     if (isCreateDefaultConstructor()) {
-      builder.append("public " + getElementName() + "() {\n}\n\n");
+      builder.append("public " + getElementName() + "() {" + ScoutUtility.NL + "}" + ScoutUtility.NL + ScoutUtility.NL);
     }
     for (ISourceBuilder childBuilder : m_children.values()) {
       builder.append(childBuilder.createSource(validator));
     }
     builder.append("}");
     return builder.toString();
+  }
+
+  private AnnotationSourceBuilder[] getAnnotations() {
+    return m_annotations.toArray(new AnnotationSourceBuilder[m_annotations.size()]);
+  }
+
+  public void addAnnotation(AnnotationSourceBuilder annotation) {
+    m_annotations.add(annotation);
   }
 
   public void addBuilder(ISourceBuilder builder, int category) {

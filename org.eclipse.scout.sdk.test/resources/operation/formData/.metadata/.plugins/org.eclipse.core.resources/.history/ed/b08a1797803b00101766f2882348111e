@@ -1,0 +1,43 @@
+package formdata.client.ui.forms;
+
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
+
+import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox;
+import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox.InternalHtmlField;
+
+@FormData
+public class UsingTemplateForm extends AbstractForm{
+
+  public UsingTemplateForm() throws ProcessingException {
+    super();
+  }
+
+  public InternalGroupBox getInternalGroupBox() {
+    return getFieldByClass(InternalGroupBox.class);
+  }
+
+  public InternalHtmlField getInternalHtmlField() {
+    return getFieldByClass(InternalHtmlField.class);
+  }
+
+  public MainBox getMainBox() {
+    return getFieldByClass(MainBox.class);
+  }
+
+  @Order(10.0)
+  public class MainBox extends AbstractGroupBox{
+
+    @Order(10.0)
+    public class InternalGroupBox extends AbstractGroupBox{
+
+      @Order(10.0)
+      public class InternalHtmlField extends AbstractHtmlField{
+      }
+    }
+  }
+}

@@ -17,12 +17,9 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.JavadocContentAccess;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutStatus;
@@ -30,6 +27,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
+import org.eclipse.scout.sdk.ui.jdt.JdtUiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodErrorPresenterContent;
 import org.eclipse.scout.sdk.util.Regex;
@@ -44,15 +42,12 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.text.edits.MalformedTreeException;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
-import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * <h3>AbstractMethodPresenter</h3> ...
@@ -250,31 +245,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   }
 
   protected void showJavaElementInEditor(IJavaElement e, boolean createNew) {
-    try {
-      IEditorPart editor = null;
-      if (createNew) {
-        editor = JavaUI.openInEditor(e);
-      }
-      else {
-        editor = EditorUtility.isOpenInEditor(e);
-        if (editor != null) {
-          PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(editor);
-        }
-      }
-      if (editor != null) {
-        JavaUI.revealInEditor(editor, e);
-        if (editor instanceof ITextEditor) {
-          ITextEditor textEditor = (ITextEditor) editor;
-          IRegion reg = textEditor.getHighlightRange();
-          if (reg != null) {
-            textEditor.setHighlightRange(reg.getOffset(), reg.getLength(), true);
-          }
-        }
-      }
-    }
-    catch (Exception ex) {
-      ScoutSdkUi.logWarning(ex);
-    }
+    JdtUiUtility.showJavaElementInEditor(e, createNew);
   }
 
   protected final String readInitalValue() throws CoreException {

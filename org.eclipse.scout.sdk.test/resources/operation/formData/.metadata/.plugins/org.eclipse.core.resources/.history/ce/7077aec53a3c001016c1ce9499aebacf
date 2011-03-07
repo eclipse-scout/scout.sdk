@@ -1,0 +1,34 @@
+package formdata.shared.services.process;
+
+import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+
+public class TableFieldFormData extends AbstractFormData {
+  private static final long serialVersionUID = 1L;
+
+  public TableFieldFormData() {
+  }
+
+  public PersonTable getPersonTable() {
+    return getFieldByClass(PersonTable.class);
+  }
+
+  public class PersonTable extends AbstractTableFieldData {
+    private static final long serialVersionUID = 1L;
+
+    public PersonTable() {
+    }
+
+    public void setAnObjectColumn(int row, Object anObjectColumn) {
+      setValueInternal(row, 2, anObjectColumn);
+    }
+
+    public void setNameColumn(int row, String nameColumn) {
+      setValueInternal(row, 1, nameColumn);
+    }
+
+    public void setPersonNrColumn(int row, Long personNrColumn) {
+      setValueInternal(row, 0, personNrColumn);
+    }
+  }
+}

@@ -17,7 +17,6 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.operation.form.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.OperationAction;
@@ -41,7 +40,6 @@ public class FormNodePage extends AbstractScoutTypePage {
   private InnerTypePageDirtyListener m_mainBoxListener;
 
   public FormNodePage(AbstractPage parent, IType type) {
-
     setParent(parent);
     setType(type);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Form));
@@ -95,8 +93,9 @@ public class FormNodePage extends AbstractScoutTypePage {
   public void fillContextMenu(IMenuManager manager) {
     super.fillContextMenu(manager);
     manager.add(new Separator());
-    manager.add(new OperationAction("Wellform Form", null, new WellformScoutTypeOperation(getType(), true)));
-    manager.add(new OperationAction("Update Form Data", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new FormDataUpdateOperation(getType())));
+    manager.add(new OperationAction("Wellform Form...", null, new WellformScoutTypeOperation(getType(), true)));
+//    manager.add(new OperationAction("Update Form Data", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new FormDataUpdateOperation(getType())));
+    manager.add(new OperationAction("Update Form Data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation(getType())));
   }
 
   @Override

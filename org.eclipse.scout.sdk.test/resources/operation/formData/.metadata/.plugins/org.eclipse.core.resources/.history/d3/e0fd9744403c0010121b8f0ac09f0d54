@@ -1,0 +1,80 @@
+package formdata.shared.services.process;
+
+import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+
+public class TableFieldFormData extends AbstractFormData {
+  private static final long serialVersionUID = 1L;
+
+  public TableFieldFormData() {
+  }
+
+  public PersonTable getPersonTable() {
+    return getFieldByClass(PersonTable.class);
+  }
+
+  public class PersonTable extends AbstractTableFieldData {
+    private static final long serialVersionUID = 1L;
+
+    public PersonTable() {
+    }
+
+    public void setPersonNrColumn(int row, Long personNrColumn) {
+      setValueInternal(row, 0, personNrColumn);
+    }
+
+    public Long getPersonNrColumn(int row) {
+      return (Long) getValueInternal(row, 1);
+    }
+
+    public void setNameColumn(int row, String nameColumn) {
+      setValueInternal(row, 1, nameColumn);
+    }
+
+    public String getNameColumn(int row) {
+      return (String) getValueInternal(row, 1);
+    }
+
+    public void setAnObjectColumn(int row, Object anObjectColumn) {
+      setValueInternal(row, 2, anObjectColumn);
+    }
+
+    public Object getAnObjectColumn(int row) {
+      return getValueInternal(row, 1);
+    }
+
+    @Override
+    public int getColumnCount() {
+      return 3;
+    }
+
+    @Override
+    public Object getValueAt(int row, int column) {
+      switch (column) {
+        case 0:
+          return getPersonNrColumn(row);
+        case 1:
+          return getNameColumn(row);
+        case 2:
+          return getAnObjectColumn(row);
+        default:
+          return null;
+      }
+    }
+
+    @Override
+    public void setValueAt(int row, int column, Object value) {
+      switch (column) {
+        case 0:
+          setPersonNrColumn(row, (Long) value);
+          break;
+        case 1:
+          setNameColumn(row, (String) value);
+          break;
+        case 2:
+          setAnObjectColumn(row, (Object) value);
+          break;
+      }
+    }
+  }
+}

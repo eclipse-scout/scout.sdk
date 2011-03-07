@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 
 /**
  *
@@ -49,7 +50,8 @@ public class FieldSourceBuilder implements ISourceBuilder {
     if (!StringUtility.isNullOrEmpty(value)) {
       builder.append(" = " + value);
     }
-    builder.append(";\n");
+    builder.append(";" + ScoutUtility.NL
+        );
     return null;
   }
 

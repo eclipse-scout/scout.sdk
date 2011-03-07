@@ -1,0 +1,42 @@
+package formdata.client.ui.forms;
+
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.commons.annotations.FormData.Operation;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
+import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+
+import formdata.client.ui.forms.TableFieldForm.MainBox.PersonTableField;
+import formdata.shared.services.process.TableFieldFormData;
+
+@FormData(value = Operation.CREATE, formDataClass = TableFieldFormData.class)
+public class TableFieldForm extends AbstractForm {
+
+  public TableFieldForm() throws ProcessingException {
+    super();
+  }
+
+  public MainBox getMainBox() {
+    return getFieldByClass(MainBox.class);
+  }
+
+  public PersonTableField getPersonTableField() {
+    return getFieldByClass(PersonTableField.class);
+  }
+
+  @Order(10.0)
+  public class MainBox extends AbstractGroupBox {
+
+    @Order(10.0)
+    public class PersonTableField extends AbstractTableField<PersonTableField.Table>{
+
+      @Order(10.0)
+      public class Table extends AbstractTable{
+      }
+    }
+
+  }
+}

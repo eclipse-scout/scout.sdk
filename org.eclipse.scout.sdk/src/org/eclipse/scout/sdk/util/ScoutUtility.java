@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -49,6 +49,7 @@ import org.eclipse.ui.part.MultiEditorInput;
  */
 public final class ScoutUtility {
 
+  public static String NL = System.getProperty("line.separator");
   private static ScoutUtility instance = new ScoutUtility();
   public static final String JAVA_MARKER = "java ";
 
@@ -273,6 +274,22 @@ public final class ScoutUtility {
       }
     }
     ScoutSdk.logWarning("could not find referenced type '" + typeName + "' in '" + declaringType.getFullyQualifiedName() + "'.");
+    return null;
+  }
+
+  public static String getReferencedTypeSignature(IType declaringType, String simpleTypeName) throws JavaModelException {
+    String[][] resolvedTypeName = declaringType.resolveType(simpleTypeName);
+    if (resolvedTypeName == null) {
+      return Signature.createTypeSignature(simpleTypeName, false);
+    }
+    else if (resolvedTypeName.length > 0) {
+      StringBuilder fqnBuilder = new StringBuilder();
+      if (!StringUtility.isNullOrEmpty(resolvedTypeName[0][0])) {
+        fqnBuilder.append(resolvedTypeName[0][0] + ".");
+      }
+      fqnBuilder.append(resolvedTypeName[0][1]);
+      return Signature.createTypeSignature(fqnBuilder.toString(), true);
+    }
     return null;
   }
 

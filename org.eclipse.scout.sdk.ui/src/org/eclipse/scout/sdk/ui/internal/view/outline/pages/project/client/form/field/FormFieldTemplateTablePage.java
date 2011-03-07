@@ -12,9 +12,12 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -62,6 +65,14 @@ public class FormFieldTemplateTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
+    for (IType fieldTemplate : resolveFormFieldTemplates()) {
+      ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(fieldTemplate, m_formFieldHierarchy);
+      nodePage.setParent(this);
+      nodePage.setType(fieldTemplate);
+    }
+  }
+
+  protected IType[] resolveFormFieldTemplates() {
     if (m_formFieldHierarchy == null) {
       m_formFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iFormField);
       m_formFieldHierarchy.addHierarchyListener(getPageDirtyListener());
@@ -71,11 +82,18 @@ public class FormFieldTemplateTablePage extends AbstractPage {
         TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic)
         );
     IType[] allSubtypes = m_formFieldHierarchy.getAllSubtypes(iFormField, filter, TypeComparators.getTypeNameComparator());
-    for (IType fieldTemplate : allSubtypes) {
-      ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(fieldTemplate, m_formFieldHierarchy);
-      nodePage.setParent(this);
-      nodePage.setType(fieldTemplate);
-    }
+    return allSubtypes;
+  }
+
+  @Override
+  public void fillContextMenu(IMenuManager manager) {
+    super.fillContextMenu(manager);
+    manager.add(new MultipleUpdateFormDataAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveFormFieldTemplates();
+      }
+    }));
   }
 
   /**

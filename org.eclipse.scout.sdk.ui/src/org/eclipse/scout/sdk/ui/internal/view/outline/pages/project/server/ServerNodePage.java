@@ -32,6 +32,8 @@ import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperati
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.axis.AxisWebServiceConsumerTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.axis.AxisWebServiceProviderTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
@@ -48,13 +50,15 @@ import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 
 /**
  * <h3>ServerNodePage</h3> ...
  */
 public class ServerNodePage extends AbstractPage {
-
+  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
   final IType iServerSession = ScoutSdk.getType(RuntimeClasses.IServerSession);
+
   private final IScoutBundle m_serverBundle;
   private ICachedTypeHierarchy m_serverSessionHierarchy;
 
@@ -156,11 +160,23 @@ public class ServerNodePage extends AbstractPage {
     return true;
   }
 
+  protected IType[] resolveServices() {
+    IPrimaryTypeTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    IType[] services = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    return services;
+  }
+
   @Override
   public void fillContextMenu(final IMenuManager manager) {
     super.fillContextMenu(manager);
     manager.add(new Separator());
     manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform server bundle...", new WellformServerBundleOperation(getScoutResource())));
+    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveServices();
+      }
+    }));
     manager.add(new WizardAction("Export as WAR file...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundleExport), new ExportServerWarWizard(getScoutResource())));
   }
 

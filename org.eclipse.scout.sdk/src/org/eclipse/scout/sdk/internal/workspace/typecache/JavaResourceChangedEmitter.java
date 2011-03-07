@@ -403,7 +403,7 @@ public class JavaResourceChangedEmitter {
           delta.accept(new IResourceDeltaVisitor() {
             public boolean visit(IResourceDelta visitDelta) {
               IResource resource = visitDelta.getResource();
-              if (resource.getType() == IFile.FILE) {
+              if (resource.getType() == IFile.FILE && resource.getFileExtension() != null) {
                 if (resource.getFileExtension().equalsIgnoreCase("java") && ((visitDelta.getFlags() & IResourceDelta.CONTENT) != 0)) {
                   releaseCompilationUnit((ICompilationUnit) JavaCore.create(resource));
                 }
@@ -426,11 +426,15 @@ public class JavaResourceChangedEmitter {
     @Override
     public void bufferChanged(BufferChangedEvent event) {
       ICompilationUnit icu = (ICompilationUnit) event.getBuffer().getOwner();
-      if (!event.getBuffer().hasUnsavedChanges() && TypeUtility.exists(icu)) {
-        m_ast.put(icu.getPath().toString(), createAst(icu));
-        releaseCompilationUnit(icu);
+      if (TypeUtility.exists(icu)) {
+        if (!event.getBuffer().hasUnsavedChanges() && TypeUtility.exists(icu)) {
+          m_ast.put(icu.getPath().toString(), createAst(icu));
+          releaseCompilationUnit(icu);
+        }
       }
-
+      else {
+        // TODO
+      }
     }
   }
 

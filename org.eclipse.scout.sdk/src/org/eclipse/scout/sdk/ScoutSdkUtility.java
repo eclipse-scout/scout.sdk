@@ -10,15 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedInputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -26,6 +30,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -105,7 +110,7 @@ public class ScoutSdkUtility {
    * @see ScoutSdkUtility#getSimpleTypeRefName(String, IImportValidator)
    */
   public static String getSimpleTypeRefFromFqn(String fullyQualifiedTypeName, IImportValidator importValidator) {
-    return instance.getSimpleTypeSignatureImpl(Signature.createTypeSignature(fullyQualifiedTypeName, true), importValidator);
+    return instance.getSimpleTypeRefImpl(Signature.createTypeSignature(fullyQualifiedTypeName, true), importValidator);
   }
 
   /**
@@ -129,10 +134,10 @@ public class ScoutSdkUtility {
    * @return the simple reference
    */
   public static String getSimpleTypeRefName(String signature, IImportValidator importValidator) {
-    return instance.getSimpleTypeSignatureImpl(signature, importValidator);
+    return instance.getSimpleTypeRefImpl(signature, importValidator);
   }
 
-  private String getSimpleTypeSignatureImpl(String signature, IImportValidator importValidator) {
+  private String getSimpleTypeRefImpl(String signature, IImportValidator importValidator) {
     boolean isSequence = false;
     if (signature.startsWith("|")) {
       signature.replaceFirst("^[\\|]{1}", "");
@@ -141,47 +146,54 @@ public class ScoutSdkUtility {
     signature = signature.replaceAll("^[\\|]*", "");
     int arrayCount = Signature.getArrayCount(signature);
     signature = signature.replaceAll("^[\\[]*", "");
+    String simpleName = null;
     if (getSignatureType(signature) == Signature.BASE_TYPE_SIGNATURE) {
-      return Signature.getSignatureSimpleName(signature);
+      simpleName = Signature.getSignatureSimpleName(signature);
+    }
+    else if (Signature.getTypeSignatureKind(signature) == Signature.WILDCARD_TYPE_SIGNATURE) {
+      switch (signature.charAt(0)) {
+        case Signature.C_STAR:
+          simpleName = "?";
+          break;
+        case Signature.C_SUPER:
+          simpleName = "? super ";
+          break;
+        case Signature.C_EXTENDS:
+          simpleName = "? extends ";
+          break;
+      }
+      if (signature.length() > 1) {
+        simpleName = simpleName + getSimpleTypeRefImpl(signature.substring(1), importValidator);
+      }
     }
     else {
-      String simpleSignature = null;
-      String argmunets = "";
-      String argRegexp = "^([^\\<]*).*(\\([^)]*\\))(\\;)$";
-      Matcher m = Pattern.compile(argRegexp).matcher(signature);
-      if (m.matches()) {
-        argmunets = m.group(2);
-        simpleSignature = m.replaceAll("$1$3");
-      }
-      else {
-        simpleSignature = signature.replaceAll("^([^\\<]*).*(\\;)$", "$1$2");
-      }
-      simpleSignature = simpleSignature.replaceAll("[\\$\\/]{1}", ".");
-      String simpleName = importValidator.getSimpleTypeRef(simpleSignature);
       String[] typeArguments = Signature.getTypeArguments(signature);
+      if (typeArguments != null && typeArguments.length > 0) {
+        signature = Signature.getTypeErasure(signature);
+        signature = signature.replaceAll("[\\$\\/]{1}", ".");
+      }
+      simpleName = importValidator.getSimpleTypeRef(signature);
       if (typeArguments != null && typeArguments.length > 0) {
         simpleName += "<";
         for (String typeArg : typeArguments) {
-          String genericSimpleName = getSimpleTypeSignatureImpl(typeArg, importValidator);
+          String genericSimpleName = getSimpleTypeRefImpl(typeArg, importValidator);
           simpleName += genericSimpleName + ",";
         }
         simpleName = simpleName.replaceAll("\\,$", ">");
 
       }
-      String arraySufix = "";
-      for (int i = 0; i < arrayCount; i++) {
-        arraySufix += "[]";
-      }
-      StringBuilder simpleTypeName = new StringBuilder();
-      simpleTypeName.append(simpleName);
-      simpleTypeName.append(argmunets);
-      simpleTypeName.append(arraySufix);
-
-      if (isSequence) {
-        simpleTypeName.append("...");
-      }
-      return simpleTypeName.toString();
     }
+    String arraySufix = "";
+    for (int i = 0; i < arrayCount; i++) {
+      arraySufix += "[]";
+    }
+    StringBuilder simpleTypeName = new StringBuilder();
+    simpleTypeName.append(simpleName);
+    simpleTypeName.append(arraySufix);
+    if (isSequence) {
+      simpleTypeName.append("...");
+    }
+    return simpleTypeName.toString();
   }
 
   public static String getFullyQuallifiedTypeName(String signature, IType jdtType) throws JavaModelException {
@@ -475,6 +487,37 @@ public class ScoutSdkUtility {
     }
 
     return Status.OK_STATUS;
+  }
+
+  public static long getAdler32Checksum(ICompilationUnit icu) {
+    if (TypeUtility.exists(icu)) {
+      IResource resource = icu.getResource();
+      if (resource != null && resource.exists() && resource.getType() == IResource.FILE) {
+        IFile file = (IFile) resource;
+        CheckedInputStream cis = null;
+        try {
+          cis = new CheckedInputStream(file.getContents(), new Adler32());
+          byte[] buf = new byte[1024];
+          while (cis.read(buf) >= 0) {
+          }
+          return cis.getChecksum().getValue();
+        }
+        catch (Exception e) {
+
+        }
+        finally {
+          if (cis != null) {
+            try {
+              cis.close();
+            }
+            catch (IOException e) {
+              // void
+            }
+          }
+        }
+      }
+    }
+    return -1;
   }
 
   public static void main(String[] args) {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -401,28 +401,28 @@ public class TypeUtility {
   }
 
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
-    IAnnotation annotation = element.getAnnotation(fullyQuallifiedAnnotation);
-    if (TypeUtility.exists(annotation)) {
-      return annotation;
-    }
-    else {
-      String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
-      annotation = element.getAnnotation(simpleName);
-      if (TypeUtility.exists(annotation)) {
+    try {
+      IAnnotation annotation = element.getAnnotation(fullyQuallifiedAnnotation);
+      // workaround since annotations are not cached properly from jdt
+      if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
         return annotation;
       }
+      else {
+        String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
+        annotation = element.getAnnotation(simpleName);
+        if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
+          return annotation;
+        }
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logError("could not get annotation '" + fullyQuallifiedAnnotation + "' of '" + element + "'", e);
     }
     return null;
   }
 
   public static boolean hasAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
-    if (TypeUtility.exists(element.getAnnotation(fullyQuallifiedAnnotation))) {
-      return true;
-    }
-    else {
-      String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
-      return TypeUtility.exists(element.getAnnotation(simpleName));
-    }
+    return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
   }
 
 //  public static class P_OverriddenMethodFilter implements IMethodFilter {
@@ -516,22 +516,14 @@ public class TypeUtility {
   }
 
   public static IType[] getTypesInPackage(IPackageFragment pck, ITypeFilter filter, Comparator<IType> comparator) {
+    return getTypesInPackage(pck, filter, comparator, false);
+  }
+
+  public static IType[] getTypesInPackage(IPackageFragment pck, ITypeFilter filter, Comparator<IType> comparator, boolean includeSubpackages) {
+
     Collection<IType> unsortedTypes = new ArrayList<IType>();
-    try {
-      if (pck != null && pck.exists()) {
-        for (ICompilationUnit cu : pck.getCompilationUnits()) {
-          for (IType t : cu.getTypes()) {
-            if (filter == null || filter.accept(t)) {
-              unsortedTypes.add(t);
-            }
-            break;
-          }
-        }
-      }
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("could not get types of package '" + pck.getElementName() + "'", e);
-    }
+    instance.collectTypesInPackage(pck, filter, includeSubpackages, unsortedTypes);
+
     if (comparator == null) {
       return unsortedTypes.toArray(new IType[unsortedTypes.size()]);
     }
@@ -540,6 +532,31 @@ public class TypeUtility {
       sortedTypes.addAll(unsortedTypes);
       return sortedTypes.toArray(new IType[sortedTypes.size()]);
     }
+  }
+
+  private void collectTypesInPackage(IPackageFragment pck, ITypeFilter filter, boolean includeSubPackages, Collection<IType> collector) {
+    try {
+      if (pck != null && pck.exists()) {
+        for (IJavaElement element : pck.getChildren()) {
+          if (element.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
+            if (includeSubPackages) {
+              collectTypesInPackage((IPackageFragment) element, filter, includeSubPackages, collector);
+            }
+          }
+          else if (element.getElementType() == IJavaElement.COMPILATION_UNIT) {
+            ICompilationUnit icu = (ICompilationUnit) element;
+            IType[] types = icu.getTypes();
+            if (types != null && types.length > 0) {
+              collector.add(types[0]);
+            }
+          }
+        }
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not get types of package '" + pck.getElementName() + "'", e);
+    }
+
   }
 
   public static boolean exists(IJavaElement type) {
@@ -650,7 +667,6 @@ public class TypeUtility {
    * <pre>
    * public boolean is<em>&lt;PropertyType&gt;</em>();
    * </pre>
-   * 
    * <p>
    * This implementation tries to determine the field by using the JDT code style settings stored in the Eclipse
    * preferences. Prefixes and suffixes used for fields must be declared. The default prefix Scout uses for fields (
@@ -664,7 +680,6 @@ public class TypeUtility {
    *          optional property bean comparator used to sort the result
    * @return Returns an array of property bean descriptions. The array is empty if the given class does not contain any
    *         bean properties.
-   * 
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
   public static IPropertyBean[] getPropertyBeans(IType type, IPropertyBeanFilter propertyFilter, Comparator<IPropertyBean> comparator) {

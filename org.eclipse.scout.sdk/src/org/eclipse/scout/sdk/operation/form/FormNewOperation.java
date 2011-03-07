@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,12 +18,13 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.field.ButtonFieldNewOperation;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperation;
 import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
@@ -39,6 +40,7 @@ public class FormNewOperation implements IOperation {
   private String m_superTypeSignature;
   private INlsEntry m_nlsEntry;
   private boolean m_autoCreateFormData;
+  private String m_formDataSignature;
   private boolean m_createButtonOk;
   private boolean m_createButtonCancel;
   private IScoutBundle m_clientBundle;
@@ -65,8 +67,10 @@ public class FormNewOperation implements IOperation {
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    if (isAutoCreateFormData()) {
-      AnnotationCreateOperation annotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.FormData, true));
+    if (!StringUtility.isNullOrEmpty(getFormDataSignature())) {
+      FormDataAnnotationCreateOperation annotOp = new FormDataAnnotationCreateOperation(null);
+      annotOp.setSdkCommand(SdkCommand.CREATE);
+      annotOp.setFormDataSignature(getFormDataSignature());
       newOp.addAnnotation(annotOp);
     }
     newOp.run(monitor, workingCopyManager);
@@ -163,12 +167,19 @@ public class FormNewOperation implements IOperation {
     m_nlsEntry = nlsEntry;
   }
 
-  public void setAutoCreateFormData(boolean autoCreateFormData) {
-    m_autoCreateFormData = autoCreateFormData;
+  /**
+   * @param formDataSignature
+   *          the formDataSignature to set
+   */
+  public void setFormDataSignature(String formDataSignature) {
+    m_formDataSignature = formDataSignature;
   }
 
-  public boolean isAutoCreateFormData() {
-    return m_autoCreateFormData;
+  /**
+   * @return the formDataSignature
+   */
+  public String getFormDataSignature() {
+    return m_formDataSignature;
   }
 
   public void setCreateButtonOk(boolean createButtonOk) {

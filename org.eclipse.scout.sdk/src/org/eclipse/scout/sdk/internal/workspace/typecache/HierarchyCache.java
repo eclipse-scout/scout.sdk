@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.internal.workspace.typecache;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
@@ -71,6 +72,17 @@ public final class HierarchyCache {
     }
     catch (JavaModelException e) {
       ScoutSdk.logWarning("could not build hierarchy of region '" + region + "'.", e);
+    }
+    return null;
+  }
+
+  public TypeHierarchy getSuperHierarchy(IType type) {
+    try {
+      ITypeHierarchy hierarchy = type.newSupertypeHierarchy(new NullProgressMonitor());
+      return new TypeHierarchy(null, hierarchy);
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not build super hierarchy '" + type.getFullyQualifiedName() + "'.", e);
     }
     return null;
   }

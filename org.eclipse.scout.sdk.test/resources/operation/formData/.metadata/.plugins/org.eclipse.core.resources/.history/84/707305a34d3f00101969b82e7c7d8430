@@ -1,0 +1,268 @@
+package formdata.shared.services.process;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.service.IService;
+
+public class PropertyTestFormData extends AbstractFormData {
+  private static final long serialVersionUID = 1L;
+
+  public PropertyTestFormData() {
+  }
+
+  public BoolObjectProperty getBoolObjectProperty() {
+    return getPropertyByClass(BoolObjectProperty.class);
+  }
+
+  public Boolean getBoolObject() {
+    return getPropertyByClass(BoolObjectProperty.class).getValue();
+  }
+
+  public void setBoolObject(Boolean boolObject) {
+    getBoolObjectProperty().setValue(boolObject);
+  }
+
+  public BoolPrimitiveProperty getBoolPrimitiveProperty() {
+    return getPropertyByClass(BoolPrimitiveProperty.class);
+  }
+
+  public boolean getBoolPrimitive() {
+    return (getPropertyByClass(BoolPrimitiveProperty.class).getValue() == null) ? (false) : (getPropertyByClass(BoolPrimitiveProperty.class).getValue());
+  }
+
+  public void setBoolPrimitive(Boolean boolPrimitive) {
+    getBoolPrimitiveProperty().setValue(boolPrimitive);
+  }
+
+  public ByteArrayProperty getByteArrayProperty() {
+    return getPropertyByClass(ByteArrayProperty.class);
+  }
+
+  public byte getByteArray() {
+    return getPropertyByClass(ByteArrayProperty.class).getValue();
+  }
+
+  public void setByteArray(byte byteArray) {
+    getByteArrayProperty().setValue(byteArray);
+  }
+
+  public ComplexArrayProperty getComplexArrayProperty() {
+    return getPropertyByClass(ComplexArrayProperty.class);
+  }
+
+  public ArrayList<List<String>>[] getComplexArray() {
+    return getPropertyByClass(ComplexArrayProperty.class).getValue();
+  }
+
+  public void setComplexArray(ArrayList<List<String>>[] complexArray) {
+    getComplexArrayProperty().setValue(complexArray);
+  }
+
+  public ComplexInnerArrayProperty getComplexInnerArrayProperty() {
+    return getPropertyByClass(ComplexInnerArrayProperty.class);
+  }
+
+  public ArrayList<List<String[]>> getComplexInnerArray() {
+    return getPropertyByClass(ComplexInnerArrayProperty.class).getValue();
+  }
+
+  public void setComplexInnerArray(ArrayList<List<String[]>> complexInnerArray) {
+    getComplexInnerArrayProperty().setValue(complexInnerArray);
+  }
+
+  public DoubleArrayPropertyProperty getDoubleArrayPropertyProperty() {
+    return getPropertyByClass(DoubleArrayPropertyProperty.class);
+  }
+
+  public String[][] getDoubleArrayProperty() {
+    return getPropertyByClass(DoubleArrayPropertyProperty.class).getValue();
+  }
+
+  public void setDoubleArrayProperty(String[][] doubleArrayProperty) {
+    getDoubleArrayPropertyProperty().setValue(doubleArrayProperty);
+  }
+
+  public IntPrimitiveProperty getIntPrimitiveProperty() {
+    return getPropertyByClass(IntPrimitiveProperty.class);
+  }
+
+  public int getIntPrimitive() {
+    return (getPropertyByClass(IntPrimitiveProperty.class).getValue() == null) ? (0) : (getPropertyByClass(IntPrimitiveProperty.class).getValue());
+  }
+
+  public void setIntPrimitive(Integer intPrimitive) {
+    getIntPrimitiveProperty().setValue(intPrimitive);
+  }
+
+  public ObjectPropertyProperty getObjectPropertyProperty() {
+    return getPropertyByClass(ObjectPropertyProperty.class);
+  }
+
+  public Object getObjectProperty() {
+    return getPropertyByClass(ObjectPropertyProperty.class).getValue();
+  }
+
+  public void setObjectProperty(Object objectProperty) {
+    getObjectPropertyProperty().setValue(objectProperty);
+  }
+
+  public PropertyTestNrProperty getPropertyTestNrProperty() {
+    return getPropertyByClass(PropertyTestNrProperty.class);
+  }
+
+  public Long getPropertyTestNr() {
+    return getPropertyByClass(PropertyTestNrProperty.class).getValue();
+  }
+
+  public void setPropertyTestNr(Long propertyTestNr) {
+    getPropertyTestNrProperty().setValue(propertyTestNr);
+  }
+
+  public SingleArrayPropertyProperty getSingleArrayPropertyProperty() {
+    return getPropertyByClass(SingleArrayPropertyProperty.class);
+  }
+
+  public String[] getSingleArrayProperty() {
+    return getPropertyByClass(SingleArrayPropertyProperty.class).getValue();
+  }
+
+  public void setSingleArrayProperty(String[] singleArrayProperty) {
+    getSingleArrayPropertyProperty().setValue(singleArrayProperty);
+  }
+
+  public WizardsProperty getWizardsProperty() {
+    return getPropertyByClass(WizardsProperty.class);
+  }
+
+  public HashMap<String, List<IService>> getWizards() {
+    return getPropertyByClass(WizardsProperty.class).getValue();
+  }
+
+  public void setWizards(HashMap<String, List<IService>> wizards) {
+    getWizardsProperty().setValue(wizards);
+  }
+
+  public Name getName() {
+    return getFieldByClass(Name.class);
+  }
+
+  public class BoolObjectProperty extends AbstractPropertyData<Boolean> {
+    private static final long serialVersionUID = 1L;
+
+    public BoolObjectProperty() {
+    }
+
+  }
+
+  public class BoolPrimitiveProperty extends AbstractPropertyData<Boolean> {
+    private static final long serialVersionUID = 1L;
+
+    public BoolPrimitiveProperty() {
+    }
+
+  }
+
+  public class ByteArrayProperty extends AbstractPropertyData<byte[]> {
+    private static final long serialVersionUID = 1L;
+
+    public ByteArrayProperty() {
+    }
+
+  }
+
+  public class ComplexArrayProperty extends AbstractPropertyData<ArrayList<List<String>>[]> {
+    private static final long serialVersionUID = 1L;
+
+    public ComplexArrayProperty() {
+    }
+
+  }
+
+  public class ComplexInnerArrayProperty extends AbstractPropertyData<ArrayList<List<String[]>>> {
+    private static final long serialVersionUID = 1L;
+
+    public ComplexInnerArrayProperty() {
+    }
+
+  }
+
+  public class DoubleArrayPropertyProperty extends AbstractPropertyData<String[][]> {
+    private static final long serialVersionUID = 1L;
+
+    public DoubleArrayPropertyProperty() {
+    }
+
+  }
+
+  public class IntPrimitiveProperty extends AbstractPropertyData<Integer> {
+    private static final long serialVersionUID = 1L;
+
+    public IntPrimitiveProperty() {
+    }
+
+  }
+
+  public class ObjectPropertyProperty extends AbstractPropertyData<Object> {
+    private static final long serialVersionUID = 1L;
+
+    public ObjectPropertyProperty() {
+    }
+
+  }
+
+  public class PropertyTestNrProperty extends AbstractPropertyData<Long> {
+    private static final long serialVersionUID = 1L;
+
+    public PropertyTestNrProperty() {
+    }
+
+  }
+
+  public class SingleArrayPropertyProperty extends AbstractPropertyData<String[]> {
+    private static final long serialVersionUID = 1L;
+
+    public SingleArrayPropertyProperty() {
+    }
+
+  }
+
+  public class WizardsProperty extends AbstractPropertyData<HashMap<String, List<IService>>> {
+    private static final long serialVersionUID = 1L;
+
+    public WizardsProperty() {
+    }
+
+  }
+
+  public class Name extends AbstractValueFieldData<String> {
+    private static final long serialVersionUID = 1L;
+
+    public Name() {
+    }
+
+    public IntPropertyProperty getIntPropertyProperty() {
+      return getPropertyByClass(IntPropertyProperty.class);
+    }
+
+    public int getIntProperty() {
+      return (getPropertyByClass(IntPropertyProperty.class).getValue() == null) ? (0) : (getPropertyByClass(IntPropertyProperty.class).getValue());
+    }
+
+    public void setIntProperty(Integer intProperty) {
+      getIntPropertyProperty().setValue(intProperty);
+    }
+
+    public class IntPropertyProperty extends AbstractPropertyData<Integer> {
+      private static final long serialVersionUID = 1L;
+
+      public IntPropertyProperty() {
+      }
+
+    }
+  }
+}

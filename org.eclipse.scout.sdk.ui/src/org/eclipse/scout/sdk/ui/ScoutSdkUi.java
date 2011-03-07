@@ -18,7 +18,14 @@ import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.LogStatus;
+import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
+import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
+import org.eclipse.scout.sdk.ui.internal.CreateFormDataRequest;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.swt.SWT;
@@ -34,9 +41,12 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
+import org.osgi.framework.ServiceRegistration;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -44,6 +54,7 @@ import org.osgi.framework.BundleContext;
 public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ui";
+  public static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
 
   // The shared instance
   private static ScoutSdkUi plugin;
@@ -57,6 +68,9 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   public static final String COLOR_INACTIVE_FOREGROUND = "inactiveForeground";
 
   private ColorRegistry m_colorRegistry;
+  private ServiceRegistration m_formDataServiceRegistration;
+  private IPropertyChangeListener m_preferencesPropertyListener;
+  private int m_loglevel;
 
   /**
    * The constructor
@@ -67,7 +81,18 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
+    m_loglevel = parseLogLevel(context.getProperty(LOG_LEVEL));
     plugin = this;
+    CreateFormDataRequest requestService = new CreateFormDataRequest();
+    if (m_formDataServiceRegistration == null) {
+      m_formDataServiceRegistration = context.registerService(ICreateFormDataRequest.class.getName(), requestService, null);
+    }
+    if (m_preferencesPropertyListener == null) {
+      m_preferencesPropertyListener = new P_PreferenceStorePropertyListener();
+    }
+    getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
+//    contributeMenus(context);
+
     // version++ -> releasenotes
 //    try {
 //      IEclipsePreferences node = new InstanceScope().getNode(getBundle().getSymbolicName());
@@ -98,7 +123,15 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   @Override
   public void stop(BundleContext context) throws Exception {
     plugin = null;
+    if (m_preferencesPropertyListener != null) {
+      getPreferenceStore().removePropertyChangeListener(m_preferencesPropertyListener);
+      m_preferencesPropertyListener = null;
+    }
     super.stop(context);
+    if (m_formDataServiceRegistration != null) {
+      m_formDataServiceRegistration.unregister();
+      m_formDataServiceRegistration = null;
+    }
 //    JavaCore.removeElementChangedListener(m_formDataMarkerSupport);
   }
 
@@ -177,15 +210,17 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   public static void log(IStatus log) {
     if (log instanceof LogStatus) {
-      logImpl((LogStatus) log);
+      getDefault().logImpl((LogStatus) log);
     }
     else {
-      logImpl(new LogStatus(ScoutSdkUi.class, log.getSeverity(), log.getPlugin(), log.getMessage(), log.getException()));
+      getDefault().logImpl(new LogStatus(ScoutSdkUi.class, log.getSeverity(), log.getPlugin(), log.getMessage(), log.getException()));
     }
   }
 
-  private static void logImpl(LogStatus log) {
-    getDefault().getLog().log(log);
+  private void logImpl(LogStatus log) {
+    if ((log.getSeverity() & m_loglevel) != 0) {
+      getLog().log(log);
+    }
   }
 
   public static void logInfo(String message) {
@@ -196,7 +231,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (message == null) {
       message = "";
     }
-    logImpl(new LogStatus(ScoutSdkUi.class, IStatus.INFO, PLUGIN_ID, message, t));
+    getDefault().logImpl(new LogStatus(ScoutSdkUi.class, IStatus.INFO, PLUGIN_ID, message, t));
   }
 
   public static void logWarning(String message) {
@@ -211,7 +246,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (message == null) {
       message = "";
     }
-    logImpl(new LogStatus(ScoutSdkUi.class, IStatus.WARNING, PLUGIN_ID, message, t));
+    getDefault().logImpl(new LogStatus(ScoutSdkUi.class, IStatus.WARNING, PLUGIN_ID, message, t));
   }
 
   public static void logError(Throwable t) {
@@ -226,7 +261,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (message == null) {
       message = "";
     }
-    logImpl(new LogStatus(ScoutSdkUi.class, IStatus.ERROR, PLUGIN_ID, message, t));
+    getDefault().logImpl(new LogStatus(ScoutSdkUi.class, IStatus.ERROR, PLUGIN_ID, message, t));
   }
 
   protected ColorRegistry createColorRegistry() {
@@ -393,4 +428,41 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     }
   }
 
+  private int parseLogLevel(String loglevel) {
+    int level = IStatus.INFO | IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
+    if (!StringUtility.isNullOrEmpty(loglevel)) {
+      String lowerLoglevel = loglevel.toLowerCase();
+      if (lowerLoglevel.equals("warning")) {
+        level = IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
+      }
+      else if (lowerLoglevel.equals("error")) {
+        level = IStatus.ERROR | IStatus.CANCEL;
+      }
+      else if (lowerLoglevel.equals("cancel")) {
+        level = IStatus.CANCEL;
+      }
+    }
+    return level;
+  }
+
+  private void contributeMenus(BundleContext context) {
+    ServiceReference serviceReference = context.getServiceReference(IMenuService.class.getName());
+    try {
+      Object service = context.getService(serviceReference);
+      System.out.println();
+    }
+    finally {
+      context.ungetService(serviceReference);
+    }
+  }
+
+  private class P_PreferenceStorePropertyListener implements IPropertyChangeListener {
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+      if (FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE.equals(event.getProperty())) {
+        Boolean autoUpdate = (Boolean) event.getNewValue();
+        ScoutSdk.getDefault().setFormDataAutoUpdate(autoUpdate);
+      }
+    }
+  }
 }

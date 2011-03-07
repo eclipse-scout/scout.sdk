@@ -53,7 +53,6 @@ public final class RuntimeClasses {
   public static final String AbstractObjectColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn";
   public static final String AbstractSmartColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn";
   public static final String AbstractStringColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn";
-  public static final String AbstractTimeColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractTimeColumn";
   public static final String AbstractComposerAttribute = "org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute";
   public static final String AbstractComposerEntity = "org.eclipse.scout.rt.client.ui.form.fields.composer.entity.AbstractComposerEntity";
   public static final String AbstractComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField";
@@ -61,6 +60,7 @@ public final class RuntimeClasses {
   public static final String AbstractComposerEntityData = "org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerEntityData";
   public static final String AbstractComposerAttributeData = "org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerAttributeData";
   public static final String AbstractComposerField_Tree = "org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField.Tree";
+  public static final String AbstractCompositeField = "org.eclipse.scout.rt.client.ui.form.fields.AbstractCompositeField";
   public static final String AbstractCustomField = "org.eclipse.scout.rt.client.ui.form.fields.customfield.AbstractCustomField";
   public static final String AbstractDateField = "org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField";
   public static final String AbstractDesktop = "org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop";

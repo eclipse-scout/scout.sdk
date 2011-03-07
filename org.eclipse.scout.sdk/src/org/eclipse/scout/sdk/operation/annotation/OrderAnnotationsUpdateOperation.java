@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -61,7 +61,7 @@ public class OrderAnnotationsUpdateOperation implements IOperation {
         String orderSignature = Signature.createTypeSignature(RuntimeClasses.Order, true);
         AnnotationCreateOperation op = new AnnotationCreateOperation(orderAnnotation.getType(), orderSignature);
         op.addParameter("" + orderAnnotation.getOrderNr());
-        TextEdit edit = op.createEdit(validator);
+        TextEdit edit = op.createEdit(validator, sourceDoc.getDefaultLineDelimiter());
         if (edit != null) {
           multiEdit.addChild(edit);
         }

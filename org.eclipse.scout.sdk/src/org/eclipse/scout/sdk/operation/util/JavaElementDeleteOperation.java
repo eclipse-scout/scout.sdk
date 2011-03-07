@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
@@ -121,7 +122,12 @@ public class JavaElementDeleteOperation implements IOperation {
         manager.register(method.getCompilationUnit(), monitor);
         method.delete(true, monitor);
         break;
-
+      case IJavaElement.ANNOTATION:
+        IAnnotation annotation = (IAnnotation) member;
+        IJavaElement primEle = annotation.getAncestor(IJavaElement.COMPILATION_UNIT);
+        manager.register((ICompilationUnit) primEle, monitor);
+        member.getParent().getJavaModel().delete(new IJavaElement[]{member}, true, monitor);
+        break;
       default:
         ScoutSdk.logWarning("no delete routine found for '" + member.getElementName() + "'.");
         break;

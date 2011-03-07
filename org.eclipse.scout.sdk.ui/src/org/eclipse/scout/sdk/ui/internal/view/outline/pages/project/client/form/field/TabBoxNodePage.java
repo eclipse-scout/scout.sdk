@@ -69,7 +69,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   public Action createNewAction() {
     GroupBoxNewWizard wizard = new GroupBoxNewWizard();
     wizard.initWizard(getType());
-    return new WizardAction(Texts.get("Process_newTypeX", "GroupBox"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxTabAdd),
+    return new WizardAction(Texts.get("Action_newTypeX", "GroupBox"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxTabAdd),
         wizard);
   }
 

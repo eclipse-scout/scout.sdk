@@ -14,11 +14,14 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -28,7 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 
 public class CustomServicePackageNodePage extends AbstractPage {
 
@@ -36,6 +39,8 @@ public class CustomServicePackageNodePage extends AbstractPage {
 
   private PackageContentChangedListener m_packageContentListener;
   private IPackageFragment m_package;
+
+  private IPrimaryTypeTypeHierarchy m_serviceHierarchy;
 
   public CustomServicePackageNodePage(AbstractPage parent, IPackageFragment packageFrament) {
     m_package = packageFrament;
@@ -49,6 +54,7 @@ public class CustomServicePackageNodePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     JavaCore.removeElementChangedListener(m_packageContentListener);
+    m_serviceHierarchy = null;
   }
 
   @Override
@@ -71,21 +77,37 @@ public class CustomServicePackageNodePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    ICachedTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
-
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getClassFilter(),
-        TypeFilters.getSubtypeFilter(iService, serviceHierarchy)
-        );
-    IType[] services = TypeUtility.getTypesInPackage(m_package, filter, TypeComparators.getTypeNameComparator());
-    for (IType service : services) {
+    for (IType service : resolveServices()) {
       IType serviceInterface = null;
-      IType[] interfaces = serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
+      IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       if (interfaces.length > 0) {
         serviceInterface = interfaces[0];
       }
       new CustomServiceNodePage(this, service, serviceInterface);
     }
+  }
+
+  protected IType[] resolveServices() {
+    if (m_serviceHierarchy == null) {
+      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    }
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+        TypeFilters.getClassFilter(),
+        TypeFilters.getSubtypeFilter(iService, m_serviceHierarchy)
+        );
+    IType[] services = TypeUtility.getTypesInPackage(m_package, filter, TypeComparators.getTypeNameComparator());
+    return services;
+  }
+
+  @Override
+  public void fillContextMenu(IMenuManager manager) {
+    super.fillContextMenu(manager);
+    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveServices();
+      }
+    }));
   }
 
   @Override

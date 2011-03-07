@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
@@ -54,14 +53,12 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     ArrayList<JavaClassProposal> proposals = new ArrayList<JavaClassProposal>();
-    TuningUtility.startTimer();
     for (IType t : provideScoutTypes(method.getType().getJavaProject(), method.getType())) {
       proposals.add(new JavaClassProposal(ScoutProposalUtility.getFieldName(t, m_labelMethodName), ScoutSdkUi.getImage(ScoutSdkUi.Default), t));
     }
     if (m_includeNullProposal) {
       proposals.add(NULL_PROPOSAL);
     }
-    TuningUtility.stopTimer("master field");
     setProposals(proposals.toArray(new JavaClassProposal[proposals.size()]));
     super.init(method);
   }

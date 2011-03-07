@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?pde version="3.5"?>
+
+<target name="Running Platform">
+<locations>
+<location configuration="/E:/workspaces/scout.sdk/headFormData/.metadata/.plugins/org.eclipse.pde.core/Form Data Template/" path="${eclipse_home}" type="Profile"/>
+</locations>
+<environment>
+<os>win32</os>
+<ws>win32</ws>
+<arch>x86</arch>
+<nl>de_CH</nl>
+</environment>
+<launcherArgs>
+<vmArgs>-Xms256m -Xmx1024m -XX:MaxPermSize=256m -Duser.name=Andreas Hoegger</vmArgs>
+</launcherArgs>
+</target>

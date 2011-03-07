@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,12 +29,14 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.internal.workspace.typecache.HierarchyCache;
 import org.eclipse.scout.sdk.internal.workspace.typecache.JavaResourceChangedEmitter;
 import org.eclipse.scout.sdk.internal.workspace.typecache.TypeCache;
 import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspace;
 import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
@@ -47,7 +49,7 @@ public class ScoutSdk extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk";
   public static final String NATURE_ID = PLUGIN_ID + ".ScoutNature";
-
+  public static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
   private static ScoutSdk plugin;
 
   private Object m_initializeLock = new Object();
@@ -55,6 +57,8 @@ public class ScoutSdk extends Plugin {
   private TypeCache m_typeCache;
   private HierarchyCache m_hierarchyCache;
   private JavaResourceChangedEmitter m_javaResourceChangedEmitter;
+  private FormDataAutoUpdater m_formDataUpdateSupport;
+  private int m_loglevel;
 
   /*
    * (non-Javadoc)
@@ -63,6 +67,7 @@ public class ScoutSdk extends Plugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
+    m_loglevel = parseLogLevel(context.getProperty(LOG_LEVEL));
     plugin = this;
     m_typeCache = new TypeCache();
     m_hierarchyCache = new HierarchyCache();
@@ -70,6 +75,8 @@ public class ScoutSdk extends Plugin {
     log(new Status(IStatus.INFO, ScoutSdk.PLUGIN_ID, "Starting SCOUT IDE Plugin."));
     m_javaResourceChangedEmitter = new JavaResourceChangedEmitter(m_hierarchyCache);
 //    new ScoutMarkerSupport();
+    m_formDataUpdateSupport = new FormDataAutoUpdater();
+
   }
 
   /*
@@ -82,6 +89,7 @@ public class ScoutSdk extends Plugin {
     m_typeCache.dispose();
     m_hierarchyCache.dispose();
     m_javaResourceChangedEmitter.dispose();
+    m_formDataUpdateSupport.dispose();
 
 //    m_structuredTypeCache.dispose();
 //    ScoutTypeHierarchy.storeCaches();
@@ -97,15 +105,17 @@ public class ScoutSdk extends Plugin {
 
   public static void log(IStatus log) {
     if (log instanceof LogStatus) {
-      logImpl((LogStatus) log);
+      getDefault().logImpl((LogStatus) log);
     }
     else {
-      logImpl(new LogStatus(ScoutSdk.class, log.getSeverity(), log.getPlugin(), log.getMessage(), log.getException()));
+      getDefault().logImpl(new LogStatus(ScoutSdk.class, log.getSeverity(), log.getPlugin(), log.getMessage(), log.getException()));
     }
   }
 
-  private static void logImpl(LogStatus log) {
-    getDefault().getLog().log(log);
+  private void logImpl(LogStatus log) {
+    if ((log.getSeverity() & m_loglevel) != 0) {
+      getLog().log(log);
+    }
   }
 
   public static void logInfo(String message) {
@@ -116,7 +126,7 @@ public class ScoutSdk extends Plugin {
     if (message == null) {
       message = "";
     }
-    logImpl(new LogStatus(ScoutSdk.class, IStatus.INFO, PLUGIN_ID, message, t));
+    getDefault().logImpl(new LogStatus(ScoutSdk.class, IStatus.INFO, PLUGIN_ID, message, t));
   }
 
   public static void logWarning(String message) {
@@ -131,7 +141,7 @@ public class ScoutSdk extends Plugin {
     if (message == null) {
       message = "";
     }
-    logImpl(new LogStatus(ScoutSdk.class, IStatus.WARNING, PLUGIN_ID, message, t));
+    getDefault().logImpl(new LogStatus(ScoutSdk.class, IStatus.WARNING, PLUGIN_ID, message, t));
   }
 
   public static void logError(Throwable t) {
@@ -146,7 +156,7 @@ public class ScoutSdk extends Plugin {
     if (message == null) {
       message = "";
     }
-    logImpl(new LogStatus(ScoutSdk.class, IStatus.ERROR, PLUGIN_ID, message, t));
+    getDefault().logImpl(new LogStatus(ScoutSdk.class, IStatus.ERROR, PLUGIN_ID, message, t));
   }
 
   public static IScoutWorkspace getScoutWorkspace() {
@@ -212,6 +222,10 @@ public class ScoutSdk extends Plugin {
 
   public static ITypeHierarchy getLocalTypeHierarchy(IRegion region) {
     return getDefault().getHierarchyCache().getLocalHierarchy(region);
+  }
+
+  public static ITypeHierarchy getSuperTypeHierarchy(IType type) {
+    return getDefault().getHierarchyCache().getSuperHierarchy(type);
   }
 
   /**
@@ -310,5 +324,30 @@ public class ScoutSdk extends Plugin {
       return null;
     }
     return matchList.values().toArray(new IType[matchList.size()]);
+  }
+
+  private int parseLogLevel(String loglevel) {
+    int level = IStatus.INFO | IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
+    if (!StringUtility.isNullOrEmpty(loglevel)) {
+      String lowerLoglevel = loglevel.toLowerCase();
+      if (lowerLoglevel.equals("warning")) {
+        level = IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
+      }
+      else if (lowerLoglevel.equals("error")) {
+        level = IStatus.ERROR | IStatus.CANCEL;
+      }
+      else if (lowerLoglevel.equals("cancel")) {
+        level = IStatus.CANCEL;
+      }
+    }
+    return level;
+  }
+
+  public void setFormDataAutoUpdate(boolean autoUpdate) {
+    m_formDataUpdateSupport.setEnabled(autoUpdate);
+  }
+
+  public boolean isFormDataAutoUpdate() {
+    return m_formDataUpdateSupport.isEnabled();
   }
 }

@@ -14,11 +14,14 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -82,15 +85,7 @@ public class ProcessServiceTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    if (m_serviceHierarchy == null) {
-      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
-    }
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getClassesInProject(getScoutResource().getJavaProject()),
-        TypeFilters.getPackageFilter(m_processServicePackage)
-        );
-    IType[] processServices = m_serviceHierarchy.getAllSubtypes(iService, filter, TypeComparators.getTypeNameComparator());
-    for (IType service : processServices) {
+    for (IType service : resolveAllProcessServices()) {
       IType serviceInterface = null;
       IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       if (interfaces.length > 0) {
@@ -99,6 +94,29 @@ public class ProcessServiceTablePage extends AbstractPage {
       new ProcessServiceNodePage(this, service, serviceInterface);
     }
 
+  }
+
+  protected IType[] resolveAllProcessServices() {
+    if (m_serviceHierarchy == null) {
+      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    }
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+        TypeFilters.getClassesInProject(getScoutResource().getJavaProject()),
+        TypeFilters.getPackageFilter(m_processServicePackage)
+        );
+    IType[] processServices = m_serviceHierarchy.getAllSubtypes(iService, filter, TypeComparators.getTypeNameComparator());
+    return processServices;
+  }
+
+  @Override
+  public void fillContextMenu(IMenuManager manager) {
+    super.fillContextMenu(manager);
+    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveAllProcessServices();
+      }
+    }));
   }
 
   @Override

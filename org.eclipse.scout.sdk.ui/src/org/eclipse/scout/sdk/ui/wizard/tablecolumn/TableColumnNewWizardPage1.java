@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -113,7 +113,6 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     templates.put(RuntimeClasses.AbstractDoubleColumn, new P_BCTypeTemplate("Double Column", ScoutSdk.getType(RuntimeClasses.AbstractDoubleColumn)));
     templates.put(RuntimeClasses.AbstractIntegerColumn, new P_BCTypeTemplate("Integer Column", ScoutSdk.getType(RuntimeClasses.AbstractIntegerColumn)));
     templates.put(RuntimeClasses.AbstractLongColumn, new P_BCTypeTemplate("Long Column", ScoutSdk.getType(RuntimeClasses.AbstractLongColumn)));
-    templates.put(RuntimeClasses.AbstractTimeColumn, new P_BCTypeTemplate("Time Column", ScoutSdk.getType(RuntimeClasses.AbstractTimeColumn)));
     templates.put(RuntimeClasses.AbstractSmartColumn, new P_BCTypeTemplate("Smart Column", ScoutSdk.getType(RuntimeClasses.AbstractSmartColumn)));
 
     ITypeHierarchy columnHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iColumn);
@@ -244,6 +243,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
     public String getColumnText(Object element, int columnIndex) {
       if (isShowAllTemplates()) {
+        System.out.println("blubber " + ((P_BCTypeTemplate) element).getType());
         return ((P_BCTypeTemplate) element).getType().getElementName();
       }
       else {

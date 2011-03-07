@@ -16,8 +16,10 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -28,12 +30,16 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.typestructure.StructuredType;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -76,6 +82,235 @@ public class SdkTypeUtility {
     }
     return null;
   }
+
+  public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
+    return instance.findFormDataAnnnotationImpl(type, hierarchy);
+  }
+
+  public static FormDataAnnotation findFormDataAnnotation(IMethod method) throws JavaModelException {
+    FormDataAnnotation annotation = new FormDataAnnotation();
+    try {
+      instance.fillFormDataAnnotation(method, annotation, true);
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not parse formdata annotation of method '" + method.getElementName() + "' on '" + method.getDeclaringType().getFullyQualifiedName() + "'", e);
+      return null;
+    }
+    return annotation;
+  }
+
+  private FormDataAnnotation findFormDataAnnnotationImpl(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
+    FormDataAnnotation anot = new FormDataAnnotation();
+    try {
+      parseFormDataAnnotationReq(anot, type, hierarchy, true);
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not parse formdata annotation of type '" + type.getFullyQualifiedName() + "'.", e);
+      return null;
+    }
+    return anot;
+  }
+
+  private void parseFormDataAnnotationReq(FormDataAnnotation annotation, IType type, ITypeHierarchy hierarchy, boolean isOwner) {
+    if (TypeUtility.exists(type)) {
+      IType superType = hierarchy.getSuperclass(type);
+      parseFormDataAnnotationReq(annotation, superType, hierarchy, false);
+    }
+    try {
+      fillFormDataAnnotation(type, annotation, isOwner);
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not parse form data annotation of '" + type.getFullyQualifiedName() + "'.", e);
+    }
+  }
+
+  private void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner) throws JavaModelException {
+    IAnnotation annotation = null;
+    if (element instanceof IAnnotatable) {
+      annotation = TypeUtility.getAnnotation((IAnnotatable) element, RuntimeClasses.FormData);
+    }
+    if (TypeUtility.exists(annotation)) {
+      // context type
+      IType contextType = null;
+      if (element.getElementType() == IJavaElement.TYPE) {
+        contextType = (IType) element;
+      }
+      else {
+        contextType = (IType) element.getAncestor(IJavaElement.TYPE);
+      }
+      for (IMemberValuePair p : annotation.getMemberValuePairs()) {
+        String memberName = p.getMemberName();
+        Object value = p.getValue();
+        if ("value".equals(memberName)) {
+          String simpleName = ((String) value).replaceAll("\\.class$", "");
+          if (isOwner) {
+            formDataAnnotation.setFormDataTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
+          }
+          else {
+            formDataAnnotation.setSuperTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
+          }
+
+        }
+        else if ("sdkCommand".equals(memberName)) {
+          if (isOwner) {
+            try {
+              Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+              if (m.find() && m.group().length() > 0) {
+                String opString = m.group();
+                SdkCommand op = SdkCommand.valueOf(opString);
+                formDataAnnotation.setSdkCommand(op);
+                switch (op) {
+                  case IGNORE:
+                    formDataAnnotation.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.DEFAULT);
+                    break;
+                  case CREATE:
+                    formDataAnnotation.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.DEFAULT);
+                    break;
+
+                  default:
+                    break;
+                }
+              }
+            }
+            catch (Exception e) {
+              ScoutSdk.logError("could not parse form data sdkCommand value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+              formDataAnnotation.setSdkCommand(null);
+            }
+          }
+        }
+        else if ("defaultSubtypeSdkCommand".equals(memberName)) {
+          try {
+            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+            if (m.find() && m.group().length() > 0) {
+              String opString = m.group();
+              DefaultSubtypeSdkCommand op = DefaultSubtypeSdkCommand.valueOf(opString);
+              formDataAnnotation.setDefaultSubtypeSdkCommand(op);
+            }
+          }
+          catch (Exception e) {
+            ScoutSdk.logError("could not parse form data defaultSubtypeSdkCommand value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+            formDataAnnotation.setSdkCommand(null);
+          }
+        }
+
+        else if ("genericOrdinal".equals(memberName)) {
+          try {
+            formDataAnnotation.setGenericOrdinal(((Integer) value).intValue());
+          }
+          catch (Exception e) {
+            ScoutSdk.logError("could not parse form data genericOrdinal value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+          }
+        }
+
+      }
+      if (element.getElementType() == IJavaElement.METHOD && formDataAnnotation.getSdkCommand() == null) {
+        formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
+      }
+    }
+  }
+
+//  private FormDataAnnotation findFormDataAnnotationImpl(IAnnotatable element, IType contextType) throws JavaModelException {
+//    FormDataAnnotation formDataAnnotation = null;
+//    IAnnotation annotation = TypeUtility.getAnnotation(element, RuntimeClasses.FormData);
+//    if (TypeUtility.exists(annotation)) {
+//      if (formDataAnnotation == null) {
+//        formDataAnnotation = new FormDataAnnotation(contextType);
+//        // default
+//        formDataAnnotation.setUpdateOperation(Operation.CREATE);
+//      }
+//      for (IMemberValuePair p : annotation.getMemberValuePairs()) {
+//        String memberName = p.getMemberName();
+//        Object value = p.getValue();
+//        if ("value".equals(memberName)) {
+//          try {
+//            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+//            if (m.find() && m.group().length() > 0) {
+//              String opString = m.group();
+//              Operation op = Operation.valueOf(opString);
+//              formDataAnnotation.setUpdateOperation(op);
+//              if (Operation.IGNORE == op) {
+//                return formDataAnnotation;
+//              }
+//            }
+//          }
+//          catch (Exception e) {
+//            ScoutSdk.logError("could not parse form data operation value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+//            formDataAnnotation.setUpdateOperation(null);
+//          }
+//        }
+//        else if ("formDataClass".equals(memberName)) {
+//          String simpleName = ((String) value).replaceAll("\\.class$", "");
+//          formDataAnnotation.setFormDataSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
+//        }
+//        else if ("superClass".equals(memberName)) {
+//          formDataAnnotation.setFormDataSuperClass(ScoutUtility.getReferencedType(contextType, (String) value));
+//        }
+//
+//      }
+//    }
+//    return formDataAnnotation;
+//  }
+
+  private static String getQualifiedNameOf(IJavaElement element) {
+    if (element == null) {
+      return "null";
+    }
+    switch (element.getElementType()) {
+      case IJavaElement.TYPE:
+        return ((IType) element).getFullyQualifiedName();
+      case IJavaElement.METHOD:
+        IMethod m = (IMethod) element;
+        return m.getElementName() + "on " + m.getDeclaringType().getFullyQualifiedName();
+      default:
+        return element.getElementName();
+    }
+  }
+
+//  public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
+//    FormDataAnnotation formDataAnnotation = null;
+//    IType visitee = type;
+//    while (TypeUtility.exists(visitee) && formDataAnnotation == null) {
+//      IAnnotation annotation = TypeUtility.getAnnotation(visitee, RuntimeClasses.FormData);
+//      if (TypeUtility.exists(annotation)) {
+//        if (formDataAnnotation == null) {
+//          formDataAnnotation = new FormDataAnnotation();
+//        }
+//        for (IMemberValuePair p : annotation.getMemberValuePairs()) {
+//          String memberName = p.getMemberName();
+//          Object value = p.getValue();
+//          if ("value".equals(memberName) && formDataAnnotation.getUpdateOperation() == null) {
+//            if ("CREATE".equals(value)) {
+//              formDataAnnotation.setUpdateOperation(UpdateOperation.Create);
+//            }
+//            else if ("IGNORE".equals(value)) {
+//              formDataAnnotation.setUpdateOperation(UpdateOperation.Ignore);
+//            }
+//            else if ("CUSTOM".equals(value)) {
+//              formDataAnnotation.setUpdateOperation(UpdateOperation.Custom);
+//            }
+//            else {
+//              ScoutSdk.logWarning("undefined form data annotation '" + annotation.getSource() + "' on type '" + visitee.getFullyQualifiedName() + "'.");
+//            }
+//          }
+//          else if ("usingClass".equals(memberName)) {
+//            IType referencedClass = TypeUtility.getReferencedType(visitee, (String) value);
+//            if (TypeUtility.exists(referencedClass)) {
+//              formDataAnnotation.setCustomFormData(referencedClass);
+//            }
+//            else {
+//              ScoutSdk.logWarning("Could not resolve custom form data '" + value + "'.");
+//            }
+//          }
+//        }
+//        if (formDataAnnotation.getUpdateOperation() == null) {
+//          // default create
+//          formDataAnnotation.setUpdateOperation(UpdateOperation.Create);
+//        }
+//      }
+//      visitee = hierarchy.getSuperclass(visitee);
+//    }
+//    return formDataAnnotation;
+//  }
 
   public static IType[] getPotentialMasterFields(IType field) {
     ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(field.getCompilationUnit());

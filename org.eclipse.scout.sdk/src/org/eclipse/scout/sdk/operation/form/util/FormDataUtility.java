@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,8 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
@@ -39,15 +41,53 @@ public final class FormDataUtility {
   }
 
   public static String getBeanName(String name, boolean startWithUpperCase) {
-    char firstChar = Character.toLowerCase(name.charAt(0));
-    if (startWithUpperCase) {
-      firstChar = Character.toUpperCase(name.charAt(0));
+    StringBuilder builder = new StringBuilder();
+    if (!StringUtility.isNullOrEmpty(name)) {
+      if (startWithUpperCase) {
+        builder.append(Character.toUpperCase(name.charAt(0)));
+      }
+      else {
+        builder.append(Character.toLowerCase(name.charAt(0)));
+      }
+      if (name.length() > 1) {
+        builder.append(name.substring(1));
+      }
     }
-    return firstChar + name.substring(1);
+    return builder.toString();
   }
 
   public static String indent(String s) {
     return ScoutIdeProperties.TAB + s.replace("\n", "\n" + ScoutIdeProperties.TAB);
+  }
+
+  public static String unboxPrimitiveSignature(String signature) {
+    if (Signature.getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE) {
+      if (Signature.SIG_BOOLEAN.equals(signature)) {
+        signature = Signature.createTypeSignature(Boolean.class.getName(), true);
+      }
+      else if (Signature.SIG_BYTE.equals(signature)) {
+        signature = Signature.createTypeSignature(Byte.class.getName(), true);
+      }
+      else if (Signature.SIG_CHAR.equals(signature)) {
+        signature = Signature.createTypeSignature(Character.class.getName(), true);
+      }
+      else if (Signature.SIG_DOUBLE.equals(signature)) {
+        signature = Signature.createTypeSignature(Double.class.getName(), true);
+      }
+      else if (Signature.SIG_FLOAT.equals(signature)) {
+        signature = Signature.createTypeSignature(Float.class.getName(), true);
+      }
+      else if (Signature.SIG_INT.equals(signature)) {
+        signature = Signature.createTypeSignature(Integer.class.getName(), true);
+      }
+      else if (Signature.SIG_LONG.equals(signature)) {
+        signature = Signature.createTypeSignature(Long.class.getName(), true);
+      }
+      else if (Signature.SIG_SHORT.equals(signature)) {
+        signature = Signature.createTypeSignature(Short.class.getName(), true);
+      }
+    }
+    return signature;
   }
 
   /**
@@ -120,6 +160,14 @@ public final class FormDataUtility {
       }
     }
     return desc;
+  }
+
+  public static String getValidMethodParameterName(String parameterName) {
+    String param = Signature.createTypeSignature(parameterName, true);
+    if (Signature.getTypeSignatureKind(param) == Signature.BASE_TYPE_SIGNATURE) {
+      return parameterName + "Value";
+    }
+    return parameterName;
   }
 
   public static class FormDataAnnotationDesc {

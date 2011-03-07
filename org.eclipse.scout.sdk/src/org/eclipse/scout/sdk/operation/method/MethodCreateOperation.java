@@ -115,7 +115,7 @@ public class MethodCreateOperation implements IOperation {
     AnnotationCreateOperation[] annotations = getAnnotations();
     if (annotations != null && annotations.length > 0) {
       for (int i = 0; i < annotations.length; i++) {
-        builder.append(annotations[i].createSource(validator));
+        builder.append(annotations[i].createSource(validator, "\n"));
         builder.append("\n");
       }
     }

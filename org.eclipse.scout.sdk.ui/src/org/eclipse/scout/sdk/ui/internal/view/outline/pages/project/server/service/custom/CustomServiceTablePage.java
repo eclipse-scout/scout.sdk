@@ -11,23 +11,33 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom;
 
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.wizard.services.CustomServiceNewPackageWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
+import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 
 public class CustomServiceTablePage extends AbstractPage {
-
+  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
   private PackageContentChangedListener m_changedListener;
+  private IPackageFragment m_servicePackage;
 
   public CustomServiceTablePage(IPage parent) {
     setParent(parent);
@@ -64,18 +74,39 @@ public class CustomServiceTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    IPackageFragment servicePackage = getScoutResource().getPackageFragment(getScoutResource().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM));
+    m_servicePackage = getScoutResource().getPackageFragment(getScoutResource().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM));
     if (m_changedListener == null) {
-      m_changedListener = new PackageContentChangedListener(this, servicePackage);
+      m_changedListener = new PackageContentChangedListener(this, m_servicePackage);
       JavaCore.addElementChangedListener(m_changedListener);
     }
-    for (IPackageFragment pFrag : TypeUtility.getSubPackages(servicePackage)) {
-      String appendix = pFrag.getElementName().replaceFirst(servicePackage.getElementName() + ".", "");
+    for (IPackageFragment pFrag : TypeUtility.getSubPackages(m_servicePackage)) {
+      String appendix = pFrag.getElementName().replaceFirst(m_servicePackage.getElementName() + ".", "");
       CustomServicePackageNodePage node = new CustomServicePackageNodePage(this, pFrag);
       node.setName(appendix);
 
     }
 
+  }
+
+  protected IType[] resolveServices() {
+    IPrimaryTypeTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+        TypeFilters.getClassFilter(),
+        TypeFilters.getSubtypeFilter(iService, serviceHierarchy)
+        );
+    IType[] services = TypeUtility.getTypesInPackage(m_servicePackage, filter, null, true);
+    return services;
+  }
+
+  @Override
+  public void fillContextMenu(IMenuManager manager) {
+    super.fillContextMenu(manager);
+    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return resolveServices();
+      }
+    }));
   }
 
   @Override
