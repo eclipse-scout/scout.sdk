@@ -81,6 +81,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         columnSetter.setSimpleBody("setValueInternal(row, " + i + ", " + methodParameterName + ");");
         addBuilder(columnSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 1, i, 1, columnSetter));
         // getter
+        final int finalColumnIndex = i;
         MethodSourceBuilder columnGetter = new MethodSourceBuilder() {
           @Override
           protected String createMethodBody(IImportValidator validator) {
@@ -90,7 +91,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
               String simpleRef = ScoutSdkUtility.getSimpleTypeRefName(colSignature, validator);
               getterBody.append("(" + simpleRef + ") ");
             }
-            getterBody.append("getValueInternal(row, 1);");
+            getterBody.append("getValueInternal(row, " + finalColumnIndex + ");");
             return getterBody.toString();
           }
         };
