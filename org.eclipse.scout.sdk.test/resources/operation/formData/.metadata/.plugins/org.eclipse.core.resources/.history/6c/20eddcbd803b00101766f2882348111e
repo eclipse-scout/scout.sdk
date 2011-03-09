@@ -1,4 +1,0 @@
-package formdata.shared.services.process;
-
-public class AbstractExternalGroupBoxData{
-}
