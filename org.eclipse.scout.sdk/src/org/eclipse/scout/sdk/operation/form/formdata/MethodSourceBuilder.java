@@ -110,7 +110,7 @@ public class MethodSourceBuilder implements ISourceBuilder {
     return getJavaDoc();
   }
 
-  protected String createMethodBody(@SuppressWarnings("unused") IImportValidator validator) {
+  protected String createMethodBody(IImportValidator validator) {
     if (!StringUtility.isNullOrEmpty(getSimleBody())) {
       return getSimleBody();
     }

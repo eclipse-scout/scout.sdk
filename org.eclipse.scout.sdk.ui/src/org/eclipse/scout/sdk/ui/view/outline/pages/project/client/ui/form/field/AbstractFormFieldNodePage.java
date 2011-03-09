@@ -16,6 +16,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.CreateTemplateAction;
+import org.eclipse.scout.sdk.ui.action.OperationAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -37,6 +38,9 @@ public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
     super.fillContextMenu(manager);
     manager.add(new Separator());
     manager.add(new CreateTemplateAction(getOutlineView().getSite().getShell(), this, getType()));
+    if (getType().getDeclaringType() == null) {
+      manager.add(new OperationAction("Update Form Data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation(getType())));
+    }
   }
 
   @Override

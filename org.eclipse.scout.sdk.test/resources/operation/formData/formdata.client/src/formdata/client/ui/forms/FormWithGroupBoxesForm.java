@@ -20,6 +20,7 @@ public class FormWithGroupBoxesForm extends AbstractForm {
 
   public FormWithGroupBoxesForm() throws ProcessingException {
     super();
+
   }
 
   public FlatStringField getFlatStringField() {

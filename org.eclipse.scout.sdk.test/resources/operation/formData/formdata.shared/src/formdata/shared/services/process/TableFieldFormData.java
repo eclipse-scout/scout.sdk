@@ -1,18 +1,33 @@
 package formdata.shared.services.process;
 
 import java.util.Map;
+import formdata.shared.services.process.AbstractCompanyTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import java.util.Set;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.commons.annotations.FormDataChecksum;
 
+@FormDataChecksum(146962376l)
 public class TableFieldFormData extends AbstractFormData {
   private static final long serialVersionUID = 1L;
 
   public TableFieldFormData() {
   }
 
+  public Company getCompany() {
+    return getFieldByClass(Company.class);
+  }
+
   public PersonTable getPersonTable() {
     return getFieldByClass(PersonTable.class);
+  }
+
+  public class Company extends AbstractCompanyTableFieldData {
+    private static final long serialVersionUID = 1L;
+
+    public Company() {
+    }
+
   }
 
   public class PersonTable extends AbstractTableFieldData {

@@ -71,6 +71,7 @@ public class TableFieldFormTest extends AbstractScoutSdkTest {
     Assert.assertEquals(tableFieldGetter.getReturnType(), "QPersonTable;");
   }
 
+  @Test
   public void testColumns() throws Exception {
     IType tableField = m_formData.getType("PersonTable");
     Assert.assertTrue(TypeUtility.exists(tableField));
@@ -95,7 +96,7 @@ public class TableFieldFormTest extends AbstractScoutSdkTest {
 
     IMethod setSmartLongColumn = TypeUtility.getMethod(tableField, "setSmartLong");
     Assert.assertTrue(TypeUtility.exists(setSmartLongColumn));
-    IMethod getSmartLongColumn = TypeUtility.getMethod(tableField, "getSmartLongColumn");
+    IMethod getSmartLongColumn = TypeUtility.getMethod(tableField, "getSmartLong");
     Assert.assertTrue(TypeUtility.exists(getSmartLongColumn));
     Assert.assertEquals(getSmartLongColumn.getReturnType(), "QLong;");
 
@@ -103,7 +104,7 @@ public class TableFieldFormTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(setCustom));
     IMethod getCustom = TypeUtility.getMethod(tableField, "getCustom");
     Assert.assertTrue(TypeUtility.exists(getCustom));
-    Assert.assertEquals(getCustom.getReturnType(), "QSet<QMap<QString, QInteger;>;>;");
+    Assert.assertEquals(getCustom.getReturnType(), "QSet<QMap<QString;QInteger;>;>;");
 
     // column count
     IMethod columnCount = TypeUtility.getMethod(tableField, "getColumnCount");
@@ -117,6 +118,16 @@ public class TableFieldFormTest extends AbstractScoutSdkTest {
     IMethod getValueAT = TypeUtility.getMethod(tableField, "getValueAt");
     Assert.assertTrue(TypeUtility.exists(getValueAT));
 
+  }
+
+  @Test
+  public void testCompanyTableField() throws Exception {
+    IType tableField = m_formData.getType("Company");
+    Assert.assertTrue(TypeUtility.exists(tableField));
+    Assert.assertEquals("QAbstractCompanyTableFieldData;", tableField.getSuperclassTypeSignature());
+    IMethod[] methods = tableField.getMethods();
+    Assert.assertEquals(methods.length, 1);
+    Assert.assertTrue(methods[0].isConstructor());
   }
 
 }

@@ -427,7 +427,7 @@ public class JavaResourceChangedEmitter {
     public void bufferChanged(BufferChangedEvent event) {
       ICompilationUnit icu = (ICompilationUnit) event.getBuffer().getOwner();
       if (TypeUtility.exists(icu)) {
-        if (!event.getBuffer().hasUnsavedChanges() && TypeUtility.exists(icu)) {
+        if (!event.getBuffer().hasUnsavedChanges() && TypeUtility.exists(icu) && icu.getResource().exists()) {
           m_ast.put(icu.getPath().toString(), createAst(icu));
           releaseCompilationUnit(icu);
         }

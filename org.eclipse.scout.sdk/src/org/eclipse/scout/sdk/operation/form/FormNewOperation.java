@@ -39,7 +39,6 @@ public class FormNewOperation implements IOperation {
   private String m_typeName;
   private String m_superTypeSignature;
   private INlsEntry m_nlsEntry;
-  private boolean m_autoCreateFormData;
   private String m_formDataSignature;
   private boolean m_createButtonOk;
   private boolean m_createButtonCancel;

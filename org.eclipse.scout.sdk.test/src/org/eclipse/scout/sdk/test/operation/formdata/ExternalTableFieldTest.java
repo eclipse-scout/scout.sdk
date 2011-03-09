@@ -24,7 +24,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TemplateFormDataTest extends AbstractScoutSdkTest {
+public class ExternalTableFieldTest extends AbstractScoutSdkTest {
 
   private IType m_formData;
 
@@ -41,7 +41,7 @@ public class TemplateFormDataTest extends AbstractScoutSdkTest {
   @Before
   public void testCreateFormData() throws Exception {
     if (m_formData == null) {
-      String formName = "AbstractExternalGroupBox";
+      String formName = "AbstractCompanyTableField";
       IType form = ScoutSdk.getType("formdata.client.ui.template.formfield." + formName);
       Assert.assertTrue(TypeUtility.exists(form));
 
@@ -57,19 +57,33 @@ public class TemplateFormDataTest extends AbstractScoutSdkTest {
       Assert.assertTrue(TypeUtility.exists(m_formData));
       Assert.assertTrue(TypeUtility.exists(m_formData));
       Assert.assertEquals(m_formData.getFullyQualifiedName(), "formdata.shared.services.process." + formName + "Data");
-      Assert.assertEquals(m_formData.getSuperclassTypeSignature(), "QAbstractFormFieldData;");
+      Assert.assertEquals(m_formData.getSuperclassTypeSignature(), "QAbstractTableFieldData;");
     }
   }
 
   @Test
-  public void testInternalField() throws Exception {
-    // string field
-    IType stringField = m_formData.getType("ExternalString");
-    Assert.assertTrue(TypeUtility.exists(stringField));
-    Assert.assertEquals("QAbstractValueFieldData<QString;>;", stringField.getSuperclassTypeSignature());
-    IMethod stringGetter = TypeUtility.getMethod(m_formData, "getExternalString");
-    Assert.assertTrue(TypeUtility.exists(stringGetter));
-    Assert.assertEquals(stringGetter.getReturnType(), "QExternalString;");
+  public void testColumns() throws Exception {
+    IType tableField = m_formData;
+    Assert.assertTrue(TypeUtility.exists(tableField));
+
+    IMethod setName = TypeUtility.getMethod(tableField, "setName");
+    Assert.assertTrue(TypeUtility.exists(setName));
+    IMethod getName = TypeUtility.getMethod(tableField, "getName");
+    Assert.assertTrue(TypeUtility.exists(getName));
+    Assert.assertEquals(getName.getReturnType(), "QString;");
+
+    // column count
+    IMethod columnCount = TypeUtility.getMethod(tableField, "getColumnCount");
+    Assert.assertTrue(TypeUtility.exists(columnCount));
+    Assert.assertTrue(columnCount.getSource().contains("return 1"));
+
+    // setValueAt
+    IMethod setValueAT = TypeUtility.getMethod(tableField, "setValueAt");
+    Assert.assertTrue(TypeUtility.exists(setValueAT));
+    // getValueAt
+    IMethod getValueAT = TypeUtility.getMethod(tableField, "getValueAt");
+    Assert.assertTrue(TypeUtility.exists(getValueAT));
+
   }
 
 }

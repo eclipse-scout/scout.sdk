@@ -12,10 +12,12 @@ package org.eclipse.scout.sdk.ui.internal;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link CreateFormDataRequest}</h3> ...
@@ -29,15 +31,40 @@ public class CreateFormDataRequest implements ICreateFormDataRequest {
   public boolean createFormData(IType type, String packageName, String simpleName) {
     final BooleanHolder result = new BooleanHolder(false);
     final String question = "The form data '" + packageName + "." + simpleName + "' for '" + type.getElementName() + "' does not exist.\n Do you want to create it?";
-    Display.getDefault().syncExec(new Runnable() {
+    final Display display = getDisplay();
+    display.syncExec(new Runnable() {
       @Override
       public void run() {
-        MessageBox box = new MessageBox(Display.getDefault().getActiveShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+        MessageBox box = new MessageBox(display.getActiveShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
         box.setMessage(question);
         result.setValue(box.open() == SWT.YES);
       }
     });
     return result.getValue();
+  }
+
+  @Override
+  public int showQuestion(final String title, final String message, final int buttons) {
+    final IntegerHolder result = new IntegerHolder(-1);
+    final Display display = getDisplay();
+    display.syncExec(new Runnable() {
+      @Override
+      public void run() {
+        MessageBox box = new MessageBox(display.getActiveShell(), buttons);
+        box.setMessage(message);
+        box.setText(title);
+        result.setValue(box.open());
+      }
+    });
+    return result.getValue();
+  }
+
+  private Display getDisplay() {
+    Display d = Display.getDefault();
+    if (d == null) {
+      d = PlatformUI.getWorkbench().getDisplay();
+    }
+    return d;
   }
 
 }

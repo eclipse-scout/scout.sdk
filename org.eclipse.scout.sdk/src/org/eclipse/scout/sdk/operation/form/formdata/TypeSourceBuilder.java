@@ -95,7 +95,7 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     return builder.toString();
   }
 
-  private AnnotationSourceBuilder[] getAnnotations() {
+  public AnnotationSourceBuilder[] getAnnotations() {
     return m_annotations.toArray(new AnnotationSourceBuilder[m_annotations.size()]);
   }
 

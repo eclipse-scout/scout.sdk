@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -43,11 +43,13 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
 
   private StyledTextField m_templateNameField;
   private Button m_replaceExistingFormField;
+  private Button m_createExternalFormDataField;
 
   private final IType m_formField;
 
   private String m_templateName;
   private boolean m_replaceFormField;
+  private boolean m_createExternalFormData;
 
   /**
    * @param parentShell
@@ -57,6 +59,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     m_formField = formField;
     m_templateName = templateName;
     m_replaceFormField = true;
+    m_createExternalFormData = true;
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setTitle("Create a template of '" + getFormField().getElementName() + "'.");
     setMessage("A template is an abstract form field. To use this template create a form field class extending the template class.");
@@ -92,10 +95,23 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
       }
     });
 
+    m_createExternalFormDataField = new Button(container, SWT.CHECK);
+    m_createExternalFormDataField.setText("Create external form data");
+    m_createExternalFormDataField.setSelection(isCreateExternalFormData());
+    m_createExternalFormDataField.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        m_createExternalFormData = m_createExternalFormDataField.getSelection();
+        pingStateChanging();
+      }
+    });
+
     // layout
     container.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
     container.setLayout(new GridLayout(1, true));
     m_templateNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_replaceExistingFormField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_createExternalFormDataField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     return container;
   }
 
@@ -134,6 +150,13 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
    */
   public boolean isReplaceFormField() {
     return m_replaceFormField;
+  }
+
+  /**
+   * @return the createExternalFormData
+   */
+  public boolean isCreateExternalFormData() {
+    return m_createExternalFormData;
   }
 
 }

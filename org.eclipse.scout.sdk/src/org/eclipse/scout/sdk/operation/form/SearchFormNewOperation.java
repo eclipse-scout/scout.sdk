@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperation;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
@@ -95,7 +96,7 @@ public class SearchFormNewOperation implements IOperation {
     // form data
     FormDataUpdateOperation formDataOp = null;
     if (getSearchFormDataLocationBundle() != null) {
-      formDataOp = new FormDataUpdateOperation(getCreatedFormType(), getSearchFormDataLocationBundle());
+      formDataOp = new FormDataUpdateOperation(getCreatedFormType());
       // formDataOp.setFormDataPackageName(getSearchFormDataLocationBundle().getPackageNameOutlineService());
       formDataOp.run(monitor, workingCopyManager);
       m_createdFormDataType = formDataOp.getFormDataType();

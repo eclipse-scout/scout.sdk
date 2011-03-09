@@ -21,4 +21,6 @@ import org.eclipse.jdt.core.IType;
 public interface ICreateFormDataRequest {
 
   public boolean createFormData(IType type, String packageName, String simpleName);
+
+  public int showQuestion(String title, String message, int buttons);
 }

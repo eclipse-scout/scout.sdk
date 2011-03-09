@@ -112,4 +112,15 @@ public class FormWithTemplateTest extends AbstractScoutSdkTest {
     Assert.assertFalse(TypeUtility.exists(plzGetter));
   }
 
+  @Test
+  public void testExternalCheckboxField() throws Exception {
+    // string field
+    IType fieldData = m_formData.getType("TestCheckbox");
+    Assert.assertTrue(TypeUtility.exists(fieldData));
+    Assert.assertEquals("QAbstractTestCheckboxFieldData;", fieldData.getSuperclassTypeSignature());
+    IMethod stringGetter = TypeUtility.getMethod(m_formData, "getTestCheckbox");
+    Assert.assertTrue(TypeUtility.exists(stringGetter));
+    Assert.assertEquals(stringGetter.getReturnType(), "QTestCheckbox;");
+  }
+
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,13 +31,16 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.internal.javadoc.JavaDoc;
 import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.FieldGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
@@ -47,6 +50,7 @@ import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutSignature;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -68,6 +72,7 @@ public class CreateTemplateOperation implements IOperation {
   private String m_templateName;
   private String m_packageName;
   private boolean m_replaceFieldWithTemplate;
+  private boolean m_createExternalFormData;
   private IType m_formField;
   private IScoutBundle m_templateBundle;
 
@@ -148,10 +153,26 @@ public class CreateTemplateOperation implements IOperation {
       op.setSuperTypeSignature(superclassSignatureBuilder.toString());
     }
     op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
-    op.addAnnotation(new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.FormData, true)));
+    IScoutBundle sharedBundle = findFormDataBundle(getTemplateBundle().getScoutProject());
+    if (isCreateExternalFormData() && sharedBundle != null) {
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
+      formDataOp.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
+      formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
+      formDataOp.run(monitor, workingCopyManager);
+
+      FormDataAnnotationCreateOperation formDataAnnotationOp = new FormDataAnnotationCreateOperation(null);
+      formDataAnnotationOp.setSdkCommand(SdkCommand.CREATE);
+      formDataAnnotationOp.setDefaultSubtypeCommand(DefaultSubtypeSdkCommand.CREATE);
+      formDataAnnotationOp.setFormDataSignature(Signature.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName(), true));
+      op.addAnnotation(formDataAnnotationOp);
+    }
     op.validate();
     op.run(monitor, workingCopyManager);
     IType templateType = op.getCreatedType();
+    if (isCreateExternalFormData() && sharedBundle != null) {
+      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType);
+      formDataUpdateOp.run(monitor, workingCopyManager);
+    }
     JavaElementFormatOperation formatOp = new JavaElementFormatOperation(templateType, true);
     formatOp.validate();
     formatOp.run(monitor, workingCopyManager);
@@ -213,6 +234,16 @@ public class CreateTemplateOperation implements IOperation {
         ScoutSdk.logError("could not create template for '" + getFormField().getFullyQualifiedName() + "'.", e);
       }
     }
+  }
+
+  protected IScoutBundle findFormDataBundle(IScoutProject project) {
+    if (project != null) {
+      if (project.getSharedBundle() != null) {
+        return project.getSharedBundle();
+      }
+      return findFormDataBundle(project.getParentProject());
+    }
+    return null;
   }
 
   protected void updateFormFieldGetter(IType formField, IMethod templateFieldGetter, HashMap<String, P_FormField> templateFormFields, IImportValidator validator, MultiTextEdit edit, ITypeHierarchy hierarchy) {
@@ -317,6 +348,21 @@ public class CreateTemplateOperation implements IOperation {
 
   public void setReplaceFieldWithTemplate(boolean replaceFieldWithTemplate) {
     m_replaceFieldWithTemplate = replaceFieldWithTemplate;
+  }
+
+  /**
+   * @return the createExternalFormData
+   */
+  public boolean isCreateExternalFormData() {
+    return m_createExternalFormData;
+  }
+
+  /**
+   * @param createExternalFormData
+   *          the createExternalFormData to set
+   */
+  public void setCreateExternalFormData(boolean createExternalFormData) {
+    m_createExternalFormData = createExternalFormData;
   }
 
   private class P_FormField {

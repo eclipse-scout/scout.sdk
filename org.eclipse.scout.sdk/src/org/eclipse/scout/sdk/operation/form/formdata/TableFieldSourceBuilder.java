@@ -18,7 +18,6 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.operation.form.util.FormDataUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -69,8 +68,8 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       try {
         IType column = columns[i];
 
-        String upperColName = FormDataUtility.getBeanName(FormDataUtility.getFieldIdWithoutSuffix(column.getElementName()), true);
-        String lowerColName = FormDataUtility.getBeanName(FormDataUtility.getFieldIdWithoutSuffix(column.getElementName()), false);
+        String upperColName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(column.getElementName()), true);
+        String lowerColName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(column.getElementName()), false);
         String methodParameterName = FormDataUtility.getValidMethodParameterName(lowerColName);
         final String colSignature = getColumnSignature(column, hierarchy);
         colunmSignatures[i] = colSignature;
@@ -113,7 +112,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         builder.append("  switch(column){\n");
         for (int i = 0; i < columns.length; i++) {
           builder.append("    case " + i + ":\n return get");
-          builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldIdWithoutSuffix(columns[i].getElementName()), true));
+          builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
           builder.append("(row);\n");
         }
         builder.append("    default: return null;\n");
@@ -136,7 +135,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         builder.append("  switch(column){\n");
         for (int i = 0; i < columns.length; i++) {
           builder.append("    case " + i + ": set");
-          builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldIdWithoutSuffix(columns[i].getElementName()), true));
+          builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
           builder.append("(row,");
           if (!colunmSignatures[i].equals("Ljava.lang.Object;")) {
             String simpleRef = ScoutSdkUtility.getSimpleTypeRefName(colunmSignatures[i], validator);

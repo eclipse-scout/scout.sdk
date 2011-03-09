@@ -16,15 +16,23 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
+import formdata.client.ui.forms.TableFieldForm.MainBox.CompanyField;
 import formdata.client.ui.forms.TableFieldForm.MainBox.PersonTableField;
+import formdata.shared.Texts;
 import formdata.shared.services.process.TableFieldFormData;
+import formdata.client.ui.template.formfield.AbstractCompanyTableField;
 
 @FormData(value = TableFieldFormData.class, sdkCommand = SdkCommand.CREATE)
 public class TableFieldForm extends AbstractForm {
 
   public TableFieldForm() throws ProcessingException {
     super();
+  }
+
+  public CompanyField getCompanyField() {
+    return getFieldByClass(CompanyField.class);
   }
 
   public MainBox getMainBox() {
@@ -84,6 +92,11 @@ public class TableFieldForm extends AbstractForm {
         public class CustomColumn extends AbstractColumn<Set<Map<String, Integer>>> {
         }
       }
+    }
+
+    @Order(20.0)
+    public class CompanyField extends AbstractCompanyTableField {
+
     }
 
   }

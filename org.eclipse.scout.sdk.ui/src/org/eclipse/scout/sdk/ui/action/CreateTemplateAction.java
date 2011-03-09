@@ -56,6 +56,7 @@ public class CreateTemplateAction extends Action {
       op.setPackageName(m_packageName);
       op.setTemplateBundle(m_bundle);
       op.setReplaceFieldWithTemplate(m_dialog.isReplaceFormField());
+      op.setCreateExternalFormData(m_dialog.isCreateExternalFormData());
       op.validate();
       OperationJob job = new OperationJob(op);
       job.schedule();

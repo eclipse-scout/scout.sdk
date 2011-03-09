@@ -5,6 +5,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
+import org.eclipse.scout.rt.client.ui.form.fields.checkbox.AbstractCheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 
@@ -12,12 +13,14 @@ import formdata.client.ui.forms.UsingTemplateForm.MainBox.ExternalGroupBox;
 import formdata.client.ui.forms.UsingTemplateForm.MainBox.ExternalWithNoAnnotationBox;
 import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox;
 import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox.InternalHtmlField;
+import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox.TestCheckboxField;
 import formdata.client.ui.template.formfield.AbstractExternalGroupBox;
 import formdata.client.ui.template.formfield.AbstractExternalWithNoAnnotationBox;
 import formdata.client.ui.template.formfield.AbstractExternalGroupBox.ExternalStringField;
 import formdata.client.ui.template.formfield.AbstractExternalWithNoAnnotationBox.NameField;
 import formdata.client.ui.template.formfield.AbstractExternalWithNoAnnotationBox.PlzField;
 import formdata.shared.services.process.UsingTemplateFormData;
+import formdata.client.ui.template.formfield.AbstractTestCheckboxField;
 
 @FormData(value = UsingTemplateFormData.class, sdkCommand = SdkCommand.CREATE)
 public class UsingTemplateForm extends AbstractForm {
@@ -44,6 +47,10 @@ public class UsingTemplateForm extends AbstractForm {
   @Deprecated
   public PlzField getPlzField() {
     return getExternalWithNoAnnotationBox().getPlzField();
+  }
+
+  public TestCheckboxField getTestCheckboxField() {
+    return getFieldByClass(TestCheckboxField.class);
   }
 
   /**
@@ -78,6 +85,10 @@ public class UsingTemplateForm extends AbstractForm {
 
       @Order(10.0)
       public class InternalHtmlField extends AbstractHtmlField {
+      }
+
+      @Order(20.0)
+      public class TestCheckboxField extends AbstractTestCheckboxField {
       }
     }
 
