@@ -297,19 +297,30 @@ public class FormDataUpdateOperation implements IOperation {
           }
         }
         else {
+
           AnnotationCreateOperation formDataUpdateOp = new AnnotationCreateOperation(m_formDataType, Signature.createTypeSignature(FormDataChecksum.class.getName(), true)) {
             @Override
             public String createSource(IImportValidator validator, String NL) throws JavaModelException {
               return super.createSource(validator, NL) + "(" + m_newChecksum + "l)";
             }
           };
-          OperationJob job = new OperationJob(formDataUpdateOp);
-          job.schedule();
-          try {
-            job.join();
+          if (m_monitor != null && m_workingCopyManager != null) {
+            try {
+              formDataUpdateOp.run(m_monitor, m_workingCopyManager);
+            }
+            catch (Exception e) {
+              ScoutSdk.logError("craete form data for '" + getType().getFullyQualifiedName() + "' failed.", e);
+            }
           }
-          catch (InterruptedException e) {
-            ScoutSdk.logError("could not join form data checksum update job.", e);
+          else {
+            OperationJob job = new OperationJob(formDataUpdateOp);
+            job.schedule();
+            try {
+              job.join();
+            }
+            catch (InterruptedException e) {
+              ScoutSdk.logError("could not join form data checksum update job.", e);
+            }
           }
         }
       }
