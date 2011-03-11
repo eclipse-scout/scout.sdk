@@ -237,7 +237,7 @@ public class FormDataUpdateOperation implements IOperation {
         newSource = newSource.trim();
         oldSource = oldSource.trim();
         if (!oldSource.equals(newSource)) {
-          System.out.println("FORM DATA UPDATE");
+//          System.out.println("FORM DATA UPDATE");
           P_FormDataStoreOperation updateOp = new P_FormDataStoreOperation(m_formDataType, m_formDataIcuSource);
           if (m_monitor != null && m_workingCopyManager != null) {
             try {
