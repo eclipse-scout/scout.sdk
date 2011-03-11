@@ -41,7 +41,7 @@ public class TableFieldFormData extends AbstractFormData {
     }
 
     public Long getPersonNr(int row) {
-      return (Long) getValueInternal(row, 1);
+      return (Long) getValueInternal(row, 0);
     }
 
     public void setName(int row, String name) {
@@ -57,7 +57,7 @@ public class TableFieldFormData extends AbstractFormData {
     }
 
     public Object getAnObject(int row) {
-      return getValueInternal(row, 1);
+      return getValueInternal(row, 2);
     }
 
     public void setSmartLong(int row, Long smartLong) {
@@ -65,7 +65,7 @@ public class TableFieldFormData extends AbstractFormData {
     }
 
     public Long getSmartLong(int row) {
-      return (Long) getValueInternal(row, 1);
+      return (Long) getValueInternal(row, 3);
     }
 
     public void setCustom(int row, Set<Map<String, Integer>> custom) {
@@ -73,7 +73,7 @@ public class TableFieldFormData extends AbstractFormData {
     }
 
     public Set<Map<String, Integer>> getCustom(int row) {
-      return (Set<Map<String, Integer>>) getValueInternal(row, 1);
+      return (Set<Map<String, Integer>>) getValueInternal(row, 4);
     }
 
     @Override
