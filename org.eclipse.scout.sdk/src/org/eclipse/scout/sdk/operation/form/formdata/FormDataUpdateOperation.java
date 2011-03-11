@@ -13,21 +13,15 @@ package org.eclipse.scout.sdk.operation.form.formdata;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.annotations.FormDataChecksum;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -50,8 +44,6 @@ public class FormDataUpdateOperation implements IOperation {
   private IType m_formDataType;
   private IScoutWorkingCopyManager m_workingCopyManager;
   private IProgressMonitor m_monitor;
-  private long m_newChecksum = -1;
-  private long m_oldCheckSum = -1;
   private String m_formDataIcuSource;
 
   public FormDataUpdateOperation(IType type) {
@@ -104,30 +96,6 @@ public class FormDataUpdateOperation implements IOperation {
     }
 
     m_formDataType = ScoutSdk.getTypeBySignature(getFormDataAnnotation().getFormDataTypeSignature());
-    // checksum
-    if (TypeUtility.exists(m_formDataType)) {
-      IAnnotation checksumAnnotation = TypeUtility.getAnnotation(m_formDataType, FormDataChecksum.class.getName());
-      if (TypeUtility.exists(checksumAnnotation)) {
-        try {
-          IMemberValuePair[] memberValuePairs = checksumAnnotation.getMemberValuePairs();
-          for (IMemberValuePair p : memberValuePairs) {
-            if (p.getMemberName().equals("value") && p.getValueKind() == IMemberValuePair.K_LONG) {
-              m_oldCheckSum = (Long) p.getValue();
-              break;
-            }
-          }
-        }
-        catch (CoreException e) {
-          ScoutSdk.logError("could not parse checksum annotation of '" + m_formDataType.getFullyQualifiedName() + "'.", e);
-        }
-      }
-    }
-
-    m_newChecksum = ScoutSdkUtility.getAdler32Checksum(getType().getCompilationUnit());
-  }
-
-  public boolean isChecksumValid() {
-    return m_oldCheckSum == m_newChecksum;
   }
 
   /**
@@ -228,12 +196,6 @@ public class FormDataUpdateOperation implements IOperation {
           ITypeSourceBuilder sourceBuilder = FormDataUtility.getPrimaryTypeFormDataSourceBuilder(getFormDataAnnotation().getSuperTypeSignature(), getType(), hierarchy);
           sourceBuilder.setElementName(m_formDataType.getElementName());
           sourceBuilder.setSuperTypeSignature(FormDataUtility.getFormDataSuperTypeSignature(getFormDataAnnotation(), getType(), hierarchy));
-          sourceBuilder.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(FormDataChecksum.class.getName(), true)) {
-            @Override
-            public String createSource(IImportValidator validator) {
-              return super.createSource(validator) + "(" + m_newChecksum + "l)";
-            }
-          });
           int flags = Flags.AccPublic;
           try {
             if (Flags.isAbstract(getType().getFlags())) {
@@ -293,33 +255,6 @@ public class FormDataUpdateOperation implements IOperation {
             }
             catch (InterruptedException e) {
               ScoutSdk.logError("could not join form data update job.", e);
-            }
-          }
-        }
-        else {
-
-          AnnotationCreateOperation formDataUpdateOp = new AnnotationCreateOperation(m_formDataType, Signature.createTypeSignature(FormDataChecksum.class.getName(), true)) {
-            @Override
-            public String createSource(IImportValidator validator, String NL) throws JavaModelException {
-              return super.createSource(validator, NL) + "(" + m_newChecksum + "l)";
-            }
-          };
-          if (m_monitor != null && m_workingCopyManager != null) {
-            try {
-              formDataUpdateOp.run(m_monitor, m_workingCopyManager);
-            }
-            catch (Exception e) {
-              ScoutSdk.logError("craete form data for '" + getType().getFullyQualifiedName() + "' failed.", e);
-            }
-          }
-          else {
-            OperationJob job = new OperationJob(formDataUpdateOp);
-            job.schedule();
-            try {
-              job.join();
-            }
-            catch (InterruptedException e) {
-              ScoutSdk.logError("could not join form data checksum update job.", e);
             }
           }
         }

@@ -16,12 +16,14 @@ import java.util.HashSet;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
@@ -30,6 +32,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.SqlBindingIgnoreValidation;
 import org.eclipse.scout.commons.parsers.BindModel;
 import org.eclipse.scout.commons.parsers.BindParser;
@@ -37,6 +40,7 @@ import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.ast.AstUtility;
 import org.eclipse.scout.sdk.jdt.ast.VariableType;
 import org.eclipse.scout.sdk.sql.binding.ast.SqlMethodIvocationVisitor;
@@ -47,6 +51,7 @@ import org.eclipse.scout.sdk.sql.binding.model.PropertyBasedBindBase;
 import org.eclipse.scout.sdk.sql.binding.model.ServerSessionBindBase;
 import org.eclipse.scout.sdk.sql.binding.model.SqlStatement;
 import org.eclipse.scout.sdk.sql.binding.model.UnresolvedBindBase;
+import org.eclipse.scout.sdk.workspace.type.IMethodFilter;
 import org.eclipse.scout.sdk.workspace.type.MethodFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -120,7 +125,8 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
             if (value instanceof Object[]) {
               Object[] values = (Object[]) value;
               for (Object v : values) {
-                globalBindings.put((String) v, new IgnoredBindBase((String) v));
+                String b = ((String) v).toLowerCase();
+                globalBindings.put(b, new IgnoredBindBase(b));
               }
             }
             else {
@@ -153,8 +159,10 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
       BindModel bindModel = parser.parse();
       for (IToken t : bindModel.getAllTokens()) {
         if (t instanceof ValueInputToken) {
-          String token = t.getParsedToken().toLowerCase();
+          String token = t.getParsedToken();
           token = token.replaceAll("^([\\:\\{\\#]*)?([^\\}\\#]*)([\\}\\#]*)?", "$2");
+          String bindName = token;
+          token = token.toLowerCase();
           if (!bindBases.containsKey(token)) {
             // try dot seperated token
             if (token.contains(".")) {
@@ -168,12 +176,23 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
                   continue;
                 }
               }
+              else if (property.getType() == IBindBase.TYPE_PROPERTY_BASE) {
+                PropertyBasedBindBase base = (PropertyBasedBindBase) property;
+
+                if (base.getAssignedSignatures().length == 1) {
+                  HashMap<String, IBindBase> resolvedBindings = loadInnerTypeProperties(base.getAssignedSignatures()[0], segments[0], property);
+                  bindBases.putAll(resolvedBindings);
+                  if (bindBases.containsKey(token)) {
+                    continue;
+                  }
+                }
+              }
             }
             if (hasUnresolvedBindBases) {
-              result.add(t.getParsedToken(), new MethodSqlBindingModel.Marker(token, IMarker.SEVERITY_WARNING, s.getOffset(), s.getLength(), serviceMethod));
+              result.add(t.getParsedToken(), new MethodSqlBindingModel.Marker(bindName, IMarker.SEVERITY_WARNING, s.getOffset(), s.getLength(), serviceMethod));
             }
             else {
-              result.add(t.getParsedToken(), new MethodSqlBindingModel.Marker(token, IMarker.SEVERITY_ERROR, s.getOffset(), s.getLength(), serviceMethod));
+              result.add(t.getParsedToken(), new MethodSqlBindingModel.Marker(bindName, IMarker.SEVERITY_ERROR, s.getOffset(), s.getLength(), serviceMethod));
             }
           }
         }
@@ -241,6 +260,34 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
     return bindBases;
   }
 
+  protected HashMap<String, IBindBase> loadInnerTypeProperties(String typeSignature, final String propertyName, IBindBase bindbase) {
+    HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
+    try {
+      IType propertyObject = ScoutSdk.getTypeBySignature(typeSignature);
+      if (TypeUtility.exists(propertyObject)) {
+        IMethod method = TypeUtility.getFirstMethod(propertyObject, new IMethodFilter() {
+          @Override
+          public boolean accept(IMethod candidate) {
+            return candidate.getElementName().toLowerCase().equals("get" + propertyName);
+          }
+        });
+        if (method != null) {
+          String resolvedSignature = ScoutSdkUtility.getResolvedSignature(method.getReturnType(), propertyObject);
+          if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
+            for (String s : getPropertyBindVars(ScoutSdk.getTypeBySignature(resolvedSignature))) {
+              bindBases.put(propertyName + "." + s, bindbase);
+            }
+          }
+        }
+      }
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not get bind bases of " + typeSignature + ".", e);
+    }
+    return bindBases;
+
+  }
+
   protected HashMap<String, IBindBase> loadNVBindBasePropertyObject(BindBaseNVPair bindBase, ASTNode rootNode, IJavaElement containerElement) {
     VariableType var = AstUtility.getTypeSignature(bindBase.getValueNode(), rootNode, containerElement);
     if (var != null) {
@@ -253,20 +300,35 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
       }
     }
     return new HashMap<String, IBindBase>(0);
-
   }
 
   protected HashSet<String> getPropertyBindVars(IType type) {
     HashSet<String> bindVars = new HashSet<String>();
     if (TypeUtility.exists(type)) {
-      for (IMethod m : TypeUtility.getMethods(type)) {
+      ITypeHierarchy supertypeHierarchy = null;
+      try {
+        supertypeHierarchy = type.newSupertypeHierarchy(new NullProgressMonitor());
+      }
+      catch (JavaModelException e) {
+        ScoutSdk.logWarning("could not create supertype hierarchy of '" + type.getFullyQualifiedName() + "'.");
+      }
+      collectPropertyBinds(bindVars, type, supertypeHierarchy);
+    }
+    return bindVars;
+  }
+
+  protected void collectPropertyBinds(HashSet<String> collector, IType currentType, ITypeHierarchy superTypeHierarchy) {
+    if (TypeUtility.exists(currentType)) {
+      for (IMethod m : TypeUtility.getMethods(currentType)) {
         String propName = m.getElementName().toLowerCase();
         propName = propName.replaceFirst("property$", "");
         propName = propName.replaceFirst("^(get|set|is)", "");
-        bindVars.add(propName);
+        collector.add(propName);
+      }
+      if (superTypeHierarchy != null) {
+        collectPropertyBinds(collector, superTypeHierarchy.getSuperclass(currentType), superTypeHierarchy);
       }
     }
-    return bindVars;
   }
 
   protected ASTNode createMethodAst(IMethod method) throws JavaModelException {

@@ -60,22 +60,15 @@ public class FormDataAutoUpdater {
 
   private void handleCompilationUnitSaved(ICompilationUnit icu) {
     synchronized (pendingJobsLock) {
-      m_pendingCompilationUnits.add(icu);
-      if (m_updateJob == null) {
-        m_updateJob = new P_UpdateFormDataJob();
+      if (m_pendingCompilationUnits.add(icu)) {
+        if (m_updateJob == null) {
+          m_updateJob = new P_UpdateFormDataJob();
+        }
+        else {
+          m_updateJob.cancel();
+        }
+        m_updateJob.schedule(500);
       }
-      else {
-        m_updateJob.cancel();
-      }
-      m_updateJob.schedule(500);
-    }
-  }
-
-  protected ICompilationUnit[] getAndClearPendingCompilationUnits() {
-    synchronized (pendingJobsLock) {
-      ICompilationUnit[] icus = m_pendingCompilationUnits.toArray(new ICompilationUnit[m_pendingCompilationUnits.size()]);
-      m_pendingCompilationUnits.clear();
-      return icus;
     }
   }
 
@@ -138,8 +131,7 @@ public class FormDataAutoUpdater {
   private class P_UpdateFormDataJob extends Job {
 
     public P_UpdateFormDataJob() {
-      super("update form data...");
-      setSystem(true);
+      super("Update form data...");
       setPriority(Job.DECORATE);
     }
 
@@ -148,9 +140,20 @@ public class FormDataAutoUpdater {
       if (monitor.isCanceled()) {
         return Status.CANCEL_STATUS;
       }
-      ICompilationUnit[] compilationUnits = getAndClearPendingCompilationUnits();
-      if (compilationUnits.length > 0) {
-        for (ICompilationUnit icu : compilationUnits) {
+      ICompilationUnit[] compilationUnits = null;
+      synchronized (pendingJobsLock) {
+        compilationUnits = m_pendingCompilationUnits.toArray(new ICompilationUnit[m_pendingCompilationUnits.size()]);
+        m_pendingCompilationUnits.clear();
+        m_updateJob = null;
+      }
+      int totalCompilationUnits = compilationUnits.length;
+      if (totalCompilationUnits > 0) {
+        for (int i = 0; i < totalCompilationUnits; i++) {
+          if (monitor.isCanceled()) {
+            return Status.CANCEL_STATUS;
+          }
+          monitor.setTaskName("Update form data [" + i + " of " + totalCompilationUnits + "]");
+          ICompilationUnit icu = compilationUnits[i];
           try {
             IType[] types = icu.getTypes();
             if (types.length > 0) {
@@ -158,7 +161,10 @@ public class FormDataAutoUpdater {
               FormDataAnnotation annotatation = SdkTypeUtility.findFormDataAnnotation(type, ScoutSdk.getSuperTypeHierarchy(type));
               if (annotatation != null && FormDataAnnotation.isSdkCommandCreate(annotatation) &&
                   !StringUtility.isNullOrEmpty(annotatation.getFormDataTypeSignature())) {
-                new FormDataUpdateJob(new FormDataUpdateOperation(type, annotatation)).schedule();
+                monitor.subTask("update '" + type.getFullyQualifiedName() + "'.");
+                FormDataUpdateJob formDataUpdateJob = new FormDataUpdateJob(new FormDataUpdateOperation(type, annotatation));
+                formDataUpdateJob.schedule();
+                formDataUpdateJob.join();
               }
             }
           }

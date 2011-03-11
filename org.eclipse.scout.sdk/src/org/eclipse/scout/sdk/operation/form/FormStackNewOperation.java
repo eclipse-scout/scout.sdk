@@ -23,12 +23,14 @@ import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceCreateMethodOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 public class FormStackNewOperation implements IOperation {
 
@@ -244,6 +246,10 @@ public class FormStackNewOperation implements IOperation {
       fillOp.setFormHandler(getOutNewHandler());
       fillOp.setServiceInterface(getOutProcessServiceInterface());
       fillOp.run(monitor, workingCopyManager);
+    }
+    if (TypeUtility.exists(m_outFormData)) {
+      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(m_outForm);
+      formDataUpdateOp.run(monitor, workingCopyManager);
     }
 
     if (m_formatSource) {

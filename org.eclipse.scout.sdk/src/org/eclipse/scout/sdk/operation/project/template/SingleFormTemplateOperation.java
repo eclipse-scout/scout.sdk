@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.form.FormHandlerNewOperation;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
@@ -73,6 +74,7 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
     String formName = "DesktopForm";
     IScoutBundle sharedBundle = getScoutProject().getSharedBundle();
     ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
+    formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
     formDataOp.run(monitor, workingCopyManager);
     final IType formData = formDataOp.getCreatedType();
     String formDataSignature = Signature.createTypeSignature(formData.getFullyQualifiedName(), true);
@@ -181,6 +183,10 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
     };
     execLoadOp.validate();
     execLoadOp.run(monitor, workingCopyManager);
+
+    // formdata
+    FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(form);
+    formDataUpdateOp.run(monitor, workingCopyManager);
 
     // desktop
     IType desktopType = ScoutSdk.getType(getScoutProject().getClientBundle().getBundleName() + IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP + ".Desktop");

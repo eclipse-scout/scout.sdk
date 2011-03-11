@@ -38,17 +38,6 @@ public class FormDataUpdateJob extends Job {
   }
 
   @Override
-  public boolean belongsTo(Object family) {
-    // TODO Auto-generated method stub
-    return super.belongsTo(family);
-  }
-
-  @Override
-  protected void canceling() {
-    super.canceling();
-  }
-
-  @Override
   public boolean shouldSchedule() {
     return !isCanceled();
   }
@@ -59,9 +48,7 @@ public class FormDataUpdateJob extends Job {
       return Status.CANCEL_STATUS;
     }
     m_formDataUpdateOperation.setup(monitor);
-    if (m_formDataUpdateOperation.isChecksumValid()) {
-      return Status.OK_STATUS;
-    }
+
     m_formDataUpdateOperation.createSourceBuilder(monitor);
     if (isCanceled()) {
       return Status.CANCEL_STATUS;
