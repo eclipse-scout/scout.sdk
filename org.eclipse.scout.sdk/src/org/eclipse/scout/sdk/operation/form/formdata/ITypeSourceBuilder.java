@@ -29,6 +29,8 @@ public interface ITypeSourceBuilder extends ISourceBuilder {
    */
   void addBuilder(ISourceBuilder builder, CompositeObject key);
 
+  ISourceBuilder[] getSourceBuilders(int type);
+
   /**
    * @param superTypeSignature
    */

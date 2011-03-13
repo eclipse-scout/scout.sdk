@@ -44,6 +44,11 @@ public class MethodSourceBuilder implements ISourceBuilder {
   }
 
   @Override
+  public int getType() {
+    return METHOD_SOURCE_BUILDER;
+  }
+
+  @Override
   public String createSource(IImportValidator validator) {
     StringBuilder builder = new StringBuilder();
     String javaDoc = createJavaDoc(validator);

@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.operation.form.formdata;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.Flags;
@@ -36,7 +35,6 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
   public static final int CATEGORY_TYPE_COMPOSER_ENTITY = 8;
 
   private TreeMap<CompositeObject, ISourceBuilder> m_children;
-  private TreeMap<String, ITypeSourceBuilder> m_externalBuilder;
   private String m_superTypeSignature;
   private String m_elementName;
   private int m_flags;
@@ -51,6 +49,11 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     m_flags = Flags.AccPublic;
     m_createDefaultConstructor = true;
     m_createDefaultSerialVersionUid = true;
+  }
+
+  @Override
+  public int getType() {
+    return TYPE_SOURCE_BUILDER;
   }
 
   public String createSource(IImportValidator validator) {
@@ -111,13 +114,15 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     m_children.put(key, builder);
   }
 
-  public void addExternalBuilder(ITypeSourceBuilder builder) {
-    m_externalBuilder.put(builder.getElementName(), builder);
-  }
-
-  public ITypeSourceBuilder[] getExternalBuilders() {
-    Collection<ITypeSourceBuilder> values = m_externalBuilder.values();
-    return values.toArray(new ITypeSourceBuilder[values.size()]);
+  @Override
+  public ISourceBuilder[] getSourceBuilders(int type) {
+    ArrayList<ISourceBuilder> builders = new ArrayList<ISourceBuilder>();
+    for (ISourceBuilder b : m_children.values()) {
+      if (b.getType() == type) {
+        builders.add(b);
+      }
+    }
+    return builders.toArray(new ISourceBuilder[builders.size()]);
   }
 
   public void setSuperTypeSignature(String superTypeSignature) {

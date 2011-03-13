@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.jdt.signature.SourceBuilderImportValidator;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
@@ -157,8 +157,8 @@ public class FormDataUtility {
     return parameterName;
   }
 
-  public static String createCompilationUnitSource(ISourceBuilder builder, String packageName, IJavaProject project, IProgressMonitor monitor) throws CoreException, BadLocationException {
-    IImportValidator validator = new SimpleImportValidator();
+  public static String createCompilationUnitSource(ITypeSourceBuilder builder, String packageName, IJavaProject project, IProgressMonitor monitor) throws CoreException, BadLocationException {
+    IImportValidator validator = new SourceBuilderImportValidator(builder);
     String typeSource = builder.createSource(validator);
     Document bodyDocument = new Document(typeSource);
     MultiTextEdit multiEdit = new MultiTextEdit();

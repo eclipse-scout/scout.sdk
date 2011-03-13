@@ -37,15 +37,8 @@ public class SimpleImportValidator implements IImportValidator {
       String pckName = Signature.getSignatureQualifier(singleTypeSignature);
       String simpleName = Signature.getSignatureSimpleName(singleTypeSignature);
       String plainSimpleName = Signature.getSignatureSimpleName(singleTypeSignature.replaceAll("^[\\[\\+]*", ""));
-      String usedPackageName = m_newImports.get(plainSimpleName);
-      if (usedPackageName != null) {
-        if (!usedPackageName.equals(pckName)) {
-          // fully quallified
-          return prefix + pckName + "." + simpleName;
-        }
-        else {
-          return prefix + simpleName;
-        }
+      if (isAlreadyUsed(pckName, plainSimpleName)) {
+        return prefix + pckName + "." + simpleName;
       }
       else {
         m_newImports.put(plainSimpleName, pckName);
@@ -53,6 +46,17 @@ public class SimpleImportValidator implements IImportValidator {
         return prefix + simpleName;
       }
     }
+  }
+
+  protected boolean isAlreadyUsed(String packageName, String simpleName) {
+    String usedPackageName = m_newImports.get(simpleName);
+    if (usedPackageName != null) {
+      if (!usedPackageName.equals(packageName)) {
+        // fully quallified
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override

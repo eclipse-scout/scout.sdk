@@ -26,6 +26,11 @@ public class AnnotationSourceBuilder implements ISourceBuilder {
 
   }
 
+  @Override
+  public int getType() {
+    return ANNOTATION_SOURCE_BUILDER;
+  }
+
   public AnnotationSourceBuilder(String annotationSignature) {
     m_annotationSignature = annotationSignature;
   }

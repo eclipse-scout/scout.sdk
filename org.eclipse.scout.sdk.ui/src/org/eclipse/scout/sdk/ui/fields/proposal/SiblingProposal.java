@@ -66,6 +66,15 @@ public class SiblingProposal implements IContentProposalEx, ITypeSibling {
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof SiblingProposal) {
+      SiblingProposal sibling = (SiblingProposal) obj;
+      if (sibling.getScoutType() == null && getScoutType() == null) {
+        return super.equals(obj);
+      }
+      else {
+        if (sibling.getScoutType() == null || getScoutType() == null) {
+          return false;
+        }
+      }
       return getScoutType().equals(((SiblingProposal) obj).getScoutType());
     }
     return false;
@@ -73,6 +82,9 @@ public class SiblingProposal implements IContentProposalEx, ITypeSibling {
 
   @Override
   public int hashCode() {
+    if (getScoutType() == null) {
+      return super.hashCode();
+    }
     return getScoutType().hashCode();
   }
 
