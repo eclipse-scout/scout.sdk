@@ -53,7 +53,6 @@ import org.eclipse.scout.sdk.sql.binding.model.ServerSessionBindBase;
 import org.eclipse.scout.sdk.sql.binding.model.SqlStatement;
 import org.eclipse.scout.sdk.sql.binding.model.UnresolvedBindBase;
 import org.eclipse.scout.sdk.workspace.type.IMethodFilter;
-import org.eclipse.scout.sdk.workspace.type.MethodFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
@@ -211,10 +210,15 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
     IType iServerSession = ScoutSdk.getType(RuntimeClasses.IServerSession);
     IPrimaryTypeTypeHierarchy serverSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iServerSession);
     for (IType serverSession : serverSessionHierarchy.getAllSubtypes(iServerSession, TypeFilters.getClassFilter())) {
-      for (IMethod m : TypeUtility.getMethods(serverSession, MethodFilters.getNameRegexFilter("get.*"))) {
-        String methodName = m.getElementName().toLowerCase();
-        methodName = methodName.replaceFirst("^(get|set|is)", "");
-        bindBases.put(methodName, new ServerSessionBindBase(methodName, serverSession));
+      HashSet<String> binds = new HashSet<String>();
+      try {
+        collectPropertyBinds(binds, serverSession, serverSession.newSupertypeHierarchy(new NullProgressMonitor()));
+      }
+      catch (JavaModelException e) {
+        ScoutSdk.logError("could not parse server session bind vars '" + serverSession.getFullyQualifiedName() + "'", e);
+      }
+      for (String s : binds) {
+        bindBases.put(s, new ServerSessionBindBase(s, serverSession));
       }
     }
     return bindBases;
