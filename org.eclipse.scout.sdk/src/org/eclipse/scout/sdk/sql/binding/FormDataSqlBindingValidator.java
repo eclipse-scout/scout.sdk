@@ -129,7 +129,7 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
               }
             }
             else {
-              globalBindings.put((String) value, new IgnoredBindBase((String) value));
+              globalBindings.put(((String) value).toLowerCase(), new IgnoredBindBase((String) value));
             }
           }
         }
