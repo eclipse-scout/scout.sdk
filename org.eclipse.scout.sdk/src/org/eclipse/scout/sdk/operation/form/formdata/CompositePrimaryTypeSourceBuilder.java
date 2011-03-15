@@ -84,8 +84,6 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
         getterBuilder.setReturnSignature(Signature.createTypeSignature(formDataElementName, false));
         getterBuilder.setSimpleBody("return getFieldByClass(" + formDataElementName + ".class);");
         addBuilder(getterBuilder, CATEGORY_METHOD_FIELD_GETTER);
-
-        return;
       }
       else if (FormDataAnnotation.isIgnore(formDataAnnotation)) {
         return;

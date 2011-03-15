@@ -115,12 +115,12 @@ public class SdkTypeUtility {
     if (TypeUtility.exists(type)) {
       IType superType = hierarchy.getSuperclass(type);
       parseFormDataAnnotationReq(annotation, superType, hierarchy, false);
-    }
-    try {
-      fillFormDataAnnotation(type, annotation, isOwner);
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("could not parse form data annotation of '" + type.getFullyQualifiedName() + "'.", e);
+      try {
+        fillFormDataAnnotation(type, annotation, isOwner);
+      }
+      catch (JavaModelException e) {
+        ScoutSdk.logWarning("could not parse form data annotation of '" + type.getFullyQualifiedName() + "'.", e);
+      }
     }
   }
 
