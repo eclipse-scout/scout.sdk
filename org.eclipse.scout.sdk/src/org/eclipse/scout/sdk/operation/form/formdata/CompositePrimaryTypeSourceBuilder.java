@@ -27,6 +27,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
   final IType iTableField = ScoutSdk.getType(RuntimeClasses.ITableField);
   final IType iComposerField = ScoutSdk.getType(RuntimeClasses.IComposerField);
   final IType iCompositeField = ScoutSdk.getType(RuntimeClasses.ICompositeField);
+  final IType iRadioButtonGroup = ScoutSdk.getType(RuntimeClasses.IRadioButtonGroup);
 
   public CompositePrimaryTypeSourceBuilder(IType type) {
     this(type, ScoutSdk.getLocalTypeHierarchy(type));
@@ -91,7 +92,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
       }
     }
     // visit children
-    if (formFieldHierarchy.isSubtype(iCompositeField, formField)) {
+    if (formFieldHierarchy.isSubtype(iCompositeField, formField) || formFieldHierarchy.isSubtype(iRadioButtonGroup, formField)) {
       visitFormFields(formField, formFieldHierarchy);
     }
   }
