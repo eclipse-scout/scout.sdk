@@ -162,7 +162,7 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
       for (IToken t : bindModel.getAllTokens()) {
         if (t instanceof ValueInputToken) {
           String token = t.getParsedToken();
-          token = token.replaceAll("^([\\:\\{\\#]*)?([^\\}\\#]*)([\\}\\#]*)?", "$2");
+          token = token.replaceAll("^([\\:\\{\\#\\&]*)?([^\\}\\#\\&]*)([\\}\\#\\&]*)?", "$2");
           String bindName = token;
           token = token.toLowerCase();
           if (!bindBases.containsKey(token)) {
