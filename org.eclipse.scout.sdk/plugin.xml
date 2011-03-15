@@ -73,16 +73,10 @@
    </extension>
    <extension
          id="org.eclipse.scout.sdk.formdata.sql.binding"
-         name="SQL Binding"
+         name="SQL Binding markers"
          point="org.eclipse.core.resources.markers">
-      <persistent
-            value="false">
-      </persistent>
       <super
             type="org.eclipse.core.resources.marker">
-      </super>
-      <super
-            type="org.eclipse.core.resources.problemmarker">
       </super>
       <super
             type="org.eclipse.core.resources.textmarker">
@@ -90,6 +84,52 @@
       <attribute
             name="method">
       </attribute>
+      <persistent
+            value="false">
+      </persistent>
    </extension>
+   <extension
+         id="org.eclipse.scout.sdk.formdata.sql.binding.single"
+         name="SQL Binding"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="false">
+      </persistent>
+      <super
+            type="org.eclipse.scout.sdk.formdata.sql.binding">
+      </super>
+      <super
+            type="org.eclipse.core.resources.marker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+      <attribute
+            name="method">
+      </attribute>
+   </extension>
+   <extension
+         id="org.eclipse.scout.sdk.formdata.sql.binding.multi"
+         name="SQL Binding Multi"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="false">
+      </persistent>
+      <super
+            type="org.eclipse.scout.sdk.formdata.sql.binding">
+      </super>
+      <super
+            type="org.eclipse.core.resources.marker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <attribute
+            name="method">
+      </attribute>
+      </extension>
 
 </plugin>

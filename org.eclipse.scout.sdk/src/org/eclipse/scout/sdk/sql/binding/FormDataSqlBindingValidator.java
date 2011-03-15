@@ -43,6 +43,7 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.ast.AstUtility;
 import org.eclipse.scout.sdk.jdt.ast.VariableType;
+import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 import org.eclipse.scout.sdk.sql.binding.ast.SqlMethodIvocationVisitor;
 import org.eclipse.scout.sdk.sql.binding.model.BindBaseNVPair;
 import org.eclipse.scout.sdk.sql.binding.model.IBindBase;
@@ -99,17 +100,16 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
   }
 
   protected void processService(IType service, IProgressMonitor monitor) throws JavaModelException {
-    SqlBindingMarker.removeMarkers(service.getCompilationUnit());
+    SqlBindingMarkers.removeMarkers(service.getResource());
     for (IMethod serviceMethod : service.getMethods()) {
       try {
         MethodSqlBindingModel processServiceMethod = processServiceMethod(serviceMethod, monitor);
-        SqlBindingMarker.setMarkers(processServiceMethod);
+        SqlBindingMarkers.setMarkers(processServiceMethod);
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not process method '" + serviceMethod.getElementName() + "' on type '" + service.getFullyQualifiedName() + "'.", e);
       }
     }
-    System.out.println("done");
   }
 
   protected MethodSqlBindingModel processServiceMethod(IMethod serviceMethod, IProgressMonitor monitor) throws JavaModelException {
@@ -142,6 +142,8 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
     methodNode.accept(visitor);
     SqlStatement[] statements = visitor.getStatements();
     for (SqlStatement s : statements) {
+      SQLStatement resultStatement = new SQLStatement(s.getOffset(), s.getLength());
+      result.addStatement(resultStatement);
       UnresolvedBindBase[] unresolvedBindBases = s.getUnresolvedBindBases();
       StringBuilder unresolvedBindings = new StringBuilder();
       for (int i = 0; i < unresolvedBindBases.length; i++) {
@@ -168,31 +170,33 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
             if (token.contains(".")) {
               String[] segments = token.split("\\.");
               IBindBase property = bindBases.get(segments[0]);
-              if (property.getType() == IBindBase.TYPE_NVPAIR) {
-                // resolve
-                HashMap<String, IBindBase> resolvedBinds = loadNVBindBasePropertyObject((BindBaseNVPair) property, methodNode, serviceMethod);
-                bindBases.putAll(resolvedBinds);
-                if (bindBases.containsKey(token)) {
-                  continue;
-                }
-              }
-              else if (property.getType() == IBindBase.TYPE_PROPERTY_BASE) {
-                PropertyBasedBindBase base = (PropertyBasedBindBase) property;
-
-                if (base.getAssignedSignatures().length == 1) {
-                  HashMap<String, IBindBase> resolvedBindings = loadInnerTypeProperties(base.getAssignedSignatures()[0], segments[0], property);
-                  bindBases.putAll(resolvedBindings);
+              if (property != null) {
+                if (property.getType() == IBindBase.TYPE_NVPAIR) {
+                  // resolve
+                  HashMap<String, IBindBase> resolvedBinds = loadNVBindBasePropertyObject((BindBaseNVPair) property, methodNode, serviceMethod);
+                  bindBases.putAll(resolvedBinds);
                   if (bindBases.containsKey(token)) {
                     continue;
+                  }
+                }
+                else if (property.getType() == IBindBase.TYPE_PROPERTY_BASE) {
+                  PropertyBasedBindBase base = (PropertyBasedBindBase) property;
+
+                  if (base.getAssignedSignatures().length == 1) {
+                    HashMap<String, IBindBase> resolvedBindings = loadInnerTypeProperties(base.getAssignedSignatures()[0], segments[0], property);
+                    bindBases.putAll(resolvedBindings);
+                    if (bindBases.containsKey(token)) {
+                      continue;
+                    }
                   }
                 }
               }
             }
             if (hasUnresolvedBindBases) {
-              result.add(t.getParsedToken(), new MethodSqlBindingModel.Marker(bindName, IMarker.SEVERITY_WARNING, s.getOffset(), s.getLength(), serviceMethod));
+              resultStatement.addMarker(t.getParsedToken(), new MethodSqlBindingModel.Marker(bindName, IMarker.SEVERITY_WARNING));
             }
             else {
-              result.add(t.getParsedToken(), new MethodSqlBindingModel.Marker(bindName, IMarker.SEVERITY_ERROR, s.getOffset(), s.getLength(), serviceMethod));
+              resultStatement.addMarker(t.getParsedToken(), new MethodSqlBindingModel.Marker(bindName, IMarker.SEVERITY_ERROR));
             }
           }
         }

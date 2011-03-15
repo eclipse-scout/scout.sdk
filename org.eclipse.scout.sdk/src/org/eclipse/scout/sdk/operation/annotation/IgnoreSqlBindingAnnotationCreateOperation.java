@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.annotation;
 
+import java.util.Arrays;
 import java.util.HashSet;
 
 import org.eclipse.core.runtime.CoreException;
@@ -36,10 +37,10 @@ public class IgnoreSqlBindingAnnotationCreateOperation extends AnnotationCreateO
    * @param annotationOwner
    * @param signature
    */
-  public IgnoreSqlBindingAnnotationCreateOperation(IMember annotationOwner, String signature, String bindVariable) {
+  public IgnoreSqlBindingAnnotationCreateOperation(IMember annotationOwner, String signature, String[] bindVariable) {
     super(annotationOwner, signature);
     m_ignoredBindings = new HashSet<String>();
-    m_ignoredBindings.add(bindVariable);
+    m_ignoredBindings.addAll(Arrays.asList(bindVariable));
   }
 
   @Override

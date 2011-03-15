@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.sql.binding;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.jdt.core.IMethod;
@@ -21,12 +22,12 @@ import org.eclipse.jdt.core.IMethod;
  * @since 1.0.8 28.02.2011
  */
 public class MethodSqlBindingModel {
-  public HashMap<String, Marker> m_missingBindVars;
   private final IMethod m_method;
+  private ArrayList<SQLStatement> m_statements;
 
   public MethodSqlBindingModel(IMethod method) {
     m_method = method;
-    m_missingBindVars = new HashMap<String, Marker>();
+    m_statements = new ArrayList<SQLStatement>();
   }
 
   /**
@@ -36,45 +37,46 @@ public class MethodSqlBindingModel {
     return m_method;
   }
 
-  public void add(String bindVar, Marker marker) {
-    m_missingBindVars.put(bindVar, marker);
+  public void addStatement(SQLStatement statement) {
+    statement.setModel(this);
+    m_statements.add(statement);
   }
 
-  public Marker[] getMissingMarkers() {
-    return m_missingBindVars.values().toArray(new Marker[m_missingBindVars.size()]);
+  public SQLStatement[] getStatements() {
+    return m_statements.toArray(new SQLStatement[m_statements.size()]);
   }
 
-  public boolean hasMissingBindVars() {
-    return !m_missingBindVars.isEmpty();
+  public boolean hasMarkers() {
+    for (SQLStatement s : getStatements()) {
+      if (s.hasMarkers()) {
+        return true;
+      }
+    }
+    return false;
   }
 
-  public static class Marker {
-    private final int m_offset;
-    private final int m_length;
-    private final int m_severity;
-    private final String m_bindVar;
-    private final IMethod m_serviceMethod;
+  public static class SQLStatement {
+    private int m_offset;
+    private int m_length;
+    private HashMap<String, Marker> m_markers;
+    private MethodSqlBindingModel m_model;
 
-    public Marker(String bindVar, int severity, int offset, int length, IMethod serviceMethod) {
-      m_bindVar = bindVar;
-      m_severity = severity;
+    public SQLStatement(int offset, int length) {
       m_offset = offset;
       m_length = length;
-      m_serviceMethod = serviceMethod;
+      m_markers = new HashMap<String, Marker>();
     }
 
-    /**
-     * @return the bindVar
-     */
-    public String getBindVariable() {
-      return m_bindVar;
+    MethodSqlBindingModel getModel() {
+      return m_model;
     }
 
-    /**
-     * @return the severity
-     */
-    public int getSeverity() {
-      return m_severity;
+    void setModel(MethodSqlBindingModel model) {
+      m_model = model;
+    }
+
+    public IMethod getDeclaringMethod() {
+      return getModel().getMethod();
     }
 
     /**
@@ -91,11 +93,55 @@ public class MethodSqlBindingModel {
       return m_length;
     }
 
-    /**
-     * @return the serviceMethod
-     */
-    public IMethod getServiceMethod() {
-      return m_serviceMethod;
+    public boolean hasMarkers() {
+      return !m_markers.isEmpty();
     }
+
+    public Marker[] getMarkers() {
+      return m_markers.values().toArray(new Marker[m_markers.size()]);
+    }
+
+    public void addMarker(String bindVar, Marker marker) {
+      m_markers.put(bindVar, marker);
+    }
+
+  }
+
+  public static class Marker {
+    private final int m_severity;
+    private final String m_bindVar;
+    private SQLStatement m_statement;
+
+    public Marker(String bindVar, int severity) {
+      m_bindVar = bindVar;
+      m_severity = severity;
+    }
+
+    /**
+     * @return the bindVar
+     */
+    public String getBindVariable() {
+      return m_bindVar;
+    }
+
+    void setStatement(SQLStatement statement) {
+      m_statement = statement;
+    }
+
+    SQLStatement getStatement() {
+      return m_statement;
+    }
+
+    public IMethod getDeclaringMethod() {
+      return getStatement().getDeclaringMethod();
+    }
+
+    /**
+     * @return the severity
+     */
+    public int getSeverity() {
+      return m_severity;
+    }
+
   }
 }

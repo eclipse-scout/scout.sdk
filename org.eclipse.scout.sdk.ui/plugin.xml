@@ -596,20 +596,6 @@
       </pasteSupport>
    </extension>
    <extension
-         point="org.eclipse.ui.exportWizards">
-      <category
-            id="org.eclipse.scout.export.category"
-            name="Scout">
-      </category>
-      <wizard
-            category="org.eclipse.scout.export.category"
-            class="org.eclipse.scout.sdk.ui.internal.wizard.export.ServerProductExportWizard"
-            icon="resources/icons/serverBundle_export.png"
-            id="org.eclipse.scout.productExportWizard"
-            name="Scout Server Export">
-      </wizard>
-   </extension>
-   <extension
          point="org.eclipse.ui.menus">
       <menuContribution
             locationURI="menu:org.eclipse.ui.main.menu?after=additions">
@@ -626,8 +612,12 @@
    <extension
          point="org.eclipse.ui.ide.markerResolution">
       <markerResolutionGenerator
-            class="org.eclipse.scout.sdk.ui.internal.marker.resolution.SqlFormDataMarkerResolutionGenerator"
-            markerType="org.eclipse.scout.sdk.formdata.sql.binding">
+            class="org.eclipse.scout.sdk.ui.internal.marker.resolution.SqlBindMarkerResolutionGenerator"
+            markerType="org.eclipse.scout.sdk.formdata.sql.binding.single">
+      </markerResolutionGenerator>
+      <markerResolutionGenerator
+            class="org.eclipse.scout.sdk.ui.internal.marker.resolution.SqlBindMarkerResolutionGenerator"
+            markerType="org.eclipse.scout.sdk.formdata.sql.binding.multi">
       </markerResolutionGenerator>
    </extension>
 </plugin>
