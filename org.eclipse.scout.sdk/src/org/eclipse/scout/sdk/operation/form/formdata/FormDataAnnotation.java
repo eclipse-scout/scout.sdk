@@ -19,13 +19,17 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 public class FormDataAnnotation {
 
   public static boolean isCreate(FormDataAnnotation anot) {
-    return anot != null &&
-        (anot.getSdkCommand() == SdkCommand.CREATE || anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.CREATE);
+    if (anot == null) {
+      return false;
+    }
+    return (anot.getSdkCommand() == SdkCommand.CREATE) || (anot.getSdkCommand() == null && anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.CREATE);
   }
 
   public static boolean isIgnore(FormDataAnnotation anot) {
-    return anot != null &&
-        (anot.getSdkCommand() == SdkCommand.IGNORE || anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.IGNORE);
+    if (anot == null) {
+      return false;
+    }
+    return (anot.getSdkCommand() == SdkCommand.IGNORE) || (anot.getSdkCommand() == null && anot.getDefaultSubtypeSdkCommand() == DefaultSubtypeSdkCommand.IGNORE);
   }
 
   public static boolean isSdkCommandDefault(FormDataAnnotation anot) {

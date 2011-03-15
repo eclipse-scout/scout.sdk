@@ -138,71 +138,134 @@ public class SdkTypeUtility {
       else {
         contextType = (IType) element.getAncestor(IJavaElement.TYPE);
       }
+
+      String valueSignature = null;
+      SdkCommand sdkCommand = null;
+      DefaultSubtypeSdkCommand subTypeCommand = null;
+      int genericOrdinal = -1;
+
       for (IMemberValuePair p : annotation.getMemberValuePairs()) {
         String memberName = p.getMemberName();
         Object value = p.getValue();
         if ("value".equals(memberName)) {
-          String simpleName = ((String) value).replaceAll("\\.class$", "");
-          if (isOwner) {
-            formDataAnnotation.setFormDataTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
+          try {
+            String simpleName = ((String) value).replaceAll("\\.class$", "");
+            valueSignature = ScoutUtility.getReferencedTypeSignature(contextType, simpleName);
           }
-          else {
-            formDataAnnotation.setSuperTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
+          catch (Exception e) {
+            ScoutSdk.logError("could not parse formdata annotation value '" + value + "'.", e);
           }
+//          if (isOwner) {
+//            formDataAnnotation.setFormDataTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
+//          }
+//          else {
+//            formDataAnnotation.setSuperTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
+//          }
 
         }
         else if ("sdkCommand".equals(memberName)) {
-          if (isOwner) {
-            try {
-              Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
-              if (m.find() && m.group().length() > 0) {
-                String opString = m.group();
-                SdkCommand op = SdkCommand.valueOf(opString);
-                formDataAnnotation.setSdkCommand(op);
-                switch (op) {
-                  case IGNORE:
-                    formDataAnnotation.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.DEFAULT);
-                    break;
-                  case CREATE:
-                    formDataAnnotation.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.DEFAULT);
-                    break;
-
-                  default:
-                    break;
-                }
-              }
-            }
-            catch (Exception e) {
-              ScoutSdk.logError("could not parse form data sdkCommand value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
-              formDataAnnotation.setSdkCommand(null);
+          try {
+            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+            if (m.find() && m.group().length() > 0) {
+              String opString = m.group();
+              sdkCommand = SdkCommand.valueOf(opString);
             }
           }
+          catch (Exception e) {
+            ScoutSdk.logError("could not parse formdata annotation sdkCommand '" + value + "'.", e);
+          }
+//          if (isOwner) {
+//            try {
+//              Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+//              if (m.find() && m.group().length() > 0) {
+//                String opString = m.group();
+//                SdkCommand op = SdkCommand.valueOf(opString);
+//                formDataAnnotation.setSdkCommand(op);
+//                switch (op) {
+//                  case IGNORE:
+//                    formDataAnnotation.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.DEFAULT);
+//                    break;
+//                  case CREATE:
+//                    formDataAnnotation.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.DEFAULT);
+//                    break;
+//                  case USE:
+//                    formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
+//                  default:
+//                    break;
+//                }
+//              }
+//            }
+//            catch (Exception e) {
+//              ScoutSdk.logError("could not parse form data sdkCommand value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+//              formDataAnnotation.setSdkCommand(null);
+//            }
+//          }
         }
         else if ("defaultSubtypeSdkCommand".equals(memberName)) {
           try {
             Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
             if (m.find() && m.group().length() > 0) {
               String opString = m.group();
-              DefaultSubtypeSdkCommand op = DefaultSubtypeSdkCommand.valueOf(opString);
-              formDataAnnotation.setDefaultSubtypeSdkCommand(op);
+              subTypeCommand = DefaultSubtypeSdkCommand.valueOf(opString);
             }
           }
           catch (Exception e) {
-            ScoutSdk.logError("could not parse form data defaultSubtypeSdkCommand value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
-            formDataAnnotation.setSdkCommand(null);
+            ScoutSdk.logError("could not parse formdata annotation defaultSubtypeCommand '" + value + "'.", e);
           }
+//          try {
+//            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+//            if (m.find() && m.group().length() > 0) {
+//              String opString = m.group();
+//              DefaultSubtypeSdkCommand op = DefaultSubtypeSdkCommand.valueOf(opString);
+//              formDataAnnotation.setDefaultSubtypeSdkCommand(op);
+//            }
+//          }
+//          catch (Exception e) {
+//            ScoutSdk.logError("could not parse form data defaultSubtypeSdkCommand value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+//            formDataAnnotation.setSdkCommand(null);
+//          }
         }
 
         else if ("genericOrdinal".equals(memberName)) {
           try {
-            formDataAnnotation.setGenericOrdinal(((Integer) value).intValue());
+            genericOrdinal = ((Integer) value).intValue();
           }
           catch (Exception e) {
-            ScoutSdk.logError("could not parse form data genericOrdinal value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+            ScoutSdk.logError("could not parse formdata annotation genericOrdinal '" + value + "'.", e);
           }
+//          try {
+//            formDataAnnotation.setGenericOrdinal(((Integer) value).intValue());
+//          }
+//          catch (Exception e) {
+//            ScoutSdk.logError("could not parse form data genericOrdinal value '" + value + "' on annotatable '" + getQualifiedNameOf(element) + "'.", e);
+//          }
         }
-
       }
+
+      // default setup
+      if (!StringUtility.isNullOrEmpty(valueSignature)) {
+        if (isOwner) {
+          formDataAnnotation.setFormDataTypeSignature(valueSignature);
+        }
+        else {
+          formDataAnnotation.setSuperTypeSignature(valueSignature);
+        }
+      }
+      if (isOwner && sdkCommand != null) {
+        formDataAnnotation.setSdkCommand(sdkCommand);
+      }
+      if (subTypeCommand != null) {
+        formDataAnnotation.setDefaultSubtypeSdkCommand(subTypeCommand);
+      }
+      if (genericOrdinal > -1) {
+        formDataAnnotation.setGenericOrdinal(genericOrdinal);
+      }
+      // correction
+      if (isOwner && sdkCommand == SdkCommand.USE && !StringUtility.isNullOrEmpty(valueSignature) && element.getParent().getElementType() == IJavaElement.COMPILATION_UNIT) {
+        formDataAnnotation.setSuperTypeSignature(valueSignature);
+        formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
+      }
+
       if (element.getElementType() == IJavaElement.METHOD && formDataAnnotation.getSdkCommand() == null) {
         formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
       }
