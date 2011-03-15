@@ -18,9 +18,15 @@ import org.eclipse.jdt.core.Signature;
 
 public class SimpleImportValidator implements IImportValidator {
   private HashMap<String/* simpleName */, String/* packageName */> m_newImports;
+  private String m_packageName;
 
   public SimpleImportValidator() {
+    this(null);
+  }
+
+  public SimpleImportValidator(String packageName) {
     m_newImports = new HashMap<String, String>();
+    m_packageName = packageName;
   }
 
   @Override
@@ -37,6 +43,7 @@ public class SimpleImportValidator implements IImportValidator {
       String pckName = Signature.getSignatureQualifier(singleTypeSignature);
       String simpleName = Signature.getSignatureSimpleName(singleTypeSignature);
       String plainSimpleName = Signature.getSignatureSimpleName(singleTypeSignature.replaceAll("^[\\[\\+]*", ""));
+
       if (isAlreadyUsed(pckName, plainSimpleName)) {
         return prefix + pckName + "." + simpleName;
       }
@@ -59,6 +66,13 @@ public class SimpleImportValidator implements IImportValidator {
     return false;
   }
 
+  protected boolean isSamePackage(String packageName) {
+    if (m_packageName != null) {
+      return m_packageName.equals(packageName);
+    }
+    return false;
+  }
+
   @Override
   public void addImport(String fqn) {
     String packageName = Signature.getQualifier(fqn);
@@ -71,7 +85,7 @@ public class SimpleImportValidator implements IImportValidator {
   public String[] getImportsToCreate() {
     ArrayList<String> list = new ArrayList<String>();
     for (Entry<String, String> e : m_newImports.entrySet()) {
-      if (!e.getValue().equals("java.lang")) {
+      if (!e.getValue().equals("java.lang") || !isSamePackage(e.getValue())) {
         list.add(e.getValue() + "." + e.getKey());
       }
     }

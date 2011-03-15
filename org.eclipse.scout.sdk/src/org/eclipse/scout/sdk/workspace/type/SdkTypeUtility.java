@@ -155,12 +155,6 @@ public class SdkTypeUtility {
           catch (Exception e) {
             ScoutSdk.logError("could not parse formdata annotation value '" + value + "'.", e);
           }
-//          if (isOwner) {
-//            formDataAnnotation.setFormDataTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
-//          }
-//          else {
-//            formDataAnnotation.setSuperTypeSignature(ScoutUtility.getReferencedTypeSignature(contextType, simpleName));
-//          }
 
         }
         else if ("sdkCommand".equals(memberName)) {

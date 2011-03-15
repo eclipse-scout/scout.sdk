@@ -19,7 +19,8 @@ public class SourceBuilderImportValidator extends SimpleImportValidator {
   private final ITypeSourceBuilder m_sourceBuilder;
   private HashSet<String> m_innerTypeNames;
 
-  public SourceBuilderImportValidator(ITypeSourceBuilder sourceBuilder) {
+  public SourceBuilderImportValidator(ITypeSourceBuilder sourceBuilder, String packageName) {
+    super(packageName);
     m_sourceBuilder = sourceBuilder;
     m_innerTypeNames = new HashSet<String>();
     for (ISourceBuilder childBuilder : m_sourceBuilder.getSourceBuilders(ISourceBuilder.TYPE_SOURCE_BUILDER)) {

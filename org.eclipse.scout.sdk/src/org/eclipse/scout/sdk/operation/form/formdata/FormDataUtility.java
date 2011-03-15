@@ -158,7 +158,7 @@ public class FormDataUtility {
   }
 
   public static String createCompilationUnitSource(ITypeSourceBuilder builder, String packageName, IJavaProject project, IProgressMonitor monitor) throws CoreException, BadLocationException {
-    IImportValidator validator = new SourceBuilderImportValidator(builder);
+    IImportValidator validator = new SourceBuilderImportValidator(builder, packageName);
     String typeSource = builder.createSource(validator);
     Document bodyDocument = new Document(typeSource);
     MultiTextEdit multiEdit = new MultiTextEdit();

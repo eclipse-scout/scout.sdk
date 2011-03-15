@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.jdt.core.Flags;
@@ -104,6 +106,48 @@ public class TypeFilters {
       @Override
       public boolean accept(IType type) {
         return type.getPackageFragment().equals(packageFragment);
+      }
+    };
+  }
+
+  public static ITypeFilter getTypesInScoutProject(IScoutProject project, boolean includeSubprojects) {
+    final HashSet<IJavaProject> projects = new HashSet<IJavaProject>();
+    collectJavaProjects(projects, project, includeSubprojects);
+    return new ITypeFilter() {
+
+      @Override
+      public boolean accept(IType candidate) {
+        if (!TypeUtility.exists(candidate) || candidate.isBinary()) {
+          return false;
+        }
+        return projects.contains(candidate.getJavaProject()) && isClass(candidate);
+      }
+    };
+  }
+
+  private static void collectJavaProjects(HashSet<IJavaProject> collector, IScoutProject project, boolean includeSubprojects) {
+    if (project != null) {
+      for (IScoutBundle b : project.getAllScoutBundles()) {
+        collector.add(b.getJavaProject());
+      }
+      if (includeSubprojects) {
+        for (IScoutProject p : project.getSubProjects()) {
+          collectJavaProjects(collector, p, includeSubprojects);
+        }
+      }
+    }
+  }
+
+  public static ITypeFilter getTypesInProjects(IJavaProject[] projects) {
+    final HashSet<IJavaProject> finalProjects = new HashSet<IJavaProject>(Arrays.asList(projects));
+    return new ITypeFilter() {
+
+      @Override
+      public boolean accept(IType candidate) {
+        if (!TypeUtility.exists(candidate) || candidate.isBinary()) {
+          return false;
+        }
+        return finalProjects.contains(candidate.getJavaProject()) && isClass(candidate);
       }
     };
   }

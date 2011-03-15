@@ -10,13 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedNodePage;
@@ -28,9 +32,14 @@ import org.eclipse.scout.sdk.ui.wizard.bundle.BundleImportWizard;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
+import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
+import org.eclipse.scout.sdk.workspace.type.TypeFilters;
+import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 
 public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
+
   private IScoutProject m_scoutProject;
+  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
 
   private IScoutWorkspaceListener m_workspaceListener = new IScoutWorkspaceListener() {
     @Override
@@ -140,12 +149,13 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
     super.fillContextMenu(manager);
     manager.add(new OrganizeAllImportsAction(getScoutResource()));
     manager.add(new WizardAction("Import Plugin...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundleAdd), new BundleImportWizard(getScoutResource())));
-    manager.add(new Action("Print Hierarchy") {
+    manager.add(new Separator());
+    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
       @Override
-      public void run() {
-        // getScoutResource().printHierarchy();
+      public IType[] getTypes() {
+        return resolveServices();
       }
-    });
+    }));
     /*
      * LaunchConfigurationQueryOrder lc=new LaunchConfigurationQueryOrder();
      * lc.setLaunchConfigurationName("google.product");
@@ -153,4 +163,11 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
      */
   }
 
+  protected IType[] resolveServices() {
+    IPrimaryTypeTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(),
+        TypeFilters.getTypesInScoutProject(getScoutResource(), true));
+    IType[] services = serviceHierarchy.getAllSubtypes(iService, filter);
+    return services;
+  }
 }
