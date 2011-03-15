@@ -85,9 +85,13 @@ public class SimpleImportValidator implements IImportValidator {
   public String[] getImportsToCreate() {
     ArrayList<String> list = new ArrayList<String>();
     for (Entry<String, String> e : m_newImports.entrySet()) {
-      if (!e.getValue().equals("java.lang") || !isSamePackage(e.getValue())) {
-        list.add(e.getValue() + "." + e.getKey());
+      if (e.getValue().equals("java.lang")) {
+        continue;
       }
+      if (isSamePackage(e.getValue())) {
+        continue;
+      }
+      list.add(e.getValue() + "." + e.getKey());
     }
     return list.toArray(new String[list.size()]);
   }
