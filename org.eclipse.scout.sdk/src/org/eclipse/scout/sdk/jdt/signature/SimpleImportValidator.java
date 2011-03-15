@@ -77,7 +77,6 @@ public class SimpleImportValidator implements IImportValidator {
   public void addImport(String fqn) {
     String packageName = Signature.getQualifier(fqn);
     String simpleName = Signature.getSimpleName(fqn);
-    System.out.println(packageName);
     m_newImports.put(simpleName, packageName);
   }
 

@@ -89,10 +89,17 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
       builder.append("private static final long serialVersionUID=1L;" + ScoutUtility.NL + ScoutUtility.NL);
     }
     if (isCreateDefaultConstructor()) {
-      builder.append("public " + getElementName() + "() {" + ScoutUtility.NL + "}" + ScoutUtility.NL + ScoutUtility.NL);
+      builder.append("public " + getElementName() + "() {" + ScoutUtility.NL + "}" + ScoutUtility.NL);
     }
-    for (ISourceBuilder childBuilder : m_children.values()) {
-      builder.append(childBuilder.createSource(validator));
+    ISourceBuilder[] childBuilders = m_children.values().toArray(new ISourceBuilder[m_children.size()]);
+    if (childBuilders.length > 0) {
+      builder.append(ScoutUtility.NL);
+      for (int i = 0; i < childBuilders.length; i++) {
+        builder.append(childBuilders[i].createSource(validator));
+        if (i < childBuilders.length - 1) {
+          builder.append(ScoutUtility.NL);
+        }
+      }
     }
     builder.append("}");
     return builder.toString();

@@ -100,7 +100,7 @@ public class MethodSourceBuilder implements ISourceBuilder {
     if (!StringUtility.isNullOrEmpty(value)) {
       builder.append(value + ScoutUtility.NL);
     }
-    builder.append("}" + ScoutUtility.NL);
+    builder.append("}");
     return builder.toString();
   }
 
