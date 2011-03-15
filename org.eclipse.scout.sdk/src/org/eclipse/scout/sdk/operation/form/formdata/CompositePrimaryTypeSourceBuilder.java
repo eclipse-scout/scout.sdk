@@ -90,7 +90,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
       }
     }
     // visit children
-    if (formFieldHierarchy.isSubtype(iCompositeField, formField) || formFieldHierarchy.isSubtype(iRadioButtonGroup, formField)) {
+    if (formFieldHierarchy.isSubtype(iCompositeField, formField)) {
       visitFormFields(formField, formFieldHierarchy);
     }
   }
