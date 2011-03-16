@@ -55,11 +55,11 @@ public class TreeUtility {
   private ITreeNode findNodeImpl(ITreeNode startNode, ITreeNodeFilter filter) {
     ArrayList<ITreeNode> collector = new ArrayList<ITreeNode>(3);
     collectNodes(startNode, filter, collector);
-    if (collector.size() == 1) {
+    if (collector.size() > 0) {
+      if (collector.size() > 1) {
+        ScoutSdkUi.logWarning("more than 1 node found.");
+      }
       return collector.get(0);
-    }
-    else if (collector.size() > 1) {
-      throw new IllegalStateException("more than 1 node found.");
     }
     return null;
   }

@@ -72,7 +72,7 @@ public class FormDataUpdateOperation implements IOperation {
     m_monitor = monitor;
     m_workingCopyManager = workingCopyManager;
     setup(monitor);
-    if (getFormDataAnnotation() != null && FormDataAnnotation.isSdkCommandCreate(getFormDataAnnotation()) &&
+    if (getFormDataAnnotation() != null && FormDataAnnotation.isCreate(getFormDataAnnotation()) &&
         !StringUtility.isNullOrEmpty(getFormDataAnnotation().getFormDataTypeSignature())) {
       createSourceBuilder(monitor);
       storeFormData(monitor);
