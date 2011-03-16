@@ -255,11 +255,11 @@ public class SdkTypeUtility {
         formDataAnnotation.setGenericOrdinal(genericOrdinal);
       }
       // correction
-//      if (isOwner && sdkCommand == SdkCommand.USE && !StringUtility.isNullOrEmpty(valueSignature) && element.getParent().getElementType() != IJavaElement.COMPILATION_UNIT) {
-//        formDataAnnotation.setSuperTypeSignature(valueSignature);
-//        formDataAnnotation.setFormDataTypeSignature(null);
-//        formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
-//      }
+      if (isOwner && sdkCommand == SdkCommand.USE && !StringUtility.isNullOrEmpty(valueSignature) && element.getParent().getElementType() != IJavaElement.COMPILATION_UNIT) {
+        formDataAnnotation.setSuperTypeSignature(valueSignature);
+        formDataAnnotation.setFormDataTypeSignature(null);
+        formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
+      }
 
       if (element.getElementType() == IJavaElement.METHOD && formDataAnnotation.getSdkCommand() == null) {
         formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
