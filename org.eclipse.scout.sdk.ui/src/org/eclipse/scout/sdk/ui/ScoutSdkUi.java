@@ -90,6 +90,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (m_preferencesPropertyListener == null) {
       m_preferencesPropertyListener = new P_PreferenceStorePropertyListener();
     }
+    getPreferenceStore().setDefault(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE, true);
     ScoutSdk.getDefault().setFormDataAutoUpdate(getPreferenceStore().getBoolean(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE));
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
 //    contributeMenus(context);
