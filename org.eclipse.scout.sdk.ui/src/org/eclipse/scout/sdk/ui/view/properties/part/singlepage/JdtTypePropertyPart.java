@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Double
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FontPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormDisplayHintPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormViewIdPresenter;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.HorizontalAglinmentPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.HorizontalAlignmentPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IconPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IntegerPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LongPresenter;
@@ -77,7 +77,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
- * <h3>TestPart</h3> ...
+ * <h3>JdtTypePropertyPart</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010
@@ -146,7 +146,6 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     // layout
     headArea.setLayout(new GridLayout(2, false));
     GridData titleData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-//    titleData.widthHint = 100;
     title.setLayoutData(titleData);
     m_saveButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END | GridData.FILL_HORIZONTAL));
     return headArea;
@@ -288,7 +287,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
 
     else if (propertyType.equals("HORIZONTAL_ALIGNMENT")) {
-      presenter = new HorizontalAglinmentPresenter(getFormToolkit(), parent);
+      presenter = new HorizontalAlignmentPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else if (propertyType.equals("ICON_ID")) {

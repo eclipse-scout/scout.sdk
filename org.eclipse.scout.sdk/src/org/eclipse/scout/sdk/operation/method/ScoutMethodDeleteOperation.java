@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
@@ -54,9 +53,7 @@ public class ScoutMethodDeleteOperation implements IOperation {
     workingCopyManager.register(compilationUnit, monitor);
     getMethod().delete(true, monitor);
     OrganizeImportOperation op = new OrganizeImportOperation(compilationUnit);
-    TuningUtility.startTimer();
     op.run(monitor, workingCopyManager);
-    TuningUtility.stopTimer("wellform '" + compilationUnit.getElementName() + "'");
   }
 
   public IMethod getMethod() {

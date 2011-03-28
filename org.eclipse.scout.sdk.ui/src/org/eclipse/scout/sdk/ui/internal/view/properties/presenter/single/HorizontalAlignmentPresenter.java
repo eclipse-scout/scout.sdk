@@ -28,13 +28,13 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 /**
  * <h3>HorizontalAglinmentPresenter</h3> ...
  */
-public class HorizontalAglinmentPresenter extends AbstractProposalPresenter<ConstantFieldProposal<Integer>> {
+public class HorizontalAlignmentPresenter extends AbstractProposalPresenter<ConstantFieldProposal<Integer>> {
 
   private static final int LEFT = -1;
   private static final int CENTER = 0;
   private static final int RIGHT = 1;
 
-  public HorizontalAglinmentPresenter(FormToolkit toolkit, Composite parent) {
+  public HorizontalAlignmentPresenter(FormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
 
   }

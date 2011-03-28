@@ -49,7 +49,7 @@ public class ScoutSdk extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk";
   public static final String NATURE_ID = PLUGIN_ID + ".ScoutNature";
-  public static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
+  private static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
   private static ScoutSdk plugin;
 
   private Object m_initializeLock = new Object();

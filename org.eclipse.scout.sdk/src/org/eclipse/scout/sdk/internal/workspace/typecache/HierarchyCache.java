@@ -33,6 +33,7 @@ import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
  *
  */
 public final class HierarchyCache {
+  private Object cacheLock = new Object();
   private HashMap<IType, PrimaryTypeTypeHierarchy> m_cachedPrimaryTypeHierarchies;
 
   public HierarchyCache() {
@@ -43,7 +44,9 @@ public final class HierarchyCache {
    *
    */
   public void dispose() {
-    m_cachedPrimaryTypeHierarchies.clear();
+    synchronized (cacheLock) {
+      m_cachedPrimaryTypeHierarchies.clear();
+    }
   }
 
   public IPrimaryTypeTypeHierarchy getPrimaryTypeHierarchy(IType type) throws IllegalArgumentException {
@@ -53,10 +56,13 @@ public final class HierarchyCache {
     else if (TypeUtility.exists(type.getDeclaringType())) {
       throw new IllegalArgumentException("type '" + type.getElementName() + "' must be a primary type.");
     }
-    PrimaryTypeTypeHierarchy hierarchy = m_cachedPrimaryTypeHierarchies.get(type);
-    if (hierarchy == null) {
-      hierarchy = new PrimaryTypeTypeHierarchy(type);
-      m_cachedPrimaryTypeHierarchies.put(type, hierarchy);
+    PrimaryTypeTypeHierarchy hierarchy = null;
+    synchronized (cacheLock) {
+      hierarchy = m_cachedPrimaryTypeHierarchies.get(type);
+      if (hierarchy == null) {
+        hierarchy = new PrimaryTypeTypeHierarchy(type);
+        m_cachedPrimaryTypeHierarchies.put(type, hierarchy);
+      }
     }
     return hierarchy;
   }
@@ -91,7 +97,9 @@ public final class HierarchyCache {
     try {
       ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
       if (!TypeUtility.exists(t.getDeclaringType())) {
-        hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+        synchronized (cacheLock) {
+          hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+        }
       }
       if (hierarchies.size() > 0) {
         for (CachedTypeHierarchy h : hierarchies) {
@@ -130,7 +138,9 @@ public final class HierarchyCache {
   private void handleCompilationUnitRemoved(ICompilationUnit icu) {
     try {
       ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
-      hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+      synchronized (cacheLock) {
+        hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+      }
       ITypeFilter compilationUnitFilter = TypeFilters.getCompilationUnitFilter(icu);
       for (CachedTypeHierarchy h : hierarchies) {
 

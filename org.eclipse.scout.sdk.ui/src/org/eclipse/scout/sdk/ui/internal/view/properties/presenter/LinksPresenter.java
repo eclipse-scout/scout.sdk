@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.ILink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
@@ -30,33 +31,19 @@ public class LinksPresenter extends AbstractPresenter {
 
   private LinksPresenterModel m_linksProperty;
 
+  public LinksPresenter(FormToolkit toolkit, Composite parent) {
+    this(toolkit, parent, null);
+  }
+
   public LinksPresenter(FormToolkit toolkit, Composite parent, LinksPresenterModel linksProperty) {
     super(toolkit, parent);
-    m_linksProperty = linksProperty;
     GridLayout layout = new GridLayout(2, true);
     layout.marginHeight = 0;
     layout.horizontalSpacing = 3;
     layout.verticalSpacing = 3;
     layout.marginWidth = 0;
     getContainer().setLayout(layout);
-    createContent(getContainer());
-  }
-
-  private void createContent(Composite container) {
-    ILink[] globalLinks = getLinksProperty().getOrderdGlobalLinks();
-    LinkGroup[] linkGroups = getLinksProperty().getOrderedNotEmtyGroups();
-    if (globalLinks.length > 0) {
-      Control globalGroup = createLinkGroup(container, null, globalLinks);
-      GridData globData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
-
-      globData.horizontalSpan = (2 - (linkGroups.length % 2));
-      globalGroup.setLayoutData(globData);
-    }
-    for (LinkGroup group : linkGroups) {
-      Control uiGroup = createLinkGroup(container, group.getName(), group.getLinks());
-      GridData formData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
-      uiGroup.setLayoutData(formData);
-    }
+    setLinksProperty(linksProperty);
   }
 
   @Override
@@ -104,12 +91,29 @@ public class LinksPresenter extends AbstractPresenter {
     return field;
   }
 
-  private void doShowSourceCode() {
-
-  }
-
   public void setLinksProperty(LinksPresenterModel linksProperty) {
-    m_linksProperty = linksProperty;
+    if (getContainer() != null && !getContainer().isDisposed()) {
+      if (!CompareUtility.equals(m_linksProperty, linksProperty)) {
+        for (Control c : getContainer().getChildren()) {
+          c.dispose();
+        }
+        ILink[] globalLinks = linksProperty.getOrderdGlobalLinks();
+        LinkGroup[] linkGroups = linksProperty.getOrderedNotEmtyGroups();
+        if (globalLinks.length > 0) {
+          Control globalGroup = createLinkGroup(getContainer(), null, globalLinks);
+          GridData globData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+
+          globData.horizontalSpan = (2 - (linkGroups.length % 2));
+          globalGroup.setLayoutData(globData);
+        }
+        for (LinkGroup group : linkGroups) {
+          Control uiGroup = createLinkGroup(getContainer(), group.getName(), group.getLinks());
+          GridData formData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+          uiGroup.setLayoutData(formData);
+        }
+        m_linksProperty = linksProperty;
+      }
+    }
   }
 
   public LinksPresenterModel getLinksProperty() {

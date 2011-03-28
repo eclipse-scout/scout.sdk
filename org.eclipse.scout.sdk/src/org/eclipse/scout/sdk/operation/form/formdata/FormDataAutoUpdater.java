@@ -29,7 +29,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 
@@ -105,15 +104,9 @@ public class FormDataAutoUpdater {
             IResource resource = delta.getResource();
             if (resource != null && resource.getType() == IResource.FILE) {
               if ((delta.getFlags() & IResourceDelta.CONTENT) != 0 && resource.getName().endsWith(".java")) {
-                try {
-                  TuningUtility.startTimer();
-                  IJavaElement javaElement = JavaCore.create((IFile) resource);
-                  if (javaElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                    handleCompilationUnitSaved((ICompilationUnit) javaElement);
-                  }
-                }
-                finally {
-                  TuningUtility.stopTimer("java core lookup");
+                IJavaElement javaElement = JavaCore.create((IFile) resource);
+                if (javaElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
+                  handleCompilationUnitSaved((ICompilationUnit) javaElement);
                 }
               }
               return false;
@@ -123,7 +116,7 @@ public class FormDataAutoUpdater {
         });
       }
       catch (CoreException e) {
-        e.printStackTrace();
+        ScoutSdk.logWarning("could not process resource change event '" + event.getResource() + "'.", e);
       }
     }
   }// end class P_ResourceChangedListener

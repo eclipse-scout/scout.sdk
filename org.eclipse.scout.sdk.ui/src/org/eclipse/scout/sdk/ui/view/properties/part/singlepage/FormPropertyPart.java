@@ -10,7 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
@@ -26,6 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -56,51 +62,80 @@ public class FormPropertyPart extends JdtTypePropertyPart {
   }
 
   protected void fillLinkSection(Composite parent) {
-    String entityName = null;
-    // model
-    LinksPresenterModel model = new LinksPresenterModel();
-    if (getPage().getType() != null) {
-      model.addGlobalLink(new TypeOpenLink(getPage().getType()));
-      entityName = findEntityName(getPage().getType().getElementName());
-    }
-    if (!StringUtility.isNullOrEmpty(entityName)) {
-      // form data
-      IScoutBundle clientBundle = getPage().getScoutResource();
-      IScoutBundle sharedBundle = clientBundle.getScoutProject().getSharedBundle();
-      String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + entityName + ScoutIdeProperties.SUFFIX_FORM_DATA;
-      IType formData = ScoutSdk.getType(formDataName);
-      if (TypeUtility.exists(formData)) {
-        model.addGlobalLink(new TypeOpenLink(formData));
-      }
-      // service
-      String formRegex = "(I)?" + entityName + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE;
-      ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
-          TypeFilters.getRegexSimpleNameFilter(formRegex),
-          TypeFilters.getInScoutProject(clientBundle.getScoutProject())
-          );
-      LinkGroup serviceGroup = model.getOrCreateGroup("Service", 10);
-      for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(iService).getAllSubtypes(iService, formFilter, TypeComparators.getTypeNameComparator())) {
-        serviceGroup.addLink(new TypeOpenLink(candidate));
-      }
-      // permissions
-      String permissionRegex = "(Create|Read|Update)" + entityName + ScoutIdeProperties.SUFFIX_PERMISSION;
-      ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-          TypeFilters.getRegexSimpleNameFilter(permissionRegex),
-          TypeFilters.getClassFilter(),
-          TypeFilters.getInScoutProject(clientBundle.getScoutProject())
-          );
-      LinkGroup permissionGroup = model.getOrCreateGroup("Permissions", 20);
-      for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
-        permissionGroup.addLink(new TypeOpenLink(candidate));
-      }
-
-    }
-
     // ui
-    LinksPresenter presenter = new LinksPresenter(getFormToolkit(), parent, model);
+
+    final LinksPresenter presenter = new LinksPresenter(getFormToolkit(), parent);
     GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     layoutData.widthHint = 200;
     presenter.getContainer().setLayoutData(layoutData);
+    // load lazy
+    final ProgressIndicator indicator = new ProgressIndicator(presenter.getContainer(), SWT.INDETERMINATE | SWT.SMOOTH);
+    indicator.beginAnimatedTask();
+    GridData indicatorData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    indicatorData.horizontalSpan = 2;
+    indicatorData.heightHint = 5;
+    indicator.setLayoutData(indicatorData);
+    Job j = new Job("load links...") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        String entityName = null;
+        LinksPresenterModel model = new LinksPresenterModel();
+        if (getPage().getType() != null) {
+          model.addGlobalLink(new TypeOpenLink(getPage().getType()));
+          entityName = findEntityName(getPage().getType().getElementName());
+        }
+        if (!StringUtility.isNullOrEmpty(entityName)) {
+          // form data
+          IScoutBundle clientBundle = getPage().getScoutResource();
+          IScoutBundle sharedBundle = clientBundle.getScoutProject().getSharedBundle();
+          String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + entityName + ScoutIdeProperties.SUFFIX_FORM_DATA;
+          IType formData = ScoutSdk.getType(formDataName);
+          if (TypeUtility.exists(formData)) {
+            model.addGlobalLink(new TypeOpenLink(formData));
+          }
+          // service
+          String formRegex = "(I)?" + entityName + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE;
+          ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
+              TypeFilters.getRegexSimpleNameFilter(formRegex),
+              TypeFilters.getInScoutProject(clientBundle.getScoutProject())
+              );
+          LinkGroup serviceGroup = model.getOrCreateGroup("Service", 10);
+          for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(iService).getAllSubtypes(iService, formFilter, TypeComparators.getTypeNameComparator())) {
+            serviceGroup.addLink(new TypeOpenLink(candidate));
+          }
+          // permissions
+          String permissionRegex = "(Create|Read|Update)" + entityName + ScoutIdeProperties.SUFFIX_PERMISSION;
+          ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+              TypeFilters.getRegexSimpleNameFilter(permissionRegex),
+              TypeFilters.getClassFilter(),
+              TypeFilters.getInScoutProject(clientBundle.getScoutProject())
+              );
+          LinkGroup permissionGroup = model.getOrCreateGroup("Permissions", 20);
+          for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
+            permissionGroup.addLink(new TypeOpenLink(candidate));
+          }
+        }
+        if (presenter != null && !presenter.isDisposed()) {
+          final LinksPresenterModel finalModel = model;
+          presenter.getContainer().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+              if (presenter != null && !presenter.isDisposed()) {
+                indicator.dispose();
+                presenter.setLinksProperty(finalModel);
+                getForm().updateToolBar();
+                getForm().reflow(true);
+
+              }
+            }
+          });
+        }
+        return Status.OK_STATUS;
+      }
+    };
+    j.setSystem(true);
+    j.schedule();
+
   }
 
   private String findEntityName(String serviceName) {
