@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -88,7 +88,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   public FormNewWizardPage(IScoutBundle clientBundle) {
     super(FormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    setTitle("New Form");
+    setTitle("Form");
     setDefaultMessage("Create a new form.");
     setSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractForm)[0]);
     setCreateFormId(true);

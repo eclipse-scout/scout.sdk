@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.operation.form.formdata;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,6 +44,61 @@ import org.eclipse.text.edits.MultiTextEdit;
  * @since 1.0.8 08.03.2011
  */
 public class FormDataUtility {
+
+  private static HashSet<String> keyWords = new HashSet<String>();
+  static {
+    keyWords.add("abstract");
+    keyWords.add("assert");
+    keyWords.add("boolean");
+    keyWords.add("break");
+    keyWords.add("byte");
+    keyWords.add("case");
+    keyWords.add("catch");
+    keyWords.add("char");
+    keyWords.add("class");
+    keyWords.add("const");
+    keyWords.add("continue");
+    keyWords.add("default");
+    keyWords.add("do");
+    keyWords.add("double");
+    keyWords.add("else");
+    keyWords.add("enum");
+    keyWords.add("extends");
+    keyWords.add("final");
+    keyWords.add("finally");
+    keyWords.add("float");
+    keyWords.add("for");
+    keyWords.add("goto");
+    keyWords.add("if");
+    keyWords.add("implements");
+    keyWords.add("import");
+    keyWords.add("instanceof");
+    keyWords.add("int");
+    keyWords.add("interface");
+    keyWords.add("long");
+    keyWords.add("native");
+    keyWords.add("new");
+    keyWords.add("package");
+    keyWords.add("private");
+    keyWords.add("protected");
+    keyWords.add("public");
+    keyWords.add("return");
+    keyWords.add("short");
+    keyWords.add("static");
+    keyWords.add("strictfp");
+    keyWords.add("super");
+    keyWords.add("switch");
+    keyWords.add("synchronized");
+    keyWords.add("this");
+    keyWords.add("throw");
+    keyWords.add("throws");
+    keyWords.add("transient");
+    keyWords.add("try");
+    keyWords.add("void");
+    keyWords.add("volatile");
+    keyWords.add("while");
+
+  }
 
   public static ITypeSourceBuilder getPrimaryTypeFormDataSourceBuilder(String superTypeSignature, IType formField, ITypeHierarchy hierarchy) {
     ITypeSourceBuilder builder = null;
@@ -150,8 +206,7 @@ public class FormDataUtility {
   }
 
   public static String getValidMethodParameterName(String parameterName) {
-    String param = Signature.createTypeSignature(parameterName, true);
-    if (Signature.getTypeSignatureKind(param) == Signature.BASE_TYPE_SIGNATURE) {
+    if (keyWords.contains(parameterName.toLowerCase())) {
       return parameterName + "Value";
     }
     return parameterName;

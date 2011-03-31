@@ -68,6 +68,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode m_locationPageRoot;
 
   public FormNewWizard(IScoutBundle clientBundle) {
+    setWindowTitle("New Form");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_clientBundle = clientBundle;
     m_formPage = new FormNewWizardPage(getClientBundle());

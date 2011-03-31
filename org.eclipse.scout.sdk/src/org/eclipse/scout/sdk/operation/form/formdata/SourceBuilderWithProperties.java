@@ -44,8 +44,9 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
             if (FormDataAnnotation.isCreate(SdkTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
                 FormDataAnnotation.isCreate(SdkTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
-              String lowerCaseBeanName = FormDataUtility.getBeanName(desc.getBeanName(), false);
-              String upperCaseBeanName = FormDataUtility.getBeanName(desc.getBeanName(), true);
+              String beanName = FormDataUtility.getValidMethodParameterName(desc.getBeanName());
+              String lowerCaseBeanName = FormDataUtility.getBeanName(beanName, false);
+              String upperCaseBeanName = FormDataUtility.getBeanName(beanName, true);
 
               String propName = upperCaseBeanName + "Property";
               String resolvedSignature = ScoutSignature.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());

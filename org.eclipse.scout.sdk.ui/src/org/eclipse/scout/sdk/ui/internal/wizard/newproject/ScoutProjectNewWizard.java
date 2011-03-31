@@ -64,8 +64,6 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
   @Override
   public final boolean performFinish() {
     new P_PerformFinishJob(getContainer().getShell().getDisplay()).schedule();
-//    OperationJob operationJob = new OperationJob(new P_PerformFinishOperation(getContainer().getShell().getDisplay()));
-//    operationJob.schedule();
     return true;
   }
 
@@ -84,39 +82,6 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
   public boolean canFinish() {
     return m_page1.isPageComplete();
   }
-
-  private class P_PerformFinishOperation implements IOperation {
-    private Display m_display;
-    private boolean m_success;
-
-    public P_PerformFinishOperation(Display display) {
-      m_display = display;
-    }
-
-    public boolean isSuccess() {
-      return m_success;
-    }
-
-    public String getOperationName() {
-      return getWindowTitle();
-    }
-
-    @Override
-    public void validate() throws IllegalArgumentException {
-    }
-
-    public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
-      m_success = performFinish(monitor, workingCopyManager);
-      if (m_success) {
-        m_display.asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            BasicNewProjectResourceWizard.updatePerspective(new P_ScoutPerspectiveConfigElement());
-          }
-        });
-      }
-    }
-  } // end class P_PerformFinishOperation
 
   private class P_PerformFinishJob extends Job {
 
@@ -148,7 +113,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
           }
           IProject shared = createProjectOperation.getSharedProject();
           if (shared != null) {
-            template.setScoutProject(ScoutSdk.getDefault().getScoutWorkspace().getScoutBundle(shared).getScoutProject());
+            template.setScoutProject(ScoutSdk.getScoutWorkspace().getScoutBundle(shared).getScoutProject());
             OperationJob applyTemplateJob = new OperationJob(new P_ApplyTemplateOperation(template));
 
             scheduleAndWait(applyTemplateJob, 0);

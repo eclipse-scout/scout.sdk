@@ -66,7 +66,7 @@ public class BigdecimalFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdField;
 
   public BigdecimalFieldNewWizardPage(IType declaringType) {
-    super("New Bigdecimal Field");
+    super(BigdecimalFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IBigDecimalField);
     m_superType = ScoutSdk.getType(RuntimeClasses.AbstractBigDecimalField);
@@ -75,7 +75,7 @@ public class BigdecimalFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    setTitle("New BigDecimalField");
+    setTitle("Bigdecimal Field");
     setDefaultMessage("Create a new Bigdecimal field.");
 
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), "Name");

@@ -66,7 +66,7 @@ public class BooleanFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdField;
 
   public BooleanFieldNewWizardPage(IType declaringType) {
-    super("New Boolean Field");
+    super(BooleanFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IBooleanField);
 

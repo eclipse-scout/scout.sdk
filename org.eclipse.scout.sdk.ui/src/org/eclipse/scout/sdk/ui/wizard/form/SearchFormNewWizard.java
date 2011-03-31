@@ -57,6 +57,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode m_locationPageRoot;
 
   public SearchFormNewWizard(IScoutBundle clientBundle) {
+    setWindowTitle("New Search Form");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_clientBundle = clientBundle;
     m_page1 = new SearchFormNewWizardPage(clientBundle);

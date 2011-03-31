@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -55,7 +54,7 @@ public class KeyStrokeNodePage extends AbstractScoutTypePage {
   @Override
   public Action createDeleteAction() {
     IDeleteOperation op = new TypeDeleteOperation(getType());
-    DeleteAction deleteAction = new DeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell(), op);
+    DeleteAction deleteAction = new DeleteAction(getName(), getOutlineView().getSite().getShell(), op);
     deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.KeystrokeRemove));
     return deleteAction;
   }

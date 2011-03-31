@@ -38,7 +38,7 @@ public class DeleteAction extends Action {
   @Override
   public void run() {
     MessageBox box = new MessageBox(m_shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    box.setMessage("Are you sure you want to delete '" + m_name + "'?");
+    box.setMessage(Texts.get("DeleteAction_ensureRequest", m_name));
     if (box.open() == SWT.OK) {
       OperationJob job = new OperationJob(getOperation());
       job.schedule();

@@ -76,6 +76,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
+
     m_projectNameField = getFieldToolkit().createStyledTextField(parent, "Project Name");
     m_projectNameField.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
@@ -131,6 +132,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     });
 
     Control aliasGroup = createAliasGroup(parent);
+    m_projectAliasNameFild.setFocus();
     // layout
     parent.setLayout(new GridLayout(1, true));
 

@@ -27,6 +27,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
@@ -55,7 +56,7 @@ public class FormDeleteAction extends Action {
   private MemberSelectionDialog m_confirmDialog;
 
   public FormDeleteAction(IType formType, Shell shell) {
-    super("Delete Form");
+    super(Texts.get("Action_deleteTypeX", formType.getElementName()));
     m_shell = shell;
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormRemove));
     m_formType = formType;
@@ -63,7 +64,7 @@ public class FormDeleteAction extends Action {
 
   @Override
   public void run() {
-    m_confirmDialog = new MemberSelectionDialog(m_shell, "Delete Form");
+    m_confirmDialog = new MemberSelectionDialog(m_shell, Texts.get("Action_deleteTypeX", getFormType().getElementName()));
     m_confirmDialog.addMemberSelectionListener(new P_SelectionValidationListener());
     List<IMember> members = new ArrayList<IMember>();
     List<IMember> selectedMembers = new ArrayList<IMember>();

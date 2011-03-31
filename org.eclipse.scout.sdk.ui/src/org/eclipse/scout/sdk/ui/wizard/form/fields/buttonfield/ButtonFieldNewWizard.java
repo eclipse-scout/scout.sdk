@@ -19,6 +19,10 @@ public class ButtonFieldNewWizard extends AbstractFormFieldWizard {
 
   private ButtonFieldNewWizardPage m_page1;
 
+  public ButtonFieldNewWizard() {
+    setWindowTitle("New Button Field");
+  }
+
   @Override
   public void initWizard(IType declaringType) {
     super.initWizard(declaringType);

@@ -118,7 +118,7 @@ public class ClientNodePage extends AbstractPage {
       ScoutSdkUi.logWarning("more than one desktop found.");
     }
     else if (desktops.length == 0) {
-      ScoutSdkUi.logWarning("no desktop found.");
+      ScoutSdkUi.logWarning(Texts.get("NoDesktopFound"));
     }
     for (IType desktop : desktops) {
       new DesktopNodePage(this, desktop);

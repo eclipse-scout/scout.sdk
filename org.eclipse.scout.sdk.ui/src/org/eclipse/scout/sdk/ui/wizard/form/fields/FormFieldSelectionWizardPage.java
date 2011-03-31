@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -77,6 +77,9 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   public FormFieldSelectionWizardPage(IType declaringType) {
     super(FormFieldSelectionWizardPage.class.getName());
     m_declaringType = declaringType;
+    setTitle("Form Field");
+    setDefaultMessage("Select a form field super class. \nUse 'show all fields' to get all subclasses of IFormField.");
+
   }
 
   @Override
