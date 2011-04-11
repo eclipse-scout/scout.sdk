@@ -72,7 +72,7 @@ public class ScoutSdk extends Plugin {
     m_typeCache = new TypeCache();
     m_hierarchyCache = new HierarchyCache();
 //    m_structuredTypeCache = new StructuredTypeCache();
-    log(new Status(IStatus.INFO, ScoutSdk.PLUGIN_ID, "Starting SCOUT IDE Plugin."));
+    log(new Status(IStatus.INFO, ScoutSdk.PLUGIN_ID, "Starting SCOUT SDK Plugin."));
     m_javaResourceChangedEmitter = new JavaResourceChangedEmitter(m_hierarchyCache);
 //    new ScoutMarkerSupport();
     m_formDataUpdateSupport = new FormDataAutoUpdater();
