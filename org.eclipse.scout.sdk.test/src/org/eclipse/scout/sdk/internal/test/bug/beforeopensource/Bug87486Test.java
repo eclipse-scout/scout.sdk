@@ -83,7 +83,6 @@ public class Bug87486Test extends AbstractScoutSdkTest {
     ScoutSdk.getScoutWorkspace().getRootProjects();
 
     IType icons = ScoutSdk.getType("a.shared.Icons");
-    Assert.assertNotNull(icons);
     Assert.assertTrue(TypeUtility.exists(icons));
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("a.shared");
     IScoutProject scoutProject = ScoutSdk.getScoutWorkspace().getScoutBundle(project).getScoutProject();

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -91,7 +91,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
   @Test
   public void testGetScoutBundle_ScoutConfigPropertyMethod() throws Exception {
     IType form = ScoutSdk.getType("a.client.form.AForm");
-    Assert.assertNotNull(form);
+    Assert.assertTrue(TypeUtility.exists(form));
 
     IType mainBox = form.getType("MainBox");
     Assert.assertNotNull(mainBox);
