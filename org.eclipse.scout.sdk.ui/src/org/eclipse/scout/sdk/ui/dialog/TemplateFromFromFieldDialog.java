@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -125,7 +124,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name not valid.");
     }
     IScoutBundle bundle = SdkTypeUtility.getScoutBundle(getFormField());
-    if (TypeUtility.exists(ScoutSdk.getType(bundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_TEMPLATE_FORM_FIELD) + "." + getTemplateName()))) {
+    if (ScoutSdk.existsType(bundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_TEMPLATE_FORM_FIELD) + "." + getTemplateName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Template already exists.");
     }
     return Status.OK_STATUS;

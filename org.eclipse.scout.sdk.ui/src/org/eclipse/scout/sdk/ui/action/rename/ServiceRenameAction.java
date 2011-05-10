@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,13 +38,13 @@ public class ServiceRenameAction extends AbstractRenameAction {
     }
     if (m_serviceImplementation != null) {
       String packName = m_serviceImplementation.getPackageFragment().getElementName();
-      if (ScoutSdk.getType(packName + "." + newName) != null) {
+      if (ScoutSdk.existsType(packName + "." + newName)) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
       }
     }
     if (m_serviceInterface != null) {
       String packName = m_serviceInterface.getPackageFragment().getElementName();
-      if (ScoutSdk.getType(packName + ".I" + newName) != null) {
+      if (ScoutSdk.existsType(packName + ".I" + newName)) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
       }
     }

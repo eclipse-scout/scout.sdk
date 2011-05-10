@@ -248,16 +248,4 @@ public class NewBsiCaseGroupStep1Operation implements IOperation {
     return m_uiSwtProject;
   }
 
-  public IProject getUiSwtAppProject() {
-    return m_uiSwtAppProject;
-  }
-
-  public IProject getTargetProject() {
-    return m_targetProject;
-  }
-
-  public IProject getProjectSetProject() {
-    return m_projectSetProject;
-  }
-
 }

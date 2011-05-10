@@ -190,6 +190,10 @@ public class ScoutSdk extends Plugin {
     return getDefault().getTypeCache().getType(fullyQualifiedName);
   }
 
+  public static boolean existsType(String fullyQualifiedName) {
+    return getDefault().getTypeCache().existsType(fullyQualifiedName);
+  }
+
   public static IType getTypeBySignature(String signature) {
     signature = Signature.getTypeErasure(signature);
     int arrayCount = Signature.getArrayCount(signature);

@@ -128,9 +128,9 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
     serviceOp.setClientServiceRegistryBundles(new IScoutBundle[]{getScoutProject().getClientBundle()});
     serviceOp.setServerServiceRegistryBundles(new IScoutBundle[]{getScoutProject().getServerBundle()});
     serviceOp.setServiceImplementationBundle(getScoutProject().getServerBundle());
-    serviceOp.setServiceImplementationName("DesktopFormService");
+    serviceOp.setServiceImplementationName("DesktopProcessService");
     serviceOp.setServiceInterfaceBundle(sharedBundle);
-    serviceOp.setServiceInterfaceName("IDesktopFormService");
+    serviceOp.setServiceInterfaceName("IDesktopProcessService");
     serviceOp.run(monitor, workingCopyManager);
     final IType serviceInterface = serviceOp.getCreatedServiceInterface();
 

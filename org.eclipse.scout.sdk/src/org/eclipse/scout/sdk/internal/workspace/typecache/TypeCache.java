@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  *
@@ -67,8 +68,23 @@ public class TypeCache {
           m_cache.put(fullyQualifiedName, type);
         }
       }
+      else {
+        new Exception().printStackTrace();
+        ScoutSdk.logError("could not resolve type '" + fullyQualifiedName + "'.");
+      }
     }
     return type;
+  }
+
+  public boolean existsType(String fullyQualifiedName) {
+    IType type = null;
+    try {
+      type = resolveType(fullyQualifiedName);
+    }
+    catch (CoreException e) {
+      ScoutSdk.logError("error during resolving type '" + fullyQualifiedName + "'.", e);
+    }
+    return TypeUtility.exists(type);
   }
 
   private IType resolveType(final String fqn) throws CoreException {
@@ -104,7 +120,6 @@ public class TypeCache {
       ScoutSdk.logWarning("found more than one type matches for '" + fqn + "' (matches: '" + matchList.size() + "').");
     }
     else if (matchList.size() < 1) {
-      ScoutSdk.logWarning("found no type matches for '" + fqn + "'.");
       return null;
     }
     return matchList.firstEntry().getValue();

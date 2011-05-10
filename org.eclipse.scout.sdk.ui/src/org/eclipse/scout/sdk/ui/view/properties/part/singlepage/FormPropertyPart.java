@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -89,9 +88,8 @@ public class FormPropertyPart extends JdtTypePropertyPart {
           IScoutBundle clientBundle = getPage().getScoutResource();
           IScoutBundle sharedBundle = clientBundle.getScoutProject().getSharedBundle();
           String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + entityName + ScoutIdeProperties.SUFFIX_FORM_DATA;
-          IType formData = ScoutSdk.getType(formDataName);
-          if (TypeUtility.exists(formData)) {
-            model.addGlobalLink(new TypeOpenLink(formData));
+          if (ScoutSdk.existsType(formDataName)) {
+            model.addGlobalLink(new TypeOpenLink(ScoutSdk.getType(formDataName)));
           }
           // service
           String formRegex = "(I)?" + entityName + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE;

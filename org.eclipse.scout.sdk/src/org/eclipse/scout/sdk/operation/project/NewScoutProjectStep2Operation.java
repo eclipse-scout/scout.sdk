@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -74,10 +74,6 @@ public class NewScoutProjectStep2Operation implements IOperation {
       if (m_step1.getUiSwtProject() != null) {
         new FillUiSwtPluginOperation(m_step1.getUiSwtProject(), m_templateBindings).run(monitor, workingCopyManager);
         projects.add(m_step1.getUiSwtProject());
-      }
-      if (m_step1.getUiSwtAppProject() != null) {
-        new FillUiSwtApplicationPluginOperation(m_step1.getUiSwtAppProject(), m_templateBindings).run(monitor, workingCopyManager);
-        projects.add(m_step1.getUiSwtAppProject());
       }
     }
     finally {

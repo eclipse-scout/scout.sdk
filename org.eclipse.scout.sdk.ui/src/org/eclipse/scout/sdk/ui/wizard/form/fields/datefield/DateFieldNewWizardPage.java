@@ -37,9 +37,9 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -61,15 +61,12 @@ public class DateFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
   public DateFieldNewWizardPage(IType declaringType) {
     super(DateFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
-    m_definitionType = ScoutSdk.getType(RuntimeClasses.IDateField);
-
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractDateField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

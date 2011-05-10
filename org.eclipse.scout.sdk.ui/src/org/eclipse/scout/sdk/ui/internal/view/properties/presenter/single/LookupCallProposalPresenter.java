@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -46,23 +46,29 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
       final IType lookupCall = getCurrentSourceValue().getJavaClass();
       if (lookupCall != null) {
         String entityName = NamingUtility.removeSuffixes(lookupCall.getElementName(), "Call");
-        final IType lookupServiceInterface = ScoutSdk.getType(lookupCall.getPackageFragment().getElementName() + ".I" + entityName + "Service");
-        if (lookupServiceInterface != null) {
-          manager.add(new Action("Go to " + lookupServiceInterface.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
-            @Override
-            public void run() {
-              showJavaElementInEditor(lookupServiceInterface);
-            }
-          });
+        String lookupServiceFqn = lookupCall.getPackageFragment().getElementName() + ".I" + entityName + "Service";
+        if (ScoutSdk.existsType(lookupServiceFqn)) {
+          final IType lookupServiceInterface = ScoutSdk.getType(lookupServiceFqn);
+          if (lookupServiceInterface != null) {
+            manager.add(new Action("Go to " + lookupServiceInterface.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
+              @Override
+              public void run() {
+                showJavaElementInEditor(lookupServiceInterface);
+              }
+            });
+          }
         }
-        final IType lookupServiceImplementation = ScoutSdk.getType(lookupCall.getPackageFragment().getElementName().replace(".shared.", ".server.") + "." + entityName + "Service");
-        if (lookupServiceImplementation != null) {
-          manager.add(new Action("Go to " + lookupServiceImplementation.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
-            @Override
-            public void run() {
-              showJavaElementInEditor(lookupServiceImplementation);
-            }
-          });
+        String serviceFqn = lookupCall.getPackageFragment().getElementName().replace(".shared.", ".server.") + "." + entityName + "Service";
+        if (ScoutSdk.existsType(serviceFqn)) {
+          final IType lookupServiceImplementation = ScoutSdk.getType(serviceFqn);
+          if (lookupServiceImplementation != null) {
+            manager.add(new Action("Go to " + lookupServiceImplementation.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
+              @Override
+              public void run() {
+                showJavaElementInEditor(lookupServiceImplementation);
+              }
+            });
+          }
         }
       }
     }

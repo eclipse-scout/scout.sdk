@@ -13,7 +13,11 @@ package org.eclipse.scout.sdk.internal.workspace.typecache;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
@@ -158,7 +162,40 @@ public final class HierarchyCache {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logError("could not handle type('" + icu.getElementName() + "') change in hierarchies.");
+      ScoutSdk.logError("could not handle icu removed ('" + icu.getElementName() + "') change in hierarchies.");
+    }
+  }
+
+  private void handleCompilationUnitAdded(ICompilationUnit icu) {
+    try {
+      // get types
+      IType[] types = icu.getTypes();
+      if (types != null && types.length > 0) {
+        for (IType t : types) {
+          recHandleTypeAdded(t);
+        }
+      }
+
+    }
+    catch (Exception e) {
+      ScoutSdk.logError("could not handle icu added ('" + icu.getElementName() + "') change in hierarchies.");
+    }
+  }
+
+  private void recHandleTypeAdded(IType type) {
+    try {
+      if (TypeUtility.exists(type)) {
+        handleTypeChange(type, type.newSupertypeHierarchy(new NullProgressMonitor()));
+        IType[] innerTypes = type.getTypes();
+        if (innerTypes != null) {
+          for (IType t : innerTypes) {
+            recHandleTypeAdded(t);
+          }
+        }
+      }
+    }
+    catch (Exception e) {
+      ScoutSdk.logError("could not handle type added ('" + type.getElementName() + "') in hierarchies.");
     }
   }
 
@@ -196,6 +233,7 @@ public final class HierarchyCache {
   public void elementChanged(JdtEvent e) {
     switch (e.getEventType()) {
       case IJavaElementDelta.ADDED:
+//        m_asyncLog.append(e.getElement());
       case IJavaElementDelta.CHANGED: {
         if (e.getElementType() == IJavaElement.TYPE && e.getDeclaringType() == null) {
           handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
@@ -216,6 +254,50 @@ public final class HierarchyCache {
           handleCompilationUnitChagnedExternal((ICompilationUnit) e.getElement());
         }
         break;
+    }
+  }
+
+  private P_AsyncLog m_asyncLog = new P_AsyncLog();
+
+  private class P_AsyncLog extends Job {
+    private ArrayList<IJavaElement> m_elements = new ArrayList<IJavaElement>();
+
+    public P_AsyncLog() {
+      super("");
+    }
+
+    public void append(IJavaElement e) {
+      m_elements.add(e);
+      cancel();
+      schedule(3000);
+    }
+
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      IJavaElement[] arr = null;
+      synchronized (m_elements) {
+        arr = m_elements.toArray(new IJavaElement[m_elements.size()]);
+        m_elements.clear();
+      }
+      if (arr != null) {
+        for (IJavaElement e : arr) {
+          String elementType = null;
+          switch (e.getElementType()) {
+            case IJavaElement.TYPE:
+              elementType = "type";
+              break;
+            case IJavaElement.COMPILATION_UNIT:
+              elementType = "icu";
+              break;
+
+            default:
+              elementType = "unknown";
+              break;
+          }
+          System.out.println("CHANGED " + elementType + ": " + e.getElementName());
+        }
+      }
+      return Status.OK_STATUS;
     }
   }
 

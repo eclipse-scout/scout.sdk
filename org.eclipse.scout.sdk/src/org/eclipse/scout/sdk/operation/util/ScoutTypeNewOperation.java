@@ -81,6 +81,7 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
       }
     }
     m_createdType = icu.createType(content, null, true, monitor);
+    workingCopyManager.reconcile(icu, monitor);
   }
 
   public IScoutBundle getScoutBundle() {

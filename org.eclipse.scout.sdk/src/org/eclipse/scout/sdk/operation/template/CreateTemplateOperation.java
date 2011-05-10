@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.operation.template;
 
 import java.util.HashMap;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -52,10 +52,10 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
@@ -99,7 +99,7 @@ public class CreateTemplateOperation implements IOperation {
     if (!TypeUtility.exists(getFormField())) {
       throw new IllegalArgumentException("Form field to create template of must exist.");
     }
-    if (TypeUtility.exists(ScoutSdk.getType(getPackageName() + "." + getTemplateName()))) {
+    if (ScoutSdk.existsType(getPackageName() + "." + getTemplateName())) {
       throw new IllegalArgumentException("Template already exists.");
     }
   }

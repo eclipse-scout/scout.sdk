@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 public class ModifyHandlerCreateMethodsOperation implements IOperation {
@@ -46,19 +47,6 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
     if (getServiceInterface() == null) {
       throw new IllegalArgumentException("Service interface can not be null.");
     }
-    if (isCreateExecLoad()) {
-      if (getUpdatePermission() == null) {
-        throw new IllegalArgumentException("Update Permission can not be null.");
-      }
-      if (!TypeUtility.exists(TypeUtility.getMethod(getServiceInterface(), "load"))) {
-        throw new IllegalArgumentException("load method mission in '" + getServiceInterface().getFullyQualifiedName() + "'.");
-      }
-    }
-    if (isCreateExecStore()) {
-      if (!TypeUtility.exists(TypeUtility.getMethod(getServiceInterface(), "store"))) {
-        throw new IllegalArgumentException("store method mission in '" + getServiceInterface().getFullyQualifiedName() + "'.");
-      }
-    }
   }
 
   @Override
@@ -78,9 +66,16 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
       execLoadBuilder.append(TAB + serviceInterfaceName + " service = " + servicesName + ".getService(" + serviceInterfaceName + ".class);\n");
       execLoadBuilder.append(TAB + formDataName + " formData = new " + formDataName + "();\n");
       execLoadBuilder.append(TAB + "exportFormData(formData);\n");
-      execLoadBuilder.append(TAB + "formData = service.load(formData);\n");
+      if (TypeUtility.exists(TypeUtility.getMethod(getServiceInterface(), "load"))) {
+        execLoadBuilder.append(TAB + "formData = service.load(formData);\n");
+      }
+      else {
+        execLoadBuilder.append(TAB + ScoutUtility.getCommentBlock("service call here") + "\n");
+      }
       execLoadBuilder.append(TAB + "importFormData(formData);\n");
-      execLoadBuilder.append(TAB + "setEnabledPermission(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getUpdatePermission().getFullyQualifiedName(), validator) + "());\n");
+      if (getUpdatePermission() != null) {
+        execLoadBuilder.append(TAB + "setEnabledPermission(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getUpdatePermission().getFullyQualifiedName(), validator) + "());\n");
+      }
       execLoadBuilder.append("}");
       getFormHandler().createMethod(execLoadBuilder.toString(), null, true, monitor);
     }
@@ -92,7 +87,12 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
       execStoreBuilder.append(TAB + serviceInterfaceName + " service = " + servicesName + ".getService(" + serviceInterfaceName + ".class);\n");
       execStoreBuilder.append(TAB + formDataName + " formData = new " + formDataName + "();\n");
       execStoreBuilder.append(TAB + "exportFormData(formData);\n");
-      execStoreBuilder.append(TAB + "formData = service.store(formData);\n");
+      if (TypeUtility.exists(TypeUtility.getMethod(getServiceInterface(), "store"))) {
+        execStoreBuilder.append(TAB + "formData = service.store(formData);\n");
+      }
+      else {
+        execStoreBuilder.append(TAB + ScoutUtility.getCommentBlock("service call here") + "\n");
+      }
       execStoreBuilder.append("}");
       getFormHandler().createMethod(execStoreBuilder.toString(), null, true, monitor);
     }

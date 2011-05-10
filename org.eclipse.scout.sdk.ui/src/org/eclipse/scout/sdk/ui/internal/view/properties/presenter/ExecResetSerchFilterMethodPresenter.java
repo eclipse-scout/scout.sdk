@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -76,8 +76,9 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
         String formDataSimpleName = m_formType.getElementName().replaceAll(ScoutIdeProperties.SUFFIX_FORM + "$", ScoutIdeProperties.SUFFIX_FORM_DATA);
         IScoutBundle clientBundle = SdkTypeUtility.getScoutBundle(getDeclaringType());
         for (IScoutBundle shared : clientBundle.getRequiredBundles(ScoutBundleFilters.getSharedFilter(), false)) {
-          m_formDataType = ScoutSdk.getType(shared.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + formDataSimpleName);
-          if (m_formDataType != null) {
+          String formDataFqn = shared.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + formDataSimpleName;
+          if (ScoutSdk.existsType(formDataFqn)) {
+            m_formDataType = ScoutSdk.getType(formDataFqn);
             break;
           }
         }
