@@ -24,7 +24,9 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.listener.ElementChangedListenerEx;
 import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
+import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.OperationAction;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.TablePageChildPageTablePage;
@@ -116,6 +118,8 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
       linkWizard.setHolderType(getType());
       linkWizard.setHolderEnabled(false);
       manager.add(new WizardAction("Add Page...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
+      manager.add(new Separator());
+      manager.add(new OperationAction("Wellform Page...", null, new WellformScoutTypeOperation(getType(), true)));
     }
 
     manager.add(new Separator());
