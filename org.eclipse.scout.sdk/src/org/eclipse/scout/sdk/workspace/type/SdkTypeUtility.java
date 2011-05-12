@@ -745,6 +745,9 @@ public class SdkTypeUtility {
       else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ITreeField))) {
         return createStructuredTreeField(type);
       }
+      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IPlannerField))) {
+        return createStructuredPlannerField(type);
+      }
       else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IComposerField))) {
         return createStructuredComposer(type);
       }
@@ -1240,6 +1243,25 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_LOCAL_BEAN,
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_TREE,
+          CATEGORIES.TYPE_UNCATEGORIZED
+          );
+    return new StructuredType(type, enabled);
+  }
+
+  public static IStructuredType createStructuredPlannerField(IType type) {
+    EnumSet<CATEGORIES> enabled = EnumSet.of(
+          CATEGORIES.FIELD_LOGGER,
+          CATEGORIES.FIELD_STATIC,
+          CATEGORIES.FIELD_MEMBER,
+          CATEGORIES.FIELD_UNKNOWN,
+          CATEGORIES.METHOD_CONSTRUCTOR,
+          CATEGORIES.METHOD_CONFIG_PROPERTY,
+          CATEGORIES.METHOD_CONFIG_EXEC,
+          CATEGORIES.METHOD_OVERRIDDEN,
+          CATEGORIES.METHOD_LOCAL_BEAN,
+          CATEGORIES.METHOD_UNCATEGORIZED,
+          CATEGORIES.TYPE_TABLE,
+          CATEGORIES.TYPE_ACTIVITY_MAP,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
     return new StructuredType(type, enabled);
