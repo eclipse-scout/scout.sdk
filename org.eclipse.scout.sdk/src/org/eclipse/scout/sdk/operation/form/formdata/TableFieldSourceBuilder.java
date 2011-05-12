@@ -105,64 +105,65 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       }
 
     }
-    // gobal getter
-    MethodSourceBuilder globalGetter = new MethodSourceBuilder() {
-      @Override
-      protected String createMethodBody(IImportValidator validator) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("  switch(column){\n");
-        for (int i = 0; i < columns.length; i++) {
-          builder.append("    case " + i + ":\n return get");
-          builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
-          builder.append("(row);\n");
-        }
-        builder.append("    default: return null;\n");
-        builder.append("  }");
-        return builder.toString();
-      }
-    };
-    globalGetter.setElementName("getValueAt");
-    globalGetter.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
-    globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
-    globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
-    globalGetter.setReturnSignature(Signature.createTypeSignature(Object.class.getName(), true));
-    addBuilder(globalGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, globalGetter.getElementName(), globalGetter));
-
-    // gobal setter
-    MethodSourceBuilder globalSetter = new MethodSourceBuilder() {
-      @Override
-      protected String createMethodBody(IImportValidator validator) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("  switch(column){\n");
-        for (int i = 0; i < columns.length; i++) {
-          builder.append("    case " + i + ": set");
-          builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
-          builder.append("(row,");
-          if (!colunmSignatures[i].equals("Ljava.lang.Object;")) {
-            String simpleRef = ScoutSdkUtility.getSimpleTypeRefName(colunmSignatures[i], validator);
-            builder.append("(" + simpleRef + ") ");
+    if (columns.length > 0) {
+      // gobal getter
+      MethodSourceBuilder globalGetter = new MethodSourceBuilder() {
+        @Override
+        protected String createMethodBody(IImportValidator validator) {
+          StringBuilder builder = new StringBuilder();
+          builder.append("  switch(column){\n");
+          for (int i = 0; i < columns.length; i++) {
+            builder.append("    case " + i + ":\n return get");
+            builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
+            builder.append("(row);\n");
           }
-          builder.append("value); break;\n");
+          builder.append("    default: return null;\n");
+          builder.append("  }");
+          return builder.toString();
         }
-        builder.append("  }");
-        return builder.toString();
-      }
-    };
-    globalSetter.setElementName("setValueAt");
-    globalSetter.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
-    globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
-    globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
-    globalSetter.addParameter(new MethodParameter(Signature.createTypeSignature(Object.class.getName(), true), "value"));
-    addBuilder(globalSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, globalSetter.getElementName(), globalSetter));
+      };
+      globalGetter.setElementName("getValueAt");
+      globalGetter.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
+      globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
+      globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
+      globalGetter.setReturnSignature(Signature.createTypeSignature(Object.class.getName(), true));
+      addBuilder(globalGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, globalGetter.getElementName(), globalGetter));
 
-    // column count
-    MethodSourceBuilder columnCount = new MethodSourceBuilder();
-    columnCount.setElementName("getColumnCount");
-    columnCount.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
-    columnCount.setReturnSignature(Signature.SIG_INT);
-    columnCount.setSimpleBody("return " + columns.length + ";");
-    addBuilder(columnCount, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, columnCount.getElementName(), columnCount));
+      // gobal setter
+      MethodSourceBuilder globalSetter = new MethodSourceBuilder() {
+        @Override
+        protected String createMethodBody(IImportValidator validator) {
+          StringBuilder builder = new StringBuilder();
+          builder.append("  switch(column){\n");
+          for (int i = 0; i < columns.length; i++) {
+            builder.append("    case " + i + ": set");
+            builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
+            builder.append("(row,");
+            if (!colunmSignatures[i].equals("Ljava.lang.Object;")) {
+              String simpleRef = ScoutSdkUtility.getSimpleTypeRefName(colunmSignatures[i], validator);
+              builder.append("(" + simpleRef + ") ");
+            }
+            builder.append("value); break;\n");
+          }
+          builder.append("  }");
+          return builder.toString();
+        }
+      };
+      globalSetter.setElementName("setValueAt");
+      globalSetter.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
+      globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
+      globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
+      globalSetter.addParameter(new MethodParameter(Signature.createTypeSignature(Object.class.getName(), true), "value"));
+      addBuilder(globalSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, globalSetter.getElementName(), globalSetter));
 
+      // column count
+      MethodSourceBuilder columnCount = new MethodSourceBuilder();
+      columnCount.setElementName("getColumnCount");
+      columnCount.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
+      columnCount.setReturnSignature(Signature.SIG_INT);
+      columnCount.setSimpleBody("return " + columns.length + ";");
+      addBuilder(columnCount, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, columnCount.getElementName(), columnCount));
+    }
   }
 
   private String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws JavaModelException {

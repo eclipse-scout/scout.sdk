@@ -49,7 +49,6 @@ public class SimpleImportValidator implements IImportValidator {
       }
       else {
         m_newImports.put(plainSimpleName, pckName);
-        System.out.println(pckName);
         return prefix + simpleName;
       }
     }
