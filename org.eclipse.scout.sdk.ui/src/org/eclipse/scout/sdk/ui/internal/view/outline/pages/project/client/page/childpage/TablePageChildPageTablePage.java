@@ -114,7 +114,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
       PageLinkWizard linkWizard = new PageLinkWizard(getScoutResource());
       linkWizard.setHolderType(getTablePageType());
       linkWizard.setHolderEnabled(false);
-      manager.add(new WizardAction("Add Page", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
+      manager.add(new WizardAction("Add Page...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
     }
   }
 
