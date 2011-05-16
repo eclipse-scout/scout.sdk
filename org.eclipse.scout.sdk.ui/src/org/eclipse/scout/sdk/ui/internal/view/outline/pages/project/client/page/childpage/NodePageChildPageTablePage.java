@@ -115,7 +115,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
     PageLinkWizard linkWizard = new PageLinkWizard(getScoutResource());
     linkWizard.setHolderType(getNodePageType());
     linkWizard.setHolderEnabled(false);
-    manager.add(new WizardAction("Add Page", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
+    manager.add(new WizardAction("Add Page...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
     // TODO LINK Action
     // manager.add(new ProcessAction("Add Page", SDEUI.getImageDescriptor(SDEUI.IMG_TOOL_ADD),
     // new LinkChildPageOfPageWithNodesProcess(getBsiCaseProjectGroup(), getNodePageType())));
