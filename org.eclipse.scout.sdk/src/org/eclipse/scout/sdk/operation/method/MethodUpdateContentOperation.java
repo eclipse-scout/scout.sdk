@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -89,7 +89,7 @@ public class MethodUpdateContentOperation implements IOperation {
         Document methodBodyDocument = new Document(icu.getBuffer().getText(contentRange.getOffset(), contentRange.getLength()));
         int initialLenght = methodBodyDocument.getLength();
         updateMethodBody(methodBodyDocument, validator);
-        int divLength = initialLenght - methodBodyDocument.getLength();
+        int divLength = methodBodyDocument.getLength() - initialLenght;
         Document doc = new Document(icu.getSource());
         ReplaceEdit redit = new ReplaceEdit(contentRange.getOffset(), contentRange.getLength(), methodBodyDocument.get());
         redit.apply(doc);
@@ -98,7 +98,6 @@ public class MethodUpdateContentOperation implements IOperation {
           ISourceRange methodSourceRange = getMethod().getSourceRange();
           int offset = methodSourceRange.getOffset();
           int length = methodSourceRange.getLength() + divLength;
-//          JavaElementFormatOperation sourceFormatOp = new JavaElementFormatOperation(getMethod(), false);
           SourceFormatOperation sourceFormatOp = new SourceFormatOperation(getMethod().getJavaProject(), doc,
               new SourceRange(offset, length));
           sourceFormatOp.run(monitor, workingCopyManager);
@@ -124,7 +123,7 @@ public class MethodUpdateContentOperation implements IOperation {
    * @see {@link MethodUpdateContentOperation#createMethodBody(IImportValidator)}
    */
   protected void updateMethodBody(Document methodBody, IImportValidator validator) throws CoreException {
-    ReplaceEdit edit = new ReplaceEdit(0, methodBody.getLength(), createMethodBody(validator));
+    ReplaceEdit edit = new ReplaceEdit(0, methodBody.getLength(), createMethodBody(methodBody.get(), validator));
     try {
       edit.apply(methodBody);
     }
@@ -138,12 +137,13 @@ public class MethodUpdateContentOperation implements IOperation {
    * Use {@link ScoutSdkUtility#getSimpleTypeRefName(String, IImportValidator)} to determ class references (fully
    * qualified vs. simple name).
    * 
+   * @param originalBody
    * @param validator
    *          validator can be used to determ class references (fully qualified vs. simple name).
    * @return
    * @throws JavaModelException
    */
-  protected String createMethodBody(@SuppressWarnings("unused") IImportValidator validator) throws JavaModelException {
+  protected String createMethodBody(String originalBody, @SuppressWarnings("unused") IImportValidator validator) throws JavaModelException {
     StringBuilder builder = new StringBuilder();
     if (!StringUtility.isNullOrEmpty(getSimpleBody())) {
       builder.append(getSimpleBody());

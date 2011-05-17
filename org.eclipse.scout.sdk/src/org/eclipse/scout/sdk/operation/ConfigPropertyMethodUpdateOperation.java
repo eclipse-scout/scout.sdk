@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -76,7 +76,7 @@ public class ConfigPropertyMethodUpdateOperation implements IOperation {
     if (TypeUtility.exists(method)) {
       MethodUpdateContentOperation op = new MethodUpdateContentOperation(method) {
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+        protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
           return ConfigPropertyMethodUpdateOperation.this.createMethodBody(getMethod(), validator);
         }
       };

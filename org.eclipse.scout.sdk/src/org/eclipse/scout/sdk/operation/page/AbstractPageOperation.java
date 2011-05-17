@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -115,26 +115,15 @@ public abstract class AbstractPageOperation implements IOperation {
     if (TypeUtility.exists(childPagesMethod)) {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(childPagesMethod) {
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String methodSource = getMethod().getSource();
-          Matcher matcher = Pattern.compile("\\}\\s*$", Pattern.MULTILINE).matcher(methodSource);
-          if (matcher.find()) {
-            Document doc = new Document(methodSource);
-            String pageRef = validator.getSimpleTypeRef(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
-            String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
-            InsertEdit edit = new InsertEdit(matcher.start(), pageRef + " " + varName + " = new " + pageRef + "();\n" + ScoutIdeProperties.TAB + "pageList.add(" + varName + ");\n");
-            try {
-              edit.apply(doc);
-              return doc.get();
-            }
-            catch (Exception e) {
-              ScoutSdk.logError("Could not update content of '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
-              return methodSource;
-            }
-          }
-          return methodSource;
+        protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
+          StringBuilder sourceBuilder = new StringBuilder(originalBody);
+          String pageRef = validator.getSimpleTypeRef(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
+          String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
+          sourceBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + ScoutIdeProperties.TAB + "pageList.add(" + varName + ");\n");
+          return sourceBuilder.toString();
         }
       };
+      updateContentOp.setFormatSource(true);
       updateContentOp.validate();
       updateContentOp.run(monitor, workingCopyManager);
     }
@@ -162,7 +151,7 @@ public abstract class AbstractPageOperation implements IOperation {
     if (TypeUtility.exists(childPagesMethod)) {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(childPagesMethod) {
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+        protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
           StringBuilder b = new StringBuilder();
           String pageRef = validator.getSimpleTypeRef(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
           b.append(pageRef + " childPage=new " + pageRef + "();\n");
@@ -171,6 +160,7 @@ public abstract class AbstractPageOperation implements IOperation {
           return b.toString();
         }
       };
+      updateContentOp.setFormatSource(true);
       updateContentOp.validate();
       updateContentOp.run(monitor, workingCopyManager);
     }
