@@ -83,9 +83,9 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
  * @since 1.0.8 19.07.2010
  */
 public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart {
-  private static final String SECTION_ID_FILTER = "section.filter";
-  private static final String SECTION_ID_PROPERTIES = "section.properties";
-  private static final String SECTION_ID_OPERATIONS = "section.operations";
+  protected static final String SECTION_ID_FILTER = "section.filter";
+  protected static final String SECTION_ID_PROPERTIES = "section.properties";
+  protected static final String SECTION_ID_OPERATIONS = "section.operations";
 
   private IJavaResourceChangedListener m_methodChangedListener;
   private ConfigPropertyType m_configPropertyType;
@@ -167,7 +167,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     m_configPropertyType = new ConfigPropertyType(getPage().getType());
     ConfigurationMethod[] configPropertyMethods = m_configPropertyType.getConfigurationMethods(ConfigurationMethod.PROPERTY_METHOD);
     if (configPropertyMethods != null && configPropertyMethods.length > 0) {
-      ISection configPropertiesSection = createSection(SECTION_ID_PROPERTIES, "properties");
+      ISection configPropertiesSection = createSection(SECTION_ID_PROPERTIES, "Properties");
       for (ConfigurationMethod m : configPropertyMethods) {
         AbstractMethodPresenter presenter = null;
         presenter = createConfigMethodPresenter(configPropertiesSection.getSectionClient(), m);
@@ -202,7 +202,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   }
 
   @Override
-  public void cleanup() {
+  protected void cleanup() {
     if (m_methodChangedListener != null) {
       ScoutSdk.removeJavaResouceChangedListener(m_methodChangedListener);
 //      JavaCore.removeElementChangedListener(m_methodChangedListener);

@@ -42,6 +42,7 @@ import org.eclipse.jface.internal.text.html.HTMLPrinter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -80,7 +81,10 @@ public class JavadocTooltip extends AbstractTooltip {
 
   public void setMember(IMember member) {
     m_member = member;
-    computJavadoc();
+    // TODO aho (uninstall tooltip if null is given)
+    if (TypeUtility.exists(m_member)) {
+      computJavadoc();
+    }
   }
 
   @Override

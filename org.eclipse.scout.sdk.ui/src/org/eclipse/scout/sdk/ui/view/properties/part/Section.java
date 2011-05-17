@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -75,6 +75,7 @@ public class Section implements ISection {
     }
     // layout
     TableWrapDataEx data = new TableWrapDataEx(TableWrapData.FILL_GRAB);
+    data.maxWidth = 260; // to scale presenter fill width properly. 260 = 2 x labelWidth
     m_uiSection.setLayoutData(data);
     Composite sectionClient = toolkit.createComposite(m_uiSection);
     m_uiSection.setClient(sectionClient);

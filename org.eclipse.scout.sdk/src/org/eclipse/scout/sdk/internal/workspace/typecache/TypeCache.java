@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
@@ -46,6 +47,10 @@ public class TypeCache {
   }
 
   public IType getType(String fullyQualifiedName) {
+    if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
+      return null;
+    }
+
     fullyQualifiedName = fullyQualifiedName.replaceAll("\\$", "\\.");
     IType type = null;
     synchronized (m_cacheLock) {
@@ -69,7 +74,6 @@ public class TypeCache {
         }
       }
       else {
-        new Exception().printStackTrace();
         ScoutSdk.logError("could not resolve type '" + fullyQualifiedName + "'.");
       }
     }
@@ -77,24 +81,52 @@ public class TypeCache {
   }
 
   public boolean existsType(String fullyQualifiedName) {
-    IType type = null;
-    try {
-      type = resolveType(fullyQualifiedName);
+    if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
+      return false;
     }
-    catch (CoreException e) {
-      ScoutSdk.logError("error during resolving type '" + fullyQualifiedName + "'.", e);
+
+    fullyQualifiedName = fullyQualifiedName.replaceAll("\\$", "\\.");
+    IType type = null;
+    synchronized (m_cacheLock) {
+      type = m_cache.get(fullyQualifiedName);
+      // keep cache clean
+      if (type != null && !type.exists()) {
+        m_cache.remove(fullyQualifiedName);
+        type = null;
+      }
+    }
+    if (type == null) {
+      try {
+        type = resolveType(fullyQualifiedName);
+      }
+      catch (CoreException e) {
+        ScoutSdk.logError("error during resolving type '" + fullyQualifiedName + "'.", e);
+      }
+      if (type != null) {
+        synchronized (m_cacheLock) {
+          m_cache.put(fullyQualifiedName, type);
+        }
+      }
     }
     return TypeUtility.exists(type);
   }
 
   private IType resolveType(final String fqn) throws CoreException {
+    if (StringUtility.isNullOrEmpty(fqn)) {
+      return null;
+    }
+
     final TreeMap<CompositeLong, IType> matchList = new TreeMap<CompositeLong, IType>();
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
-    String fastPat = fqn;
+    String fastPat = fqn.replaceAll("\\$", "\\.");
     int i = fastPat.lastIndexOf('.');
     if (i >= 0) {
       fastPat = fastPat.substring(i + 1);
     }
+    if (!StringUtility.hasText(fastPat)) {
+      return null;
+    }
+
     new SearchEngine().search(
         SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH),
         new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
