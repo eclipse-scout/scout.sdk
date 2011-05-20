@@ -58,8 +58,9 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode m_locationWizardPageRoot;
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
-    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
+    setWindowTitle("New Process Service");
+    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ProcessServiceNewWizardPage();
     m_serviceNewWizardPage.setServerBundle(serverBundle);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());

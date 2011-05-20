@@ -21,6 +21,7 @@ public class CalendarItemProviderNewWizard extends AbstractFormFieldWizard {
   private CalendarItemProviderNewWizardPage m_page1;
 
   public CalendarItemProviderNewWizard(IType calendarType) {
+    setWindowTitle("New Item Provider");
     initWizard(calendarType);
   }
 

@@ -51,8 +51,9 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public SqlServiceNewWizard(IScoutBundle serverBundle) {
-    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
+    setWindowTitle("New SQL Service");
+    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage("New SQL Service", "create a new sql service.", ScoutSdk.getType(RuntimeClasses.ISqlService), ScoutIdeProperties.SUFFIX_SQL_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);

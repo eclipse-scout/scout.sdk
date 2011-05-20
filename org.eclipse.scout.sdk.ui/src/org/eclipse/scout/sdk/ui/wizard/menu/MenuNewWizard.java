@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,10 @@ public class MenuNewWizard extends AbstractWorkspaceWizard {
 
   private MenuNewWizardPage m_page1;
   private IType m_declaringType;
+
+  public MenuNewWizard() {
+    setWindowTitle("New Menu");
+  }
 
   public void initWizard(IType declaringType) {
     m_declaringType = declaringType;

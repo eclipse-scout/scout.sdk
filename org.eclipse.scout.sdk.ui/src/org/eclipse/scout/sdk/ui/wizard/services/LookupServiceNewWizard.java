@@ -54,6 +54,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public LookupServiceNewWizard(IScoutBundle serverBundle) {
+    setWindowTitle("New Lookup Service");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
     m_serviceNewWizardPage = new ServiceNewWizardPage("New Lookup Service", "create a new lookup service.", ScoutSdk.getType(RuntimeClasses.ILookupService), ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);

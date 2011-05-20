@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ public class CodeTypeNewWizard extends AbstractWorkspaceWizard {
   private final IScoutBundle m_sharedBundle;
 
   public CodeTypeNewWizard(IScoutBundle sharedBundle) {
+    setWindowTitle("New Code Type");
     m_sharedBundle = sharedBundle;
     m_page1 = new CodeTypeNewWizardPage(getSharedBundle());
     addPage(m_page1);

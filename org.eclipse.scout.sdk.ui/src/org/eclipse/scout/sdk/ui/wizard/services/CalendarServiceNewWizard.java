@@ -54,6 +54,7 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public CalendarServiceNewWizard(IScoutBundle serverBundle) {
+    setWindowTitle("New Calendar Service");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
     m_serviceNewWizardPage = new ServiceNewWizardPage("New Calendar Service", "create a new calendar service.", ScoutSdk.getType(RuntimeClasses.ICalendarService), ScoutIdeProperties.SUFFIX_CALENDAR_SERVICE);

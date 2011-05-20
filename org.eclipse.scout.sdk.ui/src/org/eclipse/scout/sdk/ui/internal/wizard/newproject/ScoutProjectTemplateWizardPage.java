@@ -75,12 +75,13 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
     elements.add(new EmptyTemplateOperation());
     OutlineTemplateOperation outlineTemplate = new OutlineTemplateOperation();
     elements.add(outlineTemplate);
-    elements.add(new SingleFormTemplateOperation());
+    SingleFormTemplateOperation singleFormTemplate = new SingleFormTemplateOperation();
+    elements.add(singleFormTemplate);
     P_ContentProvider provider = new P_ContentProvider(elements.toArray(new IScoutProjectTemplateOperation[elements.size()]));
     m_table.getViewer().setLabelProvider(provider);
     m_table.getViewer().setContentProvider(provider);
     m_table.getViewer().setInput(provider);
-    m_table.getViewer().setSelection(new StructuredSelection(outlineTemplate));
+    m_table.getViewer().setSelection(new StructuredSelection(singleFormTemplate));
     m_descriptionLabel = new Label(parent, SWT.SHADOW_ETCHED_IN | SWT.WRAP);
     m_descriptionLabel.setText(outlineTemplate.getDescription());
 

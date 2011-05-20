@@ -117,12 +117,6 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
     wellformFormOp.validate();
     wellformFormOp.run(monitor, workingCopyManager);
 
-//    // formdata
-//    FormDataUpdateOperation formDataOp = new FormDataUpdateOperation(form, sharedBundle);
-//    formDataOp.validate();
-//    formDataOp.run(monitor, workingCopyManager);
-//    final IType formData = formDataOp.getFormDataType();
-
     // process service
     ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation();
     serviceOp.setClientServiceRegistryBundles(new IScoutBundle[]{getScoutProject().getClientBundle()});

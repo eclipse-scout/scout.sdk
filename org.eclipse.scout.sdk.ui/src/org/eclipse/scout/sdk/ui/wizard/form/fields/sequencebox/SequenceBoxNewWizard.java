@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,15 +21,19 @@ import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 
 public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
 
   private SequenceBoxNewWizardPage m_page1;
   private SequenceBoxTemplateWizardPage m_templatePage;
   private SequenceBoxNewOperation m_operation;
+
+  public SequenceBoxNewWizard() {
+    setWindowTitle("New Sequence Box");
+  }
 
   @Override
   public void initWizard(IType declaringType) {

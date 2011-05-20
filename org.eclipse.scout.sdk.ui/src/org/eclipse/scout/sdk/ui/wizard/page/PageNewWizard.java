@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,6 +28,7 @@ public class PageNewWizard extends AbstractWorkspaceWizard {
   // private ClientBundleLocationWizardPage m_clientLocationPage;
 
   public PageNewWizard(IScoutBundle clientBundle) {
+    setWindowTitle("New Page");
     // m_clientLocationPage=new ClientBundleLocationWizardPage("Choose the client bundle", "The new created table page will be located within the selected bundle.");
     // m_clientLocationPage.addPropertyChangeListener(new P_LocationPropChangeListener());
     // addPage(m_clientLocationPage);

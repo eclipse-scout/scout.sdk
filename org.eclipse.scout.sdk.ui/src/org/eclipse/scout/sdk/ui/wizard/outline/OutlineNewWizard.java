@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,6 +24,7 @@ public class OutlineNewWizard extends AbstractWorkspaceWizard {
   }
 
   public OutlineNewWizard(IScoutBundle clientBunldle, IType desktopType) {
+    setWindowTitle("New Outline");
     OutlineNewOperation op = new OutlineNewOperation();
     op.setDesktopType(desktopType);
     m_page1 = new OutlineNewWizardPage(clientBunldle);
@@ -32,5 +33,4 @@ public class OutlineNewWizard extends AbstractWorkspaceWizard {
     m_page1.setOperation(op);
     addPage(m_page1);
   }
-
 }

@@ -54,6 +54,7 @@ public class OutlineServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public OutlineServiceNewWizard(IScoutBundle serverBundle) {
+    setWindowTitle("New Outline Service");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
     m_serviceNewWizardPage = new ServiceNewWizardPage("New Outline Service", "create a new lookup service.", ScoutSdk.getType(RuntimeClasses.IService), ScoutIdeProperties.SUFFIX_OUTLINE_SERVICE);

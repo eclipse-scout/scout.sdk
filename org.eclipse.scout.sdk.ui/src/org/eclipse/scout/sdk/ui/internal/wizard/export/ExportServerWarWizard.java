@@ -20,6 +20,7 @@ public class ExportServerWarWizard extends AbstractWorkspaceWizard {
   private IType m_declaringType;
 
   public ExportServerWarWizard(IScoutBundle serverBundle) {
+    setWindowTitle("Export to WAR");
     m_page1 = new ExportServerWarWizardPage(serverBundle.getScoutProject());
     addPage(m_page1);
   }

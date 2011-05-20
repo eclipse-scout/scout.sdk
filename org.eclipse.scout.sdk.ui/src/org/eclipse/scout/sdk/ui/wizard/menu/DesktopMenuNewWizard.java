@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,9 +22,9 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 
 /**
  * <h3>DesktopMenuNewWizard</h3> ...
@@ -37,6 +37,10 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
   private MenuNewWizardPage m_page1;
   private IType m_declaringType;
   private MenuNewOperation m_operation;
+
+  public DesktopMenuNewWizard() {
+    setWindowTitle("New Desktop Menu");
+  }
 
   public void initWizard(IType declaringType) {
     m_declaringType = declaringType;

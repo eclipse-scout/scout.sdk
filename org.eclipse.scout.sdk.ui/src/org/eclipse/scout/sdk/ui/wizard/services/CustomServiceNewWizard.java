@@ -57,6 +57,7 @@ public class CustomServiceNewWizard extends AbstractWorkspaceWizard {
   private final String m_customAppendix;
 
   public CustomServiceNewWizard(IScoutBundle serverBundle, IPackageFragment implPackage) {
+    setWindowTitle("New Custom Service");
     IScoutBundle bundle = SdkTypeUtility.getScoutBundle(implPackage);
     m_customAppendix = implPackage.getElementName().replaceFirst(bundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM) + ".", "");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();

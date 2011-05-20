@@ -52,6 +52,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode m_locationPageRoot;
 
   public ClientServiceNewWizard(IScoutBundle clientBundle) {
+    setWindowTitle("New Clientside Service");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage("Client Service", "Create a new client service", ScoutSdk.getType(RuntimeClasses.IService), ScoutIdeProperties.SUFFIX_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(clientBundle);

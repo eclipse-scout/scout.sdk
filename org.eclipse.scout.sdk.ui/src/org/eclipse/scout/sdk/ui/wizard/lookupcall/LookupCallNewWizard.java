@@ -61,6 +61,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode m_locationPageRoot;
 
   public LookupCallNewWizard(IScoutBundle sharedBundle) {
+    setWindowTitle("New Lookup Call");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_sharedBundle = sharedBundle;
     m_page1 = new LookupCallNewWizardPage(getSharedBundle());

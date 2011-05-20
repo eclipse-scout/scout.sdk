@@ -54,6 +54,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public BookmarkStorageServiceNewWizard(IScoutBundle serverBundle) {
+    setWindowTitle("New Bookmark Service");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
     m_serviceNewWizardPage = new ServiceNewWizardPage("New Bookmark Storage Service", "create a new bookmark storage service.", ScoutSdk.getType(RuntimeClasses.AbstractBookmarkStorageService), ScoutIdeProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE);

@@ -51,8 +51,9 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public SmtpServiceNewWizard(IScoutBundle serverBundle) {
-    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
+    setWindowTitle("New Smtp Service");
+    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage("New SMTP Service", "create a new smtp service.", ScoutSdk.getType(RuntimeClasses.ISMTPService), ScoutIdeProperties.SUFFIX_SMTP_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
