@@ -19,13 +19,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
@@ -63,12 +64,23 @@ public class SearchFormNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
-
+    // create empty form data
+    String formDataSignature = null;
+    if (getSearchFormDataLocationBundle() != null) {
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTypeName() + "Data", getSearchFormDataLocationBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), getSearchFormDataLocationBundle());
+      formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
+      formDataOp.run(monitor, workingCopyManager);
+      formDataSignature = Signature.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName(), true);
+    }
+    // form
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSearchFormLocationBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS), getSearchFormLocationBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    if (getSearchFormDataLocationBundle() != null) {
-      AnnotationCreateOperation annotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.FormData, true));
+    if (!StringUtility.isNullOrEmpty(formDataSignature)) {
+      FormDataAnnotationCreateOperation annotOp = new FormDataAnnotationCreateOperation(null);
+      annotOp.setSdkCommand(SdkCommand.CREATE);
+      annotOp.setFormDataSignature(formDataSignature);
       newOp.addAnnotation(annotOp);
     }
     newOp.run(monitor, workingCopyManager);

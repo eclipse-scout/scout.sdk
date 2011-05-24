@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -277,7 +277,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     FormHandlerNewOperation formHandlerOp = new FormHandlerNewOperation(getSearchFormType());
     formHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
     formHandlerOp.setTypeName(ScoutIdeProperties.TYPE_NAME_SEARCH_HANDLER);
-    formHandlerOp.setStartMethodSibling(SdkTypeUtility.createStructuredForm(getFormDataType()).getSiblingMethodStartHandler(formHandlerOp.getStartMethodName()));
+    formHandlerOp.setStartMethodSibling(SdkTypeUtility.createStructuredForm(getSearchFormType()).getSiblingMethodStartHandler(formHandlerOp.getStartMethodName()));
     formHandlerOp.run(monitor, workingCopyManager);
     IType searchHandler = formHandlerOp.getCreatedHandler();
     StringBuilder execLoadBuilder = new StringBuilder();

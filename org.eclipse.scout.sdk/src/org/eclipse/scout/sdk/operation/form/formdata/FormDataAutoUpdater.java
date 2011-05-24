@@ -31,6 +31,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  * <h3>{@link FormDataAutoUpdater}</h3> ...
@@ -147,22 +148,24 @@ public class FormDataAutoUpdater {
           }
           monitor.setTaskName("Update form data [" + i + " of " + totalCompilationUnits + "]");
           ICompilationUnit icu = compilationUnits[i];
-          try {
-            IType[] types = icu.getTypes();
-            if (types.length > 0) {
-              IType type = types[0];
-              FormDataAnnotation annotatation = SdkTypeUtility.findFormDataAnnotation(type, ScoutSdk.getSuperTypeHierarchy(type));
-              if (annotatation != null && FormDataAnnotation.isSdkCommandCreate(annotatation) &&
-                  !StringUtility.isNullOrEmpty(annotatation.getFormDataTypeSignature())) {
-                monitor.subTask("update '" + type.getFullyQualifiedName() + "'.");
-                FormDataUpdateJob formDataUpdateJob = new FormDataUpdateJob(new FormDataUpdateOperation(type, annotatation));
-                formDataUpdateJob.schedule();
-                formDataUpdateJob.join();
+          if (TypeUtility.exists(icu)) {
+            try {
+              IType[] types = icu.getTypes();
+              if (types.length > 0) {
+                IType type = types[0];
+                FormDataAnnotation annotatation = SdkTypeUtility.findFormDataAnnotation(type, ScoutSdk.getSuperTypeHierarchy(type));
+                if (annotatation != null && FormDataAnnotation.isSdkCommandCreate(annotatation) &&
+                    !StringUtility.isNullOrEmpty(annotatation.getFormDataTypeSignature())) {
+                  monitor.subTask("update '" + type.getFullyQualifiedName() + "'.");
+                  FormDataUpdateJob formDataUpdateJob = new FormDataUpdateJob(new FormDataUpdateOperation(type, annotatation));
+                  formDataUpdateJob.schedule();
+                  formDataUpdateJob.join();
+                }
               }
             }
-          }
-          catch (Exception e) {
-            ScoutSdk.logWarning("could not determ type for form data update '" + icu.getElementName() + "'.", e);
+            catch (Exception e) {
+              ScoutSdk.logWarning("could not determ type for form data update '" + icu.getElementName() + "'.", e);
+            }
           }
         }
       }

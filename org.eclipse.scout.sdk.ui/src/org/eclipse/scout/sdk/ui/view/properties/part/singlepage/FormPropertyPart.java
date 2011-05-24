@@ -121,6 +121,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
               if (presenter != null && !presenter.isDisposed()) {
                 indicator.dispose();
                 presenter.setLinksProperty(finalModel);
+                getForm().layout(true, true);
                 getForm().updateToolBar();
                 getForm().reflow(true);
 

@@ -79,6 +79,7 @@ public class JavaElementDeleteOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     for (IJavaElement m : m_typesToDelete) {
       deleteMember(m, monitor, workingCopyManager);
@@ -99,8 +100,7 @@ public class JavaElementDeleteOperation implements IOperation {
       case IJavaElement.TYPE:
         IType type = (IType) member;
         if (type.getDeclaringType() == null) {
-          manager.unregister(type.getCompilationUnit(), monitor);
-          deleteMember(type.getCompilationUnit(), monitor, manager);
+          deleteCompilationUnit(type.getCompilationUnit(), monitor, manager);
         }
         else {
           ICompilationUnit icu = type.getCompilationUnit();
@@ -134,7 +134,12 @@ public class JavaElementDeleteOperation implements IOperation {
     }
   }
 
-  private void deleteCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, IScoutWorkingCopyManager manager) {
+  private void deleteCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+    manager.register(icu, false, monitor);
+    for (IType t : icu.getTypes()) {
+      t.delete(true, monitor);
+    }
+    manager.unregister(icu, monitor);
     IPackageFragment packageFragment = (IPackageFragment) icu.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
     String resourceName = icu.getElementName();
     DeleteResourcesOperation op = new DeleteResourcesOperation(new IResource[]{icu.getResource()}, "Delete", true);
