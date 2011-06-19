@@ -4,11 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.test.util;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.util.Regex;
 import org.junit.Assert;
@@ -68,4 +71,24 @@ public class RegexTest {
   private void checkVariableDeclarationRightHandSide(String fieldDeclaration, String expectedRightHandSide) {
     Assert.assertEquals(expectedRightHandSide, Regex.getFieldDeclarationRightHandSide(fieldDeclaration));
   }
+
+  @Test
+  public void checkValidationRulePatterns() {
+    checkValidationRulePatternImpl("@ValidationRule(ValidationRule.MANDATORY)", "ValidationRule.MANDATORY");
+    checkValidationRulePatternImpl("@ValidationRule(MANDATORY)", "MANDATORY");
+    checkValidationRulePatternImpl("@ValidationRule(\"mandatory\")", "\"mandatory\"");
+    checkValidationRulePatternImpl("@ValidationRule(MyValidationRules.CUSTOM)", "MyValidationRules.CUSTOM");
+    checkValidationRulePatternImpl("@ValidationRule(\"custom\")", "\"custom\"");
+    checkValidationRulePatternImpl("@ValidationRule( value = ValidationRule.MANDATORY ,\n generatedSourceCode=\"dgsfdgasfgasdfdsaf\")", "ValidationRule.MANDATORY ");
+    checkValidationRulePatternImpl("@ValidationRule(generatedSourceCode=\"dgsfdgasfgasdfdsaf\", value = ValidationRule.MANDATORY )", "ValidationRule.MANDATORY ");
+  }
+
+  private void checkValidationRulePatternImpl(String text, String group2) {
+    //copied from SdkTypeUtility.VALIDATION_RULE_PATTERN
+    Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
+    Matcher m = VALIDATION_RULE_PATTERN.matcher(text);
+    Assert.assertTrue(m.find());
+    Assert.assertEquals(group2, m.group(2));
+  }
+
 }
