@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -743,9 +744,13 @@ public class SdkTypeUtility {
     for (int i = 0; i < targetTypes.length; i++) {
       targetMethods[i] = targetTypes[i].getMethods();
     }
+    HashSet<String> visitedMethodNames = new HashSet<String>();
     for (int i = 0; i < targetTypes.length; i++) {
       for (IMethod annotatedMethod : targetMethods[i]) {
         if (!TypeUtility.exists(annotatedMethod)) {
+          continue;
+        }
+        if (visitedMethodNames.contains(annotatedMethod.getElementName())) {
           continue;
         }
         IAnnotation validationRuleAnnotation = TypeUtility.getAnnotation(annotatedMethod, RuntimeClasses.ValidationRule);
@@ -753,6 +758,7 @@ public class SdkTypeUtility {
           continue;
         }
         //extract rule name and generated code order
+        visitedMethodNames.add(annotatedMethod.getElementName());
         IMemberValuePair[] pairs = validationRuleAnnotation.getMemberValuePairs();
         if (pairs == null) {
           continue;

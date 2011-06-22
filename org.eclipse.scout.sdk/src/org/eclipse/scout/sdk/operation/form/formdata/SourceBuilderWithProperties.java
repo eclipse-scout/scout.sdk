@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.operation.form.formdata;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
@@ -211,16 +210,12 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
       return buf.toString();
     }
 
-    private static final Pattern SIMPLE_RETURN_VALUE = Pattern.compile("[^(){}:]*", Pattern.DOTALL);
-
     private boolean addSharedImportsForGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
-      if (!SIMPLE_RETURN_VALUE.matcher(sourceSnippet).matches()) {
-        return false;
-      }
-      IType[] refTypes = TypeUtility.getTypeOccurenceInMethod(sourceMethod);
+      IType[] refTypes = TypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
       for (IType refType : refTypes) {
-        //XXX imo: aho, is there a better way to find out if targetValidator would accept that type in the import section?
         String fqn = refType.getFullyQualifiedName();
+        //XXX imo: aho, is there a better way to find out if targetValidator would accept that type in the import section?
+        //XXX aho: yes, follows soon: if(TypeUtility.isOnClasspath(refType, targetValidator.getTargetProject())){
         if (fqn.indexOf(".client.") >= 0) {
           return false;
         }
