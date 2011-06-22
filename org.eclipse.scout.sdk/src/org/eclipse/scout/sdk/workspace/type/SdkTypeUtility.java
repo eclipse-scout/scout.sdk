@@ -12,8 +12,11 @@ package org.eclipse.scout.sdk.workspace.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -22,6 +25,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
@@ -40,10 +44,12 @@ import org.eclipse.scout.sdk.internal.typestructure.StructuredType;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.ScoutSignature;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkMethodUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
+import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 
@@ -706,6 +712,153 @@ public class SdkTypeUtility {
       ScoutSdk.logError("could not build ConfigPropertyType for '" + methodName + "' in type '" + declaringType.getFullyQualifiedName() + "'.", e);
     }
     return newMethod;
+  }
+
+  public static final Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
+
+  /**
+   * @return a map with all validation rule names mapped to the method on the most specific declaring type
+   * @throws JavaModelException
+   */
+  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType) throws JavaModelException {
+    HashMap<String, ValidationRuleMethod> ruleMap = new HashMap<String, ValidationRuleMethod>();
+    org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy = null;
+    try {
+      superTypeHierarchy = declaringType.newSupertypeHierarchy(null);
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'", e);
+      return Collections.emptyList();
+    }
+    ArrayList<IType> targetTypeList = new ArrayList<IType>(5);
+    targetTypeList.add(0, declaringType);
+    IType[] superClasses = superTypeHierarchy.getAllSuperclasses(declaringType);
+    for (IType t : superClasses) {
+      if (TypeUtility.exists(t) && !t.getFullyQualifiedName().equals(Object.class.getName())) {
+        targetTypeList.add(t);
+      }
+    }
+    IType[] targetTypes = targetTypeList.toArray(new IType[targetTypeList.size()]);
+    IMethod[][] targetMethods = new IMethod[targetTypes.length][];
+    for (int i = 0; i < targetTypes.length; i++) {
+      targetMethods[i] = targetTypes[i].getMethods();
+    }
+    for (int i = 0; i < targetTypes.length; i++) {
+      for (IMethod annotatedMethod : targetMethods[i]) {
+        if (!TypeUtility.exists(annotatedMethod)) {
+          continue;
+        }
+        IAnnotation validationRuleAnnotation = TypeUtility.getAnnotation(annotatedMethod, RuntimeClasses.ValidationRule);
+        if (!TypeUtility.exists(validationRuleAnnotation)) {
+          continue;
+        }
+        //extract rule name and generated code order
+        IMemberValuePair[] pairs = validationRuleAnnotation.getMemberValuePairs();
+        if (pairs == null) {
+          continue;
+        }
+        String ruleString = null;
+        Boolean ruleSkip = false;
+        String ruleGeneratedSourceCode = "";
+        for (IMemberValuePair pair : pairs) {
+          if ("value".equals(pair.getMemberName())) {
+            if (pair.getValue() instanceof String) {
+              ruleString = (String) pair.getValue();
+            }
+          }
+          else if ("generatedSourceCode".equals(pair.getMemberName())) {
+            if (pair.getValue() instanceof String) {
+              ruleGeneratedSourceCode = (String) pair.getValue();
+            }
+          }
+          else if ("skip".equals(pair.getMemberName())) {
+            if (pair.getValue() instanceof Boolean) {
+              ruleSkip = (Boolean) pair.getValue();
+            }
+          }
+        }
+        if (ruleString == null) {
+          continue;
+        }
+        //find out the annotated source code field name (constant declaration)
+        //this is either ValidationRule(value=text ) or simply ValidationRule(text)
+        IField ruleField = null;
+        Matcher annotationMatcher = VALIDATION_RULE_PATTERN.matcher("" + annotatedMethod.getSource());
+        if (annotationMatcher.find()) {
+          String fieldSource = annotationMatcher.group(2).trim();
+          int lastDot = fieldSource.lastIndexOf('.');
+          //fast check if scout rule
+          if (fieldSource.startsWith("ValidationRule")) {
+            IType fieldBaseType = ScoutSdk.getType(RuntimeClasses.ValidationRule);
+            if (fieldBaseType != null) {
+              ruleField = fieldBaseType.getField(fieldSource.substring(lastDot + 1));
+              if (!TypeUtility.exists(ruleField)) {
+                ruleField = null;
+              }
+            }
+          }
+          else if (!fieldSource.startsWith("\"") && lastDot > 0) {
+            IType fieldBaseType = ScoutUtility.getReferencedType(annotatedMethod.getDeclaringType(), fieldSource.substring(0, lastDot));
+            if (fieldBaseType != null) {
+              ruleField = fieldBaseType.getField(fieldSource.substring(lastDot + 1));
+              if (!TypeUtility.exists(ruleField)) {
+                ruleField = null;
+              }
+            }
+          }
+        }
+        if (ruleField != null) {
+          ruleString = (String) ruleField.getConstant();
+        }
+        String hashKey = ruleString;
+        if (ruleMap.containsKey(hashKey)) {
+          continue;
+        }
+        //found new rule annotation, now find most specific method in subclasses to generate source code
+        if (ruleSkip.booleanValue()) {
+          ruleMap.put(hashKey, null);
+          continue;
+        }
+        if (ruleGeneratedSourceCode != null && ruleGeneratedSourceCode.length() == 0) {
+          ruleGeneratedSourceCode = null;
+        }
+        IMethod implementedMethod = null;
+        if (ruleGeneratedSourceCode == null) {
+          for (int k = 0; k < i; k++) {
+            for (IMethod tst : targetMethods[k]) {
+              if (!TypeUtility.exists(tst)) {
+                continue;
+              }
+              if (tst.getElementName().equals(annotatedMethod.getElementName())) {
+                implementedMethod = tst;
+                break;
+              }
+            }
+            if (implementedMethod != null) {
+              break;
+            }
+          }
+          if (implementedMethod == null) {
+            implementedMethod = annotatedMethod;
+          }
+          //found most specific override of new rule
+          ruleGeneratedSourceCode = SdkMethodUtility.getMethodReturnValue(implementedMethod);
+        }
+        else {
+          implementedMethod = annotatedMethod;
+        }
+        //new rule is sufficiently parsed
+        ValidationRuleMethod vm = new ValidationRuleMethod(validationRuleAnnotation, ruleField, ruleString, ruleGeneratedSourceCode, annotatedMethod, implementedMethod, superTypeHierarchy);
+        ruleMap.put(hashKey, vm);
+      }
+    }
+    ArrayList<ValidationRuleMethod> list = new ArrayList<ValidationRuleMethod>(ruleMap.size());
+    for (ValidationRuleMethod v : ruleMap.values()) {
+      if (v != null) {
+        list.add(v);
+      }
+    }
+    return list;
   }
 
   public static IType getFistProcessButton(IType declaringType, ITypeHierarchy hierarchy) {
