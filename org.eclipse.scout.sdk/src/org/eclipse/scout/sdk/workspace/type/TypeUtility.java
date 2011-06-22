@@ -299,13 +299,22 @@ public class TypeUtility {
   }
 
   public static IType[] getTypeOccurenceInMethod(IMethod method) {
+    try {
+      return getTypeOccurenceInSnippet(method, method.getSource());
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not get source of method '" + method.getElementName() + "'.", e);
+    }
+    return new IType[0];
+  }
+
+  public static IType[] getTypeOccurenceInSnippet(IMember container, String snippet) {
     ArrayList<IType> types = new ArrayList<IType>();
     try {
-      Matcher matcher = Pattern.compile(Regex.REGEX_METHOD_CLASS_TYPE_OCCURRENCES, Pattern.DOTALL).matcher(method.getSource());
-
+      Matcher matcher = Pattern.compile(Regex.REGEX_METHOD_CLASS_TYPE_OCCURRENCES, Pattern.DOTALL).matcher(snippet);
       while (matcher.find()) {
         try {
-          String resolvedSignature = ScoutSignature.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), method.getDeclaringType());
+          String resolvedSignature = ScoutSignature.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), container.getDeclaringType());
           if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
             String pck = org.eclipse.jdt.core.Signature.getSignatureQualifier(resolvedSignature);
             String simpleName = org.eclipse.jdt.core.Signature.getSignatureSimpleName(resolvedSignature);
@@ -315,12 +324,12 @@ public class TypeUtility {
           }
         }
         catch (JavaModelException e) {
-          ScoutSdk.logWarning("could not resolve type reference '" + matcher.group(1) + "' in method '" + method.getElementName() + "'", e);
+          ScoutSdk.logWarning("could not resolve type reference '" + matcher.group(1) + "' in method '" + container.getElementName() + "'", e);
         }
       }
     }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("could not get source of method '" + method.getElementName() + "'.", e);
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not get source of method '" + container.getElementName() + "'.", e);
     }
     return types.toArray(new IType[types.size()]);
   }

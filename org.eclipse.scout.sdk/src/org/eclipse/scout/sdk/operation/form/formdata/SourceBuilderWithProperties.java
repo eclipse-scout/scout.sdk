@@ -10,12 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
+import java.util.Iterator;
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.ScoutSignature;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
@@ -23,6 +30,7 @@ import org.eclipse.scout.sdk.workspace.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.workspace.type.PropertyBeanFilters;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
 /**
  * <h3>{@link SourceBuilderWithProperties}</h3> ...
@@ -32,8 +40,38 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
  */
 public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
-  public SourceBuilderWithProperties(IType type) {
+  public SourceBuilderWithProperties(final IType type) {
     visitProperties(type);
+    // validation rules
+    try {
+      List<ValidationRuleMethod> list = SdkTypeUtility.getValidationRuleMethods(type);
+      if (list.size() > 0) {
+        for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
+          ValidationRuleMethod vm = it.next();
+          String generatedSourceCode = vm.getRuleGeneratedSourceCode();
+          if (generatedSourceCode.equals("null")) {
+            it.remove();
+            continue;
+          }
+          if (generatedSourceCode.equals("false")) {
+            it.remove();
+            continue;
+          }
+        }
+        if (list.size() > 0) {
+          ValidationRuleMethodOverrideBuilder builder = new ValidationRuleMethodOverrideBuilder(list);
+          builder.setJavaDoc(" /** " + ScoutUtility.NL + "   * list of derived validation rules." + ScoutUtility.NL + "*/");
+          builder.addAnnotation(new AnnotationSourceBuilder("Ljava.lang.Override;"));
+          builder.setFlags(Flags.AccProtected);
+          builder.setElementName("initValidationRules");
+          builder.addParameter(new MethodParameter(Signature.createTypeSignature("java.util.Map<String,Object>", false), "ruleMap"));
+          addBuilder(builder, 4);
+        }
+      }
+    }
+    catch (Throwable t) {
+      ScoutSdk.logError("could not append validation rules to form field data '" + type.getFullyQualifiedName() + "'.", t);
+    }
   }
 
   protected void visitProperties(IType type) {
@@ -125,4 +163,66 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
     }
     return source.toString();
   }
+
+  private static class ValidationRuleMethodOverrideBuilder extends MethodSourceBuilder {
+    private final List<ValidationRuleMethod> m_methods;
+
+    public ValidationRuleMethodOverrideBuilder(List<ValidationRuleMethod> methods) {
+      m_methods = methods;
+    }
+
+    @Override
+    protected String createMethodBody(IImportValidator validator) {
+      validator.addImport("java.util.Map");
+      StringBuilder buf = new StringBuilder();
+      buf.append("super.initValidationRules(ruleMap);");
+      for (ValidationRuleMethod vm : m_methods) {
+        try {
+          String generatedSourceCode = vm.getRuleGeneratedSourceCode();
+          if (!addSharedImportsForGeneratedSourceCode(vm.getImplementedMethod(), generatedSourceCode, validator)) {
+            //add javadoc warning
+            String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName() + "#" + vm.getImplementedMethod().getElementName();
+            buf.append("/**" + ScoutUtility.NL + " * XXX ValidationRule.NotProcessed: " + vm.getRuleName() + " with " + generatedSourceCode + " at " + fqn + ScoutUtility.NL + "*/");
+            continue;
+          }
+          //
+          String ruleDecl;
+          if (vm.getRuleField() != null) {
+            validator.addImport(vm.getRuleField().getDeclaringType().getFullyQualifiedName());
+            ruleDecl = vm.getRuleField().getDeclaringType().getElementName() + "." + vm.getRuleField().getElementName();
+          }
+          else {
+            ruleDecl = "\"" + vm.getRuleName() + "\"";
+          }
+          //
+          buf.append(ScoutUtility.NL);
+          buf.append("ruleMap.put(");
+          buf.append(ruleDecl);
+          buf.append(", ");
+          buf.append(generatedSourceCode);
+          buf.append(");");
+        }
+        catch (Exception e) {
+          String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName() + "#" + vm.getImplementedMethod().getElementName();
+          ScoutSdk.logError("could not append rule " + vm.getRuleName() + " from method " + fqn + ".", e);
+        }
+      }
+      return buf.toString();
+    }
+
+    private boolean addSharedImportsForGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
+      IType[] refTypes = TypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
+      for (IType refType : refTypes) {
+        String fqn = refType.getFullyQualifiedName();
+        //XXX imo: aho, is there a better way to find out if targetValidator would accept that type in the import section?
+        //XXX aho: yes, follows soon: if(TypeUtility.isOnClasspath(refType, targetValidator.getTargetProject())){
+        if (fqn.indexOf(".client.") >= 0) {
+          return false;
+        }
+        targetValidator.addImport(fqn);
+      }
+      return true;
+    }
+  }
+
 }

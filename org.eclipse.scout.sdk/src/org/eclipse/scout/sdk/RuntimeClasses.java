@@ -219,6 +219,7 @@ public final class RuntimeClasses {
   public static final String ServerServiceFactory = "org.eclipse.scout.rt.server.services.ServerServiceFactory";
   public static final String SERVICES = "org.eclipse.scout.service.SERVICES";
   public static final String ProcessingException = "org.eclipse.scout.commons.exception.ProcessingException";
+  public static final String ValidationRule = "org.eclipse.scout.rt.shared.data.form.ValidationRule";
   public static final String VetoException = "org.eclipse.scout.commons.exception.VetoException";
 
   public static final String IBigDecimalColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn";
