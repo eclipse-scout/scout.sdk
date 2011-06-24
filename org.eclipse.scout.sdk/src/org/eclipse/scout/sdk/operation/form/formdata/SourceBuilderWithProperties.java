@@ -181,8 +181,17 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
           if (!addSharedImportsForGeneratedSourceCode(vm.getImplementedMethod(), generatedSourceCode, validator)) {
             //add javadoc warning
-            String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName() + "#" + vm.getImplementedMethod().getElementName();
-            buf.append("/**" + ScoutUtility.NL + " * XXX ValidationRule.NotProcessed: " + vm.getRuleName() + " with " + generatedSourceCode + " at " + fqn + ScoutUtility.NL + "*/");
+            String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
+            buf.append("/**");
+            buf.append(ScoutUtility.NL);
+            buf.append(" * XXX not processed ValidationRule(" + vm.getRuleName() + ")");
+            buf.append(ScoutUtility.NL);
+            buf.append(" * generatedSourceCode: ");
+            buf.append(generatedSourceCode);
+            buf.append(ScoutUtility.NL);
+            buf.append(" * at " + fqn);
+            buf.append(ScoutUtility.NL);
+            buf.append("*/");
             continue;
           }
           //
