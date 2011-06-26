@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.PropertyBeanFilters;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
+import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 
 /**
  * <h3>{@link SourceBuilderWithProperties}</h3> ...
@@ -42,36 +43,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
   public SourceBuilderWithProperties(final IType type) {
     visitProperties(type);
-    // validation rules
-    try {
-      List<ValidationRuleMethod> list = SdkTypeUtility.getValidationRuleMethods(type);
-      if (list.size() > 0) {
-        for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
-          ValidationRuleMethod vm = it.next();
-          String generatedSourceCode = vm.getRuleGeneratedSourceCode();
-          if (generatedSourceCode.equals("null")) {
-            it.remove();
-            continue;
-          }
-          if (generatedSourceCode.equals("false")) {
-            it.remove();
-            continue;
-          }
-        }
-        if (list.size() > 0) {
-          ValidationRuleMethodOverrideBuilder builder = new ValidationRuleMethodOverrideBuilder(list);
-          builder.setJavaDoc(" /** " + ScoutUtility.NL + "   * list of derived validation rules." + ScoutUtility.NL + "*/");
-          builder.addAnnotation(new AnnotationSourceBuilder("Ljava.lang.Override;"));
-          builder.setFlags(Flags.AccProtected);
-          builder.setElementName("initValidationRules");
-          builder.addParameter(new MethodParameter(Signature.createTypeSignature("java.util.Map<String,Object>", false), "ruleMap"));
-          addBuilder(builder, 4);
-        }
-      }
-    }
-    catch (Throwable t) {
-      ScoutSdk.logError("could not append validation rules to form field data '" + type.getFullyQualifiedName() + "'.", t);
-    }
+    addValidationRules(type);
   }
 
   protected void visitProperties(IType type) {
@@ -164,6 +136,39 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
     return source.toString();
   }
 
+  protected void addValidationRules(IType type) {
+    // validation rules
+    try {
+      List<ValidationRuleMethod> list = SdkTypeUtility.getValidationRuleMethods(type);
+      if (list.size() > 0) {
+        for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
+          ValidationRuleMethod vm = it.next();
+          String generatedSourceCode = vm.getRuleGeneratedSourceCode();
+          if (generatedSourceCode.equals("null")) {
+            it.remove();
+            continue;
+          }
+          if (generatedSourceCode.equals("false")) {
+            it.remove();
+            continue;
+          }
+        }
+        if (list.size() > 0) {
+          ValidationRuleMethodOverrideBuilder builder = new ValidationRuleMethodOverrideBuilder(list);
+          builder.setJavaDoc(" /** " + ScoutUtility.NL + "   * list of derived validation rules." + ScoutUtility.NL + "*/");
+          builder.addAnnotation(new AnnotationSourceBuilder("Ljava.lang.Override;"));
+          builder.setFlags(Flags.AccProtected);
+          builder.setElementName("initValidationRules");
+          builder.addParameter(new MethodParameter(Signature.createTypeSignature("java.util.Map<String,Object>", false), "ruleMap"));
+          addBuilder(builder, 4);
+        }
+      }
+    }
+    catch (Throwable t) {
+      ScoutSdk.logError("could not append validation rules to form field data '" + type.getFullyQualifiedName() + "'.", t);
+    }
+  }
+
   private static class ValidationRuleMethodOverrideBuilder extends MethodSourceBuilder {
     private final List<ValidationRuleMethod> m_methods;
 
@@ -179,7 +184,9 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
       for (ValidationRuleMethod vm : m_methods) {
         try {
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
-          if (!addSharedImportsForGeneratedSourceCode(vm.getImplementedMethod(), generatedSourceCode, validator)) {
+          //filter
+          generatedSourceCode = filterGeneratedSourceCode(vm.getImplementedMethod(), generatedSourceCode, validator);
+          if (generatedSourceCode == null) {
             //add javadoc warning
             String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
             buf.append("/**");
@@ -219,18 +226,25 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
       return buf.toString();
     }
 
-    private boolean addSharedImportsForGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
+    private String filterGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
       IType[] refTypes = TypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
       for (IType refType : refTypes) {
+        //if the type is a form field type it is tranformed to the corresponding form data field
+        ITypeHierarchy h = ScoutSdk.getSuperTypeHierarchy(refType);
+        if (h.contains(ScoutSdk.getType(RuntimeClasses.IFormField))) {
+          String formDataFieldName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(refType.getElementName()), true);
+          return formDataFieldName + ".class";
+        }
+        //other client types are not supported
         String fqn = refType.getFullyQualifiedName();
         //XXX imo: aho, is there a better way to find out if targetValidator would accept that type in the import section?
         //XXX aho: yes, follows soon: if(TypeUtility.isOnClasspath(refType, targetValidator.getTargetProject())){
         if (fqn.indexOf(".client.") >= 0) {
-          return false;
+          return null;
         }
         targetValidator.addImport(fqn);
       }
-      return true;
+      return sourceSnippet;
     }
   }
 
