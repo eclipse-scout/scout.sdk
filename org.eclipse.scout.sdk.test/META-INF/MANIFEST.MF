@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout SDK Test Plug-in
+Bundle-Name: Scout SDK Testing
 Bundle-SymbolicName: org.eclipse.scout.sdk.test
 Bundle-Version: 3.7.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.internal.test.ScoutSdkTest
