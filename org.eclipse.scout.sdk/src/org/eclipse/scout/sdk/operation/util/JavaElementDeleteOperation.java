@@ -53,6 +53,7 @@ public class JavaElementDeleteOperation implements IOperation {
     return m_typesToDelete.remove(type);
   }
 
+  @Override
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
     builder.append("delete ");
