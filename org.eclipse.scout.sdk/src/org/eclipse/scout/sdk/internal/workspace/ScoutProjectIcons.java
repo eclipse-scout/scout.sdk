@@ -128,14 +128,23 @@ public class ScoutProjectIcons implements IIconProvider {
   }
 
   protected void collectIconNames(Map<String, ScoutIconDesc> collector) {
-    IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getInScoutBundles(m_scoutProject.getSharedBundle()));
-    if (iconTypes.length > 0) {
-      if (TypeUtility.exists(iconTypes[0])) {
-        try {
-          collectIconNamesOfType(iconTypes[0], collector);
-        }
-        catch (Exception e) {
-          e.printStackTrace();
+    // find best match shared bundle
+    IScoutProject project = m_scoutProject;
+    IScoutBundle sharedBundle = null;
+    while (sharedBundle == null && project != null) {
+      sharedBundle = project.getSharedBundle();
+      project = project.getParentProject();
+    }
+    if (sharedBundle != null) {
+      IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getInScoutBundles(sharedBundle));
+      if (iconTypes.length > 0) {
+        if (TypeUtility.exists(iconTypes[0])) {
+          try {
+            collectIconNamesOfType(iconTypes[0], collector);
+          }
+          catch (Exception e) {
+            e.printStackTrace();
+          }
         }
       }
     }
