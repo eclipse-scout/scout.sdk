@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
-import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.junit.AfterClass;

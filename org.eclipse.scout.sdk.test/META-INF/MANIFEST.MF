@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK Testing
 Bundle-SymbolicName: org.eclipse.scout.sdk.test
 Bundle-Version: 3.7.0.qualifier
-Bundle-Activator: org.eclipse.scout.sdk.internal.test.ScoutSdkTest
+Bundle-Activator: org.eclipse.scout.sdk.internal.test.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.junit4;bundle-version="4.3.1",
