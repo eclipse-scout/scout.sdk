@@ -98,7 +98,6 @@ public class MethodTest extends AbstractScoutSdkTest {
 
     InputStream refIs = getInputStream("operation/method/formReferences/Test1FormWithExecInitForm.java");
     IFile orig = (IFile) testForm.getCompilationUnit().getResource();
-    System.out.println(testForm.getCompilationUnit().getSource());
     Assert.assertTrue(equalContents(refIs, orig.getContents()));
   }
 
