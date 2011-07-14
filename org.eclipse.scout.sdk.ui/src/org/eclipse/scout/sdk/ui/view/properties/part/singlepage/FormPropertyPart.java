@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.TypeOpenLin
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -86,10 +87,20 @@ public class FormPropertyPart extends JdtTypePropertyPart {
         if (!StringUtility.isNullOrEmpty(entityName)) {
           // form data
           IScoutBundle clientBundle = getPage().getScoutResource();
-          IScoutBundle sharedBundle = clientBundle.getScoutProject().getSharedBundle();
-          String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + entityName + ScoutIdeProperties.SUFFIX_FORM_DATA;
-          if (ScoutSdk.existsType(formDataName)) {
-            model.addGlobalLink(new TypeOpenLink(ScoutSdk.getType(formDataName)));
+          IScoutProject scoutProject = clientBundle.getScoutProject();
+          IScoutBundle sharedBundle = scoutProject.getSharedBundle();
+          while (sharedBundle == null) {
+            scoutProject = scoutProject.getParentProject();
+            if (scoutProject == null) {
+              break;
+            }
+            sharedBundle = scoutProject.getSharedBundle();
+          }
+          if (sharedBundle != null) {
+            String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + entityName + ScoutIdeProperties.SUFFIX_FORM_DATA;
+            if (ScoutSdk.existsType(formDataName)) {
+              model.addGlobalLink(new TypeOpenLink(ScoutSdk.getType(formDataName)));
+            }
           }
           // service
           String formRegex = "(I)?" + entityName + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE;
