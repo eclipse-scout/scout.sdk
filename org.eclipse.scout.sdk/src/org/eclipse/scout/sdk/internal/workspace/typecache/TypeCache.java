@@ -13,6 +13,12 @@ package org.eclipse.scout.sdk.internal.workspace.typecache;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceChangeEvent;
+import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
@@ -34,13 +40,22 @@ public class TypeCache {
 
   private Object m_cacheLock;
   private HashMap<String, IType> m_cache;
+  private P_ResourceListener m_resourceChangeListener;
 
   public TypeCache() {
     m_cache = new HashMap<String, IType>();
     m_cacheLock = new Object();
+    m_resourceChangeListener = new P_ResourceListener();
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener);
   }
 
   public void dispose() {
+    clearCache();
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_resourceChangeListener);
+    m_resourceChangeListener = null;
+  }
+
+  private void clearCache() {
     synchronized (m_cacheLock) {
       m_cache.clear();
     }
@@ -155,6 +170,35 @@ public class TypeCache {
       return null;
     }
     return matchList.firstEntry().getValue();
+  }
+
+  private class P_ResourceListener implements IResourceChangeListener {
+    @Override
+    public void resourceChanged(final IResourceChangeEvent event) {
+      IResourceDelta delta = event.getDelta();
+      try {
+        if (delta != null) {
+          delta.accept(new IResourceDeltaVisitor() {
+            @Override
+            public boolean visit(IResourceDelta visitDelta) {
+              IResource resource = visitDelta.getResource();
+              if (resource.getType() == IResource.PROJECT && ((visitDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.REMOVED)) != 0)) {
+                clearCache();
+                return false;
+              }
+              return true;
+            }
+
+          });
+        }
+        else if (event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource().getType() == IResource.PROJECT) {
+          clearCache();
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdk.logWarning(e);
+      }
+    }
   }
 
 }

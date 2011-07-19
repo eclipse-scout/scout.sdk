@@ -140,6 +140,7 @@ public class JavaElementDeleteOperation implements IOperation {
     for (IType t : icu.getTypes()) {
       t.delete(true, monitor);
     }
+    icu.delete(true, monitor);
     manager.unregister(icu, monitor);
     IPackageFragment packageFragment = (IPackageFragment) icu.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
     String resourceName = icu.getElementName();

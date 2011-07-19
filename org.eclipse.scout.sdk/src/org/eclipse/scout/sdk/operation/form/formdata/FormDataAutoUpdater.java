@@ -98,26 +98,28 @@ public class FormDataAutoUpdater {
   public class P_ResourceChangedListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-      try {
-        event.getDelta().accept(new IResourceDeltaVisitor() {
-          @Override
-          public boolean visit(IResourceDelta delta) throws CoreException {
-            IResource resource = delta.getResource();
-            if (resource != null && resource.getType() == IResource.FILE) {
-              if ((delta.getFlags() & IResourceDelta.CONTENT) != 0 && resource.getName().endsWith(".java")) {
-                IJavaElement javaElement = JavaCore.create((IFile) resource);
-                if (javaElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                  handleCompilationUnitSaved((ICompilationUnit) javaElement);
+      if (event.getDelta() != null) {
+        try {
+          event.getDelta().accept(new IResourceDeltaVisitor() {
+            @Override
+            public boolean visit(IResourceDelta delta) throws CoreException {
+              IResource resource = delta.getResource();
+              if (resource != null && resource.getType() == IResource.FILE) {
+                if ((delta.getFlags() & IResourceDelta.CONTENT) != 0 && resource.getName().endsWith(".java")) {
+                  IJavaElement javaElement = JavaCore.create((IFile) resource);
+                  if (javaElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
+                    handleCompilationUnitSaved((ICompilationUnit) javaElement);
+                  }
                 }
+                return false;
               }
-              return false;
+              return true;
             }
-            return true;
-          }
-        });
-      }
-      catch (CoreException e) {
-        ScoutSdk.logWarning("could not process resource change event '" + event.getResource() + "'.", e);
+          });
+        }
+        catch (CoreException e) {
+          ScoutSdk.logWarning("could not process resource change event '" + event.getResource() + "'.", e);
+        }
       }
     }
   }// end class P_ResourceChangedListener

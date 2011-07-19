@@ -101,6 +101,23 @@ public class TypeFilters {
     };
   }
 
+  public static ITypeFilter getInnterTypeFilter(final IType type) {
+    return new ITypeFilter() {
+      @Override
+      public boolean accept(IType t) {
+        if (t != null) {
+          if (t.equals(type)) {
+            return true;
+          }
+          else {
+            return accept(t.getDeclaringType());
+          }
+        }
+        return false;
+      }
+    };
+  }
+
   public static ITypeFilter getPackageFilter(final IPackageFragment packageFragment) {
     return new ITypeFilter() {
       @Override

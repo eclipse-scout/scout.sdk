@@ -29,6 +29,7 @@ public class CachedTypeHierarchy extends TypeHierarchy implements ICachedTypeHie
     super(type);
   }
 
+  @Override
   public void invalidate() {
     m_created = false;
   }
@@ -57,14 +58,17 @@ public class CachedTypeHierarchy extends TypeHierarchy implements ICachedTypeHie
     }
   }
 
+  @Override
   public boolean isCreated() {
     return m_created;
   }
 
+  @Override
   public void addHierarchyListener(ITypeHierarchyChangedListener listener) {
     m_hierarchyListeners.add(ITypeHierarchyChangedListener.class, listener);
   }
 
+  @Override
   public void removeHierarchyListener(ITypeHierarchyChangedListener listener) {
     m_hierarchyListeners.remove(ITypeHierarchyChangedListener.class, listener);
   }
@@ -84,7 +88,6 @@ public class CachedTypeHierarchy extends TypeHierarchy implements ICachedTypeHie
       catch (JavaModelException e) {
         e.printStackTrace();
       }
-
     }
   }
 

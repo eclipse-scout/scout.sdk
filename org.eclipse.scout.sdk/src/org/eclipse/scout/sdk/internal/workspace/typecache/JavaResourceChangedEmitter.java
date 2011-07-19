@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.internal.jdt.finegraned.FineGrainedAstMatcher;
 import org.eclipse.scout.sdk.internal.jdt.finegraned.FineGrainedJavaElementDelta;
@@ -401,8 +400,12 @@ public class JavaResourceChangedEmitter {
       try {
         if (delta != null) {
           delta.accept(new IResourceDeltaVisitor() {
+            @Override
             public boolean visit(IResourceDelta visitDelta) {
               IResource resource = visitDelta.getResource();
+              if (resource.getType() == IResource.PROJECT && ((visitDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.REMOVED)) != 0)) {
+                m_hierarchyCache.clearCache();
+              }
               if (resource.getType() == IFile.FILE && resource.getFileExtension() != null) {
                 if (resource.getFileExtension().equalsIgnoreCase("java") && ((visitDelta.getFlags() & IResourceDelta.CONTENT) != 0)) {
                   releaseCompilationUnit((ICompilationUnit) JavaCore.create(resource));
@@ -414,9 +417,12 @@ public class JavaResourceChangedEmitter {
 
           });
         }
+        else if (event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource().getType() == IResource.PROJECT) {
+          m_hierarchyCache.clearCache();
+        }
       }
       catch (CoreException e) {
-        NlsCore.logWarning(e);
+        ScoutSdk.logWarning(e);
       }
     }
   } // end class P_ResouceListener

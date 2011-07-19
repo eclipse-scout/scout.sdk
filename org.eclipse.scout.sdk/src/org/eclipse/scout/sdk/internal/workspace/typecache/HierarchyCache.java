@@ -135,7 +135,36 @@ public final class HierarchyCache {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logError("could not handle type('" + t.getFullyQualifiedName() + "') change in hierarchies.");
+      ScoutSdk.logError("could not handle type('" + t.getFullyQualifiedName() + "') change in hierarchies.", e);
+    }
+  }
+
+  /**
+   * @param type
+   */
+  private void handleTypeRemoved(IType type) {
+    try {
+      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
+      synchronized (cacheLock) {
+        hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+      }
+      ITypeFilter compilationUnitFilter = TypeFilters.getInnterTypeFilter(type);
+      for (CachedTypeHierarchy h : hierarchies) {
+        if (h.isCreated()) {
+          IType[] allTypes = h.getJdtHierarchy().getAllTypes();
+          for (IType candidate : allTypes) {
+            if (compilationUnitFilter.accept(candidate)) {
+              // remove
+              h.handleTypeRemoving(candidate);
+              break;
+            }
+          }
+        }
+
+      }
+    }
+    catch (Exception e) {
+      ScoutSdk.logError("could not handle type removed ('" + type.getElementName() + "') change in hierarchies.");
     }
   }
 
@@ -225,6 +254,17 @@ public final class HierarchyCache {
     }
   }
 
+  public void clearCache() {
+    ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
+    synchronized (cacheLock) {
+      hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+      m_cachedPrimaryTypeHierarchies.clear();
+    }
+    for (CachedTypeHierarchy hierarchy : hierarchies) {
+      hierarchy.invalidate();
+    }
+  }
+
   /**
    * will be notified before events are passed through the event listener list from {@link JavaResourceChangedEmitter}
    * 
@@ -245,7 +285,8 @@ public final class HierarchyCache {
           handleCompilationUnitRemoved((ICompilationUnit) e.getElement());
         }
         else if (e.getElementType() == IJavaElement.TYPE && e.getDeclaringType() == null) {
-          handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
+          handleTypeRemoved((IType) e.getElement());
+//          handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
         }
         break;
       }
