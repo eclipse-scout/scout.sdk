@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+    //    RecreateTypeTest.class,
     TypeHierarchyTest.class,
     TypeUtilityTest.class})
 public class _SuiteTypes {

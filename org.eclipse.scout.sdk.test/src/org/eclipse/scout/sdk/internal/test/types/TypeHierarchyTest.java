@@ -10,16 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.types;
 
-import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -64,33 +58,4 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
     Assert.assertEquals(formFields[2].getElementName(), "DetailsGroup");
   }
 
-  @Test
-  public void testModifyPrimaryTypeHierarchy() throws Exception {
-    IType companyForm = ScoutSdk.getType("test.client.ui.forms.CompanyForm");
-    Assert.assertTrue(TypeUtility.exists(companyForm));
-    IType iformField = ScoutSdk.getType(RuntimeClasses.IFormField);
-    IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iformField);
-    primaryFormFieldHierarchy.invalidate();
-    primaryFormFieldHierarchy.getSubclasses(iformField, null);
-
-    // create new myAbstractFormField
-    ScoutTypeNewOperation op = new ScoutTypeNewOperation("AbstractMyStringField", "test.client.ui.custom.field", SdkTypeUtility.getScoutBundle(companyForm));
-    op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
-    op.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractStringField, true));
-
-    OperationJob job = new OperationJob(op);
-    job.schedule();
-    job.join();
-
-    IType t = op.getCreatedType();
-    Assert.assertFalse(primaryFormFieldHierarchy.isCreated());
-    Assert.assertTrue(primaryFormFieldHierarchy.contains(op.getCreatedType()));
-    Assert.assertTrue(primaryFormFieldHierarchy.isCreated());
-    JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
-    delOp.addMember(t);
-    job = new OperationJob(op);
-    job.schedule();
-    job.join();
-    Assert.assertFalse(primaryFormFieldHierarchy.isCreated());
-  }
 }

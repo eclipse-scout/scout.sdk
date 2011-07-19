@@ -1,36 +1,82 @@
-/*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
- * 
- * Contributors:
- *     BSI Business Systems Integration AG - initial API and implementation
- ******************************************************************************/
 package test.shared.services.process;
 
-import java.lang.Long;
-import org.eclipse.scout.commons.annotations.FormData;
+import java.util.Date;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import java.util.Map;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
-/** 
-  * This class is auto generated and will be refreshed automatically.
-  */
-public class CompanyFormData extends AbstractFormData{
-  private static final long serialVersionUID=1L;
+public class CompanyFormData extends AbstractFormData {
+  private static final long serialVersionUID = 1L;
 
-  private Long m_companyNr;
-
-  public CompanyFormData(){}
-
-  @FormData
-  public Long getCompanyNr( ) {
-    return m_companyNr;
+  public CompanyFormData() {
   }
 
-  @FormData
+  public CompanyNrProperty getCompanyNrProperty() {
+    return getPropertyByClass(CompanyNrProperty.class);
+  }
+
+  /**
+   * access method for property CompanyNr.
+   */
+  public Long getCompanyNr() {
+    return getCompanyNrProperty().getValue();
+  }
+
+  /**
+   * access method for property CompanyNr.
+   */
   public void setCompanyNr(Long companyNr) {
-    m_companyNr = companyNr;
+    getCompanyNrProperty().setValue(companyNr);
+  }
+
+  public Anzahl getAnzahl() {
+    return getFieldByClass(Anzahl.class);
+  }
+
+  public Name getName() {
+    return getFieldByClass(Name.class);
+  }
+
+  public Since getSince() {
+    return getFieldByClass(Since.class);
+  }
+
+  public class CompanyNrProperty extends AbstractPropertyData<Long> {
+    private static final long serialVersionUID = 1L;
+
+    public CompanyNrProperty() {
+    }
+  }
+
+  public class Anzahl extends AbstractValueFieldData<Integer> {
+    private static final long serialVersionUID = 1L;
+
+    public Anzahl() {
+    }
+  }
+
+  public class Name extends AbstractValueFieldData<String> {
+    private static final long serialVersionUID = 1L;
+
+    public Name() {
+    }
+
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
+    }
+  }
+
+  public class Since extends AbstractValueFieldData<Date> {
+    private static final long serialVersionUID = 1L;
+
+    public Since() {
+    }
   }
 }

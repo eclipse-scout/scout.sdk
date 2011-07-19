@@ -46,7 +46,7 @@ public class Bug87486Test extends AbstractScoutSdkTest {
 
   @Test
   public void testGetIcon_AbstractIcons_Folder() throws Exception {
-    checkResolveName("folder", true);
+    checkResolveName("tree_node_closed", true);
   }
 
   @Test

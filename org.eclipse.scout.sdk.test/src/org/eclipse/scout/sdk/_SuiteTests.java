@@ -3,7 +3,8 @@
  */
 package org.eclipse.scout.sdk;
 
-import org.eclipse.scout.sdk.internal.test.types.TypeHierarchyTest;
+import org.eclipse.scout.sdk.internal.test.operation.formdata.ExternalCheckboxFieldTest;
+import org.eclipse.scout.sdk.internal.test.types.RecreateTypeTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -15,8 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
  * @since 1.0.8 14.07.2011
  */
 @RunWith(Suite.class)
-@SuiteClasses({TypeHierarchyTest.class,
-    TypeHierarchyTest.class})
+@SuiteClasses({ExternalCheckboxFieldTest.class,
+    RecreateTypeTest.class})
 public class _SuiteTests {
 
 }

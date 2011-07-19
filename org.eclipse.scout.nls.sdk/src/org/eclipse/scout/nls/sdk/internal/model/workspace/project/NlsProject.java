@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.internal.corext.refactoring.typeconstraints.typesets.TypeUniverseSet;
 import org.eclipse.osgi.util.NLS;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
@@ -115,7 +116,7 @@ public class NlsProject implements INlsProject {
 
   protected void updateTranslationFileLocation() {
     try {
-      if (m_nlsClass != null) {
+      if (m_nlsClass != null && m_nlsClass.getType() != null && m_nlsClass.getType().exists()) {
         ITranslationFile[] translationFiles = NlsCore.getNlsWorkspace().loadTranslationFiles(m_nlsClass, new NullProgressMonitor());
         for (ITranslationFile file : translationFiles) {
           addTranslationFile(file, new NullProgressMonitor());
