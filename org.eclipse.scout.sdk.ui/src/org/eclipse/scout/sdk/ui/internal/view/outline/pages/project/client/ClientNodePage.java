@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.operation.form.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -150,6 +151,7 @@ public class ClientNodePage extends AbstractPage {
     }
     manager.add(new Separator());
     manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform client...", new WellformClientBundleOperation(getScoutResource())));
+    manager.add(new OperationAction("Update form data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new ClientBundleUpdateFormDataOperation(getScoutResource())));
 
   }
 

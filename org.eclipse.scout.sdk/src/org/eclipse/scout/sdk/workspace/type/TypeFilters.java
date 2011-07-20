@@ -183,6 +183,7 @@ public class TypeFilters {
 
   public static ITypeFilter getInScoutBundles(final IScoutBundle... bundles) {
     return new ITypeFilter() {
+      @Override
       public boolean accept(IType type) {
         if (bundles != null) {
           for (IScoutBundle b : bundles) {

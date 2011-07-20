@@ -157,8 +157,16 @@ public class ScoutProjectIcons implements IIconProvider {
         if (Flags.isPublic(field.getFlags()) && field.getSource() != null && field.getSource().contains(" String ")) {
           String source = field.getSource();
           String iconDeclaration = ScoutUtility.removeComments(source);
-          String iconSimpleName = Regex.getFieldDeclarationRightHandSide(iconDeclaration);
-          collector.put(iconSimpleName, new ScoutIconDesc(field.getElementName(), Regex.getIconSimpleName(iconSimpleName), field, inherited));
+          String iconSimpleName = null;
+          try {
+            iconSimpleName = Regex.getFieldDeclarationRightHandSide(iconDeclaration);
+            collector.put(iconSimpleName, new ScoutIconDesc(field.getElementName(), Regex.getIconSimpleName(iconSimpleName), field, inherited));
+          }
+          catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(iconDeclaration);
+            // TODO: handle exception
+          }
         }
       }
       collectIconNamesOfType(m_iconsHierarchy.getSuperclass(iconType), collector);
