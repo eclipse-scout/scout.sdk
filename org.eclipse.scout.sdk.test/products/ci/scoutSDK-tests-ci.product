@@ -4,7 +4,7 @@
 <product name="Scout SDK Tests" id="org.eclipse.scout.sdk.test.product" application="org.eclipse.scout.sdk.test.app" useFeatures="false" includeLaunchers="false">
 
    <configIni use="default">
-      <win32>/org.eclipse.scout.sdk.test/products/tests/config.ini</win32>
+      <win32>/org.eclipse.scout.sdk.test/products/ci/config.ini</win32>
    </configIni>
 
    <launcherArgs>
