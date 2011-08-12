@@ -26,12 +26,14 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * <h1>Bug 77'596</h1>
  * <p>
  */
+@Ignore
 public class MethodTest extends AbstractScoutSdkTest {
 
   @BeforeClass

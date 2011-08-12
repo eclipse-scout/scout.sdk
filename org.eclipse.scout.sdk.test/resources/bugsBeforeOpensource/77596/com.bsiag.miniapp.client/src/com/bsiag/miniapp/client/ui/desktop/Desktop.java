@@ -4,17 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package com.bsiag.miniapp.client.ui.desktop;
 
-
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -26,105 +25,105 @@ import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.service.SERVICES;
+
 import com.bsiag.miniapp.client.ClientSession;
-import com.bsiag.miniapp.shared.Texts;
 import com.bsiag.miniapp.shared.Icons;
+import com.bsiag.miniapp.shared.Texts;
 
-public class Desktop extends AbstractDesktop implements IDesktop{
-  private static Logger logger=LoggerFactory.getLogger(Desktop.class);
+public class Desktop extends AbstractDesktop implements IDesktop {
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(Desktop.class);
 
-  public Desktop(){
+  public Desktop() {
   }
 
   @Override
-  public String getConfiguredTitle(){
+  public String getConfiguredTitle() {
     return Texts.get("ApplicationTitle");
   }
 
   @Override
   protected void execOpened() throws ProcessingException {
     //outline form
-    DefaultOutlineTreeForm treeForm=new DefaultOutlineTreeForm();
+    DefaultOutlineTreeForm treeForm = new DefaultOutlineTreeForm();
     treeForm.setIconId(Icons.EclipseScout);
     treeForm.startView();
     //outline table
-    DefaultOutlineTableForm tableForm=new DefaultOutlineTableForm();
+    DefaultOutlineTableForm tableForm = new DefaultOutlineTableForm();
     tableForm.setIconId(Icons.EclipseScout);
     tableForm.startView();
 
-
     //load startup bookmark
-    IBookmarkService bookmarkService=SERVICES.getService(IBookmarkService.class);
+    IBookmarkService bookmarkService = SERVICES.getService(IBookmarkService.class);
     bookmarkService.loadBookmarks();
-    Bookmark bm=bookmarkService.getStartBookmark();
-    if(bm!=null){
+    Bookmark bm = bookmarkService.getStartBookmark();
+    if (bm != null) {
       bookmarkService.activate(bm);
     }
-    else{
-      if(getAvailableOutlines().length>0){
+    else {
+      if (getAvailableOutlines().length > 0) {
         setOutline(getAvailableOutlines()[0]);
       }
     }
   }
 
   @Order(10.0)
-  public class FileMenu extends AbstractMenu{
+  public class FileMenu extends AbstractMenu {
 
     @Override
-    public String getConfiguredText(){
+    public String getConfiguredText() {
       return Texts.get("FileMenu");
     }
 
     @Order(100.0)
-    public class ExitMenu extends AbstractMenu{
+    public class ExitMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText(){
+      public String getConfiguredText() {
         return Texts.get("ExitMenu");
       }
 
       @Override
-      public void execAction() throws ProcessingException{
+      public void execAction() throws ProcessingException {
         ClientSyncJob.getCurrentSession(ClientSession.class).stopSession();
       }
     }
   }
 
   @Order(20.0)
-  public class ToolsMenu extends AbstractMenu{
+  public class ToolsMenu extends AbstractMenu {
 
     @Override
-    public String getConfiguredText(){
+    public String getConfiguredText() {
       return Texts.get("ToolsMenu");
     }
   }
 
   @Order(25)
-  public class BookmarkMenu extends AbstractBookmarkMenu{
-    public BookmarkMenu(){
+  public class BookmarkMenu extends AbstractBookmarkMenu {
+    public BookmarkMenu() {
       super(Desktop.this);
     }
   }
 
   @Order(30.0)
-  public class HelpMenu extends AbstractMenu{
+  public class HelpMenu extends AbstractMenu {
 
     @Override
-    public String getConfiguredText(){
+    public String getConfiguredText() {
       return Texts.get("HelpMenu");
     }
 
     @Order(10.0)
-    public class AboutMenu extends AbstractMenu{
+    public class AboutMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText(){
+      public String getConfiguredText() {
         return Texts.get("AboutMenu");
       }
 
       @Override
-      public void execAction() throws ProcessingException{
-        ScoutInfoForm form=new ScoutInfoForm();
+      public void execAction() throws ProcessingException {
+        ScoutInfoForm form = new ScoutInfoForm();
         form.startModify();
       }
     }

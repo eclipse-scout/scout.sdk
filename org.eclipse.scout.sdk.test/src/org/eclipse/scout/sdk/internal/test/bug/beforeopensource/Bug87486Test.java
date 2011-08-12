@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -32,11 +33,12 @@ import org.junit.Test;
  * <b>Reason:</b> The way icons are listed in the AbstractIcons.java (Scout framework) and Icons.java (project) has
  * changed. The fields are no more final, but only static.
  */
+@Ignore
 public class Bug87486Test extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("bugsBeforeOpensource/87486", "a.client", "a.shared");
+    setupWorkspace("bugsBeforeOpensource/87486", "a.shared", "a.client");
   }
 
   @AfterClass

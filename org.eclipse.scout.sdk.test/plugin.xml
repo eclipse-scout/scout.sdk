@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.scout.sdk.test.app"
+            name="Scout SDK Tests">
+         <property
+               name="appName"
+               value="Scout SDK Tests">
+         </property>
+      </product>
+   </extension>
+   <extension
+         id="app"
+         point="org.eclipse.core.runtime.applications">
+      <application
+            cardinality="singleton-global"
+            thread="main"
+            visible="true">
+         <run
+               class="org.eclipse.scout.sdk.test.ScoutSdkTestApplication">
+         </run>
+      </application>
+   </extension>
+
+</plugin>

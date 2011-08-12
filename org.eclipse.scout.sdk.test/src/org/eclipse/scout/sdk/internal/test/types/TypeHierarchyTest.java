@@ -22,13 +22,14 @@ import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * <h1>TypeHierarchyTest</h1>
  * <p>
  */
-//TODO CHECK TEST
+@Ignore
 public class TypeHierarchyTest extends AbstractScoutSdkTest {
 
   @BeforeClass

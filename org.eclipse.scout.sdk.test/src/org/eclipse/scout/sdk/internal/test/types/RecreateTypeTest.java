@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -27,6 +28,7 @@ import org.junit.Test;
  * @author aho
  * @since 1.0.8 15.07.2011
  */
+@Ignore
 public class RecreateTypeTest extends AbstractScoutSdkTest {
 
   @BeforeClass
