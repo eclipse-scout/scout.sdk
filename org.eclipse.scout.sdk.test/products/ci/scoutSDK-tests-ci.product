@@ -8,8 +8,6 @@
    </configIni>
 
    <launcherArgs>
-      <programArgs>-bundleNameIncludeFilter=org.eclipse.scout.sdk.test
--classNameExcludeFilter=*._Suite*</programArgs>
       <vmArgsMac>-XstartOnFirstThread -Dorg.eclipse.swt.internal.carbon.smallFonts</vmArgsMac>
    </launcherArgs>
 
