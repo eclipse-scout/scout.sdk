@@ -83,6 +83,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
   public SearchFormFromTablePageFillOperation() {
   }
 
+  @Override
   public String getOperationName() {
     return "Create search form from table page";
   }
@@ -97,6 +98,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     workingCopyManager.register(getSearchFormType().getCompilationUnit(), monitor);
 
@@ -380,7 +382,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
         IMethod lookupCallMethod = TypeUtility.getMethod(column, "getConfiguredLookupCall");
         if (TypeUtility.exists(lookupCallMethod)) {
           final IType lookupCall = PropertyMethodSourceUtilities.parseReturnParameterClass(PropertyMethodSourceUtilities.getMethodReturnValue(lookupCallMethod), lookupCallMethod);
-          // listbox
+          // smartfield
           SmartFieldNewOperation op = new SmartFieldNewOperation(declaringType, false);
           op.setNlsEntry(nlsEntry);
           op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_FORM_FIELD);
@@ -388,15 +390,15 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
           op.run(monitor, manager);
           createdField = op.getCreatedField();
           if (TypeUtility.exists(lookupCall)) {
-            MethodOverrideOperation codeTypeOp = new MethodOverrideOperation(createdField, "getConfiguredLookupCall") {
+            MethodOverrideOperation lookupCallOp = new MethodOverrideOperation(createdField, "getConfiguredLookupCall") {
               @Override
               protected String createMethodBody(IImportValidator validator) throws JavaModelException {
                 String typeRef = validator.getSimpleTypeRef(Signature.createTypeSignature(lookupCall.getFullyQualifiedName(), true));
                 return "return " + typeRef + ".class;";
               }
             };
-            codeTypeOp.validate();
-            codeTypeOp.run(monitor, manager);
+            lookupCallOp.validate();
+            lookupCallOp.run(monitor, manager);
           }
         }
       }
