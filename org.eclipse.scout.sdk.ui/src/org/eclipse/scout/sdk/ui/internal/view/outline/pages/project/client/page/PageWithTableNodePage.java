@@ -134,7 +134,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
         ScoutSdkUi.logWarning("could not parse nls entry for method '" + titleMethod.getElementName() + "'.", e);
       }
     }
-    manager.add(new WizardAction("Create Search Form", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchFormAdd), wizard));
+    manager.add(new WizardAction("Create Search Form...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchFormAdd), wizard));
   }
 
   private class P_MethodChangedListener extends ElementChangedListenerEx {
