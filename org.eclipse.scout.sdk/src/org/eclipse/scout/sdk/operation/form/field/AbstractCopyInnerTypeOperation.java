@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -79,9 +79,13 @@ public class AbstractCopyInnerTypeOperation implements IOperation, IFieldPositio
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     List<String> imports = new ArrayList<String>();
+    String fieldSimpleName = getTypeToCopy().getElementName();
+    String normalizedFieldToCopyElementName = getTypeToCopy().getFullyQualifiedName().replace('$', '.');
+    String normalizedTargetFieldElementName = getTargetDeclaringType().getFullyQualifiedName().replace('$', '.');
     for (IImportDeclaration imp : getTypeToCopy().getCompilationUnit().getImports()) {
-      if (imp.getElementName().startsWith(getTypeToCopy().getFullyQualifiedName())) {
-        imports.add(imp.getElementName());
+      String normalizedImport = imp.getElementName().replace('$', '.');
+      if (normalizedImport.startsWith(normalizedFieldToCopyElementName)) {
+        imports.add(normalizedTargetFieldElementName + "." + fieldSimpleName + normalizedImport.replaceAll("^" + normalizedFieldToCopyElementName, ""));
       }
     }
     updateOrderNumbers(monitor, workingCopyManager);
@@ -147,12 +151,12 @@ public class AbstractCopyInnerTypeOperation implements IOperation, IFieldPositio
           case BEFORE:
             m_orderNr = tempOrderNr;
             tempOrderNr += 10.0;
-            orderAnnotationOp.addOrderAnnotation((IType) innerTypes[i], tempOrderNr);
+            orderAnnotationOp.addOrderAnnotation(innerTypes[i], tempOrderNr);
             m_sibling = innerTypes[i];
             break;
           case AFTER:
             tempOrderNr += 10.0;
-            orderAnnotationOp.addOrderAnnotation((IType) innerTypes[i], tempOrderNr);
+            orderAnnotationOp.addOrderAnnotation(innerTypes[i], tempOrderNr);
             m_orderNr = tempOrderNr;
             if (innerTypes.length > i + 1) {
               m_sibling = innerTypes[i + 1];
@@ -161,7 +165,7 @@ public class AbstractCopyInnerTypeOperation implements IOperation, IFieldPositio
         }
       }
       else {
-        orderAnnotationOp.addOrderAnnotation((IType) innerTypes[i], tempOrderNr);
+        orderAnnotationOp.addOrderAnnotation(innerTypes[i], tempOrderNr);
       }
       tempOrderNr += 10.0;
     }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,12 +26,12 @@ import org.eclipse.swt.dnd.DND;
 
 public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
 
+  @Override
   public boolean validateDrop(OutlineDropTargetEvent event) {
     try {
       if (!LocalSelectionTransfer.getTransfer().isSupportedType(event.getTransferData())) {
         return false;
       }
-//      int currentLocation = event.getCurrentLocation();
       Object currentTargetPage = event.getCurrentTarget();
       IType targetType = null;
       if (currentTargetPage instanceof AbstractBoxNodePage) {
@@ -72,10 +72,12 @@ public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
     return false;
   }
 
+  @Override
   public boolean expand(OutlineDropTargetEvent event) {
     return !(event.getCurrentTarget() instanceof AbstractFormFieldNodePage);
   }
 
+  @Override
   public boolean performDrop(OutlineDropTargetEvent event) {
     if (event.getOperation() == DND.DROP_COPY || event.getOperation() == DND.DROP_MOVE) {
       AbstractScoutTypePage sourcePage = (AbstractScoutTypePage) event.getSelectedObject();

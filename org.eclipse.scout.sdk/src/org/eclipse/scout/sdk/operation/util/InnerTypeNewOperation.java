@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,6 +38,7 @@ public class InnerTypeNewOperation extends AbstractScoutTypeNewOperation {
     m_formatSource = formatSource;
   }
 
+  @Override
   public String getOperationName() {
     return "New Inner Type '" + getTypeName() + "'";
   }
@@ -50,6 +51,7 @@ public class InnerTypeNewOperation extends AbstractScoutTypeNewOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(getDeclaringtype().getCompilationUnit(), monitor);
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getDeclaringtype().getCompilationUnit());
@@ -70,9 +72,11 @@ public class InnerTypeNewOperation extends AbstractScoutTypeNewOperation {
     for (String imp : validator.getImportsToCreate()) {
       if (!imp.matches(javaLangRegex)) {
         icu.createImport(imp, null, p);
+        System.out.println("--------- " + imp);
       }
     }
     IType t = m_declaringType.createType(content, getSibling(), true, p);
+
     return t;
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.operation.form.field;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,10 +35,10 @@ import org.eclipse.scout.sdk.operation.method.FieldGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
@@ -64,6 +64,7 @@ public class FormFieldMoveOperation implements IOperation, IFieldPosition {
     m_targetDeclaringType = targetDeclaringType;
   }
 
+  @Override
   public String getOperationName() {
     return "Move field '" + getFieldToMove().getElementName() + "'.";
   }
@@ -84,6 +85,7 @@ public class FormFieldMoveOperation implements IOperation, IFieldPosition {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find sibling
     IStructuredType structuredType = SdkTypeUtility.createStructuredCompositeField(getTargetDeclaringType());
@@ -91,11 +93,14 @@ public class FormFieldMoveOperation implements IOperation, IFieldPosition {
     String fieldSimpleName = getFieldToMove().getElementName();
     List<String> imports = new ArrayList<String>();
     if (!getTargetDeclaringType().equals(getFieldToMove().getDeclaringType())) {
+      String normalizedFieldToMoveElementName = getFieldToMove().getFullyQualifiedName().replace('$', '.');
+      String normalizedTargetFieldElementName = getTargetDeclaringType().getFullyQualifiedName().replace('$', '.');
       for (IImportDeclaration imp : getFieldToMove().getCompilationUnit().getImports()) {
-        if (imp.getElementName().startsWith(getFieldToMove().getFullyQualifiedName())) {
-          imports.add(imp.getElementName());
+        String normalizedImport = imp.getElementName().replace('$', '.');
+        if (normalizedImport.startsWith(normalizedFieldToMoveElementName)) {
+          imports.add(normalizedTargetFieldElementName + "." + fieldSimpleName + normalizedImport.replaceAll("^" + normalizedFieldToMoveElementName, ""));
+          imp.delete(true, monitor);
         }
-        imp.delete(true, monitor);
       }
     }
 
