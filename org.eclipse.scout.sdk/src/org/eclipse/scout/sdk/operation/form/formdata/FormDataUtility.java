@@ -254,7 +254,12 @@ public class FormDataUtility {
           if (TypeUtility.isGenericType(currentSuperType)) {
             String superTypeGenericParameterName = currentSuperType.getTypeParameters()[0].getElementName();
             String currentSuperTypeSig = currentType.getSuperclassTypeSignature();
-            String superTypeGenericParameterSignature = ScoutSdkUtility.getResolvedSignature(Signature.getTypeArguments(currentSuperTypeSig)[0], currentType);
+            String[] typeArgs = Signature.getTypeArguments(currentSuperTypeSig);
+            if (typeArgs.length < 1) {
+              // if the class has no generic type defined, use java.lang.Object as type for the formdata
+              typeArgs = new String[]{Signature.C_RESOLVED + Object.class.getName() + Signature.C_SEMICOLON};
+            }
+            String superTypeGenericParameterSignature = ScoutSdkUtility.getResolvedSignature(typeArgs[0], currentType);
             signatureMapping.add(0, new GenericSignatureMapping(superTypeGenericParameterName, superTypeGenericParameterSignature));
             currentType = currentSuperType;
             currentSuperType = formFieldHierarchy.getSuperclass(currentSuperType);
