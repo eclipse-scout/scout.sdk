@@ -47,6 +47,7 @@ import org.eclipse.scout.sdk.util.SdkMethodUtility;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 
@@ -207,7 +208,11 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       if (TypeUtility.exists(table)) {
         IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(iColumn, tablePageHierarchy));
         for (IType column : columns) {
-          createField(fieldBox, column, tablePageHierarchy, monitor, workingCopyManager);
+          ConfigurationMethod configurationMethod = SdkTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable");
+          String retVal = SdkMethodUtility.getMethodReturnValue(configurationMethod.peekMethod());
+          if ("true".equals(retVal)) {
+            createField(fieldBox, column, tablePageHierarchy, monitor, workingCopyManager);
+          }
         }
       }
     }
