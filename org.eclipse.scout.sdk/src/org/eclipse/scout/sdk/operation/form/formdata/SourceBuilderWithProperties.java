@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.operation.form.formdata;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
@@ -40,6 +41,8 @@ import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
  * @since 1.0.8 21.02.2011
  */
 public class SourceBuilderWithProperties extends TypeSourceBuilder {
+
+  private static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
 
   public SourceBuilderWithProperties(final IType type) {
     visitProperties(type);
@@ -144,13 +147,15 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
         for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
           ValidationRuleMethod vm = it.next();
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
-          if (generatedSourceCode.equals("null")) {
-            it.remove();
-            continue;
-          }
-          if (generatedSourceCode.equals("false")) {
-            it.remove();
-            continue;
+          if (generatedSourceCode != null) {
+            if (generatedSourceCode.equals("null")) {
+              it.remove();
+              continue;
+            }
+            if (generatedSourceCode.equals("false")) {
+              it.remove();
+              continue;
+            }
           }
         }
         if (list.size() > 0) {
@@ -167,6 +172,11 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
     catch (Throwable t) {
       ScoutSdk.logError("could not append validation rules to form field data '" + type.getFullyQualifiedName() + "'.", t);
     }
+  }
+
+  private static boolean containsBrackets(String genSource) {
+    String srcWithoutStrings = REGEX_STRING_LITERALS.matcher(genSource).replaceAll("");
+    return srcWithoutStrings != null && srcWithoutStrings.contains("(");
   }
 
   private static class ValidationRuleMethodOverrideBuilder extends MethodSourceBuilder {
@@ -186,7 +196,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
           //filter
           generatedSourceCode = filterGeneratedSourceCode(vm.getImplementedMethod(), generatedSourceCode, validator);
-          if (generatedSourceCode == null) {
+          if (generatedSourceCode == null || containsBrackets(generatedSourceCode)) {
             //add javadoc warning
             String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
             buf.append("/**");
@@ -227,22 +237,24 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
     }
 
     private String filterGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
-      IType[] refTypes = TypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
-      for (IType refType : refTypes) {
-        //if the type is a form field type it is tranformed to the corresponding form data field
-        ITypeHierarchy h = ScoutSdk.getSuperTypeHierarchy(refType);
-        if (h.contains(ScoutSdk.getType(RuntimeClasses.IFormField))) {
-          String formDataFieldName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(refType.getElementName()), true);
-          return formDataFieldName + ".class";
+      if (sourceSnippet != null) {
+        IType[] refTypes = TypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
+        for (IType refType : refTypes) {
+          //if the type is a form field type it is transformed to the corresponding form data field
+          ITypeHierarchy h = ScoutSdk.getSuperTypeHierarchy(refType);
+          if (h.contains(ScoutSdk.getType(RuntimeClasses.IFormField))) {
+            String formDataFieldName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(refType.getElementName()), true);
+            return formDataFieldName + ".class";
+          }
+          //other client types are not supported
+          String fqn = refType.getFullyQualifiedName();
+          //XXX imo: aho, is there a better way to find out if targetValidator would accept that type in the import section?
+          //XXX aho: yes, follows soon: if(TypeUtility.isOnClasspath(refType, targetValidator.getTargetProject())){
+          if (fqn.indexOf(".client.") >= 0) {
+            return null;
+          }
+          targetValidator.addImport(fqn);
         }
-        //other client types are not supported
-        String fqn = refType.getFullyQualifiedName();
-        //XXX imo: aho, is there a better way to find out if targetValidator would accept that type in the import section?
-        //XXX aho: yes, follows soon: if(TypeUtility.isOnClasspath(refType, targetValidator.getTargetProject())){
-        if (fqn.indexOf(".client.") >= 0) {
-          return null;
-        }
-        targetValidator.addImport(fqn);
       }
       return sourceSnippet;
     }
