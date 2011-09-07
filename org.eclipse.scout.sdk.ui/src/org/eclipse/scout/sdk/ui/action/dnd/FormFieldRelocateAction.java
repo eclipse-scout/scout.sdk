@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,9 +17,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldCopyOperation;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldMoveOperation;
+import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.dialog.RenameConfirmationDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -65,24 +63,15 @@ public class FormFieldRelocateAction extends Action {
       }
       fieldName = dialog.getTypeName();
     }
-    IOperation operation = null;
-    // copy
+    // operation
+    int mode = FormFieldDndOperation.MODE_MOVE;
     if (isCreateCopy()) {
-      FormFieldCopyOperation copyOp = new FormFieldCopyOperation(fieldName, getFormField(), getTargetDeclaringType());
-      copyOp.setPosition(getLocation());
-      copyOp.setPositionType(getNeighborField());
-      operation = copyOp;
+      mode = FormFieldDndOperation.MODE_COPY;
     }
-    // move
-    else {
-      FormFieldMoveOperation moveOperation = new FormFieldMoveOperation(getFormField(), getTargetDeclaringType());
-      moveOperation.setPosition(getLocation());
-      moveOperation.setPositionField(getNeighborField());
-      operation = moveOperation;
-    }
-    if (operation != null) {
-      new OperationJob(operation).schedule();
-    }
+    FormFieldDndOperation dndOp = new FormFieldDndOperation(getFormField(), getTargetDeclaringType(), fieldName, mode);
+    dndOp.setPosition(getLocation());
+    dndOp.setPositionType(getNeighborField());
+    new OperationJob(dndOp).schedule();
 
   }
 

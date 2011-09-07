@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypeOrderChangedPageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.wizard.form.fields.FormFieldNewWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
@@ -39,6 +40,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
   protected IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
 
   private InnerTypePageDirtyListener m_innerTypeListener;
+  private InnerTypeOrderChangedPageDirtyListener m_orderChangedListener;
 
   public AbstractBoxNodePage() {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Groupbox));
@@ -49,6 +51,10 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
     if (m_innerTypeListener != null) {
       ScoutSdk.removeInnerTypeChangedListener(getType(), m_innerTypeListener);
       m_innerTypeListener = null;
+    }
+    if (m_orderChangedListener != null) {
+      ScoutSdk.removeJavaResourceChangedListener(m_orderChangedListener);
+      m_orderChangedListener = null;
     }
     super.unloadPage();
   }
@@ -69,6 +75,11 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormField);
       ScoutSdk.addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
+    if (m_orderChangedListener == null) {
+      m_orderChangedListener = new InnerTypeOrderChangedPageDirtyListener(this, iFormField, getType());
+      ScoutSdk.addJavaResourceChangedListener(m_orderChangedListener);
+    }
+
     new KeyStrokeTablePage(this, getType());
     ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(getType());
     IType[] allSubtypes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iFormField, hierarchy), TypeComparators.getOrderAnnotationComparator());

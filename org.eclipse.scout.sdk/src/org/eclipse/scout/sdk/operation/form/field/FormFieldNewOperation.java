@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationsUpdateOperation;
-import org.eclipse.scout.sdk.operation.method.FieldGetterCreateOperation;
+import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
@@ -139,7 +139,7 @@ public class FormFieldNewOperation implements IOperation {
         TypeFilters.getToplevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {
-      FieldGetterCreateOperation getterMethodOp = new FieldGetterCreateOperation(getCreatedFormField(), form, true);
+      InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedFormField(), form, true);
       IStructuredType sourceHelper = SdkTypeUtility.createStructuredForm(form);
       IJavaElement sibling = sourceHelper.getSiblingMethodFieldGetter("get" + getTypeName());
       if (sibling == null && getCreatedFormField().getDeclaringType().equals(form)) {

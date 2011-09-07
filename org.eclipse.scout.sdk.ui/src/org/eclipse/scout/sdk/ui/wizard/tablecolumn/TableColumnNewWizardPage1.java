@@ -72,6 +72,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     m_filteredTable = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_filteredTable.getViewer().addFilter(new P_ModeFilter());
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -230,10 +231,12 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       m_templates = templates;
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return m_templates;
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
         return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
@@ -241,9 +244,9 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       return null;
     }
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       if (isShowAllTemplates()) {
-        System.out.println("blubber " + ((P_BCTypeTemplate) element).getType());
         return ((P_BCTypeTemplate) element).getType().getElementName();
       }
       else {
@@ -251,19 +254,24 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
   } // end class P_TableContentProvider

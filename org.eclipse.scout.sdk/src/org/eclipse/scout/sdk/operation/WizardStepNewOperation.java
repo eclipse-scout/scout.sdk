@@ -22,7 +22,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.operation.method.FieldGetterCreateOperation;
+import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
@@ -81,7 +81,7 @@ public class WizardStepNewOperation implements IOperation {
     wizardStepOp.run(monitor, workingCopyManager);
     m_createdWizardStep = wizardStepOp.getCreatedType();
     // getter on declaring type
-    FieldGetterCreateOperation getterOp = new FieldGetterCreateOperation(getCreatedWizardStep(), getDeclaringType(), true) {
+    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedWizardStep(), getDeclaringType(), true) {
       @Override
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         String wizardStepRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getField().getFullyQualifiedName(), true));

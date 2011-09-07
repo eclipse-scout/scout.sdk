@@ -109,6 +109,12 @@
       <dropSupport
             dropTargetDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.dnd.FormFieldDropTargetDelegator">
       </dropSupport>
+      <dragSupport
+            dragSourceDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.dnd.TableColumnDragSourceDelegator">
+      </dragSupport>
+      <dropSupport
+            dropTargetDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.dnd.TableColumnDropTargetDelegator">
+      </dropSupport>
    </extension>
    <extension point="org.eclipse.scout.sdk.ui.formField">
       <FormField

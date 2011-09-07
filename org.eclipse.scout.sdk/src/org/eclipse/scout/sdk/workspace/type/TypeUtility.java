@@ -568,8 +568,8 @@ public class TypeUtility {
 
   }
 
-  public static boolean exists(IJavaElement type) {
-    return type != null && type.exists();
+  public static boolean exists(IJavaElement element) {
+    return element != null && element.exists();
   }
 
   public static void setSource(IMember element, String source, IScoutWorkingCopyManager workingCopyManager, IProgressMonitor monitor) throws CoreException {

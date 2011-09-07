@@ -41,7 +41,7 @@ import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.operation.method.FieldGetterCreateOperation;
+import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
@@ -291,7 +291,7 @@ public class CreateTemplateOperation implements IOperation {
   protected void createFormFieldGetter(IType type, IType formType, TreeMap<CompositeObject, IJavaElement> siblings, HashMap<String, P_FormField> getterMethods, org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy hierarchy, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
     if (TypeUtility.exists(type)) {
       if (hierarchy.isSubtype(iFormField, type)) {
-        FieldGetterCreateOperation op = new FieldGetterCreateOperation(type, formType, true);
+        InnerTypeGetterCreateOperation op = new InnerTypeGetterCreateOperation(type, formType, true);
         CompositeObject key = new CompositeObject(1, op.getMethodName());
         for (Entry<CompositeObject, IJavaElement> entry : siblings.entrySet()) {
           if (entry.getKey().compareTo(key) > 0) {

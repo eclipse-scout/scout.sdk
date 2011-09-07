@@ -204,7 +204,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   @Override
   protected void cleanup() {
     if (m_methodChangedListener != null) {
-      ScoutSdk.removeJavaResouceChangedListener(m_methodChangedListener);
+      ScoutSdk.removeJavaResourceChangedListener(m_methodChangedListener);
 //      JavaCore.removeElementChangedListener(m_methodChangedListener);
       m_methodChangedListener = null;
     }

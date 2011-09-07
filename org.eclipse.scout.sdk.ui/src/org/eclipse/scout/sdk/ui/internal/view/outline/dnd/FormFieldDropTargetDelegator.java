@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldMoveOperation;
+import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
 import org.eclipse.scout.sdk.ui.action.dnd.FormFieldRelocateAction;
 import org.eclipse.scout.sdk.ui.extensions.IDropTargetDelegator;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.AbstractBoxNodePage;
@@ -32,13 +32,15 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       if (!LocalSelectionTransfer.getTransfer().isSupportedType(event.getTransferData())) {
         return false;
       }
-//      int currentLocation = event.getCurrentLocation();
       Object currentTargetPage = event.getCurrentTarget();
       IType targetType = null;
       if (currentTargetPage instanceof AbstractBoxNodePage) {
         targetType = ((AbstractBoxNodePage) currentTargetPage).getType();
       }
       else if (currentTargetPage instanceof AbstractFormFieldNodePage) {
+        if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {
+          return false;
+        }
         targetType = ((AbstractFormFieldNodePage) currentTargetPage).getType();
       }
       if (targetType == null) {
@@ -51,7 +53,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       else if (event.getSelectedObject() instanceof AbstractFormFieldNodePage) {
         selectedType = ((AbstractFormFieldNodePage) event.getSelectedObject()).getType();
       }
-      if (selectedType == null) {
+      if (selectedType == null || targetType.equals(selectedType)) {
         return false;
       }
       // do not allow copy boxes with inner types within the same compilation unit -> import problems of inner fields
@@ -102,11 +104,11 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
   private int dndToMoveOperationLocation(int location) {
     switch (location) {
       case ViewerDropAdapter.LOCATION_AFTER:
-        return FormFieldMoveOperation.AFTER;
+        return FormFieldDndOperation.AFTER;
       case ViewerDropAdapter.LOCATION_BEFORE:
-        return FormFieldMoveOperation.BEFORE;
+        return FormFieldDndOperation.BEFORE;
       default:
-        return FormFieldMoveOperation.LAST;
+        return FormFieldDndOperation.LAST;
     }
   }
 

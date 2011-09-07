@@ -14,14 +14,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldMoveOperation;
+import org.eclipse.scout.sdk.operation.dnd.AbstractTypeDndOperation;
 import org.eclipse.scout.sdk.ui.action.dnd.TableColumnRelocateAction;
 import org.eclipse.scout.sdk.ui.extensions.IDropTargetDelegator;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.AbstractBoxNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.ColumnNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.ColumnTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.OutlineDropTargetEvent;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
 public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
@@ -34,33 +34,32 @@ public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
       }
       Object currentTargetPage = event.getCurrentTarget();
       IType targetType = null;
-      if (currentTargetPage instanceof AbstractBoxNodePage) {
-        targetType = ((AbstractBoxNodePage) currentTargetPage).getType();
+//      IType declaringTable = null;
+      if (currentTargetPage instanceof ColumnTablePage) {
+        if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON) {
+          return false;
+        }
+        targetType = ((ColumnTablePage) currentTargetPage).getColumnDeclaringType();
+//        declaringTable = ((ColumnTablePage) currentTargetPage).getColumnDeclaringType();
       }
-      else if (currentTargetPage instanceof AbstractFormFieldNodePage) {
-        targetType = ((AbstractFormFieldNodePage) currentTargetPage).getType();
+      else if (currentTargetPage instanceof ColumnNodePage) {
+        if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {
+          return false;
+        }
+        targetType = ((ColumnNodePage) currentTargetPage).getType();
+//        declaringTable = ((ColumnNodePage) currentTargetPage).getType().getDeclaringType();
       }
       if (targetType == null) {
         return false;
       }
       IType selectedType = null;
-      if (event.getSelectedObject() instanceof AbstractBoxNodePage) {
-        selectedType = ((AbstractBoxNodePage) event.getSelectedObject()).getType();
-      }
-      else if (event.getSelectedObject() instanceof AbstractFormFieldNodePage) {
-        selectedType = ((AbstractFormFieldNodePage) event.getSelectedObject()).getType();
+      if (event.getSelectedObject() instanceof ColumnNodePage) {
+        selectedType = ((ColumnNodePage) event.getSelectedObject()).getType();
       }
       if (selectedType == null) {
         return false;
       }
-      // do not allow copy boxes with inner types within the same compilation unit -> import problems of inner fields
-      if (event.getOperation() == DND.DROP_COPY) {
-        if (selectedType.getCompilationUnit().equals(targetType.getCompilationUnit())) {
-          if (SdkTypeUtility.getFormFields(selectedType).length > 0) {
-            return false;
-          }
-        }
-      }
+
       if (selectedType.equals(targetType)) {
         return false;
       }
@@ -68,8 +67,8 @@ public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
     }
     catch (Exception e) {
       ScoutSdk.logWarning("could not validate drop location.", e);
+      return false;
     }
-    return false;
   }
 
   @Override
@@ -80,33 +79,46 @@ public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
   @Override
   public boolean performDrop(OutlineDropTargetEvent event) {
     if (event.getOperation() == DND.DROP_COPY || event.getOperation() == DND.DROP_MOVE) {
+      IType targetDeclaringType = null;
+      IType targetNeighborType = null;
+      if (event.getCurrentTarget() instanceof ColumnNodePage) {
+        targetNeighborType = ((ColumnNodePage) event.getCurrentTarget()).getType();
+        targetDeclaringType = targetNeighborType.getDeclaringType();
+      }
+      else if (event.getCurrentTarget() instanceof ColumnTablePage) {
+        targetDeclaringType = ((ColumnTablePage) event.getCurrentTarget()).getColumnDeclaringType();
+      }
       AbstractScoutTypePage sourcePage = (AbstractScoutTypePage) event.getSelectedObject();
-      AbstractScoutTypePage targetPage = (AbstractScoutTypePage) event.getCurrentTarget();
 
       TableColumnRelocateAction action = new TableColumnRelocateAction(sourcePage.getType(), sourcePage.getOutlineView().getSite().getShell());
       action.setCreateCopy(event.getOperation() == DND.DROP_COPY);
       action.setLocation(dndToMoveOperationLocation(event.getCurrentLocation()));
-      if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {
-        action.setTargetDeclaringType(targetPage.getType());
-      }
-      else {
-        action.setTargetDeclaringType(targetPage.getType().getDeclaringType());
-        action.setNeighborField(targetPage.getType());
-      }
+      action.setTargetDeclaringType(targetDeclaringType);
+      action.setNeighborField(targetNeighborType);
       action.run();
 
     }
     return true;
   }
 
+  private IType getDeclaringTableType(Object target) {
+    if (target instanceof ColumnTablePage) {
+      return ((ColumnTablePage) target).getColumnDeclaringType();
+    }
+    else if (target instanceof ColumnNodePage) {
+      return ((ColumnNodePage) target).getType().getDeclaringType();
+    }
+    return null;
+  }
+
   private int dndToMoveOperationLocation(int location) {
     switch (location) {
       case ViewerDropAdapter.LOCATION_AFTER:
-        return FormFieldMoveOperation.AFTER;
+        return AbstractTypeDndOperation.AFTER;
       case ViewerDropAdapter.LOCATION_BEFORE:
-        return FormFieldMoveOperation.BEFORE;
+        return AbstractTypeDndOperation.BEFORE;
       default:
-        return FormFieldMoveOperation.LAST;
+        return AbstractTypeDndOperation.LAST;
     }
   }
 

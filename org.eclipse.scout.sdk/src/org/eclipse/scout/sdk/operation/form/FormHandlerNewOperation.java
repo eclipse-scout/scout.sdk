@@ -65,6 +65,7 @@ public class FormHandlerNewOperation implements IOperation {
     m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true);
   }
 
+  @Override
   public String getOperationName() {
     return "new form handler...";
   }
@@ -79,8 +80,8 @@ public class FormHandlerNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    workingCopyManager.reconcile(getDeclaringType().getCompilationUnit(), monitor);
     workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
     // create handler
     InnerTypeNewOperation formHandlerOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType());

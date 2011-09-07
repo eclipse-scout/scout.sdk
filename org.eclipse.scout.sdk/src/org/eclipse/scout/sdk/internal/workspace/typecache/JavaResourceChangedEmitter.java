@@ -72,6 +72,7 @@ public class JavaResourceChangedEmitter {
     m_eventListenerLock = new Object();
     m_innerTypeChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
     m_methodChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
+
     m_resourceChangeListener = new P_ResourceListener();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener);
     m_javaElementListener = new P_JavaElementChangedListener();
@@ -479,6 +480,10 @@ public class JavaResourceChangedEmitter {
       else {
         IJavaElement e = delta.getElement();
         if (e != null) {
+          // annotations
+          for (IJavaElementDelta annotationDelta : delta.getAnnotationDeltas()) {
+            visitDelta(annotationDelta, eventType);
+          }
           switch (kind) {
             case IJavaElementDelta.ADDED:
               add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));

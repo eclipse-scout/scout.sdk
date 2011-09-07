@@ -451,7 +451,6 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     ServiceReference serviceReference = context.getServiceReference(IMenuService.class.getName());
     try {
       Object service = context.getService(serviceReference);
-      System.out.println();
     }
     finally {
       context.ungetService(serviceReference);

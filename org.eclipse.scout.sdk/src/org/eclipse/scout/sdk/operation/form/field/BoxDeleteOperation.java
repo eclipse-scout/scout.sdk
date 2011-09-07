@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
+import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
@@ -38,6 +38,7 @@ public class BoxDeleteOperation implements IOperation {
     m_name = Texts.get("Action_deleteTypeX", ScoutSourceUtilities.getTranslatedMethodStringValue(boxType, "getConfiguredLabel"));
   }
 
+  @Override
   public String getOperationName() {
     return m_name;
   }
@@ -49,17 +50,29 @@ public class BoxDeleteOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
-    deleteGetterMethodsAndImportsRec(getBoxType(), monitor, workingCopyManager);
-    TypeDeleteOperation op = new TypeDeleteOperation(getBoxType());
-    op.run(monitor, workingCopyManager);
+    JavaElementDeleteOperation deleteOperation = new JavaElementDeleteOperation();
+    deleteGetterMethodsAndImportsRec(getBoxType(), deleteOperation, monitor, workingCopyManager);
+    deleteOperation.addMember(getBoxType());
+    // collect all imports
+    String normalizedTypeName = getBoxType().getFullyQualifiedName().replace('$', '.');
+    for (IImportDeclaration imp : getBoxType().getCompilationUnit().getImports()) {
+      String normalizedImport = imp.getElementName().replace('$', '.');
+      if (normalizedImport.startsWith(normalizedTypeName)) {
+        deleteOperation.addMember(imp);
+      }
+    }
+    deleteOperation.run(monitor, workingCopyManager);
+//    TypeDeleteOperation op = new TypeDeleteOperation(getBoxType());
+//    op.run(monitor, workingCopyManager);
   }
 
-  protected void deleteGetterMethodsAndImportsRec(IType type, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected void deleteGetterMethodsAndImportsRec(IType type, JavaElementDeleteOperation deleteOperation, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
     IPrimaryTypeTypeHierarchy columnHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iColumn);
     ITypeHierarchy localHierarchy = columnHierarchy.combinedTypeHierarchy(type.getCompilationUnit());
     for (IType innerType : type.getTypes()) {
-      deleteGetterMethodsAndImportsRec(innerType, monitor, manager);
+      deleteGetterMethodsAndImportsRec(innerType, deleteOperation, monitor, manager);
     }
     IMethod getter = null;
     if (localHierarchy.isSubtype(iColumn, type)) {
@@ -70,13 +83,13 @@ public class BoxDeleteOperation implements IOperation {
     }
     manager.register(type.getCompilationUnit(), false, monitor);
     if (TypeUtility.exists(getter)) {
-      getter.delete(true, monitor);
+      deleteOperation.addMember(getter);
     }
-    // import
-    IImportDeclaration importDec = type.getCompilationUnit().getImport(type.getFullyQualifiedName().replaceAll("\\$", "."));
-    if (importDec != null && importDec.exists()) {
-      importDec.delete(true, monitor);
-    }
+//    // import
+//    IImportDeclaration importDec = type.getCompilationUnit().getImport(type.getFullyQualifiedName().replaceAll("\\$", "."));
+//    if (importDec != null && importDec.exists()) {
+//      importDec.delete(true, monitor);
+//    }
   }
 
   public IType getBoxType() {

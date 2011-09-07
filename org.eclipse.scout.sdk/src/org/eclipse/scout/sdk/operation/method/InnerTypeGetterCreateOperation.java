@@ -20,16 +20,16 @@ import org.eclipse.scout.sdk.util.ScoutSignature;
 /**
  *
  */
-public class FieldGetterCreateOperation extends MethodCreateOperation {
+public class InnerTypeGetterCreateOperation extends MethodCreateOperation {
 
   private final IType m_field;
 
-  public FieldGetterCreateOperation(IType field, IType getterDeclaringType) throws JavaModelException {
+  public InnerTypeGetterCreateOperation(IType field, IType getterDeclaringType) throws JavaModelException {
     this(field, getterDeclaringType, false);
 
   }
 
-  public FieldGetterCreateOperation(IType field, IType getterDeclaringType, boolean formatSource) throws JavaModelException {
+  public InnerTypeGetterCreateOperation(IType field, IType getterDeclaringType, boolean formatSource) throws JavaModelException {
     super(getterDeclaringType, "get" + field.getElementName(), null, formatSource);
     m_field = field;
     setMethodFlags(Flags.AccPublic);

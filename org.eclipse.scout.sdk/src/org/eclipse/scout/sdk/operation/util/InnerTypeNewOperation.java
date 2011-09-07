@@ -72,7 +72,6 @@ public class InnerTypeNewOperation extends AbstractScoutTypeNewOperation {
     for (String imp : validator.getImportsToCreate()) {
       if (!imp.matches(javaLangRegex)) {
         icu.createImport(imp, null, p);
-        System.out.println("--------- " + imp);
       }
     }
     IType t = m_declaringType.createType(content, getSibling(), true, p);
