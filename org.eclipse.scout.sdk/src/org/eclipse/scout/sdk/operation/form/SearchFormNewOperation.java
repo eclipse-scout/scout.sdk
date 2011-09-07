@@ -73,6 +73,9 @@ public class SearchFormNewOperation implements IOperation {
       formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
       formDataOp.run(monitor, workingCopyManager);
       formDataSignature = Signature.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName(), true);
+      // exported form type
+      ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{formDataOp.getCreatedType().getPackageFragment()}, true);
+      manifestOp.run(monitor, workingCopyManager);
     }
     // form
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSearchFormLocationBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS), getSearchFormLocationBundle());
@@ -112,6 +115,11 @@ public class SearchFormNewOperation implements IOperation {
       // formDataOp.setFormDataPackageName(getSearchFormDataLocationBundle().getPackageNameOutlineService());
       formDataOp.run(monitor, workingCopyManager);
       m_createdFormDataType = formDataOp.getFormDataType();
+
+//      // add formdata package to exported packages of shared plugin
+//      ManifestExportPackageOperation manifestOpFormData = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY,
+//          new IPackageFragment[]{m_createdFormDataType.getPackageFragment()}, true);
+//      manifestOpFormData.run(monitor, workingCopyManager);
     }
     if (getTablePage() != null) {
       SearchFormFromTablePageFillOperation fillOp = new SearchFormFromTablePageFillOperation();
@@ -178,6 +186,7 @@ public class SearchFormNewOperation implements IOperation {
     formatOp.run(monitor, workingCopyManager);
   }
 
+  @Override
   public String getOperationName() {
     return "New Search Form...";
   }
