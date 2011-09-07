@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -56,6 +56,7 @@ public class NlsProposalTextField extends ProposalTextField {
     manager.setRemoveAllWhenShown(true);
     Menu menu = manager.createContextMenu(getTextComponent());
     manager.addMenuListener(new IMenuListener() {
+      @Override
       public void menuAboutToShow(IMenuManager managerInside) {
         createContextMenu((MenuManager) managerInside);
       }
@@ -85,6 +86,9 @@ public class NlsProposalTextField extends ProposalTextField {
       }
       row = action.getEntry();
       if (row != null) {
+        if (getNlsProject() != null) {
+          getProposalProvider().setNlsEntries(getNlsProject().getAllEntries(), getNlsProject().getDevelopmentLanguage());
+        }
         NlsProposal selectedProposal = new NlsProposal(row, getNlsProject().getDevelopmentLanguage());
         acceptProposal(selectedProposal);
         return;
