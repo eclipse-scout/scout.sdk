@@ -66,7 +66,7 @@ public abstract class AbstractPageOperation implements IOperation {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(childPagesMethod) {
         @Override
         protected void updateMethodBody(Document methodBody, IImportValidator validator) throws CoreException {
-          Matcher matcher = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(\\s*[a-zA-Z0-9\\_\\-]*\\s*\\)\\;", Pattern.MULTILINE).matcher(methodBody.get());
+          Matcher matcher = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(.+\\)\\;", Pattern.MULTILINE).matcher(methodBody.get());
           int index = -1;
           String listName = null;
           while (matcher.find()) {
