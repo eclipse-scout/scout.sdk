@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree.P_DependentFilter;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
@@ -181,11 +180,11 @@ public class TreeUtility {
           TreeNode productNode = new TreeNode(TYPE_PRODUCT_NODE, file.getName() + " (" + file.getParent().getName() + ")", file);
           productNode.setCheckable(checkMode);
           productNode.setBold(true);
-          Image img = ScoutSdkUi.getImage(ScoutSdkUi.File);
+          //Image img = ScoutSdkUi.getImage(ScoutSdkUi.File);
           IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) file.getAdapter(IWorkbenchAdapter.class);
           if (wbAdapter != null) {
             ImageDescriptor imageDescriptor = wbAdapter.getImageDescriptor(file);
-            ((TreeNode) productNode).setImage(imageDescriptor);
+            (productNode).setImage(imageDescriptor);
           }
 
           if (visibleFilter.accept(productNode)) {
@@ -195,6 +194,16 @@ public class TreeUtility {
       }
       return rootNode;
     }
+  }
+
+  public static IFile[] getAllProductFiles(IScoutProject project) {
+    ArrayList<P_ProductFile> productFiles = new ArrayList<P_ProductFile>();
+    instance.visitScoutProject(productFiles, project);
+    IFile[] ret = new IFile[productFiles.size()];
+    for (int i = 0; i < ret.length; i++) {
+      ret[i] = productFiles.get(i).getProductFile();
+    }
+    return ret;
   }
 
   private void visitScoutProject(List<P_ProductFile> productFileCollector, IScoutProject project) {

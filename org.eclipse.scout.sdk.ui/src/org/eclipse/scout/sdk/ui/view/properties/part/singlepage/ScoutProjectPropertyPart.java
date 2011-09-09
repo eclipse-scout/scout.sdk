@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import java.util.ArrayList;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -148,16 +148,23 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   @Override
   public void save(IMemento memento) {
+    IFile[] files = new IFile[m_launchPresenters.size()];
+    for (int i = 0; i < files.length; i++) {
+      files[i] = m_launchPresenters.get(i).getProductFile();
+    }
+    saveProductLaunchers(getScoutProject(), files);
+  }
+
+  public static void saveProductLaunchers(IScoutProject scoutProject, IFile[] files) {
     StringBuilder mementoString = new StringBuilder();
-    ProductLaunchPresenter[] presenters = m_launchPresenters.toArray(new ProductLaunchPresenter[m_launchPresenters.size()]);
-    for (int i = 0; i < presenters.length; i++) {
-      mementoString.append(presenters[i].getProductFile().getFullPath());
-      if (i < presenters.length - 1) {
+    for (int i = 0; i < files.length; i++) {
+      mementoString.append(files[i].getFullPath());
+      if (i < files.length - 1) {
         mementoString.append(",");
       }
     }
     IEclipsePreferences node = new InstanceScope().getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
-    node.put(SECTION_ID_PRODUCT_LAUNCHER + "_" + getScoutProject().getProjectName(), mementoString.toString());
+    node.put(SECTION_ID_PRODUCT_LAUNCHER + "_" + scoutProject.getProjectName(), mementoString.toString());
   }
 
   private class P_ProductFile {

@@ -124,6 +124,12 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     getSite().setSelectionProvider(m_outlineSelectionProvider);
     m_viewer.setUseHashlookup(true);
     m_viewContentProvider = new ViewContentProvider();
+    m_viewContentProvider.addContentProviderListener(new IContentProviderListener() {
+      @Override
+      public void handleChildrenLoaded(IPage page) {
+        m_viewer.refresh(page);
+      }
+    });
     m_viewer.setContentProvider(m_viewContentProvider);
     m_viewer.setLabelProvider(new ViewLabelProvider(parent, this));
     m_viewer.setSorter(null);
@@ -152,6 +158,24 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
       }
     });
+    expandAndSelectProjectLevel();
+  }
+
+  @Override
+  public void expandAndSelectProjectLevel() {
+    try {
+      m_viewContentProvider.setLoadSync(true);
+      m_viewer.expandToLevel(4);
+      IPage[] children = m_invisibleRoot.getChildArray();
+      if (children != null && children.length > 0) {
+        IPage p = children[0];
+        StructuredSelection outlineSelection = new StructuredSelection(p);
+        m_viewer.setSelection(outlineSelection);
+      }
+    }
+    finally {
+      m_viewContentProvider.setLoadSync(false);
+    }
   }
 
   public InvisibleRootNodePage getInvisibleRoot() {
@@ -290,6 +314,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     MenuManager menuMgr = new MenuManager("#PopupMenu");
     menuMgr.setRemoveAllWhenShown(true);
     menuMgr.addMenuListener(new IMenuListener() {
+      @Override
       public void menuAboutToShow(IMenuManager manager) {
         ScoutExplorerPart.this.fillContextMenu(manager);
       }
@@ -323,6 +348,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
   private void hookSelectionAction() {
     m_viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent e) {
         handleNodeSelection((StructuredSelection) e.getSelection());
       }
@@ -337,9 +363,11 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   private void hookKeyActions() {
     m_viewer.getControl().addKeyListener(
         new KeyListener() {
+          @Override
           public void keyPressed(KeyEvent e) {
           }
 
+          @Override
           public void keyReleased(final KeyEvent e) {
             ISelection sel = m_viewer.getSelection();
             if (sel instanceof StructuredSelection) {
@@ -349,6 +377,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
                 if (elem instanceof AbstractPage) {
                   final AbstractPage page = (AbstractPage) elem;
                   ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
+                    @Override
                     public void run() {
                       if (e.keyCode == SWT.F5) {
                         // act on F5
@@ -374,6 +403,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
   private void hookDoubleClickAction() {
     m_viewer.addDoubleClickListener(new IDoubleClickListener() {
+      @Override
       public void doubleClick(DoubleClickEvent e) {
         handleNodeAction((StructuredSelection) e.getSelection());
 
@@ -401,10 +431,12 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
   }
 
+  @Override
   public void setSelection(IStructuredSelection selection) {
     getTreeViewer().setSelection(selection);
   }
 
+  @Override
   public IStructuredSelection getSelection() {
     return (IStructuredSelection) getTreeViewer().getSelection();
   }
@@ -426,19 +458,23 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       m_viewer.addSelectionChangedListener(this);
     }
 
+    @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
       m_selectionListeners.add(listener);
     }
 
+    @Override
     public ISelection getSelection() {
       return m_viewer.getSelection();
     }
 
+    @Override
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
       m_selectionListeners.remove(listener);
 
     }
 
+    @Override
     public void setSelection(ISelection selection) {
 
       if (CompareUtility.notEquals(getTreeViewer().getSelection(), selection)) {
@@ -460,6 +496,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       }
     }
 
+    @Override
     public void selectionChanged(SelectionChangedEvent event) {
       if (m_viewer.getData(RefreshOutlineSubTreeOperation.SELECTION_PREVENTER) != null) {
         return;

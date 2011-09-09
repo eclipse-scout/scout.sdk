@@ -8,24 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.view.outline;
+package org.eclipse.scout.sdk.ui.internal.view.outline;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
+import java.util.EventListener;
+
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**
- * <h3>IScoutExplorerPart</h3> ...
+ *
  */
-public interface IScoutExplorerPart {
+public interface IContentProviderListener extends EventListener {
 
-  /**
-   * @return
-   */
-  IStructuredSelection getSelection();
-
-  /**
-   * @param selection
-   */
-  void setSelection(IStructuredSelection selection);
-
-  void expandAndSelectProjectLevel();
+  public void handleChildrenLoaded(IPage page);
 }
