@@ -51,6 +51,7 @@ public class RegexTest {
   public void testRegexFieldDeclaration_validFieldDeclarations() {
     checkVariableDeclarationRightHandSide("int i = 5;", "5");
     checkVariableDeclarationRightHandSide("  int     i    =     5     ;", "5");
+    checkVariableDeclarationRightHandSide("@Deprecated private int i = 5;", "5");
     checkVariableDeclarationRightHandSide("private int i = 5;", "5");
     checkVariableDeclarationRightHandSide("private static String foo = \"String\";", "\"String\"");
     checkVariableDeclarationRightHandSide("private final static String foo = \"test string with \\\" \";", "\"test string with \\\" \"");
