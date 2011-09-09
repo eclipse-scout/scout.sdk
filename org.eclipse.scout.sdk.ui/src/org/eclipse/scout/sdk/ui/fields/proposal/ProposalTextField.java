@@ -56,14 +56,17 @@ public class ProposalTextField extends TextField {
   private ProposalPopup m_popup;
   private P_ProposalFieldListener m_proposalFieldListener;
   private IContentProposalEx m_loadingProposal = new ISeparatorProposal() {
+    @Override
     public String getLabel(boolean selected, boolean expertMode) {
       return "Loading...";
     }
 
+    @Override
     public Image getImage(boolean selected, boolean expertMode) {
       return ScoutSdkUi.getImage(ScoutSdkUi.ToolProgress);
     }
 
+    @Override
     public int getCursorPosition(boolean selected, boolean expertMode) {
       return 0;
     }
@@ -81,6 +84,7 @@ public class ProposalTextField extends TextField {
   private IProposalPopupListener m_popupListener = new P_PopupListener();
   private int m_type;
   private boolean m_searchExpertMode;
+  private IProposalDescriptionProvider m_proposalDescriptionProvider;
 
   public ProposalTextField(Composite parent) {
     this(parent, null);
@@ -304,6 +308,14 @@ public class ProposalTextField extends TextField {
 
   }
 
+  public void setProposalDescriptionProvider(IProposalDescriptionProvider proposalDescriptionProvider) {
+    m_proposalDescriptionProvider = proposalDescriptionProvider;
+  }
+
+  public IProposalDescriptionProvider getProposalDescriptionProvider() {
+    return m_proposalDescriptionProvider;
+  }
+
   @Override
   public void setText(String text) {
     if (m_updateLock.aquire()) {
@@ -447,8 +459,10 @@ public class ProposalTextField extends TextField {
 
   private synchronized void openPopup() {
     m_popup = new ProposalPopup(getTextComponent(), m_proposalProvider.supportsExpertMode(), m_searchExpertMode);
+    m_popup.setProposalDescriptionProvider(m_proposalDescriptionProvider);
     m_popup.open();
     m_popup.getShell().addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent event) {
         if (m_popup != null) {
           m_popup.removePopupListener(m_popupListener);
@@ -514,6 +528,7 @@ public class ProposalTextField extends TextField {
       }
       m_requestPattern.setProposals(proposals);
       getDisplay().syncExec(new Runnable() {
+        @Override
         public void run() {
           if (m_monitor.isCanceled()) {
             return;
@@ -531,6 +546,7 @@ public class ProposalTextField extends TextField {
   } // end P_ProposalLoaderJob
 
   private class P_ProposalFieldListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Modify: {
@@ -754,6 +770,7 @@ public class ProposalTextField extends TextField {
   } // end class P_RequestPattern
 
   private class P_PopupListener implements IProposalPopupListener {
+    @Override
     public void popupChanged(ProposalPopupEvent event) {
       switch (event.getType()) {
         case ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED:
@@ -769,6 +786,9 @@ public class ProposalTextField extends TextField {
         case ProposalPopupEvent.TYPE_SEARCH_SHORTENED:
           m_searchExpertMode = ((Boolean) event.getData(ProposalPopupEvent.IDENTIFIER_SELECTION_SEARCH_SHORTENED)).booleanValue();
           m_lastRequestPattern = null;
+          updateProposals();
+          break;
+        case ProposalPopupEvent.TYPE_PROPOSAL_SELECTED:
           updateProposals();
           break;
         case ProposalPopupEvent.TYPE_POPUP_CLOSED:

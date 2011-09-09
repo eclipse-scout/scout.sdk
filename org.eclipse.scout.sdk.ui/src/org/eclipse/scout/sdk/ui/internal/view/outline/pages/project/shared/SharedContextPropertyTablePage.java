@@ -105,31 +105,33 @@ public class SharedContextPropertyTablePage extends AbstractPage {
 
     @Override
     public boolean accept(IMethod candidate) {
-      try {
-        String source = candidate.getSource();
-        if (source.contains("setSharedContextVariable")) {
-          String propName = candidate.getElementName();
-          propName = propName.replaceFirst("^set", "");
-          PropertyBean bean = m_beans.get(propName);
-          if (bean == null) {
-            bean = new PropertyBean(candidate.getDeclaringType(), propName);
-            m_beans.put(propName, bean);
+      if (TypeUtility.exists(candidate) && !candidate.isBinary()) {
+        try {
+          String source = candidate.getSource();
+          if (source.contains("setSharedContextVariable")) {
+            String propName = candidate.getElementName();
+            propName = propName.replaceFirst("^set", "");
+            PropertyBean bean = m_beans.get(propName);
+            if (bean == null) {
+              bean = new PropertyBean(candidate.getDeclaringType(), propName);
+              m_beans.put(propName, bean);
+            }
+            bean.setWriteMethod(candidate);
           }
-          bean.setWriteMethod(candidate);
-        }
-        else if (source.contains("getSharedContextVariable")) {
-          String propName = candidate.getElementName();
-          propName = propName.replaceFirst("^(get|is)", "");
-          PropertyBean bean = m_beans.get(propName);
-          if (bean == null) {
-            bean = new PropertyBean(candidate.getDeclaringType(), propName);
-            m_beans.put(propName, bean);
+          else if (source.contains("getSharedContextVariable")) {
+            String propName = candidate.getElementName();
+            propName = propName.replaceFirst("^(get|is)", "");
+            PropertyBean bean = m_beans.get(propName);
+            if (bean == null) {
+              bean = new PropertyBean(candidate.getDeclaringType(), propName);
+              m_beans.put(propName, bean);
+            }
+            bean.setReadMethod(candidate);
           }
-          bean.setReadMethod(candidate);
         }
-      }
-      catch (JavaModelException e) {
-        ScoutSdkUi.logError("could not parse method '" + candidate.getElementName() + "' on type '" + candidate.getDeclaringType().getFullyQualifiedName() + "'.", e);
+        catch (JavaModelException e) {
+          ScoutSdkUi.logError("could not parse method '" + candidate.getElementName() + "' on type '" + candidate.getDeclaringType().getFullyQualifiedName() + "'.", e);
+        }
       }
       return false;
     }
