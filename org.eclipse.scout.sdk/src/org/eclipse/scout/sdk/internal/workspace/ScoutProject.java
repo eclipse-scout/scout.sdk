@@ -44,6 +44,7 @@ public class ScoutProject implements IScoutProject {
     m_scoutBundles = new HashSet<ScoutBundle>();
   }
 
+  @Override
   public ScoutWorkspace getScoutWorkspace() {
     return m_scoutWorkspace;
   }
@@ -66,6 +67,7 @@ public class ScoutProject implements IScoutProject {
     return PROJECT;
   }
 
+  @Override
   public String getProjectName() {
     return m_projectName;
   }
@@ -77,14 +79,17 @@ public class ScoutProject implements IScoutProject {
     }
   }
 
+  @Override
   public ScoutProject getParentProject() {
     return getScoutWorkspace().getParentProject(this);
   }
 
+  @Override
   public ScoutProject[] getSubProjects() {
     return getScoutWorkspace().getSubProjects(this);
   }
 
+  @Override
   public boolean hasParentOrSubProjects() {
     if (getParentProject() != null) {
       return true;
@@ -196,9 +201,15 @@ public class ScoutProject implements IScoutProject {
         }
       }
     }
+    for (ScoutProject subProject : getSubProjects()) {
+      if (subProject.contains(element)) {
+        return true;
+      }
+    }
     return false;
   }
 
+  @Override
   public INlsProject findNlsProject() {
     INlsProject nlsProject = getNlsProject();
     if (nlsProject == null) {
@@ -223,6 +234,7 @@ public class ScoutProject implements IScoutProject {
     return m_nlsProject;
   }
 
+  @Override
   public IIconProvider findIconProvider() {
     IIconProvider iconProvider = getIconProvider();
     if (iconProvider == null) {
@@ -234,6 +246,7 @@ public class ScoutProject implements IScoutProject {
     return iconProvider;
   }
 
+  @Override
   public IIconProvider getIconProvider() {
     if (m_iconProvider == null) {
       m_iconProvider = new ScoutProjectIcons(this);
