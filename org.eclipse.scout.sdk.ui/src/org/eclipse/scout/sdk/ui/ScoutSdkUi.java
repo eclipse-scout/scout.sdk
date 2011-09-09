@@ -16,6 +16,7 @@ import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
+import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -31,6 +32,8 @@ import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
@@ -67,7 +70,11 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   // COLORS
   public static final String COLOR_INACTIVE_FOREGROUND = "inactiveForeground";
 
+  // FONTS
+  public static final String FONT_SYSTEM_BOLD = "fontSystemBold";
+
   private ColorRegistry m_colorRegistry;
+  private FontRegistry m_fontRegistry;
   private ServiceRegistration m_formDataServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
   private int m_loglevel;
@@ -294,6 +301,23 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   public static Color getColor(String colorId) {
     return getDefault().getColorRegistry().get(colorId);
+  }
+
+  public FontRegistry getFontRegistry() {
+    if (m_fontRegistry == null) {
+      m_fontRegistry = new FontRegistry(getDisplay());
+      FontData[] systemFontData = getDisplay().getSystemFont().getFontData();
+      FontData[] systemBoldData = new FontData[systemFontData.length];
+      for (int i = 0; i < systemFontData.length; i++) {
+        systemBoldData[i] = new FontData(systemFontData[i].getName(), systemFontData[i].getHeight(), SWT.BOLD);
+      }
+      m_fontRegistry.put(FONT_SYSTEM_BOLD, systemBoldData);
+    }
+    return m_fontRegistry;
+  }
+
+  public static Font getFont(String fontId) {
+    return getDefault().getFontRegistry().get(fontId);
   }
 
   @Override

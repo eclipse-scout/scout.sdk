@@ -64,6 +64,7 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the type
    */
+  @Override
   public int getType() {
     return m_type;
   }
@@ -72,6 +73,7 @@ public class TreeNode implements ITreeNode {
    * @param text
    *          the text to set
    */
+  @Override
   public void setText(String text) {
     m_text = text;
   }
@@ -79,6 +81,7 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the text
    */
+  @Override
   public String getText() {
     return m_text;
   }
@@ -90,30 +93,37 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the data
    */
+  @Override
   public Object getData() {
     return m_data;
   }
 
+  @Override
   public void setParent(ITreeNode parent) {
     m_parent = parent;
   }
 
+  @Override
   public ITreeNode getParent() {
     return m_parent;
   }
 
+  @Override
   public void addChild(ITreeNode childNode) {
     m_children.add(childNode);
   }
 
+  @Override
   public boolean removeChild(ITreeNode childNode) {
     return m_children.remove(childNode);
   }
 
+  @Override
   public List<ITreeNode> getChildren() {
     return m_children;
   }
 
+  @Override
   public ITreeNode[] getChildren(ITreeNodeFilter filter) {
     ArrayList<ITreeNode> children = new ArrayList<ITreeNode>();
     for (ITreeNode child : getChildren()) {
@@ -128,6 +138,7 @@ public class TreeNode implements ITreeNode {
    * @param visible
    *          the visible to set
    */
+  @Override
   public void setVisible(boolean visible) {
     m_visible = visible;
   }
@@ -135,6 +146,7 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the visible
    */
+  @Override
   public boolean isVisible() {
     return m_visible;
   }
@@ -153,6 +165,7 @@ public class TreeNode implements ITreeNode {
    * @param bold
    *          the bold to set
    */
+  @Override
   public void setBold(boolean bold) {
     m_bold = bold;
   }
@@ -160,6 +173,7 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the bold
    */
+  @Override
   public boolean isBold() {
     return m_bold;
   }
@@ -175,6 +189,7 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the image
    */
+  @Override
   public ImageDescriptor getImage() {
     return m_image;
   }
@@ -183,6 +198,7 @@ public class TreeNode implements ITreeNode {
    * @param checkable
    *          the checkable to set
    */
+  @Override
   public void setCheckable(boolean checkable) {
     m_checkable = checkable;
   }
@@ -190,6 +206,7 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the checkable
    */
+  @Override
   public boolean isCheckable() {
     return m_checkable;
   }
@@ -205,6 +222,7 @@ public class TreeNode implements ITreeNode {
   /**
    * @return the orderNr
    */
+  @Override
   public long getOrderNr() {
     return m_orderNr;
   }

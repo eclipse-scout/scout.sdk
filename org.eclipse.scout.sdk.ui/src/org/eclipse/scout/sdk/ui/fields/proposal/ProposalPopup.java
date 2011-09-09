@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.Texts;
@@ -253,7 +254,12 @@ public class ProposalPopup extends Window {
     }
     // Default to the first selection if there is no selection. This is the case, every time the popup is opened.
     if (m_tableViewer.getSelection().isEmpty()) {
-      m_tableViewer.getTable().select(0);
+      Object proposal = m_tableViewer.getElementAt(0);
+      if (proposal != null) {
+        updateDescription((IContentProposalEx) proposal);
+      }
+      m_tableViewer.setSelection(new StructuredSelection(proposal));
+//      m_tableViewer.getTable().select(0);
     }
     m_itemCountLabel.setText(proposals.length + " items found");
   }

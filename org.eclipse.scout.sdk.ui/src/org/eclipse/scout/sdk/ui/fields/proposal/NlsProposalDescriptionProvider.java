@@ -13,8 +13,11 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 import java.util.Set;
 
 import org.eclipse.scout.nls.sdk.model.util.Language;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -30,7 +33,8 @@ public class NlsProposalDescriptionProvider implements IProposalDescriptionProvi
 
     if (proposal instanceof NlsProposal) {
       NlsProposal nlsProp = (NlsProposal) proposal;
-      if (nlsProp.getNlsEntry().getKey().contains("Field")) {
+      String key = nlsProp.getNlsEntry().getKey();
+      if (key == null) {
         return null;
       }
       Composite rootArea = new Composite(parent, SWT.INHERIT_FORCE);
@@ -38,6 +42,18 @@ public class NlsProposalDescriptionProvider implements IProposalDescriptionProvi
       Set<Language> lanuageSet = nlsProp.getNlsEntry().getAllTranslations().keySet();
       Language[] languageArr = lanuageSet.toArray(new Language[lanuageSet.size()]);
       // Arrays.sort(languageArr, NlsCore.getLanguageDefaultComparator());
+      Label keyLabel = new Label(rootArea, SWT.NONE);
+      keyLabel.setBackground(rootArea.getBackground());
+      keyLabel.setFont(ScoutSdkUi.getFont(ScoutSdkUi.FONT_SYSTEM_BOLD));
+      keyLabel.setText(key);
+      keyLabel.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 2, 1));
+      Canvas splitter = new Canvas(rootArea, SWT.NONE);
+      splitter.setBackground(splitter.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+      GridData splitterData = new GridData(SWT.DEFAULT, 2);
+      splitterData.grabExcessHorizontalSpace = true;
+      splitterData.horizontalSpan = 2;
+      splitterData.horizontalAlignment = SWT.FILL;
+      splitter.setLayoutData(splitterData);
       for (Language lang : languageArr) {
         Label langLabel = new Label(rootArea, SWT.NONE);
         langLabel.setBackground(rootArea.getBackground());
