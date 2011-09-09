@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -40,6 +40,7 @@ public class SmartFieldNewOperation implements IOperation {
   private String m_superTypeSignature;
 
   private IType m_codeType;
+  private IType m_lookupCall;
   private IJavaElement m_sibling;
   private IType m_createdField;
 
@@ -54,6 +55,7 @@ public class SmartFieldNewOperation implements IOperation {
     setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSmartField + "<" + Long.class.getName() + ">", true));
   }
 
+  @Override
   public String getOperationName() {
     return "Create smart field '" + getTypeName() + "'...";
   }
@@ -68,6 +70,7 @@ public class SmartFieldNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
@@ -85,7 +88,7 @@ public class SmartFieldNewOperation implements IOperation {
     }
 
     if (getCodeType() != null) {
-      MethodOverrideOperation codetypeOp = new MethodOverrideOperation(m_createdField, "getConfiguredCodeType") {
+      MethodOverrideOperation codetypeOp = new MethodOverrideOperation(m_createdField, "getConfiguredCodeType", false) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder source = new StringBuilder();
@@ -99,6 +102,20 @@ public class SmartFieldNewOperation implements IOperation {
       codetypeOp.run(monitor, workingCopyManager);
 
     }
+    else if (getLookupCall() != null) {
+      MethodOverrideOperation lookupCallOp = new MethodOverrideOperation(m_createdField, "getConfiguredLookupCall", false) {
+        @Override
+        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+          StringBuilder sourceBuilder = new StringBuilder();
+          String lookupCallRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getLookupCall().getFullyQualifiedName(), true));
+          sourceBuilder.append("return " + lookupCallRef + ".class;\n");
+          return sourceBuilder.toString();
+        }
+      };
+      lookupCallOp.validate();
+      lookupCallOp.run(monitor, workingCopyManager);
+    }
+
     if (isFormatSource()) {
       // format
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedField(), true);
@@ -154,6 +171,14 @@ public class SmartFieldNewOperation implements IOperation {
 
   public void setCodeType(IType codeType) {
     m_codeType = codeType;
+  }
+
+  public IType getLookupCall() {
+    return m_lookupCall;
+  }
+
+  public void setLookupCall(IType lookupCall) {
+    m_lookupCall = lookupCall;
   }
 
   public IJavaElement getSibling() {

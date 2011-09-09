@@ -41,10 +41,10 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Composite;
 public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   final IType iSmartField = ScoutSdk.getType(RuntimeClasses.ISmartField);
   final IType abstractSmartField = ScoutSdk.getType(RuntimeClasses.AbstractSmartField);
-
+  final IType iLookupCall = ScoutSdk.getType(RuntimeClasses.LookupCall);
   final IType iCodeType = ScoutSdk.getType(RuntimeClasses.ICodeType);
 
   private NlsProposal m_nlsName;
@@ -65,12 +65,14 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_superType;
   private SignatureProposal m_genericSignature;
   private ITypeProposal m_codeType;
+  private ITypeProposal m_lookupCall;
   private SiblingProposal m_sibling;
 
   private NlsProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_genericTypeField;
   private ProposalTextField m_codeTypeField;
+  private ProposalTextField m_lookupCallField;
   private ProposalTextField m_siblingField;
 
   // process members
@@ -94,6 +96,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), "Name");
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -118,6 +121,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM_FIELD);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
@@ -128,6 +132,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_genericSignature = (SignatureProposal) event.proposal;
         pingStateChanging();
@@ -138,14 +143,42 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_codeTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(codeTypeProposals), "Code Type");
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_codeType = (ITypeProposal) event.proposal;
+        try {
+          m_codeType = (ITypeProposal) event.proposal;
+          m_lookupCallField.acceptProposal(null);
+          m_lookupCallField.setEnabled(m_codeType == null);
+        }
+        finally {
+          setStateChanging(false);
+        }
+        pingStateChanging();
+      }
+    });
+
+    ITypeProposal[] lookupCallProps = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getClassesOnClasspath(iLookupCall, m_declaringType.getJavaProject()));
+    m_lookupCallField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(lookupCallProps), "Lookup call");
+    m_lookupCallField.acceptProposal(getLookupCall());
+    m_lookupCallField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        try {
+          setStateChanging(true);
+          m_lookupCall = (ITypeProposal) event.proposal;
+          m_codeTypeField.acceptProposal(null);
+          m_codeTypeField.setEnabled(m_lookupCall == null);
+        }
+        finally {
+          setStateChanging(false);
+        }
         pingStateChanging();
       }
     });
 
     m_siblingField = getFieldToolkit().createFormFieldSiblingProposalField(parent, m_declaringType);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_sibling = (SiblingProposal) event.proposal;
         pingStateChanging();
@@ -160,6 +193,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_genericTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_codeTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_lookupCallField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_siblingField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
@@ -183,9 +217,14 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setSuperTypeSignature(sig);
     }
     ITypeProposal codeTypeProposal = getCodeType();
+    ITypeProposal lookupCallProposal = getLookupCall();
     if (codeTypeProposal != null) {
       operation.setCodeType(codeTypeProposal.getType());
     }
+    else if (lookupCallProposal != null) {
+      operation.setLookupCall(lookupCallProposal.getType());
+    }
+
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = SdkTypeUtility.createStructuredCompositeField(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
@@ -321,6 +360,23 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   public ITypeProposal getCodeType() {
     return m_codeType;
+  }
+
+  public void setLookupCall(ITypeProposal lookupCall) {
+    try {
+      setStateChanging(true);
+      m_lookupCall = lookupCall;
+      if (isControlCreated()) {
+        m_codeTypeField.acceptProposal(lookupCall);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  public ITypeProposal getLookupCall() {
+    return m_lookupCall;
   }
 
   public SiblingProposal getSibling() {
