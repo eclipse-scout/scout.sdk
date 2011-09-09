@@ -44,7 +44,7 @@ public class Regex {
 
   public static final String REGEX_ICON_NAME = "(\\\")?(([^\\\\/]*(/|\\\\))*)([^.\\\"]*)(\\.)?([^\"]*)(\\\")?";
 
-  public static final String REGEX_FIELD_DECLARATION = "\\s*(public|private|protected)?\\s*(final\\s*|static\\s*|transient\\s*|volatile\\s*){0,4}([a-zA-Z0-9_]*(<([a-zA-Z0-9_]|(,\\s*))*>)?)\\s*([a-zA-Z0-9_]*)(\\s*=\\s*(.*))?\\s*;.*";
+  public static final String REGEX_FIELD_DECLARATION = "\\s*(@Deprecated){0,1}\\s*(public|private|protected)?\\s*(final\\s*|static\\s*|transient\\s*|volatile\\s*){0,4}([a-zA-Z0-9_]*(<([a-zA-Z0-9_]|(,\\s*))*>)?)\\s*([a-zA-Z0-9_]*)(\\s*=\\s*(.*))?\\s*;.*";
 
   /**
    * @param fieldSource
@@ -133,7 +133,7 @@ public class Regex {
     Pattern pattern = Pattern.compile(Regex.REGEX_FIELD_DECLARATION, Pattern.DOTALL);
     Matcher matcher = pattern.matcher(fieldDeclaration);
     if (matcher.matches()) {
-      String match = matcher.group(9);
+      String match = matcher.group(10);
       if (match != null) {
         match = match.trim();
       }
