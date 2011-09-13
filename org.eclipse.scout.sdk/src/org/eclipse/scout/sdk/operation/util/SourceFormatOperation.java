@@ -88,8 +88,7 @@ public class SourceFormatOperation implements IOperation {
       // XXX check which code is calling this with a type source
       CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getJavaProject().getOptions(false));
       int kind = CodeFormatter.F_INCLUDE_COMMENTS | CodeFormatter.K_UNKNOWN;
-      TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent,
-          ScoutUtility.getLineSeparator(getDocument()));
+      TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent, ScoutUtility.getLineSeparator(getDocument()));
       if (te != null) {
         te.apply(getDocument());
       }

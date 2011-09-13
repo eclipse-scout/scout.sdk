@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.dnd;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
+import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
 import org.eclipse.scout.sdk.ui.action.dnd.FormFieldRelocateAction;
@@ -36,6 +37,9 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       IType targetType = null;
       if (currentTargetPage instanceof AbstractBoxNodePage) {
         targetType = ((AbstractBoxNodePage) currentTargetPage).getType();
+        if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON && targetType.getElementName().equals(ScoutIdeProperties.TYPE_NAME_MAIN_BOX)) {
+          return false;
+        }
       }
       else if (currentTargetPage instanceof AbstractFormFieldNodePage) {
         if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {

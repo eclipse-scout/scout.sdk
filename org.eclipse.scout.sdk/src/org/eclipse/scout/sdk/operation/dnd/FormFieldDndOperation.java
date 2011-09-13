@@ -82,7 +82,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
       deleteOp.run(monitor, workingCopyManager);
     }
     else {
-      FormFieldDeleteOperation deleteOp = new FormFieldDeleteOperation(getType(), true);
+      FormFieldDeleteOperation deleteOp = new FormFieldDeleteOperation(getType(), false);
       deleteOp.validate();
       deleteOp.run(monitor, workingCopyManager);
     }
