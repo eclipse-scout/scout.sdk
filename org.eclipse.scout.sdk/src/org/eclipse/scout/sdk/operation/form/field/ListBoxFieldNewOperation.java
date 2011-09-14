@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,7 +38,6 @@ public class ListBoxFieldNewOperation implements IOperation {
   private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
-  private IType m_genericType;
   private IType m_codeType;
   private IJavaElement m_sibling;
   private IType m_createdField;
@@ -51,7 +50,7 @@ public class ListBoxFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractListBox, true));
+    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractListBox + "<" + Long.class.getName() + ">", true));
   }
 
   @Override
@@ -68,6 +67,7 @@ public class ListBoxFieldNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
@@ -106,6 +106,7 @@ public class ListBoxFieldNewOperation implements IOperation {
     }
   }
 
+  @Override
   public String getOperationName() {
     return "New list box";
   }
@@ -148,14 +149,6 @@ public class ListBoxFieldNewOperation implements IOperation {
 
   public void setSuperTypeSignature(String superTypeSignature) {
     m_superTypeSignature = superTypeSignature;
-  }
-
-  public IType getGenericType() {
-    return m_genericType;
-  }
-
-  public void setGenericType(IType genericType) {
-    m_genericType = genericType;
   }
 
   public IType getCodeType() {

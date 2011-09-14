@@ -65,15 +65,17 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
     }
     if (!StringUtility.isNullOrEmpty(entityName)) {
       // form
-      String formRegex = entityName + ScoutIdeProperties.SUFFIX_FORM;
-      ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
-          TypeFilters.getRegexSimpleNameFilter(formRegex),
-          TypeFilters.getClassFilter(),
-          TypeFilters.getInScoutProject(getPage().getScoutResource().getScoutProject())
-          );
-      LinkGroup formGroup = model.getOrCreateGroup("Form", 10);
-      for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(iForm).getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator())) {
-        formGroup.addLink(new TypeOpenLink(candidate));
+      if (iForm != null) /* can be null on a server-only-project (bugzilla ticket 325428) */{
+        String formRegex = entityName + ScoutIdeProperties.SUFFIX_FORM;
+        ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
+            TypeFilters.getRegexSimpleNameFilter(formRegex),
+            TypeFilters.getClassFilter(),
+            TypeFilters.getInScoutProject(getPage().getScoutResource().getScoutProject())
+            );
+        LinkGroup formGroup = model.getOrCreateGroup("Form", 10);
+        for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(iForm).getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator())) {
+          formGroup.addLink(new TypeOpenLink(candidate));
+        }
       }
       // permissions
       String permissionRegex = "(Create|Read|Update)" + entityName + ScoutIdeProperties.SUFFIX_PERMISSION;

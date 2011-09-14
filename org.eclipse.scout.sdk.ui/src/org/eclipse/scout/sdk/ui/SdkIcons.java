@@ -17,6 +17,7 @@ package org.eclipse.scout.sdk.ui;
  * @since 1.0.8 28.11.2010
  */
 public interface SdkIcons {
+//CHECKSTYLE:OFF
   String ToolAdd = "add.png";
   String ToolRemove = "remove.png";
   String ToolDelete = "delete.gif";
@@ -324,5 +325,5 @@ public interface SdkIcons {
   String UnknownField = FormField; // TODO
   String UnknownFieldAdd = ToolAdd; // TODO
   String UnknownFieldRemove = ToolRemove; // TODO
-
+//CHECKSTYLE:ON
 }

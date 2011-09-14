@@ -64,6 +64,7 @@ public class MethodUpdateContentOperation implements IOperation {
     m_formatSource = formatSource;
   }
 
+  @Override
   public String getOperationName() {
     return Texts.get("Process_deleteX", getMethod().getElementName());
   }
@@ -79,6 +80,7 @@ public class MethodUpdateContentOperation implements IOperation {
 
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     ISourceRange contentRange = TypeUtility.getContentRange(getMethod());
     if (contentRange != null) {
@@ -143,7 +145,7 @@ public class MethodUpdateContentOperation implements IOperation {
    * @return
    * @throws JavaModelException
    */
-  protected String createMethodBody(String originalBody, @SuppressWarnings("unused") IImportValidator validator) throws JavaModelException {
+  protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
     StringBuilder builder = new StringBuilder();
     if (!StringUtility.isNullOrEmpty(getSimpleBody())) {
       builder.append(getSimpleBody());

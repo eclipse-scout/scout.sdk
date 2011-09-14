@@ -13,7 +13,6 @@ Export-Package: com.bsiag.miniapp.client,
  com.bsiag.miniapp.client.ui.desktop,
  com.bsiag.miniapp.client.ui.forms
 Import-Package: javax.activation;resolution:=optional,
- javax.jms;resolution:=optional,
  javax.mail;resolution:=optional,
  javax.mail.event;resolution:=optional,
  javax.mail.internet;resolution:=optional,

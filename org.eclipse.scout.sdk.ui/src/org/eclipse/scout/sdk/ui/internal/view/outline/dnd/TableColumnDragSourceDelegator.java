@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 
 public class TableColumnDragSourceDelegator implements IDragSourceDelegator {
 
+  @Override
   public boolean acceptDrag(DragSourceEvent event, TreeViewer outlineViewer) {
     StructuredSelection selection = (StructuredSelection) outlineViewer.getSelection();
     if (selection.size() == 1) {
@@ -28,6 +29,7 @@ public class TableColumnDragSourceDelegator implements IDragSourceDelegator {
     return false;
   }
 
+  @Override
   public void dragSetData(DragSourceEvent event, TreeViewer outlineViewer) {
     LocalSelectionTransfer transfer = LocalSelectionTransfer.getTransfer();
     if (transfer.isSupportedType(event.dataType)) {
@@ -36,6 +38,7 @@ public class TableColumnDragSourceDelegator implements IDragSourceDelegator {
     }
   }
 
+  @Override
   public void dragFinished(DragSourceEvent event, TreeViewer outlineViewer) {
     // void delete of the moved field is handled in the move operation.
   }

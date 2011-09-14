@@ -252,7 +252,7 @@ public class ScoutSdk extends Plugin {
     getDefault().getJavaResourceChangedEmitter().addJavaResourceChangedListener(listener);
   }
 
-  public static void removeJavaResouceChangedListener(IJavaResourceChangedListener listener) {
+  public static void removeJavaResourceChangedListener(IJavaResourceChangedListener listener) {
     getDefault().getJavaResourceChangedEmitter().removeJavaResouceChangedListener(listener);
   }
 

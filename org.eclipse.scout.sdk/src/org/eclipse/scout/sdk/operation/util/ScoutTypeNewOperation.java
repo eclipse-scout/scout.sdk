@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jdt.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  * <h3>BCTypeNewOperation</h3> To create a new BCType. Can be used to create a class or an interface. To create an
@@ -68,7 +69,10 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
 
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     IPackageFragment pck = getScoutBundle().getSpecificPackageFragment(getImplementationPackageName(), monitor, workingCopyManager);
-    ICompilationUnit icu = pck.createCompilationUnit(getTypeName() + ".java", "", true, monitor);
+    ICompilationUnit icu = pck.getCompilationUnit(getTypeName() + ".java");
+    if (!TypeUtility.exists(icu)) {
+      icu = pck.createCompilationUnit(getTypeName() + ".java", "", true, monitor);
+    }
     workingCopyManager.register(icu, monitor);
     icu.createPackageDeclaration(pck.getElementName(), monitor);
     SimpleImportValidator validator = new SimpleImportValidator(getImplementationPackageName());

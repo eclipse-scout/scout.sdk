@@ -20,6 +20,7 @@ public final class RuntimeClasses {
   private RuntimeClasses() {
   }
 
+// CHECKSTYLE:OFF
   public static final String ScoutSharedBundleId = "org.eclipse.scout.rt.shared";
   public static final String ScoutClientBundleId = "org.eclipse.scout.rt.client";
   public static final String ScoutServerBundleId = "org.eclipse.scout.rt.server";
@@ -234,4 +235,5 @@ public final class RuntimeClasses {
   public static final String CopyWidthsOfColumnsMenu = "org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu";
 
   public static final String ResourceServlet = "org.eclipse.scout.rt.server.ResourceServlet";
+//CHECKSTYLE:ON
 }

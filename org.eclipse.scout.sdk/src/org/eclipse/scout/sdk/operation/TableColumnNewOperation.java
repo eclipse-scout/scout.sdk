@@ -22,7 +22,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.operation.method.FieldGetterCreateOperation;
+import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
@@ -83,7 +83,7 @@ public class TableColumnNewOperation implements IOperation {
     m_createdColumn = columnOp.getCreatedType();
     // getter on declaring table
 
-    FieldGetterCreateOperation getterOp = new FieldGetterCreateOperation(getCreatedColumn(), getDeclaringType(), true) {
+    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedColumn(), getDeclaringType(), true) {
       @Override
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         StringBuilder source = new StringBuilder();

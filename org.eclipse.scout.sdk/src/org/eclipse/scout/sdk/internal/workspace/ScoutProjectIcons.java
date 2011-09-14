@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.internal.workspace;
 
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,12 +18,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.FileLocator;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
@@ -32,7 +25,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutFileLocator;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
@@ -49,7 +41,8 @@ import org.eclipse.swt.graphics.ImageData;
 
 public class ScoutProjectIcons implements IIconProvider {
 
-  protected static String[] PREDEFINED_EXTENSIONS = new String[]{"ico", "gif", "png"};
+  protected static String[] PREDEFINED_EXTENSIONS = new String[]{"png", "ico", "gif"};
+  protected static String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
 
   private HashMap<String, ScoutIconDesc> m_cachedIcons;
   private Object cacheLock = new Object();
@@ -111,7 +104,6 @@ public class ScoutProjectIcons implements IIconProvider {
     List<String> projects = new ArrayList<String>();
     IScoutBundle clientP = m_scoutProject.getClientBundle();
     while (clientP != null) {
-
       projects.add(clientP.getBundleName());
       if (clientP.getScoutProject().getParentProject() != null) {
         clientP = clientP.getScoutProject().getParentProject().getClientBundle();
@@ -121,6 +113,8 @@ public class ScoutProjectIcons implements IIconProvider {
       }
     }
     projects.add(RuntimeClasses.ScoutClientBundleId);
+    projects.add(RuntimeClasses.ScoutUiSwtBundleId);
+    projects.add(RuntimeClasses.ScoutUiSwingBundleId);
     // invert order
     String[] result = projects.toArray(new String[projects.size()]);
     Arrays.sort(result, Collections.reverseOrder());
@@ -157,8 +151,16 @@ public class ScoutProjectIcons implements IIconProvider {
         if (Flags.isPublic(field.getFlags()) && field.getSource() != null && field.getSource().contains(" String ")) {
           String source = field.getSource();
           String iconDeclaration = ScoutUtility.removeComments(source);
-          String iconSimpleName = Regex.getFieldDeclarationRightHandSide(iconDeclaration);
-          collector.put(iconSimpleName, new ScoutIconDesc(field.getElementName(), Regex.getIconSimpleName(iconSimpleName), field, inherited));
+          String iconSimpleName = null;
+          try {
+            iconSimpleName = Regex.getFieldDeclarationRightHandSide(iconDeclaration);
+            collector.put(iconSimpleName, new ScoutIconDesc(field.getElementName(), Regex.getIconSimpleName(iconSimpleName), field, inherited));
+          }
+          catch (Exception e) {
+            e.printStackTrace();
+            System.out.println(iconDeclaration);
+            // TODO: handle exception
+          }
         }
       }
       collectIconNamesOfType(m_iconsHierarchy.getSuperclass(iconType), collector);
@@ -166,53 +168,58 @@ public class ScoutProjectIcons implements IIconProvider {
   }
 
   protected void findIconInProject(ScoutIconDesc desc) {
+    if (desc == null || desc.getIconName() == null) return;
+
     for (String baseUrl : m_baseUrls) {
       for (String ext : PREDEFINED_EXTENSIONS) {
-        String imgPath = "resources/icons/" + desc.getIconName() + "." + ext;
-        InputStream is = ScoutFileLocator.resolve(baseUrl, imgPath);
-        if (is != null) {
-          ImageDescriptor desc1 = ImageDescriptor.createFromImageData(new ImageData(is));
-          if (desc1 != null) {
-            desc.setImgDesc(desc1);
+        for (String folder : PREDEFINED_SUB_FOLDERS) {
+          String imgPath = folder + desc.getIconName() + "." + ext;
+          InputStream is = ScoutFileLocator.resolve(baseUrl, imgPath);
+          if (is != null) {
+            ImageDescriptor desc1 = ImageDescriptor.createFromImageData(new ImageData(is));
+            if (desc1 != null) {
+              desc.setImgDesc(desc1);
+              return;
+            }
           }
         }
       }
     }
   }
 
-  protected void findIconInProject1(IScoutProject project, ScoutIconDesc desc) {
-    if (project == null) {
-      return;
-    }
-    for (String ext : PREDEFINED_EXTENSIONS) {
-      Path iconPath = new Path(ScoutIdeProperties.ICON_PATH + desc.getIconName() + "." + ext);
-      if (project.getClientBundle() != null) {
-        if (project.getClientBundle().getProject().getResourceAttributes().isReadOnly()) {
-          URL[] imgUrl = FileLocator.findEntries(Platform.getBundle(project.getClientBundle().getBundleName()), iconPath, null);
-          if (imgUrl.length > 0) {
-            desc.setImgDesc(ImageDescriptor.createFromURL(imgUrl[imgUrl.length - 1]));
-            return;
-          }
-        }
-        else {
-          project.getClientBundle().getProject().getFile(iconPath);
-          try {
-            IResource iconResource = project.getClientBundle().getProject().getFile(iconPath);
-            if (iconResource instanceof IFile && iconResource.exists()) {
-              ImageData data = new ImageData(((IFile) iconResource).getContents());
-              desc.setImgDesc(ImageDescriptor.createFromImageData(data));
-              return;
-            }
-          }
-          catch (CoreException e) {
-            ScoutSdk.logInfo("could not find icon '" + iconPath + "'");
-            return;
-          }
-        }
-      }
-    }
-    findIconInProject1(project.getParentProject(), desc);
-  }
+//  protected void findIconInProject1(IScoutProject project, ScoutIconDesc desc) {
+//    if (project == null) {
+//      return;
+//    }
+//    for (String ext : PREDEFINED_EXTENSIONS) {
+//      Path iconPath = new Path(ScoutIdeProperties.ICON_PATH + desc.getIconName() + "." + ext);
+//      if (project.getClientBundle() != null) {
+//        if (project.getClientBundle().getProject().getResourceAttributes().isReadOnly()) {
+//          URL[] imgUrl = FileLocator.findEntries(Platform.getBundle(project.getClientBundle().getBundleName()), iconPath, null);
+//          if (imgUrl.length > 0) {
+//            desc.setImgDesc(ImageDescriptor.createFromURL(imgUrl[imgUrl.length - 1]));
+//            return;
+//          }
+//        }
+//        else {
+//          project.getClientBundle().getProject().getFile(iconPath);
+//          try {
+//            IResource iconResource = project.getClientBundle().getProject().getFile(iconPath);
+//            if (iconResource instanceof IFile && iconResource.exists()) {
+//              ImageData data = new ImageData(((IFile) iconResource).getContents());
+//              desc.setImgDesc(ImageDescriptor.createFromImageData(data));
+//              return;
+//            }
+//          }
+//          catch (CoreException e) {
+//            ScoutSdk.logInfo("could not find icon '" + iconPath + "'");
+//            return;
+//          }
+//        }
+//      }
+//    }
+//    findIconInProject1(project.getParentProject(), desc);
+//  }
 
 //  protected void findIconsInProject(IScoutProject project,  Map<String, ScoutIconDesc> collector){
 //    IType[] iconTypes = iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getInScoutBundles(project.getSharedBundle()));

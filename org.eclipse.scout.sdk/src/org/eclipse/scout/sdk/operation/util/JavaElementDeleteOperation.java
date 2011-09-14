@@ -12,7 +12,9 @@ package org.eclipse.scout.sdk.operation.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -53,6 +55,7 @@ public class JavaElementDeleteOperation implements IOperation {
     return m_typesToDelete.remove(type);
   }
 
+  @Override
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
     builder.append("delete ");
@@ -81,12 +84,20 @@ public class JavaElementDeleteOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+    HashSet<ICompilationUnit> icuForOrganizeImports = new HashSet<ICompilationUnit>();
     for (IJavaElement m : m_typesToDelete) {
-      deleteMember(m, monitor, workingCopyManager);
+      deleteMember(m, icuForOrganizeImports, monitor, workingCopyManager);
     }
+    for (ICompilationUnit icu : icuForOrganizeImports) {
+      if (TypeUtility.exists(icu)) {
+        OrganizeImportOperation op = new OrganizeImportOperation(icu);
+//        op.run(monitor, workingCopyManager);
+      }
+    }
+
   }
 
-  protected void deleteMember(IJavaElement member, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
     if (!member.exists()) {
       ScoutSdk.logWarning("Can not delete a non existing member '" + member.getElementName() + "'.");
       return;
@@ -94,7 +105,10 @@ public class JavaElementDeleteOperation implements IOperation {
     switch (member.getElementType()) {
       case IJavaElement.IMPORT_DECLARATION:
         IImportDeclaration imp = (IImportDeclaration) member;
-        manager.register((ICompilationUnit) imp.getPrimaryElement(), monitor);
+        IJavaElement ancestor = imp.getAncestor(IJavaElement.COMPILATION_UNIT);
+        if (TypeUtility.exists(ancestor)) {
+          manager.register((ICompilationUnit) ancestor, monitor);
+        }
         imp.delete(true, monitor);
         break;
       case IJavaElement.TYPE:
@@ -105,12 +119,13 @@ public class JavaElementDeleteOperation implements IOperation {
         else {
           ICompilationUnit icu = type.getCompilationUnit();
           manager.register(icu, false, monitor);
-          // clear imports
-          IImportDeclaration importDeclaration = icu.getImport(((IType) member).getFullyQualifiedName());
-          deleteMember(importDeclaration, monitor, manager);
+//          // clear imports
+//          IImportDeclaration importDeclaration = icu.getImport(((IType) member).getFullyQualifiedName());
+//          deleteMember(importDeclaration, monitor, manager);
           type.delete(true, monitor);
-          OrganizeImportOperation op = new OrganizeImportOperation(icu);
-          op.run(monitor, manager);
+          icuForOrganizeImports.add(icu);
+//          OrganizeImportOperation op = new OrganizeImportOperation(icu);
+//          op.run(monitor, manager);
         }
         break;
       case IJavaElement.COMPILATION_UNIT:
@@ -121,12 +136,14 @@ public class JavaElementDeleteOperation implements IOperation {
         IMember method = (IMember) member;
         manager.register(method.getCompilationUnit(), monitor);
         method.delete(true, monitor);
+        icuForOrganizeImports.add(method.getCompilationUnit());
         break;
       case IJavaElement.ANNOTATION:
         IAnnotation annotation = (IAnnotation) member;
         IJavaElement primEle = annotation.getAncestor(IJavaElement.COMPILATION_UNIT);
         manager.register((ICompilationUnit) primEle, monitor);
         member.getParent().getJavaModel().delete(new IJavaElement[]{member}, true, monitor);
+        icuForOrganizeImports.add((ICompilationUnit) primEle);
         break;
       default:
         ScoutSdk.logWarning("no delete routine found for '" + member.getElementName() + "'.");
@@ -139,6 +156,7 @@ public class JavaElementDeleteOperation implements IOperation {
     for (IType t : icu.getTypes()) {
       t.delete(true, monitor);
     }
+    icu.delete(true, monitor);
     manager.unregister(icu, monitor);
     IPackageFragment packageFragment = (IPackageFragment) icu.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
     String resourceName = icu.getElementName();

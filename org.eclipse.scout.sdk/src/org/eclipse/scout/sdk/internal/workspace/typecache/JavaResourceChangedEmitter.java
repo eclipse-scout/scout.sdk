@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.internal.jdt.finegraned.FineGrainedAstMatcher;
 import org.eclipse.scout.sdk.internal.jdt.finegraned.FineGrainedJavaElementDelta;
@@ -73,6 +72,7 @@ public class JavaResourceChangedEmitter {
     m_eventListenerLock = new Object();
     m_innerTypeChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
     m_methodChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
+
     m_resourceChangeListener = new P_ResourceListener();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener);
     m_javaElementListener = new P_JavaElementChangedListener();
@@ -401,8 +401,12 @@ public class JavaResourceChangedEmitter {
       try {
         if (delta != null) {
           delta.accept(new IResourceDeltaVisitor() {
+            @Override
             public boolean visit(IResourceDelta visitDelta) {
               IResource resource = visitDelta.getResource();
+              if (resource.getType() == IResource.PROJECT && ((visitDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.REMOVED)) != 0)) {
+                m_hierarchyCache.clearCache();
+              }
               if (resource.getType() == IFile.FILE && resource.getFileExtension() != null) {
                 if (resource.getFileExtension().equalsIgnoreCase("java") && ((visitDelta.getFlags() & IResourceDelta.CONTENT) != 0)) {
                   releaseCompilationUnit((ICompilationUnit) JavaCore.create(resource));
@@ -414,9 +418,12 @@ public class JavaResourceChangedEmitter {
 
           });
         }
+        else if (event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource().getType() == IResource.PROJECT) {
+          m_hierarchyCache.clearCache();
+        }
       }
       catch (CoreException e) {
-        NlsCore.logWarning(e);
+        ScoutSdk.logWarning(e);
       }
     }
   } // end class P_ResouceListener
@@ -473,6 +480,10 @@ public class JavaResourceChangedEmitter {
       else {
         IJavaElement e = delta.getElement();
         if (e != null) {
+          // annotations
+          for (IJavaElementDelta annotationDelta : delta.getAnnotationDeltas()) {
+            visitDelta(annotationDelta, eventType);
+          }
           switch (kind) {
             case IJavaElementDelta.ADDED:
               add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));

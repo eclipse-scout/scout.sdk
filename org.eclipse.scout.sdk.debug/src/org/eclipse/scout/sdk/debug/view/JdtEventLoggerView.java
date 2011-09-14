@@ -265,6 +265,7 @@ public class JdtEventLoggerView extends ViewPart {
 
     private void visitDelta(IJavaElementDelta delta, int eventType, StringBuilder eventLogBuilder, int indent) {
       int flags = delta.getFlags();
+      eventType = delta.getKind();
 
       // children
       if ((flags & IJavaElementDelta.F_CHILDREN) != 0) {
@@ -278,6 +279,9 @@ public class JdtEventLoggerView extends ViewPart {
       }
       else {
         eventLogBuilder.append(getEventLogLine(delta, eventType, indent));
+      }
+      for (IJavaElementDelta annotationDelta : delta.getAnnotationDeltas()) {
+        visitDelta(annotationDelta, eventType, eventLogBuilder, indent + 1);
       }
     }
   }

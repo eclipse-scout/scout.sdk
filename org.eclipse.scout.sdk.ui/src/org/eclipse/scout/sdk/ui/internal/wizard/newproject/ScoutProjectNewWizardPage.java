@@ -66,7 +66,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   private StyledTextField m_postFixField;
   private CheckableTree m_bundleTree;
   private ITreeNode m_invisibleRootNode;
-  private StyledTextField m_projectAliasNameFild;
+  private StyledTextField m_projectAliasNameField;
 
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
@@ -79,6 +79,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
     m_projectNameField = getFieldToolkit().createStyledTextField(parent, "Project Name");
     m_projectNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         try {
           setStateChanging(true);
@@ -93,6 +94,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
     m_postFixField = getFieldToolkit().createStyledTextField(parent, "Project Postfix");
     m_postFixField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         try {
           setStateChanging(true);
@@ -132,7 +134,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     });
 
     Control aliasGroup = createAliasGroup(parent);
-    m_projectAliasNameFild.setFocus();
+    m_projectNameField.setFocus();
     // layout
     parent.setLayout(new GridLayout(1, true));
 
@@ -174,7 +176,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       alias = alias + Character.toUpperCase(pf.charAt(0)) + pf.substring(1);
     }
     // setProjectAlias(alias);
-    m_projectAliasNameFild.setText(alias);
+    m_projectAliasNameField.setText(alias);
   }
 
   private Control createAliasGroup(Composite parent) {
@@ -182,11 +184,11 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     group.setText("Project Alias");
     Label label = new Label(group, SWT.NONE);
     label.setText("The project alias is used for the servlet name and launcher names.");
-    m_projectAliasNameFild = getFieldToolkit().createStyledTextField(group, "Project Alias");
-    m_projectAliasNameFild.addModifyListener(new ModifyListener() {
+    m_projectAliasNameField = getFieldToolkit().createStyledTextField(group, "Project Alias");
+    m_projectAliasNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
-        m_projectAlias = m_projectAliasNameFild.getText();
+        m_projectAlias = m_projectAliasNameField.getText();
         pingStateChanging();
       }
     });
@@ -194,7 +196,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     group.setLayout(new GridLayout(1, true));
 
     label.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_projectAliasNameFild.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_projectAliasNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     return group;
   }

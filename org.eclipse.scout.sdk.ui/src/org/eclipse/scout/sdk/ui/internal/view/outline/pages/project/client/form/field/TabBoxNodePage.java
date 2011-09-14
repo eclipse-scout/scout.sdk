@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 import org.eclipse.scout.sdk.ui.wizard.form.fields.groupbox.GroupBoxNewWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
@@ -32,8 +33,9 @@ import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 
 public class TabBoxNodePage extends AbstractFormFieldNodePage {
   IType igroupBox = ScoutSdk.getType(RuntimeClasses.IGroupBox);
+  IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
 
-//  IPrimaryTypeTypeHierarchy formfieldHierarchy = ScoutSdk.getTypeHierarchyPrimaryTypes(igroupBox);
+  private InnerTypePageDirtyListener m_innerTypeListener;
 
   public TabBoxNodePage() {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Tabbox));
@@ -46,7 +48,20 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
+  public void unloadPage() {
+    if (m_innerTypeListener != null) {
+      ScoutSdk.removeInnerTypeChangedListener(getType(), m_innerTypeListener);
+      m_innerTypeListener = null;
+    }
+    super.unloadPage();
+  }
+
+  @Override
   protected void loadChildrenImpl() {
+    if (m_innerTypeListener == null) {
+      m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormField);
+      ScoutSdk.addInnerTypeChangedListener(getType(), m_innerTypeListener);
+    }
     new KeyStrokeTablePage(this, getType());
     ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(getType());
     IType[] allGroupboxes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(igroupBox, hierarchy), TypeComparators.getOrderAnnotationComparator());

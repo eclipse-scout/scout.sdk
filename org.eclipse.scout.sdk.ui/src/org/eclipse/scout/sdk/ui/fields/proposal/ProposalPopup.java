@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,17 +18,18 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -70,6 +71,9 @@ public class ProposalPopup extends Window {
   private boolean m_expertModusChecked;
   private final boolean m_supportsEpertModus;
 
+  private IProposalDescriptionProvider m_proposalDescriptionProvider;
+  private ScrolledComposite m_proposalDescriptionArea;
+
   public ProposalPopup(Control proposalField, boolean supportsExpertModus, boolean expertModusChecked) {
     super(proposalField.getShell());
     m_proposalField = proposalField;
@@ -86,22 +90,26 @@ public class ProposalPopup extends Window {
   }
 
   @Override
-  protected Control createContents(Composite parent) {
-    parent.setLayout(new FillLayout());
-    Composite rootArea = new Composite(parent, SWT.INHERIT_FORCE);
-    rootArea.setBackground(rootArea.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    Table table = new Table(rootArea, SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+  protected Control createContents(final Composite parent) {
+    Composite proposalArea = new Composite(parent, SWT.INHERIT_FORCE);
+    proposalArea.setBackground(proposalArea.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    Table table = new Table(proposalArea, SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
     m_tableViewer = new TableViewer(table);
     m_tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        if (!selection.isEmpty()) {
-          // selectProposal((int)selection.getFirstElement());
-          ProposalPopupEvent delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
-          delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, selection.getFirstElement());
-          firePopupEvent(delegateEvent);
+        IContentProposalEx selectedProposal = null;
+        if (!selection.isEmpty() && selection.getFirstElement() instanceof IContentProposalEx) {
+          selectedProposal = (IContentProposalEx) selection.getFirstElement();
         }
+        // update description
+        updateDescription(selectedProposal);
+        // selectProposal((int)selection.getFirstElement());
+        ProposalPopupEvent delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
+        delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, selectedProposal);
+        firePopupEvent(delegateEvent);
+
       }
     });
 
@@ -141,40 +149,22 @@ public class ProposalPopup extends Window {
     });
     table.setHeaderVisible(false);
 
-    // m_proposalTable.addKeyListener(new KeyAdapter(){
-    // @Override
-    // public void keyPressed(KeyEvent e){
-    // if(e.character == ' '){
-    // ProposalPopupEvent event=new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
-    // event.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, m_proposals[m_proposalTable.getSelectionIndex()]);
-    // firePopupEvent(event);
-    // }
-    // }
-    // });
-    //
-    // m_proposalTable.addSelectionListener(new SelectionAdapter(){
-    // @Override
-    // public void widgetSelected(SelectionEvent e){
-    // selectProposal(m_proposalTable.getSelectionIndex());
-    // ProposalPopupEvent event=new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
-    // int index=m_proposalTable.indexOf((TableItem)e.item);
-    // if(index > 0 && index < m_proposals.length){
-    // event.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, m_proposals[index]);
-    // }
-    // firePopupEvent(event);
-    // }
-    //
-    // @Override
-    // public void widgetDefaultSelected(SelectionEvent e){
-    // ProposalPopupEvent event=new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED);
-    // int index=m_proposalTable.indexOf((TableItem)e.item);
-    // if(index > 0 && index < m_proposals.length){
-    // event.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, m_proposals[index]);
-    // }
-    // firePopupEvent(event);
-    // }
-    // });
-    Group group = new Group(rootArea, SWT.SHADOW_ETCHED_OUT);
+    m_proposalDescriptionArea = new ScrolledComposite(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+    m_proposalDescriptionArea.setBackground(m_proposalDescriptionArea.getDisplay().getSystemColor(SWT.COLOR_INFO_BACKGROUND));
+    m_proposalDescriptionArea.setExpandHorizontal(true);
+    m_proposalDescriptionArea.setExpandVertical(true);
+//    m_proposalDescriptionArea.addControlListener(new ControlAdapter() {
+//      @Override
+//      public void controlResized(ControlEvent e) {
+//        Rectangle r = m_proposalDescriptionArea.getClientArea();
+//        Point minSize = new Point(0,0);
+//        if(m_proposalDescriptionArea.getContent() != null)
+//        m_proposalDescriptionArea.setMinSize(m_proposalDescriptionArea.getContent().computeSize(r.width, SWT.DEFAULT));
+//      }
+//    });
+//    m_proposalDescriptionArea.setBackground(m_proposalDescriptionArea.getDisplay().getSystemColor(SWT.COLOR_RED));
+
+    Group group = new Group(proposalArea, SWT.SHADOW_ETCHED_OUT);
     group.setBackground(group.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     group.setForeground(group.getDisplay().getSystemColor(SWT.COLOR_BLUE));
     m_itemCountLabel = new Label(group, SWT.NONE);
@@ -194,13 +184,32 @@ public class ProposalPopup extends Window {
       }
     });
     // layout
-    rootArea.setLayout(new FormLayout());
+    GridLayout parentLayout = new GridLayout(1, true);
+    parentLayout.horizontalSpacing = 0;
+    parentLayout.marginHeight = 0;
+    parentLayout.marginWidth = 0;
+    parentLayout.verticalSpacing = 0;
+    parent.setLayout(parentLayout);
+    GridData proposalAreaData = new GridData(GridData.FILL_BOTH);
+    proposalAreaData.heightHint = POPUP_MINIMUM_WIDTH;
+    proposalAreaData.widthHint = POPUP_MINIMUM_WIDTH;
+    proposalArea.setLayoutData(new GridData(GridData.FILL_BOTH));
+    GridData proposalDescriptionData = new GridData(GridData.FILL_BOTH);
+    proposalDescriptionData.heightHint = POPUP_MINIMUM_WIDTH;
+    proposalDescriptionData.widthHint = POPUP_MINIMUM_WIDTH;
+    proposalDescriptionData.exclude = true;
+    m_proposalDescriptionArea.setLayoutData(proposalDescriptionData);
+
+//    m_proposalDescriptionArea.setLayout(new FillLayout());
+
+    proposalArea.setLayout(new FormLayout());
     FormData data = new FormData();
     data.top = new FormAttachment(0, 0);
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(100, 0);
     data.bottom = new FormAttachment(group, -2);
     table.setLayoutData(data);
+
     data = new FormData();
     data.left = new FormAttachment(0, 2);
     data.right = new FormAttachment(100, -2);
@@ -214,7 +223,8 @@ public class ProposalPopup extends Window {
     m_itemCountLabel.setLayoutData(gd);
     gd = new GridData(GridData.END);
     m_showAllProposals.setLayoutData(gd);
-    return rootArea;
+
+    return parent;
   }
 
   public void setProposals(IContentProposalEx[] proposals) {
@@ -230,10 +240,11 @@ public class ProposalPopup extends Window {
       TableItem[] items = m_tableViewer.getTable().getItems();
       for (int i = 0; i < items.length; i++) {
         TableItem item = items[i];
-
         IContentProposalEx proposal = proposals[i];
-        item.setText(getText(proposal, false));
-        item.setImage(getImage(proposal, false));
+        int selectionIndex = m_tableViewer.getTable().getSelectionIndex();
+        boolean selected = i == selectionIndex;
+        item.setText(getText(proposal, selected));
+        item.setImage(getImage(proposal, selected));
         item.setData(proposal);
       }
     }
@@ -241,13 +252,15 @@ public class ProposalPopup extends Window {
       m_tableViewer.getTable().setRedraw(true);
 
     }
-    // Default to the first selection if there is content.
-    if (proposals.length > 0) {
-      m_tableViewer.getTable().select(0);
+    // Default to the first selection if there is no selection. This is the case, every time the popup is opened.
+    if (m_tableViewer.getSelection().isEmpty()) {
+      Object proposal = m_tableViewer.getElementAt(0);
+      if (proposal != null) {
+        updateDescription((IContentProposalEx) proposal);
+      }
+      m_tableViewer.setSelection(new StructuredSelection(proposal));
+//      m_tableViewer.getTable().select(0);
     }
-    // if(proposals.length > 0){
-    // selectProposal(0);
-    // }
     m_itemCountLabel.setText(proposals.length + " items found");
   }
 
@@ -274,8 +287,43 @@ public class ProposalPopup extends Window {
     return OK;
   }
 
+  private void updateDescription(IContentProposalEx proposal) {
+    // remove old content
+    for (Control c : m_proposalDescriptionArea.getChildren()) {
+      if (!c.isDisposed()) {
+        c.dispose();
+      }
+    }
+    if (getProposalDescriptionProvider() != null) {
+      Control content = getProposalDescriptionProvider().createDescriptionContent(m_proposalDescriptionArea, proposal);
+      if (content != null) {
+        ((GridLayout) m_proposalDescriptionArea.getParent().getLayout()).numColumns = 2;
+        m_proposalDescriptionArea.setContent(content);
+        m_proposalDescriptionArea.setMinSize(content.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        ((GridData) m_proposalDescriptionArea.getLayoutData()).exclude = false;
+
+      }
+      else {
+        ((GridLayout) m_proposalDescriptionArea.getParent().getLayout()).numColumns = 1;
+        ((GridData) m_proposalDescriptionArea.getLayoutData()).exclude = true;
+      }
+//      getShell().layout(true);
+      adjustBounds();
+//      m_proposalDescriptionArea.setExpandHorizontal(true);
+//      m_proposalDescriptionArea.setExpandVertical(true);
+    }
+  }
+
   public void setIgnoreClose(boolean ignore) {
     m_ignoreClose = ignore;
+  }
+
+  public void setProposalDescriptionProvider(IProposalDescriptionProvider proposalDescriptionProvider) {
+    m_proposalDescriptionProvider = proposalDescriptionProvider;
+  }
+
+  public IProposalDescriptionProvider getProposalDescriptionProvider() {
+    return m_proposalDescriptionProvider;
   }
 
   @Override
@@ -317,23 +365,6 @@ public class ProposalPopup extends Window {
     }
   }
 
-  // private void selectProposal(int index){
-  // // remove old selection
-  // if(m_selectionIndex >= 0){
-  // TableItem item=m_proposalTable.getItem(m_selectionIndex);
-  // item.setText(getText(m_proposals[m_selectionIndex], false));
-  // }
-  //    Assert.isTrue(index >= 0, "Proposal index should never be negative"); //$NON-NLS-1$
-  // if(m_proposals == null || index >= m_proposals.length){
-  // return;
-  // }
-  // m_selectionIndex=index;
-  // TableItem item=m_proposalTable.getItem(m_selectionIndex);
-  // item.setText(getText(m_proposals[m_selectionIndex], true));
-  // m_proposalTable.setSelection(m_selectionIndex);
-  // m_proposalTable.showSelection();
-  // }
-
   IContentProposalEx getSelectedProposal() {
     IStructuredSelection selection = (IStructuredSelection) m_tableViewer.getSelection();
     if (!selection.isEmpty()) {
@@ -343,13 +374,6 @@ public class ProposalPopup extends Window {
       return (IContentProposalEx) selection.getFirstElement();
     }
     return null;
-    // int index=m_proposalTable.getSelectionIndex();
-    // if(index < 0){
-    // return null;
-    // }
-    // else{
-    // return m_proposals[index];
-    // }
   }
 
   private String getText(IContentProposalEx proposal, boolean selected) {
@@ -366,22 +390,34 @@ public class ProposalPopup extends Window {
 
   private void adjustBounds() {
     // Get our control's location in display coordinates.
-
+//    FormData data = (FormData) m_tableViewer.getTable().getLayoutData();
+//    data.height = m_tableViewer.getTable().getItemHeight() * POPUP_CHAR_HEIGHT;
+//    data.width = Math.max(m_proposalField.getSize().x, POPUP_MINIMUM_WIDTH);
+//    m_tableViewer.getTable().setLayoutData(data);
     Point location = m_proposalField.getDisplay().map(m_proposalField.getParent(), null, m_proposalField.getLocation());
     int initialX = location.x + POPUP_OFFSET;
     int initialY = location.y + m_proposalField.getSize().y + POPUP_OFFSET;
 
     // If there is no specified size, force it by setting
     // up a layout on the table.
-    if (popupSize == null) {
-      FormData data = (FormData) m_tableViewer.getTable().getLayoutData();
-      data.height = m_tableViewer.getTable().getItemHeight() * POPUP_CHAR_HEIGHT;
-      data.width = Math.max(m_proposalField.getSize().x, POPUP_MINIMUM_WIDTH);
-      m_tableViewer.getTable().setLayoutData(data);
-      getShell().pack();
-      popupSize = getShell().getSize();
+    Point size = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+    if (((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
+      size.x = POPUP_MINIMUM_WIDTH;
     }
-    getShell().setBounds(initialX, initialY, popupSize.x, popupSize.y);
+    else {
+      size.x = POPUP_MINIMUM_WIDTH * 2;
+    }
+    size.y = POPUP_MINIMUM_WIDTH;
+    getShell().setBounds(initialX, initialY, size.x, size.y);
+//    if (popupSize == null) {
+//    FormData data = (FormData) m_tableViewer.getTable().getLayoutData();
+//    data.height = m_tableViewer.getTable().getItemHeight() * POPUP_CHAR_HEIGHT;
+//    data.width = Math.max(m_proposalField.getSize().x, POPUP_MINIMUM_WIDTH);
+//    m_tableViewer.getTable().setLayoutData(data);
+//      getShell().pack();
+//      popupSize = getShell().getSize();
+//    }
+//    getShell().setBounds(initialX, initialY, popupSize.x, popupSize.y);
 
   }
 

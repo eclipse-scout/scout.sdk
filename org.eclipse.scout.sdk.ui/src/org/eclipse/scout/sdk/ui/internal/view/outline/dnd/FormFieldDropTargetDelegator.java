@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,8 +13,9 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.dnd;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
+import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldMoveOperation;
+import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
 import org.eclipse.scout.sdk.ui.action.dnd.FormFieldRelocateAction;
 import org.eclipse.scout.sdk.ui.extensions.IDropTargetDelegator;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.AbstractBoxNodePage;
@@ -26,18 +27,24 @@ import org.eclipse.swt.dnd.DND;
 
 public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
 
+  @Override
   public boolean validateDrop(OutlineDropTargetEvent event) {
     try {
       if (!LocalSelectionTransfer.getTransfer().isSupportedType(event.getTransferData())) {
         return false;
       }
-//      int currentLocation = event.getCurrentLocation();
       Object currentTargetPage = event.getCurrentTarget();
       IType targetType = null;
       if (currentTargetPage instanceof AbstractBoxNodePage) {
         targetType = ((AbstractBoxNodePage) currentTargetPage).getType();
+        if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON && targetType.getElementName().equals(ScoutIdeProperties.TYPE_NAME_MAIN_BOX)) {
+          return false;
+        }
       }
       else if (currentTargetPage instanceof AbstractFormFieldNodePage) {
+        if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {
+          return false;
+        }
         targetType = ((AbstractFormFieldNodePage) currentTargetPage).getType();
       }
       if (targetType == null) {
@@ -50,7 +57,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       else if (event.getSelectedObject() instanceof AbstractFormFieldNodePage) {
         selectedType = ((AbstractFormFieldNodePage) event.getSelectedObject()).getType();
       }
-      if (selectedType == null) {
+      if (selectedType == null || targetType.equals(selectedType)) {
         return false;
       }
       // do not allow copy boxes with inner types within the same compilation unit -> import problems of inner fields
@@ -72,10 +79,12 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
     return false;
   }
 
+  @Override
   public boolean expand(OutlineDropTargetEvent event) {
     return !(event.getCurrentTarget() instanceof AbstractFormFieldNodePage);
   }
 
+  @Override
   public boolean performDrop(OutlineDropTargetEvent event) {
     if (event.getOperation() == DND.DROP_COPY || event.getOperation() == DND.DROP_MOVE) {
       AbstractScoutTypePage sourcePage = (AbstractScoutTypePage) event.getSelectedObject();
@@ -92,7 +101,6 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
         action.setNeighborField(targetPage.getType());
       }
       action.run();
-
     }
     return true;
   }
@@ -100,11 +108,11 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
   private int dndToMoveOperationLocation(int location) {
     switch (location) {
       case ViewerDropAdapter.LOCATION_AFTER:
-        return FormFieldMoveOperation.AFTER;
+        return FormFieldDndOperation.AFTER;
       case ViewerDropAdapter.LOCATION_BEFORE:
-        return FormFieldMoveOperation.BEFORE;
+        return FormFieldDndOperation.BEFORE;
       default:
-        return FormFieldMoveOperation.LAST;
+        return FormFieldDndOperation.LAST;
     }
   }
 

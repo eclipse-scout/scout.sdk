@@ -190,7 +190,7 @@ public class MethodCreateOperation implements IOperation {
    * @return
    * @throws JavaModelException
    */
-  protected String createMethodBody(@SuppressWarnings("unused") IImportValidator validator) throws JavaModelException {
+  protected String createMethodBody(IImportValidator validator) throws JavaModelException {
     StringBuilder builder = new StringBuilder();
     if (!StringUtility.isNullOrEmpty(getSimpleBody())) {
       builder.append(getSimpleBody());

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,7 +13,10 @@ package org.eclipse.scout.sdk.operation.util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.BadLocationException;
@@ -46,6 +49,15 @@ public class SourceFormatOperation implements IOperation {
     m_range = range;
   }
 
+  public SourceFormatOperation(IType type) throws JavaModelException {
+    this(type.getJavaProject(), new Document(type.getCompilationUnit().getSource()), type.getSourceRange());
+  }
+
+  public SourceFormatOperation(IMethod method) throws JavaModelException {
+    this(method.getJavaProject(), new Document(method.getCompilationUnit().getSource()), method.getSourceRange());
+  }
+
+  @Override
   public String getOperationName() {
     return "Format source";
   }
@@ -61,6 +73,7 @@ public class SourceFormatOperation implements IOperation {
 
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     if (monitor.isCanceled()) {
       return;
@@ -75,8 +88,7 @@ public class SourceFormatOperation implements IOperation {
       // XXX check which code is calling this with a type source
       CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getJavaProject().getOptions(false));
       int kind = CodeFormatter.F_INCLUDE_COMMENTS | CodeFormatter.K_UNKNOWN;
-      TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent,
-          ScoutUtility.getLineSeparator(getDocument()));
+      TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent, ScoutUtility.getLineSeparator(getDocument()));
       if (te != null) {
         te.apply(getDocument());
       }

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK
 Bundle-SymbolicName: org.eclipse.scout.sdk;singleton:=true
-Bundle-Version: 3.7.0.qualifier
+Bundle-Version: 3.7.1.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.ScoutSdk
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.apache.ant;bundle-version="1.7.0",
@@ -50,6 +50,7 @@ Export-Package: org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.operation,
  org.eclipse.scout.sdk.operation.annotation,
  org.eclipse.scout.sdk.operation.axis,
+ org.eclipse.scout.sdk.operation.dnd,
  org.eclipse.scout.sdk.operation.export,
  org.eclipse.scout.sdk.operation.field,
  org.eclipse.scout.sdk.operation.form,

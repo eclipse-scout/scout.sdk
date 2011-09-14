@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,9 +17,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldCopyOperation;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldMoveOperation;
+import org.eclipse.scout.sdk.operation.dnd.TableColumnDndOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.dialog.RenameConfirmationDialog;
 import org.eclipse.swt.widgets.Shell;
@@ -27,21 +25,21 @@ import org.eclipse.swt.widgets.Shell;
 public class TableColumnRelocateAction extends Action {
   private boolean createCopy;
   private int m_location;
-  private IType m_formField;
+  private IType m_columnToMove;
   private IType m_targetDeclaringType;
   private IType m_neighborField;
   private String m_newFieldName;
   private final Shell m_shell;
 
-  public TableColumnRelocateAction(IType formFieldToMove, Shell shell) {
+  public TableColumnRelocateAction(IType columnToMove, Shell shell) {
     super("Relocate Table column");
-    m_formField = formFieldToMove;
+    m_columnToMove = columnToMove;
     m_shell = shell;
   }
 
   @Override
   public void run() {
-    String fieldName = getFormField().getElementName();
+    String fieldName = getColumnToMove().getElementName();
     HashSet<String> usedNames = new HashSet<String>();
     try {
       for (IType t : m_targetDeclaringType.getCompilationUnit().getAllTypes()) {
@@ -51,47 +49,38 @@ public class TableColumnRelocateAction extends Action {
     catch (JavaModelException e) {
       ScoutSdkUi.logError("During finding used names.", e);
     }
-    if (getFormField().getCompilationUnit().equals(getTargetDeclaringType().getCompilationUnit()) && !isCreateCopy()) {
-      usedNames.remove(getFormField().getElementName());
+    if (getColumnToMove().getCompilationUnit().equals(getTargetDeclaringType().getCompilationUnit()) && !isCreateCopy()) {
+      usedNames.remove(getColumnToMove().getElementName());
     }
-    if (usedNames.contains(getFormField().getElementName())) {
+    if (usedNames.contains(getColumnToMove().getElementName())) {
       String message = "Enter a name of the " + ((isCreateCopy()) ? ("copied") : ("moved")) + " table column.";
       // show dialog
       RenameConfirmationDialog dialog = new RenameConfirmationDialog(m_shell, "Table Column Name", message);
       dialog.setNotAllowedNames(usedNames);
-      dialog.setTypeName("CopyOf" + getFormField().getElementName());
+      dialog.setTypeName("CopyOf" + getColumnToMove().getElementName());
       if (dialog.open() != Dialog.OK) {
         return;
       }
       fieldName = dialog.getTypeName();
     }
-    IOperation operation = null;
-    // copy
+    // operation
+    int mode = TableColumnDndOperation.MODE_MOVE;
     if (isCreateCopy()) {
-      FormFieldCopyOperation copyOp = new FormFieldCopyOperation(fieldName, getFormField(), getTargetDeclaringType());
-      copyOp.setPosition(getLocation());
-      copyOp.setPositionType(getNeighborField());
-      operation = copyOp;
+      mode = TableColumnDndOperation.MODE_COPY;
     }
-    // move
-    else {
-      FormFieldMoveOperation moveOperation = new FormFieldMoveOperation(getFormField(), getTargetDeclaringType());
-      moveOperation.setPosition(getLocation());
-      moveOperation.setPositionField(getNeighborField());
-      operation = moveOperation;
-    }
-    if (operation != null) {
-      new OperationJob(operation).schedule();
-    }
+    TableColumnDndOperation dndOp = new TableColumnDndOperation(getColumnToMove(), getTargetDeclaringType(), fieldName, mode);
+    dndOp.setPosition(getLocation());
+    dndOp.setPositionType(getNeighborField());
+    new OperationJob(dndOp).schedule();
 
   }
 
-  public void setFormField(IType formField) {
-    m_formField = formField;
+  public void setColumnToMove(IType columnToMove) {
+    m_columnToMove = columnToMove;
   }
 
-  public IType getFormField() {
-    return m_formField;
+  public IType getColumnToMove() {
+    return m_columnToMove;
   }
 
   public void setTargetDeclaringType(IType targetDeclaringType) {

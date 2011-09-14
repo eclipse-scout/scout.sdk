@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,14 +37,14 @@ public class Regex {
   public static final String REGEX_METHOD_CONTENT = "\\A[^\\{]*\\{(.*)\\}\\Z";
   public static final String REGEX_METHOD_DEFINITION = "[ \\t]*(public|protected|private)?\\s*(static)?\\s*(void|[^\\s]*)\\s*[^\\s\\(]*\\s*\\([^\\)]*\\)\\s*\\{";
 
-  public static final String REGEX_PROPERTY_METHOD_REPRESENTER_VALUE = "\\{\\s*return\\s*([^\\;]*)\\s*\\;\\s*\\}";
+  public static final String REGEX_PROPERTY_METHOD_REPRESENTER_VALUE = "\\{\\s*return\\s*([^\\;]*)\\s*\\;.*\\}";
   public static final String REGEX_PROPERTY_METHOD_REPRESENTER_BOOLEAN = "\\{\\s*return\\s*(true|false)\\s*\\;\\s*\\}";
 
   public static final String REGEX_FIELD_GETTER_METHOD = "\\s*(public|private|protected)?\\s*(#0#)\\s*get#0#\\s*\\(\\s*\\).*";
 
   public static final String REGEX_ICON_NAME = "(\\\")?(([^\\\\/]*(/|\\\\))*)([^.\\\"]*)(\\.)?([^\"]*)(\\\")?";
 
-  public static final String REGEX_FIELD_DECLARATION = "\\s*(public|private|protected)?\\s*(final\\s*|static\\s*|transient\\s*|volatile\\s*){0,4}([a-zA-Z0-9_]*(<([a-zA-Z0-9_]|(,\\s*))*>)?)\\s*([a-zA-Z0-9_]*)(\\s*=\\s*(.*))?\\s*;.*";
+  public static final String REGEX_FIELD_DECLARATION = "\\s*(@Deprecated){0,1}\\s*(public|private|protected)?\\s*(final\\s*|static\\s*|transient\\s*|volatile\\s*){0,4}([a-zA-Z0-9_]*(<([a-zA-Z0-9_]|(,\\s*))*>)?)\\s*([a-zA-Z0-9_]*)(\\s*=\\s*(.*))?\\s*;.*";
 
   /**
    * @param fieldSource
@@ -133,7 +133,7 @@ public class Regex {
     Pattern pattern = Pattern.compile(Regex.REGEX_FIELD_DECLARATION, Pattern.DOTALL);
     Matcher matcher = pattern.matcher(fieldDeclaration);
     if (matcher.matches()) {
-      String match = matcher.group(9);
+      String match = matcher.group(10);
       if (match != null) {
         match = match.trim();
       }

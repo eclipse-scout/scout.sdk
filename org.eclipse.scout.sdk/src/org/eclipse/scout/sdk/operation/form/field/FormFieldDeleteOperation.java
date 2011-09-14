@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.operation.form.field;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -35,6 +36,7 @@ public class FormFieldDeleteOperation implements IOperation {
     m_formatSource = formatSource;
   }
 
+  @Override
   public String getOperationName() {
     return "Delete field '" + getFormFieldType().getElementName() + "'...";
   }
@@ -46,22 +48,26 @@ public class FormFieldDeleteOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(getFormFieldType().getCompilationUnit(), true, monitor);
     IType declaringType = getFormFieldType().getDeclaringType();
-    // delete getter
+
+    JavaElementDeleteOperation op = new JavaElementDeleteOperation();
+    // getter method
     IMethod getter = SdkTypeUtility.getFormFieldGetterMethod(getFormFieldType());
     if (TypeUtility.exists(getter)) {
-      getter.delete(true, monitor);
+      op.addMember(getter);
     }
-    // organize imports
-
-//    // import
-//    IImportDeclaration importDec = getFormFieldType().getCompilationUnit().getImport(getFormFieldType().getFullyQualifiedName().replaceAll("\\$", "."));
-//    if (TypeUtility.exists(importDec)) {
-//      importDec.delete(true, monitor);
-//    }
-    JavaElementDeleteOperation op = new JavaElementDeleteOperation();
+    // import
+    String normalizedTypeName = getFormFieldType().getFullyQualifiedName().replace('$', '.');
+    for (IImportDeclaration imp : getFormFieldType().getCompilationUnit().getImports()) {
+      String normalizedImport = imp.getElementName().replace('$', '.');
+      if (normalizedImport.startsWith(normalizedTypeName)) {
+        op.addMember(imp);
+      }
+    }
+    // field
     op.addMember(getFormFieldType());
     op.run(monitor, workingCopyManager);
     // form field

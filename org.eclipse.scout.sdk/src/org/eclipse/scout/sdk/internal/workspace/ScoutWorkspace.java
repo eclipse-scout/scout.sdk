@@ -136,6 +136,10 @@ public class ScoutWorkspace implements IScoutWorkspace {
     return m_bundleGraph.getScoutBundle(project);
   }
 
+  public void printBundleGraph() {
+    m_bundleGraph.printGraph(System.out);
+  }
+
   public IScoutBundle[] getDirectDependents(IScoutBundle bundle, IScoutBundleFilter filter) {
     ArrayList<IScoutBundle> result = new ArrayList<IScoutBundle>();
     BundleGraphNode node = m_bundleGraph.getNode(bundle);

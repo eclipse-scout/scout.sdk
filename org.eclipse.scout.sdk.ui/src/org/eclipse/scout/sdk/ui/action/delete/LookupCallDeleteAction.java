@@ -14,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
@@ -72,7 +74,7 @@ public class LookupCallDeleteAction extends Action {
     if (m_confirmDialog.open() == Dialog.OK) {
       JavaElementDeleteOperation op = new JavaElementDeleteOperation() {
         @Override
-        protected void deleteMember(IJavaElement member, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+        protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
           if (m_lookupServiceInterface != null && member.equals(m_lookupServiceInterface)) {
             ScoutUtility.unregisterServiceClass(m_lookupServiceInterface.getJavaProject().getProject(),
                 "org.eclipse.scout.rt.client.serviceProxies", "serviceProxy", m_lookupServiceInterface.getFullyQualifiedName(), null, monitor);
@@ -82,7 +84,7 @@ public class LookupCallDeleteAction extends Action {
             ScoutUtility.unregisterServiceClass(m_lookupService.getJavaProject().getProject(),
                 "org.eclipse.scout.rt.server.services", "service", m_lookupService.getFullyQualifiedName(), implementationBundle.getRootPackageName() + ".ServerSession", monitor);
           }
-          super.deleteMember(member, monitor, manager);
+          super.deleteMember(member, icuForOrganizeImports, monitor, manager);
         }
       };
       op.setMembers(m_confirmDialog.getSelectedMembers());
@@ -136,6 +138,7 @@ public class LookupCallDeleteAction extends Action {
   }
 
   private class P_SelectionValidationListener implements IMemberSelectionChangedListener {
+    @Override
     public void handleSelectionChanged(IMember[] selection) {
       m_confirmDialog.setMessage("");
       HashSet<IMember> members = new HashSet<IMember>(Arrays.asList(selection));

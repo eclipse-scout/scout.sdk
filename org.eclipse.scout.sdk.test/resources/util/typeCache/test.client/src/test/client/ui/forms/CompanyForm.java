@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package test.client.ui.forms;
 
 import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
@@ -23,15 +24,15 @@ import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.service.SERVICES;
 
 import test.client.ui.forms.CompanyForm.MainBox.DetailsGroup;
+import test.client.ui.forms.CompanyForm.MainBox.DetailsGroup.AnzahlField;
 import test.client.ui.forms.CompanyForm.MainBox.NameField;
 import test.client.ui.forms.CompanyForm.MainBox.SinceField;
-import test.client.ui.forms.CompanyForm.MainBox.DetailsGroup.AnzahlField;
 import test.shared.Texts;
 import test.shared.security.UpdateCompanyPermission;
 import test.shared.services.process.CompanyFormData;
 import test.shared.services.process.ICompanyProcessService;
 
-@FormData
+@FormData(sdkCommand = SdkCommand.CREATE, value = CompanyFormData.class)
 public class CompanyForm extends AbstractForm {
 
   private Long m_companyNr;

@@ -16,8 +16,12 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.operation.form.formdata.ScoutProjectUpdateFormDataOperation;
+import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutProjectOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.OperationAction;
 import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
+import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
@@ -150,6 +154,9 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
     manager.add(new OrganizeAllImportsAction(getScoutResource()));
     manager.add(new WizardAction("Import Plugin...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundleAdd), new BundleImportWizard(getScoutResource())));
     manager.add(new Separator());
+    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform project...", new WellformScoutProjectOperation(getScoutResource())));
+    manager.add(new OperationAction("Update form data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new ScoutProjectUpdateFormDataOperation(getScoutResource())));
+    // update formData
     manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
       @Override
       public IType[] getTypes() {

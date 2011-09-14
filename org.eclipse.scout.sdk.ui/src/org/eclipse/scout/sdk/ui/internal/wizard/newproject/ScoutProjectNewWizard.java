@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
+import java.util.ArrayList;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -34,6 +37,10 @@ import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
+import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ScoutProjectPropertyPart;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
@@ -53,6 +60,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
     super.setContainer(wizardContainer);
   }
 
+  @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     m_page1 = new ScoutProjectNewWizardPage();
     // m_page1.setProjectCoding(ScoutIdeProperties.BUNDLE_TYPE_CLIENT | ScoutIdeProperties.BUNDLE_TYPE_CLIENT_APPLICATION | ScoutIdeProperties.BUNDLE_TYPE_SERVER | ScoutIdeProperties.BUNDLE_TYPE_SHARED);
@@ -104,7 +112,6 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
         IScoutProjectTemplateOperation template = m_page2.getSelectedTemplate();
         if (template != null) {
           try {
-
             Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_REFRESH, monitor);
             Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor);
           }
@@ -119,14 +126,30 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
             scheduleAndWait(applyTemplateJob, 0);
           }
         }
+
+        IScoutProject[] pr = ScoutSdk.getScoutWorkspace().getRootProjects();
+        if (pr.length > 0) {
+          IScoutProject sp = pr[0];
+          IFile[] products = TreeUtility.getAllProductFiles(sp);
+          ArrayList<IFile> dev = new ArrayList<IFile>(products.length);
+          for (IFile f : products) {
+            if (f.getFullPath().toString().toLowerCase().contains("development")) {
+              dev.add(f);
+            }
+          }
+          ScoutProjectPropertyPart.saveProductLaunchers(sp, dev.toArray(new IFile[dev.size()]));
+        }
+
         // switch to scout perspective
         m_display.asyncExec(new Runnable() {
           @Override
           public void run() {
             BasicNewProjectResourceWizard.updatePerspective(new P_ScoutPerspectiveConfigElement());
-          }
+            IScoutExplorerPart ex = ScoutSdkUi.getExplorer(true);
+            if (ex != null)
+              ex.expandAndSelectProjectLevel();
+            }
         });
-
       }
       return Status.OK_STATUS;
     }
@@ -154,6 +177,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
       return "Create projects...";
     }
 
+    @Override
     public void validate() throws IllegalArgumentException {
     }
 
@@ -228,10 +252,12 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
       return null;
     }
 
+    @Override
     public String getAttribute(String attrName, String locale) throws InvalidRegistryObjectException {
       return null;
     }
 
+    @Override
     public String getValue(String locale) throws InvalidRegistryObjectException {
       return null;
     }
