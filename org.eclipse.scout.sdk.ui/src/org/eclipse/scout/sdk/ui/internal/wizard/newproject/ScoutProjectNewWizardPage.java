@@ -115,6 +115,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
         switch (node.getType()) {
           case TYPE_BUNDLE_CLIENT:
             m_createClient = checkState;
+            ((ScoutProjectTemplateWizardPage) getWizard().getPage(ScoutProjectTemplateWizardPage.class.getName())).refreshList();
             break;
           case TYPE_BUNDLE_SHARED:
             m_createShared = checkState;

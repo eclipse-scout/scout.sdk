@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -22,6 +23,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -143,6 +145,9 @@ public class FormDataUpdateOperation implements IOperation {
             @Override
             public void run(IProgressMonitor localMonitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
               super.run(localMonitor, workingCopyManager);
+              // ensure the package of the form data is exported in the shared plugin
+              ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{getCreatedType().getPackageFragment()}, true);
+              manifestOp.run(localMonitor, workingCopyManager);
               workingCopyManager.register(getType().getCompilationUnit(), localMonitor);
               getType().getCompilationUnit().createImport(getCreatedType().getFullyQualifiedName(), null, localMonitor);
             }
