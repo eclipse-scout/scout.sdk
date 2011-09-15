@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -33,7 +33,10 @@ import org.eclipse.scout.sdk.workspace.type.TypeFilters;
  * implementation in the serviceImplementationBundle.
  * The service implementation is registered in the serviceRegistrationBundle and its interface in the
  * serviceProxyRegistrationBundle.
+ * 
+ * @deprecated use {@link ServiceNewOperation} instead.
  */
+@Deprecated
 public class RemoteServiceNewOperation implements IOperation {
 
   final IType iServerSession = ScoutSdk.getType(RuntimeClasses.IServerSession);
