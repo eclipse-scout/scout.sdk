@@ -47,6 +47,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
   private FilteredTable m_table;
   private IScoutProjectTemplateOperation m_selectedTemplate;
   private Label m_descriptionLabel;
+  private P_ContentProvider m_provider;
 
   /**
    * @param pageName
@@ -60,6 +61,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
   protected void createContent(Composite parent) {
     m_table = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_table.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         IScoutProjectTemplateOperation selectedItem = null;
         if (!event.getSelection().isEmpty()) {
@@ -68,29 +70,32 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
         }
         handleSelection(selectedItem);
       }
-
     });
 
-    ArrayList<IScoutProjectTemplateOperation> elements = new ArrayList<IScoutProjectTemplateOperation>();
-    elements.add(new EmptyTemplateOperation());
-    OutlineTemplateOperation outlineTemplate = new OutlineTemplateOperation();
-    elements.add(outlineTemplate);
-    SingleFormTemplateOperation singleFormTemplate = new SingleFormTemplateOperation();
-    elements.add(singleFormTemplate);
-    P_ContentProvider provider = new P_ContentProvider(elements.toArray(new IScoutProjectTemplateOperation[elements.size()]));
-    m_table.getViewer().setLabelProvider(provider);
-    m_table.getViewer().setContentProvider(provider);
-    m_table.getViewer().setInput(provider);
-    m_table.getViewer().setSelection(new StructuredSelection(singleFormTemplate));
+    m_provider = new P_ContentProvider();
+    m_table.getViewer().setLabelProvider(m_provider);
+    m_table.getViewer().setContentProvider(m_provider);
+    m_table.getViewer().setInput(m_provider);
+
     m_descriptionLabel = new Label(parent, SWT.SHADOW_ETCHED_IN | SWT.WRAP);
-    m_descriptionLabel.setText(outlineTemplate.getDescription());
+
+    refreshDefaultSelection();
 
     // layout
     parent.setLayout(new GridLayout(1, true));
 
     m_table.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_descriptionLabel.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+  }
 
+  public void refreshList() {
+    m_table.refresh(true);
+    refreshDefaultSelection();
+  }
+
+  private void refreshDefaultSelection() {
+    m_table.getViewer().setSelection(new StructuredSelection(m_provider.getDefaultOperation()));
+    m_descriptionLabel.setText(m_provider.getDefaultOperation().getDescription());
   }
 
   private void handleSelection(IScoutProjectTemplateOperation selectedItem) {
@@ -126,13 +131,32 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
   private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
 
     private IScoutProjectTemplateOperation[] m_templates;
+    private IScoutProjectTemplateOperation m_defaultOperation;
 
-    public P_ContentProvider(IScoutProjectTemplateOperation[] templates) {
-      m_templates = templates;
+    public P_ContentProvider() {
+      refresh();
+    }
+
+    private void refresh() {
+      ArrayList<IScoutProjectTemplateOperation> elements = new ArrayList<IScoutProjectTemplateOperation>();
+      IScoutProjectTemplateOperation emptyTemplate = new EmptyTemplateOperation();
+      elements.add(emptyTemplate);
+      m_defaultOperation = emptyTemplate;
+
+      ScoutProjectNewWizardPage previousPage = (ScoutProjectNewWizardPage) getWizard().getPage(ScoutProjectNewWizardPage.class.getName());
+      if (previousPage.isCreateClient()) {
+        OutlineTemplateOperation outlineTemplate = new OutlineTemplateOperation();
+        elements.add(outlineTemplate);
+        SingleFormTemplateOperation singleFormTemplate = new SingleFormTemplateOperation();
+        elements.add(singleFormTemplate);
+        m_defaultOperation = singleFormTemplate;
+      }
+      m_templates = elements.toArray(new IScoutProjectTemplateOperation[elements.size()]);
     }
 
     @Override
     public Object[] getElements(Object inputElement) {
+      refresh();
       return m_templates;
     }
 
@@ -177,8 +201,10 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
     @Override
     public void removeListener(ILabelProviderListener listener) {
       // TODO Auto-generated method stub
-
     }
 
+    public IScoutProjectTemplateOperation getDefaultOperation() {
+      return m_defaultOperation;
+    }
   }
 }
