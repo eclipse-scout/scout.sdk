@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,18 +15,16 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.NamingUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
-public class LookupServiceNewOperation extends RemoteServiceNewOperation {
+public class LookupServiceNewOperation extends ServiceNewOperation {
 
   final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
   final IType abstractSqlLookupService = ScoutSdk.getType(RuntimeClasses.AbstractSqlLookupService);
@@ -39,7 +37,6 @@ public class LookupServiceNewOperation extends RemoteServiceNewOperation {
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
-    IType serviceInterface = getCreatedServiceInterface();
     IType serviceImplementation = getCreatedServiceImplementation();
     ITypeHierarchy superTypeHierarchy = serviceImplementation.newSupertypeHierarchy(monitor);
 
@@ -92,30 +89,28 @@ public class LookupServiceNewOperation extends RemoteServiceNewOperation {
         serviceImplementation.getCompilationUnit().createImport(imp, null, monitor);
       }
     }
+  }
 
-    if (getInterfaceBundle().getType() == IScoutBundle.BUNDLE_SHARED) {
-      // create LookupCall
-      ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(NamingUtility.removeSuffixes(getServiceName(), "Lookup", "Service") + "LookupCall", getInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP), getInterfaceBundle());
-      lookupCallOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.LookupCall, true));
-      lookupCallOp.run(monitor, workingCopyManager);
-      IType lookupCallType = lookupCallOp.getCreatedType();
-      workingCopyManager.register(lookupCallType.getCompilationUnit(), monitor);
-      IImportValidator lookupCallImportValidator = new CompilationUnitImportValidator(lookupCallType.getCompilationUnit());
-
-      lookupCallType.createField("private static final long serialVersionUID=1L;", null, true, monitor);
-      StringBuilder methodBody = new StringBuilder();
-      methodBody.append("@Override\npublic Class<? extends " + lookupCallImportValidator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.ILookupService, true)) + "> getConfiguredService(){\n");
-      methodBody.append("return " + lookupCallImportValidator.getSimpleTypeRef(Signature.createTypeSignature(serviceInterface.getFullyQualifiedName(), true)) + ".class;\n");
-      methodBody.append("}");
-
-      lookupCallType.createMethod(methodBody.toString(), null, true, monitor);
-      for (String imp : lookupCallImportValidator.getImportsToCreate()) {
-        lookupCallType.getCompilationUnit().createImport(imp, null, monitor);
-      }
+  @Override
+  public void setImplementationBundle(IScoutBundle implementationBundle) {
+    super.setImplementationBundle(implementationBundle);
+    if (implementationBundle != null) {
+      setServicePackageName(implementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_LOOKUP));
     }
+    else {
+      setServicePackageName(null);
+    }
+  }
 
-    //
-    // registerServiceClass(lookupCallType.getBsiCaseProject().getProject(), "org.eclipse.scout.rt.client.serviceProxies", "serviceProxy", lookupCallType.getFullyQualifiedName(),null,monitor);
+  @Override
+  public void setInterfaceBundle(IScoutBundle interfaceBundle) {
+    super.setInterfaceBundle(interfaceBundle);
+    if (interfaceBundle != null) {
+      setServiceInterfacePackageName(interfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP));
+    }
+    else {
+      setServiceInterfacePackageName(null);
+    }
   }
 
 }

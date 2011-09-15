@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -59,17 +59,14 @@ public class LookupCallNewOperation implements IOperation {
     if (lookupServiceInterface == null) {
       if (!StringUtility.isNullOrEmpty(getServiceSuperTypeSignature())) {
         LookupServiceNewOperation serviceOp = new LookupServiceNewOperation();
-        serviceOp.setClientRegistrationBundle(getInterfaceRegistrationBundle());
-        serviceOp.setCreateImplementation(true);
-        serviceOp.setCreateInterface(true);
+        serviceOp.addProxyRegistrationBundle(getInterfaceRegistrationBundle());
         serviceOp.setImplementationBundle(getServiceImplementationBundle());
-        serviceOp.setImplementationPackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_LOOKUP));
-        serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
-        serviceOp.setInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP));
-        serviceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.ILookupService, true));
         serviceOp.setServiceName(namePrefix + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+        serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
+        serviceOp.setServiceInterfaceName("I" + namePrefix + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+        serviceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.ILookupService, true));
         serviceOp.setServiceSuperTypeSignature(getServiceSuperTypeSignature());
-        serviceOp.setServerRegistrationBundle(getImplementationRegistrationBundle());
+        serviceOp.addServiceRegistrationBundle(getImplementationRegistrationBundle());
         serviceOp.validate();
         serviceOp.run(monitor, workingCopyManager);
         lookupServiceInterface = serviceOp.getCreatedServiceInterface();

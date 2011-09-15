@@ -23,7 +23,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.LookupServiceNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
@@ -51,7 +51,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
-  private ServiceNewOperation m_operation = new ServiceNewOperation();
+  private LookupServiceNewOperation m_operation = new LookupServiceNewOperation();
 
   public LookupServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle("New Lookup Service");
@@ -113,7 +113,6 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
       m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_LOOKUP));
       m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     }
     IScoutBundle[] regProxyLocations = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
@@ -127,7 +126,6 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle interfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
       m_operation.setInterfaceBundle(interfaceBundle);
-      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP));
     }
     m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
     m_operation.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.ILookupService, true));
