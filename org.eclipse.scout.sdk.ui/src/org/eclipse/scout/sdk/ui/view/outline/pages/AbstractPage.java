@@ -60,6 +60,7 @@ public abstract class AbstractPage implements IPage {
     m_children = new ArrayList<IPage>();
   }
 
+  @Override
   public void setParent(IPage parent) {
     m_parent = parent;
     if (m_parent != null) {
@@ -67,6 +68,7 @@ public abstract class AbstractPage implements IPage {
     }
   }
 
+  @Override
   public IPage getParent() {
     return m_parent;
   }
@@ -77,12 +79,14 @@ public abstract class AbstractPage implements IPage {
     else return null;
   }
 
+  @Override
   public ScoutExplorerPart getOutlineView() {
     IPage parent = getParent();
     if (parent != null) return parent.getOutlineView();
     else return null;
   }
 
+  @Override
   public String getName() {
 
     return m_name;
@@ -92,14 +96,17 @@ public abstract class AbstractPage implements IPage {
     m_name = s;
   }
 
+  @Override
   public boolean isChildrenLoaded() {
     return m_childrenLoaded;
   }
 
+  @Override
   public boolean isInitiallyLoaded() {
     return false;
   }
 
+  @Override
   public void markStructureDirty() {
     ScoutExplorerPart o = getOutlineView();
     if (o != null) {
@@ -111,17 +118,24 @@ public abstract class AbstractPage implements IPage {
     return getName() + (m_recursive ? (" (R)") : (""));
   }
 
+  @Override
   public void addChild(IPage child) {
     if (child == null) throw new IllegalArgumentException("adding null child to " + getName());
-    m_children.add(child);
+    synchronized (m_children) {
+      m_children.add(child);
+    }
   }
 
+  @Override
   public boolean removeChild(IPage childPage) {
     if (childPage == null) throw new IllegalArgumentException("remove null child to " + getName());
     childPage.setParent(null);
-    return m_children.remove(childPage);
+    synchronized (m_children) {
+      return m_children.remove(childPage);
+    }
   }
 
+  @Override
   public IPage[] getChildArray() {
     return getChildArray(null);
   }
@@ -129,9 +143,11 @@ public abstract class AbstractPage implements IPage {
   @Override
   public IPage[] getChildArray(IPageFilter filter) {
     ArrayList<IPage> children = new ArrayList<IPage>();
-    for (IPage p : m_children) {
-      if (filter == null || filter.accept(p)) {
-        children.add(p);
+    synchronized (m_children) {
+      for (IPage p : m_children) {
+        if (filter == null || filter.accept(p)) {
+          children.add(p);
+        }
       }
     }
     return children.toArray(new IPage[children.size()]);
@@ -139,31 +155,41 @@ public abstract class AbstractPage implements IPage {
 
   @Override
   public List<IPage> getChildren() {
-    return Collections.unmodifiableList(m_children);
+    synchronized (m_children) {
+      return Collections.unmodifiableList(new ArrayList<IPage>(m_children));
+    }
   }
 
   @Override
   public boolean hasChildren() {
-    return m_children.size() > 0;
+    synchronized (m_children) {
+      return m_children.size() > 0;
+    }
   }
 
   @Override
   public void unloadPage() {
   }
 
+  @Override
   public final void unloadChildren() {
-    for (IPage page : m_children) {
-      page.setParent(null);
-      page.unloadChildren();
-      page.unloadPage();
+    synchronized (m_children) {
+      for (IPage page : m_children) {
+        page.setParent(null);
+        page.unloadChildren();
+        page.unloadPage();
+      }
+      m_children.clear();
+      m_childrenLoaded = false;
     }
-    m_children.clear();
-    m_childrenLoaded = false;
   }
 
   @Override
   public void refresh(boolean clearCache) {
-    getOutlineView().markStructureDirty(this);
+    ScoutExplorerPart outlineView = getOutlineView();
+    if (outlineView != null) {
+      outlineView.markStructureDirty(this);
+    }
   }
 
   @Override
@@ -171,6 +197,7 @@ public abstract class AbstractPage implements IPage {
     return getDecoratedName();
   }
 
+  @Override
   public final void loadChildren() {
     loadChildrenImpl();
     // extension point
@@ -237,6 +264,7 @@ public abstract class AbstractPage implements IPage {
     }
   }
 
+  @Override
   public void setImageDescriptor(ImageDescriptor desc) {
     m_imageDesc = desc;
   }
@@ -272,6 +300,7 @@ public abstract class AbstractPage implements IPage {
     return ScoutSdkUi.getImage(desc);
   }
 
+  @Override
   public int getQuality() {
     if (hasChildren()) {
       IPage[] a = getChildArray();
@@ -324,10 +353,12 @@ public abstract class AbstractPage implements IPage {
     return false;
   }
 
+  @Override
   public boolean isFolder() {
     return false;
   }
 
+  @Override
   public int accept(INodeVisitor visitor) {
     switch (visitor.visit(this)) {
       case INodeVisitor.CANCEL:
