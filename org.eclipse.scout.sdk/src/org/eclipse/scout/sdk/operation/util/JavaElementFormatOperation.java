@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,7 +38,7 @@ public class JavaElementFormatOperation extends SourceFormatOperation {
     m_organizeImports = organizeImports;
     m_javaMember = element;
     setDocument(new Document(m_javaMember.getCompilationUnit().getSource()));
-    SourceRange range = new SourceRange(0, element.getSourceRange().getLength());
+    SourceRange range = new SourceRange(element.getSourceRange().getOffset(), element.getSourceRange().getLength());
     setRange(range);
   }
 
