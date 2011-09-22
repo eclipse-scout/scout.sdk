@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
 import org.eclipse.ui.IEditorPart;
@@ -28,13 +28,24 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
 
   private IType m_type;
   private int m_nodeTypeIndex = -1;
+  private final String m_readOnlySuffix;
 
+  public AbstractScoutTypePage() {
+    this(null);
+  }
+
+  public AbstractScoutTypePage(String readOnlySuffix) {
+    m_readOnlySuffix = readOnlySuffix;
+  }
+
+  @Override
   public void setType(IType type) {
     m_type = type;
     String methodNameForTranslatedText = getMethodNameForTranslatedText();
     setName(ScoutSourceUtilities.getTranslatedMethodStringValue(getType(), methodNameForTranslatedText));
   }
 
+  @Override
   public IType getType() {
     return m_type;
   }
@@ -57,11 +68,23 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
     return quality;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new ShowJavaReferencesAction(getType()));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof TypeRenameAction) {
+      TypeRenameAction action = (TypeRenameAction) menu;
+      action.setOldName(getType().getElementName());
+      action.setReadOnlySuffix(m_readOnlySuffix);
+      action.setType(getType());
+    }
+    else if (menu instanceof ShowJavaReferencesAction) {
+      ((ShowJavaReferencesAction) menu).setElement(getType());
+    }
   }
 
   @Override

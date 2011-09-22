@@ -31,6 +31,7 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -62,8 +63,8 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   public TableColumnNewWizardPage1(IType declaringType) {
     super(TableColumnNewWizardPage1.class.getName());
-    setTitle("Table Column Templates");
-    setDefaultMessage("Choose a template for your table column.");
+    setTitle(Texts.get("TableColumnTemplates"));
+    setDefaultMessage(Texts.get("ChooseATemplateForYourTableColumn"));
     m_declaringType = declaringType;
   }
 
@@ -108,13 +109,13 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     });
 
     HashMap<String, P_BCTypeTemplate> templates = new HashMap<String, P_BCTypeTemplate>();
-    templates.put(RuntimeClasses.AbstractStringColumn, new P_BCTypeTemplate("String Column", ScoutSdk.getType(RuntimeClasses.AbstractStringColumn)));
-    templates.put(RuntimeClasses.AbstractBooleanColumn, new P_BCTypeTemplate("Boolean Column", ScoutSdk.getType(RuntimeClasses.AbstractBooleanColumn)));
-    templates.put(RuntimeClasses.AbstractDateColumn, new P_BCTypeTemplate("Date Column", ScoutSdk.getType(RuntimeClasses.AbstractDateColumn)));
-    templates.put(RuntimeClasses.AbstractDoubleColumn, new P_BCTypeTemplate("Double Column", ScoutSdk.getType(RuntimeClasses.AbstractDoubleColumn)));
-    templates.put(RuntimeClasses.AbstractIntegerColumn, new P_BCTypeTemplate("Integer Column", ScoutSdk.getType(RuntimeClasses.AbstractIntegerColumn)));
-    templates.put(RuntimeClasses.AbstractLongColumn, new P_BCTypeTemplate("Long Column", ScoutSdk.getType(RuntimeClasses.AbstractLongColumn)));
-    templates.put(RuntimeClasses.AbstractSmartColumn, new P_BCTypeTemplate("Smart Column", ScoutSdk.getType(RuntimeClasses.AbstractSmartColumn)));
+    templates.put(RuntimeClasses.AbstractStringColumn, new P_BCTypeTemplate(Texts.get("StringColumn"), ScoutSdk.getType(RuntimeClasses.AbstractStringColumn)));
+    templates.put(RuntimeClasses.AbstractBooleanColumn, new P_BCTypeTemplate(Texts.get("BooleanColumn"), ScoutSdk.getType(RuntimeClasses.AbstractBooleanColumn)));
+    templates.put(RuntimeClasses.AbstractDateColumn, new P_BCTypeTemplate(Texts.get("DateColumn"), ScoutSdk.getType(RuntimeClasses.AbstractDateColumn)));
+    templates.put(RuntimeClasses.AbstractDoubleColumn, new P_BCTypeTemplate(Texts.get("DoubleColumn"), ScoutSdk.getType(RuntimeClasses.AbstractDoubleColumn)));
+    templates.put(RuntimeClasses.AbstractIntegerColumn, new P_BCTypeTemplate(Texts.get("IntegerColumn"), ScoutSdk.getType(RuntimeClasses.AbstractIntegerColumn)));
+    templates.put(RuntimeClasses.AbstractLongColumn, new P_BCTypeTemplate(Texts.get("LongColumn"), ScoutSdk.getType(RuntimeClasses.AbstractLongColumn)));
+    templates.put(RuntimeClasses.AbstractSmartColumn, new P_BCTypeTemplate(Texts.get("SmartColumn"), ScoutSdk.getType(RuntimeClasses.AbstractSmartColumn)));
 
     ITypeHierarchy columnHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iColumn);
     for (IType t : columnHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()))) {
@@ -129,7 +130,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
     m_showAllTemplatesField = new Button(parent, SWT.CHECK);
     m_showAllTemplatesField.setSelection(false);
-    m_showAllTemplatesField.setText("Show all templates");
+    m_showAllTemplatesField.setText(Texts.get("ShowAllTemplates"));
     m_showAllTemplatesField.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -187,7 +188,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       multiStatus.add(Status.OK_STATUS);
     }
     else {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "A template must be selected."));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
     }
   }
 

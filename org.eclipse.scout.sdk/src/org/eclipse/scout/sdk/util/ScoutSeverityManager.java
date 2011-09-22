@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,6 +44,7 @@ public final class ScoutSeverityManager {
     m_listenerListLock = new Object();
     m_listenerList = new EventListenerList();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(new IResourceChangeListener() {
+      @Override
       public void resourceChanged(IResourceChangeEvent e) {
         IMarkerDelta[] mdeltas = e.findMarkerDeltas(IMarker.PROBLEM, true);
         if (mdeltas != null && mdeltas.length > 0) {

@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.AutoResizeColumnTable;
 import org.eclipse.scout.sdk.ui.fields.table.JavaElementTableContentProvider;
@@ -84,7 +85,6 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
       }
       m_addButton.setEnabled(enabled);
     }
-    // TODO Auto-generated method stub
     super.setEnabled(enabled);
   }
 
@@ -96,10 +96,11 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
     TableColumn simpleNameCol = new TableColumn(m_table, SWT.LEFT);
     simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(3));
     simpleNameCol.setWidth(170);
-    simpleNameCol.setText("Member");
+    simpleNameCol.setText(Texts.get("Member"));
     m_table.setHeaderVisible(false);
     m_viewer = new TableViewer(m_table);
     m_viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         m_removeButton.setEnabled(!event.getSelection().isEmpty());
       }
@@ -108,6 +109,7 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
     m_viewer.setLabelProvider(m_tableModel);
     m_viewer.setInput(this);
     m_viewer.addDoubleClickListener(new IDoubleClickListener() {
+      @Override
       public void doubleClick(DoubleClickEvent event) {
         // TODO select the current oultine in the outline view
       }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.form.fields.composerfield.entity;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -21,7 +22,7 @@ public class EntityNewWizard extends AbstractWorkspaceWizard {
   private IType m_declaringType;
 
   public EntityNewWizard(IType declaringType) {
-    setWindowTitle("New Composer Entity");
+    setWindowTitle(Texts.get("NewComposerFieldEntity"));
     m_declaringType = declaringType;
 
   }

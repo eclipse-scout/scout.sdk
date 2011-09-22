@@ -16,15 +16,14 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint.ExplorerPageExtension;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.menu.IContextMenuProvider;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -32,7 +31,7 @@ import org.eclipse.swt.graphics.Point;
 /**
  * Tree Node with editor adapter of type ICfgAdapter
  */
-public abstract class AbstractPage implements IPage {
+public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   private String m_name;
   private ArrayList<IPage> m_children;
@@ -243,27 +242,6 @@ public abstract class AbstractPage implements IPage {
     return m_pageDirtyListener;
   }
 
-  public void fillContextMenu(IMenuManager manager) {
-    Action na = createNewAction();
-    if (na != null) {
-      manager.add(na);
-    }
-    manager.add(new Separator());
-    Action ea = createEditAction();
-    if (ea != null) {
-      manager.add(ea);
-    }
-    Action ra = createRenameAction();
-    if (ra != null) {
-      manager.add(ra);
-    }
-    manager.add(new Separator());
-    Action da = createDeleteAction();
-    if (da != null) {
-      manager.add(da);
-    }
-  }
-
   @Override
   public void setImageDescriptor(ImageDescriptor desc) {
     m_imageDesc = desc;
@@ -318,26 +296,6 @@ public abstract class AbstractPage implements IPage {
     }
   }
 
-  public Action createNewAction() {
-    return null;
-  }
-
-  public Action createRenameAction() {
-    return null;
-  }
-
-  public Action createDeleteAction() {
-    return null;
-  }
-
-  public Action createEditAction() {
-    return null;
-  }
-
-  public Action createMoveAction(int moveOperation) {
-    return null;
-  }
-
   /**
    * to handle the node selection
    */
@@ -386,4 +344,12 @@ public abstract class AbstractPage implements IPage {
     return INodeVisitor.CONTINUE;
   }
 
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return null;
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+  }
 }

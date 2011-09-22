@@ -31,6 +31,7 @@ public class ScoutMethodDeleteOperation implements IOperation {
     m_method = method;
   }
 
+  @Override
   public String getOperationName() {
     return Texts.get("Process_deleteX", getMethod().getElementName());
   }
@@ -48,6 +49,7 @@ public class ScoutMethodDeleteOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit compilationUnit = getMethod().getCompilationUnit();
     workingCopyManager.register(compilationUnit, monitor);

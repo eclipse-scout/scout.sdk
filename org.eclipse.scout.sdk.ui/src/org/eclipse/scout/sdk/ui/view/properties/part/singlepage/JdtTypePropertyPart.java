@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -113,7 +114,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   @Override
   public void setPage(IPage page) {
     super.setPage(page);
-    m_icuNotSyncStatus = new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, "Save the file '" + getPage().getType().getResource().getName() + "' to use property view.");
+    m_icuNotSyncStatus = new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, Texts.get("SaveTheFile", getPage().getType().getResource().getName()));
   }
 
   @Override
@@ -131,7 +132,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
         }
       }
     });
-    m_saveButton = getFormToolkit().createButton(headArea, "Save file", SWT.PUSH);
+    m_saveButton = getFormToolkit().createButton(headArea, Texts.get("SaveFile"), SWT.PUSH);
     m_saveButton.setEnabled(false);
     m_saveButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -157,7 +158,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       m_updateJob = new P_UpdateMethodsJob(getForm().getDisplay());
     }
     if (getPage().isFolder()) {
-      ISection filterSection = createSection(SECTION_ID_FILTER, "Filter");
+      ISection filterSection = createSection(SECTION_ID_FILTER, Texts.get("Filter"));
       PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), filterSection.getSectionClient(), getPage());
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
@@ -167,7 +168,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     m_configPropertyType = new ConfigPropertyType(getPage().getType());
     ConfigurationMethod[] configPropertyMethods = m_configPropertyType.getConfigurationMethods(ConfigurationMethod.PROPERTY_METHOD);
     if (configPropertyMethods != null && configPropertyMethods.length > 0) {
-      ISection configPropertiesSection = createSection(SECTION_ID_PROPERTIES, "Properties");
+      ISection configPropertiesSection = createSection(SECTION_ID_PROPERTIES, Texts.get("Properties"));
       for (ConfigurationMethod m : configPropertyMethods) {
         AbstractMethodPresenter presenter = null;
         presenter = createConfigMethodPresenter(configPropertiesSection.getSectionClient(), m);
@@ -182,7 +183,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
 
     ConfigurationMethod[] operationPropertyMethods = m_configPropertyType.getConfigurationMethods(ConfigurationMethod.OPERATION_METHOD);
     if (operationPropertyMethods != null && operationPropertyMethods.length > 0) {
-      ISection operationPropertiesSection = createSection(SECTION_ID_OPERATIONS, "Operations");
+      ISection operationPropertiesSection = createSection(SECTION_ID_OPERATIONS, Texts.get("Operations"));
       for (ConfigurationMethod m : operationPropertyMethods) {
         createOperationPresenter(operationPropertiesSection.getSectionClient(), m);
       }

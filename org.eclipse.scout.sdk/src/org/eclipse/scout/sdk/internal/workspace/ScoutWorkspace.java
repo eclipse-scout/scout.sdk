@@ -67,10 +67,12 @@ public class ScoutWorkspace implements IScoutWorkspace {
     fireWorkspaceEvnets(eventCollector.getAllEvents());
   }
 
+  @Override
   public void addWorkspaceListener(IScoutWorkspaceListener listener) {
     m_eventListeners.add(IScoutWorkspaceListener.class, listener);
   }
 
+  @Override
   public void removeWorkspaceListener(IScoutWorkspaceListener listener) {
     m_eventListeners.remove(IScoutWorkspaceListener.class, listener);
   }
@@ -123,6 +125,7 @@ public class ScoutWorkspace implements IScoutWorkspace {
     }
   }
 
+  @Override
   public IScoutBundle[] getAllBundles() {
     ArrayList<IScoutBundle> result = new ArrayList<IScoutBundle>();
     for (BundleGraphNode desc : m_bundleGraph.getWorkspaceNodes()) {

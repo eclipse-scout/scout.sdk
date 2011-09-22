@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -39,7 +40,7 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
   private MenuNewOperation m_operation;
 
   public DesktopMenuNewWizard() {
-    setWindowTitle("New Desktop Menu");
+    setWindowTitle(Texts.get("NewDesktopMenu"));
   }
 
   public void initWizard(IType declaringType) {

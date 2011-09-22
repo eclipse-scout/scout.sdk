@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -48,20 +49,9 @@ public class TableNodePage extends AbstractScoutTypePage {
     new ColumnTablePage(this, getType());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createEditAction() {
-    // XXX
-    return null;
-    // return new EditAction(new EntityEditOrder(new TableEntity(getType())));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ShowJavaReferencesAction.class};
   }
-
-  @Override
-  public Action createRenameAction() {
-    // XXX
-    return null;
-    // return new RenameAction(new TableRenameOrder(getType()));
-  }
-
-  // XXX add new/delete orders
-
 }

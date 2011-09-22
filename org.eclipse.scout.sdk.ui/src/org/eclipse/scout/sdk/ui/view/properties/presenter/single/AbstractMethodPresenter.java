@@ -23,6 +23,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutStatus;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -193,7 +194,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
       }
       ((GridData) m_deleteButton.getLayoutData()).exclude = !configurationMethod.isImplemented();
       m_deleteButton.setVisible(configurationMethod.isImplemented());
-      m_deleteButton.setToolTipText("Remove '" + getMethod().getMethodName() + "' in '" + getMethod().getType().getElementName() + "'...");
+      m_deleteButton.setToolTipText(Texts.get("RemoveXinY", getMethod().getMethodName(), getMethod().getType().getElementName()));
 
     }
     finally {

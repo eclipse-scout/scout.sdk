@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 
 /**
@@ -24,7 +25,7 @@ public class TableColumnNewWizard extends AbstractFormFieldWizard {
   private TableColumnNewWizardPage1 m_page1;
 
   public TableColumnNewWizard() {
-    setWindowTitle("New Table Column");
+    setWindowTitle(Texts.get("NewTableColumn"));
   }
 
   @Override

@@ -14,21 +14,17 @@ import java.util.HashSet;
 
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformFormsOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.create.FormNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.form.FormNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
@@ -88,7 +84,6 @@ public class FormTablePage extends AbstractPage {
     for (IType t : resolveForms()) {
       new FormNodePage(this, t);
     }
-
   }
 
   protected IType[] resolveForms() {
@@ -101,23 +96,30 @@ public class FormTablePage extends AbstractPage {
     return allSubtypes;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform all forms...", new WellformFormsOperation(getScoutResource())));
-    manager.add(new MultipleUpdateFormDataAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveForms();
-      }
-    }));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WellformAction.class, FormNewAction.class, MultipleUpdateFormDataAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Form"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormAdd),
-        new FormNewWizard(getScoutResource()));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setOperation(new WellformFormsOperation(getScoutResource()));
+      action.setLabel(Texts.get("WellformAllForms"));
+    }
+    else if (menu instanceof FormNewAction) {
+      ((FormNewAction) menu).setScoutBundle(getScoutResource());
+    }
+    else if (menu instanceof MultipleUpdateFormDataAction) {
+      ((MultipleUpdateFormDataAction) menu).setTypeResolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveForms();
+        }
+      });
+    }
   }
 
   private class P_FormFilter implements ITypeFilter {

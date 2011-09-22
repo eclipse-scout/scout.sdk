@@ -11,9 +11,8 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.tree;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -55,14 +54,24 @@ public class TreeNodePage extends AbstractScoutTypePage {
     return (IScoutBundle) super.getScoutResource();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createDeleteAction() {
-    MemberListDeleteAction action = null;
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
     if (m_hasDeleteAction) {
-      action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getType().getElementName()), getOutlineView().getSite().getShell());
-      action.addMemberToDelete(getType());
-      action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TreeRemove));
+      return new Class[]{MemberListDeleteAction.class};
     }
-    return action;
+    else {
+      return null;
+    }
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof MemberListDeleteAction) {
+      MemberListDeleteAction action = (MemberListDeleteAction) menu;
+      action.addMemberToDelete(getType());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TreeRemove));
+    }
   }
 }

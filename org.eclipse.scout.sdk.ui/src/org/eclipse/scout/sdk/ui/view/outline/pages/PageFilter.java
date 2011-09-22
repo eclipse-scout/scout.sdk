@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,6 +32,7 @@ public class PageFilter implements IPageFilter {
     createPattern();
   }
 
+  @Override
   public String getFilterExpression() {
     return m_filterExpression;
   }
@@ -79,6 +80,7 @@ public class PageFilter implements IPageFilter {
     }
   }
 
+  @Override
   public boolean isEmpty() {
     return m_filterExpression == null;
   }

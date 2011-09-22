@@ -11,17 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.EntityNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.form.fields.composerfield.entity.EntityNewWizard;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 
 /**
@@ -41,7 +40,7 @@ public class EntityTablePage extends AbstractPage {
     super();
     m_declaringType = declaringType;
     setParent(parent);
-    setName("Entities");
+    setName(Texts.get("Entities"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerEntries));
   }
 
@@ -76,12 +75,17 @@ public class EntityTablePage extends AbstractPage {
   }
 
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Entity"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerEntryAdd), new EntityNewWizard(getDeclaringType()));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((EntityNewAction) menu).setType(getDeclaringType());
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{EntityNewAction.class};
   }
 
   public IType getDeclaringType() {
     return m_declaringType;
   }
-
 }

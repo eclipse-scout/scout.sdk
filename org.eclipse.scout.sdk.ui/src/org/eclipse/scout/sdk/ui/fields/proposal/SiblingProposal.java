@@ -41,14 +41,17 @@ public class SiblingProposal implements IContentProposalEx, ITypeSibling {
     m_siblingType = TYPE_SIBLING;
   }
 
+  @Override
   public int getCursorPosition(boolean selected, boolean expertMode) {
     return m_text.length();
   }
 
+  @Override
   public Image getImage(boolean selected, boolean expertMode) {
     return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
   }
 
+  @Override
   public String getLabel(boolean selected, boolean expertMode) {
     return m_text;
   }

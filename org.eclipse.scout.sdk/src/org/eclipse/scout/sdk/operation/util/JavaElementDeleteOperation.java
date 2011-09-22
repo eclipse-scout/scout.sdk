@@ -88,12 +88,12 @@ public class JavaElementDeleteOperation implements IOperation {
     for (IJavaElement m : m_typesToDelete) {
       deleteMember(m, icuForOrganizeImports, monitor, workingCopyManager);
     }
-    for (ICompilationUnit icu : icuForOrganizeImports) {
-      if (TypeUtility.exists(icu)) {
-        OrganizeImportOperation op = new OrganizeImportOperation(icu);
+//    for (ICompilationUnit icu : icuForOrganizeImports) {
+//      if (TypeUtility.exists(icu)) {
+//        OrganizeImportOperation op = new OrganizeImportOperation(icu);
 //        op.run(monitor, workingCopyManager);
-      }
-    }
+//      }
+//    }
 
   }
 

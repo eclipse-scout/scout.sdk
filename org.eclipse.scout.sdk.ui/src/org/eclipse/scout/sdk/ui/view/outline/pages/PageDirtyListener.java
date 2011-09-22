@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,7 @@ public class PageDirtyListener implements ITypeHierarchyChangedListener {
     m_page = page;
   }
 
+  @Override
   public void handleEvent(int eventType, IType type) {
     switch (eventType) {
       case POST_TYPE_REMOVING:
@@ -29,7 +30,6 @@ public class PageDirtyListener implements ITypeHierarchyChangedListener {
         m_page.markStructureDirty();
         break;
     }
-
   }
 
   public void typeChanged(IType type, int eventType, IJavaElement modification) {

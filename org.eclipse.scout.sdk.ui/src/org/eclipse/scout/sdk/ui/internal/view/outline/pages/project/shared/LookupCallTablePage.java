@@ -11,15 +11,14 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.LookupCallNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.lookupcall.LookupCallNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
@@ -84,10 +83,14 @@ public class LookupCallTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "LookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LookupCallAdd),
-        new LookupCallNewWizard(getScoutResource()));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{LookupCallNewAction.class};
   }
 
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((LookupCallNewAction) menu).setScoutBundle(getScoutResource());
+  }
 }

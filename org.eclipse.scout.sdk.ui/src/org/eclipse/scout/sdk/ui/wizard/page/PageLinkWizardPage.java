@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.page.LinkPageOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -62,18 +63,19 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   public PageLinkWizardPage(IScoutBundle clientBundle) {
     super(PageLinkWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    setTitle("Link Page");
-    setDefaultMessage("Link page to a page holder.");
+    setTitle(Texts.get("LinkPage"));
+    setDefaultMessage(Texts.get("LinkPageToAPageHolder"));
     setOperation(new LinkPageOperation());
   }
 
   @Override
   protected void createContent(Composite parent) {
     IType[] pages = SdkTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
-    m_pageTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(ScoutProposalUtility.getScoutTypeProposalsFor(pages)), "Page");
+    m_pageTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(ScoutProposalUtility.getScoutTypeProposalsFor(pages)), Texts.get("Page"));
     m_pageTypeField.acceptProposal(getPageType());
     m_pageTypeField.setEnabled(isPageTypeFieldEnabled());
     m_pageTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setPageType((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -87,10 +89,11 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
     ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(propTypes);
 
-    m_holderTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(proposals), "Holder Page/Outline");
+    m_holderTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(proposals), Texts.get("HolderPageOutline"));
     m_holderTypeField.acceptProposal(getHolderType());
     m_holderTypeField.setEnabled(isHolderTypeEnabled());
     m_holderTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_holderType = (ITypeProposal) event.proposal;
         pingStateChanging();
@@ -115,10 +118,10 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void validatePage(MultiStatus multiStatus) {
     if (getHolderType() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "holder type is missing."));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("HolderTypeIsMissing")));
     }
     else if (getPageType() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "page type is missing."));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("PageTypeIsMissing")));
     }
     else {
       multiStatus.add(Status.OK_STATUS);

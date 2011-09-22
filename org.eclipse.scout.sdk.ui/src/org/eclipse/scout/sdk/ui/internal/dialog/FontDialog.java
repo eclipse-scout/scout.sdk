@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.swt.SWT;
@@ -67,7 +68,7 @@ public class FontDialog extends TitleAreaDialog {
   private final String m_message;
 
   public FontDialog(Shell parentShell, FontSpec initialSpec) {
-    this(parentShell, initialSpec, "Font", "Choose a font. Use default to ensure the default font value is taken.");
+    this(parentShell, initialSpec, Texts.get("Font"), Texts.get("FontDialogHelpMsg"));
   }
 
   /**
@@ -121,11 +122,11 @@ public class FontDialog extends TitleAreaDialog {
 
   private Control createFontNameArea(Composite parent) {
     Group nameGroup = new Group(parent, SWT.SHADOW_ETCHED_IN);
-    nameGroup.setText("Name");
+    nameGroup.setText(Texts.get("Name"));
     m_defaultFontNameButton = new Button(nameGroup, SWT.CHECK);
     String fontName = m_fontSpec.getName();
     m_defaultFontNameButton.setSelection(fontName == null);
-    m_defaultFontNameButton.setText("use default");
+    m_defaultFontNameButton.setText(Texts.get("UseDefault"));
     m_defaultFontNameButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -162,7 +163,7 @@ public class FontDialog extends TitleAreaDialog {
     styleGroup.setText("Style");
     m_defaultFontStyleButton = new Button(styleGroup, SWT.CHECK);
     m_defaultFontStyleButton.setSelection(m_fontSpec.getStyle() == null);
-    m_defaultFontStyleButton.setText("use default");
+    m_defaultFontStyleButton.setText(Texts.get("UseDefault"));
     m_defaultFontStyleButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -199,7 +200,7 @@ public class FontDialog extends TitleAreaDialog {
     sizeGroup.setText("Size");
     m_defaultFontSizeButton = new Button(sizeGroup, SWT.CHECK);
     m_defaultFontSizeButton.setSelection(m_fontSpec.getHeight() == null);
-    m_defaultFontSizeButton.setText("use default");
+    m_defaultFontSizeButton.setText(Texts.get("UseDefault"));
     m_defaultFontSizeButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -238,7 +239,7 @@ public class FontDialog extends TitleAreaDialog {
     });
 
     Group previewGroup = new Group(area, SWT.SHADOW_ETCHED_IN);
-    previewGroup.setText("Preview");
+    previewGroup.setText(Texts.get("Preview"));
     m_preview = new Label(previewGroup, SWT.WRAP);
 
     m_preview.setText("ABCDEFGHIJklmnopqrs 123456789");
@@ -420,27 +421,19 @@ public class FontDialog extends TitleAreaDialog {
 
     @Override
     public void addListener(ILabelProviderListener listener) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
-      // TODO Auto-generated method stub
-
     }
-
   }
 }

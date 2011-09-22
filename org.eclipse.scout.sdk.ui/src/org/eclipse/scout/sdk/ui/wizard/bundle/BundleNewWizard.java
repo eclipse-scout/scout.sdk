@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.bundle;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -27,7 +28,7 @@ public class BundleNewWizard extends AbstractWorkspaceWizard {
   }
 
   public BundleNewWizard(IScoutProject project) {
-    setWindowTitle("New Scout Bundle");
+    setWindowTitle(Texts.get("NewScoutBundle"));
     m_project = project;
   }
 

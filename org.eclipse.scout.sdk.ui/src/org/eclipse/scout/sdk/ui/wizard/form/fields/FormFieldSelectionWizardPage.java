@@ -32,6 +32,7 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
@@ -77,8 +78,8 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   public FormFieldSelectionWizardPage(IType declaringType) {
     super(FormFieldSelectionWizardPage.class.getName());
     m_declaringType = declaringType;
-    setTitle("Form Field");
-    setDefaultMessage("Select a form field super class. \nUse 'show all fields' to get all subclasses of IFormField.");
+    setTitle(Texts.get("FormField"));
+    setDefaultMessage(Texts.get("FormFieldDesc"));
 
   }
 
@@ -100,6 +101,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     m_table = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_table.getViewer().addFilter(m_tableFilter);
     m_table.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         Object selectedItem = null;
         if (!event.getSelection().isEmpty()) {
@@ -142,7 +144,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     m_table.getViewer().setContentProvider(provider);
     m_table.getViewer().setInput(provider);
     m_allFieldsButton = new Button(parent, SWT.CHECK);
-    m_allFieldsButton.setText("show all fields");
+    m_allFieldsButton.setText(Texts.get("ShowAllFields"));
     m_allFieldsButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -195,7 +197,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
   private IStatus getStatusFieldList() {
     if (m_nextPage == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "No Field selected.");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NoFieldSelected"));
     }
     return Status.OK_STATUS;
   }
@@ -236,10 +238,12 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       m_elements = elements;
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return m_elements;
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
         return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
@@ -247,6 +251,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       if (columnIndex == 0) {
         String label = "";
@@ -266,20 +271,25 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
 
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
   } // end class P_ByClassProvider

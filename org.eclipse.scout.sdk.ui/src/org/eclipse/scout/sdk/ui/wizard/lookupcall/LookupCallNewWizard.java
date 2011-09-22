@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.lookupcall.LookupCallNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -61,13 +62,13 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode m_locationPageRoot;
 
   public LookupCallNewWizard(IScoutBundle sharedBundle) {
-    setWindowTitle("New Lookup Call");
+    setWindowTitle(Texts.get("NewLookupCall"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_sharedBundle = sharedBundle;
     m_page1 = new LookupCallNewWizardPage(getSharedBundle());
     addPage(m_page1);
     m_locationPageRoot = createTree(sharedBundle);
-    m_page2 = new BundleTreeWizardPage("Lookup Call Locations", "Use drag'n drop to organise the locations.\n Only selected items will be created.", m_locationPageRoot, new P_InitialCheckedFilter());
+    m_page2 = new BundleTreeWizardPage(Texts.get("LookupCallLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
     m_page2.addStatusProvider(statusProvider);
     m_page2.addDndListener(new P_TreeDndListener());
     addPage(m_page2);
@@ -94,23 +95,23 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
       // service client reg
-      ITreeNode clientRegNode = TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
+      ITreeNode clientRegNode = TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, Texts.get("ServiceProxyRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
       clientRegNode.setEnabled(false);
     }
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // formData
-      TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, "LookupCall", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_LOOKUPCALL).setEnabled(false);
+      TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, Texts.get("LookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_LOOKUPCALL).setEnabled(false);
       if (serverBundle != null) {
         // service interface
-        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE).setEnabled(false);
+        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE).setEnabled(false);
       }
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION).setEnabled(false);
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER).setEnabled(false);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION).setEnabled(false);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER).setEnabled(false);
     }
 
     return rootNode;
@@ -315,7 +316,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
           String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceImplNode.getText();
           IType findType = serviceImplementationBundle.findType(fqn);
           if (findType != null && findType.exists()) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -327,7 +328,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
           String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceInterfaceNode.getText();
           IType interfaceType = serviceInterfaceBundle.findType(fqn);
           if (interfaceType != null && interfaceType.exists()) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -342,7 +343,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
           String fqn = permissionBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SECURITY) + "." + permissionNode.getText();
           IType permission = permissionBundle.findType(fqn);
           if (permission != null && permission.exists()) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -355,7 +356,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
         IScoutBundle serviceInterfaceBundle = m_page2.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceBundle != null) {
           if (!lookupCallBundle.isOnClasspath(serviceInterfaceBundle)) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_page2.getTextOfNode(TYPE_SERVICE_INTERFACE) + " is not on classpath of '" + m_page2.getTextOfNode(TYPE_LOOKUPCALL) + "'.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_page2.getTextOfNode(TYPE_SERVICE_INTERFACE), m_page2.getTextOfNode(TYPE_LOOKUPCALL)));
           }
         }
       }
@@ -368,7 +369,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
         IScoutBundle serviceInterfaceBundle = m_page2.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceBundle != null) {
           if (!serviceImplementationBundle.isOnClasspath(serviceInterfaceBundle)) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_page2.getTextOfNode(TYPE_SERVICE_INTERFACE) + " is not on classpath of '" + m_page2.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + "'.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_page2.getTextOfNode(TYPE_SERVICE_INTERFACE), m_page2.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
       }
@@ -384,7 +385,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
             if (!serviceRegistrationBundle.isOnClasspath(serviceInterfaceBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_page2.getTextOfNode(TYPE_SERVICE_INTERFACE) + " is not on classpath of Service Registration in '" + serviceRegistrationBundle.getBundleName() + "'.");
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_page2.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getBundleName()));
             }
           }
         }
@@ -401,7 +402,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
             if (!serviceRegistrationBundle.isOnClasspath(serviceImplementationBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_page2.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + " is not on classpath of Service Registration in '" + serviceRegistrationBundle.getBundleName() + "'.");
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_page2.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getBundleName()));
             }
           }
         }

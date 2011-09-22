@@ -32,10 +32,12 @@ public class JavaElementTableContentProvider implements IStructuredContentProvid
     return m_elements;
   }
 
+  @Override
   public Object[] getElements(Object inputElement) {
     return m_elements;
   }
 
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     Image img = null;
     if (columnIndex == 0) {
@@ -67,6 +69,7 @@ public class JavaElementTableContentProvider implements IStructuredContentProvid
     return img;
   }
 
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     IJavaElement member = (IJavaElement) element;
     switch (columnIndex) {
@@ -85,20 +88,25 @@ public class JavaElementTableContentProvider implements IStructuredContentProvid
     }
   }
 
+  @Override
   public void dispose() {
 
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 
+  @Override
   public void addListener(ILabelProviderListener listener) {
   }
 
+  @Override
   public boolean isLabelProperty(Object element, String property) {
     return false;
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
   }
 

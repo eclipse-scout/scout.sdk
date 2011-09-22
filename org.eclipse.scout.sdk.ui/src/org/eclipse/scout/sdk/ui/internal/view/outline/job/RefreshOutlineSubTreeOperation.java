@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.InvisibleRootNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ScoutExplorerRootNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.swt.SWT;
@@ -62,6 +62,7 @@ public class RefreshOutlineSubTreeOperation extends AbstractWorkspaceBlockingJob
           return;
         }
         display.syncExec(new Runnable() {
+          @Override
           public void run() {
             if (m_treeControl == null || m_treeControl.isDisposed()) {
               return;
@@ -90,6 +91,7 @@ public class RefreshOutlineSubTreeOperation extends AbstractWorkspaceBlockingJob
         return;
       }
       display.syncExec(new Runnable() {
+        @Override
         public void run() {
           if (m_treeControl == null || m_treeControl.isDisposed()) {
             return;
@@ -169,7 +171,7 @@ public class RefreshOutlineSubTreeOperation extends AbstractWorkspaceBlockingJob
      * must be running in java thread
      */
     public void refreshStructure(IPage p) {
-      if (p.getParent() != null || (p instanceof InvisibleRootNodePage)) {
+      if (p.getParent() != null || (p instanceof ScoutExplorerRootNodePage)) {
         p.unloadChildren();
         if (m_expanded) {
           p.loadChildren();

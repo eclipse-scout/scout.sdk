@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,11 +15,12 @@ import java.util.HashMap;
 import java.util.TreeSet;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 
 public class LinksPresenterModel {
 
   private HashMap<String, LinkGroup> m_groups = new HashMap<String, LinkGroup>();
-  private LinkGroup m_globalLinks = new LinkGroup("global", 0);
+  private LinkGroup m_globalLinks = new LinkGroup(Texts.get("Global"), 0);
 
   public LinkGroup[] getOrderedNotEmtyGroups() {
     TreeSet<LinkGroup> orderedGroups = new TreeSet<LinkGroup>(new P_GroupComparator());

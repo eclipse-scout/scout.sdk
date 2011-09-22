@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,7 @@ public class JavaCodeFieldContentAdapter implements IControlContentAdapter {
    * (non-Javadoc)
    * @see org.eclipse.jface.dialogs.taskassistance.IControlContentAdapter#getControlContents(org.eclipse.swt.widgets.Control)
    */
+  @Override
   public String getControlContents(Control control) {
     return ((StyledText) control).getText();
   }
@@ -36,6 +37,7 @@ public class JavaCodeFieldContentAdapter implements IControlContentAdapter {
    * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setControlContents(org.eclipse.swt.widgets.Control,
    * java.lang.String, int)
    */
+  @Override
   public void setControlContents(Control control, String text, int cursorPosition) {
     StyledText tc = (StyledText) control;
     int currentCursorPosition = tc.getSelection().x;
@@ -52,6 +54,7 @@ public class JavaCodeFieldContentAdapter implements IControlContentAdapter {
    * @see org.eclipse.jface.fieldassist.IControlContentAdapter#insertControlContents(org.eclipse.swt.widgets.Control,
    * java.lang.String, int)
    */
+  @Override
   public void insertControlContents(Control control, String text, int cursorPosition) {
     Point selection = ((StyledText) control).getSelection();
     ((StyledText) control).insert(text);
@@ -66,6 +69,7 @@ public class JavaCodeFieldContentAdapter implements IControlContentAdapter {
    * (non-Javadoc)
    * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getCursorPosition(org.eclipse.swt.widgets.Control)
    */
+  @Override
   public int getCursorPosition(Control control) {
     return ((StyledText) control).getCaretOffset();
   }
@@ -74,6 +78,7 @@ public class JavaCodeFieldContentAdapter implements IControlContentAdapter {
    * (non-Javadoc)
    * @see org.eclipse.jface.fieldassist.IControlContentAdapter#getInsertionBounds(org.eclipse.swt.widgets.Control)
    */
+  @Override
   public Rectangle getInsertionBounds(Control control) {
     StyledText text = (StyledText) control;
     Point caretOrigin = text.getCaret().getLocation();
@@ -85,6 +90,7 @@ public class JavaCodeFieldContentAdapter implements IControlContentAdapter {
    * @see org.eclipse.jface.fieldassist.IControlContentAdapter#setCursorPosition(org.eclipse.swt.widgets.Control,
    * int)
    */
+  @Override
   public void setCursorPosition(Control control, int position) {
     ((StyledText) control).setSelection(new Point(position, position));
   }

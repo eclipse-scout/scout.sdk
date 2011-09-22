@@ -87,17 +87,19 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   public FormNewWizardPage(IScoutBundle clientBundle) {
     super(FormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    setTitle("Form");
-    setDefaultMessage("Create a new form.");
+    setTitle(Texts.get("Form"));
+    setDefaultMessage(Texts.get("CreateANewForm"));
     setSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractForm)[0]);
     setCreateFormId(true);
   }
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, Texts.get("Name"));
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @SuppressWarnings("null")
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
 
         try {
@@ -123,19 +125,21 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         setTypeNameInternal(m_typeNameField.getText());
         pingStateChanging();
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, "Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("SuperType"));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setSuperTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -157,10 +161,10 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected Control createIdGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-    group.setText("Form ID");
+    group.setText(Texts.get("FormId"));
 
     m_createFormIdField = new Button(group, SWT.CHECK);
-    m_createFormIdField.setText("Create form ID");
+    m_createFormIdField.setText(Texts.get("CreateFormId"));
     m_createFormIdField.setSelection(isCreateFormId());
     m_createFormIdField.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -170,10 +174,11 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_formIdField = getFieldToolkit().createStyledTextField(group, "Property name ID");
+    m_formIdField = getFieldToolkit().createStyledTextField(group, Texts.get("PropertyNameId"));
     m_formIdField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_ID);
     m_formIdField.setText(getTypeName());
     m_formIdField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         setFormIdInternal(m_formIdField.getText());
         pingStateChanging();
@@ -251,7 +256,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusPropertyId() {
     if (isCreateFormId()) {
       if (StringUtility.isNullOrEmpty(getFormId()) || getFormId().equals(ScoutIdeProperties.SUFFIX_ID)) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Id name is not set.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("IdNameMissing"));
       }
     }
     return Status.OK_STATUS;
@@ -279,7 +284,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.form.fields.composerfield.tree;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 
 /**
@@ -24,7 +25,7 @@ public class ComposerFieldOverrideTreeWizard extends AbstractWorkspaceWizard {
   private final IType m_composerField;
 
   public ComposerFieldOverrideTreeWizard(IType composerField) {
-    setWindowTitle("Override Composer Field Tree");
+    setWindowTitle(Texts.get("OverrideComposerFieldTree"));
     m_composerField = composerField;
   }
 

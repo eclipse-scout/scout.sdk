@@ -11,21 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformOutlinesOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.create.OutlineNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.outline.OutlineNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -91,17 +86,21 @@ public class OutlineTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform all outlines...", new WellformOutlinesOperation(getScoutResource())));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{OutlineNewAction.class, WellformAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    OutlineNewWizard wizard = new OutlineNewWizard(getScoutResource());
-    return new WizardAction(Texts.get("Action_newTypeX", "Outline"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS),
-        wizard);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof OutlineNewAction) {
+      ((OutlineNewAction) menu).init(getScoutResource());
+    }
+    else if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setLabel(Texts.get("WellformAllOutlines"));
+      action.setOperation(new WellformOutlinesOperation(getScoutResource()));
+    }
   }
 }

@@ -23,25 +23,21 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ExportServerWarAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.axis.AxisWebServiceConsumerTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.axis.AxisWebServiceProviderTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom.CustomServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.outline.OutlineServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.process.ProcessServiceTablePage;
-import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWarWizard;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -141,18 +137,6 @@ public class ServerNodePage extends AbstractPage {
     catch (Exception e) {
       ScoutSdkUi.logWarning("Error occured during loading '" + CustomServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
     }
-    try {
-      new AxisWebServiceConsumerTablePage(this);
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + AxisWebServiceConsumerTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
-    }
-    try {
-      new AxisWebServiceProviderTablePage(this);
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + AxisWebServiceProviderTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
-    }
   }
 
   @Override
@@ -166,18 +150,28 @@ public class ServerNodePage extends AbstractPage {
     return services;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(final IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform server bundle...", new WellformServerBundleOperation(getScoutResource())));
-    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveServices();
-      }
-    }));
-    manager.add(new WizardAction("Export as WAR file...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundleExport), new ExportServerWarWizard(getScoutResource())));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof WellformAction) {
+      ((WellformAction) menu).setOperation(new WellformServerBundleOperation(getScoutResource()));
+    }
+    else if (menu instanceof FormDataSqlBindingValidateAction) {
+      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveServices();
+        }
+      });
+    }
+    else if (menu instanceof ExportServerWarAction) {
+      ((ExportServerWarAction) menu).setScoutBundle(getScoutResource());
+    }
   }
 
   private IType resolveType(final String fqn) throws CoreException {

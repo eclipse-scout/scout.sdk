@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,6 +32,7 @@ public class SqlBindFromFormDataCompletionComputer implements IJavaCompletionPro
 
   private SqlBindCompletionProposalProcessor m_processor = null;
 
+  @Override
   public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)
         || Platform.getBundle(ScoutSdk.PLUGIN_ID).getState() != Bundle.ACTIVE) {
@@ -45,6 +46,7 @@ public class SqlBindFromFormDataCompletionComputer implements IJavaCompletionPro
     return Arrays.asList(m_processor.computeCompletionProposals(javaContext));
   }
 
+  @Override
   public List computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (m_processor == null) {
       m_processor = new SqlBindCompletionProposalProcessor();
@@ -55,6 +57,7 @@ public class SqlBindFromFormDataCompletionComputer implements IJavaCompletionPro
   /*
    * @see org.eclipse.jface.text.contentassist.ICompletionProposalComputer#getErrorMessage()
    */
+  @Override
   public String getErrorMessage() {
     if (m_processor == null) {
       return "";

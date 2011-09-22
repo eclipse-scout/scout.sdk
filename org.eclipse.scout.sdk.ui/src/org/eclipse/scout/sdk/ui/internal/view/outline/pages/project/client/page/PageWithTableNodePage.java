@@ -10,35 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.listener.ElementChangedListenerEx;
-import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.PageLinkAction;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction;
+import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
+import org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
+import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.TablePageChildPageTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.TableNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
-import org.eclipse.scout.sdk.ui.wizard.form.SearchFormNewWizard;
-import org.eclipse.scout.sdk.ui.wizard.page.PageLinkWizard;
-import org.eclipse.scout.sdk.ui.wizard.page.PageNewWizard;
-import org.eclipse.scout.sdk.util.SdkMethodUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -47,7 +41,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
  * <h3>PageWithTableNodePage</h3> ...
  */
 public class PageWithTableNodePage extends AbstractScoutTypePage {
-  final static String METHOD_EXEC_CREATE_CHILD_PAGE = "execCreateChildPage";
+  public final static String METHOD_EXEC_CREATE_CHILD_PAGE = "execCreateChildPage";
   final IType iTable = ScoutSdk.getType(RuntimeClasses.ITable);
 
   private P_MethodChangedListener m_methodChangedListener;
@@ -102,39 +96,35 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
     new TablePageChildPageTablePage(this, getType());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createDeleteAction() {
-    TypeDeleteOperation op = new TypeDeleteOperation(getType());
-    return new DeleteAction(getName(), getOutlineView().getSite().getShell(), op);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class, SearchFormNewAction.class,
+        PageNewAction.class, PageLinkAction.class, WellformScoutTypeAction.class};
   }
 
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    if (!TypeUtility.exists(TypeUtility.getMethod(getType(), METHOD_EXEC_CREATE_CHILD_PAGE))) {
-      PageNewWizard wizard = new PageNewWizard(getScoutResource());
-      manager.add(new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageAdd), wizard));
-      PageLinkWizard linkWizard = new PageLinkWizard(getScoutResource());
-      linkWizard.setHolderType(getType());
-      linkWizard.setHolderEnabled(false);
-      manager.add(new WizardAction("Add Page...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
-      manager.add(new Separator());
-      manager.add(new OperationAction("Wellform Page...", null, new WellformScoutTypeOperation(getType(), true)));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof DeleteAction) {
+      DeleteAction action = (DeleteAction) menu;
+      action.addType(getType());
+      action.setName(getName());
     }
-
-    manager.add(new Separator());
-    SearchFormNewWizard wizard = new SearchFormNewWizard(getScoutResource());
-    wizard.setTablePage(getType());
-    IMethod titleMethod = TypeUtility.getMethod(getType(), "getConfiguredTitle");
-    if (TypeUtility.exists(titleMethod)) {
-      try {
-        wizard.setNlsEntry(SdkMethodUtility.getReturnNlsEntry(titleMethod));
-      }
-      catch (CoreException e) {
-        ScoutSdkUi.logWarning("could not parse nls entry for method '" + titleMethod.getElementName() + "'.", e);
-      }
+    else if (menu instanceof SearchFormNewAction) {
+      ((SearchFormNewAction) menu).init(getType(), getScoutResource());
     }
-    manager.add(new WizardAction("Create Search Form...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchFormAdd), wizard));
+    else if (menu instanceof PageNewAction) {
+      PageNewAction action = (PageNewAction) menu;
+      action.init(getScoutResource(), getType());
+    }
+    else if (menu instanceof PageLinkAction) {
+      PageLinkAction action = (PageLinkAction) menu;
+      action.init(getScoutResource(), getType());
+    }
+    else if (menu instanceof WellformScoutTypeAction) {
+      ((WellformScoutTypeAction) menu).setType(getType());
+    }
   }
 
   private class P_MethodChangedListener extends ElementChangedListenerEx {

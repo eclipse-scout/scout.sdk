@@ -89,7 +89,7 @@ public class TypeCache {
         }
       }
       else {
-        ScoutSdk.logError("could not resolve type '" + fullyQualifiedName + "'.");
+        ScoutSdk.logWarning("could not resolve type '" + fullyQualifiedName + "'.");
       }
     }
     return type;

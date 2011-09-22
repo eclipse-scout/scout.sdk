@@ -25,9 +25,8 @@ import org.eclipse.ui.texteditor.ITextEditor;
  * @author Andreas Hoegger
  * @since 1.0.8 07.03.2011
  */
+@SuppressWarnings("restriction")
 public class JdtUiUtility {
-
-  @SuppressWarnings("restriction")
   public static void showJavaElementInEditor(IJavaElement e, boolean createNew) {
     try {
       IEditorPart editor = null;

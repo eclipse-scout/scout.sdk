@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -54,9 +54,9 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
   private IType m_createdFormHandler;
 
   public FormHandlerNewWizardPage2(IType declaringType) {
-    super("New Form Handler");
-    setTitle("New Form Handler");
-    setDefaultMessage("Create a new calendar form handler.");
+    super(Texts.get("NewFormHandler"));
+    setTitle(Texts.get("NewFormHandler"));
+    setDefaultMessage(Texts.get("CreateANewCalendarFormHandler"));
     m_declaringType = declaringType;
 
   }
@@ -64,10 +64,11 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM_HANDLER);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();

@@ -11,21 +11,18 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSearchFormsOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.form.SearchFormNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -96,23 +93,29 @@ public class SearchFormTablePage extends AbstractPage {
     return searchForms;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform all search forms...", new WellformSearchFormsOperation(getScoutResource())));
-    manager.add(new MultipleUpdateFormDataAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveSearchForms();
-      }
-    }));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WellformAction.class, SearchFormNewAction.class, MultipleUpdateFormDataAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Search Form"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchFormAdd),
-        new SearchFormNewWizard(getScoutResource()));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setOperation(new WellformSearchFormsOperation(getScoutResource()));
+      action.setLabel(Texts.get("WellformAllSearchForms"));
+    }
+    else if (menu instanceof SearchFormNewAction) {
+      ((SearchFormNewAction) menu).init(getScoutResource());
+    }
+    else if (menu instanceof MultipleUpdateFormDataAction) {
+      ((MultipleUpdateFormDataAction) menu).setTypeResolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveSearchForms();
+        }
+      });
+    }
   }
-
 }

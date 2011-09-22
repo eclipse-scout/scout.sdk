@@ -129,7 +129,7 @@ public interface SdkIcons {
   String OutlineRemove = "outline_remove.png";
   String Page = "page.png";
   String PageAdd = "page_add.png";
-  String PageLink = null; // TODO
+  String PageLink = "page.png"; // TODO: own image
   String PageRemove = "page_remove.png";
   String PageNode = "pageNode.png";
   String PageTable = "pageTable.png";

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,6 +50,7 @@ public abstract class AbstractTooltip {
     m_sourceControl = sourceControl;
     attachListeners();
     m_sourceControl.addDisposeListener(new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent e) {
         detachListeners();
       }
@@ -178,6 +179,7 @@ public abstract class AbstractTooltip {
   }
 
   private class P_PopupListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.MouseHover:

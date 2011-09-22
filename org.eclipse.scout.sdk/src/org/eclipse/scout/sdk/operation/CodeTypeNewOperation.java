@@ -72,17 +72,17 @@ public class CodeTypeNewOperation implements IOperation {
     versionUidOp.run(monitor, workingCopyManager);
 
     // XXX handle id behaviour unboxing!!! Long -> long
-    String genericTypeSimpleName = "";
-    String unboxedFieldName = "";
-    if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
-      String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
-      if (typeArguments != null && typeArguments.length > 0) {
-        genericTypeSimpleName = Signature.getSignatureSimpleName(typeArguments[0]);
-        if (Signature.createTypeSignature(Long.class.getName(), true).equals(typeArguments[0])) {
-          unboxedFieldName = "long";
-        }
-      }
-    }
+    //String genericTypeSimpleName = "";
+    //String unboxedFieldName = "";
+    //if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
+    //  String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
+    //  if (typeArguments != null && typeArguments.length > 0) {
+    //    genericTypeSimpleName = Signature.getSignatureSimpleName(typeArguments[0]);
+    //    if (Signature.createTypeSignature(Long.class.getName(), true).equals(typeArguments[0])) {
+    //      unboxedFieldName = "long";
+    //    }
+    //  }
+    //}
 
     String codeId = getNextCodeId();
     final String todo = (StringUtility.isNullOrEmpty(codeId)) ? ("//TODO") : ("");

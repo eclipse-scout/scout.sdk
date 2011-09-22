@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,16 +21,10 @@ import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.swt.widgets.Shell;
 
 public class FormFieldRenameAction extends AbstractRenameAction {
 
-  private final IType m_formField;
-
-  public FormFieldRenameAction(Shell shell, String name, IType formField, String readOnlySuffix) {
-    super(shell, name, formField.getElementName(), readOnlySuffix);
-    m_formField = formField;
-  }
+  private IType m_formField;
 
   @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
@@ -64,4 +58,7 @@ public class FormFieldRenameAction extends AbstractRenameAction {
     return m_formField;
   }
 
+  public void setFormField(IType formField) {
+    m_formField = formField;
+  }
 }

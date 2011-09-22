@@ -11,17 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.wizard.step.WizardStepNewWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -73,18 +72,20 @@ public class WizardStepTablePage extends AbstractPage {
       childPage.setParent(this);
       childPage.setType(wizardStep);
     }
+  }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WizardStepNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    WizardStepNewWizard wizard = new WizardStepNewWizard();
-    wizard.initWizard(getWizardType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Wizard step"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStepAdd), wizard);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((WizardStepNewAction) menu).init(getWizardType());
   }
 
   public IType getWizardType() {
     return m_wizardType;
   }
-
 }

@@ -11,15 +11,15 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.MainBoxNodePage;
@@ -40,6 +40,7 @@ public class FormNodePage extends AbstractScoutTypePage {
   private InnerTypePageDirtyListener m_mainBoxListener;
 
   public FormNodePage(AbstractPage parent, IType type) {
+    super(ScoutIdeProperties.SUFFIX_FORM);
     setParent(parent);
     setType(type);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Form));
@@ -81,31 +82,32 @@ public class FormNodePage extends AbstractScoutTypePage {
     new FormHandlerTablePage(this, getType());
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, FormDeleteAction.class, WellformAction.class, FormDataUpdateAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof FormDeleteAction) {
+      ((FormDeleteAction) menu).setFormType(getType());
+    }
+    else if (menu instanceof WellformAction) {
+      ((WellformAction) menu).setOperation(new WellformScoutTypeOperation(getType(), true));
+    }
+    else if (menu instanceof FormDataUpdateAction) {
+      ((FormDataUpdateAction) menu).setType(getType());
+    }
+  }
+
   /**
    * client bundle
    */
   @Override
   public IScoutBundle getScoutResource() {
     return (IScoutBundle) super.getScoutResource();
-  }
-
-  @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new OperationAction("Wellform Form...", null, new WellformScoutTypeOperation(getType(), true)));
-//    manager.add(new OperationAction("Update Form Data", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new FormDataUpdateOperation(getType())));
-    manager.add(new OperationAction("Update Form Data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation(getType())));
-  }
-
-  @Override
-  public Action createRenameAction() {
-    return new TypeRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_FORM);
-  }
-
-  @Override
-  public Action createDeleteAction() {
-    return new FormDeleteAction(getType(), getOutlineView().getSite().getShell());
   }
 
   @Override

@@ -11,12 +11,11 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.IDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
+import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -46,11 +45,19 @@ public class AttributeNodePage extends AbstractScoutTypePage {
     new BeanPropertyTablePage(this, getType());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createDeleteAction() {
-    IDeleteOperation op = new TypeDeleteOperation(getType());
-    DeleteAction deleteAction = new DeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell(), op);
-    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerAttributeRemove));
-    return deleteAction;
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof DeleteAction) {
+      DeleteAction action = (DeleteAction) menu;
+      action.addType(getType());
+      action.setName(getName());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ComposerAttributeRemove));
+    }
   }
 }

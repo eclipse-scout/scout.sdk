@@ -18,16 +18,15 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.workspace.member.PropertyBean;
 import org.eclipse.scout.sdk.jdt.listener.ElementChangedListenerEx;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.SharedContextBeanPropertyNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.beanproperty.SharedContextBeanPropertyNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
 import org.eclipse.scout.sdk.workspace.type.IMethodFilter;
@@ -95,9 +94,15 @@ public class SharedContextPropertyTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Shared Context Property"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableAdd), new SharedContextBeanPropertyNewWizard(m_serverSession, m_clientSession));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{SharedContextBeanPropertyNewAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((SharedContextBeanPropertyNewAction) menu).init(m_serverSession, m_clientSession);
   }
 
   private class P_PropertyMethodFilter implements IMethodFilter {

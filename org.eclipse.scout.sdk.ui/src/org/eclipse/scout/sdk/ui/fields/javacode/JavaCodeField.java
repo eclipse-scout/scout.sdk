@@ -58,6 +58,7 @@ public class JavaCodeField extends Composite {
     super(parent, SWT.NONE);
     m_text = new StyledText(this, SWT.SINGLE | SWT.BORDER);
     m_text.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         handleTextModified(false);
       }
@@ -82,6 +83,7 @@ public class JavaCodeField extends Composite {
        * (non-Javadoc)
        * @see org.eclipse.jface.fieldassist.IContentProposalListener#proposalAccepted(org.eclipse.jface.fieldassist.IContentProposal)
        */
+      @Override
       public void proposalAccepted(IContentProposal proposal) {
         JavaTypeProposal tp = (JavaTypeProposal) proposal;
         JavaCodeRange codeRange = new JavaCodeRange(tp.getContent());
@@ -224,6 +226,7 @@ public class JavaCodeField extends Composite {
   private P_Popup m_popup = new P_Popup();
 
   private class P_PopupListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.MouseHover:

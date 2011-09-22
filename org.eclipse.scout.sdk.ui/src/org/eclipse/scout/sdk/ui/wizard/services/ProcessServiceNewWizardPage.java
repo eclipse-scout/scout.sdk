@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -70,23 +70,24 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
   public ProcessServiceNewWizardPage() {
     super(ProcessServiceNewWizardPage.class.getName());
-    setTitle("New Process Service");
-    setDefaultMessage("create a new Process Service.");
+    setTitle(Texts.get("NewProcessService"));
+    setDefaultMessage(Texts.get("CreateANewProcessService"));
   }
 
   @Override
   protected void createContent(Composite parent) {
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_PROCESS_SERVICE);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         setTypeNameInternal(m_typeNameField.getText());
         pingStateChanging();
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, "Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("SuperType"));
     if (getServerBundle() != null) {
       ICachedTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
       ITypeFilter filter = TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject());
@@ -96,13 +97,14 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setSuperTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
       }
     });
 
-    m_formDataTypeField = getFieldToolkit().createProposalField(parent, null, "FormData");
+    m_formDataTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("FormData"));
     if (getServerBundle() != null) {
       ICachedTypeHierarchy formDataHierarchy = ScoutSdk.getPrimaryTypeHierarchy(abstractFormData);
       ITypeFilter filter = TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject());
@@ -112,6 +114,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     m_formDataTypeField.acceptProposal(getFormDataType());
     m_formDataTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setFormDataTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -163,7 +166,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.project.NewBsiCaseGroupStep1Operation;
@@ -52,7 +53,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
   private ScoutProjectTemplateWizardPage m_page2;
 
   public ScoutProjectNewWizard() {
-    setWindowTitle("New Scout Project");
+    setWindowTitle(Texts.get("NewScoutProjectNoPopup"));
   }
 
   @Override
@@ -161,8 +162,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
         return job.getResult().isOK();
       }
       catch (InterruptedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        ScoutSdkUi.logWarning(e);
         return false;
       }
     }
@@ -218,13 +218,11 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
 
     @Override
     public String getOperationName() {
-      // TODO Auto-generated method stub
       return null;
     }
 
     @Override
     public void validate() throws IllegalArgumentException {
-      // TODO Auto-generated method stub
     }
 
     @Override
@@ -262,6 +260,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
       return null;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String getAttributeAsIs(String name) throws InvalidRegistryObjectException {
       return null;
@@ -297,6 +296,7 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
       return null;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String getNamespace() throws InvalidRegistryObjectException {
       return null;
@@ -309,28 +309,23 @@ public class ScoutProjectNewWizard extends Wizard implements INewWizard {
 
     @Override
     public Object getParent() throws InvalidRegistryObjectException {
-
       return null;
     }
 
     @Override
     public String getValue() throws InvalidRegistryObjectException {
-
       return null;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public String getValueAsIs() throws InvalidRegistryObjectException {
-
       return null;
     }
 
     @Override
     public boolean isValid() {
-
       return false;
     }
-
   }
-
 }

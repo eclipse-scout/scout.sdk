@@ -10,24 +10,30 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.actions.FindReferencesAction;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 
-public class ShowJavaReferencesAction extends Action {
+public class ShowJavaReferencesAction extends AbstractScoutHandler {
   private IJavaElement m_element;
 
-  public ShowJavaReferencesAction(IJavaElement e) {
-    super(Texts.get("Process_findReferencesX", e.getElementName()), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolSearch));
-    m_element = e;
+  public void setElement(IJavaElement element) {
+    m_element = element;
+  }
+
+  public ShowJavaReferencesAction() {
+    super(Texts.get("FindJavaReferences"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolSearch));
   }
 
   @Override
-  public void run() {
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     if (m_element != null && m_element.exists()) {
       try {
         IEditorPart part = JavaUI.openInEditor(m_element, true, true);
@@ -40,5 +46,6 @@ public class ShowJavaReferencesAction extends Action {
         ScoutSdkUi.logError(e);
       }
     }
+    return null;
   }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,6 +38,7 @@ public class RefreshOutlineLabelsJob extends Job {
       return Status.CANCEL_STATUS;
     }
     display.asyncExec(new Runnable() {
+      @Override
       public void run() {
         if (m_treeControl == null || m_treeControl.isDisposed()) {
           return;

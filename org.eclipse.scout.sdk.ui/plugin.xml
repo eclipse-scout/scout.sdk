@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-  <extension-point id="scoutIdeExtensions" name="scoutIdeExtensions" schema="schema/scoutIdeExtensions.exsd"/>
    <extension-point id="formField" name="Form Field" schema="schema/formField.exsd"/>
    <extension-point id="outlineDragAndDrop" name="Drag And Drop" schema="schema/outlineDragAndDrop.exsd"/>
    <extension-point id="scoutCodeIdProvider" name="Code ID Provider" schema="schema/scoutCodeIdProvider.exsd"/>
@@ -9,6 +8,8 @@
    <extension-point id="propertyStructure" name="Scout Property View Structure" schema="schema/propertyStructure.exsd"/>
    <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
    <extension-point id="outlineCopyAndPaste" name="Copy And Paste" schema="schema/outlineCopyAndPaste.exsd"/>
+   <extension-point id="contextMenu" name="contextMenu" schema="schema/contextMenu.exsd"/>
+   <extension-point id="contextMenuContributor" name="contextMenuContributor" schema="schema/contextMenuContributor.exsd"/>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
          <perspectiveExtension
@@ -387,7 +388,7 @@
             name="String Field">
          <newWizard
                inShortList="true"
-               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.stirngfield.StringFieldNewWizard">
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.stringfield.StringFieldNewWizard">
          </newWizard>
          <nodePage
                nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.StringFieldNodePage">
@@ -480,11 +481,72 @@
          </nodePage>
       </FormField>
    </extension>
-   <extension
-         point="org.eclipse.scout.sdk.ui.scoutIdeExtensions">
-      <scoutIdeExtension
-            class="org.eclipse.scout.sdk.ui.internal.extensions.LocalScoutSdkExtension">
-      </scoutIdeExtension>
+   <extension point="org.eclipse.scout.sdk.ui.contextMenu">
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.ExportServerWarAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.FormDataUpdateAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.ImportPluginAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.InstallClientSessionAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.PageLinkAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.WellformAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.AttributeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.BeanPropertyNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.BookmarkStorageServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CalendarItemProviderNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CalendarServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ClientServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CodeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CustomServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CustomServiceNewPackageAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.DesktopMenuNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.EntityNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.FormHandlerNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.FormNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.GroupBoxNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.KeyStrokeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.LocalLookupCallNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.LookupCallNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.MenuNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.OutlineNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.OutlineServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.PageNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.PermissionNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.RadioButtonNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SharedContextBeanPropertyNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SmtpServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SqlServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ToolbuttonNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.WizardNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.DeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.LookupCallDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.PropertyBeanDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.TableColumnDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.WizardStepDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.TableColumnRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.WizardStepRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction"></contextMenu>
    </extension>
    <extension
          id="sqlBindCompletionProposalComputer"
@@ -614,6 +676,11 @@
             </dynamic>
          </menu>
       </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.eclipse.scout.sdk.ui.menu.ScoutMenuContributionItemFactory"
+            locationURI="popup:org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart">
+      </menuContribution>
    </extension>
    <extension
          point="org.eclipse.ui.ide.markerResolution">
@@ -625,5 +692,28 @@
             class="org.eclipse.scout.sdk.ui.internal.marker.resolution.SqlBindMarkerResolutionGenerator"
             markerType="org.eclipse.scout.sdk.formdata.sql.binding.multi">
       </markerResolutionGenerator>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.scout.sdk.ui.menu.MenuVisibilityTester"
+            id="org.eclipse.scout.sdk.ui.menu.menuVisibilityTester"
+            namespace="org.eclipse.scout.sdk.ui.menu"
+            properties="menuVisibilityTester"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.eclipse.scout.sdk.explorer.context"
+            name="Scout Explorer Context">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.contextMenuContributor">
+      <contributor
+            class="org.eclipse.scout.sdk.ui.internal.extensions.DefaultMenuContributorExtension">
+      </contributor>
    </extension>
 </plugin>

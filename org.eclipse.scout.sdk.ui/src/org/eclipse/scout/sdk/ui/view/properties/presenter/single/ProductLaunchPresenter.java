@@ -35,6 +35,7 @@ import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
@@ -208,7 +209,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     Composite container = getToolkit().createComposite(parent);
     m_runLink = getToolkit().createImageHyperlink(container, SWT.NONE);
     m_runLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolRun));
-    m_runLink.setToolTipText("Start product...");
+    m_runLink.setToolTipText(Texts.get("StartProduct"));
     m_runLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
@@ -216,7 +217,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       }
     });
     m_debugLink = getToolkit().createImageHyperlink(container, SWT.NONE);
-    m_debugLink.setToolTipText("Start product in debug mode...");
+    m_debugLink.setToolTipText(Texts.get("StartProductInDebugMode"));
     m_debugLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDebug));
     m_debugLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
@@ -226,7 +227,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     });
     m_stopLink = getToolkit().createImageHyperlink(container, SWT.NONE);
     m_stopLink.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolStop));
-    m_stopLink.setToolTipText("Stop product...");
+    m_stopLink.setToolTipText(Texts.get("StopProduct"));
     m_stopLink.setEnabled(false);
     m_stopLink.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
@@ -367,13 +368,13 @@ public class ProductLaunchPresenter extends AbstractPresenter {
             else {
               m_stopLink.setEnabled(true);
               if (l.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-                m_mainGroup.setText(getProductFile().getParent().getName() + " - debugging...");
+                m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
               }
               else if (l.getLaunchMode().equals(ILaunchManager.RUN_MODE)) {
-                m_mainGroup.setText(getProductFile().getParent().getName() + " - running...");
+                m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
               }
               else {
-                m_mainGroup.setText(getProductFile().getParent().getName() + " - undefined state...");
+                m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("UndefinedState") + "...");
               }
             }
           }

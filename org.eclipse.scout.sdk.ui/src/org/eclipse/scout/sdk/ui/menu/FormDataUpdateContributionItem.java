@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.ui.menu;
 
 import org.eclipse.jface.action.ContributionItem;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.swt.SWT;
@@ -22,7 +23,7 @@ public class FormDataUpdateContributionItem extends ContributionItem {
   @Override
   public void fill(Menu menu, int index) {
     MenuItem item = new MenuItem(menu, SWT.CHECK, index);
-    item.setText("Update Formdata Automatically");
+    item.setText(Texts.get("UpdateFormDataAutomatically"));
     boolean selected = ScoutSdkUi.getDefault().getPreferenceStore().getBoolean(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE);
     item.setSelection(selected);
     item.addSelectionListener(new P_SelectionListener());
@@ -34,5 +35,4 @@ public class FormDataUpdateContributionItem extends ContributionItem {
       ScoutSdkUi.getDefault().getPreferenceStore().setValue(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE, ((MenuItem) e.widget).getSelection());
     }
   }
-
 }

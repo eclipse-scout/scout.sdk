@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 
@@ -22,7 +23,6 @@ public class IntegerFieldNodePage extends AbstractFormFieldNodePage {
 
   public IntegerFieldNodePage() {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IntegerField));
-
   }
 
   @Override
@@ -31,11 +31,10 @@ public class IntegerFieldNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
-  public Action createDeleteAction() {
-    Action deleteAction = super.createDeleteAction();
-    if (deleteAction != null) {
-      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IntegerFieldRemove));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof FormFieldDeleteAction) {
+      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.IntegerFieldRemove));
     }
-    return deleteAction;
   }
 }

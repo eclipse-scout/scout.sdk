@@ -39,6 +39,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
 
   }
 
+  @Override
   public ITypeHierarchy getJdtHierarchy() {
     return m_hierarchy;
   }
@@ -47,6 +48,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
     m_hierarchy = hierarchy;
   }
 
+  @Override
   public boolean contains(IType type) {
     return contains(type, null);
   }
@@ -56,10 +58,11 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
     return m_hierarchy.contains(type) && TypeUtility.exists(type);
   }
 
-  void revalidate(@SuppressWarnings("unused") IProgressMonitor monitor) {
+  void revalidate(IProgressMonitor monitor) {
     // void here
   }
 
+  @Override
   public IType getType() {
     return m_type;
   }
@@ -73,10 +76,12 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
     return getAllClasses(null);
   }
 
+  @Override
   public IType[] getAllClasses(ITypeFilter filter) {
     return getAllClasses(filter, null);
   }
 
+  @Override
   public IType[] getAllClasses(ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] classes = m_hierarchy.getAllClasses();
@@ -98,14 +103,17 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
     }
   }
 
+  @Override
   public IType[] getAllInterfaces() {
     return getAllInterfaces(null);
   }
 
+  @Override
   public IType[] getAllInterfaces(ITypeFilter filter) {
     return getAllInterfaces(filter, null);
   }
 
+  @Override
   public IType[] getAllInterfaces(ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getAllInterfaces();
@@ -127,12 +135,14 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
     }
   }
 
+  @Override
   public boolean isSubtype(IType type, IType potentialSubtype) {
     HashSet<IType> allSubTypes = new HashSet<IType>(Arrays.asList(getAllSubtypes(type)));
     allSubTypes.add(type);
     return allSubTypes.contains(potentialSubtype);
   }
 
+  @Override
   public boolean containsInSubhierarchy(IType type, IType[] potentialSubtypes) {
     HashSet<IType> allSubTypes = new HashSet<IType>(Arrays.asList(getAllSubtypes(type)));
     allSubTypes.add(type);
@@ -145,14 +155,17 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
 
   }
 
+  @Override
   public IType[] getAllSubtypes(IType type) {
     return getAllSubtypes(type, null);
   }
 
+  @Override
   public IType[] getAllSubtypes(IType type, ITypeFilter filter) {
     return getAllSubtypes(type, filter, null);
   }
 
+  @Override
   public IType[] getAllSubtypes(IType type, ITypeFilter filter, Comparator<IType> typeComparator) {
     revalidate(null);
     IType[] subtypes = m_hierarchy.getAllSubtypes(type);
@@ -174,6 +187,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
     }
   }
 
+  @Override
   public IType[] getAllSuperclasses(IType type) {
     return getAllSuperclasses(type, null);
   }
@@ -273,6 +287,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
    * @return
    * @see org.eclipse.jdt.core.ITypeHierarchy#getAllTypes()
    */
+  @Override
   public IType[] getAllTypes() {
     return getAllTypes(null);
   }
@@ -309,6 +324,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
    * @return
    * @see org.eclipse.jdt.core.ITypeHierarchy#getSubclasses(org.eclipse.jdt.core.IType)
    */
+  @Override
   public IType[] getSubclasses(IType type) {
     return getSubclasses(type, null);
   }
@@ -377,6 +393,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
    * @return
    * @see org.eclipse.jdt.core.ITypeHierarchy#getSuperclass(org.eclipse.jdt.core.IType)
    */
+  @Override
   public IType getSuperclass(IType type) {
     revalidate(null);
     IType superclass = m_hierarchy.getSuperclass(type);
@@ -391,6 +408,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
    * @return
    * @see org.eclipse.jdt.core.ITypeHierarchy#getSuperInterfaces(org.eclipse.jdt.core.IType)
    */
+  @Override
   public IType[] getSuperInterfaces(IType type) {
     return getSuperInterfaces(type, null);
   }
@@ -427,14 +445,17 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.workspace.typecache.
    * @return
    * @see org.eclipse.jdt.core.ITypeHierarchy#getSupertypes(org.eclipse.jdt.core.IType)
    */
+  @Override
   public IType[] getSupertypes(IType type) {
     return getSupertypes(type, null);
   }
 
+  @Override
   public IType[] getSupertypes(IType type, ITypeFilter filter) {
     return getSupertypes(type, filter, null);
   }
 
+  @Override
   public IType[] getSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getSupertypes(type);

@@ -11,17 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 
@@ -83,11 +82,15 @@ public class ColumnTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createNewAction() {
-    TableColumnNewWizard wizard = new TableColumnNewWizard();
-    wizard.initWizard(getColumnDeclaringType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Column"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableColumnAdd), wizard);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TableColumnNewAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((TableColumnNewAction) menu).init(getColumnDeclaringType());
   }
 
   public IType getColumnDeclaringType() {

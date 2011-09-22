@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -55,6 +55,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     m_clientSession = clientSession;
   }
 
+  @Override
   public String getOperationName() {
     return "new shared context variable";
   }
@@ -80,6 +81,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     if (getServerSession() != null) {
       runServer(getServerSession(), monitor, workingCopyManager);
@@ -192,6 +194,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     return methodFlagsString;
   }
 
+  @Override
   public String getBeanName(boolean startWithUpperCase) {
     if (StringUtility.isNullOrEmpty(getBeanName())) {
       return null;
@@ -204,10 +207,12 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     }
   }
 
+  @Override
   public String getBeanName() {
     return m_beanName;
   }
 
+  @Override
   public void setBeanName(String beanName) {
     m_beanName = beanName;
   }
@@ -216,6 +221,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
    * @return a binary or combination of {@link Flags#AccAbstract}, {@link Flags#AccPrivate}, {@link Flags#AccProtected},
    *         {@link Flags#AccDefault}, {@link Flags#AccPublic}, {@link Flags#AccFinal}, {@link Flags#AccStatic}
    */
+  @Override
   public int getMethodFlags() {
     return m_methodFlags;
   }
@@ -225,14 +231,17 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
    *          a binary or combination of {@link Flags#AccAbstract}, {@link Flags#AccPrivate}, {@link Flags#AccProtected}
    *          , {@link Flags#AccDefault}, {@link Flags#AccPublic}, {@link Flags#AccFinal}, {@link Flags#AccStatic}
    */
+  @Override
   public void setMethodFlags(int methodFlags) {
     m_methodFlags = methodFlags;
   }
 
+  @Override
   public void setBeanTypeSignature(String beanTypeSignature) {
     m_beanTypeSignature = beanTypeSignature;
   }
 
+  @Override
   public String getBeanTypeSignature() {
     return m_beanTypeSignature;
   }

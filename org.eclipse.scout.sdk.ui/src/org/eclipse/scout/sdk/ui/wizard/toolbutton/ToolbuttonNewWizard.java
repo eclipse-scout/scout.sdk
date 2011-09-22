@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.toolbutton;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
@@ -24,7 +25,7 @@ public class ToolbuttonNewWizard extends AbstractFormFieldWizard {
   private OutlineToolbuttonNewWizardPage m_page2b;
 
   public ToolbuttonNewWizard(IType formType) {
-    setWindowTitle("New Tool Button");
+    setWindowTitle(Texts.get("NewToolButton"));
     initWizard(formType);
   }
 

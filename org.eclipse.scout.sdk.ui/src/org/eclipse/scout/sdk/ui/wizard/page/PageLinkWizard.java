@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.page;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -20,7 +21,7 @@ public class PageLinkWizard extends AbstractWorkspaceWizard {
   private PageLinkWizardPage m_linkPageWizardPage;
 
   public PageLinkWizard(IScoutBundle clientBunlde) {
-    setWindowTitle("Link Page");
+    setWindowTitle(Texts.get("LinkPage"));
     setLinkPageWizardPage(new PageLinkWizardPage(clientBunlde));
     addPage(getLinkPageWizardPage());
   }

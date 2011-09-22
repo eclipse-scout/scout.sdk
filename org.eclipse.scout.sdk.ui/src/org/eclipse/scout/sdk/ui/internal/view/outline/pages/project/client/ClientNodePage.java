@@ -21,17 +21,16 @@ import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.formdata.ClientBundleUpdateFormDataOperation;
-import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.SearchFormTablePage;
@@ -139,20 +138,23 @@ public class ClientNodePage extends AbstractPage {
     new TemplateTablePage(this);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(final IMenuManager manager) {
-    super.fillContextMenu(manager);
-    if (m_clientSessionHierarchy != null) {
-      IType[] clientSessions = m_clientSessionHierarchy.getAllClasses(TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), null);
-      if (clientSessions.length == 0) {
-        manager.add(new OperationAction(Texts.get("Action_newTypeX", "Client Session"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientSessionAdd),
-            new InstallJavaFileOperation("templates/client/src/ClientSession.java", "ClientSession.java", getScoutResource())));
-      }
-    }
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform client...", new WellformClientBundleOperation(getScoutResource())));
-    manager.add(new OperationAction("Update form data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new ClientBundleUpdateFormDataOperation(getScoutResource())));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WellformAction.class, FormDataUpdateAction.class, InstallClientSessionAction.class};
+  }
 
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof WellformAction) {
+      ((WellformAction) menu).setOperation(new WellformClientBundleOperation(getScoutResource()));
+    }
+    else if (menu instanceof FormDataUpdateAction) {
+      ((FormDataUpdateAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutResource()));
+    }
+    else if (menu instanceof InstallClientSessionAction) {
+      ((InstallClientSessionAction) menu).init(m_clientSessionHierarchy, getScoutResource());
+    }
   }
 
   private IType resolveType(final String fqn) throws CoreException {

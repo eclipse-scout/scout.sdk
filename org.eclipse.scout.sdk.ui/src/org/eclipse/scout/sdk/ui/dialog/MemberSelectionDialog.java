@@ -105,6 +105,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     packageCol.setWidth(270);
     m_viewer = new CheckboxTableViewer(table);
     m_viewer.addCheckStateListener(new ICheckStateListener() {
+      @Override
       public void checkStateChanged(CheckStateChangedEvent event) {
         Object[] checkedElements = m_viewer.getCheckedElements();
         IMember[] dest = new IMember[checkedElements.length];
@@ -176,10 +177,12 @@ public class MemberSelectionDialog extends TitleAreaDialog {
 
   private class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return getMembers();
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       Image img = null;
       if (columnIndex == 0) {
@@ -211,6 +214,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
       return img;
     }
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       IMember member = (IMember) element;
       switch (columnIndex) {
@@ -229,23 +233,26 @@ public class MemberSelectionDialog extends TitleAreaDialog {
       }
     }
 
+    @Override
     public void dispose() {
 
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
-
   }
-
 }

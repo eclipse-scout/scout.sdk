@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -23,7 +24,7 @@ public class NlsTextsNodePage extends AbstractPage {
 
   public NlsTextsNodePage(IPage parentPage) {
     setParent(parentPage);
-    setName("Texts");
+    setName(Texts.get("Texts"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Texts));
   }
 

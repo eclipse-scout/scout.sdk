@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.ScoutSdk;
 
 public class ResourceChangeListenerWithVisitor implements IResourceChangeListener, IResourceDeltaVisitor {
 
+  @Override
   public final void resourceChanged(IResourceChangeEvent e) {
     if (e.getDelta() != null) {
       try {
@@ -46,6 +47,7 @@ public class ResourceChangeListenerWithVisitor implements IResourceChangeListene
     }
   }
 
+  @Override
   public final boolean visit(IResourceDelta delta) throws CoreException {
     return visitDelta(delta);
   }

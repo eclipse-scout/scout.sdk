@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,6 +41,7 @@ public class ElementChangedListenerEx implements IElementChangedListener {
           IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED |
           IJavaElementDelta.F_ANNOTATIONS;
 
+  @Override
   public void elementChanged(ElementChangedEvent e) {
     CompilationUnit ast = e.getDelta().getCompilationUnitAST();
     visitDelta(e.getDelta(), e.getType(), ast);
@@ -105,7 +106,6 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    * @param ast
    *          CompilationUnit AST (can be null)
    */
-  @SuppressWarnings("unused")
   protected boolean visit(int kind, int flags, IJavaElement e, CompilationUnit ast) {
     return true;
   }
@@ -118,7 +118,6 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    * @param cu
    *          CompilationUnit AST (can be null)
    */
-  @SuppressWarnings("unused")
   protected boolean visitAdd(int flags, IJavaElement e, CompilationUnit ast) {
     return true;
   }
@@ -131,7 +130,6 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    * @param cu
    *          CompilationUnit AST (can be null)
    */
-  @SuppressWarnings("unused")
   protected boolean visitRemove(int flags, IJavaElement e, CompilationUnit ast) {
     return true;
   }
@@ -144,14 +142,11 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    * @param cu
    *          CompilationUnit AST (can be null)
    */
-  @SuppressWarnings("unused")
   protected boolean visitModify(int flags, IJavaElement e, CompilationUnit ast) {
     return true;
   }
 
-  @SuppressWarnings("unused")
   protected boolean visitPackageModify(int flags, IJavaElement e, CompilationUnit ast) {
     return true;
   }
-
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -49,6 +49,7 @@ public class CreateClientDevelopmentProductOperation implements IOperation {
     m_devProduct = devProduct;
   }
 
+  @Override
   public String getOperationName() {
     return "Create personalized product '" + m_devProduct.getParent().getName() + "' based on '" + m_templateProductFile.getParent().getName() + "'";
   }
@@ -58,6 +59,7 @@ public class CreateClientDevelopmentProductOperation implements IOperation {
 
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     if (!m_templateProductFile.exists()) return;
     IFile productionConfigIni = m_templateProductFile.getParent().getFile(new Path("config.ini"));
@@ -92,14 +94,14 @@ public class CreateClientDevelopmentProductOperation implements IOperation {
         for (String s : configIniContent) {
           String[] a = s.split("[=]", 2);
           if (!s.startsWith("#") && a.length == 2) {
-            String key = a[0].trim();
+            //String key = a[0].trim();
             // default add
-            if (1 == 0) {
-              // ...
-            }
-            else {
-              newContent.add(s);
-            }
+            //if (1 == 0) {
+            // ...
+            //}
+            //else {
+            newContent.add(s);
+            //}
           }
           else {
             newContent.add(s);

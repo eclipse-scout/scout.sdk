@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -64,7 +65,7 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
     super.init(method);
     ((GridData) m_addButton.getLayoutData()).exclude = getMethod().isImplemented();
     m_addButton.setVisible(!getMethod().isImplemented());
-    m_addButton.setToolTipText("Implement '" + getMethod().getMethodName() + "' in '" + getMethod().getType().getElementName() + "'...");
+    m_addButton.setToolTipText(Texts.get("ImplementXInY", getMethod().getMethodName(), getMethod().getType().getElementName()));
 
   }
 

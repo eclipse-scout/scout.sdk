@@ -12,10 +12,10 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class OutlineNodePage extends AbstractScoutTypePage {
 
   public OutlineNodePage(IPage parentPage, IType outlineType) {
+    super(ScoutIdeProperties.SUFFIX_OUTLINE);
     setParent(parentPage);
     setType(outlineType);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Outline));
@@ -62,17 +63,19 @@ public class OutlineNodePage extends AbstractScoutTypePage {
     new OutlinePageChildPageTablePage(this, getType());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new TypeRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_OUTLINE);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, MemberListDeleteAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    MemberListDeleteAction action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell());
-    action.setTypesToDelete(new IMember[]{getType()});
-    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.OutlineRemove));
-    return action;
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof MemberListDeleteAction) {
+      MemberListDeleteAction action = (MemberListDeleteAction) menu;
+      action.setTypesToDelete(new IMember[]{getType()});
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.OutlineRemove));
+    }
   }
-
 }

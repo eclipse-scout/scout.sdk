@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 public class SplitBoxNodePage extends AbstractBoxNodePage {
 
   public SplitBoxNodePage() {
-
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SplitBox));
   }
 
@@ -27,11 +27,10 @@ public class SplitBoxNodePage extends AbstractBoxNodePage {
   }
 
   @Override
-  public Action createDeleteAction() {
-    Action deleteAction = super.createDeleteAction();
-    if (deleteAction != null) {
-      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SplitBoxRemove));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof BoxDeleteAction) {
+      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SplitBoxRemove));
     }
-    return deleteAction;
   }
 }

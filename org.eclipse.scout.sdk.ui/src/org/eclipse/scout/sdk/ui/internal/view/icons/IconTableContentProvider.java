@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -43,10 +43,12 @@ public class IconTableContentProvider extends ViewerComparator implements IStruc
     m_icons = icons;
   }
 
+  @Override
   public Object[] getElements(Object inputElement) {
     return m_icons;
   }
 
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     Image img = null;
     if (columnIndex == 0) {
@@ -55,6 +57,7 @@ public class IconTableContentProvider extends ViewerComparator implements IStruc
     return img;
   }
 
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     switch (columnIndex) {
       case 1:
@@ -66,26 +69,33 @@ public class IconTableContentProvider extends ViewerComparator implements IStruc
     }
   }
 
+  @Override
   public void addListener(ILabelProviderListener listener) {
   }
 
+  @Override
   public boolean isLabelProperty(Object element, String property) {
     return false;
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
   }
 
+  @Override
   public void dispose() {
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 
+  @Override
   public Color getBackground(Object element, int columnIndex) {
     return null;
   }
 
+  @Override
   public Color getForeground(Object element, int columnIndex) {
     Color c = null;
     if (element instanceof IconProposal) {

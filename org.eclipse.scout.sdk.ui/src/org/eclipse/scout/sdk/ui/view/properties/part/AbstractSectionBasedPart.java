@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.view.property.IPropertyViewPart;
 import org.eclipse.scout.sdk.ui.util.TableWrapLayoutEx;
@@ -59,7 +60,7 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
     m_formToolkit = new FormToolkit(parent.getDisplay());
     m_form = m_formToolkit.createScrolledForm(parent);
     m_form.setDelayedReflow(true);
-    m_form.setText("Properties");
+    m_form.setText(Texts.get("Properties"));
     createHeadInternal(m_form);
     // sections
     Composite formBody = m_form.getBody();

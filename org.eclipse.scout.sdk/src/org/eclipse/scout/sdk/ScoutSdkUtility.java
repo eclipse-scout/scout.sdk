@@ -45,6 +45,7 @@ import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
+@SuppressWarnings("restriction")
 public class ScoutSdkUtility {
 
   public static String BUNDLE_ID_HTTP_REGISTRY = "org.eclipse.equinox.http.registry";
@@ -64,7 +65,6 @@ public class ScoutSdkUtility {
    * getSimpleTypeSignature("Ljava.lang.String", emptyList) -> String ;List<java.lang.String>
    * getSimpleTypeSignature(Signature.SIG_LONG, emptyList) -> long ;List<>
    * getSimpleTypeSignature(
-   * 
    * "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;"
    * , emptyList)
    * -> HashMap[]<ArrayList<String[][]>,IScoutType>
@@ -117,13 +117,13 @@ public class ScoutSdkUtility {
    * To get the simple type reference name within a context represented by the given importValidator. Every fully
    * qualified type name
    * will be passed to the importValidator to decide if the import is already in use.<br>
-   * Type conflicts e.g. <code>'java.util.List&lt;java.awt.List&gt;'</code> are solved within this method and will return List<java.awt.List> with the
+   * Type conflicts e.g. <code>'java.util.List&lt;java.awt.List&gt;'</code> are solved within this method and will
+   * return List<java.awt.List> with the
    * java.util.List import.
    * <xmp>
    * getSimpleTypeRefName("Ljava.lang.String", emptyList) -> String ;List<java.lang.String>
    * getSimpleTypeRefName(Signature.SIG_LONG, emptyList) -> long
    * getSimpleTypeRefName(
-   * 
    * "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;"
    * , emptyList)
    * -> HashMap[]<ArrayList<String[][]>,IScoutType>
@@ -432,7 +432,6 @@ public class ScoutSdkUtility {
    * @param productFile
    * @return {@link Status#OK_STATUS} if the given product is valid to deploy on a app server using the servlet bridge
    */
-  @SuppressWarnings("restriction")
   public static IStatus getServletBridgeProductStatus(IFile productFile) {
     if (productFile == null) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "product file is null.");

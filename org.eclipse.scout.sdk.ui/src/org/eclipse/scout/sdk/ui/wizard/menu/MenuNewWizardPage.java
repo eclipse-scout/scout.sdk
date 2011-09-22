@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,12 +44,12 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 import org.eclipse.swt.SWT;
@@ -90,9 +90,9 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdMenu;
 
   public MenuNewWizardPage(IType declaringType) {
-    super("New Menu");
-    setTitle("New Menu");
-    setDefaultMessage("Create a new menu.");
+    super(Texts.get("NewMenu"));
+    setTitle(Texts.get("NewMenu"));
+    setDefaultMessage(Texts.get("CreateANewMenu"));
     m_declaringType = declaringType;
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractMenuType)[0];
     setSiblingInternal(SiblingProposal.SIBLING_END);
@@ -101,9 +101,10 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -124,10 +125,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_MENU);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
@@ -138,9 +140,10 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     IType[] abstractMenus = menuHierarchy.getAllSubtypes(iMenuType, TypeFilters.getAbstractOnClasspath(getDeclaringType().getJavaProject()));
     ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractMenus);
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), "Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_superType = (ITypeProposal) event.proposal;
         pingStateChanging();
@@ -164,6 +167,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     m_siblingField.acceptProposal(getSibling());
     m_siblingField.setEnabled(availableSiblings.size() > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setSiblingInternal((SiblingProposal) event.proposal);
         pingStateChanging();
@@ -191,9 +195,10 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     IType[] formCandidates = cachedFormHierarchy.getAllSubtypes(iformType, formsFilter, TypeComparators.getTypeNameComparator());
     ITypeProposal[] formProposals = ScoutProposalUtility.getScoutTypeProposalsFor(formCandidates);
 
-    m_formToOpenField = getFieldToolkit().createProposalField(groupBox, new DefaultProposalProvider(formProposals), "Form to start");
+    m_formToOpenField = getFieldToolkit().createProposalField(groupBox, new DefaultProposalProvider(formProposals), Texts.get("FormToStart"));
     m_formToOpenField.acceptProposal(getFormToOpen());
     m_formToOpenField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -227,10 +232,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_formHandlerField = getFieldToolkit().createProposalField(groupBox, new DefaultProposalProvider(), "Form handler");
+    m_formHandlerField = getFieldToolkit().createProposalField(groupBox, new DefaultProposalProvider(), Texts.get("FormHandler"));
     m_formHandlerField.setEnabled(false);
     m_formHandlerField.acceptProposal(getFormToOpen());
     m_formHandlerField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setFormHandlerInternal((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -309,7 +315,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

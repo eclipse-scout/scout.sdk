@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,10 +42,12 @@ public class WorkingCopyManager implements IScoutWorkingCopyManager {
     }
   }
 
+  @Override
   public void register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
     register(icu, true, monitor);
   }
 
+  @Override
   public void register(ICompilationUnit icu, boolean wellform, IProgressMonitor monitor) throws JavaModelException {
     synchronized (LOCK) {
       boolean added = m_workingCopies.add(icu);
@@ -59,6 +61,7 @@ public class WorkingCopyManager implements IScoutWorkingCopyManager {
     }
   }
 
+  @Override
   public void unregister(ICompilationUnit icu, IProgressMonitor monitor) {
     try {
       synchronized (LOCK) {
@@ -109,6 +112,7 @@ public class WorkingCopyManager implements IScoutWorkingCopyManager {
     }
   }
 
+  @Override
   public void unregisterAll(IProgressMonitor monitor) {
     for (ICompilationUnit icu : getWorkingCopies()) {
       unregister(icu, monitor);
@@ -125,6 +129,7 @@ public class WorkingCopyManager implements IScoutWorkingCopyManager {
     }
   }
 
+  @Override
   public CompilationUnit reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
     CompilationUnit ast = null;
     try {

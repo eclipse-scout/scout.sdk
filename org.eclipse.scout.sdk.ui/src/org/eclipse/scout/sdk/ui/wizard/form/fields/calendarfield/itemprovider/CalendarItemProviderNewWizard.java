@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.form.fields.calendarfield.itemprovider;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
@@ -21,7 +22,7 @@ public class CalendarItemProviderNewWizard extends AbstractFormFieldWizard {
   private CalendarItemProviderNewWizardPage m_page1;
 
   public CalendarItemProviderNewWizard(IType calendarType) {
-    setWindowTitle("New Item Provider");
+    setWindowTitle(Texts.get("NewItemProvider"));
     initWizard(calendarType);
   }
 

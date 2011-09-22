@@ -13,19 +13,17 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.services.ProcessServiceNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
@@ -93,11 +91,10 @@ public class ProcessServiceTablePage extends AbstractPage {
       }
       new ProcessServiceNodePage(this, service, serviceInterface);
     }
-
   }
 
   protected IType[] resolveAllProcessServices() {
-    if (m_serviceHierarchy == null) {
+    if (m_serviceHierarchy == null || !m_serviceHierarchy.isCreated()) {
       m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
     }
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
@@ -108,22 +105,24 @@ public class ProcessServiceTablePage extends AbstractPage {
     return processServices;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveAllProcessServices();
-      }
-    }));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{FormDataSqlBindingValidateAction.class, ProcessServiceNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    ProcessServiceNewWizard wizard = new ProcessServiceNewWizard(getScoutResource());
-    return new WizardAction(Texts.get("Action_newTypeX", "Process Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd),
-        wizard);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof FormDataSqlBindingValidateAction) {
+      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveAllProcessServices();
+        }
+      });
+    }
+    else if (menu instanceof ProcessServiceNewAction) {
+      ((ProcessServiceNewAction) menu).setScoutBundle(getScoutResource());
+    }
   }
-
 }

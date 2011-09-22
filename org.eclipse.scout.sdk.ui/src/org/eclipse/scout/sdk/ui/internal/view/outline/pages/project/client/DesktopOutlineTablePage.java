@@ -12,18 +12,17 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.OutlineNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.outline.OutlineNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
@@ -109,11 +108,15 @@ public class DesktopOutlineTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createNewAction() {
-    OutlineNewWizard wizard = new OutlineNewWizard(getScoutResource(), getDesktopType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Outline"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.OutlineAdd),
-        wizard);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{OutlineNewAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((OutlineNewAction) menu).init(getScoutResource(), getDesktopType());
   }
 
   private class P_MethodListener implements IJavaResourceChangedListener {

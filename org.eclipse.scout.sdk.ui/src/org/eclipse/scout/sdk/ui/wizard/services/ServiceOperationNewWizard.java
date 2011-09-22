@@ -11,12 +11,13 @@
 package org.eclipse.scout.sdk.ui.wizard.services;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 
 public class ServiceOperationNewWizard extends AbstractWorkspaceWizard {
 
   public ServiceOperationNewWizard(IType serviceInterface, IType[] serviceImpls) {
-    setWindowTitle("New Service Operation");
+    setWindowTitle(Texts.get("NewServiceOperationNoPopup"));
     ServiceOperationNewWizardPage page1 = new ServiceOperationNewWizardPage(serviceInterface, serviceImpls);
     addPage(page1);
   }

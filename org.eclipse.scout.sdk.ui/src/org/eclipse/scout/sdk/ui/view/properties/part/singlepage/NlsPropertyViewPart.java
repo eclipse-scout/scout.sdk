@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.NlsTextsNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
@@ -38,7 +39,7 @@ public class NlsPropertyViewPart extends AbstractSinglePageSectionBasedViewPart 
   @Override
   protected void createSections() {
     // link area
-    ISection linkSection = createSection(SECTION_ID_LINKS, "Links");
+    ISection linkSection = createSection(SECTION_ID_LINKS, Texts.get("Links"));
     fillLinkSection(linkSection.getSectionClient());
     super.createSections();
   }
@@ -46,13 +47,13 @@ public class NlsPropertyViewPart extends AbstractSinglePageSectionBasedViewPart 
   protected void fillLinkSection(Composite parent) {
     // model
     LinksPresenterModel model = new LinksPresenterModel();
-    IScoutBundle bundle = (IScoutBundle) getPage().getScoutResource();
+    IScoutBundle bundle = getPage().getScoutResource();
     if (bundle != null) {
 
       IFile nlsFile = bundle.getProject().getFile(new Path("translation.nls"));
       if (nlsFile != null && nlsFile.exists()) {
         FileOpenLink link = new FileOpenLink(nlsFile, 10);
-        link.setName("open nls editor");
+        link.setName(Texts.get("OpenNlsEditor"));
         model.addGlobalLink(link);
       }
 

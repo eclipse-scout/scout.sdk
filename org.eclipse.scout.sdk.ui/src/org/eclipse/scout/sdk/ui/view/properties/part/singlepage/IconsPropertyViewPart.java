@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.view.property.ISinglePropertyViewPart;
 import org.eclipse.scout.sdk.ui.internal.view.icons.IconsEditor;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.IconNodePage;
@@ -49,7 +50,7 @@ public class IconsPropertyViewPart extends AbstractSectionBasedPart implements I
   @Override
   protected void createSections() {
     // link area
-    ISection linkSection = createSection(SECTION_ID_LINKS, "Links");
+    ISection linkSection = createSection(SECTION_ID_LINKS, Texts.get("Links"));
     fillLinkSection(linkSection.getSectionClient());
     super.createSections();
   }
@@ -60,7 +61,7 @@ public class IconsPropertyViewPart extends AbstractSectionBasedPart implements I
     IFile nlsFile = (IFile) getPage().getIconsType().getResource();
     if (nlsFile != null && nlsFile.exists()) {
       FileOpenLink link = new FileOpenLink(nlsFile, 10, IconsEditor.ID);
-      link.setName("open icons editor");
+      link.setName(Texts.get("OpenIconsEditor"));
       model.addGlobalLink(link);
     }
     // ui

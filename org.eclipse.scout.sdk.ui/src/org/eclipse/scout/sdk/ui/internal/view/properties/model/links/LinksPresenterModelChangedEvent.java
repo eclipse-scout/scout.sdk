@@ -19,6 +19,7 @@ import java.util.EventObject;
  * @since 1.0.8 17.03.2011
  */
 public class LinksPresenterModelChangedEvent extends EventObject {
+  private static final long serialVersionUID = 3060115335990243727L;
   public static final int GROUP_ADDED = 1;
   public static final int GROUP_REMOVED = 2;
   public static final int GROUP_CHANGED = 3;

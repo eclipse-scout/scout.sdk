@@ -80,6 +80,7 @@ public class FilteredTable extends Composite {
     Composite filterComposite = new Composite(parent, SWT.NONE);
     m_filterField = new Text(filterComposite, SWT.BORDER);
     m_filterField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_tableFilter.setFilterText(m_filterField.getText());
         refresh(true);
@@ -202,5 +203,4 @@ public class FilteredTable extends Composite {
       return -1;
     }
   }
-
 }

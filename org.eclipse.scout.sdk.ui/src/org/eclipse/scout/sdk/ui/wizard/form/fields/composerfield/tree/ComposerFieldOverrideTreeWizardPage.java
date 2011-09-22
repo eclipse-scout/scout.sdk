@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,8 +51,8 @@ public class ComposerFieldOverrideTreeWizardPage extends AbstractWorkspaceWizard
 
   public ComposerFieldOverrideTreeWizardPage(IType declaringType) {
     super(ComposerFieldOverrideTreeWizardPage.class.getName());
-    setTitle("Override Composer Field Tree");
-    setDefaultMessage("Overrides the composer fields default tree.");
+    setTitle(Texts.get("OverrideComposerFieldTree"));
+    setDefaultMessage(Texts.get("OverridesTheComposerFieldsDefaultTree"));
     // default
     m_declaringType = declaringType;
     setTypeName(ScoutIdeProperties.SUFFIX_TREE);
@@ -61,10 +61,11 @@ public class ComposerFieldOverrideTreeWizardPage extends AbstractWorkspaceWizard
   @Override
   protected void createContent(Composite parent) {
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_TREE);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();

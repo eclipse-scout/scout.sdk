@@ -12,21 +12,19 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.PageLinkAction;
+import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePageHelper;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.page.PageLinkWizard;
-import org.eclipse.scout.sdk.ui.wizard.page.PageNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
@@ -47,7 +45,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   public OutlinePageChildPageTablePage(IPage parent, IType outlineType) {
     m_outlineType = outlineType;
     setParent(parent);
-    setName("Child Pages");
+    setName(Texts.get("ChildPages"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Outlines));
   }
 
@@ -93,21 +91,20 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createNewAction() {
-    PageNewWizard wizard = new PageNewWizard(getScoutResource());
-    wizard.setHolderType(getOutlineType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageAdd), wizard);
-
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{PageLinkAction.class, PageNewAction.class};
   }
 
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    PageLinkWizard wizard = new PageLinkWizard(getScoutResource());
-    wizard.setHolderType(getOutlineType());
-    wizard.setHolderEnabled(false);
-    manager.add(new WizardAction("Add Page", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), wizard));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof PageLinkAction) {
+      ((PageLinkAction) menu).init(getScoutResource(), getOutlineType());
+    }
+    else if (menu instanceof PageNewAction) {
+      ((PageNewAction) menu).init(getScoutResource(), getOutlineType());
+    }
   }
 
   public IType getOutlineType() {

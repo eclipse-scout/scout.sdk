@@ -14,6 +14,7 @@ import java.util.HashSet;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.type.MethodFilters;
@@ -22,7 +23,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
 
   public BeanPropertyNewWizard(IType declaringType) {
-    setWindowTitle("New Property");
+    setWindowTitle(Texts.get("NewProperty"));
     BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(TypeUtility.newSearchScope(declaringType.getJavaProject()));
     BeanPropertyNewOperation op = new BeanPropertyNewOperation(declaringType);
     beanPropertyWizardPage.setOperation(op);

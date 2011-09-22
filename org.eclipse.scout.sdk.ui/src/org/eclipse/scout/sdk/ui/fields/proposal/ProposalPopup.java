@@ -261,7 +261,7 @@ public class ProposalPopup extends Window {
       m_tableViewer.setSelection(new StructuredSelection(proposal));
 //      m_tableViewer.getTable().select(0);
     }
-    m_itemCountLabel.setText(proposals.length + " items found");
+    m_itemCountLabel.setText(proposals.length + " " + Texts.get("ItemsFound"));
   }
 
   @Override

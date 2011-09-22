@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -60,23 +61,24 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     m_replaceFormField = true;
     m_createExternalFormData = true;
     setShellStyle(getShellStyle() | SWT.RESIZE);
-    setTitle("Create a template of '" + getFormField().getElementName() + "'.");
-    setMessage("A template is an abstract form field. To use this template create a form field class extending the template class.");
+    setTitle(Texts.get("CreateTemplateOf", getFormField().getElementName()));
+    setMessage(Texts.get("TemplateDesc"));
   }
 
   @Override
   protected void configureShell(Shell newShell) {
     super.configureShell(newShell);
-    newShell.setText("Template support");
+    newShell.setText(Texts.get("TemplateSupport"));
   }
 
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
-    m_templateNameField = getFieldToolkit().createStyledTextField(container, "Template name");
+    m_templateNameField = getFieldToolkit().createStyledTextField(container, Texts.get("TemplateName"));
     m_templateNameField.setReadOnlyPrefix("Abstract");
     m_templateNameField.setText(getTemplateName());
     m_templateNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_templateName = m_templateNameField.getText();
         pingStateChanging();
@@ -84,7 +86,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     });
 
     m_replaceExistingFormField = new Button(container, SWT.CHECK);
-    m_replaceExistingFormField.setText("Use template for '" + getFormField().getElementName() + "'");
+    m_replaceExistingFormField.setText(Texts.get("UseTemplateFor", getFormField().getElementName()));
     m_replaceExistingFormField.setSelection(isReplaceFormField());
     m_replaceExistingFormField.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -95,7 +97,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     });
 
     m_createExternalFormDataField = new Button(container, SWT.CHECK);
-    m_createExternalFormDataField.setText("Create external form data");
+    m_createExternalFormDataField.setText(Texts.get("CreateExternalFormData"));
     m_createExternalFormDataField.setSelection(isCreateExternalFormData());
     m_createExternalFormDataField.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -121,11 +123,11 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
 
   private IStatus getStatusTemplateName() {
     if (StringUtility.isNullOrEmpty(getTemplateName()) || "Abstrat".equals(getTemplateName())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name not valid.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NameNotValid"));
     }
     IScoutBundle bundle = SdkTypeUtility.getScoutBundle(getFormField());
     if (ScoutSdk.existsType(bundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_TEMPLATE_FORM_FIELD) + "." + getTemplateName())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Template already exists.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TemplateAlreadyExists"));
     }
     return Status.OK_STATUS;
   }
@@ -157,5 +159,4 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
   public boolean isCreateExternalFormData() {
     return m_createExternalFormData;
   }
-
 }

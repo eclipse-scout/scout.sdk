@@ -11,13 +11,12 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanProper
 public class WizardNodePage extends AbstractScoutTypePage {
 
   public WizardNodePage(IPage parent, IType wizardType) {
+    super(ScoutIdeProperties.SUFFIX_WIZARD);
     setParent(parent);
     setType(wizardType);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Wizard));
@@ -58,24 +58,24 @@ public class WizardNodePage extends AbstractScoutTypePage {
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform wizard...", new WellformScoutTypeOperation(getType(), true)));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, WellformAction.class, DeleteAction.class};
   }
 
   @Override
-  public Action createRenameAction() {
-    return new TypeRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_WIZARD);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setLabel(Texts.get("WellformWizard"));
+      action.setOperation(new WellformScoutTypeOperation(getType(), true));
+    }
+    else if (menu instanceof DeleteAction) {
+      DeleteAction action = (DeleteAction) menu;
+      action.addType(getType());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardRemove));
+    }
   }
-
-  @Override
-  public Action createDeleteAction() {
-    TypeDeleteOperation delOp = new TypeDeleteOperation(getType());
-    DeleteAction deleteAction = new DeleteAction("Delete...", getOutlineView().getSite().getShell(), delOp);
-    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardRemove));
-    return deleteAction;
-  }
-
 }

@@ -14,9 +14,9 @@ import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.NamingUtility;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -45,33 +45,39 @@ public class SharedContextPropertyNodePage extends AbstractPage {
     return IScoutPageConstants.SHARED_CONTEXT_PROPERTY_NODE_PAGE;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    ArrayList<IPropertyBean> descs = new ArrayList<IPropertyBean>();
-    if (getClientDesc() != null) {
-      descs.add(getClientDesc());
-    }
-    if (getServerDesc() != null) {
-      descs.add(getServerDesc());
-    }
-    return new PropertyBeansRenameAction(getOutlineView().getSite().getShell(), "Rename...", descs.toArray(new IPropertyBean[descs.size()]));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{PropertyBeansRenameAction.class, MemberListDeleteAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    MemberListDeleteAction action = new MemberListDeleteAction("Delete " + getName(), ScoutSdkUi.getShell());
-    if (getServerDesc() != null) {
-      for (IMember m : getServerDesc().getAllMembers()) {
-        action.addMemberToDelete(m);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof MemberListDeleteAction) {
+      MemberListDeleteAction action = (MemberListDeleteAction) menu;
+      if (getServerDesc() != null) {
+        for (IMember m : getServerDesc().getAllMembers()) {
+          action.addMemberToDelete(m);
+        }
       }
-    }
-    if (getClientDesc() != null) {
-      for (IMember m : getClientDesc().getAllMembers()) {
-        action.addMemberToDelete(m);
+      if (getClientDesc() != null) {
+        for (IMember m : getClientDesc().getAllMembers()) {
+          action.addMemberToDelete(m);
+        }
       }
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove));
     }
-    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove));
-    return action;
+    else if (menu instanceof PropertyBeansRenameAction) {
+      ArrayList<IPropertyBean> descs = new ArrayList<IPropertyBean>();
+      if (getClientDesc() != null) {
+        descs.add(getClientDesc());
+      }
+      if (getServerDesc() != null) {
+        descs.add(getServerDesc());
+      }
+      ((PropertyBeansRenameAction) menu).setPropertyBeanDescriptors(descs.toArray(new IPropertyBean[descs.size()]));
+    }
   }
 
   public IPropertyBean getServerDesc() {

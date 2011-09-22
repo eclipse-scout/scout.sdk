@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.lookupcall;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -24,7 +25,7 @@ public class LocalLookupCallNewWizard extends AbstractWorkspaceWizard {
   private final IScoutBundle m_clientBundle;
 
   public LocalLookupCallNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle("New Local Lookup Call");
+    setWindowTitle(Texts.get("NewLocalLookupCallNoPopup"));
     m_clientBundle = clientBundle;
     addPage(new LocalLookupCallNewWizardPage(clientBundle));
 

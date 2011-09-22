@@ -49,6 +49,7 @@ public class FormNewOperation implements IOperation {
   private IMethod m_createdNlsLabelMethod;
   private IMethod m_createdMainBoxGetter;
 
+  @Override
   public String getOperationName() {
     return "New Form...";
   }
@@ -63,6 +64,7 @@ public class FormNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
@@ -59,7 +60,7 @@ public class PageFilterPresenter extends AbstractPresenter {
     m_filterExpressionField = getToolkit().createText(container, "", SWT.BORDER);
     m_resetFilter = getToolkit().createImageHyperlink(container, SWT.PUSH);
     m_resetFilter.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDelete));
-    m_regexButton = getToolkit().createButton(container, "Regex", SWT.CHECK);
+    m_regexButton = getToolkit().createButton(container, Texts.get("Regex"), SWT.CHECK);
     // listeners
     m_filterExpressionField.addModifyListener(new ModifyListener() {
       @Override

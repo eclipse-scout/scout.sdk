@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -59,14 +60,14 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
     m_serverBundle = serverBundle;
-    setWindowTitle("New Process Service");
+    setWindowTitle(Texts.get("NewProcessService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ProcessServiceNewWizardPage();
     m_serviceNewWizardPage.setServerBundle(serverBundle);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
     m_locationWizardPageRoot = createTree(serverBundle);
-    m_locationWizardPage = new BundleTreeWizardPage("Process Service Location", "Use drag'n drop to organise the locations.\n Only selected items will be created.", m_locationWizardPageRoot, new P_InitialCheckerFilter());
+    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ProcessServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckerFilter());
     m_locationWizardPage.addStatusProvider(statusProvider);
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
     addPage(m_locationWizardPage);
@@ -87,25 +88,25 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
       // service client reg
-      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, "Service Proxy Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
+      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, Texts.get("ServiceProxyRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
     }
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // permission create
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, "CreatePermission", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_CREATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, Texts.get("CreatePermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_CREATE);
       // permission read
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, "ReadPermission", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_READ);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, Texts.get("ReadPermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_READ);
       // permission update
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, "UpdatePermission", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_UPDATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, Texts.get("UpdatePermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_UPDATE);
       // service interface
-      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
+      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, "Service Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
     }
     return rootNode;
   }
@@ -278,7 +279,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
         if (serviceImplNode != null) {
           String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -288,7 +289,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
         if (serviceInterfaceNode != null) {
           String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceInterfaceNode.getText();
           if (serviceInterfaceBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -315,7 +316,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
         if (permissionNode != null) {
           String fqn = permissionBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SECURITY) + "." + permissionNode.getText();
           if (permissionBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -328,25 +329,25 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
         IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceBundle != null) {
           if (!serviceImplementationBundle.isOnClasspath(serviceInterfaceBundle)) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE) + " is not on classpath of '" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + "'.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
         IScoutBundle permissionCreateBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_CREATE, true, true);
         if (permissionCreateBundle != null) {
           if (!serviceImplementationBundle.isOnClasspath(permissionCreateBundle)) {
-            return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_CREATE) + " is not on classpath of '" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + "'.");
+            return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_CREATE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
         IScoutBundle permissionReadBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_READ, true, true);
         if (permissionReadBundle != null) {
           if (!serviceImplementationBundle.isOnClasspath(permissionReadBundle)) {
-            return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_READ) + " is not on classpath of '" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + "'.");
+            return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_READ), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
         IScoutBundle permissionUpdateBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true);
         if (permissionUpdateBundle != null) {
           if (!serviceImplementationBundle.isOnClasspath(permissionUpdateBundle)) {
-            return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_UPDATE) + " is not on classpath of '" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + "'.");
+            return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_UPDATE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
       }
@@ -362,7 +363,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
             if (!serviceRegistrationBundle.isOnClasspath(serviceInterfaceBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE) + " is not on classpath of Service Registration in '" + serviceRegistrationBundle.getBundleName() + "'.");
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getBundleName()));
             }
           }
         }
@@ -379,7 +380,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
             if (!serviceRegistrationBundle.isOnClasspath(serviceImplementationBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + " is not on classpath of Service Registration in '" + serviceRegistrationBundle.getBundleName() + "'.");
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getBundleName()));
             }
           }
         }

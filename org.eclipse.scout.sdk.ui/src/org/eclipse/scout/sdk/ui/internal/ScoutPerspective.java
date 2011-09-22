@@ -24,6 +24,7 @@ public class ScoutPerspective implements IPerspectiveFactory {
   public ScoutPerspective() {
   }
 
+  @Override
   public void createInitialLayout(IPageLayout layout) {
     defineActions(layout);
     defineLayout(layout);

@@ -47,6 +47,7 @@ import org.eclipse.ui.part.MultiEditorInput;
 /**
  * <h3>BcUtilities</h3> ...
  */
+@SuppressWarnings("restriction")
 public final class ScoutUtility {
 
   public static String NL = System.getProperty("line.separator");

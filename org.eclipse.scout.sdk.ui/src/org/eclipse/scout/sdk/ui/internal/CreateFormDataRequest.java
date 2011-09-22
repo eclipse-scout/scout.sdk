@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.IntegerHolder;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -30,7 +31,7 @@ public class CreateFormDataRequest implements ICreateFormDataRequest {
   @Override
   public boolean createFormData(IType type, String packageName, String simpleName) {
     final BooleanHolder result = new BooleanHolder(false);
-    final String question = "The form data '" + packageName + "." + simpleName + "' for '" + type.getElementName() + "' does not exist.\n Do you want to create it?";
+    final String question = Texts.get("FormDataExistsConfirmationMessage", packageName + "." + simpleName, type.getElementName());
     final Display display = getDisplay();
     display.syncExec(new Runnable() {
       @Override

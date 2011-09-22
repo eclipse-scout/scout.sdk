@@ -13,19 +13,17 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.OutlineServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.services.OutlineServiceNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
@@ -116,19 +114,24 @@ public class OutlineServiceTablePage extends AbstractPage {
     return services;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveAllOutlineServices();
-      }
-    }));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{FormDataSqlBindingValidateAction.class, OutlineServiceNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Outline Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), new OutlineServiceNewWizard(getScoutResource()));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof FormDataSqlBindingValidateAction) {
+      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveAllOutlineServices();
+        }
+      });
+    }
+    else if (menu instanceof OutlineServiceNewAction) {
+      ((OutlineServiceNewAction) menu).setScoutBundle(getScoutResource());
+    }
   }
 }

@@ -19,11 +19,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -41,15 +38,12 @@ import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
-import org.eclipse.scout.sdk.ui.action.ScoutProjectNewAction;
-import org.eclipse.scout.sdk.ui.extensions.IScoutSdkExtension;
-import org.eclipse.scout.sdk.ui.internal.extensions.ScoutExtensionsExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndPasteSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineProcess;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeOperation;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.InvisibleRootNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ScoutExplorerRootNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -65,9 +59,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
-import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.part.ViewPart;
 
 public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
@@ -79,7 +73,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   public static final int IS_LINKING_ENABLED_PROPERTY = 1;
   private String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
   private TreeViewer m_viewer;
-  private InvisibleRootNodePage m_invisibleRoot;
+  private ScoutExplorerRootNodePage m_invisibleRoot;
   private ViewContentProvider m_viewContentProvider;
   // init/update
   private DirtyUpdateManager m_dirtyManager;
@@ -133,7 +127,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     m_viewer.setContentProvider(m_viewContentProvider);
     m_viewer.setLabelProvider(new ViewLabelProvider(parent, this));
     m_viewer.setSorter(null);
-    m_invisibleRoot = new InvisibleRootNodePage(null, this);
+    m_invisibleRoot = new ScoutExplorerRootNodePage(null, this);
     m_viewContentProvider.setRoot(m_invisibleRoot);
     m_viewer.setInput(m_viewContentProvider);// getViewSite());
     hookDragAndDrop(m_viewer);
@@ -145,7 +139,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     // add context help
     PlatformUI.getWorkbench().getHelpSystem().setHelp(tree, ScoutSdk.PLUGIN_ID + ".doc.outline");
 
-    //
+    IContextService serivce = (IContextService) getSite().getService(IContextService.class);
+    serivce.activateContext("org.eclipse.scout.sdk.explorer.context");
+
     ScoutSdk.getScoutWorkspace().addWorkspaceListener(new IScoutWorkspaceListener() {
       @Override
       public void worspaceChanged(ScoutWorkspaceEvent event) {
@@ -178,7 +174,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
   }
 
-  public InvisibleRootNodePage getInvisibleRoot() {
+  public ScoutExplorerRootNodePage getInvisibleRoot() {
     return m_invisibleRoot;
   }
 
@@ -312,38 +308,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
   private void hookContextMenu() {
     MenuManager menuMgr = new MenuManager("#PopupMenu");
-    menuMgr.setRemoveAllWhenShown(true);
-    menuMgr.addMenuListener(new IMenuListener() {
-      @Override
-      public void menuAboutToShow(IMenuManager manager) {
-        ScoutExplorerPart.this.fillContextMenu(manager);
-      }
-    });
     Menu menu = menuMgr.createContextMenu(m_viewer.getControl());
     m_viewer.getControl().setMenu(menu);
     getSite().registerContextMenu(menuMgr, m_viewer);
-  }
-
-  private void fillContextMenu(IMenuManager manager) {
-    if (m_viewer.getSelection() instanceof IStructuredSelection) {
-      IStructuredSelection selection = (IStructuredSelection) m_viewer.getSelection();
-      if (selection.size() > 0) {
-        Object firstElement = selection.getFirstElement();
-        if (firstElement instanceof AbstractPage) {
-          AbstractPage page = (AbstractPage) firstElement;
-          page.fillContextMenu(manager);
-          // extensions
-          for (IScoutSdkExtension ext : ScoutExtensionsExtensionPoint.getExtensions()) {
-            ext.contributePageMenus(manager, page);
-          }
-        }
-      }
-      else {
-        manager.add(new ScoutProjectNewAction(getViewSite().getShell()));
-      }
-    }
-    // Other plug-ins can contribute their actions here
-    manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
   }
 
   private void hookSelectionAction() {
@@ -357,7 +324,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   }
 
   private void hookDragAndDrop(TreeViewer viewer) {
-    ExplorerDndSupport support = new ExplorerDndSupport(viewer);
+    new ExplorerDndSupport(viewer);
   }
 
   private void hookKeyActions() {

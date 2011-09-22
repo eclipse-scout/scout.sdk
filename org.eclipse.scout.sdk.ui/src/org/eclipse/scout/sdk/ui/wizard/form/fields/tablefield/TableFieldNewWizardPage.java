@@ -37,9 +37,9 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -67,8 +67,8 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   public TableFieldNewWizardPage(IType declaringType) {
     super(TableFieldNewWizardPage.class.getName());
-    setTitle("New TableField");
-    setDefaultMessage("Create a new table field.");
+    setTitle(Texts.get("NewTableField"));
+    setDefaultMessage(Texts.get("CreateANewTableField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ITableField);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractTableField));
@@ -77,9 +77,10 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -100,10 +101,11 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM_FIELD);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
@@ -112,6 +114,7 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_siblingField = getFieldToolkit().createFormFieldSiblingProposalField(parent, m_declaringType);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_sibling = (SiblingProposal) event.proposal;
         pingStateChanging();

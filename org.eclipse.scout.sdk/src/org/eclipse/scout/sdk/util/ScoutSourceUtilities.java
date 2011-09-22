@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -71,7 +71,7 @@ public class ScoutSourceUtilities {
     IType[] referenceTypes = nlsProject.getReferenceTypes();
     if (referenceTypes != null && referenceTypes.length > 0) {
       StringBuilder classBuilder = new StringBuilder();
-      boolean returnTypeName = true;
+      //boolean returnTypeName = true;
       classBuilder.append("(");
       for (int i = 0; i < referenceTypes.length; i++) {
         classBuilder.append(referenceTypes[i].getElementName());
@@ -223,6 +223,7 @@ public class ScoutSourceUtilities {
       return m_range;
     }
 
+    @Override
     public int compareTo(P_CompareableSourceRange o) {
       if (m_ascending) {
         return m_range.getOffset() - o.getRange().getOffset();

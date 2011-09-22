@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -50,20 +51,10 @@ public class CalendarNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public Action createDeleteAction() {
-    Action deleteAction = super.createDeleteAction();
-    if (deleteAction != null) {
-      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarRemove));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof FormFieldDeleteAction) {
+      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarRemove));
     }
-    return deleteAction;
   }
-
-  @Override
-  public Action createEditAction() {
-    // XXX
-
-    return super.createEditAction();
-    // return new EditAction(new EntityEditOrder(new CalendarEntity(getType())));
-  }
-
 }

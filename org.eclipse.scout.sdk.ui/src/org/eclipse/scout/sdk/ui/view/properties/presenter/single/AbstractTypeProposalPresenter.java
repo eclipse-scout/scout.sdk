@@ -23,6 +23,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
@@ -113,7 +114,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
     if (getCurrentSourceValue() != null) {
       final IType t = getCurrentSourceValue().getJavaClass();
       if (t != null) {
-        manager.add(new Action("Go to " + t.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
+        manager.add(new Action(Texts.get("GoTo") + t.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
           @Override
           public void run() {
             showJavaElementInEditor(t);

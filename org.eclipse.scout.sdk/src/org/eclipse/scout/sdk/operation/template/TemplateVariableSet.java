@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,8 +17,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.scout.commons.StringUtility;
@@ -122,6 +122,7 @@ public class TemplateVariableSet implements ITemplateVariableSet {
     m_variables.put(var, value);
   }
 
+  @Override
   public Set<Entry<String, String>> entrySet() {
     return m_variables.entrySet();
   }

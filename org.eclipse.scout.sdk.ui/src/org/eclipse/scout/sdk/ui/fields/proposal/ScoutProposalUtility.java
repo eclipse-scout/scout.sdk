@@ -383,6 +383,7 @@ public class ScoutProposalUtility {
 
     }
 
+    @Override
     public int compare(IContentProposalEx o1, IContentProposalEx o2) {
       if (o1 == null && o2 == null) {
         return 0;

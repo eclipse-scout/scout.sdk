@@ -86,8 +86,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   public LookupCallNewWizardPage(IScoutBundle sharedBundle) {
     super(LookupCallNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
-    setTitle("New Lookup Call");
-    setDefaultMessage("Create a new lookup call.");
+    setTitle(Texts.get("NewLookupCall"));
+    setDefaultMessage(Texts.get("CreateANewLookupCall"));
     setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
     setServiceSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractSqlLookupService)[0]);
 
@@ -96,10 +96,11 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         setTypeNameInternal(m_typeNameField.getText());
         pingStateChanging();
@@ -132,17 +133,19 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_noServiceButton.addSelectionListener(new P_LookupServiceStrategyButtonListener(LOOKUP_SERVICE_STRATEGY.NO_SERVICE));
     m_noServiceButton.setText("no lookup service");
 
-    m_serviceSuperTypeField = getFieldToolkit().createProposalField(group, null, "Lookup Service Super Type");
+    m_serviceSuperTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("LookupServiceSuperType"));
     m_serviceSuperTypeField.acceptProposal(getServiceSuperType());
     m_serviceSuperTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setServiceSuperTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
       }
     });
 
-    m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, null, "Lookup Serivice");
+    m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("LookupSerivice"));
     m_lookupServiceTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setLookupServiceTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -243,14 +246,14 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.CREATE_NEW && getServiceSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }
 
   protected IStatus getStatusLookupService() throws JavaModelException {
     if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.USE_EXISTING && getLookupServiceType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The lookup call can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheLookupCallCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

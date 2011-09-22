@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,6 +32,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_modelType = modelType;
   }
 
+  @Override
   public AbstractWorkspaceWizard createNewWizard() {
     if (m_newWizardClazz == null) {
       ScoutSdkUi.logWarning("new Wizard is not defined");
@@ -46,6 +47,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     }
   }
 
+  @Override
   public IPage createNodePage() {
     if (m_nodePageClazz == null) {
       ScoutSdkUi.logWarning("node page is not defined");
@@ -61,14 +63,17 @@ public class FormFieldExtension implements IFormFieldExtension {
     }
   }
 
+  @Override
   public String getName() {
     return m_name;
   }
 
+  @Override
   public IType getModelType() {
     return m_modelType;
   }
 
+  @Override
   public Class<? extends AbstractFormFieldWizard> getNewWizardClazz() {
     return m_newWizardClazz;
   }
@@ -77,6 +82,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_newWizardClazz = newWizardClazz;
   }
 
+  @Override
   public Class<? extends AbstractScoutTypePage> getNodePage() {
     return m_nodePageClazz;
   }
@@ -85,6 +91,7 @@ public class FormFieldExtension implements IFormFieldExtension {
     m_nodePageClazz = nodePage;
   }
 
+  @Override
   public boolean isInShortList() {
     return m_inShortList;
   }

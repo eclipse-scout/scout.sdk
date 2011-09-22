@@ -11,16 +11,15 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.FormHandlerNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.form.handler.FormHandlerNewWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
@@ -69,13 +68,17 @@ public class FormHandlerTablePage extends AbstractPage {
     for (IType formHandlerType : TypeUtility.getInnerTypesOrdered(getFormType(), iFormHandler, TypeComparators.getTypeNameComparator())) {
       new FormHandlerNodePage(this, formHandlerType);
     }
+  }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{FormHandlerNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-
-    return new WizardAction(Texts.get("Action_newTypeX", "Handler"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormHandlerAdd), new FormHandlerNewWizard(getFormType()));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((FormHandlerNewAction) menu).setType(getFormType());
   }
 
   public IType getFormType() {

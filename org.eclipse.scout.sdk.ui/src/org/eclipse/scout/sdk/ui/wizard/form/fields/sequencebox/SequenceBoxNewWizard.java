@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.SequenceBoxNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -32,7 +33,7 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
   private SequenceBoxNewOperation m_operation;
 
   public SequenceBoxNewWizard() {
-    setWindowTitle("New Sequence Box");
+    setWindowTitle(Texts.get("NewSequenceBox"));
   }
 
   @Override

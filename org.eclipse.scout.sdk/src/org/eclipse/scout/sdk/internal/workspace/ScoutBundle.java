@@ -97,10 +97,12 @@ public class ScoutBundle implements IScoutBundle {
     return m_workspaceGraph.getDirectRequiredBundles(this, filter);
   }
 
+  @Override
   public IScoutBundle[] getRequiredBundles(IScoutBundleFilter filter, boolean includeThis) {
     return m_workspaceGraph.getRequiredBundles(this, filter, includeThis);
   }
 
+  @Override
   public IScoutBundle findBestMatchShared() {
     IScoutBundle result = null;
     IScoutBundle[] knownShareds = getRequiredBundles(ScoutBundleFilters.getSharedFilter(), true);
@@ -127,18 +129,22 @@ public class ScoutBundle implements IScoutBundle {
     return iconProvider;
   }
 
+  @Override
   public IProject getProject() {
     return m_project;
   }
 
+  @Override
   public IJavaProject getJavaProject() {
     return JavaCore.create(getProject());
   }
 
+  @Override
   public IScoutProject getScoutProject() {
     return m_workspaceGraph.getScoutProject(this);
   }
 
+  @Override
   public String getBundleName() {
     return getProject().getName();
   }
@@ -150,18 +156,22 @@ public class ScoutBundle implements IScoutBundle {
     return bundleName;
   }
 
+  @Override
   public String getRootPackageName() {
     return getBundleName();
   }
 
+  @Override
   public String getSourceFolderName() {
     return ScoutIdeProperties.DEFAULT_SOURCE_FOLDER_NAME;
   }
 
+  @Override
   public IPackageFragment getRootPackage(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
     return getPackageFragment(getRootPackageName(), monitor, workingCopyManager);
   }
 
+  @Override
   public IPackageFragment getSpecificPackageFragment(String packageName, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
     return getPackageFragment(packageName, monitor, workingCopyManager);
   }
@@ -171,6 +181,7 @@ public class ScoutBundle implements IScoutBundle {
    *          . top workingCopyManager classes only.
    * @return the IType which corresponds to the qualified class name.
    */
+  @Override
   public IType findType(String qualifiedClassName) {
     try {
       return getJavaProject().findType(qualifiedClassName);
@@ -186,6 +197,7 @@ public class ScoutBundle implements IScoutBundle {
     return SearchEngine.createJavaSearchScope(new IJavaElement[]{getJavaProject()});
   }
 
+  @Override
   public String getPackageName(String extension) {
     return getRootPackageName() + extension;
   }
@@ -203,6 +215,7 @@ public class ScoutBundle implements IScoutBundle {
     return pck;
   }
 
+  @Override
   public IPackageFragment getPackageFragment(String packageName, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
     IPackageFragment pck = null;
     try {
@@ -220,6 +233,7 @@ public class ScoutBundle implements IScoutBundle {
     return pck;
   }
 
+  @Override
   public IPackageFragment[] getSubpackages(String packageName, int depth) {
     // Leniency
     packageName = packageName.replace("/", ".");
@@ -247,16 +261,19 @@ public class ScoutBundle implements IScoutBundle {
     return packages.toArray(new IPackageFragment[packages.size()]);
   }
 
+  @Override
   public boolean contains(IJavaElement e) {
     if (e == null || !e.exists()) return false;
     if ((e instanceof IMember) && ((IMember) e).isBinary()) return false;
     return e.getJavaProject().getProject() == getJavaProject().getProject();
   }
 
+  @Override
   public boolean isOnClasspath(IType type) {
     return TypeFilters.getTypesOnClasspath(getJavaProject()).accept(type);
   }
 
+  @Override
   public boolean isOnClasspath(IScoutBundle bundle) {
     if (equals(bundle)) {
       return true;

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 
 public class OutlineDeleteOperation implements IOperation {
 
+  @Override
   public String getOperationName() {
     // TODO Auto-generated method stub
     return null;
@@ -28,6 +29,7 @@ public class OutlineDeleteOperation implements IOperation {
 
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     // TODO Auto-generated method stub
 

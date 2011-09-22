@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,6 +41,7 @@ public class ResourceDeleteOperation implements IOperation {
     return m_resourcesToDelete.remove(resource);
   }
 
+  @Override
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
     builder.append("delete ");
@@ -75,6 +76,7 @@ public class ResourceDeleteOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     for (IResource resource : m_resourcesToDelete) {
       resource.delete(1, monitor);

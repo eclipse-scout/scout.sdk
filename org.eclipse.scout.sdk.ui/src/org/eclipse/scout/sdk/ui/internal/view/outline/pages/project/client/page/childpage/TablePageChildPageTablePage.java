@@ -12,20 +12,19 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.PageLinkAction;
+import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePageHelper;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.page.PageLinkWizard;
-import org.eclipse.scout.sdk.ui.wizard.page.PageNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
@@ -50,7 +49,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
   public TablePageChildPageTablePage(IPage parent, IType tablePageType) {
     m_tablePageType = tablePageType;
     setParent(parent);
-    setName("Child Page");
+    setName(Texts.get("ChildPage"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Pages));
   }
 
@@ -101,20 +100,23 @@ public class TablePageChildPageTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
     IMethod createChildPageMethod = TypeUtility.getMethod(getTablePageType(), "execCreateChildPage");
     if (!TypeUtility.exists(createChildPageMethod)) {
-      // new action
-      PageNewWizard wizard = new PageNewWizard(getScoutResource());
-      wizard.setHolderType(getTablePageType());
-      manager.add(new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageAdd), wizard));
-      // link action
-      PageLinkWizard linkWizard = new PageLinkWizard(getScoutResource());
-      linkWizard.setHolderType(getTablePageType());
-      linkWizard.setHolderEnabled(false);
-      manager.add(new WizardAction("Add Page...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageLink), linkWizard));
+      return new Class[]{PageLinkAction.class, PageNewAction.class};
+    }
+    return null;
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof PageLinkAction) {
+      ((PageLinkAction) menu).init(getScoutResource(), getTablePageType());
+    }
+    else if (menu instanceof PageNewAction) {
+      ((PageNewAction) menu).init(getScoutResource(), getTablePageType());
     }
   }
 

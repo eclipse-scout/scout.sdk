@@ -15,12 +15,13 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
 
 public class OkButtonNewWizard extends ButtonFieldNewWizard {
 
   public OkButtonNewWizard() {
-    setWindowTitle("New Ok Button");
+    setWindowTitle(Texts.get("NewOkButton"));
   }
 
   @Override

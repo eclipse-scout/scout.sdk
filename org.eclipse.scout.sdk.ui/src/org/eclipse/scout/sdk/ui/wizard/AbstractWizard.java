@@ -23,8 +23,6 @@ import org.eclipse.scout.sdk.ui.ScoutSdkUi;
  */
 public class AbstractWizard extends Wizard {
 
-
-
   public AbstractWizard(AbstractScoutWizardPage... pages) {
     for (AbstractScoutWizardPage page : pages) {
       addPage(page);

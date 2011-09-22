@@ -11,17 +11,18 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.CodeNewAction;
+import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
+import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.code.CodeNewWizard;
 import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
@@ -78,19 +79,23 @@ public class CodeNodePage extends AbstractScoutTypePage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createNewAction() {
-    CodeNewWizard wizard = new CodeNewWizard();
-    wizard.initWizard(getType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Code"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeAdd),
-        wizard);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, CodeNewAction.class, DeleteAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    // TODO Auto-generated method stub
-    Action deleteAction = super.createDeleteAction();
-    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeRemove));
-    return deleteAction;
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof CodeNewAction) {
+      ((CodeNewAction) menu).setType(getType());
+    }
+    else if (menu instanceof DeleteAction) {
+      DeleteAction action = (DeleteAction) menu;
+      action.addType(getType());
+      action.setName(getName());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeRemove));
+    }
   }
 }

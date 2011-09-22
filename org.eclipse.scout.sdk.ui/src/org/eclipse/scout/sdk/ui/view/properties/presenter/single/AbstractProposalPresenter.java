@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,9 +15,10 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
+import org.eclipse.scout.sdk.ui.action.LegacyOperationAction;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
@@ -32,6 +33,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 /**
  * <h3>AbstractProposalPresenter</h3> ...
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractProposalPresenter<T extends IContentProposalEx> extends AbstractMethodPresenter {
 
   private ProposalTextField m_proposalField;
@@ -54,6 +56,7 @@ public abstract class AbstractProposalPresenter<T extends IContentProposalEx> ex
     MenuManager manager = new MenuManager();
     Menu menu = manager.createContextMenu(m_proposalField);
     manager.addMenuListener(new IMenuListener() {
+      @Override
       public void menuAboutToShow(IMenuManager managerInside) {
         managerInside.removeAll();
         createContextMenu((MenuManager) managerInside);
@@ -121,11 +124,12 @@ public abstract class AbstractProposalPresenter<T extends IContentProposalEx> ex
 
   protected void createContextMenu(MenuManager manager) {
     if (getMethod().isImplemented()) {
-      manager.add(new OperationAction("set default value", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
+      manager.add(new LegacyOperationAction(Texts.get("SetDefaultValue"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
     }
   }
 
   private class P_ProposalFieldListener implements IProposalAdapterListener {
+    @Override
     @SuppressWarnings("unchecked")
     public void proposalAccepted(ContentProposalEvent event) {
       setCurrentSourceValue((T) event.proposal);

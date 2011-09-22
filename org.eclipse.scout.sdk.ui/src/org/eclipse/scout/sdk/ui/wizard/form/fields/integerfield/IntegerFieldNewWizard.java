@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.form.fields.integerfield;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -20,7 +21,7 @@ public class IntegerFieldNewWizard extends AbstractFormFieldWizard {
   private IntegerFieldNewWizardPage m_page1;
 
   public IntegerFieldNewWizard() {
-    setWindowTitle("New Integer Field");
+    setWindowTitle(Texts.get("NewIntegerField"));
   }
 
   @Override

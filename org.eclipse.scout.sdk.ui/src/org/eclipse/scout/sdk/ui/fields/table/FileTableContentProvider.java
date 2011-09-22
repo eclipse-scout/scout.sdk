@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,10 +29,12 @@ public class FileTableContentProvider implements IStructuredContentProvider, ITa
     return m_elements;
   }
 
+  @Override
   public Object[] getElements(Object inputElement) {
     return m_elements;
   }
 
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     Image img = null;
     if (columnIndex == 0) {
@@ -41,6 +43,7 @@ public class FileTableContentProvider implements IStructuredContentProvider, ITa
     return img;
   }
 
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     IFile member = (IFile) element;
     switch (columnIndex) {
@@ -53,20 +56,25 @@ public class FileTableContentProvider implements IStructuredContentProvider, ITa
     }
   }
 
+  @Override
   public void dispose() {
 
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 
+  @Override
   public void addListener(ILabelProviderListener listener) {
   }
 
+  @Override
   public boolean isLabelProperty(Object element, String property) {
     return false;
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
   }
 

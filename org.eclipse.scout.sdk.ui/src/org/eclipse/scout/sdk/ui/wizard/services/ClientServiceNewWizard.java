@@ -23,6 +23,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -52,15 +53,15 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode m_locationPageRoot;
 
   public ClientServiceNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle("New Clientside Service");
+    setWindowTitle(Texts.get("NewClientService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serviceNewWizardPage = new ServiceNewWizardPage("Client Service", "Create a new client service", ScoutSdk.getType(RuntimeClasses.IService), ScoutIdeProperties.SUFFIX_SERVICE);
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"), ScoutSdk.getType(RuntimeClasses.IService), ScoutIdeProperties.SUFFIX_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(clientBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
     m_locationPageRoot = createTree(clientBundle);
-    m_locationWizardPage = new BundleTreeWizardPage("Service Location", "Use drag'n drop to organise the locations.\n Only selected items will be created.", m_locationPageRoot, NodeFilters.getByData(null));
+    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ServiceLocation"), Texts.get("OrganiseLocations"), m_locationPageRoot, NodeFilters.getByData((Object[]) null));
     m_locationWizardPage.addStatusProvider(statusProvider);
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
     addPage(m_locationWizardPage);
@@ -72,9 +73,9 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
     ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle.getScoutProject(), NodeFilters.getByType(IScoutBundle.BUNDLE_CLIENT));
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
     // service client reg
-    TreeUtility.createNode(clientNode, TYPE_SERVICE_REGISTRATION, "Service Registration", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_IMPLEMENTATION);
-    TreeUtility.createNode(clientNode, TYPE_SERVICE_INTERFACE, "IService", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
-    TreeUtility.createNode(clientNode, TYPE_SERVICE_IMPLEMENTATION, "Service", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
+    TreeUtility.createNode(clientNode, TYPE_SERVICE_REGISTRATION, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_IMPLEMENTATION);
+    TreeUtility.createNode(clientNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
+    TreeUtility.createNode(clientNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
     return rootNode;
   }
 
@@ -226,7 +227,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
         if (serviceImplNode != null) {
           String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -237,7 +238,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
         if (serviceInterfaceNode != null) {
           String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES) + "." + serviceInterfaceNode.getText();
           if (serviceInterfaceBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' already exists.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
         }
       }
@@ -252,7 +253,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
         IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceBundle != null) {
           if (!serviceImplementationBundle.isOnClasspath(serviceInterfaceBundle)) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE) + " is not on classpath of '" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION) + "'.");
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
       }
@@ -269,7 +270,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
             if (!serviceRegistrationBundle.isOnClasspath(serviceInterfaceBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE) + " is not on classpath of Service Registration in '" + serviceRegistrationBundle.getBundleName() + "'.");
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getBundleName()));
             }
           }
         }

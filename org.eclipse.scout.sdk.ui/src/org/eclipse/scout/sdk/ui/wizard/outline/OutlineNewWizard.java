@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.outline;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -24,7 +25,7 @@ public class OutlineNewWizard extends AbstractWorkspaceWizard {
   }
 
   public OutlineNewWizard(IScoutBundle clientBunldle, IType desktopType) {
-    setWindowTitle("New Outline");
+    setWindowTitle(Texts.get("NewOutline"));
     OutlineNewOperation op = new OutlineNewOperation();
     op.setDesktopType(desktopType);
     m_page1 = new OutlineNewWizardPage(clientBunldle);

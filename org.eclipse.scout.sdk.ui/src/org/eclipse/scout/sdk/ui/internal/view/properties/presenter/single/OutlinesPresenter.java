@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,7 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
@@ -75,7 +76,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
         candidates.add(t);
       }
     }
-    JavaElementSelectionDialog dialog = new JavaElementSelectionDialog(getContainer().getShell(), "Add Outline");
+    JavaElementSelectionDialog dialog = new JavaElementSelectionDialog(getContainer().getShell(), Texts.get("AddOutline"));
     dialog.addPropertyChangeListener(new P_OutlineDialogPropertyListener(dialog));
     dialog.setMultiSelect(true);
     dialog.setJavaElements(candidates.toArray(new IJavaElement[candidates.size()]));

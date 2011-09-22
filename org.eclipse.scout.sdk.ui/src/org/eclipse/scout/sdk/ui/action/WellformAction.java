@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
-import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -22,28 +25,19 @@ import org.eclipse.swt.widgets.Shell;
  * @author Andreas Hoegger
  * @since 1.0.8 09.09.2010
  */
-public class WellformAction extends OperationAction {
+public class WellformAction extends AbstractOperationAction {
 
-  private final Shell m_shell;
-
-  /**
-   * @param label
-   * @param imageDescriptor
-   * @param operation
-   */
-  public WellformAction(Shell shell, String label, IOperation operation) {
-    super(label, ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), operation);
-    m_shell = shell;
+  public WellformAction() {
+    super(Texts.get("Wellform"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
   }
 
   @Override
-  public void run() {
-    // user request
-    MessageBox box = new MessageBox(m_shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    box.setMessage("Wellform can take several minutes do you want to continue?");
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+    box.setMessage(Texts.get("WellformConfirmationMessage"));
     if (box.open() == SWT.OK) {
-      super.run();
+      super.execute(shell, selection, event);
     }
+    return null;
   }
-
 }

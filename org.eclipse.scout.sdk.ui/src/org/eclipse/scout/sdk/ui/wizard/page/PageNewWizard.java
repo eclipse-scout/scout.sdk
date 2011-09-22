@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.page;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -28,7 +29,7 @@ public class PageNewWizard extends AbstractWorkspaceWizard {
   // private ClientBundleLocationWizardPage m_clientLocationPage;
 
   public PageNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle("New Page");
+    setWindowTitle(Texts.get("NewPage"));
     // m_clientLocationPage=new ClientBundleLocationWizardPage("Choose the client bundle", "The new created table page will be located within the selected bundle.");
     // m_clientLocationPage.addPropertyChangeListener(new P_LocationPropChangeListener());
     // addPage(m_clientLocationPage);

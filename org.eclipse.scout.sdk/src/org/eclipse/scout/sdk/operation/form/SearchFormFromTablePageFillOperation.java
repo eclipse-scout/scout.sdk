@@ -227,7 +227,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     // composerFieldOp.setTypeName("ComposerField");
     // composerFieldOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractComposerField, true));
     // composerFieldOp.run(monitor, workingCopyManager);
-    IType composerField = null;// composerFieldOp.getCreatedField();
+    //IType composerField = null;// composerFieldOp.getCreatedField();
     // composerField.createMethod("@Override\npublic boolean getConfiguredLabelVisible(){\n" + ScoutIdeProperties.TAB + "return false;\n}\n", null, true, monitor);
     // composerField.createMethod("@Override\npublic int getConfiguredGridW(){\n" + ScoutIdeProperties.TAB + "return FULL_WIDTH;\n}\n", null, true, monitor);
     // composerField.createMethod("@Override\npublic int getConfiguredGridH(){\n" + ScoutIdeProperties.TAB + "return 8;\n}\n", null, true, monitor);

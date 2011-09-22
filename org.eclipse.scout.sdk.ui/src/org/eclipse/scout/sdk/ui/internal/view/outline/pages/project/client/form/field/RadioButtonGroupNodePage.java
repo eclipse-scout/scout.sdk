@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
+import org.eclipse.scout.sdk.ui.action.create.RadioButtonNewAction;
+import org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction;
+import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.form.fields.radiobutton.RadioButtonNewWizard;
 
 /**
  * <h3>{@link RadioButtonGroupNodePage}</h3> ...
@@ -41,19 +43,20 @@ public class RadioButtonGroupNodePage extends AbstractBoxNodePage {
   }
 
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    RadioButtonNewWizard wizard = new RadioButtonNewWizard();
-    wizard.initWizard(getType());
-    manager.add(new WizardAction("New Radio Button...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.RadiobuttonAdd), wizard));
-    super.fillContextMenu(manager);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof RadioButtonNewAction) {
+      ((RadioButtonNewAction) menu).setType(getType());
+    }
+    if (menu instanceof BoxDeleteAction) {
+      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.RadiobuttonGroupRemove));
+    }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createDeleteAction() {
-    Action deleteAction = super.createDeleteAction();
-    if (deleteAction != null) {
-      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.RadiobuttonGroupRemove));
-    }
-    return deleteAction;
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, RadioButtonNewAction.class,
+        BoxDeleteAction.class, CreateTemplateAction.class};
   }
 }

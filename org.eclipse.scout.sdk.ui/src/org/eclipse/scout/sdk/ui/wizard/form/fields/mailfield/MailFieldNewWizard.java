@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.form.fields.mailfield;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -20,7 +21,7 @@ public class MailFieldNewWizard extends AbstractFormFieldWizard {
   private MailFieldNewWizardPage m_page1;
 
   public MailFieldNewWizard() {
-    setWindowTitle("New Mail Field");
+    setWindowTitle(Texts.get("NewMailField"));
   }
 
   @Override

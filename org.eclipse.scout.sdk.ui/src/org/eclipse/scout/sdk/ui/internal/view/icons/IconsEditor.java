@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -52,7 +53,7 @@ public class IconsEditor extends EditorPart {
   public void createPartControl(Composite parent) {
     m_toolkit = new FormToolkit(parent.getDisplay());
     m_form = m_toolkit.createForm(parent);
-    m_form.setText("Icons");
+    m_form.setText(Texts.get("Icons"));
     Composite body = m_form.getBody();
     body.setLayout(new FillLayout());
     createFormBody(body);
@@ -76,10 +77,10 @@ public class IconsEditor extends EditorPart {
     columns[0] = new TableColumn(m_table, SWT.LEFT);
     columns[0].setWidth(20);
     columns[1] = new TableColumn(m_table, SWT.LEFT);
-    columns[1].setText("KEY");
+    columns[1].setText(Texts.get("KEY"));
     columns[1].setWidth(300);
     columns[2] = new TableColumn(m_table, SWT.LEFT);
-    columns[2].setText("Name");
+    columns[2].setText(Texts.get("Name"));
     columns[2].setWidth(300);
     P_SortSelectionAdapter sortListener = new P_SortSelectionAdapter();
     for (TableColumn c : columns) {
@@ -133,7 +134,7 @@ public class IconsEditor extends EditorPart {
       IFile file = ((FileEditorInput) input).getFile();
       IScoutBundle scoutProject = ScoutSdk.getScoutWorkspace().getScoutBundle(file.getProject());
       if (scoutProject.getType() == IScoutElement.BUNDLE_SHARED) {
-        setScoutSharedBundle((IScoutBundle) scoutProject);
+        setScoutSharedBundle(scoutProject);
       }
       // TODO parse file
       // setScoutSharedBundle(BsiCaseCore.getDefault().getScoutWorkspace().getProjectGroup(file.getProject()));
@@ -149,7 +150,6 @@ public class IconsEditor extends EditorPart {
 
   @Override
   public void doSave(IProgressMonitor monitor) {
-    // TODO Auto-generated method stub
 
   }
 

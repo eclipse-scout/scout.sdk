@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 public class MethodOverrideOperation extends MethodCreateOperation {
   // operation member
   private IMethod m_methodToOverride;
+  private String m_genericWildcardReplacement;
 
   public MethodOverrideOperation(IType declaringType, String methodName) throws JavaModelException {
     this(declaringType, methodName, false);
@@ -60,7 +61,11 @@ public class MethodOverrideOperation extends MethodCreateOperation {
       return;
     }
     // generic substitutions
-    setReturnTypeSignature(ScoutSignature.getReturnTypeSignatureResolved(m_methodToOverride, getDeclaringType()));
+    String returnTypeSig = ScoutSignature.getReturnTypeSignatureResolved(m_methodToOverride, getDeclaringType());
+    if (getGenericWildcardReplacement() != null) {
+      returnTypeSig = returnTypeSig.replaceAll("\\" + Signature.C_STAR, getGenericWildcardReplacement());
+    }
+    setReturnTypeSignature(returnTypeSig);
     setMethodFlags(m_methodToOverride.getFlags());
     setExceptionSignatures(m_methodToOverride.getExceptionTypes());
     String[] paramNames = m_methodToOverride.getParameterNames();
@@ -78,5 +83,13 @@ public class MethodOverrideOperation extends MethodCreateOperation {
 
   protected IMethod getMethodToOverride() {
     return m_methodToOverride;
+  }
+
+  public String getGenericWildcardReplacement() {
+    return m_genericWildcardReplacement;
+  }
+
+  public void setGenericWildcardReplacement(String genericWildcardReplacement) {
+    m_genericWildcardReplacement = genericWildcardReplacement;
   }
 }

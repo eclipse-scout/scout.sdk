@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.CreateTemplateAction;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -25,7 +24,6 @@ public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
 
   public AbstractFormFieldNodePage() {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormField));
-
   }
 
   @Override
@@ -33,49 +31,33 @@ public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
     return "getConfiguredLabel";
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new CreateTemplateAction(getOutlineView().getSite().getShell(), this, getType()));
-    if (getType().getDeclaringType() == null) {
-      manager.add(new OperationAction("Update Form Data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation(getType())));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ShowJavaReferencesAction.class, FormDataUpdateAction.class,
+        CreateTemplateAction.class, FormFieldRenameAction.class, FormFieldDeleteAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof FormDataUpdateAction) {
+      ((FormDataUpdateAction) menu).setType(getType());
+    }
+    else if (menu instanceof CreateTemplateAction) {
+      CreateTemplateAction action = (CreateTemplateAction) menu;
+      action.setPage(this);
+      action.setType(getType());
+    }
+    else if (menu instanceof FormFieldRenameAction) {
+      FormFieldRenameAction a = (FormFieldRenameAction) menu;
+      a.setFormField(getType());
+      a.setOldName(getType().getElementName());
+      a.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM_FIELD);
+    }
+    else if (menu instanceof FormFieldDeleteAction) {
+      FormFieldDeleteAction action = (FormFieldDeleteAction) menu;
+      action.addFormFieldType(getType());
     }
   }
-
-  @Override
-  public Action createRenameAction() {
-    return new FormFieldRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_FORM_FIELD);
-  }
-
-  @Override
-  public Action createDeleteAction() {
-    FormFieldDeleteAction action = new FormFieldDeleteAction(getType(), getName(), getOutlineView().getSite().getShell());
-
-    return action;
-  }
-
-//  @Override
-//  public void fillContextMenu(IMenuManager manager) {
-//    super.fillContextMenu(manager);
-//    manager.add(new Action("ast on field") {
-//      @Override
-//      public void run() {
-//        ((ScoutType) getType()).visitMethodsNew();
-//      }
-//    });
-//  }
-
-  // @Override
-  // public void fillContextMenu(IMenuManager manager){
-  // super.fillContextMenu(manager);
-  // manager.add(new Separator());
-  // manager.add(createMoveAction(IMoveTypes.UP));
-  // manager.add(createMoveAction(IMoveTypes.DOWN));
-  // manager.add(new Separator());
-  // manager.add(createMoveAction(IMoveTypes.TOP));
-  // manager.add(createMoveAction(IMoveTypes.BOTTOM));
-  // // XXX rename action
-  // }
-
 }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -27,7 +28,7 @@ public class IconNodePage extends AbstractPage {
   public IconNodePage(IPage parentPage, IType iconsType) {
     m_iconsType = iconsType;
     setParent(parentPage);
-    setName("Icons");
+    setName(Texts.get("Icons"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Icons));
   }
 

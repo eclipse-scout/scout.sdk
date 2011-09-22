@@ -131,6 +131,7 @@ public class SdkTypeUtility {
     }
   }
 
+  @SuppressWarnings("null")
   private void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner) throws JavaModelException {
     IAnnotation annotation = null;
     if (element instanceof IAnnotatable) {

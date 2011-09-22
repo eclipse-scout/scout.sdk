@@ -42,6 +42,7 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
     m_typeModifiers = Flags.AccPublic;
   }
 
+  @Override
   public void validate() throws IllegalArgumentException {
     if (StringUtility.isNullOrEmpty(getTypeName())) {
       throw new IllegalArgumentException("type name can not be null or empty");
@@ -87,7 +88,7 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
     return buf.toString();
   }
 
-  protected void createContent(@SuppressWarnings("unused") StringBuilder source, @SuppressWarnings("unused") IImportValidator validator) {
+  protected void createContent(StringBuilder source, IImportValidator validator) {
 
   }
 

@@ -33,6 +33,8 @@ import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
  */
 public class SmartFieldNewOperation implements IOperation {
 
+  private static final String DEFAULT_SMARTFIELD_VALUE_TYPE = Long.class.getName();
+
   private final IType m_declaringType;
   private boolean m_formatSource;
   private String m_typeName;
@@ -52,7 +54,7 @@ public class SmartFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSmartField + "<" + Long.class.getName() + ">", true));
+    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSmartField + "<" + DEFAULT_SMARTFIELD_VALUE_TYPE + ">", true));
   }
 
   @Override
@@ -98,6 +100,7 @@ public class SmartFieldNewOperation implements IOperation {
           return source.toString();
         }
       };
+      codetypeOp.setGenericWildcardReplacement(Signature.createTypeSignature(DEFAULT_SMARTFIELD_VALUE_TYPE, true));
       codetypeOp.validate();
       codetypeOp.run(monitor, workingCopyManager);
 

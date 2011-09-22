@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,6 +35,7 @@ public class WizardNewOperation implements IOperation {
   // operation member
   private IType m_createdWizard;
 
+  @Override
   public String getOperationName() {
     return "Create wizard '" + getTypeName() + "'...";
   }
@@ -49,6 +50,7 @@ public class WizardNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_WIZARDS), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());

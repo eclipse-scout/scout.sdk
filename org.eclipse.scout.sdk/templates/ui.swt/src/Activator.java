@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,11 +35,13 @@ public class Activator implements BundleActivator{
   // the shared instance
   private static Activator m_bundle;
 
+  @Override
   public void start(BundleContext context) throws Exception {
     m_bundle = this;
     m_environment = new SwtEnvironment(context.getBundle(), PERSPECITVE_ID, ClientSession.class);
   }
 
+  @Override
   public void stop(BundleContext context) throws Exception {
     m_bundle = null;
   }

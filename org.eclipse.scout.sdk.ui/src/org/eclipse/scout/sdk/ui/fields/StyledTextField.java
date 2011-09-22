@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -40,7 +40,6 @@ public class StyledTextField extends TextField {
    */
   public StyledTextField(Composite parent) {
     this(parent, "");
-
   }
 
   public StyledTextField(Composite parent, String labelName) {
@@ -152,6 +151,7 @@ public class StyledTextField extends TextField {
       setSuffix(postfix);
     }
 
+    @Override
     public void verifyKey(VerifyEvent event) {
       Event e = new Event();
       e.keyCode = event.keyCode;
@@ -163,6 +163,7 @@ public class StyledTextField extends TextField {
       event.doit = e.doit;
     }
 
+    @Override
     public void handleEvent(Event event) {
       try {
         if (m_revalLock.acquire()) {

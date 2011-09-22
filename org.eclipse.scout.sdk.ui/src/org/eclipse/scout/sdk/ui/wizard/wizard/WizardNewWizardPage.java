@@ -67,16 +67,16 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
   private final IScoutBundle m_clientBundle;
 
   public WizardNewWizardPage(IScoutBundle clientBundle) {
-    super("New Wizard");
-    setTitle("New Wizard");
-    setDefaultMessage("Create a new wizard.");
+    super(Texts.get("NewWizard"));
+    setTitle(Texts.get("NewWizard"));
+    setDefaultMessage(Texts.get("CreateANewWizard"));
     m_clientBundle = clientBundle;
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractWizard)[0];
   }
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, Texts.get("Name"));
     INlsProject nlsProject = getClientBundle().findBestMatchNlsProject();
     if (nlsProject != null) {
       m_nlsNameField.setNlsProject(nlsProject);
@@ -86,6 +86,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -106,10 +107,11 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_WIZARD);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
@@ -119,9 +121,10 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(abstractWizard);
     ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getAbstractTypesOnClasspath(iWizard, getClientBundle().getJavaProject()));
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), "Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_superType = (ITypeProposal) event.proposal;
         pingStateChanging();
@@ -191,7 +194,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

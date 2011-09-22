@@ -33,6 +33,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.export.ExportServerWarOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
@@ -95,17 +96,15 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
   public ExportServerWarWizardPage(IScoutProject scoutProject) {
     super(ExportServerWarWizardPage.class.getName());
     m_scoutProject = scoutProject;
-
-    setTitle("Export war file.");
-    setDefaultMessage("To export a product as a war file.\n" +
-        "The export can be done directly into the webapps folder of a web server.");
+    setTitle(Texts.get("ExportWebArchive"));
+    setDefaultMessage(Texts.get("ExportWebArchiveMessage"));
   }
 
   @Override
   protected void createContent(Composite parent) {
     ITreeNode serverProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new P_ServerProductFilter(), false);
     m_serverProductField = new ProductSelectionField(parent, serverProductTreeRoot);
-    m_serverProductField.setLabelText("Product file");
+    m_serverProductField.setLabelText(Texts.get("ProductFile"));
     m_serverProductField.addProductSelectionListener(new IProductSelectionListener() {
 
       @Override
@@ -121,14 +120,11 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
       m_serverProductField.setProductFile(pf);
     }
     else if (serverProductNodes.length == 0) {
-      m_serverProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "No server product to deploy on a webserver available.\n" +
-          "A deployable server product must contain the bundles:\n" +
-          "- " + ScoutSdkUtility.BUNDLE_ID_HTTP_SERVLETBRIDGE +
-          "- " + ScoutSdkUtility.BUNDLE_ID_HTTP_REGISTRY);
+      m_serverProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WarExportNoServerFound", ScoutSdkUtility.BUNDLE_ID_HTTP_SERVLETBRIDGE, ScoutSdkUtility.BUNDLE_ID_HTTP_REGISTRY));
     }
 
     m_warFileField = new FileSelectionField(parent);
-    m_warFileField.setLabelText("war file");
+    m_warFileField.setLabelText(Texts.get("WarFile"));
     m_warFileField.setFilterExtensions(new String[]{"*.war"});
     m_warFileField.setFileName(findBestFitWarName());
     String warFile = getDialogSettings().get(SETTINGS_WAR_FILE);
@@ -151,11 +147,12 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_overwriteButton = new Button(parent, SWT.CHECK);
-    m_overwriteButton.setText("Overwrite existing war file");
+    m_overwriteButton.setText(Texts.get("OverwriteExistingWarFile"));
     boolean initialSelection = getDialogSettings().getBoolean(SETTINGS_OVERWRITE_WAR);
     setOverwriteExistingWarFileInternal(initialSelection);
     m_overwriteButton.setSelection(initialSelection);
     m_overwriteButton.addSelectionListener(new SelectionAdapter() {
+      @Override
       public void widgetSelected(SelectionEvent e) {
         getDialogSettings().put(SETTINGS_OVERWRITE_WAR, m_overwriteButton.getSelection());
         setOverwriteExistingWarFileInternal(m_overwriteButton.getSelection());
@@ -177,9 +174,9 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
   protected Control createIncludeClientBox(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     Label description = new Label(group, SWT.WRAP);
-    description.setText("If a client application is indluded it will be available for download under the rootUrl/download.");
+    description.setText(Texts.get("WarExportDownloadClient"));
     m_includeClientButton = new Button(group, SWT.CHECK);
-    m_includeClientButton.setText("Include Client application");
+    m_includeClientButton.setText(Texts.get("IncludeClientApplication"));
     boolean initialSelection = getDialogSettings().getBoolean(SETTINGS_INCLUDE_CLIENT);
     setIncludingClientInternal(initialSelection);
     m_includeClientButton.setSelection(initialSelection);
@@ -195,7 +192,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
 
     ITreeNode clientProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new P_ClientProductFilter(), false);
     m_clientProductField = new ProductSelectionField(group, clientProductTreeRoot);
-    m_clientProductField.setLabelText("Client product to include");
+    m_clientProductField.setLabelText(Texts.get("ClientProductToInclude"));
 
     String clientProductFileName = getDialogSettings().get(SETTINGS_CLIENT_PRODUCT);
     if (!StringUtility.isNullOrEmpty(clientProductFileName)) {
@@ -230,11 +227,11 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
       m_clientProductField.setProductFile(pf);
     }
     else if (clientProductNodes.length == 0) {
-      m_clientProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "No client product to add as download available.");
+      m_clientProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientToAddAvail"));
     }
 
     m_resourceFolderField = new ResourceServletFolderSelectionField(group, getScoutProject());
-    m_resourceFolderField.setLabelText("Client download location");
+    m_resourceFolderField.setLabelText(Texts.get("ClientDownloadLocation"));
     m_resourceFolderField.addProductSelectionListener(new IFolderSelectedListener() {
       @Override
       public void handleFolderSelection(IFolder folder) {
@@ -249,8 +246,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
       m_resourceFolderField.setFolder(folder);
     }
     else if (folderNodes.length == 0) {
-      m_clientExportFolderStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Could not find a ResourceServlet registration.\n" +
-          "Ensure to register a ResourceServlet with the two parameters [bundle-name, bundle-path].");
+      m_clientExportFolderStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoResourceServletFound"));
     }
 
     group.setLayout(new GridLayout(1, true));
@@ -297,7 +293,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusServerProductField() throws JavaModelException {
     if (getServerProductFile() == null) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "No server product file specified!");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoServerProductFileSpecified"));
     }
     return m_serverProductStatus;
   }
@@ -306,7 +302,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
     if (isIncludingClient()) {
       if (m_clientProductStatus.isOK()) {
         if (getClientProductFile() == null) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "No client product file specified!");
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientProductFileSpecified"));
         }
       }
       return m_clientProductStatus;
@@ -316,7 +312,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusWarField() throws JavaModelException {
     if (getWarFile() == null) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "No war file specified!");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoWARFileSpecified"));
     }
     return Status.OK_STATUS;
   }
@@ -324,7 +320,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusOverwriteWarField() throws JavaModelException {
     if (!isOverwriteExistingWarFile()) {
       if (getWarFile() != null && getWarFile().exists()) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "war file already exists!");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WARFileAlreadyExists"));
       }
     }
     return Status.OK_STATUS;
@@ -334,7 +330,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
     if (isIncludingClient()) {
       if (m_clientExportFolderStatus.isOK()) {
         if (getClientExportFolder() == null) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "No client export location specified!");
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientExportLocationSpecified"));
         }
       }
       return m_clientExportFolderStatus;

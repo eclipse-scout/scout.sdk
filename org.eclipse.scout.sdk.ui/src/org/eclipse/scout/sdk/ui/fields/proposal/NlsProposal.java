@@ -30,14 +30,17 @@ public class NlsProposal implements IContentProposalEx {
     m_translation = entry.getTranslation(language, true);
   }
 
+  @Override
   public int getCursorPosition(boolean selected, boolean expertMode) {
     return m_translation.length();
   }
 
+  @Override
   public Image getImage(boolean selected, boolean expertMode) {
     return ScoutSdkUi.getImage(ScoutSdkUi.Text);
   }
 
+  @Override
   public String getLabel(boolean selected, boolean expertMode) {
     String value = m_translation;
     if (selected) {

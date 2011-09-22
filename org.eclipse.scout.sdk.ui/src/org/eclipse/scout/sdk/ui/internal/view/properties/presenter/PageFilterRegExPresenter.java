@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.EnableRegExProperty;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
@@ -36,7 +37,7 @@ public class PageFilterRegExPresenter extends AbstractPresenter {
   }
 
   protected void createContent(Composite parent) {
-    m_label = getToolkit().createLabel(parent, "Use RegEx");
+    m_label = getToolkit().createLabel(parent, Texts.get("UseRegEx"));
     m_field = getToolkit().createButton(parent, "", SWT.CHECK);
     m_field.setSelection(m_prop.isRegExFilter());
     GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -44,6 +45,7 @@ public class PageFilterRegExPresenter extends AbstractPresenter {
     m_field.setLayoutData(gd);
     // add listener
     Listener selectListener = new Listener() {
+      @Override
       public void handleEvent(Event e) {
         doVerifyInput();
       }

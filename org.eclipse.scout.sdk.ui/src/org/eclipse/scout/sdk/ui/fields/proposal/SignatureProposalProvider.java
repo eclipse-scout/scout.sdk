@@ -81,10 +81,12 @@ public class SignatureProposalProvider implements IContentProposalProvider {
     m_searchEngine = new SearchEngine();
   }
 
+  @Override
   public boolean supportsExpertMode() {
     return true;
   }
 
+  @Override
   public IContentProposalEx[] getProposals(String content, int cursorPosition, IProgressMonitor monitor) {
     ArrayList<IContentProposalEx> props = new ArrayList<IContentProposalEx>();
     String patStr = content.substring(0, cursorPosition) + "*";
@@ -105,6 +107,7 @@ public class SignatureProposalProvider implements IContentProposalProvider {
     return props.toArray(new IContentProposalEx[props.size()]);
   }
 
+  @Override
   public IContentProposalEx[] getProposalsExpertMode(String contents, int position, IProgressMonitor monitor) {
     ArrayList<IContentProposalEx> collector = new ArrayList<IContentProposalEx>();
     if (m_usePrimitives) {
@@ -189,14 +192,17 @@ public class SignatureProposalProvider implements IContentProposalProvider {
 
     private class P_Separator implements ISeparatorProposal {
 
+      @Override
       public String getLabel(boolean selected, boolean expertMode) {
         return "------------ common used ------------------";
       }
 
+      @Override
       public Image getImage(boolean selected, boolean expertMode) {
         return ScoutSdkUi.getImage(ScoutSdkUi.Separator);
       }
 
+      @Override
       public int getCursorPosition(boolean selected, boolean expertMode) {
         return 0;
       }

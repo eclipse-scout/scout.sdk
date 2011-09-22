@@ -17,13 +17,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -34,8 +35,10 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
@@ -48,25 +51,21 @@ import org.eclipse.swt.widgets.Shell;
  * (e.g. CompanyForm -> (I)CompanyProcessService the user will be asked to delete
  * also the service.
  */
-public class FormDeleteAction extends Action {
+public class FormDeleteAction extends AbstractScoutHandler {
 
   private IType m_formType;
   private IType m_formData;
   private IType m_processServiceInterface;
   private IType m_processServiceImplementation;
-  private final Shell m_shell;
   private MemberSelectionDialog m_confirmDialog;
 
-  public FormDeleteAction(IType formType, Shell shell) {
-    super(Texts.get("Action_deleteTypeX", formType.getElementName()));
-    m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormRemove));
-    m_formType = formType;
+  public FormDeleteAction() {
+    super(Texts.get("DeleteForm"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormRemove), "Delete", false, Category.DELETE);
   }
 
   @Override
-  public void run() {
-    m_confirmDialog = new MemberSelectionDialog(m_shell, Texts.get("Action_deleteTypeX", getFormType().getElementName()));
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("Action_deleteTypeX", getFormType().getElementName()));
     m_confirmDialog.addMemberSelectionListener(new P_SelectionValidationListener());
     List<IMember> members = new ArrayList<IMember>();
     List<IMember> selectedMembers = new ArrayList<IMember>();
@@ -94,6 +93,7 @@ public class FormDeleteAction extends Action {
       OperationJob job = new OperationJob(op);
       job.schedule();
     }
+    return null;
   }
 
   protected void collectAffectedMembers(List<IMember> members, List<IMember> selectedMembers) {
@@ -162,6 +162,10 @@ public class FormDeleteAction extends Action {
     return m_formType;
   }
 
+  public void setFormType(IType formType) {
+    m_formType = formType;
+  }
+
   private class P_SelectionValidationListener implements IMemberSelectionChangedListener {
     @Override
     public void handleSelectionChanged(IMember[] selection) {
@@ -172,11 +176,11 @@ public class FormDeleteAction extends Action {
         canOk = false;
       }
       if (m_processServiceImplementation != null && m_processServiceInterface != null && (members.contains(m_processServiceInterface) != members.contains(m_processServiceImplementation))) {
-        m_confirmDialog.setMessage("Process service interface and implementation must have the same selection.", IMessageProvider.ERROR);
+        m_confirmDialog.setMessage(Texts.get("ProcessServiceSelection"), IMessageProvider.ERROR);
         canOk = false;
       }
       if (m_formType != null && m_formData != null && (members.contains(m_formType) != members.contains(m_formData))) {
-        m_confirmDialog.setMessage("FormData '" + m_formData.getElementName() + "' should be deleted together with the form.", IMessageProvider.WARNING);
+        m_confirmDialog.setMessage(Texts.get("FormDataDeleteWithForm", m_formData.getElementName()), IMessageProvider.WARNING);
       }
       m_confirmDialog.getOkButton().setEnabled(canOk);
 

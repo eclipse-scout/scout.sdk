@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -146,6 +146,7 @@ public class StructuredType implements IStructuredType {
     return null;
   }
 
+  @Override
   public IJavaElement getSiblingMethodConfigGetConfigured(String methodName) {
     IJavaElement[] configProperties = getElements(CATEGORIES.METHOD_CONFIG_PROPERTY);
     if (configProperties != null) {
@@ -158,6 +159,7 @@ public class StructuredType implements IStructuredType {
     return getSibling(CATEGORIES.METHOD_CONFIG_PROPERTY);
   }
 
+  @Override
   public IJavaElement getSiblingMethodConfigExec(String methodName) {
     cache(CATEGORIES.METHOD_CONFIG_EXEC);
     IJavaElement[] references = getElements(CATEGORIES.METHOD_CONFIG_EXEC);
@@ -171,6 +173,7 @@ public class StructuredType implements IStructuredType {
     return getSibling(CATEGORIES.METHOD_CONFIG_EXEC);
   }
 
+  @Override
   public IJavaElement getSiblingMethodFieldGetter(String methodName) {
     cache(CATEGORIES.METHOD_INNER_TYPE_GETTER);
     IJavaElement[] references = getElements(CATEGORIES.METHOD_INNER_TYPE_GETTER);
@@ -184,6 +187,7 @@ public class StructuredType implements IStructuredType {
     return getSibling(CATEGORIES.METHOD_INNER_TYPE_GETTER);
   }
 
+  @Override
   public IJavaElement getSiblingMethodStartHandler(String methodName) {
     cache(CATEGORIES.METHOD_START_HANDLER);
     IJavaElement[] references = getElements(CATEGORIES.METHOD_START_HANDLER);
@@ -197,6 +201,7 @@ public class StructuredType implements IStructuredType {
     return getSibling(CATEGORIES.METHOD_START_HANDLER);
   }
 
+  @Override
   public IJavaElement getSiblingTypeKeyStroke(String keyStrokeName) {
     cache(CATEGORIES.TYPE_KEYSTROKE);
     IJavaElement[] types = getElements(CATEGORIES.TYPE_KEYSTROKE);
@@ -210,6 +215,7 @@ public class StructuredType implements IStructuredType {
     return getSibling(CATEGORIES.TYPE_KEYSTROKE);
   }
 
+  @Override
   public IJavaElement getSiblingComposerAttribute(String attributeName) {
     cache(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE);
     IJavaElement[] attributes = getElements(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE);
@@ -223,6 +229,7 @@ public class StructuredType implements IStructuredType {
     return getSibling(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE);
   }
 
+  @Override
   public IJavaElement getSiblingComposerEntity(String entityName) {
     cache(CATEGORIES.TYPE_COMPOSER_ENTRY);
     IJavaElement[] entities = getElements(CATEGORIES.TYPE_COMPOSER_ENTRY);
@@ -236,6 +243,7 @@ public class StructuredType implements IStructuredType {
     return getSibling(CATEGORIES.TYPE_COMPOSER_ENTRY);
   }
 
+  @Override
   public IJavaElement getSiblingTypeFormHandler(String formHandlerName) {
     cache(CATEGORIES.TYPE_FORM_HANDLER);
     IJavaElement[] formHandlers = getElements(CATEGORIES.TYPE_FORM_HANDLER);
@@ -889,6 +897,7 @@ public class StructuredType implements IStructuredType {
 
   }
 
+  @Override
   public void print(PrintStream printer) {
     printer.println("------ Structured type of '" + getType().getFullyQualifiedName() + "' ------------");
     for (CATEGORIES c : CATEGORIES.values()) {

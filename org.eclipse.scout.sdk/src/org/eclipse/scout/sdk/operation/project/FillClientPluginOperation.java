@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,6 +31,7 @@ public class FillClientPluginOperation implements IOperation {
 
   }
 
+  @Override
   public String getOperationName() {
     return "Fill Scout Client Plugin";
   }
@@ -42,6 +43,7 @@ public class FillClientPluginOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     TemplateVariableSet bindings = TemplateVariableSet.createNew(getClientProject(), m_templateBindings);
     String destPathPref = "src/" + (getClientProject().getName().replace('.', '/')) + "/";

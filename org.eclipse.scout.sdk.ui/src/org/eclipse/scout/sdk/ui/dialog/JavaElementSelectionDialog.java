@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.table.AutoResizeColumnTable;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.fields.table.JavaElementTableContentProvider;
@@ -77,6 +78,7 @@ public class JavaElementSelectionDialog extends Dialog {
     int style = (isMultiSelect() ? SWT.MULTI : SWT.SINGLE) | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL;
     m_filteredTable = new FilteredTable(rootArea, style);
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         StructuredSelection selection = (StructuredSelection) event.getSelection();
         IJavaElement[] selectedElements = TypeCastUtility.castValue(selection.toArray(), IJavaElement[].class);
@@ -87,10 +89,10 @@ public class JavaElementSelectionDialog extends Dialog {
     TableColumn simpleNameCol = new TableColumn(m_filteredTable.getTable(), SWT.LEFT);
     simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(3));
     simpleNameCol.setWidth(170);
-    simpleNameCol.setText("Member");
+    simpleNameCol.setText(Texts.get("Member"));
     TableColumn packageCol = new TableColumn(m_filteredTable.getTable(), SWT.LEFT);
     packageCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(5));
-    packageCol.setText("Package");
+    packageCol.setText(Texts.get("Package"));
     packageCol.setWidth(270);
 
     JavaElementTableContentProvider provider = new JavaElementTableContentProvider();
@@ -147,5 +149,4 @@ public class JavaElementSelectionDialog extends Dialog {
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(propertyName, listener);
   }
-
 }

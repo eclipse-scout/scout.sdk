@@ -25,9 +25,11 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.dialog.ProductSelectionDialog;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ProjectVersionPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.Section;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
@@ -51,19 +53,30 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   private static final String SECTION_ID_FILTER = "section.filter";
   private static final String SECTION_ID_PRODUCT_LAUNCHER = "section.productLauncher";
+  private static final String SECTION_ID_VERSION = "section.version";
 
   private ArrayList<ProductLaunchPresenter> m_launchPresenters = new ArrayList<ProductLaunchPresenter>();
 
   @Override
   protected void createSections() {
-    ISection filterSection = createSection(SECTION_ID_FILTER, "Filter");
+    // filter
+    ISection filterSection = createSection(SECTION_ID_FILTER, Texts.get("Filter"));
     PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), filterSection.getSectionClient(), getPage());
     GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     layoutData.widthHint = 200;
     filterPresenter.getContainer().setLayoutData(layoutData);
     getSection(SECTION_ID_FILTER).setExpanded(false);
-    // link area
-    Section linkSection = (Section) createSection(SECTION_ID_PRODUCT_LAUNCHER, "Product launcher");
+
+    // version
+    ISection versionSection = createSection(SECTION_ID_VERSION, Texts.get("ProjectVersion"));
+    ProjectVersionPresenter versionPresenter = new ProjectVersionPresenter(getFormToolkit(), versionSection.getSectionClient(), getScoutProject());
+    GridData versionLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    versionLayoutData.widthHint = 200;
+    versionPresenter.getContainer().setLayoutData(versionLayoutData);
+    getSection(SECTION_ID_VERSION).setExpanded(true);
+
+    // product launchers
+    Section linkSection = (Section) createSection(SECTION_ID_PRODUCT_LAUNCHER, Texts.get("ProductLauncher"));
     ToolBarManager toolBarManager = new ToolBarManager(SWT.FLAT);
     ToolBar toolbar = toolBarManager.createControl(linkSection.getUiSection());
     final Cursor handCursor = new Cursor(Display.getCurrent(), SWT.CURSOR_HAND);
@@ -83,7 +96,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
       }
     };
     action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolEdit));
-    action.setToolTipText("edit content...");
+    action.setToolTipText(Texts.get("EditContent"));
     toolBarManager.add(action);
     toolBarManager.update(true);
 

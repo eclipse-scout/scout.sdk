@@ -11,15 +11,14 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.PermissionNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.permission.PermissionNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
@@ -83,13 +82,16 @@ public class PermissionTablePage extends AbstractPage {
     for (IType type : permissions) {
       new PermissionNodePage(this, type);
     }
+  }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{PermissionNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    PermissionNewWizard newWizard = new PermissionNewWizard(getScoutResource());
-    return new WizardAction(Texts.get("Action_newTypeX", "Permission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PermissionAdd), newWizard);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((PermissionNewAction) menu).setScoutBundle(getScoutResource());
   }
-
 }

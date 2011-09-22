@@ -15,34 +15,34 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IMember;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
 import org.eclipse.swt.widgets.Shell;
 
-public class PropertyBeanDeleteAction extends Action {
+public class PropertyBeanDeleteAction extends AbstractScoutHandler {
 
-  private final Shell m_shell;
   private MemberSelectionDialog m_confirmDialog;
-  private final IPropertyBean m_beanDesc;
+  private IPropertyBean m_beanDesc;
 
-  public PropertyBeanDeleteAction(String title, Shell shell, IPropertyBean beanDesc) {
-    super(title);
-    m_beanDesc = beanDesc;
-    m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove));
+  public PropertyBeanDeleteAction() {
+    super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove), "Delete", false, Category.DELETE);
   }
 
   @Override
-  public void run() {
-    m_confirmDialog = new MemberSelectionDialog(m_shell, getText());
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    m_confirmDialog = new MemberSelectionDialog(shell, getLabel());
     m_confirmDialog.addMemberSelectionListener(new P_SelectionValidationListener());
     List<IMember> members = new ArrayList<IMember>();
     List<IMember> selectedMembers = new ArrayList<IMember>();
@@ -55,6 +55,7 @@ public class PropertyBeanDeleteAction extends Action {
       OperationJob job = new OperationJob(op);
       job.schedule();
     }
+    return null;
   }
 
   protected void collectAffectedMembers(List<IMember> members, List<IMember> selectedMembers) {
@@ -67,7 +68,12 @@ public class PropertyBeanDeleteAction extends Action {
     return m_beanDesc;
   }
 
+  public void setBeanDesc(IPropertyBean beanDesc) {
+    m_beanDesc = beanDesc;
+  }
+
   private class P_SelectionValidationListener implements IMemberSelectionChangedListener {
+    @Override
     public void handleSelectionChanged(IMember[] selection) {
       m_confirmDialog.setMessage("");
       boolean canOk = true;
@@ -80,7 +86,7 @@ public class PropertyBeanDeleteAction extends Action {
           if ((getBeanDesc().getReadMethod() != null && !members.contains(getBeanDesc().getReadMethod())) ||
               (getBeanDesc().getWriteMethod() != null && !members.contains(getBeanDesc().getWriteMethod()))) {
             canOk = false;
-            m_confirmDialog.setMessage("The field can only be deleted together with the read and write method.", IMessageProvider.ERROR);
+            m_confirmDialog.setMessage(Texts.get("FieldCanBeDeletedWithWriteMethod"), IMessageProvider.ERROR);
           }
         }
       }

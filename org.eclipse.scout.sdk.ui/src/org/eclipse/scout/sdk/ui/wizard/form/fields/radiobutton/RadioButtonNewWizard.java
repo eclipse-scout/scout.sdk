@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.form.fields.radiobutton;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
@@ -21,7 +22,7 @@ public class RadioButtonNewWizard extends AbstractFormFieldWizard {
   private RadioButtonNewWizardPage m_page1;
 
   public RadioButtonNewWizard() {
-    setWindowTitle("New Radio Button");
+    setWindowTitle(Texts.get("NewRadioButtonNoPopup"));
   }
 
   @Override

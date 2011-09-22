@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 /**
  * <h3>SourceIndentationFormatter</h3> ...
  */
+@SuppressWarnings("restriction")
 public class SourceIndentationFormatter implements IOperation {
 
   private final IJavaProject m_project;
@@ -42,6 +43,7 @@ public class SourceIndentationFormatter implements IOperation {
 
   }
 
+  @Override
   public String getOperationName() {
     return "Formatting indents...";
   }
@@ -56,7 +58,7 @@ public class SourceIndentationFormatter implements IOperation {
     }
   }
 
-  @SuppressWarnings("restriction")
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       IndentUtil.indentLines(m_document, m_range, getProject(), null);

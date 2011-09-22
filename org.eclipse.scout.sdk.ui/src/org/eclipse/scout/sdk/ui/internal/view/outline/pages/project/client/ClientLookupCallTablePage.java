@@ -11,20 +11,17 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformLookupCallsOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.create.LocalLookupCallNewAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.LookupCallNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.lookupcall.LocalLookupCallNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -87,15 +84,21 @@ public class ClientLookupCallTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform all lookup calls...", new WellformLookupCallsOperation(getScoutResource())));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WellformAction.class, LocalLookupCallNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    return new WizardAction("new Local LookupCall", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LookupCallAdd), new LocalLookupCallNewWizard(getScoutResource()));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setOperation(new WellformLookupCallsOperation(getScoutResource()));
+      action.setLabel(Texts.get("WellformLookupCalls"));
+    }
+    else if (menu instanceof LocalLookupCallNewAction) {
+      ((LocalLookupCallNewAction) menu).setScoutBundle(getScoutResource());
+    }
   }
 }

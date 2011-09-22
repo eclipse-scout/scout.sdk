@@ -11,12 +11,10 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.DesktopMenuNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.ui.wizard.menu.DesktopMenuNewWizard;
 
 /**
  * <h3>DesktopMenuTablePage</h3> ...
@@ -36,12 +34,13 @@ public class DesktopMenuTablePage extends MenuTablePage {
   }
 
   @Override
-  public Action createNewAction() {
-    DesktopMenuNewWizard wizard = new DesktopMenuNewWizard();
-    wizard.initWizard(getDeclaringType());
-    WizardAction newAction = new WizardAction(Texts.get("Action_newTypeX", "Menu"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuAdd),
-        wizard);
-    return newAction;
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((DesktopMenuNewAction) menu).setType(getDeclaringType());
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{DesktopMenuNewAction.class};
+  }
 }

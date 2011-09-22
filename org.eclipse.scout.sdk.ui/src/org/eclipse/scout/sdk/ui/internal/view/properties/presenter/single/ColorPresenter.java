@@ -210,10 +210,10 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
     public P_ColorPresenter(Composite parent) {
       super(parent, SWT.NONE);
       addPaintListener(new PaintListener() {
+        @Override
         public void paintControl(PaintEvent e) {
           paint(e);
         }
-
       });
     }
 
@@ -224,6 +224,5 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
       gc.setBackground(getBackground());
       gc.fillRoundRectangle(1, 1, getBounds().width - 2, getBounds().height - 2, 2, 2);
     }
-
   }
 }

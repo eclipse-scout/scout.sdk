@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.extensions;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 
 public abstract class AbstractFormFieldWizard extends AbstractWorkspaceWizard {
@@ -18,7 +19,7 @@ public abstract class AbstractFormFieldWizard extends AbstractWorkspaceWizard {
   private IType m_declaringType;
 
   public AbstractFormFieldWizard() {
-    setWindowTitle("New Form Field");
+    setWindowTitle(Texts.get("NewFormField"));
   }
 
   public void initWizard(IType declaringType) {

@@ -70,25 +70,26 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   public LocalLookupCallNewWizardPage(IScoutBundle client) {
     super(LocalLookupCallNewWizardPage.class.getName());
     m_clientBundle = client;
-    setTitle("New Local Lookup Call");
-    setDefaultMessage("Create a new local lookup call.");
+    setTitle(Texts.get("NewLocalLookupCallNoPopup"));
+    setDefaultMessage(Texts.get("CreateANewLocalLookupCall"));
     setLookupCallSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(localLookupCall)[0]);
   }
 
   @Override
   protected void createContent(Composite parent) {
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         setTypeNameInternal(m_typeNameField.getText());
         pingStateChanging();
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, "Lookup Call Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("LookupCallSuperType"));
     ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(localLookupCall);
     ICachedTypeHierarchy lookupServiceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(localLookupCall);
     IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
@@ -97,6 +98,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_superTypeField.acceptProposal(getLookupCallSuperType());
 
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setLookupCallSuperTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -163,7 +165,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getLookupCallSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

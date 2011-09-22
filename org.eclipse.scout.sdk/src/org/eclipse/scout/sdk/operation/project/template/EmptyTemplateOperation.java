@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.operation.project.template;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
@@ -27,18 +28,17 @@ public class EmptyTemplateOperation implements IScoutProjectTemplateOperation {
 
   @Override
   public String getDescription() {
-
-    return "Creates an empty Scout applicaiton.";
+    return Texts.get("CreatesAnAmptyScoutApplicaiton");
   }
 
   @Override
   public String getTemplateName() {
-    return "An empty application.";
+    return Texts.get("AnEmptyApplication");
   }
 
   @Override
   public String getOperationName() {
-    return "Apply empty template...";
+    return Texts.get("ApplyEmptyTemplate");
   }
 
   @Override
@@ -62,6 +62,7 @@ public class EmptyTemplateOperation implements IScoutProjectTemplateOperation {
    * @param scoutProject
    *          the scoutProject to set
    */
+  @Override
   public void setScoutProject(IScoutProject scoutProject) {
     m_scoutProject = scoutProject;
   }

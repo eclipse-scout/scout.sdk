@@ -48,6 +48,7 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
     m_implementationPackageName = implementationPackageName;
   }
 
+  @Override
   public String getOperationName() {
     return "New Type";
   }
@@ -67,6 +68,7 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     IPackageFragment pck = getScoutBundle().getSpecificPackageFragment(getImplementationPackageName(), monitor, workingCopyManager);
     ICompilationUnit icu = pck.getCompilationUnit(getTypeName() + ".java");

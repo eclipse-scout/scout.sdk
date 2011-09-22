@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -57,6 +57,7 @@ public class CodeNewOperation implements IOperation {
     m_formatSource = formatSource;
   }
 
+  @Override
   public String getOperationName() {
     return "Create Code '" + getTypeName() + "'...";
   }
@@ -71,6 +72,7 @@ public class CodeNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation codeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType());
     codeOp.setFormatSource(false);

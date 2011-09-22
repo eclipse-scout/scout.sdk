@@ -57,6 +57,7 @@ import org.osgi.framework.Version;
  * @author Andreas Hoegger
  * @since 1.0.8 04.02.2011
  */
+@SuppressWarnings("restriction")
 public class ExportServerWarOperation implements IOperation {
   public static final String BUNDLE_NAME_SERVLETBRIDGE = "org.eclipse.equinox.servletbridge";
 
@@ -128,7 +129,6 @@ public class ExportServerWarOperation implements IOperation {
 
   }
 
-  @SuppressWarnings("restriction")
   private void buildClientProduct(IProgressMonitor monitor) throws CoreException {
     WorkspaceProductModel clientModel = new WorkspaceProductModel(getClientProduct(), false);
     clientModel.load();
@@ -182,7 +182,6 @@ public class ExportServerWarOperation implements IOperation {
     }
   }
 
-  @SuppressWarnings("restriction")
   private void buildServerProduct(IProgressMonitor monitor) throws CoreException {
     WorkspaceProductModel serverModel = new WorkspaceProductModel(getServerProduct(), false);
     serverModel.load();
@@ -396,7 +395,7 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   private BundleDescription[] getPluginModels(WorkspaceProductModel model) {
-    ArrayList list = new ArrayList();
+    ArrayList<BundleDescription> list = new ArrayList<BundleDescription>();
     State state = TargetPlatformHelper.getState();
     IProductPlugin[] plugins = model.getProduct().getPlugins();
     for (int i = 0; i < plugins.length; i++) {
@@ -409,6 +408,6 @@ public class ExportServerWarOperation implements IOperation {
       if (bundle == null) bundle = state.getBundle(plugins[i].getId(), null);
       if (bundle != null) list.add(bundle);
     }
-    return (BundleDescription[]) list.toArray(new BundleDescription[list.size()]);
+    return list.toArray(new BundleDescription[list.size()]);
   }
 }

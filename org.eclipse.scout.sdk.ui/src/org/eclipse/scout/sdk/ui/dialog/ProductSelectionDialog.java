@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ICheckStateListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
@@ -62,7 +63,7 @@ public class ProductSelectionDialog extends TitleAreaDialog {
     super(parentShell);
     m_project = project;
     m_visibleNodeFilter = visibleFilter;
-    setTitle("Select Product");
+    setTitle(Texts.get("ProductSelectionDialogTitle"));
     m_checkedFiles = new IFile[0];
     setShellStyle(getShellStyle() | SWT.RESIZE);
   }
@@ -70,7 +71,7 @@ public class ProductSelectionDialog extends TitleAreaDialog {
   public ProductSelectionDialog(Shell parentShell, ITreeNode rootNode) {
     super(parentShell);
     m_rootNode = rootNode;
-    setTitle("Select Product");
+    setTitle(Texts.get("ProductSelectionDialogTitle"));
     m_checkedFiles = new IFile[0];
     setShellStyle(getShellStyle() | SWT.RESIZE);
   }
@@ -93,7 +94,7 @@ public class ProductSelectionDialog extends TitleAreaDialog {
       }
     });
     m_tree.getTreeViewer().addSelectionChangedListener(new P_TreeSelectionListener());
-    m_tree.setChecked(TreeUtility.findNodes(m_rootNode, NodeFilters.getByData(m_checkedFiles)));
+    m_tree.setChecked(TreeUtility.findNodes(m_rootNode, NodeFilters.getByData((Object[]) m_checkedFiles)));
     if (parent.getLayout() instanceof GridLayout) {
       rootPane.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL | GridData.GRAB_VERTICAL));
     }
@@ -134,7 +135,7 @@ public class ProductSelectionDialog extends TitleAreaDialog {
   public void setCheckedProductFiles(IFile[] array) {
     m_checkedFiles = array;
     if (m_tree != null && !m_tree.isDisposed()) {
-      ITreeNode[] treeNodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByData(array));
+      ITreeNode[] treeNodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByData((Object[]) array));
       if (isMultiSelectionMode()) {
         m_tree.setChecked(treeNodes);
       }

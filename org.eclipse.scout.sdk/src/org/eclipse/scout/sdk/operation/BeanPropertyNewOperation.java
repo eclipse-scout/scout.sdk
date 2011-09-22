@@ -4,13 +4,11 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation;
-
-import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -71,10 +69,12 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     m_createSetterMethod = true;
   }
 
+  @Override
   public String getOperationName() {
     return Texts.get("Action_newTypeX", "Property");
   }
 
+  @Override
   public void validate() throws IllegalArgumentException {
     if (StringUtility.isNullOrEmpty(getBeanName())) {
       throw new IllegalArgumentException("bean name can not be null.");
@@ -84,9 +84,10 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(m_declaringType.getCompilationUnit(), monitor);
-    ArrayList<String> imports = new ArrayList<String>();
+//    ArrayList<String> imports = new ArrayList<String>();
 //    String beanTypeString = ScoutSdkUtility.getSimpleTypeSignature(getBeanTypeSignature(), imports);
 //    for (String imp : imports) {
 //      m_declaringType.createImport(imp, monitor);
@@ -170,6 +171,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
 
   }
 
+  @Override
   public String getBeanName(boolean startWithUpperCase) {
     if (StringUtility.isNullOrEmpty(getBeanName())) {
       return null;
@@ -182,10 +184,12 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     }
   }
 
+  @Override
   public String getBeanName() {
     return m_beanName;
   }
 
+  @Override
   public void setBeanName(String beanName) {
     m_beanName = beanName;
   }
@@ -194,6 +198,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
    * @return a binary or combination of {@link Flags#AccAbstract}, {@link Flags#AccPrivate}, {@link Flags#AccProtected},
    *         {@link Flags#AccDefault}, {@link Flags#AccPublic}, {@link Flags#AccFinal}, {@link Flags#AccStatic}
    */
+  @Override
   public int getMethodFlags() {
     return m_methodFlags;
   }
@@ -203,6 +208,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
    *          a binary or combination of {@link Flags#AccAbstract}, {@link Flags#AccPrivate}, {@link Flags#AccProtected}
    *          , {@link Flags#AccDefault}, {@link Flags#AccPublic}, {@link Flags#AccFinal}, {@link Flags#AccStatic}
    */
+  @Override
   public void setMethodFlags(int methodFlags) {
     m_methodFlags = methodFlags;
   }

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormFieldTemplateTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -27,7 +28,7 @@ public class TemplateTablePage extends AbstractPage {
 
   public TemplateTablePage(IPage parent) {
     setParent(parent);
-    setName("Templates");
+    setName(Texts.get("Templates"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Templates));
   }
 

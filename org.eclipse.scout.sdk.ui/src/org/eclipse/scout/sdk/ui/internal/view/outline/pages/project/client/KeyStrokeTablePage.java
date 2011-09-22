@@ -11,17 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.KeyStrokeNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.keystroke.KeyStrokeNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 
@@ -80,17 +79,20 @@ public class KeyStrokeTablePage extends AbstractPage {
       childPage.setParent(this);
       childPage.setType(keyStroke);
     }
+  }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{KeyStrokeNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Key stroke"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.KeystrokeAdd), new KeyStrokeNewWizard(getDeclaringType()));
-
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((KeyStrokeNewAction) menu).setType(getDeclaringType());
   }
 
   public IType getDeclaringType() {
     return m_declaringType;
   }
-
 }

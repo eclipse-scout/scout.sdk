@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,6 +35,7 @@ public class DefaultProposalProvider implements IContentProposalProvider {
 
   }
 
+  @Override
   public IContentProposalEx[] getProposalsExpertMode(String content, int cursorPosition, IProgressMonitor monitor) {
     ArrayList<IContentProposalEx> props = new ArrayList<IContentProposalEx>();
     String matchString = content.substring(0, cursorPosition);
@@ -47,6 +48,7 @@ public class DefaultProposalProvider implements IContentProposalProvider {
     return props.toArray(new IContentProposalEx[props.size()]);
   }
 
+  @Override
   public IContentProposalEx[] getProposals(String content, int cursorPosition, IProgressMonitor monitor) {
     ArrayList<IContentProposalEx> props = new ArrayList<IContentProposalEx>();
     String matchString = content.substring(0, cursorPosition);
@@ -60,6 +62,7 @@ public class DefaultProposalProvider implements IContentProposalProvider {
     return props.toArray(new IContentProposalEx[props.size()]);
   }
 
+  @Override
   public boolean supportsExpertMode() {
     return m_expertList != null && m_expertList.length > 0;
   }

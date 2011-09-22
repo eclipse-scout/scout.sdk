@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -55,10 +55,10 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   private final IJavaSearchScope m_searchScope;
 
   public BeanPropertyNewWizardPage(IJavaSearchScope searchScope) {
-    super("New Property Bean");
+    super(Texts.get("NewPropertyBean"));
     m_searchScope = searchScope;
-    setTitle("New Property Bean");
-    setDefaultMessage("create a new property bean.");
+    setTitle(Texts.get("NewPropertyBean"));
+    setDefaultMessage(Texts.get("NewPropertyBeanDesc"));
   }
 
   @Override
@@ -68,6 +68,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     m_beanNameField = new StyledTextField(parent, Texts.get("Dialog_rename_oldNameLabel"));
     m_beanNameField.setText(getBeanName());
     m_beanNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_beanName = m_beanNameField.getText();
         pingStateChanging();
@@ -78,6 +79,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     m_beanTypeField.setLabelText(Texts.get("Dialog_propertyBean_typeLabel"));
     m_beanTypeField.acceptProposal(getBeanSignature());
     m_beanTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);

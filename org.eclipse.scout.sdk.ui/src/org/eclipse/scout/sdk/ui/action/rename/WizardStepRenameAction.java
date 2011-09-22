@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,15 +20,13 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.swt.widgets.Shell;
 
 public class WizardStepRenameAction extends AbstractRenameAction {
 
-  private final IType m_wizardStep;
+  private IType m_wizardStep;
 
-  public WizardStepRenameAction(Shell shell, String name, IType wizardStep) {
-    super(shell, name, wizardStep.getElementName(), ScoutIdeProperties.SUFFIX_WIZARD_STEP);
-    m_wizardStep = wizardStep;
+  public WizardStepRenameAction() {
+    setReadOnlySuffix(ScoutIdeProperties.SUFFIX_WIZARD_STEP);
   }
 
   @Override
@@ -57,4 +55,7 @@ public class WizardStepRenameAction extends AbstractRenameAction {
     return m_wizardStep;
   }
 
+  public void setWizardStep(IType wizardStep) {
+    m_wizardStep = wizardStep;
+  }
 }

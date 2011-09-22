@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
@@ -46,7 +47,7 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
   @Override
   protected void createSections() {
     // link area
-    ISection linkSection = createSection(SECTION_ID_LINKS, "Links");
+    ISection linkSection = createSection(SECTION_ID_LINKS, Texts.get("Links"));
     fillLinkSection(linkSection.getSectionClient());
     super.createSections();
   }

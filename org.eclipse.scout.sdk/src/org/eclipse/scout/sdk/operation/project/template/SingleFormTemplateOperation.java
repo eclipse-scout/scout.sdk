@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
@@ -47,19 +48,17 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
 
   @Override
   public String getDescription() {
-
-    return "Creates an application with a single form 'DesktopForm' opening with the application start as a view.\n" +
-        "This template can be extended with several own forms.";
+    return Texts.get("SingleFormTemplateDesc");
   }
 
   @Override
   public String getTemplateName() {
-    return "Application with a single form.";
+    return Texts.get("ApplicationWithASingleForm");
   }
 
   @Override
   public String getOperationName() {
-    return "Applay single form tempalte...";
+    return Texts.get("ApplySingleFormTemplate");
   }
 
   @Override

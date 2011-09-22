@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.menu;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
@@ -22,7 +23,7 @@ public class MenuNewWizard extends AbstractWorkspaceWizard {
   private IType m_declaringType;
 
   public MenuNewWizard() {
-    setWindowTitle("New Menu");
+    setWindowTitle(Texts.get("NewMenu"));
   }
 
   public void initWizard(IType declaringType) {

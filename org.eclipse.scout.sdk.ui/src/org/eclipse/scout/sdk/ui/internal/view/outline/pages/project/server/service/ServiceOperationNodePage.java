@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -53,15 +53,23 @@ public class ServiceOperationNodePage extends AbstractPage {
     return (IScoutBundle) super.getScoutResource();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createDeleteAction() {
-    MemberListDeleteAction delAction = new MemberListDeleteAction("delete...", getOutlineView().getSite().getShell());
-    if (TypeUtility.exists(getInterfaceOpMethod())) {
-      delAction.addMemberToDelete(getInterfaceOpMethod());
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{MemberListDeleteAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof MemberListDeleteAction) {
+      MemberListDeleteAction action = (MemberListDeleteAction) menu;
+      if (TypeUtility.exists(getInterfaceOpMethod())) {
+        action.addMemberToDelete(getInterfaceOpMethod());
+      }
+      action.addMemberToDelete(getImplementationOpMethod());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperationRemove));
     }
-    delAction.addMemberToDelete(getImplementationOpMethod());
-    delAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperationRemove));
-    return delAction;
   }
 
   @Override

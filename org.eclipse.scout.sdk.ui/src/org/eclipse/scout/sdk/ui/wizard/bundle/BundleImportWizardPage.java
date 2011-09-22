@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,6 +24,7 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.BundleImportOperation;
 import org.eclipse.scout.sdk.pde.Manifest;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
@@ -68,8 +69,8 @@ public class BundleImportWizardPage extends AbstractWorkspaceWizardPage {
 
   public BundleImportWizardPage() {
     super(BundleImportWizardPage.class.getName());
-    setTitle("Import Scout Bundle");
-    setDefaultMessage("Import an existing workspace bundle to a Scout Project.");
+    setTitle(Texts.get("ImportScoutBundle"));
+    setDefaultMessage(Texts.get("BundleImportDesc"));
   }
 
   @Override
@@ -82,9 +83,10 @@ public class BundleImportWizardPage extends AbstractWorkspaceWizardPage {
         proposals.add(new PluginDescriptorProposal(pluginModel));
       }
     }
-    m_pluginModelField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(proposals.toArray(new IContentProposalEx[proposals.size()])), "Plugin to import");
+    m_pluginModelField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(proposals.toArray(new IContentProposalEx[proposals.size()])), Texts.get("PluginToImport"));
     // m_pluginModelField.acceptProposal(m_superType);
     m_pluginModelField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -99,20 +101,22 @@ public class BundleImportWizardPage extends AbstractWorkspaceWizardPage {
     for (BundleTypeProposal p : ScoutProposalUtility.getAllBundleProposals()) {
       m_bundleProposals.put(p.getType(), p);
     }
-    m_bundleTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(ScoutProposalUtility.getAllBundleProposals()), "Bundle type");
+    m_bundleTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(ScoutProposalUtility.getAllBundleProposals()), Texts.get("BundleType"));
     // m_pluginModelField.acceptProposal(m_superType);
     m_bundleTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_bundleType = (BundleTypeProposal) event.proposal;
         pingStateChanging();
       }
     });
 
-    m_projectIdField = getFieldToolkit().createStyledTextField(parent, "Scout Project ID");
+    m_projectIdField = getFieldToolkit().createStyledTextField(parent, Texts.get("ScoutProjectId"));
     m_projectIdField.setText(getProjectId());
     m_projectIdField.setEnabled(isProjectIdFieldEnabled());
     m_projectIdField.addModifyListener(new ModifyListener() {
 
+      @Override
       public void modifyText(ModifyEvent e) {
         m_projectId = m_projectIdField.getText();
         pingStateChanging();

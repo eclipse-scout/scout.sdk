@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.bundle;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
@@ -25,7 +26,7 @@ public class BundleImportWizard extends AbstractWorkspaceWizard {
 
   public BundleImportWizard(IScoutProject project) {
     // create pages
-    setWindowTitle("Import Bundle");
+    setWindowTitle(Texts.get("ImportBundle"));
     m_importBundlePage = new BundleImportWizardPage();
     addPage(m_importBundlePage);
     setProject(project);

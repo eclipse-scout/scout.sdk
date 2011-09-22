@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -42,9 +42,9 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -80,9 +80,9 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdColumn;
 
   public SmartTableColumnNewWizardPage(IType declaringType) {
-    super("New Smart Table Column");
-    setTitle("New Smart Table Column");
-    setDefaultMessage("Create a new smart table column");
+    super(Texts.get("NewSmartTableColumn"));
+    setTitle(Texts.get("NewSmartTableColumn"));
+    setDefaultMessage(Texts.get("CreateANewSmartTableColumn"));
     m_declaringType = declaringType;
     // default values
     m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
@@ -91,9 +91,10 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -114,29 +115,32 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_TABLE_COLUMN);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, SdkTypeUtility.getScoutBundle(m_declaringType), "Generic Type");
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, SdkTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_genericSignature = (SignatureProposal) event.proposal;
         pingStateChanging();
       }
     });
     ITypeProposal[] lookupCallProps = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getClassesOnClasspath(lookupCall, getSharedBundle().getJavaProject()));
-    m_lookupCallField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(lookupCallProps), "Lookup call");
+    m_lookupCallField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(lookupCallProps), Texts.get("LookupCall"));
     m_lookupCallField.acceptProposal(getLookupCall());
     m_lookupCallField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -152,9 +156,10 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     ITypeProposal[] codeTypeProps = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getClassesOnClasspath(iCodeType, getSharedBundle().getJavaProject()));
-    m_codeTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(codeTypeProps), "Code type");
+    m_codeTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(codeTypeProps), Texts.get("CodeType"));
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -169,10 +174,11 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(SdkTypeUtility.getColumns(m_declaringType));
-    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), "Sibling");
+    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_sibling = (SiblingProposal) event.proposal;
         pingStateChanging();
@@ -261,7 +267,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusGenericType() throws JavaModelException {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
-        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Generic type can not be null!");
+        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
       }
     }
     return Status.OK_STATUS;
@@ -273,7 +279,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     // }
     // else
     if (getCodeType() != null && getLookupCall() != null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Only one of code type or lookup call can be processed.");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("OnlyOneOfCodeTypeOrLookupCallCanBeProcessed"));
     }
     return Status.OK_STATUS;
   }

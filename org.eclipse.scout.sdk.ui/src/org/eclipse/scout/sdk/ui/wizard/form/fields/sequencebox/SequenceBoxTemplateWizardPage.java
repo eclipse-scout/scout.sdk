@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.template.IContentTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.DateFromToTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.DateTimeFromToTemplate;
@@ -44,16 +45,17 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
   private IContentTemplate m_selectedTemplate;
 
   public SequenceBoxTemplateWizardPage(IType declaringType) {
-    super("Templates for SequenceBox");
+    super(Texts.get("TemplatesForSequenceBox"));
     m_declaringType = declaringType;
   }
 
   @Override
   protected void createContent(Composite parent) {
-    setTitle("Templates");
-    setDefaultMessage("Choose a template for your sequence box.");
+    setTitle(Texts.get("Templates"));
+    setDefaultMessage(Texts.get("ChooseATemplateForYourSequenceBox"));
     m_filteredTable = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -99,10 +101,12 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
       m_templates = templates;
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return m_templates;
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
         return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
@@ -110,24 +114,30 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
 
       return ((IContentTemplate) element).getName();
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
 

@@ -56,6 +56,7 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     return TYPE_SOURCE_BUILDER;
   }
 
+  @Override
   public String createSource(IImportValidator validator) {
     StringBuilder builder = new StringBuilder();
     for (AnnotationSourceBuilder as : getAnnotations()) {
@@ -105,18 +106,22 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     return builder.toString();
   }
 
+  @Override
   public AnnotationSourceBuilder[] getAnnotations() {
     return m_annotations.toArray(new AnnotationSourceBuilder[m_annotations.size()]);
   }
 
+  @Override
   public void addAnnotation(AnnotationSourceBuilder annotation) {
     m_annotations.add(annotation);
   }
 
+  @Override
   public void addBuilder(ISourceBuilder builder, int category) {
     addBuilder(builder, new CompositeObject(category, builder.getElementName(), builder));
   }
 
+  @Override
   public void addBuilder(ISourceBuilder builder, CompositeObject key) {
     m_children.put(key, builder);
   }
@@ -132,6 +137,7 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     return builders.toArray(new ISourceBuilder[builders.size()]);
   }
 
+  @Override
   public void setSuperTypeSignature(String superTypeSignature) {
     m_superTypeSignature = superTypeSignature;
   }
@@ -140,14 +146,17 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     return m_superTypeSignature;
   }
 
+  @Override
   public void setElementName(String elementName) {
     m_elementName = elementName;
   }
 
+  @Override
   public String getElementName() {
     return m_elementName;
   }
 
+  @Override
   public void setFlags(int flags) {
     m_flags = flags;
   }

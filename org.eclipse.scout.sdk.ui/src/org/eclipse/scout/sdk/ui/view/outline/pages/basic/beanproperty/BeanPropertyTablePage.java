@@ -12,18 +12,17 @@ package org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty;
 
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.BeanPropertyNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.beanproperty.BeanPropertyNewWizard;
 import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
 import org.eclipse.scout.sdk.workspace.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.workspace.type.PropertyBeanFilters;
@@ -81,10 +80,15 @@ public class BeanPropertyTablePage extends AbstractPage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Property Bean"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableAdd),
-        new BeanPropertyNewWizard(m_declaringType));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{BeanPropertyNewAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    ((BeanPropertyNewAction) menu).setType(m_declaringType);
   }
 
   private class P_MethodChangedListener implements IJavaResourceChangedListener {

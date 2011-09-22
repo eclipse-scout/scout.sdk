@@ -11,17 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.MenuNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.menu.MenuNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 
@@ -88,11 +87,16 @@ public class MenuTablePage extends AbstractPage {
   }
 
   @Override
-  public Action createNewAction() {
-    MenuNewWizard wizard = new MenuNewWizard();
-    wizard.initWizard(getDeclaringType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Menu"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuAdd),
-        wizard);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof MenuNewAction) {
+      MenuNewAction action = (MenuNewAction) menu;
+      action.setType(getDeclaringType());
+    }
   }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{MenuNewAction.class};
+  }
 }

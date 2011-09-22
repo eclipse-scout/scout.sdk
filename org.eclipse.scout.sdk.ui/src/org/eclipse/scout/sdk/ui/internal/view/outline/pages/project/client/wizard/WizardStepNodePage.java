@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.WizardStepDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.WizardStepRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -36,37 +37,23 @@ public class WizardStepNodePage extends AbstractScoutTypePage {
     return "getConfiguredTitle";
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new WizardStepRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType());
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WizardStepRenameAction.class, WizardStepDeleteAction.class, ShowJavaReferencesAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    WizardStepDeleteAction deleteAction = new WizardStepDeleteAction(getType(), getOutlineView().getSite().getShell());
-    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStepRemove));
-    return deleteAction;
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof WizardStepRenameAction) {
+      WizardStepRenameAction action = (WizardStepRenameAction) menu;
+      action.setOldName(getType().getElementName());
+      action.setWizardStep(getType());
+    }
+    else if (menu instanceof WizardStepDeleteAction) {
+      WizardStepDeleteAction action = (WizardStepDeleteAction) menu;
+      action.addWizardStep(getType());
+    }
   }
-
-  // @Override
-  // public Action createMoveAction(int moveOperation){
-  // return new ProcessAction(Texts.get("Action_moveTypeX",IMoveTypes.TEXTS[moveOperation]),
-  // JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CFILE),
-  // new BCTypeMoveProcess(getType(),SDE.getType(RuntimeClasses.IWizardStep),moveOperation));
-  // // BCTypeMoveOperation o=new BCTypeMoveOperation(getType());
-  // // o.setMoveOperation(moveOperation);
-  // // o.setTypeFilter(new DescendantTypeFilter(IWizardStep.class));
-  // // return new RunAction(o);
-  // }
-
-  // @Override
-  // public void fillContextMenu(IMenuManager manager){
-  // super.fillContextMenu(manager);
-  // manager.add(new Separator());
-  // manager.add(createMoveAction(IMoveTypes.UP));
-  // manager.add(createMoveAction(IMoveTypes.DOWN));
-  // manager.add(new Separator());
-  // manager.add(createMoveAction(IMoveTypes.TOP));
-  // manager.add(createMoveAction(IMoveTypes.BOTTOM));
-  // }
 }

@@ -37,6 +37,7 @@ public class ScoutWizardDialog extends WizardDialog implements IWizardPageContai
   public ScoutWizardDialog(Shell parentShell, IWizard newWizard) {
     super(parentShell, newWizard);
     super.addPageChangedListener(new IPageChangedListener() {
+      @Override
       public void pageChanged(PageChangedEvent event) {
         // initially set the status
         if (event.getSelectedPage() instanceof AbstractScoutWizardPage) {
@@ -59,6 +60,7 @@ public class ScoutWizardDialog extends WizardDialog implements IWizardPageContai
     }
   }
 
+  @Override
   public void setStatus(IStatus status, IStatus defaultOkStatus) {
     IStatus highestSeverityStatus = getHighestSeverityStatus(status, defaultOkStatus);
     int messagetype;

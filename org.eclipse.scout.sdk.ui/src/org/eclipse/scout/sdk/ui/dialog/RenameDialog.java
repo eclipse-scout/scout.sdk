@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import java.beans.PropertyChangeListener;
 
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.wizard.WizardPageFieldToolkit;
 import org.eclipse.swt.SWT;
@@ -66,11 +67,12 @@ public class RenameDialog extends TitleAreaDialog {
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite rootPane = new Composite(parent, SWT.NONE);
-    m_typeNameField = m_fieldToolkit.createStyledTextField(rootPane, "Name");
+    m_typeNameField = m_fieldToolkit.createStyledTextField(rootPane, Texts.get("Dialog_rename_oldNameLabel"));
     m_typeNameField.setReadOnlySuffix(getReadOnlySuffix());
     m_typeNameField.setReadOnlyPrefix(getReadOnlyPrefix());
     m_typeNameField.setText(getNewName());
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_propertySupport.setPropertyString(PROP_NEW_NAME, m_typeNameField.getText());
       }
@@ -118,5 +120,4 @@ public class RenameDialog extends TitleAreaDialog {
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(listener);
   }
-
 }

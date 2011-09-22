@@ -11,8 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -50,46 +48,4 @@ public class ToolButtonNodePage extends AbstractScoutTypePage {
   public void loadChildrenImpl() {
     new ToolButtonTablePage(this, getType());
   }
-
-  @Override
-  public Action createEditAction() {
-    // find out the exact menu type.
-
-    // return new EditAction(new EntityEditOrder(new ToolEntity(getType())));
-    return null;
-  }
-
-  @Override
-  public Action createRenameAction() {
-    // XXX
-    // return new RenameAction(new MenuRenameOrder(getType()));
-    return null;
-  }
-
-  @Override
-  public Action createDeleteAction() {
-    return null;
-    // return new DeleteAction(new MenuDeleteOrder(getType()));
-  }
-
-  @Override
-  public Action createMoveAction(int moveOperation) {
-    // TypeMoveOrder o=new TypeMoveOrder(getType());
-    // o.setMoveOperation(moveOperation);
-    // o.setTypeFilter(new DescendantTypeFilter(ITool.class));
-    // return new RunAction(o);
-    return null;
-  }
-
-  @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    // manager.add(new Separator());
-    // manager.add(createMoveAction(IMoveTypes.UP));
-    // manager.add(createMoveAction(IMoveTypes.DOWN));
-    // manager.add(new Separator());
-    // manager.add(createMoveAction(IMoveTypes.TOP));
-    // manager.add(createMoveAction(IMoveTypes.BOTTOM));
-  }
-
 }

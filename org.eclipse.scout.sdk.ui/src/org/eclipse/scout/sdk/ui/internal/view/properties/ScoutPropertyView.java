@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -117,7 +117,7 @@ public class ScoutPropertyView extends ViewPart {
     }
     // create new
     try {
-      if (pagesa == null) {
+      if (pagesa == null || pagesa.length == 0) {
         m_currentPart = new UnknownSinglePagePropertyViewPart();
         m_currentPart.createPart(m_content);
       }
@@ -192,6 +192,7 @@ public class ScoutPropertyView extends ViewPart {
   }
 
   private class P_SelectionListener implements ISelectionListener {
+    @Override
     public void selectionChanged(IWorkbenchPart part, ISelection selection) {
       handleSelectionChanged(selection);
     }

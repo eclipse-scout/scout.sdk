@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,15 +48,16 @@ public class BundleNewWizardPage extends AbstractWorkspaceWizardPage {
   public BundleNewWizardPage(IScoutBundle bundle) {
     super(BundleNewWizardPage.class.getName());
     m_parentBundle = bundle;
-    setTitle("New Scout Bundle");
-    setDefaultMessage("Create a new Scout Bundle");
+    setTitle(Texts.get("NewScoutBundle"));
+    setDefaultMessage(Texts.get("CreateANewScoutBundle"));
   }
 
   @Override
   protected void createContent(Composite parent) {
-    m_bundleNameField = getFieldToolkit().createStyledTextField(parent, "Bundle Name");
+    m_bundleNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("BundleName"));
     m_bundleNameField.setReadOnlyPrefix(getParentBundle().getScoutProject().getProjectName());
     m_bundleNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_bundleName = m_bundleNameField.getText();
         pingStateChanging();

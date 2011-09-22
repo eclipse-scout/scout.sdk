@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.form.fields.checkbox;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -20,7 +21,7 @@ public class CheckboxFieldNewWizard extends AbstractFormFieldWizard {
   private CheckboxFieldNewWizardPage m_page1;
 
   public CheckboxFieldNewWizard() {
-    setWindowTitle("New Checkbox Field");
+    setWindowTitle(Texts.get("NewCheckboxField"));
   }
 
   @Override

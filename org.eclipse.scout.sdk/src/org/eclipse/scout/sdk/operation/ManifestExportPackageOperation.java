@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,6 +51,7 @@ public class ManifestExportPackageOperation implements IOperation {
     m_avoidInternalMarkedExports = avoidInternalMarkedExports;
   }
 
+  @Override
   public String getOperationName() {
     switch (m_type) {
       case TYPE_REMOVE:
@@ -69,6 +70,7 @@ public class ManifestExportPackageOperation implements IOperation {
 
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     switch (m_type) {
       case TYPE_REMOVE_WHEN_EMTPY:

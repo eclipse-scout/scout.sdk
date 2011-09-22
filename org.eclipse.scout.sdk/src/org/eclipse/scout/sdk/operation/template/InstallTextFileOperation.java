@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -47,6 +47,7 @@ public class InstallTextFileOperation implements IOperation {
     m_templateBinding = templateBinding;
   }
 
+  @Override
   public String getOperationName() {
     return "Install file " + getSrcPath() + " to /" + m_dstProject.getName() + "/" + getDstPath();
   }
@@ -65,6 +66,7 @@ public class InstallTextFileOperation implements IOperation {
 
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       String s = new String(IOUtility.getContent(FileLocator.openStream(Platform.getBundle(ScoutSdk.PLUGIN_ID), new Path(getSrcPath()), false)), "UTF-8");

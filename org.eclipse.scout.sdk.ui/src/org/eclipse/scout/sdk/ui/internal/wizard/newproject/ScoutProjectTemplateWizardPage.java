@@ -21,6 +21,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.template.EmptyTemplateOperation;
 import org.eclipse.scout.sdk.operation.project.template.IScoutProjectTemplateOperation;
 import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation;
@@ -54,7 +55,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
    */
   public ScoutProjectTemplateWizardPage() {
     super(ScoutProjectTemplateWizardPage.class.getName());
-    setTitle("Scout application templates");
+    setTitle(Texts.get("ScoutApplicationTemplates"));
   }
 
   @Override
@@ -176,31 +177,23 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
 
     @Override
     public void dispose() {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public void addListener(ILabelProviderListener listener) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
-      // TODO Auto-generated method stub
     }
 
     public IScoutProjectTemplateOperation getDefaultOperation() {

@@ -12,35 +12,35 @@ package org.eclipse.scout.sdk.ui.action.delete;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.service.ServiceDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.widgets.Shell;
 
-public class ServiceDeleteAction extends Action {
+public class ServiceDeleteAction extends AbstractScoutHandler {
   private MemberSelectionDialog m_confirmDialog;
-  private final Shell m_shell;
-  private final IType m_serviceImplementation;
+
+  private IType m_serviceImplementation;
   private IType m_serviceInterface;
 
-  public ServiceDeleteAction(Shell shell, IType serviceInterface, IType serviceImplementation) {
-    m_shell = shell;
-    m_serviceInterface = serviceInterface;
-    m_serviceImplementation = serviceImplementation;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceRemove));
-    setText("Delete...");
+  public ServiceDeleteAction() {
+    super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceRemove), "Delete", false, Category.DELETE);
   }
 
   @Override
-  public void run() {
-    m_confirmDialog = new MemberSelectionDialog(m_shell, getText());
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    m_confirmDialog = new MemberSelectionDialog(shell, getLabel());
 //    m_serviceInterface = findServiceInterface();
     ArrayList<IMember> members = new ArrayList<IMember>();
     if (TypeUtility.exists(m_serviceInterface)) {
@@ -66,13 +66,27 @@ public class ServiceDeleteAction extends Action {
       OperationJob job = new OperationJob(deleteOp);
       job.schedule();
     }
+    return null;
   }
 
   public IType getServiceImplementation() {
     return m_serviceImplementation;
   }
 
+  public IType getServiceInterface() {
+    return m_serviceInterface;
+  }
+
+  public void setServiceInterface(IType serviceInterface) {
+    m_serviceInterface = serviceInterface;
+  }
+
+  public void setServiceImplementation(IType serviceImplementation) {
+    m_serviceImplementation = serviceImplementation;
+  }
+
   private class P_SelectionValidationListener implements IMemberSelectionChangedListener {
+    @Override
     public void handleSelectionChanged(IMember[] selection) {
       m_confirmDialog.setMessage("");
       boolean canOk = true;

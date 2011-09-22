@@ -10,49 +10,57 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.delete;
 
+import java.util.LinkedList;
+
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-public class WizardStepDeleteAction extends Action {
-  private Shell m_shell;
-  private MemberSelectionDialog m_confirmDialog;
-  private final IType m_wizardStep;
+public class WizardStepDeleteAction extends AbstractScoutHandler {
+  private LinkedList<IType> m_wizardSteps;
 
-  public WizardStepDeleteAction(IType wizardStep, Shell shell) {
-    super("Delete...");
-    m_wizardStep = wizardStep;
-    m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStepRemove));
+  public WizardStepDeleteAction() {
+    super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStepRemove), "Delete", true, Category.DELETE);
+    m_wizardSteps = new LinkedList<IType>();
   }
 
   @Override
-  public void run() {
-    MessageBox box = new MessageBox(m_shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    box.setMessage("Are you sure you want to delete '" + getWizardStep().getElementName() + "'?");
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+    if (m_wizardSteps.size() == 1) {
+      box.setMessage(Texts.get("StepDeleteConfirmationMessage"));
+    }
+    else {
+      box.setMessage(Texts.get("StepDeleteConfirmationMessagePlural"));
+    }
     if (box.open() == SWT.OK) {
       JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
-      delOp.addMember(getWizardStep());
-      IMethod getter = SdkTypeUtility.getWizardStepGetterMethod(getWizardStep());
-      if (TypeUtility.exists(getter)) {
-        delOp.addMember(getter);
+      for (IType stepToDelete : m_wizardSteps) {
+        delOp.addMember(stepToDelete);
+        IMethod getter = SdkTypeUtility.getWizardStepGetterMethod(stepToDelete);
+        if (TypeUtility.exists(getter)) {
+          delOp.addMember(getter);
+        }
       }
       OperationJob job = new OperationJob(delOp);
       job.schedule();
     }
+    return null;
   }
 
-  public IType getWizardStep() {
-    return m_wizardStep;
+  public void addWizardStep(IType wizardStep) {
+    m_wizardSteps.add(wizardStep);
   }
-
 }

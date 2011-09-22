@@ -69,6 +69,7 @@ public class FileSelectionField extends TextField {
     });
 
     text.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         try {
           if (m_inputLock.acquire()) {

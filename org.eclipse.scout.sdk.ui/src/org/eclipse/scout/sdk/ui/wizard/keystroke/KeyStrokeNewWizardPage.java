@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -66,9 +66,9 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdKeystroke;
 
   public KeyStrokeNewWizardPage(IType declaringType) {
-    super("New Key Stroke");
-    setTitle("New Key Stroke");
-    setDefaultMessage("Create a new key stroke.");
+    super(Texts.get("NewKeyStroke"));
+    setTitle(Texts.get("NewKeyStroke"));
+    setDefaultMessage(Texts.get("CreateANewKeyStroke"));
     // default
     m_declaringType = declaringType;
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractKeyStroke)[0];
@@ -78,10 +78,11 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_KEY_STROKE);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
@@ -92,18 +93,20 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
 
     ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getAbstractTypesOnClasspath(iKeyStroke, m_declaringType.getJavaProject()));
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), "Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_superType = (ITypeProposal) event.proposal;
         pingStateChanging();
       }
     });
 
-    m_keyStrokeField = getFieldToolkit().createStyledTextField(parent, "Key Stroke");
+    m_keyStrokeField = getFieldToolkit().createStyledTextField(parent, Texts.get("KeyStroke"));
     m_keyStrokeField.setText(getKeyStroke());
     m_keyStrokeField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_keyStroke = m_keyStrokeField.getText();
         pingStateChanging();
@@ -175,7 +178,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

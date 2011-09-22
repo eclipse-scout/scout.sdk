@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineLabelsJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeOperation;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -36,6 +37,7 @@ public class DirtyUpdateManager {
     // add quality listener
     ScoutSeverityManager.getInstance().addQualityManagerListener(
         new IScoutSeverityListener() {
+          @Override
           public void severityChanged(IResource r) {
             enqueueLabelsJob();
           }
@@ -74,7 +76,7 @@ public class DirtyUpdateManager {
       m_currentRefreshSubTreeProcess.cancel();
       m_currentRefreshSubTreeProcess = null;
     }
-    m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeOperation(m_view, "Refreshing...");
+    m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeOperation(m_view, Texts.get("Refreshing"));
     m_currentRefreshSubTreeProcess.schedule(200);
   }
 
@@ -83,7 +85,7 @@ public class DirtyUpdateManager {
       m_currentRefreshLabelsProcess.cancel();
       m_currentRefreshLabelsProcess = null;
     }
-    m_currentRefreshLabelsProcess = new RefreshOutlineLabelsJob(m_view, "Refreshing...");
+    m_currentRefreshLabelsProcess = new RefreshOutlineLabelsJob(m_view, Texts.get("Refreshing"));
     m_currentRefreshLabelsProcess.schedule(200);
   }
 

@@ -13,37 +13,35 @@ package org.eclipse.scout.sdk.ui.action.rename;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.RenameDialog;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.swt.widgets.Shell;
 
-public abstract class AbstractRenameAction extends Action {
+public abstract class AbstractRenameAction extends AbstractScoutHandler {
   private RenameDialog m_dialog;
-  private final String m_readOnlySuffix;
   private String m_oldName;
-  private final Shell m_shell;
+  private String m_readOnlySuffix;
 
-  public AbstractRenameAction(Shell shell, String name, String oldName, String readOnlySuffix) {
-    super(name);
-    m_shell = shell;
-    setOldName(oldName);
-    m_readOnlySuffix = readOnlySuffix;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolRename));
+  public AbstractRenameAction() {
+    super(Texts.get("RenameWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolRename), "ALT+SHIFT+R", false, Category.RENAME);
   }
 
   @Override
-  public void run() {
-    m_dialog = new RenameDialog(m_shell, "Rename...", getOldName(), getReadOnlySuffix());
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    m_dialog = new RenameDialog(shell, Texts.get("RenameWithPopup"), getOldName(), getReadOnlySuffix());
     m_dialog.addPropertyChangeListener(new P_PropertyListener());
     getDialog().create();
     validateInternal(getDialog().getNewName());
@@ -57,16 +55,15 @@ public abstract class AbstractRenameAction extends Action {
         ScoutSdkUi.logError("rename failed.", e);
       }
     }
+    return null;
   }
 
   protected abstract void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException;
 
+  protected abstract IStatus validate(String newName);
+
   public RenameDialog getDialog() {
     return m_dialog;
-  }
-
-  public String getReadOnlySuffix() {
-    return m_readOnlySuffix;
   }
 
   private void validateInternal(String newName) {
@@ -89,8 +86,6 @@ public abstract class AbstractRenameAction extends Action {
     }
   }
 
-  protected abstract IStatus validate(String newName);
-
   protected IStatus getJavaNameStatus(String newName) {
     if (newName.equals(getReadOnlySuffix())) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Name can not be null or empty");
@@ -104,14 +99,6 @@ public abstract class AbstractRenameAction extends Action {
     return Status.OK_STATUS;
   }
 
-  public void setOldName(String oldName) {
-    m_oldName = oldName;
-  }
-
-  public String getOldName() {
-    return m_oldName;
-  }
-
   private class P_PropertyListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -119,5 +106,21 @@ public abstract class AbstractRenameAction extends Action {
         validateInternal((String) evt.getNewValue());
       }
     }
+  }
+
+  public String getOldName() {
+    return m_oldName;
+  }
+
+  public void setOldName(String oldName) {
+    m_oldName = oldName;
+  }
+
+  public String getReadOnlySuffix() {
+    return m_readOnlySuffix;
+  }
+
+  public void setReadOnlySuffix(String readOnlySuffix) {
+    m_readOnlySuffix = readOnlySuffix;
   }
 }

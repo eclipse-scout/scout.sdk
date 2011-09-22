@@ -12,10 +12,11 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
@@ -42,7 +43,7 @@ public class FormFieldTemplateTablePage extends AbstractPage {
 
   public FormFieldTemplateTablePage(IPage parent) {
     setParent(parent);
-    setName("Form Fields");
+    setName(Texts.get("FormFields"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldTemplate));
   }
 
@@ -86,14 +87,21 @@ public class FormFieldTemplateTablePage extends AbstractPage {
   }
 
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new MultipleUpdateFormDataAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveFormFieldTemplates();
-      }
-    }));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof MultipleUpdateFormDataAction) {
+      ((MultipleUpdateFormDataAction) menu).setTypeResolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveFormFieldTemplates();
+        }
+      });
+    }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{MultipleUpdateFormDataAction.class};
   }
 
   /**

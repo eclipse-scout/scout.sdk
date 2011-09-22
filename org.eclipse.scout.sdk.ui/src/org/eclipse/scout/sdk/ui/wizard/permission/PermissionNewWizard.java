@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.permission;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -20,7 +21,7 @@ public class PermissionNewWizard extends AbstractWorkspaceWizard {
 
   public PermissionNewWizard(IScoutBundle sharedBundle) {
     m_sharedBundle = sharedBundle;
-    setWindowTitle("New Permission");
+    setWindowTitle(Texts.get("NewPermission"));
     m_page1 = new PermissionWizardPage(getSharedBundle());
     addPage(m_page1);
   }

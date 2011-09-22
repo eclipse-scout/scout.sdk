@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.SharedContextBeanPropertyNewOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.type.IMethodFilter;
@@ -26,7 +27,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard {
 
   public SharedContextBeanPropertyNewWizard(IType serverSessionType, IType clientSessionType) {
-    setWindowTitle("New Shared Context Property");
+    setWindowTitle(Texts.get("NewSharedContextProperty"));
     BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(ScoutSdk.getScoutWorkspace().getScoutBundle(serverSessionType.getJavaProject().getProject()).getSearchScope());
 
     SharedContextBeanPropertyNewOperation op = new SharedContextBeanPropertyNewOperation(serverSessionType, clientSessionType);

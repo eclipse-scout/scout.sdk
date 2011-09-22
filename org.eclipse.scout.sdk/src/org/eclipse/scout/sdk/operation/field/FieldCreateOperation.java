@@ -140,7 +140,7 @@ public class FieldCreateOperation implements IOperation {
    * @return
    * @throws JavaModelException
    */
-  protected String createInitValue(@SuppressWarnings("unused") IImportValidator validator) throws JavaModelException {
+  protected String createInitValue(IImportValidator validator) throws JavaModelException {
     if (!StringUtility.isNullOrEmpty(getSimpleInitValue())) {
       return " = " + getSimpleInitValue();
     }

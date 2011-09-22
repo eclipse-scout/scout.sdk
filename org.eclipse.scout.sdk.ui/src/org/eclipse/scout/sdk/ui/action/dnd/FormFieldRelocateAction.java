@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -32,7 +33,7 @@ public class FormFieldRelocateAction extends Action {
   private final Shell m_shell;
 
   public FormFieldRelocateAction(IType formFieldToMove, Shell shell) {
-    super("Relocate Form Field");
+    super(Texts.get("RelocateFormField"));
     m_formField = formFieldToMove;
     m_shell = shell;
   }
@@ -53,11 +54,11 @@ public class FormFieldRelocateAction extends Action {
       usedNames.remove(getFormField().getElementName());
     }
     if (usedNames.contains(getFormField().getElementName())) {
-      String message = "Enter a name of the " + ((isCreateCopy()) ? ("copied") : ("moved")) + " form field.";
+      String message = Texts.get("EnterFieldName", isCreateCopy() ? Texts.get("Copied") : Texts.get("Moved"));
       // show dialog
-      RenameConfirmationDialog dialog = new RenameConfirmationDialog(m_shell, "Form Field Name", message);
+      RenameConfirmationDialog dialog = new RenameConfirmationDialog(m_shell, Texts.get("FormFieldName"), message);
       dialog.setNotAllowedNames(usedNames);
-      dialog.setTypeName("CopyOf" + getFormField().getElementName());
+      dialog.setTypeName(Texts.get("CopyOf") + getFormField().getElementName());
       if (dialog.open() != Dialog.OK) {
         return;
       }

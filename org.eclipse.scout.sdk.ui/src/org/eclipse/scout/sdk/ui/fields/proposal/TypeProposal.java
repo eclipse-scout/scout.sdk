@@ -39,10 +39,12 @@ public class TypeProposal implements ITypeProposal {
     m_packageName = packageName;
   }
 
+  @Override
   public int getProposalType() {
     return TYPE_BCTYPE;
   }
 
+  @Override
   public String getLabel(boolean selected, boolean expertMode) {
     String name = "";
     String packagePostfix = "";
@@ -60,12 +62,14 @@ public class TypeProposal implements ITypeProposal {
     return name;
   }
 
+  @Override
   public Image getImage(boolean selected, boolean expertMode) {
     Image img = null;
     img = ScoutSdkUi.getImage(ScoutSdkUi.FieldPublic);
     return img;
   }
 
+  @Override
   public int getCursorPosition(boolean selected, boolean expertMode) {
     if (expertMode) {
       return getSimpleName().length();

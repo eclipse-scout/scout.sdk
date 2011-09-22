@@ -147,6 +147,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
    * 
    * @see ILayoutExtension
    */
+  @Override
   public int computeMinimumWidth(Composite parent, boolean changed) {
 
     Control[] children = getOrderdVisibleChildren(parent);
@@ -179,6 +180,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
    * 
    * @see ILayoutExtension
    */
+  @Override
   public int computeMaximumWidth(Composite parent, boolean changed) {
     Control[] children = getOrderdVisibleChildren(parent);
     if (changed) {
@@ -208,6 +210,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   /**
    * @see Layout#layout(Composite, boolean)
    */
+  @Override
   protected void layout(Composite parent, boolean changed) {
 
     Rectangle clientArea = parent.getClientArea();
@@ -441,12 +444,13 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     control.setBounds(xloc, yloc, width, height);
   }
 
+  @SuppressWarnings("unchecked")
   void createGrid(Composite composite) {
     int row, column, rowFill, columnFill;
     Control[] children;
     TableWrapDataEx spacerSpec;
     Vector growingCols = new Vector();
-    Vector growingRows = new Vector();
+    Vector gr = new Vector();
     rowspans = new Hashtable();
     //
     children = getOrderdVisibleChildren(composite);
@@ -500,7 +504,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         updateGrowingColumns(growingCols, spec, column);
       }
       if (spec.grabVertical) {
-        updateGrowingRows(growingRows, spec, row);
+        updateGrowingRows(gr, spec, row);
       }
       // Put spacers in the grid to account for the item's vertical and
       // horizontal
@@ -538,30 +542,30 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     for (int i = 0; i < growingCols.size(); i++) {
       growingColumns[i] = ((Integer) growingCols.get(i)).intValue();
     }
-    this.growingRows = new int[growingRows.size()];
-    for (int i = 0; i < growingRows.size(); i++) {
-      this.growingRows[i] = ((Integer) growingRows.get(i)).intValue();
+    this.growingRows = new int[gr.size()];
+    for (int i = 0; i < gr.size(); i++) {
+      this.growingRows[i] = ((Integer) gr.get(i)).intValue();
     }
   }
 
-  private void updateGrowingColumns(Vector growingColumns,
-      TableWrapDataEx spec, int column) {
+  @SuppressWarnings("unchecked")
+  private void updateGrowingColumns(Vector gc, TableWrapDataEx spec, int column) {
     int affectedColumn = column + spec.colspan - 1;
-    for (int i = 0; i < growingColumns.size(); i++) {
-      Integer col = (Integer) growingColumns.get(i);
+    for (int i = 0; i < gc.size(); i++) {
+      Integer col = (Integer) gc.get(i);
       if (col.intValue() == affectedColumn) return;
     }
-    growingColumns.add(new Integer(affectedColumn));
+    gc.add(new Integer(affectedColumn));
   }
 
-  private void updateGrowingRows(Vector growingRows, TableWrapDataEx spec,
-      int row) {
+  @SuppressWarnings("unchecked")
+  private void updateGrowingRows(Vector gr, TableWrapDataEx spec, int row) {
     int affectedRow = row + spec.rowspan - 1;
-    for (int i = 0; i < growingRows.size(); i++) {
-      Integer irow = (Integer) growingRows.get(i);
+    for (int i = 0; i < gr.size(); i++) {
+      Integer irow = (Integer) gr.get(i);
       if (irow.intValue() == affectedRow) return;
     }
-    growingRows.add(new Integer(affectedRow));
+    gr.add(new Integer(affectedRow));
   }
 
   private TableWrapDataEx[] createEmptyRow() {
@@ -574,6 +578,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   /**
    * @see Layout#computeSize(Composite, int, int, boolean)
    */
+  @Override
   protected Point computeSize(Composite parent, int wHint, int hHint,
       boolean changed) {
     Control[] children = getOrderdVisibleChildren(parent);

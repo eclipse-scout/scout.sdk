@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,18 +23,14 @@ import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
 import org.eclipse.scout.sdk.workspace.type.FieldFilters;
 import org.eclipse.scout.sdk.workspace.type.MethodFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.swt.widgets.Shell;
 
 public class PropertyBeansRenameAction extends AbstractRenameAction {
 
-  private final IPropertyBean[] m_propertyBeanDescriptors;
+  private IPropertyBean[] m_propertyBeanDescriptors;
 
-  public PropertyBeansRenameAction(Shell shell, String name, IPropertyBean[] propertyBeanDescriptors) {
-    super(shell, name, "", "");
-    m_propertyBeanDescriptors = propertyBeanDescriptors;
-    if (getPropertyBeanDescriptors() != null && getPropertyBeanDescriptors().length > 0) {
-      setOldName(getPropertyBeanDescriptors()[0].getBeanName());
-    }
+  public PropertyBeansRenameAction() {
+    setReadOnlySuffix("");
+    setOldName("");
   }
 
   @Override
@@ -98,4 +94,10 @@ public class PropertyBeansRenameAction extends AbstractRenameAction {
     return m_propertyBeanDescriptors;
   }
 
+  public void setPropertyBeanDescriptors(IPropertyBean[] propertyBeanDescriptors) {
+    m_propertyBeanDescriptors = propertyBeanDescriptors;
+    if (getPropertyBeanDescriptors() != null && getPropertyBeanDescriptors().length > 0) {
+      setOldName(getPropertyBeanDescriptors()[0].getBeanName());
+    }
+  }
 }

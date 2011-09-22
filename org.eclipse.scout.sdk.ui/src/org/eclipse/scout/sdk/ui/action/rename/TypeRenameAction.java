@@ -17,16 +17,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
-import org.eclipse.swt.widgets.Shell;
 
 public class TypeRenameAction extends AbstractRenameAction {
-
-  private final IType m_type;
-
-  public TypeRenameAction(Shell shell, String name, IType type, String readOnlySuffix) {
-    super(shell, name, type.getElementName(), readOnlySuffix);
-    m_type = type;
-  }
+  private IType m_type;
 
   @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
@@ -58,4 +51,7 @@ public class TypeRenameAction extends AbstractRenameAction {
     return m_type;
   }
 
+  public void setType(IType type) {
+    m_type = type;
+  }
 }

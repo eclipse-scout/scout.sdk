@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
 import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.table.AutoResizeColumnTable;
 import org.eclipse.scout.sdk.ui.fields.table.FileTableContentProvider;
 import org.eclipse.swt.SWT;
@@ -102,13 +103,14 @@ public class FileSelectionDialog extends TitleAreaDialog {
     TableColumn simpleNameCol = new TableColumn(table, SWT.LEFT);
     simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(3));
     simpleNameCol.setWidth(170);
-    simpleNameCol.setText("File");
+    simpleNameCol.setText(Texts.get("File"));
     TableColumn packageCol = new TableColumn(table, SWT.LEFT);
     packageCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(5));
-    packageCol.setText("Path");
+    packageCol.setText(Texts.get("Path"));
     packageCol.setWidth(270);
     m_viewer = new CheckboxTableViewer(table);
     m_viewer.addCheckStateListener(new ICheckStateListener() {
+      @Override
       public void checkStateChanged(CheckStateChangedEvent event) {
         Object[] checkedElements = m_viewer.getCheckedElements();
         setSelectedFilesFromUI(TypeCastUtility.castValue(checkedElements, IFile[].class));
@@ -140,5 +142,4 @@ public class FileSelectionDialog extends TitleAreaDialog {
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(listener);
   }
-
 }

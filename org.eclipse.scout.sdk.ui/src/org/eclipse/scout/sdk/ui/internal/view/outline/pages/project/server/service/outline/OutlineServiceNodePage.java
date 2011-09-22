@@ -4,17 +4,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.outline;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
@@ -25,7 +28,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.Abstra
 public class OutlineServiceNodePage extends AbstractServiceNodePage {
 
   public OutlineServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
-    super(parent, type, interfaceType);
+    super(parent, type, interfaceType, ScoutIdeProperties.SUFFIX_OUTLINE_SERVICE);
   }
 
   @Override
@@ -33,25 +36,20 @@ public class OutlineServiceNodePage extends AbstractServiceNodePage {
     return IScoutPageConstants.OUTLINE_SERVICE_NODE_PAGE;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new ServiceRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), getInterfaceType(), ScoutIdeProperties.SUFFIX_OUTLINE_SERVICE);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class,
+        ServiceOperationNewAction.class, ServiceDeleteAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    return new ServiceDeleteAction(getOutlineView().getSite().getShell(), getInterfaceType(), getType());
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof ServiceDeleteAction) {
+      ServiceDeleteAction action = (ServiceDeleteAction) menu;
+      action.setServiceImplementation(getType());
+      action.setServiceInterface(getInterfaceType());
+    }
   }
-  /*
-   * @Override
-   * public Action createDeleteAction(){
-   * return new ProcessAction(Texts.get("Action_deleteTypeX", getName()), Icons.getDescriptor(Icons.IMG_TOOL_DELETE),
-   * new ServiceDeleteProcess(getType()));
-   * }
-   * @Override
-   * public Action createNewAction() {
-   * return new ProcessAction(Texts.get("Action_newTypeX", "Service Operation"), Icons.getDescriptor(Icons.IMG_TOOL_ADD),
-   * new ServiceOperationNewProcess(getType(), m_interfaceType, getBsiCaseProjectGroup()));
-   * }
-   */
 }

@@ -43,9 +43,9 @@ public class InstallBinaryFileOperation implements IOperation {
     m_sourceUrl = sourceUrl;
     m_destinationProject = destinationProject;
     m_destinationPath = destinationPath;
-
   }
 
+  @Override
   public String getOperationName() {
     return "Install binary file " + getSourceUrl().toString() + " to /" + getDestinationProject().getName() + "/" + getDestinationPath();
   }
@@ -63,6 +63,7 @@ public class InstallBinaryFileOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       URL absSourceUrl = FileLocator.resolve(getSourceUrl());

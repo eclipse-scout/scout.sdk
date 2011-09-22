@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,10 +15,6 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
  */
 public abstract interface IScoutPageConstants {
   public static final String ALL_PAGES_TABLE_PAGE = "org.eclipse.scout.sdk.page.AllPagesTablePage";
-  public static final String AXIS_WEB_SERVICE_CONSUMER_NODE_PAGE = "org.eclipse.scout.sdk.page.AxisWebServiceConsumerNodePage";
-  public static final String AXIS_WEB_SERVICE_CONSUMER_TABLE_PAGE = "org.eclipse.scout.sdk.page.AxisWebServiceConsumerTablePage";
-  public static final String AXIS_WEB_SERVICE_PROVIDER_NODE_PAGE = "org.eclipse.scout.sdk.page.AxisWebServiceProviderNodePage";
-  public static final String AXIS_WEB_SERVICE_PROVIDER_TABLE_PAGE = "org.eclipse.scout.sdk.page.AxisWebServiceProviderTablePage";
   public static final String BEAN_PROPERTY_NODE_PAGE = "org.eclipse.scout.sdk.page.BeanPropertyNodePage";
   public static final String BEAN_PROPERTY_TABLE_PAGE = "org.eclipse.scout.sdk.page.BeanPropertyTablePage";
   public static final String BIG_DECIMAL_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.BigDecimalFieldNodePage";

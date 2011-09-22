@@ -80,7 +80,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdField;
 
   public SmartFieldNewWizardPage(IType declaringType) {
-    super("New Smart Field");
+    super(Texts.get("NewSmartField"));
     m_declaringType = declaringType;
     // default
     setSuperType(abstractSmartField);
@@ -90,10 +90,10 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    setTitle("New Smart Field");
-    setDefaultMessage("Create a new smart field.");
+    setTitle(Texts.get("NewSmartField"));
+    setDefaultMessage(Texts.get("CreateANewSmartField"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -117,7 +117,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM_FIELD);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -128,7 +128,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, SdkTypeUtility.getScoutBundle(m_declaringType), "Generic Type");
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, SdkTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -140,7 +140,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     ITypeProposal[] codeTypeProposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getClassesOnClasspath(iCodeType, m_declaringType.getJavaProject()));
-    m_codeTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(codeTypeProposals), "Code Type");
+    m_codeTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(codeTypeProposals), Texts.get("CodeType"));
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -158,7 +158,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     ITypeProposal[] lookupCallProps = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getClassesOnClasspath(iLookupCall, m_declaringType.getJavaProject()));
-    m_lookupCallField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(lookupCallProps), "Lookup call");
+    m_lookupCallField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(lookupCallProps), Texts.get("LookupCall"));
     m_lookupCallField.acceptProposal(getLookupCall());
     m_lookupCallField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -273,7 +273,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusGenericType() throws JavaModelException {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
-        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Generic type can not be null!");
+        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
       }
     }
     return Status.OK_STATUS;

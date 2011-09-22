@@ -11,10 +11,10 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
 import org.eclipse.jdt.core.IMember;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
 
   public CalendarItemProviderNodePage() {
+    super(ScoutIdeProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProvider));
   }
 
@@ -49,17 +50,19 @@ public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
     new MenuTablePage(this, getType());
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new TypeRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
-
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, MemberListDeleteAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    MemberListDeleteAction action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell());
-    action.setTypesToDelete(new IMember[]{getType()});
-    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviderRemove));
-    return action;
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof MemberListDeleteAction) {
+      MemberListDeleteAction action = (MemberListDeleteAction) menu;
+      action.setTypesToDelete(new IMember[]{getType()});
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviderRemove));
+    }
   }
 }

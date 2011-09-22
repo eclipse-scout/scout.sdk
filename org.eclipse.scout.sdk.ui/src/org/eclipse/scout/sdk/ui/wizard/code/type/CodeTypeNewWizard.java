@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -19,7 +20,7 @@ public class CodeTypeNewWizard extends AbstractWorkspaceWizard {
   private final IScoutBundle m_sharedBundle;
 
   public CodeTypeNewWizard(IScoutBundle sharedBundle) {
-    setWindowTitle("New Code Type");
+    setWindowTitle(Texts.get("NewCodeType"));
     m_sharedBundle = sharedBundle;
     m_page1 = new CodeTypeNewWizardPage(getSharedBundle());
     addPage(m_page1);

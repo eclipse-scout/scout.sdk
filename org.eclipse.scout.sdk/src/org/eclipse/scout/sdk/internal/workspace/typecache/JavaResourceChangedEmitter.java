@@ -271,7 +271,6 @@ public class JavaResourceChangedEmitter {
     fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, icu));
   }
 
-  @SuppressWarnings("unused")
   private void printEventType(int type, PrintStream out) {
     switch (type) {
       case IJavaElementDelta.ADDED:
@@ -290,7 +289,7 @@ public class JavaResourceChangedEmitter {
     out.flush();
   }
 
-  @SuppressWarnings({"unused", "deprecation"})
+  @SuppressWarnings("deprecation")
   private void printJdtFlags(int flags, PrintStream out) {
     boolean first = true;
     out.print("flags for '" + flags + "'[");

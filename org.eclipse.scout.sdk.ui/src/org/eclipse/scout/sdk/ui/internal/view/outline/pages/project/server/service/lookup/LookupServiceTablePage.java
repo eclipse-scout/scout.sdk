@@ -11,20 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.services.LookupServiceNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -91,21 +87,25 @@ public class LookupServiceTablePage extends AbstractPage {
     return services;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveAllLookupServices();
-      }
-    }));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{FormDataSqlBindingValidateAction.class, LookupServiceNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    return new WizardAction(Texts.get("Action_newTypeX", "Lookup Service"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS),
-        new LookupServiceNewWizard(getScoutResource()));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof FormDataSqlBindingValidateAction) {
+      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveAllLookupServices();
+        }
+      });
+    }
+    else if (menu instanceof LookupServiceNewAction) {
+      ((LookupServiceNewAction) menu).setScoutBundle(getScoutResource());
+    }
   }
 
   private class P_HierarchyListener implements ITypeHierarchyChangedListener {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -66,6 +66,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
   public void postActivate() {
   }
 
+  @Override
   public final void createControl(Composite parent) {
     m_content = new Composite(parent, SWT.NONE);
     m_content.setLayout(new FillLayout());

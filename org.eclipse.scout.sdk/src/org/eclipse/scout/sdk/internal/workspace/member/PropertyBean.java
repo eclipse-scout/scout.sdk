@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -40,6 +40,7 @@ public class PropertyBean implements IPropertyBean {
     m_beanName = beanName;
   }
 
+  @Override
   public IType getDeclaringType() {
     return m_declaringType;
   }
@@ -68,6 +69,7 @@ public class PropertyBean implements IPropertyBean {
     return m_beanName;
   }
 
+  @Override
   public boolean isFormDataProperty() {
     return PropertyBeanFilters.getFormDataPropertyFilter().accept(this);
   }

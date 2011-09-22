@@ -13,21 +13,18 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.create.CustomServiceNewPackageAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.services.CustomServiceNewPackageWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -41,7 +38,7 @@ public class CustomServiceTablePage extends AbstractPage {
 
   public CustomServiceTablePage(IPage parent) {
     setParent(parent);
-    setName("Custom Services");
+    setName(Texts.get("CustomServices"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Services));
 
   }
@@ -98,29 +95,24 @@ public class CustomServiceTablePage extends AbstractPage {
     return services;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveServices();
-      }
-    }));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{FormDataSqlBindingValidateAction.class, CustomServiceNewPackageAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    CustomServiceNewPackageWizard wizard;
-    try {
-      wizard = new CustomServiceNewPackageWizard(getScoutResource());
-      return new WizardAction(Texts.get("Action_newTypeX", "Custom Service Package"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd),
-          wizard);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof FormDataSqlBindingValidateAction) {
+      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveServices();
+        }
+      });
     }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError(e);
+    else if (menu instanceof CustomServiceNewPackageAction) {
+      ((CustomServiceNewPackageAction) menu).setScoutBundle(getScoutResource());
     }
-    return null;
   }
-
 }

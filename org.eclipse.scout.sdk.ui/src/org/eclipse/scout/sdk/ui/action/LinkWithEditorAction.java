@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TuningUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.JdtUtility;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
@@ -54,7 +55,7 @@ public class LinkWithEditorAction extends Action {
     super(null, AS_CHECK_BOX);
     m_viewPart = viewPart;
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolSynchronize));
-    setToolTipText("link with editor");
+    setToolTipText(Texts.get("LinkWithEditor"));
     m_updateSelectionJob = new P_UpdateSelectionJob();
     init();
   }
@@ -100,6 +101,7 @@ public class LinkWithEditorAction extends Action {
   }
 
   private class P_PropertyListener implements IPropertyListener {
+    @Override
     public void propertyChanged(Object aSource, int propId) {
       switch (propId) {
         case ScoutExplorerPart.IS_LINKING_ENABLED_PROPERTY:
@@ -112,6 +114,7 @@ public class LinkWithEditorAction extends Action {
   private class P_JavaEditorSelectionListener implements ISelectionListener {
     private ISelection m_lastSelection;
 
+    @Override
     public void selectionChanged(IWorkbenchPart part, ISelection selection) {
       if (JavaUI.ID_CU_EDITOR.equals(part.getSite().getId())) {
         if (part instanceof IEditorPart) {
@@ -156,6 +159,7 @@ public class LinkWithEditorAction extends Action {
     public IStatus runInUIThread(IProgressMonitor monitor) {
       if (!m_viewPart.getTreeViewer().getTree().isDisposed() && m_currentIcuSelection != null) {
         SafeRunner.run(new ISafeRunnable() {
+          @Override
           public void run() throws Exception {
             IPage startPage = m_viewPart.getInvisibleRoot();
             IStructuredSelection selection = (IStructuredSelection) m_viewPart.getTreeViewer().getSelection();
@@ -177,6 +181,7 @@ public class LinkWithEditorAction extends Action {
             }
           }
 
+          @Override
           public void handleException(Throwable e) {
             ScoutSdkUi.logError(e);
           }

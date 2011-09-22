@@ -27,6 +27,7 @@ public class SourceRange implements ISourceRange {
     m_length = length;
   }
 
+  @Override
   public int getLength() {
     return m_length;
   }
@@ -35,6 +36,7 @@ public class SourceRange implements ISourceRange {
     m_length = length;
   }
 
+  @Override
   public int getOffset() {
     return m_offset;
   }

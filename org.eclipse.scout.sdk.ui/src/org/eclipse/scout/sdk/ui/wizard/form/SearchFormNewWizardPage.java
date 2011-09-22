@@ -81,17 +81,18 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   public SearchFormNewWizardPage(IScoutBundle clientBundle) {
     super(SearchFormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    setTitle("Search Form");
-    setDefaultMessage("Create a new search form.");
+    setTitle(Texts.get("SearchForm2"));
+    setDefaultMessage(Texts.get("CreateANewSearchForm"));
     setSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractSearchForm)[0]);
   }
 
   @Override
   protected void createContent(Composite parent) {
     Control tablePageGroup = createTablePageGroup(parent);
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, Texts.get("Name"));
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -102,10 +103,8 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
           NlsProposal newName = (NlsProposal) event.proposal;
           setNlsNameInternal(newName);
           if (newName != null) {
-            if (oldEntry == null) {
-              if (StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText()) || oldEntry.getKey().equals(m_typeNameField.getModifiableText())) {
-                m_typeNameField.setText(newName.getNlsEntry().getKey());
-              }
+            if (oldEntry == null || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText()) || oldEntry.getKey().equals(m_typeNameField.getModifiableText())) {
+              m_typeNameField.setText(newName.getNlsEntry().getKey());
             }
 
           }
@@ -116,19 +115,21 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_SEARCH_FORM);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         setTypeNameInternal(m_typeNameField.getText());
         pingStateChanging();
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, "Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("SuperType"));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setSuperTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -147,12 +148,13 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   private Control createTablePageGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-    group.setText("Auto create");
+    group.setText(Texts.get("AutoCreate"));
     Label label = new Label(group, SWT.NONE);
-    label.setText("Choose a table page to create a 'Search Form' for.");
-    m_tablePageField = getFieldToolkit().createProposalField(group, null, "Table Page");
+    label.setText(Texts.get("SelectTablePageForSearchForm"));
+    m_tablePageField = getFieldToolkit().createProposalField(group, null, Texts.get("TablePage"));
     m_tablePageField.acceptProposal(getTablePageType());
     m_tablePageField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setTablePageTypeInternal((ITypeProposal) event.proposal);
         pingStateChanging();
@@ -269,7 +271,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

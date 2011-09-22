@@ -10,11 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.operation.IDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -24,7 +23,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class KeyStrokeNodePage extends AbstractScoutTypePage {
 
   public KeyStrokeNodePage() {
-    super();
+    super(ScoutIdeProperties.SUFFIX_KEY_STROKE);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Keystroke));
   }
 
@@ -46,17 +45,19 @@ public class KeyStrokeNodePage extends AbstractScoutTypePage {
     return "getConfiguredText";
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new TypeRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_KEY_STROKE);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    IDeleteOperation op = new TypeDeleteOperation(getType());
-    DeleteAction deleteAction = new DeleteAction(getName(), getOutlineView().getSite().getShell(), op);
-    deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.KeystrokeRemove));
-    return deleteAction;
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof DeleteAction) {
+      DeleteAction action = (DeleteAction) menu;
+      action.addType(getType());
+      action.setName(getName());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.KeystrokeRemove));
+    }
   }
-
 }

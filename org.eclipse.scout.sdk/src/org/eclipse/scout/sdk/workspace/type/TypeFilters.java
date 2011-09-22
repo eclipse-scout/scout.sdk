@@ -92,6 +92,7 @@ public class TypeFilters {
 
   public static ITypeFilter getCompilationUnitFilter(final ICompilationUnit icu) {
     return new ITypeFilter() {
+      @Override
       public boolean accept(IType type) {
         if (!type.isBinary()) {
           return icu.equals(type.getCompilationUnit());
@@ -306,6 +307,7 @@ public class TypeFilters {
 
   public static ITypeFilter getExistingFilter() {
     return new ITypeFilter() {
+      @Override
       public boolean accept(IType type) {
         return type != null && type.exists();
       }
@@ -314,6 +316,7 @@ public class TypeFilters {
 
   public static ITypeFilter getNotInTypes(final Set<IType> excludedTypes) {
     return new ITypeFilter() {
+      @Override
       public boolean accept(IType type) {
         return !excludedTypes.contains(type);
       }

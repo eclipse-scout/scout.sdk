@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,6 +30,7 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -56,8 +57,8 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
 
   public PageNewTemplatesWizardPage(IScoutBundle clientBundle) {
     super(PageNewTemplatesWizardPage.class.getName());
-    setTitle("Page Templates");
-    setDefaultMessage("Choose a template for your page.");
+    setTitle(Texts.get("PageTemplates"));
+    setDefaultMessage(Texts.get("ChooseATemplateForYourPage"));
     m_clientBundle = clientBundle;
   }
 
@@ -65,6 +66,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
   protected void createContent(Composite parent) {
     m_filteredTable = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -120,7 +122,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
       multiStatus.add(Status.OK_STATUS);
     }
     else {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "A template must be selected."));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
     }
     PageNewAttributesWizardPage page = (PageNewAttributesWizardPage) getWizard().getPage(PageNewAttributesWizardPage.class.getName());
     if (page != null) {
@@ -189,10 +191,12 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
       m_templates = templates;
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return m_templates;
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
         return ScoutSdkUi.getImage(ScoutSdkUi.Class);
@@ -200,23 +204,29 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       return ((IType) element).getElementName();
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
   } // end class P_TableContentProvider

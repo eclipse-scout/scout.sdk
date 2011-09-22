@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,10 +26,12 @@ import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 
 public class IntegerFromToTemplate implements IContentTemplate {
 
+  @Override
   public String getName() {
     return "Integer FROM-TO";
   }
 
+  @Override
   public void apply(IType type, IScoutWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
     monitor.beginTask("apply " + getName() + " template.", IProgressMonitor.UNKNOWN);
 

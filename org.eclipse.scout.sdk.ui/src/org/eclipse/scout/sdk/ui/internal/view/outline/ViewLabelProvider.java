@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -68,10 +68,12 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
     }
   }
 
+  @Override
   public Color getBackground(Object element) {
     return null;
   }
 
+  @Override
   public Color getForeground(Object element) {
     // if(element instanceof AbstractPage){
     // return ((AbstractPage)element).getTextColor();
@@ -79,6 +81,7 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
     return null;
   }
 
+  @Override
   public Font getFont(Object element) {
     ensureFontCache();
     if (element instanceof IPage) {

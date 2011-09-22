@@ -11,20 +11,17 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformPagesOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.ui.wizard.page.PageNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -40,7 +37,7 @@ public class AllPagesTablePage extends AbstractPage {
 
   public AllPagesTablePage(IPage parent) {
     setParent(parent);
-    setName("All pages");
+    setName(Texts.get("AllPages"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Pages));
   }
 
@@ -88,16 +85,21 @@ public class AllPagesTablePage extends AbstractPage {
     PageNodePageHelper.createRepresentationFor(this, allPages, m_cachedTypeHierarchy);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform all pages...", new WellformPagesOperation(getScoutResource())));
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{WellformAction.class, PageNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    PageNewWizard wizard = new PageNewWizard(getScoutResource());
-    return new WizardAction(Texts.get("Action_newTypeX", "Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageAdd), wizard);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setOperation(new WellformPagesOperation(getScoutResource()));
+      action.setLabel(Texts.get("Wellform all Pages..."));
+    }
+    else if (menu instanceof PageNewAction) {
+      ((PageNewAction) menu).init(getScoutResource());
+    }
   }
 }

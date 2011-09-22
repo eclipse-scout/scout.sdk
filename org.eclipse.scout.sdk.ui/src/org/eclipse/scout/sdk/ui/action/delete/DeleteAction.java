@@ -10,43 +10,53 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.delete;
 
-import org.eclipse.jface.action.Action;
+import java.util.ArrayList;
+
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.IDeleteOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-public class DeleteAction extends Action {
-  private Shell m_shell;
-  private MemberSelectionDialog m_confirmDialog;
+public class DeleteAction extends AbstractScoutHandler {
   private String m_name;
-  private final IDeleteOperation m_operation;
+  private ArrayList<IType> m_types;
 
-  public DeleteAction(String name, Shell parentShell, IDeleteOperation operation) {
-    super(Texts.get("Action_deleteTypeX", name));
-    m_name = name;
-    m_shell = parentShell;
-    m_operation = operation;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolRemove));
+  public DeleteAction() {
+    super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolRemove), "Delete", true, Category.DELETE);
+    m_types = new ArrayList<IType>();
   }
 
   @Override
-  public void run() {
-    MessageBox box = new MessageBox(m_shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    box.setMessage(Texts.get("DeleteAction_ensureRequest", m_name));
-    if (box.open() == SWT.OK) {
-      OperationJob job = new OperationJob(getOperation());
-      job.schedule();
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+    if (m_types.size() == 1) {
+      box.setMessage(Texts.get("DeleteAction_ensureRequest", m_name));
     }
+    else {
+      box.setMessage(Texts.get("DeleteAction_ensureRequestPlural"));
+    }
+    if (box.open() == SWT.OK) {
+      for (IType t : m_types) {
+        OperationJob job = new OperationJob(new TypeDeleteOperation(t));
+        job.schedule();
+      }
+    }
+    return null;
   }
 
-  public IOperation getOperation() {
-    return m_operation;
+  public void addType(IType t) {
+    m_types.add(t);
   }
 
+  public void setName(String name) {
+    m_name = name;
+  }
 }

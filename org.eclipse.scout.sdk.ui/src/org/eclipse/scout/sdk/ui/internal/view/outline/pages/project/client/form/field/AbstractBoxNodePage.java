@@ -11,17 +11,15 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.CreateTemplateAction;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
+import org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
@@ -30,7 +28,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypeOrderChangedPageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.form.fields.FormFieldNewWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -93,26 +90,34 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    manager.add(new WizardAction(Texts.get("Action_newTypeX", "Form Field"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldAdd),
-        new FormFieldNewWizard(getType())));
-    manager.add(new Separator());
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    manager.add(new CreateTemplateAction(getOutlineView().getSite().getShell(), this, getType()));
-    if (getType().getDeclaringType() == null) {
-      manager.add(new OperationAction("Update Form Data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation(getType())));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof FormFieldRenameAction) {
+      FormFieldRenameAction a = (FormFieldRenameAction) menu;
+      a.setFormField(getType());
+      a.setOldName(getType().getElementName());
+      a.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_BOX);
+    }
+    else if (menu instanceof FormFieldNewAction) {
+      ((FormFieldNewAction) menu).setType(getType());
+    }
+    else if (menu instanceof BoxDeleteAction) {
+      ((BoxDeleteAction) menu).setBoxType(getType());
+    }
+    else if (menu instanceof CreateTemplateAction) {
+      CreateTemplateAction action = (CreateTemplateAction) menu;
+      action.setPage(this);
+      action.setType(getType());
+    }
+    else if (menu instanceof FormDataUpdateAction) {
+      ((FormDataUpdateAction) menu).setType(getType());
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new FormFieldRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_BOX);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, FormFieldNewAction.class,
+        BoxDeleteAction.class, CreateTemplateAction.class, FormDataUpdateAction.class};
   }
-
-  @Override
-  public Action createDeleteAction() {
-    return new BoxDeleteAction(getType(), getOutlineView().getSite().getShell());
-  }
-
 }

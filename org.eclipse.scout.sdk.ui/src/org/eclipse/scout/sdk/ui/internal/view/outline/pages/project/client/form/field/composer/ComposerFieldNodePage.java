@@ -11,12 +11,9 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute.AttributeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity.EntityTablePage;
@@ -24,7 +21,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.tree.
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
-import org.eclipse.scout.sdk.ui.wizard.form.fields.composerfield.tree.ComposerFieldOverrideTreeWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
@@ -75,14 +71,4 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
     new AttributeTablePage(this, getType());
     new EntityTablePage(this, getType());
   }
-
-  @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new Separator());
-    if (!m_hasTree) {
-      manager.add(new WizardAction("Override default tree...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd), new ComposerFieldOverrideTreeWizard(getType())));
-    }
-  }
-
 }

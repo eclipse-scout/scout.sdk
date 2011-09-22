@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedContextPropertyTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -31,7 +32,7 @@ public class ServerSessionNodePage extends AbstractScoutTypePage {
   public ServerSessionNodePage(IPage parent, IType type) {
     setParent(parent);
     setType(type);
-    setName("Server Session");
+    setName(Texts.get("ServerSession"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerSession));
   }
 

@@ -15,10 +15,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.PropertyBeanDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -74,14 +73,19 @@ public class BeanPropertyNodePage extends AbstractPage {
     return m_propertyDescriptor;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new PropertyBeansRenameAction(getOutlineView().getSite().getShell(), "Rename...", new IPropertyBean[]{getPropertyDescriptor()});
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{PropertyBeansRenameAction.class, PropertyBeanDeleteAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    return new PropertyBeanDeleteAction(Texts.get("Action_deleteTypeX", getName()), getOutlineView().getSite().getShell(), getPropertyDescriptor());
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof PropertyBeansRenameAction) {
+      ((PropertyBeansRenameAction) menu).setPropertyBeanDescriptors(new IPropertyBean[]{getPropertyDescriptor()});
+    }
+    else if (menu instanceof PropertyBeanDeleteAction) {
+      ((PropertyBeanDeleteAction) menu).setBeanDesc(getPropertyDescriptor());
+    }
   }
-
 }

@@ -17,18 +17,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
-import org.eclipse.swt.widgets.Shell;
 
 public class ServiceRenameAction extends AbstractRenameAction {
 
-  private final IType m_serviceInterface;
-  private final IType m_serviceImplementation;
-
-  public ServiceRenameAction(Shell shell, String name, IType serviceImplementation, IType serviceInterface, String readOnlySuffix) {
-    super(shell, name, serviceImplementation.getElementName(), readOnlySuffix);
-    m_serviceImplementation = serviceImplementation;
-    m_serviceInterface = serviceInterface;
-  }
+  private IType m_serviceInterface;
+  private IType m_serviceImplementation;
 
   @Override
   protected IStatus validate(String newName) {
@@ -59,9 +52,11 @@ public class ServiceRenameAction extends AbstractRenameAction {
     }
   }
 
-  @Override
-  public void run() {
-    super.run();
-    // TODO rename service proxy registration client side.
+  public void setServiceInterface(IType serviceInterface) {
+    m_serviceInterface = serviceInterface;
+  }
+
+  public void setServiceImplementation(IType serviceImplementation) {
+    m_serviceImplementation = serviceImplementation;
   }
 }

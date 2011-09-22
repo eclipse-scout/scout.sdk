@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,9 +20,10 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
+import org.eclipse.scout.sdk.ui.action.LegacyOperationAction;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -36,6 +37,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 /**
  * <h3>AbstractValuePresenter</h3> ...
  */
+@SuppressWarnings("deprecation")
 public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter {
 
   private Text m_textComponent;
@@ -60,6 +62,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
     manager.setRemoveAllWhenShown(true);
     Menu menu = manager.createContextMenu(m_textComponent);
     manager.addMenuListener(new IMenuListener() {
+      @Override
       public void menuAboutToShow(IMenuManager managerInside) {
         managerInside.removeAll();
         createContextMenu((MenuManager) managerInside);
@@ -162,11 +165,12 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
 
   protected void createContextMenu(MenuManager manager) {
     if (getMethod() != null && getMethod().isImplemented()) {
-      manager.add(new OperationAction("set default value", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
+      manager.add(new LegacyOperationAction(Texts.get("SetDefaultValue"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
     }
   }
 
   private class P_TextListener implements Listener {
+    @Override
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Verify:

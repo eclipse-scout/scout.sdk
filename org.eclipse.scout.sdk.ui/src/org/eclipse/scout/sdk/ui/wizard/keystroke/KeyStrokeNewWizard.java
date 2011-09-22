@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.keystroke;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
@@ -21,7 +22,7 @@ public class KeyStrokeNewWizard extends AbstractFormFieldWizard {
   private KeyStrokeNewWizardPage m_page1;
 
   public KeyStrokeNewWizard(IType declaringType) {
-    setWindowTitle("New Key Stroke");
+    setWindowTitle(Texts.get("NewKeyStroke"));
     initWizard(declaringType);
   }
 

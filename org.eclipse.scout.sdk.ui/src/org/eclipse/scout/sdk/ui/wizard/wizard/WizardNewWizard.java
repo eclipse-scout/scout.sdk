@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.wizard;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -25,7 +26,7 @@ public class WizardNewWizard extends AbstractWorkspaceWizard {
   private final IScoutBundle m_clientBundle;
 
   public WizardNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle("New Wizard");
+    setWindowTitle(Texts.get("NewWizard"));
     m_clientBundle = clientBundle;
     m_page1 = new WizardNewWizardPage(getClientBundle());
     addPage(m_page1);

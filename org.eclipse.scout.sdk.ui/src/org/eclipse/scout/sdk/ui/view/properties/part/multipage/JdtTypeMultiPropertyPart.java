@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jdt.listener.ElementChangedListenerEx;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.multi.MultiBooleanPresenter;
@@ -325,7 +326,7 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
     private void update(AbstractMultiMethodPresenter presenter, ConfigurationMethodSet methodSet) {
       synchronized (m_delayedUpdateLock) {
         cancel();
-        setName("Update presenter for '" + methodSet.getMethodName() + "'...");
+        setName(Texts.get("UpdatePresenterForX", methodSet.getMethodName()));
         m_presenter = presenter;
         m_methodSet = methodSet;
         schedule(200);

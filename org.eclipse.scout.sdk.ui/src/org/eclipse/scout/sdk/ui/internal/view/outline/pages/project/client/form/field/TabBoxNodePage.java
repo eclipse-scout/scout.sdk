@@ -11,13 +11,16 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
+import org.eclipse.scout.sdk.ui.action.create.GroupBoxNewAction;
+import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
@@ -25,7 +28,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
-import org.eclipse.scout.sdk.ui.wizard.form.fields.groupbox.GroupBoxNewWizard;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -75,25 +77,25 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createRenameAction() {
-    return new FormFieldRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_BOX);
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ShowJavaReferencesAction.class, FormDataUpdateAction.class,
+        CreateTemplateAction.class, FormFieldRenameAction.class, FormFieldDeleteAction.class, GroupBoxNewAction.class};
   }
 
   @Override
-  public Action createNewAction() {
-    GroupBoxNewWizard wizard = new GroupBoxNewWizard();
-    wizard.initWizard(getType());
-    return new WizardAction(Texts.get("Action_newTypeX", "GroupBox"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxTabAdd),
-        wizard);
-  }
-
-  @Override
-  public Action createDeleteAction() {
-    Action deleteAction = super.createDeleteAction();
-    if (deleteAction != null) {
-      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxRemove));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof FormFieldRenameAction) {
+      FormFieldRenameAction a = (FormFieldRenameAction) menu;
+      a.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_BOX);
     }
-    return deleteAction;
+    else if (menu instanceof FormFieldDeleteAction) {
+      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxRemove));
+    }
+    else if (menu instanceof GroupBoxNewAction) {
+      ((GroupBoxNewAction) menu).setType(getType());
+    }
   }
 }

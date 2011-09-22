@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,15 +20,13 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.swt.widgets.Shell;
 
 public class TableColumnRenameAction extends AbstractRenameAction {
 
-  private final IType m_tableColumn;
+  private IType m_tableColumn;
 
-  public TableColumnRenameAction(Shell shell, String name, IType tableColumn) {
-    super(shell, name, tableColumn.getElementName(), ScoutIdeProperties.SUFFIX_TABLE_COLUMN);
-    m_tableColumn = tableColumn;
+  public TableColumnRenameAction() {
+    setReadOnlySuffix(ScoutIdeProperties.SUFFIX_TABLE_COLUMN);
   }
 
   @Override
@@ -57,4 +55,7 @@ public class TableColumnRenameAction extends AbstractRenameAction {
     return m_tableColumn;
   }
 
+  public void setTableColumn(IType tableColumn) {
+    m_tableColumn = tableColumn;
+  }
 }

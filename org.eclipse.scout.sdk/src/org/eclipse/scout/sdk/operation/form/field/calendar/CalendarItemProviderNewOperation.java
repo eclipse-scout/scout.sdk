@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -46,6 +46,7 @@ public class CalendarItemProviderNewOperation implements IOperation {
     m_formatSource = foramtSource;
   }
 
+  @Override
   public String getOperationName() {
     return "new calendar item provider...";
   }
@@ -60,6 +61,7 @@ public class CalendarItemProviderNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_TABLEFIELD_TABLE, getCreatedField(), false);
     tableNewOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCalendarItemProvider, true));

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -58,9 +59,10 @@ public class RenameConfirmationDialog extends TitleAreaDialog {
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite rootPane = new Composite(parent, SWT.NONE);
-    m_typeNameField = new StyledTextField(rootPane, "Type Name");
+    m_typeNameField = new StyledTextField(rootPane, Texts.get("TypeName"));
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         revalidate();
@@ -84,7 +86,7 @@ public class RenameConfirmationDialog extends TitleAreaDialog {
   protected void revalidate() {
     if (getNotAllowedNames().contains(m_typeNameField.getText())) {
       getOkButton().setEnabled(false);
-      setMessage("This name is already used!", IMessageProvider.ERROR);
+      setMessage(Texts.get("NameAlreadyInUse"), IMessageProvider.ERROR);
     }
     else {
       getOkButton().setEnabled(true);
@@ -113,5 +115,4 @@ public class RenameConfirmationDialog extends TitleAreaDialog {
   public Set<String> getNotAllowedNames() {
     return m_notAllowedNames;
   }
-
 }

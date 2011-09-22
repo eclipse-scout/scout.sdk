@@ -63,8 +63,8 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
   public PermissionWizardPage(IScoutBundle sharedBundle) {
     super(PermissionWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
-    setTitle("New Permission");
-    setDefaultMessage("Create a new permission.");
+    setTitle(Texts.get("NewPermission"));
+    setDefaultMessage(Texts.get("CreateANewPermission"));
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(basicHierarchyPermission)[0];
   }
 
@@ -76,10 +76,11 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_PERMISSION);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
@@ -89,9 +90,10 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutSdk.getType(RuntimeClasses.BasicPermission));
     ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getAbstractTypesOnClasspath(basicHierarchyPermission, getSharedBundle().getJavaProject()));
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), "Super Type");
+    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_superType = (ITypeProposal) event.proposal;
         pingStateChanging();
@@ -156,7 +158,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The super type can not be null!");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

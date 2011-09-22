@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
@@ -51,7 +52,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
   @Override
   protected void createSections() {
     // link area
-    ISection linkSection = createSection(SECTION_ID_LINKS, "Links");
+    ISection linkSection = createSection(SECTION_ID_LINKS, Texts.get("Links"));
     fillLinkSection(linkSection.getSectionClient());
     super.createSections();
   }
@@ -108,7 +109,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
               TypeFilters.getRegexSimpleNameFilter(formRegex),
               TypeFilters.getInScoutProject(clientBundle.getScoutProject())
               );
-          LinkGroup serviceGroup = model.getOrCreateGroup("Service", 10);
+          LinkGroup serviceGroup = model.getOrCreateGroup(Texts.get("Service"), 10);
           for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(iService).getAllSubtypes(iService, formFilter, TypeComparators.getTypeNameComparator())) {
             serviceGroup.addLink(new TypeOpenLink(candidate));
           }
@@ -119,7 +120,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
               TypeFilters.getClassFilter(),
               TypeFilters.getInScoutProject(clientBundle.getScoutProject())
               );
-          LinkGroup permissionGroup = model.getOrCreateGroup("Permissions", 20);
+          LinkGroup permissionGroup = model.getOrCreateGroup(Texts.get("PermissionTablePage"), 20);
           for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
             permissionGroup.addLink(new TypeOpenLink(candidate));
           }

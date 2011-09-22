@@ -11,10 +11,10 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 public class PermissionNodePage extends AbstractScoutTypePage {
 
   public PermissionNodePage(IPage parent, IType type) {
+    super(ScoutIdeProperties.SUFFIX_PERMISSION);
     setParent(parent);
     setType(type);
     // String name=type.getSimpleName();
@@ -47,16 +48,19 @@ public class PermissionNodePage extends AbstractScoutTypePage {
     return false;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createDeleteAction() {
-    DeleteAction action = new DeleteAction("Delete...", ScoutSdkUi.getShell(), new TypeDeleteOperation(getType()));
-    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PermissionRemove));
-    return action;
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class};
   }
 
   @Override
-  public Action createRenameAction() {
-    return new TypeRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_PERMISSION);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof DeleteAction) {
+      DeleteAction action = (DeleteAction) menu;
+      action.addType(getType());
+      action.setName(getName());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PermissionRemove));
+    }
   }
-
 }

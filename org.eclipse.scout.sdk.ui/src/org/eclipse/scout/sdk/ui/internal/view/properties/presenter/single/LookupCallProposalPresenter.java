@@ -43,10 +43,10 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
   protected void createContextMenu(MenuManager manager) {
     super.createContextMenu(manager);
     if (getCurrentSourceValue() != null) {
-      final IType lookupCall = getCurrentSourceValue().getJavaClass();
-      if (lookupCall != null) {
-        String entityName = NamingUtility.removeSuffixes(lookupCall.getElementName(), "Call");
-        String lookupServiceFqn = lookupCall.getPackageFragment().getElementName() + ".I" + entityName + "Service";
+      final IType lc = getCurrentSourceValue().getJavaClass();
+      if (lc != null) {
+        String entityName = NamingUtility.removeSuffixes(lc.getElementName(), "Call");
+        String lookupServiceFqn = lc.getPackageFragment().getElementName() + ".I" + entityName + "Service";
         if (ScoutSdk.existsType(lookupServiceFqn)) {
           final IType lookupServiceInterface = ScoutSdk.getType(lookupServiceFqn);
           if (lookupServiceInterface != null) {
@@ -58,7 +58,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
             });
           }
         }
-        String serviceFqn = lookupCall.getPackageFragment().getElementName().replace(".shared.", ".server.") + "." + entityName + "Service";
+        String serviceFqn = lc.getPackageFragment().getElementName().replace(".shared.", ".server.") + "." + entityName + "Service";
         if (ScoutSdk.existsType(serviceFqn)) {
           final IType lookupServiceImplementation = ScoutSdk.getType(serviceFqn);
           if (lookupServiceImplementation != null) {

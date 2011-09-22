@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
@@ -37,18 +38,17 @@ public class OutlineTemplateOperation implements IScoutProjectTemplateOperation 
 
   @Override
   public String getDescription() {
-    return "Creates an application with two forms. \n" +
-        "on the left a form containing a tree and on the right a form with a table. These two forms displaying pages and outlines.";
+    return Texts.get("OutlineTemplateDesc");
   }
 
   @Override
   public String getTemplateName() {
-    return "Outline tree and table form.";
+    return Texts.get("OutlineTreeAndTableForm");
   }
 
   @Override
   public String getOperationName() {
-    return "Applay outline template...";
+    return Texts.get("ApplayOutlineTemplate");
   }
 
   @Override
@@ -113,6 +113,7 @@ public class OutlineTemplateOperation implements IScoutProjectTemplateOperation 
    * @param scoutProject
    *          the scoutProject to set
    */
+  @Override
   public void setScoutProject(IScoutProject scoutProject) {
     m_scoutProject = scoutProject;
   }

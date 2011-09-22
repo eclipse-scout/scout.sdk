@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.dnd.TableColumnDndOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -53,11 +54,11 @@ public class TableColumnRelocateAction extends Action {
       usedNames.remove(getColumnToMove().getElementName());
     }
     if (usedNames.contains(getColumnToMove().getElementName())) {
-      String message = "Enter a name of the " + ((isCreateCopy()) ? ("copied") : ("moved")) + " table column.";
+      String message = Texts.get("EnterColumnName", isCreateCopy() ? Texts.get("Copied") : Texts.get("Moved"));
       // show dialog
-      RenameConfirmationDialog dialog = new RenameConfirmationDialog(m_shell, "Table Column Name", message);
+      RenameConfirmationDialog dialog = new RenameConfirmationDialog(m_shell, Texts.get("TableColumnName"), message);
       dialog.setNotAllowedNames(usedNames);
-      dialog.setTypeName("CopyOf" + getColumnToMove().getElementName());
+      dialog.setTypeName(Texts.get("CopyOf") + getColumnToMove().getElementName());
       if (dialog.open() != Dialog.OK) {
         return;
       }

@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.LookupCallDeleteAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -51,28 +52,18 @@ public class LookupCallNodePage extends AbstractScoutTypePage {
     return (IScoutBundle) super.getScoutResource();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createDeleteAction() {
-    return new LookupCallDeleteAction(getType(), getOutlineView().getSite().getShell());
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ShowJavaReferencesAction.class, LookupCallDeleteAction.class};
   }
 
-  /*
-   * XXX
-   * @Override
-   * public Action createRenameAction(){
-   * return new ProcessAction(Texts.get("Action_renameX", getType().getSimpleName()), Icons.getDescriptor(Icons.IMG_TOOL_RENAME),new FormRenameProcess(getType()));
-   * }
-   */
-
-  /*
-   * XXX
-   * @Override
-   * public Action createDeleteAction(){
-   * ProcessAction a = new ProcessAction(Texts.get("Action_deleteTypeX", getType().getSimpleName()),
-   * JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CFILE),
-   * new FormDeleteProcess(getType(), getBsiCaseProjectGroup()));
-   * return a;
-   * }
-   */
-
+  @Override
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof LookupCallDeleteAction) {
+      LookupCallDeleteAction action = (LookupCallDeleteAction) menu;
+      action.setLookupCall(getType());
+    }
+  }
 }

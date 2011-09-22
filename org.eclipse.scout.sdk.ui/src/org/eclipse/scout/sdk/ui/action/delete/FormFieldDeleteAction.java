@@ -10,44 +10,50 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.delete;
 
+import java.util.LinkedList;
+
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-public class FormFieldDeleteAction extends Action {
-  private Shell m_shell;
-  private MemberSelectionDialog m_confirmDialog;
-  private final IType m_formFieldType;
-  private final String m_fieldName;
+public class FormFieldDeleteAction extends AbstractScoutHandler {
 
-  public FormFieldDeleteAction(IType formFieldType, String fieldName, Shell shell) {
-    super(Texts.get("Action_deleteTypeX", fieldName));
-    m_formFieldType = formFieldType;
-    m_fieldName = fieldName;
-    m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldRemove));
+  private LinkedList<IType> m_formFieldTypes;
+
+  public FormFieldDeleteAction() {
+    super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldRemove), "Delete", true, Category.DELETE);
+    m_formFieldTypes = new LinkedList<IType>();
   }
 
   @Override
-  public void run() {
-    MessageBox box = new MessageBox(m_shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    box.setMessage("Are you sure you want to delete '" + m_fieldName + "'?");
-    if (box.open() == SWT.OK) {
-      FormFieldDeleteOperation op = new FormFieldDeleteOperation(getFormFieldType(), true);
-      OperationJob job = new OperationJob(op);
-      job.schedule();
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+    if (m_formFieldTypes.size() == 1) {
+      box.setMessage(Texts.get("FieldDeleteConfirmation"));
     }
+    else {
+      box.setMessage(Texts.get("FieldDeleteConfirmationPlural"));
+    }
+    if (box.open() == SWT.OK) {
+      for (IType t : m_formFieldTypes) {
+        FormFieldDeleteOperation op = new FormFieldDeleteOperation(t, true);
+        OperationJob job = new OperationJob(op);
+        job.schedule();
+      }
+    }
+    return null;
   }
 
-  public IType getFormFieldType() {
-    return m_formFieldType;
+  public void addFormFieldType(IType formFieldType) {
+    m_formFieldTypes.add(formFieldType);
   }
-
 }

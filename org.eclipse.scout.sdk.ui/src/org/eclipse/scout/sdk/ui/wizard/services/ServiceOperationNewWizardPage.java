@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ParameterArgument;
 import org.eclipse.scout.sdk.operation.service.ServiceOperationNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
@@ -61,16 +62,17 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     super(ServiceOperationNewWizardPage.class.getName());
     m_serviceInterface = serviceInterface;
     m_serviceImplementations = serviceImplementations;
-    setTitle("New Service Operation");
-    setDefaultMessage("create a new Service Operation.");
+    setTitle(Texts.get("NewServiceOperationNoPopup"));
+    setDefaultMessage(Texts.get("CreateANewServiceOperation"));
   }
 
   @Override
   protected void createContent(Composite parent) {
     m_operationNameField = new TextField(parent, 20);
-    m_operationNameField.setLabelText("Operation Name");
+    m_operationNameField.setLabelText(Texts.get("OperationName"));
     m_operationNameField.addModifyListener(new ModifyListener() {
 
+      @Override
       public void modifyText(ModifyEvent e) {
         m_operationName = m_operationNameField.getText();
         pingStateChanging();
@@ -79,8 +81,9 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     IScoutBundle interfaceBundle = ScoutSdk.getScoutWorkspace().getScoutBundle(m_serviceInterface.getJavaProject().getProject());
 
     m_returnParameterField = new ReturnParameterField(parent, 20, m_returnParameter, interfaceBundle.getSearchScope());
-    m_returnParameterField.setLabel("Return type");
+    m_returnParameterField.setLabel(Texts.get("ReturnType"));
     m_returnParameterField.addParameterFieldListener(new IParameterFieldListener() {
+      @Override
       public void parameterChanged(ParameterArgument argument) {
         m_returnParameter = argument;
         pingStateChanging();
@@ -88,9 +91,10 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_parameterArg1Field = new ParameterField(parent, m_parameterArg1, interfaceBundle.getSearchScope());
-    m_parameterArg1Field.setLabelParameterName("Name Arg 1");
-    m_parameterArg1Field.setLabelParameterType("Type");
+    m_parameterArg1Field.setLabelParameterName(Texts.get("NameArg") + " 1");
+    m_parameterArg1Field.setLabelParameterType(Texts.get("Type"));
     m_parameterArg1Field.addParameterFieldListener(new IParameterFieldListener() {
+      @Override
       public void parameterChanged(ParameterArgument argument) {
         m_parameterArg1 = argument;
         pingStateChanging();
@@ -98,9 +102,10 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_parameterArg2Field = new ParameterField(parent, m_parameterArg1, interfaceBundle.getSearchScope());
-    m_parameterArg2Field.setLabelParameterName("Name Arg 2");
-    m_parameterArg2Field.setLabelParameterType("Type");
+    m_parameterArg2Field.setLabelParameterName(Texts.get("NameArg") + "2");
+    m_parameterArg2Field.setLabelParameterType(Texts.get("Type"));
     m_parameterArg2Field.addParameterFieldListener(new IParameterFieldListener() {
+      @Override
       public void parameterChanged(ParameterArgument argument) {
         m_parameterArg2 = argument;
         pingStateChanging();
@@ -161,7 +166,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getOperationNameStatus() {
     if (m_operationName == null || m_operationName.length() == 0) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Operation name missing.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("OperationNameMissing"));
     }
     else {
       return Status.OK_STATUS;
@@ -170,7 +175,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getReturnParameterStatus() {
     if (m_returnParameter == null || StringUtility.isNullOrEmpty(m_returnParameter.getType())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "return type missing");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ReturnTypeMissing"));
     }
     else {
       return Status.OK_STATUS;
@@ -179,10 +184,10 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getParameterStatus(ParameterArgument arg, String fieldName) {
     if (StringUtility.isNullOrEmpty(arg.getName()) && !StringUtility.isNullOrEmpty(arg.getType())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "parameter " + fieldName + " not valid");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ParameterXIsNotValid", fieldName));
     }
     else if (!StringUtility.isNullOrEmpty(arg.getName()) && StringUtility.isNullOrEmpty(arg.getType())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "parameter " + fieldName + " not valid");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ParameterXIsNotValid", fieldName));
     }
     return Status.OK_STATUS;
   }

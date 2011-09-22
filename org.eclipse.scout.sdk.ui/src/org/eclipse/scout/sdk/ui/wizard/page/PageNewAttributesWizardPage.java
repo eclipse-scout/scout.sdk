@@ -86,8 +86,8 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   public PageNewAttributesWizardPage() {
     super(PageNewAttributesWizardPage.class.getName());
-    setTitle("New Page");
-    setDefaultMessage("Create a new page.");
+    setTitle(Texts.get("NewPage"));
+    setDefaultMessage(Texts.get("CreateANewPage"));
     m_nameSuffix = "";
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractPageWithNodes));
     setOperation(new PageNewOperation(true));
@@ -95,9 +95,10 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, "Name");
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
@@ -118,10 +119,11 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, "Type Name");
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(m_nameSuffix);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         m_typeName = m_typeNameField.getText();
         pingStateChanging();
@@ -139,12 +141,13 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   protected Control createParentPageGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_OUT);
-    group.setText("Add to");
+    group.setText(Texts.get("AddTo"));
 
-    m_holderTypeField = getFieldToolkit().createProposalField(group, null, "Page/Outline");
+    m_holderTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("PageOutline"));
 
     m_holderTypeField.acceptProposal(getHolderType());
     m_holderTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_holderType = (ITypeProposal) event.proposal;
         pingStateChanging();
@@ -216,7 +219,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusClientBundle() throws JavaModelException {
     if (getClientBundle() == null) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "client bundle missing");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ClientBundleMissing"));
     }
     return Status.OK_STATUS;
   }

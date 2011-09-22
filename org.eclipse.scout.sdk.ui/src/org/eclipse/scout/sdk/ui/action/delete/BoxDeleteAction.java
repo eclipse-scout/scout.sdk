@@ -13,34 +13,32 @@ package org.eclipse.scout.sdk.ui.action.delete;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.field.BoxDeleteOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.widgets.Shell;
 
-public class BoxDeleteAction extends Action {
-  private Shell m_shell;
+public class BoxDeleteAction extends AbstractScoutHandler {
   private MemberSelectionDialog m_confirmDialog;
-  private final IType m_boxType;
+  private IType m_boxType;
 
-  public BoxDeleteAction(IType boxType, Shell shell) {
-    super(Texts.get("Process_deleteX", ScoutSourceUtilities.getTranslatedMethodStringValue(boxType, "getConfiguredLabel")));
-    m_boxType = boxType;
-    m_shell = shell;
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.GroupboxRemove));
+  public BoxDeleteAction() {
+    super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.GroupboxRemove), "Delete", false, Category.DELETE);
   }
 
   @Override
-  public void run() {
-    m_confirmDialog = new MemberSelectionDialog(m_shell, getText());
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    m_confirmDialog = new MemberSelectionDialog(shell, getLabel());
     List<IMember> members = new ArrayList<IMember>();
     List<IMember> selectedMembers = new ArrayList<IMember>();
     collectAffectedMembers(members, selectedMembers);
@@ -51,6 +49,7 @@ public class BoxDeleteAction extends Action {
       OperationJob job = new OperationJob(op);
       job.schedule();
     }
+    return null;
   }
 
   protected void collectAffectedMembers(List<IMember> members, List<IMember> selectedMembers) {
@@ -62,7 +61,12 @@ public class BoxDeleteAction extends Action {
     return m_boxType;
   }
 
+  public void setBoxType(IType boxType) {
+    m_boxType = boxType;
+  }
+
   private class P_SelectionValidationListener implements IMemberSelectionChangedListener {
+    @Override
     public void handleSelectionChanged(IMember[] selection) {
       m_confirmDialog.setMessage("");
       boolean canOk = true;
@@ -73,5 +77,4 @@ public class BoxDeleteAction extends Action {
 
     }
   } // end class P_SelectionValidationListener
-
 }

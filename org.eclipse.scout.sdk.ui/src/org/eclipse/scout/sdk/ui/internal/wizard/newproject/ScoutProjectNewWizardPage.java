@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.NewBsiCaseGroupStep1Operation;
 import org.eclipse.scout.sdk.operation.project.NewScoutProjectStep2Operation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
@@ -70,14 +71,14 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
-    setTitle("Create a Scout Project");
-    setDescription("Create a Scout project in the workspace.\nEnter the name and choose the desired tiers.");
+    setTitle(Texts.get("CreateAScoutProject"));
+    setDescription(Texts.get("CreateScoutProjectHelpMsg"));
   }
 
   @Override
   protected void createContent(Composite parent) {
 
-    m_projectNameField = getFieldToolkit().createStyledTextField(parent, "Project Name");
+    m_projectNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("ProjectName"));
     m_projectNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -92,7 +93,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       }
     });
 
-    m_postFixField = getFieldToolkit().createStyledTextField(parent, "Project Postfix");
+    m_postFixField = getFieldToolkit().createStyledTextField(parent, Texts.get("ProjectPostfix"));
     m_postFixField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -182,10 +183,10 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   private Control createAliasGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_IN);
-    group.setText("Project Alias");
+    group.setText(Texts.get("ProjectAlias"));
     Label label = new Label(group, SWT.NONE);
-    label.setText("The project alias is used for the servlet name and launcher names.");
-    m_projectAliasNameField = getFieldToolkit().createStyledTextField(group, "Project Alias");
+    label.setText(Texts.get("ProjectAliasHelp"));
+    m_projectAliasNameField = getFieldToolkit().createStyledTextField(group, Texts.get("ProjectAlias"));
     m_projectAliasNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -232,14 +233,14 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
 
   protected IStatus getStatusProjectName() {
     if (StringUtility.isNullOrEmpty(getProjectName())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not set.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectNameMissing"));
     }
     return Status.OK_STATUS;
   }
 
   protected IStatus getStatusProjectAlias() {
     if (StringUtility.isNullOrEmpty(getProjectAlias())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project alias is not set.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectAliasMissing"));
     }
     return Status.OK_STATUS;
   }
@@ -247,11 +248,11 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   protected IStatus getStatusUiBundles() {
     if (!m_createClient) {
       if (isCreateUiSwing()) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "A swing bundle without a client boundle can not be created.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoSwingWithoutClient"));
       }
 
       if (isCreateUiSwt()) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "A swt bundle without a client boundle can not be created.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoSwtWithoutAClient"));
       }
     }
     return Status.OK_STATUS;
@@ -260,7 +261,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   protected IStatus getStatusClientBundle() {
     if (isCreateClient()) {
       if (!isCreateShared()) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "A client bundle without a shared bundle can not be created.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientWithoutAShared"));
       }
 
     }

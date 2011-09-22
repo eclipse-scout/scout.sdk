@@ -11,20 +11,19 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.MenuNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.ui.wizard.menu.MenuNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
@@ -36,7 +35,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
   private InnerTypePageDirtyListener m_menuChangedListener;
 
   public MenuNodePage(IPage parentPage, IType menuType) {
-    super();
+    super(ScoutIdeProperties.SUFFIX_MENU);
     setParent(parentPage);
     setType(menuType);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Menu));
@@ -83,42 +82,22 @@ public class MenuNodePage extends AbstractScoutTypePage {
     }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Action createEditAction() {
-    // find out the exact menu type.
-    // try {
-    // if (JdtUtility.isDescendant(getType(), ICheckBoxMenu.class)){
-    // return new EditAction(new EntityEditOrder(new CheckBoxMenuEntity(getType())));
-    // }
-    // else{
-    // return new EditAction(new EntityEditOrder(new MenuEntity(getType())));
-    // }
-    // }
-    // catch (JavaModelException e) {
-    // BsiCaseCore.reportError(e);
-    // }
-    return null;
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, MemberListDeleteAction.class, MenuNewAction.class};
   }
 
   @Override
-  public Action createRenameAction() {
-    return new TypeRenameAction(getOutlineView().getSite().getShell(), "Rename...", getType(), ScoutIdeProperties.SUFFIX_MENU);
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof MemberListDeleteAction) {
+      MemberListDeleteAction action = (MemberListDeleteAction) menu;
+      action.addMemberToDelete(getType());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuRemove));
+    }
+    else if (menu instanceof MenuNewAction) {
+      ((MenuNewAction) menu).setType(getType());
+    }
   }
-
-  @Override
-  public Action createDeleteAction() {
-    MemberListDeleteAction action = new MemberListDeleteAction(Texts.get("Action_deleteTypeX", getType().getElementName()), getOutlineView().getSite().getShell());
-    action.addMemberToDelete(getType());
-    action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuRemove));
-    return action;
-  }
-
-  @Override
-  public Action createNewAction() {
-    MenuNewWizard wizard = new MenuNewWizard();
-    wizard.initWizard(getType());
-    return new WizardAction(Texts.get("Action_newTypeX", "Menu"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuAdd),
-        wizard);
-  }
-
 }

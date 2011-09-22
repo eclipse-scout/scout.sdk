@@ -15,20 +15,18 @@ import java.util.TreeMap;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.AxisWebServiceProviderPublishAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
+import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServiceOperationNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
-import org.eclipse.scout.sdk.ui.wizard.services.ServiceOperationNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.MethodComparators;
 import org.eclipse.scout.sdk.workspace.type.MethodFilters;
@@ -40,7 +38,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
 
   private final IType m_interfaceType;
-
+  private final String m_readOnlySuffix;
   private P_ServiceMethodsListener m_serviceMethodListener;
 
   /**
@@ -51,12 +49,12 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     return (IScoutBundle) super.getScoutResource();
   }
 
-  public AbstractServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
+  public AbstractServiceNodePage(AbstractPage parent, IType type, IType interfaceType, String readOnlySuffix) {
     setParent(parent);
     setType(type);
     m_interfaceType = interfaceType;
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Service));
-
+    m_readOnlySuffix = readOnlySuffix;
   }
 
   @Override
@@ -89,25 +87,30 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     for (IMethod implMethod : serviceMethods) {
       new ServiceOperationNodePage(this, interfaceMethodsMap.get(implMethod.getElementName()), implMethod);
     }
+  }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class, ServiceOperationNewAction.class};
   }
 
   @Override
-  public Action createDeleteAction() {
-    Action deleteAction = super.createDeleteAction();
-    if (deleteAction != null) {
-      deleteAction.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceRemove));
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof ServiceRenameAction) {
+      ServiceRenameAction sra = (ServiceRenameAction) menu;
+      sra.setServiceImplementation(getType());
+      sra.setServiceInterface(getInterfaceType());
+      sra.setReadOnlySuffix(m_readOnlySuffix);
+      sra.setOldName(getType().getElementName());
     }
-    return deleteAction;
-  }
-
-  @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new WizardAction("New Service Operation...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperationAdd), new ServiceOperationNewWizard(getInterfaceType(), new IType[]{getType()})));
-    manager.add(new Separator());
-    manager.add(new AxisWebServiceProviderPublishAction(getOutlineView().getSite().getShell(), getType(), getInterfaceType()));
-    manager.add(new FormDataSqlBindingValidateAction(getType()));
+    else if (menu instanceof FormDataSqlBindingValidateAction) {
+      ((FormDataSqlBindingValidateAction) menu).setServices(getType());
+    }
+    else if (menu instanceof ServiceOperationNewAction) {
+      ((ServiceOperationNewAction) menu).init(getInterfaceType(), getType());
+    }
   }
 
   public IType getInterfaceType() {

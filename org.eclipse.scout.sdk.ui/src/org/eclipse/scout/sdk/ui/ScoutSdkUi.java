@@ -44,16 +44,15 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.menus.IMenuService;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.eclipse.ui.texteditor.ITextEditor;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
 import org.osgi.framework.ServiceRegistration;
 
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ui";
@@ -471,15 +470,15 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     return level;
   }
 
-  private void contributeMenus(BundleContext context) {
-    ServiceReference serviceReference = context.getServiceReference(IMenuService.class.getName());
-    try {
-      Object service = context.getService(serviceReference);
-    }
-    finally {
-      context.ungetService(serviceReference);
-    }
-  }
+//  private void contributeMenus(BundleContext context) {
+//    ServiceReference serviceReference = context.getServiceReference(IMenuService.class.getName());
+//    try {
+//      Object service = context.getService(serviceReference);
+//    }
+//    finally {
+//      context.ungetService(serviceReference);
+//    }
+//  }
 
   private class P_PreferenceStorePropertyListener implements IPropertyChangeListener {
     @Override

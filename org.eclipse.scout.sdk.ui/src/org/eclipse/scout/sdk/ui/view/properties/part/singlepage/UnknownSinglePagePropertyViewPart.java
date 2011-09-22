@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.swt.SWT;
@@ -31,9 +32,9 @@ public class UnknownSinglePagePropertyViewPart extends AbstractSinglePageSection
   @Override
   protected Control createHead(Composite parent) {
     Composite headArea = getFormToolkit().createComposite(parent);
-    String titleText = "No properties available.";
+    String titleText = Texts.get("NoPropertiesAvailable");
     if (getPage() != null) {
-      titleText = "No properties available for " + getPage().getName();
+      titleText = Texts.get("NoPropertiesAvailableForX", getPage().getName());
     }
     Label title = getFormToolkit().createLabel(headArea, titleText, SWT.WRAP | SWT.READ_ONLY);
     // layout
@@ -46,8 +47,8 @@ public class UnknownSinglePagePropertyViewPart extends AbstractSinglePageSection
 
   @Override
   protected void createSections() {
-    if (getPage().isFolder()) {
-      ISection filterSection = createSection(SECTION_ID_FILTER, "Filter");
+    if (getPage() != null && getPage().isFolder()) {
+      ISection filterSection = createSection(SECTION_ID_FILTER, Texts.get("Filter"));
       PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), filterSection.getSectionClient(), getPage());
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,12 +38,14 @@ public class CreateEclipseProjectOperation implements IOperation {
 
   }
 
+  @Override
   public void validate() throws IllegalArgumentException {
     if (StringUtility.isNullOrEmpty(getSymbolicName())) {
       throw new IllegalArgumentException("symbolic name can not be null.");
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     // check for exist
     if (ResourcesPlugin.getWorkspace().getRoot().getProject(getSymbolicName()).exists()) {
@@ -70,6 +72,7 @@ public class CreateEclipseProjectOperation implements IOperation {
     return Collections.unmodifiableSet(m_natures);
   }
 
+  @Override
   public String getOperationName() {
     return "Create Eclipse Project";
   }
@@ -78,7 +81,7 @@ public class CreateEclipseProjectOperation implements IOperation {
     return m_createdProject;
   }
 
-  protected IProject createProject(IProgressMonitor monitor, @SuppressWarnings("unused") IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  protected IProject createProject(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(getSymbolicName());
     project.create(monitor);
     project.open(monitor);

@@ -187,6 +187,7 @@ public class MenuNewOperation implements IOperation {
     }
   }
 
+  @Override
   public String getOperationName() {
     return "New menu";
   }

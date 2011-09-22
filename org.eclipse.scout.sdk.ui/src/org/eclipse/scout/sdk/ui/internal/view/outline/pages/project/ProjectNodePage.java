@@ -11,18 +11,17 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.ScoutProjectUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutProjectOperation;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.action.OperationAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.ImportPluginAction;
 import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientNodePage;
@@ -32,7 +31,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.IProjectNodePage;
-import org.eclipse.scout.sdk.ui.wizard.bundle.BundleImportWizard;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
@@ -145,29 +143,36 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
         ScoutSdkUi.logWarning("Error during creating node page for Project '" + subProject.getProjectName() + "'.", e);
       }
     }
+  }
 
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ImportPluginAction.class, OrganizeAllImportsAction.class, WellformAction.class, FormDataUpdateAction.class, FormDataSqlBindingValidateAction.class};
   }
 
   @Override
-  public void fillContextMenu(IMenuManager manager) {
-    super.fillContextMenu(manager);
-    manager.add(new OrganizeAllImportsAction(getScoutResource()));
-    manager.add(new WizardAction("Import Plugin...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundleAdd), new BundleImportWizard(getScoutResource())));
-    manager.add(new Separator());
-    manager.add(new WellformAction(getOutlineView().getSite().getShell(), "Wellform project...", new WellformScoutProjectOperation(getScoutResource())));
-    manager.add(new OperationAction("Update form data...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), new ScoutProjectUpdateFormDataOperation(getScoutResource())));
-    // update formData
-    manager.add(new FormDataSqlBindingValidateAction(new ITypeResolver() {
-      @Override
-      public IType[] getTypes() {
-        return resolveServices();
-      }
-    }));
-    /*
-     * LaunchConfigurationQueryOrder lc=new LaunchConfigurationQueryOrder();
-     * lc.setLaunchConfigurationName("google.product");
-     * manager.add(new RunAction(lc));
-     */
+  public void prepareMenuAction(AbstractScoutHandler menu) {
+    if (menu instanceof ImportPluginAction) {
+      ((ImportPluginAction) menu).setScoutProject(getScoutResource());
+    }
+    else if (menu instanceof OrganizeAllImportsAction) {
+      ((OrganizeAllImportsAction) menu).setScoutProject(getScoutResource());
+    }
+    else if (menu instanceof WellformAction) {
+      ((WellformAction) menu).setOperation(new WellformScoutProjectOperation(getScoutResource()));
+    }
+    else if (menu instanceof FormDataUpdateAction) {
+      ((FormDataUpdateAction) menu).setOperation(new ScoutProjectUpdateFormDataOperation(getScoutResource()));
+    }
+    else if (menu instanceof FormDataSqlBindingValidateAction) {
+      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          return resolveServices();
+        }
+      });
+    }
   }
 
   protected IType[] resolveServices() {

@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.annotations.SqlBindingIgnoreValidation;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.annotation.IgnoreSqlBindingAnnotationCreateOperation;
 import org.eclipse.scout.sdk.sql.binding.SqlBindingMarkers;
@@ -43,10 +44,10 @@ public class SqlBindMarkerResolution implements IMarkerResolution {
   @Override
   public String getLabel() {
     if (getBindings().length == 1) {
-      return "Add ignore annotation for '" + getBindings()[0] + "'.";
+      return Texts.get("AddIgnoreAnnotation", getBindings()[0]);
     }
     else {
-      return "Add ignore annotation for all bindings.";
+      return Texts.get("AddIgnoreAnnotationPlural");
     }
   }
 

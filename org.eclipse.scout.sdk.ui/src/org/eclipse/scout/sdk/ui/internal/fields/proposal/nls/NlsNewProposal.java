@@ -19,14 +19,17 @@ public class NlsNewProposal implements ICustomProposal {
 
   private String m_text = Texts.get("Nls_newProposal_name");
 
+  @Override
   public int getCursorPosition(boolean selected, boolean expertMode) {
     return m_text.length();
   }
 
+  @Override
   public Image getImage(boolean selected, boolean expertMode) {
     return ScoutSdkUi.getImage(ScoutSdkUi.ToolAdd);
   }
 
+  @Override
   public String getLabel(boolean selected, boolean expertMode) {
     return m_text;
   }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -36,7 +37,7 @@ public class ExceptionSinglePagePropertyViewPart extends AbstractSinglePageSecti
   @Override
   protected Control createHead(Composite parent) {
     Composite headArea = getFormToolkit().createComposite(parent);
-    String titleText = "An Error occured during creating property part.";
+    String titleText = Texts.get("ErrorDuringCreatingPropertyPart");
     Label title = getFormToolkit().createLabel(headArea, titleText, SWT.WRAP | SWT.READ_ONLY);
     // layout
     headArea.setLayout(new GridLayout(1, true));
@@ -48,7 +49,7 @@ public class ExceptionSinglePagePropertyViewPart extends AbstractSinglePageSecti
 
   @Override
   protected void createSections() {
-    ISection errorSection = createSection(SECTION_ID_ERROR, "Error detail");
+    ISection errorSection = createSection(SECTION_ID_ERROR, Texts.get("ErrorDetail"));
     errorSection.setExpanded(false);
     Text errorText = getFormToolkit().createText(errorSection.getSectionClient(), "", SWT.SHADOW_ETCHED_IN | SWT.MULTI);
     StringBuilder sb = new StringBuilder();

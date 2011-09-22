@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.swt.SWT;
@@ -33,9 +34,9 @@ public class TestFolderViewPart extends AbstractSinglePageSectionBasedViewPart {
   @Override
   protected Control createHead(Composite parent) {
     Composite headArea = getFormToolkit().createComposite(parent);
-    String titleText = "No properties available.";
+    String titleText = Texts.get("NoPropertiesAvailable");
     if (getPage() != null) {
-      titleText = "No properties available for " + getPage().getName();
+      titleText = Texts.get("NoPropertiesAvailableForX ", getPage().getName());
     }
     Label title = getFormToolkit().createLabel(headArea, titleText, SWT.WRAP | SWT.READ_ONLY);
     // layout
@@ -52,9 +53,9 @@ public class TestFolderViewPart extends AbstractSinglePageSectionBasedViewPart {
 
   @Override
   protected void createSections() {
-    ISection actionSection = createSection(SECTION_ID_ACTION, " Some Actions");
+    ISection actionSection = createSection(SECTION_ID_ACTION, Texts.get("SomeActions"));
     getSection(SECTION_ID_ACTION).setExpanded(false);
-    Button testSectionButton = getFormToolkit().createButton(actionSection.getSectionClient(), "show test section", SWT.CHECK);
+    Button testSectionButton = getFormToolkit().createButton(actionSection.getSectionClient(), Texts.get("ShowTestSection"), SWT.CHECK);
     testSectionButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -64,10 +65,10 @@ public class TestFolderViewPart extends AbstractSinglePageSectionBasedViewPart {
 
       }
     });
-    ISection testSection = createSection(SECTION_ID_TEST, "a test section", "", false, SECTION_ID_ACTION);
+    ISection testSection = createSection(SECTION_ID_TEST, Texts.get("ATestSection"), "", false, SECTION_ID_ACTION);
     getFormToolkit().createLabel(testSection.getSectionClient(), "blubber");
     if (getPage().isFolder()) {
-      ISection filterSection = createSection(SECTION_ID_FILTER, "Filter");
+      ISection filterSection = createSection(SECTION_ID_FILTER, Texts.get("Filter"));
       PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), filterSection.getSectionClient(), getPage());
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;

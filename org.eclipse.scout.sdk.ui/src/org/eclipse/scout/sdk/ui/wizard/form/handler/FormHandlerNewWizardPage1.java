@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -57,9 +58,9 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
   private IWizardPage m_nextPage;
 
   public FormHandlerNewWizardPage1(IType declaringType) {
-    super("Form Handler Templates");
-    setTitle("Form Handler Templates");
-    setDefaultMessage("Choose a template for your form handler.");
+    super(Texts.get("FormHandlerTemplates"));
+    setTitle(Texts.get("FormHandlerTemplates"));
+    setDefaultMessage(Texts.get("ChooseATemplateForYourFormHandler"));
     m_declaringType = declaringType;
   }
 
@@ -68,6 +69,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
     m_filteredTable = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_filteredTable.getViewer().addFilter(new P_ModeFilter());
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
@@ -79,9 +81,9 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     });
     List<HandlerTemplate> templates = new ArrayList<HandlerTemplate>();
-    templates.add(new HandlerTemplate("Form Handler NEW", ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_NEW));
-    templates.add(new HandlerTemplate("Form Handler MODIFY", ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_MODIFY));
-    templates.add(new HandlerTemplate("Form Handler", ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_CUSTOM));
+    templates.add(new HandlerTemplate(Texts.get("FormHandlerNEW"), ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_NEW));
+    templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_MODIFY));
+    templates.add(new HandlerTemplate(Texts.get("FormHandler"), ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_CUSTOM));
 
     IType[] abstractFormHandlers = ScoutSdk.getPrimaryTypeHierarchy(iFormHandler).getAllSubtypes(iFormHandler, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType t : abstractFormHandlers) {
@@ -94,7 +96,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
     m_showAllTemplatesField = new Button(parent, SWT.CHECK);
     m_showAllTemplatesField.setSelection(false);
-    m_showAllTemplatesField.setText("Show all templates");
+    m_showAllTemplatesField.setText(Texts.get("ShowAllTemplates"));
     m_showAllTemplatesField.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -138,7 +140,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       multiStatus.add(Status.OK_STATUS);
     }
     else {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "A template must be selected."));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
     }
   }
 
@@ -182,10 +184,12 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       m_templates = templates;
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return m_templates;
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
         return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
@@ -193,23 +197,29 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       return null;
     }
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       return ((HandlerTemplate) element).getTemplateName();
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
   } // end class P_TableContentProvider

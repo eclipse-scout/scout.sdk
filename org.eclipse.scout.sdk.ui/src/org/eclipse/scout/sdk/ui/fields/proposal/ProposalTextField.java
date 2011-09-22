@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.TextField;
 import org.eclipse.swt.SWT;
@@ -58,7 +59,7 @@ public class ProposalTextField extends TextField {
   private IContentProposalEx m_loadingProposal = new ISeparatorProposal() {
     @Override
     public String getLabel(boolean selected, boolean expertMode) {
-      return "Loading...";
+      return Texts.get("Loading");
     }
 
     @Override
@@ -777,7 +778,13 @@ public class ProposalTextField extends TextField {
           try {
             m_focusLock.aquire();
             acceptProposal((IContentProposalEx) event.getData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL));
-            getTextComponent().traverse(SWT.TRAVERSE_TAB_NEXT);
+
+            // only move to the next field, if the current field is not the last (ticket 84'140).
+            Control[] siblings = getParent().getChildren();
+            if (siblings[siblings.length - 1] != ProposalTextField.this) {
+
+              getTextComponent().traverse(SWT.TRAVERSE_TAB_NEXT);
+            }
           }
           finally {
             m_focusLock.release();
