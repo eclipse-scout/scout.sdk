@@ -68,7 +68,7 @@ public class FileChooserFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public FileChooserFieldNewWizardPage(IType declaringType) {
     super(FileChooserFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewFileChooserField"));
-    setDefaultMessage(Texts.get("CreateANnewFileChooserField"));
+    setDescription(Texts.get("CreateANnewFileChooserField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IFileChooserField);
 

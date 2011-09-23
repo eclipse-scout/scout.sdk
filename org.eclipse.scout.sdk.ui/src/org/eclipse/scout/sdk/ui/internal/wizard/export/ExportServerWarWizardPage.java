@@ -97,7 +97,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
     super(ExportServerWarWizardPage.class.getName());
     m_scoutProject = scoutProject;
     setTitle(Texts.get("ExportWebArchive"));
-    setDefaultMessage(Texts.get("ExportWebArchiveMessage"));
+    setDescription(Texts.get("ExportWebArchiveMessage"));
   }
 
   @Override

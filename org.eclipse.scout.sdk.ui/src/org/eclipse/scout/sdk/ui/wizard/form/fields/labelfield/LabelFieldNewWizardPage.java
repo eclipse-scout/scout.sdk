@@ -68,7 +68,7 @@ public class LabelFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public LabelFieldNewWizardPage(IType declaringType) {
     super(LabelFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewLabelField"));
-    setDefaultMessage(Texts.get("CreateANewLabelField"));
+    setDescription(Texts.get("CreateANewLabelField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ILabelField);
 

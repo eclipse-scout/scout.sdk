@@ -104,6 +104,24 @@ public class ScoutWorkspace implements IScoutWorkspace {
   }
 
   @Override
+  public IScoutProject findScoutProject(String projectName) {
+    return findScoutProjectRec(m_projectGraph.getRootNode(), projectName);
+  }
+
+  private IScoutProject findScoutProjectRec(ProjectGraphNode node, String projectName) {
+    if (node.getScoutProject() != null && projectName.equals(node.getScoutProject().getProjectName())) {
+      return node.getScoutProject();
+    }
+    for (ProjectGraphNode childNode : node.getSubProjects()) {
+      IScoutProject scoutProject = findScoutProjectRec(childNode, projectName);
+      if (scoutProject != null) {
+        return scoutProject;
+      }
+    }
+    return null;
+  }
+
+  @Override
   public ScoutProject getParentProject(ScoutProject scoutProject) {
     return m_projectGraph.getParentProject(scoutProject);
   }

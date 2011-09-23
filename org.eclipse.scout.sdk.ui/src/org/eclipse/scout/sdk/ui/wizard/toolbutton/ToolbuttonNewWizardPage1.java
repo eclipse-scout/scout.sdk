@@ -54,7 +54,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
   public ToolbuttonNewWizardPage1(IType declaringType) {
     super(ToolbuttonNewWizardPage1.class.getName());
     setTitle(Texts.get("ToolButtonTemplates"));
-    setDefaultMessage(Texts.get("ChooseATemplateForYourToolButton"));
+    setDescription(Texts.get("ChooseATemplateForYourToolButton"));
     m_declaringType = declaringType;
   }
 

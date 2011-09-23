@@ -82,7 +82,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   public SmartTableColumnNewWizardPage(IType declaringType) {
     super(Texts.get("NewSmartTableColumn"));
     setTitle(Texts.get("NewSmartTableColumn"));
-    setDefaultMessage(Texts.get("CreateANewSmartTableColumn"));
+    setDescription(Texts.get("CreateANewSmartTableColumn"));
     m_declaringType = declaringType;
     // default values
     m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));

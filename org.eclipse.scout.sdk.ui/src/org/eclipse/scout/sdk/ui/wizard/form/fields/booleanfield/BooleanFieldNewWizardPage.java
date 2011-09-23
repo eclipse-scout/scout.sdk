@@ -77,7 +77,7 @@ public class BooleanFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     setTitle(Texts.get("NewBooleanField"));
-    setDefaultMessage(Texts.get("CreateANewBooleanField"));
+    setDescription(Texts.get("CreateANewBooleanField"));
 
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);

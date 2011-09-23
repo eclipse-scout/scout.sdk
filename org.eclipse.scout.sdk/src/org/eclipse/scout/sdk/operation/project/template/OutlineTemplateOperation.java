@@ -17,9 +17,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -32,23 +32,17 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
-public class OutlineTemplateOperation implements IScoutProjectTemplateOperation {
+public class OutlineTemplateOperation implements IOperation {
 
   IScoutProject m_scoutProject;
 
-  @Override
-  public String getDescription() {
-    return Texts.get("OutlineTemplateDesc");
-  }
-
-  @Override
-  public String getTemplateName() {
-    return Texts.get("OutlineTreeAndTableForm");
+  public OutlineTemplateOperation(IScoutProject project) {
+    m_scoutProject = project;
   }
 
   @Override
   public String getOperationName() {
-    return Texts.get("ApplayOutlineTemplate");
+    return "Applay outline template...";
   }
 
   @Override
@@ -113,7 +107,6 @@ public class OutlineTemplateOperation implements IScoutProjectTemplateOperation 
    * @param scoutProject
    *          the scoutProject to set
    */
-  @Override
   public void setScoutProject(IScoutProject scoutProject) {
     m_scoutProject = scoutProject;
   }

@@ -74,6 +74,7 @@ public class TemplateVariableSet implements ITemplateVariableSet {
     if (!StringUtility.isNullOrEmpty(namePostfix)) {
       postfix = "." + namePostfix;
     }
+    templateVariableSet.setVariable(VAR_PROJECT_POSTFIX, postfix);
     templateVariableSet.setVariable(VAR_BUNDLE_SWING_NAME, projectName + ".ui.swing" + postfix);
     templateVariableSet.setVariable(VAR_BUNDLE_SWT_NAME, projectName + ".ui.swt" + postfix);
     templateVariableSet.setVariable(VAR_BUNDLE_CLIENT_NAME, projectName + ".client" + postfix);

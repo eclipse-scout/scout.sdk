@@ -68,7 +68,7 @@ public class LongFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public LongFieldNewWizardPage(IType declaringType) {
     super(LongFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewLongField"));
-    setDefaultMessage(Texts.get("CreateANewLongField"));
+    setDescription(Texts.get("CreateANewLongField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ILongField);
 

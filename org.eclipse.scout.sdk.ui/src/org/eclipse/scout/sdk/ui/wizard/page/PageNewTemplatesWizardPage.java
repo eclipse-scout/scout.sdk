@@ -58,7 +58,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
   public PageNewTemplatesWizardPage(IScoutBundle clientBundle) {
     super(PageNewTemplatesWizardPage.class.getName());
     setTitle(Texts.get("PageTemplates"));
-    setDefaultMessage(Texts.get("ChooseATemplateForYourPage"));
+    setDescription(Texts.get("ChooseATemplateForYourPage"));
     m_clientBundle = clientBundle;
   }
 

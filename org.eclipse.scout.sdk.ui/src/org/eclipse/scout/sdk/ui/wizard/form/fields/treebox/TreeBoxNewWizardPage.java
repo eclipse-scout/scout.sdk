@@ -70,7 +70,7 @@ public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   public TreeBoxNewWizardPage(IType declaringType) {
     super(TreeBoxNewWizardPage.class.getName());
     setTitle(Texts.get("NewTreeBox"));
-    setDefaultMessage(Texts.get("CreateANewTreeBox"));
+    setDescription(Texts.get("CreateANewTreeBox"));
     m_declaringType = declaringType;
     setSuperType(abstractTreeBox);
     m_sibling = SiblingProposal.SIBLING_END;

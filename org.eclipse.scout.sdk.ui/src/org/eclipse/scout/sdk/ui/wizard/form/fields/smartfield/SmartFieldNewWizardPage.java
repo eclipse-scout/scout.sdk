@@ -91,7 +91,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     setTitle(Texts.get("NewSmartField"));
-    setDefaultMessage(Texts.get("CreateANewSmartField"));
+    setDescription(Texts.get("CreateANewSmartField"));
 
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);

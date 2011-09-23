@@ -56,7 +56,7 @@ public abstract class AbstractWizardPage extends WizardPage {
     return m_fieldToolkit;
   }
 
-  public void setDefaultMessage(String newMessage) {
+  public void setDescription(String newMessage) {
     m_defaultOkStatus = new Status(IStatus.OK, ScoutSdk.PLUGIN_ID, newMessage);
     setStatus(m_status);
   }

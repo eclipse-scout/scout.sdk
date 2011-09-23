@@ -76,7 +76,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     super(OutlineNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
     setTitle(Texts.get("New Outline"));
-    setDefaultMessage(Texts.get("CreateANewOutline"));
+    setDescription(Texts.get("CreateANewOutline"));
     // default values
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractOutline)[0];
     setAddToDesktopEnabled(false);

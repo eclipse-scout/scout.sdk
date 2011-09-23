@@ -4,14 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.template;
 
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 public interface ITemplateVariableSet {
   public static final String VAR_OS = "OSGI_OS";
@@ -19,6 +19,7 @@ public interface ITemplateVariableSet {
   public static final String VAR_ARCH = "OSGI_ARCH";
   public static final String VAR_PROJECT_ALIAS = "ALIAS";
   public static final String VAR_PROJECT_NAME = "GROUP";
+  public static final String VAR_PROJECT_POSTFIX = "POSTFIX";
   public static final String VAR_ROOT_PACKAGE = "ROOT_PACKAGE";
   public static final String VAR_LOCALHOST = "LOCALHOST";
   public static final String VAR_FS_ROOT = "FS_ROOT";

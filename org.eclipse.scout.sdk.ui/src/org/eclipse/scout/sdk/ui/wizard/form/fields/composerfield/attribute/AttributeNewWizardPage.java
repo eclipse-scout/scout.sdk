@@ -77,7 +77,7 @@ public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
   public AttributeNewWizardPage(IType declaringType) {
     super(AttributeNewWizardPage.class.getName());
     setTitle(Texts.get("NewAttribute"));
-    setDefaultMessage(Texts.get("CreateANewComposerFieldAttribute"));
+    setDescription(Texts.get("CreateANewComposerFieldAttribute"));
     m_declaringType = declaringType;
 
     // default values

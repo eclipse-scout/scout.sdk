@@ -70,7 +70,7 @@ public class ToolbuttonNewWizardPage2 extends AbstractWorkspaceWizardPage {
   public ToolbuttonNewWizardPage2(IType declaringType) {
     super(ToolbuttonNewWizardPage2.class.getName());
     setTitle(Texts.get("NewToolButton"));
-    setDefaultMessage(Texts.get("CreateANewToolButton"));
+    setDescription(Texts.get("CreateANewToolButton"));
     m_declaringType = declaringType;
 
     m_sibling = SiblingProposal.SIBLING_END;

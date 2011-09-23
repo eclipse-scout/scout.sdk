@@ -83,7 +83,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
   public WizardStepNewWizardPage(IType declaringType) {
     super(WizardStepNewWizardPage.class.getName());
     setTitle(Texts.get("NewWizardStep"));
-    setDefaultMessage(Texts.get("CreateANewWizardStep"));
+    setDescription(Texts.get("CreateANewWizardStep"));
     m_declaringType = declaringType;
 
     // default values

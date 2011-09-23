@@ -75,7 +75,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   public DefaultTableColumnNewWizardPage(IType declaringType) {
     super(Texts.get("NewTableColumn"));
     setTitle(Texts.get("NewTableColumn"));
-    setDefaultMessage(Texts.get("CreateANewTableColumn"));
+    setDescription(Texts.get("CreateANewTableColumn"));
     // default values
     m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
     m_declaringType = declaringType;

@@ -70,7 +70,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
   public OutlineToolbuttonNewWizardPage(IType declaringType) {
     super(OutlineToolbuttonNewWizardPage.class.getName());
     setTitle(Texts.get("NewOutlineToolButton"));
-    setDefaultMessage(Texts.get("CreateANewOutlineToolButton"));
+    setDescription(Texts.get("CreateANewOutlineToolButton"));
     m_declaringType = declaringType;
     // default
     m_sibling = SiblingProposal.SIBLING_END;

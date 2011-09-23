@@ -68,7 +68,7 @@ public class HtmlFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public HtmlFieldNewWizardPage(IType declaringType) {
     super(HtmlFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewHTMLField"));
-    setDefaultMessage(Texts.get("CreateANewHTMLField"));
+    setDescription(Texts.get("CreateANewHTMLField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IHtmlField);
 

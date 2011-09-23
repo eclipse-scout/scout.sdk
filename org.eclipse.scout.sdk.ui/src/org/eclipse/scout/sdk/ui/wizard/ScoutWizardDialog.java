@@ -42,7 +42,6 @@ public class ScoutWizardDialog extends WizardDialog implements IWizardPageContai
         // initially set the status
         if (event.getSelectedPage() instanceof AbstractScoutWizardPage) {
           AbstractScoutWizardPage selectedPage = (AbstractScoutWizardPage) event.getSelectedPage();
-          setStatus(selectedPage.getStatus(), selectedPage.getDefaultOkStatus());
           selectedPage.postActivate();
         }
       }

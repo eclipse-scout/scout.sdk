@@ -68,7 +68,7 @@ public class ImageFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public ImageFieldNewWizardPage(IType declaringType) {
     super(ImageFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewImageField"));
-    setDefaultMessage(Texts.get("CreateANnewImageField"));
+    setDescription(Texts.get("CreateANnewImageField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IImageField);
 

@@ -64,7 +64,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   public TableColumnNewWizardPage1(IType declaringType) {
     super(TableColumnNewWizardPage1.class.getName());
     setTitle(Texts.get("TableColumnTemplates"));
-    setDefaultMessage(Texts.get("ChooseATemplateForYourTableColumn"));
+    setDescription(Texts.get("ChooseATemplateForYourTableColumn"));
     m_declaringType = declaringType;
   }
 

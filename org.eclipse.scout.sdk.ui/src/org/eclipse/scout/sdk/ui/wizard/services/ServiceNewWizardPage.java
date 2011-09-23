@@ -63,7 +63,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameSuffix = typeNameSuffix;
     m_definitionType = definitionType;
     setTitle(title);
-    setDefaultMessage(message);
+    setDescription(message);
   }
 
   @Override

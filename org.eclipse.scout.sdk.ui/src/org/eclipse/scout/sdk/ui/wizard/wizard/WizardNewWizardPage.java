@@ -69,7 +69,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
   public WizardNewWizardPage(IScoutBundle clientBundle) {
     super(Texts.get("NewWizard"));
     setTitle(Texts.get("NewWizard"));
-    setDefaultMessage(Texts.get("CreateANewWizard"));
+    setDescription(Texts.get("CreateANewWizard"));
     m_clientBundle = clientBundle;
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractWizard)[0];
   }

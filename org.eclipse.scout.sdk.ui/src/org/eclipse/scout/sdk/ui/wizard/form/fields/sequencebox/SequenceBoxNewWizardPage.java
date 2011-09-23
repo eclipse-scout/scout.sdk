@@ -69,7 +69,7 @@ public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   public SequenceBoxNewWizardPage(IType declaringType) {
     super(SequenceBoxNewWizardPage.class.getName());
     setTitle(Texts.get("NewSequenceBox"));
-    setDefaultMessage(Texts.get("CreateANewSequenceBox"));
+    setDescription(Texts.get("CreateANewSequenceBox"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ISequenceBox);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractSequenceBox));

@@ -49,7 +49,7 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
   public BundleTreeWizardPage(String pageTitle, String message, ITreeNode rootNode, ITreeNodeFilter initialCheckedFilter) {
     super(BundleTreeWizardPage.class.getName());
     m_rootNode = rootNode;
-    setDefaultMessage(message);
+    setDescription(message);
     setTitle(pageTitle);
     if (initialCheckedFilter == null) {
       initialCheckedFilter = NodeFilters.getAcceptNone();

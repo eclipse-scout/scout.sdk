@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -66,7 +67,7 @@ public class FillUiSwtPluginOperation implements IOperation {
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationActionBarAdvisor.java", destPathPref + "application/ApplicationActionBarAdvisor.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationWorkbenchAdvisor.java", destPathPref + "application/ApplicationWorkbenchAdvisor.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationWorkbenchWindowAdvisor.java", destPathPref + "application/ApplicationWorkbenchWindowAdvisor.java", getProject(), bindings).run(monitor, workingCopyManager);
-
+    getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 
   public IProject getProject() {

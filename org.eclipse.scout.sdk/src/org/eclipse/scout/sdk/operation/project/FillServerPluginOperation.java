@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -48,7 +49,7 @@ public class FillServerPluginOperation implements IOperation {
     new InstallJavaFileOperation("templates/server/src/ServerApplication.java", destPathPref + "ServerApplication.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/server/src/ServerSession.java", destPathPref + "ServerSession.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/server/src/AccessControlService.java", destPathPref + "services/custom/security/AccessControlService.java", getProject(), bindings).run(monitor, workingCopyManager);
-
+    getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 
   public IProject getProject() {

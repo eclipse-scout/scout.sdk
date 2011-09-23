@@ -74,7 +74,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
   public CalendarItemProviderNewWizardPage(IType declaringType) {
     super(Texts.get("NewCalendarItemProvider"));
     setTitle(Texts.get("NewCalendarItemProvider"));
-    setDefaultMessage(Texts.get("CreateANewCalendarItemProvider"));
+    setDescription(Texts.get("CreateANewCalendarItemProvider"));
     m_declaringType = declaringType;
 
     ITypeProposal superType = getSuperType();

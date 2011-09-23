@@ -80,7 +80,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   public CodeNewWizardPage(IType declaringType) {
     super(Texts.get("NewCode"));
     setTitle(Texts.get("NewCode"));
-    setDefaultMessage(Texts.get("CreateANewCode"));
+    setDescription(Texts.get("CreateANewCode"));
     m_declaringType = declaringType;
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractCode)[0];
     m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));

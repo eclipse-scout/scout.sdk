@@ -69,7 +69,7 @@ public class MailFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public MailFieldNewWizardPage(IType declaringType) {
     super(MailFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewMailField"));
-    setDefaultMessage(Texts.get("CreateANewMailField"));
+    setDescription(Texts.get("CreateANewMailField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IMailField);
 

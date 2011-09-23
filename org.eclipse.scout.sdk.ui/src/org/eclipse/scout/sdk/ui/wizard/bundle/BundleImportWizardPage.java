@@ -70,7 +70,7 @@ public class BundleImportWizardPage extends AbstractWorkspaceWizardPage {
   public BundleImportWizardPage() {
     super(BundleImportWizardPage.class.getName());
     setTitle(Texts.get("ImportScoutBundle"));
-    setDefaultMessage(Texts.get("BundleImportDesc"));
+    setDescription(Texts.get("BundleImportDesc"));
   }
 
   @Override

@@ -77,7 +77,7 @@ public class GroupBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     setTitle(Texts.get("NewGroupBox"));
-    setDefaultMessage(Texts.get("CreateANewGroupBox"));
+    setDescription(Texts.get("CreateANewGroupBox"));
 
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);

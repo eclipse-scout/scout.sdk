@@ -58,7 +58,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     super(Texts.get("NewPropertyBean"));
     m_searchScope = searchScope;
     setTitle(Texts.get("NewPropertyBean"));
-    setDefaultMessage(Texts.get("NewPropertyBeanDesc"));
+    setDescription(Texts.get("NewPropertyBeanDesc"));
   }
 
   @Override

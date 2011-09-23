@@ -68,7 +68,7 @@ public class IntegerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public IntegerFieldNewWizardPage(IType declaringType) {
     super(IntegerFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewIntegerField"));
-    setDefaultMessage(Texts.get("CreateANewIntegerField"));
+    setDescription(Texts.get("CreateANewIntegerField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IIntegerField);
 

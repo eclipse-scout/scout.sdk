@@ -8,25 +8,27 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.operation.project.template;
+package org.eclipse.scout.sdk.ui.wizard.project;
 
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 
 /**
- * <h3>{@link IScoutProjectTemplateOperation}</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 1.0.8 09.02.2011
+ *
  */
-public interface IScoutProjectTemplateOperation extends IOperation {
+public interface IScoutProjectWizard {
 
-  String getTemplateName();
-
-  String getDescription();
+  public IScoutProjectWizardPage getProjectWizardPage();
 
   /**
-   * @param scoutProject
+   * @param name
+   * @return
    */
-  void setScoutProject(IScoutProject scoutProject);
+  AbstractScoutWizardPage getPage(String name);
+
+  /**
+   * @param page
+   */
+  void addPage(IWizardPage page);
+
 }

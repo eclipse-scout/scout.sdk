@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -49,6 +50,7 @@ public class FillSharedPluginOperation implements IOperation {
     new InstallJavaFileOperation("templates/shared/src/Activator.java", destPathPref + "Activator.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/Icons.java", destPathPref + "Icons.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/Texts.java", destPathPref + "Texts.java", getProject(), bindings).run(monitor, workingCopyManager);
+    getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 
   public IProject getProject() {

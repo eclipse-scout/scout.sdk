@@ -79,7 +79,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     super(ButtonFieldNewWizardPage.class.getName());
     m_readOnlySuffix = suffix;
     setTitle(title);
-    setDefaultMessage(message);
+    setDescription(message);
     m_declaringType = declaringType;
 
     setOperation(new ButtonFieldNewOperation(m_declaringType));

@@ -18,10 +18,10 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.form.FormHandlerNewOperation;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
@@ -42,23 +42,17 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
-public class SingleFormTemplateOperation implements IScoutProjectTemplateOperation {
+public class SingleFormTemplateOperation implements IOperation {
 
   IScoutProject m_scoutProject;
 
-  @Override
-  public String getDescription() {
-    return Texts.get("SingleFormTemplateDesc");
-  }
-
-  @Override
-  public String getTemplateName() {
-    return Texts.get("ApplicationWithASingleForm");
+  public SingleFormTemplateOperation(IScoutProject scoutProject) {
+    m_scoutProject = scoutProject;
   }
 
   @Override
   public String getOperationName() {
-    return Texts.get("ApplySingleFormTemplate");
+    return "Applay single form tempalte...";
   }
 
   @Override
@@ -219,15 +213,6 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
    */
   public IScoutProject getScoutProject() {
     return m_scoutProject;
-  }
-
-  /**
-   * @param scoutProject
-   *          the scoutProject to set
-   */
-  @Override
-  public void setScoutProject(IScoutProject scoutProject) {
-    m_scoutProject = scoutProject;
   }
 
 }

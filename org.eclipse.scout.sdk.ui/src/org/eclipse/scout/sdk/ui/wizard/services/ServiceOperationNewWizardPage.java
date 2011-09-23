@@ -63,7 +63,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     m_serviceInterface = serviceInterface;
     m_serviceImplementations = serviceImplementations;
     setTitle(Texts.get("NewServiceOperationNoPopup"));
-    setDefaultMessage(Texts.get("CreateANewServiceOperation"));
+    setDescription(Texts.get("CreateANewServiceOperation"));
   }
 
   @Override

@@ -71,7 +71,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     super(LocalLookupCallNewWizardPage.class.getName());
     m_clientBundle = client;
     setTitle(Texts.get("NewLocalLookupCallNoPopup"));
-    setDefaultMessage(Texts.get("CreateANewLocalLookupCall"));
+    setDescription(Texts.get("CreateANewLocalLookupCall"));
     setLookupCallSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(localLookupCall)[0]);
   }
 

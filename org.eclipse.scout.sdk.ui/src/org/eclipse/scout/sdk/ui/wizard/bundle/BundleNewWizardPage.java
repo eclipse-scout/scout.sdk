@@ -49,7 +49,7 @@ public class BundleNewWizardPage extends AbstractWorkspaceWizardPage {
     super(BundleNewWizardPage.class.getName());
     m_parentBundle = bundle;
     setTitle(Texts.get("NewScoutBundle"));
-    setDefaultMessage(Texts.get("CreateANewScoutBundle"));
+    setDescription(Texts.get("CreateANewScoutBundle"));
   }
 
   @Override

@@ -70,7 +70,7 @@ public class CheckboxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public CheckboxFieldNewWizardPage(IType declaringType) {
     super(CheckboxFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewCheckboxField"));
-    setDefaultMessage(Texts.get("CreateANewCheckboxField"));
+    setDescription(Texts.get("CreateANewCheckboxField"));
     m_declaringType = declaringType;
 
     setSuperType(abstractCheckBox);

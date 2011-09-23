@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperation {
 
   private String m_execEnvId;
+  private IJavaProject m_javaProject;
 
   @SuppressWarnings("restriction")
   public CreateEclipseJavaPluginOperation() {
@@ -53,6 +54,10 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
     return "Create Eclipse Plugin";
   }
 
+  public IJavaProject getJavaProject() {
+    return m_javaProject;
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
@@ -68,15 +73,15 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
       PdeUtility.createFolder(folder);
     }
     //
-    IJavaProject javaProject = JavaCore.create(project);
+    m_javaProject = JavaCore.create(project);
     IPath path = project.getFullPath().append("bin");
-    javaProject.setOutputLocation(path, null);
+    m_javaProject.setOutputLocation(path, null);
     IClasspathEntry[] entries = new IClasspathEntry[3];
     IPath pathSrc = project.getFullPath().append("src");
     entries[0] = JavaCore.newSourceEntry(pathSrc);
     entries[1] = createJREEntry(m_execEnvId);
     entries[2] = createContainerEntry();
-    javaProject.setRawClasspath(entries, null);
+    m_javaProject.setRawClasspath(entries, null);
     // files
     new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.core.prefs", ".settings/org.eclipse.jdt.core.prefs", project).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.ui.prefs", ".settings/org.eclipse.jdt.ui.prefs", project).run(monitor, workingCopyManager);

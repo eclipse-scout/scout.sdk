@@ -71,7 +71,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   public ProcessServiceNewWizardPage() {
     super(ProcessServiceNewWizardPage.class.getName());
     setTitle(Texts.get("NewProcessService"));
-    setDefaultMessage(Texts.get("CreateANewProcessService"));
+    setDescription(Texts.get("CreateANewProcessService"));
   }
 
   @Override

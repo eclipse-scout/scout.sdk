@@ -77,7 +77,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     super(CodeTypeNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewCodeType"));
-    setDefaultMessage(Texts.get("CreateANewCodeType"));
+    setDescription(Texts.get("CreateANewCodeType"));
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractCodeType)[0];
     m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
   }

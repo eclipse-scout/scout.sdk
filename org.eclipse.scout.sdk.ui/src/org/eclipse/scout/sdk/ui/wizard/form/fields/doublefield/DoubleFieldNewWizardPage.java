@@ -68,7 +68,7 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public DoubleFieldNewWizardPage(IType declaringType) {
     super(DoubleFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewDoubleField"));
-    setDefaultMessage(Texts.get("CreateANewDoubleField"));
+    setDescription(Texts.get("CreateANewDoubleField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IDoubleField);
 

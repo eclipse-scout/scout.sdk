@@ -39,6 +39,10 @@ public class InstallBinaryFileOperation implements IOperation {
     this(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/" + srcPath.replaceAll("^[\\\\\\/]*", "")), destinationProject, destinationPath);
   }
 
+  public InstallBinaryFileOperation(String sourceBundleId, String srcPath, IProject destinationProject, String destinationPath) throws MalformedURLException {
+    this(new URL("platform:/plugin/" + sourceBundleId + "/" + srcPath.replaceAll("^[\\\\\\/]*", "")), destinationProject, destinationPath);
+  }
+
   public InstallBinaryFileOperation(URL sourceUrl, IProject destinationProject, String destinationPath) {
     m_sourceUrl = sourceUrl;
     m_destinationProject = destinationProject;

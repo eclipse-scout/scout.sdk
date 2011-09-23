@@ -8,8 +8,10 @@
    <extension-point id="propertyStructure" name="Scout Property View Structure" schema="schema/propertyStructure.exsd"/>
    <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
    <extension-point id="outlineCopyAndPaste" name="Copy And Paste" schema="schema/outlineCopyAndPaste.exsd"/>
-   <extension-point id="contextMenu" name="contextMenu" schema="schema/contextMenu.exsd"/>
+      <extension-point id="contextMenu" name="contextMenu" schema="schema/contextMenu.exsd"/>
    <extension-point id="contextMenuContributor" name="contextMenuContributor" schema="schema/contextMenuContributor.exsd"/>
+   <extension-point id="scoutBundle" name="Scout Bundle" schema="schema/scoutBundle.exsd"/>
+   <extension-point id="scoutProjectTemplate" name="Scout Project Template" schema="schema/scoutProjectTemplate.exsd"/>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
          <perspectiveExtension
@@ -693,7 +695,7 @@
             markerType="org.eclipse.scout.sdk.formdata.sql.binding.multi">
       </markerResolutionGenerator>
    </extension>
-   <extension
+      <extension
          point="org.eclipse.core.expressions.propertyTesters">
       <propertyTester
             class="org.eclipse.scout.sdk.ui.menu.MenuVisibilityTester"
@@ -715,5 +717,69 @@
       <contributor
             class="org.eclipse.scout.sdk.ui.internal.extensions.DefaultMenuContributorExtension">
       </contributor>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.scoutBundle">
+      <bundleNode
+            bundleName="ui.swing"
+            bundleType="GUI_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwingScoutBundleExtension"
+            icon="resources/icons/uiBundle.png"
+            id="org.eclipse.scout.sdk.ui.UiSwingBundle"
+            orderNumber="10">
+      </bundleNode>
+      <bundleNode
+            bundleName="ui.swt"
+            bundleType="GUI_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwtScoutBundleExtension"
+            icon="resources/icons/uiBundle.png"
+            id="org.eclipse.scout.sdk.ui.UiSwtBundle"
+            orderNumber="20">
+      </bundleNode>
+      <bundleNode
+            bundleName="client"
+            bundleType="Client_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ClientScoutBundleExtension"
+            icon="resources/icons/clientBundle.png"
+            id="org.eclipse.scout.sdk.ui.ClientBundle"
+            orderNumber="150">
+      </bundleNode>
+      <bundleNode
+            bundleName="shared"
+            bundleType="Shared_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SharedScoutBundleExtension"
+            icon="resources/icons/sharedBundle.png"
+            id="org.eclipse.scout.sdk.ui.SharedBundle"
+            orderNumber="250">
+      </bundleNode>
+      <bundleNode
+            bundleName="server"
+            bundleType="Server_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ServerScoutBundleExtension"
+            icon="resources/icons/serverBundle.png"
+            id="org.eclipse.scout.sdk.ui.ServerBundle"
+            orderNumber="350">
+      </bundleNode>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.scoutProjectTemplate">
+      <template
+            class="org.eclipse.scout.sdk.ui.internal.extensions.project.template.DesktopFormTemplate"
+            icon="resources/icons/default.gif"
+            id="org.eclipse.scout.sdk.ui.dektopFormTemplate"
+            orderNumber="10">
+      </template>
+      <template
+            class="org.eclipse.scout.sdk.ui.internal.extensions.project.template.OutlineTemplate"
+            icon="resources/icons/default.gif"
+            id="org.eclipse.scout.sdk.ui.outlineTemplate"
+            orderNumber="20">
+      </template>
+      <template
+            class="org.eclipse.scout.sdk.ui.internal.extensions.project.template.EmptyApplicationTemplate"
+            icon="resources/icons/default.gif"
+            id="org.eclipse.scout.sdk.ui.emptyTemplate"
+            orderNumber="30">
+      </template>
    </extension>
 </plugin>

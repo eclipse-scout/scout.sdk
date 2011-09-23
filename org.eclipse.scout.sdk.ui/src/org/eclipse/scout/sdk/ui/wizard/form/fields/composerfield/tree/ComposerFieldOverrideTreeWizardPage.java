@@ -52,7 +52,7 @@ public class ComposerFieldOverrideTreeWizardPage extends AbstractWorkspaceWizard
   public ComposerFieldOverrideTreeWizardPage(IType declaringType) {
     super(ComposerFieldOverrideTreeWizardPage.class.getName());
     setTitle(Texts.get("OverrideComposerFieldTree"));
-    setDefaultMessage(Texts.get("OverridesTheComposerFieldsDefaultTree"));
+    setDescription(Texts.get("OverridesTheComposerFieldsDefaultTree"));
     // default
     m_declaringType = declaringType;
     setTypeName(ScoutIdeProperties.SUFFIX_TREE);

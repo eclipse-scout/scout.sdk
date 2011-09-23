@@ -64,7 +64,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     super(PermissionWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewPermission"));
-    setDefaultMessage(Texts.get("CreateANewPermission"));
+    setDescription(Texts.get("CreateANewPermission"));
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(basicHierarchyPermission)[0];
   }
 

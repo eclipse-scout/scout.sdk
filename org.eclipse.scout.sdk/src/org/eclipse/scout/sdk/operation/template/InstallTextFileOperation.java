@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ScoutStatus;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.osgi.framework.Bundle;
 
 public class InstallTextFileOperation implements IOperation {
 
@@ -35,14 +36,20 @@ public class InstallTextFileOperation implements IOperation {
   protected final String m_dstPath;
   protected final IProject m_dstProject;
   private final ITemplateVariableSet m_templateBinding;
+  private final Bundle m_sourceBoundle;
 
   public InstallTextFileOperation(String srcPath, String dstPath, IProject dstProject) {
     this(srcPath, dstPath, dstProject, TemplateVariableSet.createNew(dstProject));
   }
 
   public InstallTextFileOperation(String srcPath, String dstPath, IProject dstProject, ITemplateVariableSet templateBinding) {
+    this(srcPath, dstPath, Platform.getBundle(ScoutSdk.PLUGIN_ID), dstProject, templateBinding);
+  }
+
+  public InstallTextFileOperation(String srcPath, String dstPath, Bundle sourceBoundle, IProject dstProject, ITemplateVariableSet templateBinding) {
     m_srcPath = srcPath;
     m_dstPath = dstPath;
+    m_sourceBoundle = sourceBoundle;
     m_dstProject = dstProject;
     m_templateBinding = templateBinding;
   }
@@ -69,7 +76,7 @@ public class InstallTextFileOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     try {
-      String s = new String(IOUtility.getContent(FileLocator.openStream(Platform.getBundle(ScoutSdk.PLUGIN_ID), new Path(getSrcPath()), false)), "UTF-8");
+      String s = new String(IOUtility.getContent(FileLocator.openStream(m_sourceBoundle, new Path(getSrcPath()), false)), "UTF-8");
       for (Map.Entry<String, String> e : m_templateBinding.entrySet()) {
         s = s.replace("@@" + e.getKey() + "@@", e.getValue());
       }

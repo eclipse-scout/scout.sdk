@@ -64,7 +64,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     super(PageLinkWizardPage.class.getName());
     m_clientBundle = clientBundle;
     setTitle(Texts.get("LinkPage"));
-    setDefaultMessage(Texts.get("LinkPageToAPageHolder"));
+    setDescription(Texts.get("LinkPageToAPageHolder"));
     setOperation(new LinkPageOperation());
   }
 

@@ -68,7 +68,7 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public TableFieldNewWizardPage(IType declaringType) {
     super(TableFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewTableField"));
-    setDefaultMessage(Texts.get("CreateANewTableField"));
+    setDescription(Texts.get("CreateANewTableField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ITableField);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractTableField));

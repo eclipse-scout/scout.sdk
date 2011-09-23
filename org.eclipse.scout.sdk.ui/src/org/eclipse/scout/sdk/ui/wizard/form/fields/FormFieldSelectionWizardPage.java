@@ -79,7 +79,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     super(FormFieldSelectionWizardPage.class.getName());
     m_declaringType = declaringType;
     setTitle(Texts.get("FormField"));
-    setDefaultMessage(Texts.get("FormFieldDesc"));
+    setDescription(Texts.get("FormFieldDesc"));
 
   }
 

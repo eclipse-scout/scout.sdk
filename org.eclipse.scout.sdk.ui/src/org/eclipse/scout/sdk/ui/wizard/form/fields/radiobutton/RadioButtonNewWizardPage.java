@@ -76,7 +76,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
   public RadioButtonNewWizardPage(IType declaringType) {
     super(RadioButtonNewWizardPage.class.getName());
     setTitle(Texts.get("NewRadioButtonNoPopup"));
-    setDefaultMessage(Texts.get("CreateANewRadioButton"));
+    setDescription(Texts.get("CreateANewRadioButton"));
     m_declaringType = declaringType;
 
     // default values

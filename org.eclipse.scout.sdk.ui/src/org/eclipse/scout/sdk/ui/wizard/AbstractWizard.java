@@ -40,6 +40,11 @@ public class AbstractWizard extends Wizard {
   }
 
   @Override
+  public AbstractScoutWizardPage getPage(String name) {
+    return (AbstractScoutWizardPage) super.getPage(name);
+  }
+
+  @Override
   public IDialogSettings getDialogSettings() {
     if (super.getDialogSettings() == null) {
       IDialogSettings dialogSettings = ScoutSdkUi.getDefault().getDialogSettings().getSection(getClass().getName());

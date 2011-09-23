@@ -87,7 +87,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   public PageNewAttributesWizardPage() {
     super(PageNewAttributesWizardPage.class.getName());
     setTitle(Texts.get("NewPage"));
-    setDefaultMessage(Texts.get("CreateANewPage"));
+    setDescription(Texts.get("CreateANewPage"));
     m_nameSuffix = "";
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractPageWithNodes));
     setOperation(new PageNewOperation(true));

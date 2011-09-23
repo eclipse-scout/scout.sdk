@@ -68,7 +68,7 @@ public class TreeFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public TreeFieldNewWizardPage(IType declaringType) {
     super(TreeFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewTreeField"));
-    setDefaultMessage(Texts.get("CreateANewTreeField"));
+    setDescription(Texts.get("CreateANewTreeField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ITreeField);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractTreeField));

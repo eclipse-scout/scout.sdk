@@ -52,7 +52,6 @@ import org.osgi.framework.ServiceRegistration;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
 public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ui";
@@ -399,8 +398,13 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   private void loadImage(String name) {
     ImageDescriptor desc = null;
-    // try already extension
-    desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + name);
+    if (name.startsWith(IMAGE_PATH)) {
+      desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, name);
+    }
+    if (desc == null) {
+      // try already extension
+      desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + name);
+    }
     // gif
     if (desc == null) {
       desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + name + ".gif");

@@ -85,7 +85,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     setTitle(Texts.get("NewDefaultField"));
-    setDefaultMessage(Texts.get("CreateANewDefaultField"));
+    setDescription(Texts.get("CreateANewDefaultField"));
 
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);

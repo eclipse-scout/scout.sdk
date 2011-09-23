@@ -77,7 +77,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
   public EntityNewWizardPage(IType declaringType) {
     super(EntityNewWizardPage.class.getName());
     setTitle(Texts.get("NewComposerFieldEntity"));
-    setDefaultMessage(Texts.get("CreateANewComposerFieldEntity"));
+    setDescription(Texts.get("CreateANewComposerFieldEntity"));
     m_declaringType = declaringType;
 
     // default values

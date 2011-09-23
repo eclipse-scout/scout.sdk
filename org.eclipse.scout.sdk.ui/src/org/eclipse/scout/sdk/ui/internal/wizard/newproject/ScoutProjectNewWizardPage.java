@@ -10,18 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
+import java.beans.PropertyChangeListener;
+import java.util.HashSet;
+
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.project.NewBsiCaseGroupStep1Operation;
-import org.eclipse.scout.sdk.operation.project.NewScoutProjectStep2Operation;
+import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension;
+import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ICheckStateListener;
@@ -30,7 +39,10 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
-import org.eclipse.scout.sdk.ui.internal.wizard.AbstractWizardPage;
+import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtension;
+import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
+import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -47,21 +59,10 @@ import org.eclipse.swt.widgets.Label;
  * @author Andreas Hoegger
  * @since 1.0.8 06.03.2010
  */
-public class ScoutProjectNewWizardPage extends AbstractWizardPage {
-  static final int TYPE_BUNDLE_SWING = 100;
-  static final int TYPE_BUNDLE_SWT = 101;
-  static final int TYPE_BUNDLE_CLIENT = 102;
-  static final int TYPE_BUNDLE_SHARED = 103;
-  static final int TYPE_BUNDLE_SERVER = 104;
+public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage implements IScoutProjectWizardPage {
+  static final int TYPE_BUNDLE = 99;
 
-  private String m_projectName;
-  private String m_postFix;
-  private boolean m_createUiSwing;
-  private boolean m_createUiSwt;
-  private boolean m_createClient;
-  private boolean m_createShared;
-  private boolean m_createServer;
-  private String m_projectAlias;
+  private BasicPropertySupport m_propertySupport;
 
   private StyledTextField m_projectNameField;
   private StyledTextField m_postFixField;
@@ -69,22 +70,26 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   private ITreeNode m_invisibleRootNode;
   private StyledTextField m_projectAliasNameField;
 
+  private ScoutBundleExtension[] m_scoutBundleExtensions;
+
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
+    m_propertySupport = new BasicPropertySupport(this);
     setTitle(Texts.get("CreateAScoutProject"));
     setDescription(Texts.get("CreateScoutProjectHelpMsg"));
+    m_scoutBundleExtensions = ScoutBundleExtensionPoint.getExtensions();
   }
 
   @Override
   protected void createContent(Composite parent) {
-
+    ScoutBundleExtensionPoint.getExtensions();
     m_projectNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("ProjectName"));
     m_projectNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
         try {
           setStateChanging(true);
-          m_projectName = m_projectNameField.getText();
+          setProjectNameInternal(m_projectNameField.getText());
           updateBundleNames();
         }
         finally {
@@ -99,7 +104,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       public void modifyText(ModifyEvent e) {
         try {
           setStateChanging(true);
-          m_postFix = m_postFixField.getText();
+          setProjectNamePostfixInternal(m_postFixField.getText());
           updateBundleNames();
         }
         finally {
@@ -109,31 +114,21 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     });
     m_invisibleRootNode = buildBundleTree();
     m_bundleTree = new CheckableTree(parent, m_invisibleRootNode);
-    m_bundleTree.setChecked(TreeUtility.findNodes(m_invisibleRootNode, new P_InitialCheckNodesFilter()));
+
     m_bundleTree.addCheckSelectionListener(new ICheckStateListener() {
       @Override
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
-        switch (node.getType()) {
-          case TYPE_BUNDLE_CLIENT:
-            m_createClient = checkState;
-            ((ScoutProjectTemplateWizardPage) getWizard().getPage(ScoutProjectTemplateWizardPage.class.getName())).refreshList();
-            break;
-          case TYPE_BUNDLE_SHARED:
-            m_createShared = checkState;
-            break;
-          case TYPE_BUNDLE_SERVER:
-            m_createServer = checkState;
-            break;
-          case TYPE_BUNDLE_SWING:
-            m_createUiSwing = checkState;
-            break;
-          case TYPE_BUNDLE_SWT:
-            m_createUiSwt = checkState;
-            break;
+        m_propertySupport.setProperty(PROP_SELECTED_BUNDLES, m_bundleTree.getCheckedNodes());
+        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+        if (ext != null) {
+          ext.getBundleExtention().bundleSelectionChanged(getWizard(), checkState);
         }
+
         pingStateChanging();
       }
     });
+
+    m_bundleTree.setChecked(TreeUtility.findNodes(m_invisibleRootNode, new P_InitialCheckNodesFilter()));
 
     Control aliasGroup = createAliasGroup(parent);
     m_projectNameField.setFocus();
@@ -149,25 +144,38 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   private ITreeNode buildBundleTree() {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWING, "ui.swing", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwingBundle), TYPE_BUNDLE_SWING);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWT, "ui.swt", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwtBundle), TYPE_BUNDLE_SWT);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_CLIENT, "client", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientBundle), TYPE_BUNDLE_CLIENT);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SHARED, "shared", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundle), TYPE_BUNDLE_SHARED);
-    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SERVER, "server", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle), TYPE_BUNDLE_SERVER);
+    for (ScoutBundleExtension e : ScoutBundleExtensionPoint.getExtensions()) {
+      TreeUtility.createNode(rootNode, TYPE_BUNDLE, e.getBundleName(), ScoutSdkUi.getImageDescriptor(e.getIconPath()), e.getOrderNumber(), e);
+    }
+//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWING, "ui.swing", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwingBundle), TYPE_BUNDLE_SWING);
+//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWT, "ui.swt", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwtBundle), TYPE_BUNDLE_SWT);
+//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_CLIENT, "client", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientBundle), TYPE_BUNDLE_CLIENT);
+//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SHARED, "shared", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundle), TYPE_BUNDLE_SHARED);
+//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SERVER, "server", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle), TYPE_BUNDLE_SERVER);
     return rootNode;
   }
 
   private void updateBundleNames() {
+    String prefix = "";
+    if (!StringUtility.isNullOrEmpty(getProjectName())) {
+      prefix = getProjectName() + ".";
+    }
     String postfix = "";
-    String pf = getPostFix();
+    String pf = getProjectNamePostfix();
     if (!StringUtility.isNullOrEmpty(pf)) {
       postfix = "." + pf;
     }
-    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_CLIENT)).setText(getProjectName() + ".client" + postfix);
-    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SHARED)).setText(getProjectName() + ".shared" + postfix);
-    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SERVER)).setText(getProjectName() + ".server" + postfix);
-    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SWING)).setText(getProjectName() + ".ui.swing" + postfix);
-    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SWT)).setText(getProjectName() + ".ui.swt" + postfix);
+    for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
+      ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+      if (ext != null) {
+        node.setText(prefix + ext.getBundleName() + postfix);
+      }
+    }
+//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_CLIENT)).setText(getProjectName() + ".client" + postfix);
+//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SHARED)).setText(getProjectName() + ".shared" + postfix);
+//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SERVER)).setText(getProjectName() + ".server" + postfix);
+//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SWING)).setText(getProjectName() + ".ui.swing" + postfix);
+//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SWT)).setText(getProjectName() + ".ui.swt" + postfix);
     m_bundleTree.getTreeViewer().refresh();
     String alias = "";
     int dotIndex = getProjectName().lastIndexOf('.');
@@ -190,7 +198,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     m_projectAliasNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
-        m_projectAlias = m_projectAliasNameField.getText();
+        setProjectAliasInternal(m_projectAliasNameField.getText());
         pingStateChanging();
       }
     });
@@ -203,37 +211,97 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     return group;
   }
 
-  public void performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws IllegalArgumentException, CoreException {
-    TemplateVariableSet variables = TemplateVariableSet.createNew(getProjectName(), getPostFix(), getProjectAlias());
-    NewBsiCaseGroupStep1Operation op1 = new NewBsiCaseGroupStep1Operation(variables);
-    op1.setCreateUiSwing(isCreateUiSwing());
-    op1.setCreateUiSwt(isCreateUiSwt());
-    op1.setCreateClient(isCreateClient());
-    op1.setCreateShared(isCreateShared());
-    op1.setCreateServer(isCreateServer());
-    op1.setProjectName(getProjectName());
-    op1.setProjectNamePostfix(getPostFix());
-    op1.setProjectAlias(getProjectAlias());
-    op1.validate();
-    op1.run(monitor, workingCopyManager);
+  @Override
+  public boolean performFinish(IProgressMonitor monitor) {
+    OperationJob job = new OperationJob(new P_PerformFinishOperation());
+    job.schedule();
+    try {
+      job.join();
+    }
+    catch (InterruptedException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    try {
+      Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_REFRESH, monitor);
+      Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor);
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logError("error during waiting for auto build and refresh");
+    }
+    getWizard().setCreatedProject(ScoutSdk.getScoutWorkspace().findScoutProject(getWizard().getProjectWizardPage().getProjectName()));
 
-    NewScoutProjectStep2Operation op2 = new NewScoutProjectStep2Operation(op1, variables);
-    op2.validate();
-    op2.run(monitor, workingCopyManager);
+    return true;
+  }
 
+//  @Override
+//  public void performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws IllegalArgumentException, CoreException {
+//    TemplateVariableSet variables = TemplateVariableSet.createNew(getProjectName(), getProjectNamePostfix(), getProjectAlias());
+//    for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
+//      if (m_bundleTree.isChecked(node)) {
+//        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+//        if (ext != null) {
+//          try {
+//            ext.getBundleExtention().createBundle(variables, monitor, workingCopyManager);
+//          }
+//          catch (Exception e) {
+//            ScoutSdkUi.logError("could not create bundle of extension '" + ext.getBundleID() + "'.", e);
+//          }
+//        }
+//      }
+//    }
+//
+//    NewBsiCaseGroupStep1Operation op1 = new NewBsiCaseGroupStep1Operation(variables);
+//    op1.setCreateUiSwing(isCreateUiSwing());
+//    op1.setCreateUiSwt(isCreateUiSwt());
+//    op1.setCreateClient(isCreateClient());
+//    op1.setCreateShared(isCreateShared());
+//    op1.setCreateServer(isCreateServer());
+//    op1.setProjectName(getProjectName());
+//    op1.setProjectNamePostfix(getPostFix());
+//    op1.setProjectAlias(getProjectAlias());
+//    op1.validate();
+//    op1.run(monitor, workingCopyManager);
+//
+//    NewScoutProjectStep2Operation op2 = new NewScoutProjectStep2Operation(op1, variables);
+//    op2.validate();
+//    op2.run(monitor, workingCopyManager);
+//
+//  }
+
+  @Override
+  public ScoutProjectNewWizard getWizard() {
+    return (ScoutProjectNewWizard) super.getWizard();
   }
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
     multiStatus.add(getStatusProjectName());
     multiStatus.add(getStatusProjectAlias());
-    multiStatus.add(getStatusUiBundles());
-    multiStatus.add(getStatusClientBundle());
+    for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
+      if (m_bundleTree.isChecked(node)) {
+        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+        if (ext != null) {
+          multiStatus.add(ext.getBundleExtention().getStatus(getWizard()));
+        }
+      }
+    }
   }
 
   protected IStatus getStatusProjectName() {
     if (StringUtility.isNullOrEmpty(getProjectName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectNameMissing"));
+    }
+    if (getProjectName().contains("..")) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid prject names are similar to 'org.eclipse.testapp'.");
+    }
+    if (getProjectName().matches("[a-zA-Z]{1}[a-zA-Z0-9\\.]*[a-zA-Z]{1}")) {
+      if (getProjectName().matches(".*[A-Z].*")) {
+        return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "Project name should contain only lower case characters (e.g. 'org.eclipse.testapp').");
+      }
+    }
+    else {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid prject names are similar to 'org.eclipse.testapp'.");
     }
     return Status.OK_STATUS;
   }
@@ -245,147 +313,133 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     return Status.OK_STATUS;
   }
 
-  protected IStatus getStatusUiBundles() {
-    if (!m_createClient) {
-      if (isCreateUiSwing()) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoSwingWithoutClient"));
-      }
-
-      if (isCreateUiSwt()) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoSwtWithoutAClient"));
-      }
-    }
-    return Status.OK_STATUS;
+  @Override
+  public void addPropertyChangeListener(PropertyChangeListener listener) {
+    m_propertySupport.addPropertyChangeListener(listener);
   }
 
-  protected IStatus getStatusClientBundle() {
-    if (isCreateClient()) {
-      if (!isCreateShared()) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientWithoutAShared"));
-      }
-
-    }
-    return Status.OK_STATUS;
+  @Override
+  public void removePropertyChangeListener(PropertyChangeListener listener) {
+    m_propertySupport.removePropertyChangeListener(listener);
   }
 
-  /**
-   * @return the projectName
-   */
+  @Override
+  public boolean isBundleNodesSelected(String... extensionIds) {
+    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
+    for (ITreeNode n : nodes) {
+      if (!m_bundleTree.isChecked(n)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public boolean hasSelectedBundle(BundleTypes... types) {
+    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByBundleTypeFilter(types));
+    for (ITreeNode n : nodes) {
+      if (m_bundleTree.isChecked(n)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
   public String getProjectName() {
-    return m_projectName;
+    return m_propertySupport.getPropertyString(PROP_PROJECT_NAME);
   }
 
-  /**
-   * @param projectName
-   *          the projectName to set
-   */
   public void setProjectName(String projectName) {
-    m_projectName = projectName;
+    try {
+      setStateChanging(true);
+      setProjectNameInternal(projectName);
+      if (isControlCreated()) {
+        m_projectNameField.setText(projectName);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
   }
 
-  /**
-   * @return the postFix
-   */
-  public String getPostFix() {
-    return m_postFix;
+  private void setProjectNameInternal(String projectName) {
+    m_propertySupport.setPropertyString(PROP_PROJECT_NAME, projectName);
   }
 
-  /**
-   * @param postFix
-   *          the postFix to set
-   */
-  public void setPostFix(String postFix) {
-    m_postFix = postFix;
+  @Override
+  public String getProjectNamePostfix() {
+    return m_propertySupport.getPropertyString(PROP_PROJECT_NAME_POSTFIX);
   }
 
-  /**
-   * @param projectAlias
-   *          the projectAlias to set
-   */
-  public void setProjectAlias(String projectAlias) {
-    m_projectAlias = projectAlias;
+  public void setProjectNamePostfix(String projectPostfix) {
+    try {
+      setStateChanging(true);
+      setProjectNamePostfixInternal(projectPostfix);
+      if (isControlCreated()) {
+        m_postFixField.setText(projectPostfix);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
   }
 
-  /**
-   * @return the projectAlias
-   */
+  private void setProjectNamePostfixInternal(String projectPostfix) {
+    m_propertySupport.setPropertyString(PROP_PROJECT_NAME_POSTFIX, projectPostfix);
+  }
+
+  @Override
   public String getProjectAlias() {
-    return m_projectAlias;
+    return m_propertySupport.getPropertyString(PROP_PROJECT_ALIAS);
   }
 
-  /**
-   * @return the createUiSwing
-   */
-  public boolean isCreateUiSwing() {
-    return m_createUiSwing;
+  public void setProjectAlias(String projectAlias) {
+    try {
+      setStateChanging(true);
+      setProjectAliasInternal(projectAlias);
+      if (isControlCreated()) {
+        m_projectAliasNameField.setText(projectAlias);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
   }
 
-  /**
-   * @param createUiSwing
-   *          the createUiSwing to set
-   */
-  public void setCreateUiSwing(boolean createUiSwing) {
-    m_createUiSwing = createUiSwing;
+  private void setProjectAliasInternal(String alias) {
+    m_propertySupport.setPropertyString(PROP_PROJECT_ALIAS, alias);
   }
 
-  /**
-   * @return the createUiSwt
-   */
-  public boolean isCreateUiSwt() {
-    return m_createUiSwt;
-  }
+  private class P_PerformFinishOperation implements IOperation {
+    @Override
+    public String getOperationName() {
+      return "create bundles...";
+    }
 
-  /**
-   * @param createUiSwt
-   *          the createUiSwt to set
-   */
-  public void setCreateUiSwt(boolean createUiSwt) {
-    m_createUiSwt = createUiSwt;
-  }
+    @Override
+    public void validate() throws IllegalArgumentException {
+    }
 
-  /**
-   * @return the createClient
-   */
-  public boolean isCreateClient() {
-    return m_createClient;
-  }
+    @Override
+    public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+      TemplateVariableSet variables = TemplateVariableSet.createNew(getProjectName(), getProjectNamePostfix(), getProjectAlias());
+      for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
+        if (m_bundleTree.isChecked(node)) {
+          ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+          if (ext != null) {
+            try {
+              ext.getBundleExtention().createBundle(variables, monitor, workingCopyManager);
+            }
+            catch (Exception e) {
+              ScoutSdkUi.logError("could not create bundle of extension '" + ext.getBundleID() + "'.", e);
+            }
+          }
+        }
+      }
 
-  /**
-   * @param createClient
-   *          the createClient to set
-   */
-  public void setCreateClient(boolean createClient) {
-    m_createClient = createClient;
-  }
+    }
 
-  /**
-   * @return the createShared
-   */
-  public boolean isCreateShared() {
-    return m_createShared;
-  }
-
-  /**
-   * @param createShared
-   *          the createShared to set
-   */
-  public void setCreateShared(boolean createShared) {
-    m_createShared = createShared;
-  }
-
-  /**
-   * @return the createServer
-   */
-  public boolean isCreateServer() {
-    return m_createServer;
-  }
-
-  /**
-   * @param createServer
-   *          the createServer to set
-   */
-  public void setCreateServer(boolean createServer) {
-    m_createServer = createServer;
   }
 
   private class P_InitialCheckNodesFilter implements ITreeNodeFilter {
@@ -393,25 +447,55 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     @Override
     public boolean accept(ITreeNode node) {
       switch (node.getType()) {
-        case TYPE_BUNDLE_CLIENT:
-          m_createClient = true;
-          return true;
-        case TYPE_BUNDLE_SHARED:
-          m_createShared = true;
-          return true;
-        case TYPE_BUNDLE_SERVER:
-          m_createServer = true;
-          return true;
-        case TYPE_BUNDLE_SWING:
-          m_createUiSwing = true;
-          return true;
-        case TYPE_BUNDLE_SWT:
-          m_createUiSwt = true;
+        case TYPE_BUNDLE:
           return true;
       }
       return false;
     }
 
   } // end class P_InitialCheckNodesFilter
+
+  private class P_NodeByExtensionIdFilter implements ITreeNodeFilter {
+    private final HashSet<String> m_ids = new HashSet<String>();
+
+    public P_NodeByExtensionIdFilter(String... extensionIds) {
+      if (extensionIds != null) {
+        for (String s : extensionIds) {
+          m_ids.add(s);
+        }
+      }
+    }
+
+    @Override
+    public boolean accept(ITreeNode node) {
+      ScoutBundleExtension extension = (ScoutBundleExtension) node.getData();
+      if (extension != null) {
+        return m_ids.contains(extension.getBundleID());
+      }
+      return false;
+    }
+  }
+
+  private class P_NodeByBundleTypeFilter implements ITreeNodeFilter {
+
+    private final HashSet<BundleTypes> m_types = new HashSet<IScoutBundleExtension.BundleTypes>();
+
+    public P_NodeByBundleTypeFilter(BundleTypes... types) {
+      if (types != null) {
+        for (BundleTypes s : types) {
+          m_types.add(s);
+        }
+      }
+    }
+
+    @Override
+    public boolean accept(ITreeNode node) {
+      ScoutBundleExtension extension = (ScoutBundleExtension) node.getData();
+      if (extension != null) {
+        return m_types.contains(extension.getBundleType());
+      }
+      return false;
+    }
+  }
 
 }

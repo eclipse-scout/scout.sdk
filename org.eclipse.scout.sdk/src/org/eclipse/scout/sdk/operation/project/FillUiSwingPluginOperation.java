@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -55,6 +56,7 @@ public class FillUiSwingPluginOperation implements IOperation {
     new InstallJavaFileOperation("templates/ui.swing/src/Activator.java", destPathPref + "Activator.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swing/src/SwingEnvironment.java", destPathPref + "SwingEnvironment.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swing/src/SwingApplication.java", destPathPref + "SwingApplication.java", getProject(), bindings).run(monitor, workingCopyManager);
+    getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 
   public IProject getProject() {

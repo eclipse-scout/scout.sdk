@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
@@ -22,14 +24,16 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.project.template.EmptyTemplateOperation;
-import org.eclipse.scout.sdk.operation.project.template.IScoutProjectTemplateOperation;
-import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation;
-import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
+import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
-import org.eclipse.scout.sdk.ui.internal.wizard.AbstractWizardPage;
+import org.eclipse.scout.sdk.ui.internal.extensions.project.template.ProjectTemplateExtension;
+import org.eclipse.scout.sdk.ui.internal.extensions.project.template.ProjectTemplateExtensionPoint;
+import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -43,12 +47,14 @@ import org.eclipse.swt.widgets.Label;
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
-public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
+public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage {
 
   private FilteredTable m_table;
-  private IScoutProjectTemplateOperation m_selectedTemplate;
+//  private IScoutProjectTemplateOperation m_selectedTemplate;
   private Label m_descriptionLabel;
   private P_ContentProvider m_provider;
+  private ProjectTemplateExtension m_selectedTemplate;
+  private ProjectTemplateExtension[] m_extensions;
 
   /**
    * @param pageName
@@ -56,6 +62,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
   public ScoutProjectTemplateWizardPage() {
     super(ScoutProjectTemplateWizardPage.class.getName());
     setTitle(Texts.get("ScoutApplicationTemplates"));
+    m_extensions = ProjectTemplateExtensionPoint.getExtensions();
   }
 
   @Override
@@ -64,10 +71,10 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
     m_table.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        IScoutProjectTemplateOperation selectedItem = null;
+        ProjectTemplateExtension selectedItem = null;
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
-          selectedItem = (IScoutProjectTemplateOperation) selection.getFirstElement();
+          selectedItem = (ProjectTemplateExtension) selection.getFirstElement();
         }
         handleSelection(selectedItem);
       }
@@ -80,44 +87,27 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
 
     m_descriptionLabel = new Label(parent, SWT.SHADOW_ETCHED_IN | SWT.WRAP);
 
-    refreshDefaultSelection();
+    reloadTemplates();
 
     // layout
     parent.setLayout(new GridLayout(1, true));
 
-    m_table.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_table.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
     m_descriptionLabel.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
-  public void refreshList() {
-    m_table.refresh(true);
-    refreshDefaultSelection();
-  }
-
-  private void refreshDefaultSelection() {
-    m_table.getViewer().setSelection(new StructuredSelection(m_provider.getDefaultOperation()));
-    m_descriptionLabel.setText(m_provider.getDefaultOperation().getDescription());
-  }
-
-  private void handleSelection(IScoutProjectTemplateOperation selectedItem) {
-    m_selectedTemplate = selectedItem;
-    if (isControlCreated()) {
-      String description = "";
-      if (m_selectedTemplate != null) {
-        description = m_selectedTemplate.getDescription();
-      }
-//    setMessage(description);
-      m_descriptionLabel.setText(description);
+  @Override
+  public boolean performFinish(IProgressMonitor monitor) {
+    OperationJob performFinishJob = new OperationJob(new P_PerformFinishOperation());
+    performFinishJob.schedule();
+    try {
+      performFinishJob.join();
     }
-
-  }
-
-  /**
-   * @return the selectedTemplate
-   */
-  public IScoutProjectTemplateOperation getSelectedTemplate() {
-
-    return m_selectedTemplate;
+    catch (InterruptedException e) {
+      ScoutSdkUi.logWarning("perform finish job of Project Template step get canceled.",e);
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -125,54 +115,83 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
     return (ScoutProjectNewWizard) super.getWizard();
   }
 
-  public void performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws IllegalArgumentException, CoreException {
-    m_selectedTemplate.run(monitor, workingCopyManager);
+  @Override
+  public void setWizard(IWizard newWizard) {
+    super.setWizard(newWizard);
+    getWizard().getProjectWizardPage().addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getPropertyName().equals(IScoutProjectWizardPage.PROP_SELECTED_BUNDLES)) {
+          reloadTemplates();
+        }
+      }
+    });
+  }
+
+  private void reloadTemplates() {
+    if (m_table != null && !m_table.isDisposed()) {
+      P_ContentProvider contentProvider = (P_ContentProvider) m_table.getViewer().getContentProvider();
+      ProjectTemplateExtension extToSelect = contentProvider.revalidate();
+      m_table.refresh(false);
+      m_selectedTemplate = null;
+      if (extToSelect != null) {
+        m_table.getViewer().setSelection(new StructuredSelection(extToSelect));
+      }
+      else {
+        m_table.getViewer().setSelection(StructuredSelection.EMPTY);
+      }
+    }
+  }
+
+  private void handleSelection(ProjectTemplateExtension selectedItem) {
+    m_selectedTemplate = selectedItem;
+    if (isControlCreated()) {
+      String description = "";
+      if (m_selectedTemplate != null) {
+        description = m_selectedTemplate.getTemplate().getDescription();
+      }
+      m_descriptionLabel.setText(description);
+    }
   }
 
   private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
 
-    private IScoutProjectTemplateOperation[] m_templates;
-    private IScoutProjectTemplateOperation m_defaultOperation;
+    private ArrayList<ProjectTemplateExtension> m_activeExtensions;
 
-    public P_ContentProvider() {
-      refresh();
+    private P_ContentProvider() {
+      m_activeExtensions = new ArrayList<ProjectTemplateExtension>();
     }
 
-    private void refresh() {
-      ArrayList<IScoutProjectTemplateOperation> elements = new ArrayList<IScoutProjectTemplateOperation>();
-      IScoutProjectTemplateOperation emptyTemplate = new EmptyTemplateOperation();
-      elements.add(emptyTemplate);
-      m_defaultOperation = emptyTemplate;
-
-      ScoutProjectNewWizardPage previousPage = (ScoutProjectNewWizardPage) getWizard().getPage(ScoutProjectNewWizardPage.class.getName());
-      if (previousPage.isCreateClient()) {
-        OutlineTemplateOperation outlineTemplate = new OutlineTemplateOperation();
-        elements.add(outlineTemplate);
-        SingleFormTemplateOperation singleFormTemplate = new SingleFormTemplateOperation();
-        elements.add(singleFormTemplate);
-        m_defaultOperation = singleFormTemplate;
+    public ProjectTemplateExtension revalidate() {
+      m_activeExtensions.clear();
+      ProjectTemplateExtension firstExt = null;
+      for (ProjectTemplateExtension ext : m_extensions) {
+        if (ext.getTemplate().isApplicable(getWizard())) {
+          m_activeExtensions.add(ext);
+          if (firstExt == null) {
+            firstExt = ext;
+          }
+        }
       }
-      m_templates = elements.toArray(new IScoutProjectTemplateOperation[elements.size()]);
+      return firstExt;
     }
 
     @Override
     public Object[] getElements(Object inputElement) {
-      refresh();
-      return m_templates;
+      return m_activeExtensions.toArray(new ProjectTemplateExtension[m_activeExtensions.size()]);
     }
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-      IScoutProjectTemplateOperation op = (IScoutProjectTemplateOperation) element;
-      return op.getTemplateName();
+      ProjectTemplateExtension extension = (ProjectTemplateExtension) element;
+      return extension.getTemplate().getText();
     }
 
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
-      if (columnIndex == 0) {
-        return ScoutSdkUi.getImage(ScoutSdkUi.Templates);
-      }
-      return null;
+      ProjectTemplateExtension extension = (ProjectTemplateExtension) element;
+      Image img = ScoutSdkUi.getImage(extension.getIconPath());
+      return img;
     }
 
     @Override
@@ -181,23 +200,43 @@ public class ScoutProjectTemplateWizardPage extends AbstractWizardPage {
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      // TODO Auto-generated method stub
+
     }
 
     @Override
     public void addListener(ILabelProviderListener listener) {
+      // TODO Auto-generated method stub
+
     }
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
+      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
+      // TODO Auto-generated method stub
+    }
+  } // end class P_ContentProvider
+
+  private class P_PerformFinishOperation implements IOperation {
+    @Override
+    public String getOperationName() {
+      return "apply template...";
     }
 
-    public IScoutProjectTemplateOperation getDefaultOperation() {
-      return m_defaultOperation;
+    @Override
+    public void validate() throws IllegalArgumentException {
+    }
+
+    @Override
+    public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+      if (m_selectedTemplate != null) {
+        m_selectedTemplate.getTemplate().apply(getWizard().getCreatedProject(), monitor, workingCopyManager);
+      }
     }
   }
 }

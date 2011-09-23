@@ -14,9 +14,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -233,9 +234,26 @@ public class CheckableTree extends Composite {
   }
 
   protected void invertCheckStateFromUi(ITreeNode node) {
-    boolean checked = !isChecked(node);
-    if (setChecked(node, checked)) {
-      fireNodeCheckstateChanged(node, checked);
+    setChecked(node, !isChecked(node));
+  }
+
+  public void setChecked(ITreeNode[] nodes) {
+    ArrayList<ITreeNode> nodesToCheck = new ArrayList<ITreeNode>(Arrays.asList(nodes));
+    ArrayList<ITreeNode> checkedNodes = new ArrayList<ITreeNode>(m_checkedNodes);
+    // remove already checked
+    for (Iterator<ITreeNode> it = checkedNodes.iterator(); it.hasNext();) {
+      ITreeNode n = it.next();
+      if (nodesToCheck.remove(n)) {
+        it.remove();
+      }
+    }
+    // uncheck other
+    for (ITreeNode n : checkedNodes) {
+      setChecked(n, false);
+    }
+    // check new
+    for (ITreeNode n : nodesToCheck) {
+      setChecked(n, true);
     }
   }
 
@@ -248,15 +266,10 @@ public class CheckableTree extends Composite {
       result = m_checkedNodes.remove(node);
     }
     if (result) {
+      fireNodeCheckstateChanged(node, checked);
       m_tree.redraw();
     }
     return result;
-  }
-
-  public void setChecked(ITreeNode[] nodes) {
-    m_checkedNodes.clear();
-    m_checkedNodes.addAll(Arrays.asList(nodes));
-    m_tree.redraw();
   }
 
   public ITreeNode getParent(ITreeNode childNode) {

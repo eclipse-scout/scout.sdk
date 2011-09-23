@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.swt.SWT;
@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Composite;
 public abstract class AbstractScoutWizardPage extends WizardPage {
 
   private IStatus m_status = Status.OK_STATUS;
-  private IStatus m_defaultOkStatus = Status.OK_STATUS;
   private Composite m_content;
   private final WizardPageFieldToolkit m_fieldToolkit;
   private int m_stateChangingCounter = 0;
@@ -53,11 +52,6 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
 
   public WizardPageFieldToolkit getFieldToolkit() {
     return m_fieldToolkit;
-  }
-
-  public void setDefaultMessage(String newMessage) {
-    m_defaultOkStatus = new Status(IStatus.OK, ScoutSdk.PLUGIN_ID, newMessage);
-    setStatus(m_status);
   }
 
   /**
@@ -97,16 +91,6 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
     m_content.setVisible(visible);
   }
 
-  @Override
-  @Deprecated
-  public void setMessage(String newMessage) {
-  }
-
-  @Override
-  @Deprecated
-  public void setMessage(String newMessage, int newType) {
-  }
-
   public boolean addStatusProvider(IStatusProvider provider) {
     return m_statusProvider.add(provider);
   }
@@ -117,32 +101,52 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
 
   protected void setStatus(IStatus status) {
     if (status == null) {
+      status = Status.OK_STATUS;
+    }
+    if (status.isOK()) {
+      setMessage(getDescription(), IStatus.OK);
+    }
+    else {
+      IStatus highestSeverityStatus = getHighestSeverityStatus(status, Status.OK_STATUS);
+      int messagetype;
+      switch (highestSeverityStatus.getSeverity()) {
+        case IStatus.INFO:
+          messagetype = IMessageProvider.INFORMATION;
+          break;
+        case IStatus.WARNING:
+          messagetype = IMessageProvider.WARNING;
+          break;
+        case IStatus.ERROR:
+          messagetype = IMessageProvider.ERROR;
+          break;
+        default:
+          messagetype = IMessageProvider.NONE;
+          break;
+      }
+      String message = highestSeverityStatus.getMessage();
+      setMessage(message, messagetype);
+    }
+    if (!status.matches(IStatus.ERROR)) {
       setPageComplete(true);
     }
     else {
-      if (status.isOK() && Status.OK_STATUS.equals(status)) {
-        m_status = m_defaultOkStatus;
-      }
-      else {
-        m_status = status;
-      }
-      if (!m_status.matches(IStatus.ERROR)) {
-        setPageComplete(true);
-      }
-      else {
-        setPageComplete(false);
-      }
+      setPageComplete(false);
     }
-    if (isCurrentPage()) {
-      displayStatus(getStatus(), m_defaultOkStatus);
-
-    }
+    m_status = status;
   }
 
-  protected void displayStatus(IStatus status, IStatus defaultStatus) {
-    if (isCurrentPage()) {
-      IWizardContainer container = getContainer();
-      ((ScoutWizardDialog) container).setStatus(status, defaultStatus);
+  private IStatus getHighestSeverityStatus(IStatus status, IStatus highestSeverity) {
+    if (status.isMultiStatus()) {
+      for (IStatus child : status.getChildren()) {
+        highestSeverity = getHighestSeverityStatus(child, highestSeverity);
+      }
+      return highestSeverity;
+    }
+    else {
+      if (highestSeverity.getSeverity() < status.getSeverity()) {
+        highestSeverity = status;
+      }
+      return highestSeverity;
     }
   }
 
@@ -204,10 +208,6 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
 
   protected IStatus getStatus() {
     return m_status;
-  }
-
-  public IStatus getDefaultOkStatus() {
-    return m_defaultOkStatus;
   }
 
   public void setExcludePage(boolean excludePage) {

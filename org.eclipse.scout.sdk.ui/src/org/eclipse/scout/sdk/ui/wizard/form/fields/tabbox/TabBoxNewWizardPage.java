@@ -68,7 +68,7 @@ public class TabBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   public TabBoxNewWizardPage(IType declaringType) {
     super(TabBoxNewWizardPage.class.getName());
     setTitle(Texts.get("NewTabBox"));
-    setDefaultMessage(Texts.get("CreateANewTabBox"));
+    setDescription(Texts.get("CreateANewTabBox"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ITabBox);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractTabBox));

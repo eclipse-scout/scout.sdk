@@ -82,7 +82,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public ListBoxFieldNewWizardPage(IType declaringType) {
     super(ListBoxFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewListboxField"));
-    setDefaultMessage(Texts.get("CreateANewListBoxField"));
+    setDescription(Texts.get("CreateANewListBoxField"));
     m_declaringType = declaringType;
     // default
     m_superType = abstractListBox;

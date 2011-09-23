@@ -68,7 +68,7 @@ public class PlannerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public PlannerFieldNewWizardPage(IType declaringType) {
     super(PlannerFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewPlannerField"));
-    setDefaultMessage(Texts.get("CreateANewPlannerField"));
+    setDescription(Texts.get("CreateANewPlannerField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IPlannerField);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractPlannerField));

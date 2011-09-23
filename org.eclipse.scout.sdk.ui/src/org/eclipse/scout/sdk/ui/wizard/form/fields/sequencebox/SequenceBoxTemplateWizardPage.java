@@ -52,7 +52,7 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     setTitle(Texts.get("Templates"));
-    setDefaultMessage(Texts.get("ChooseATemplateForYourSequenceBox"));
+    setDescription(Texts.get("ChooseATemplateForYourSequenceBox"));
     m_filteredTable = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
       @Override

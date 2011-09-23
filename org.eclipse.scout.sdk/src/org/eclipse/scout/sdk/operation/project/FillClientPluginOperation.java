@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -50,6 +51,7 @@ public class FillClientPluginOperation implements IOperation {
     new InstallJavaFileOperation("templates/client/src/Activator.java", destPathPref + "Activator.java", getClientProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/client/src/ClientSession.java", destPathPref + "ClientSession.java", getClientProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/client/src/ui/desktop/Desktop.java", destPathPref + "ui/desktop/Desktop.java", getClientProject(), bindings).run(monitor, workingCopyManager);
+    getClientProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 
   public IProject getClientProject() {

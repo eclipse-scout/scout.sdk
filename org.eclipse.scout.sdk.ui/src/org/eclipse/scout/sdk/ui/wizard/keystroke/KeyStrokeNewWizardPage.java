@@ -68,7 +68,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   public KeyStrokeNewWizardPage(IType declaringType) {
     super(Texts.get("NewKeyStroke"));
     setTitle(Texts.get("NewKeyStroke"));
-    setDefaultMessage(Texts.get("CreateANewKeyStroke"));
+    setDescription(Texts.get("CreateANewKeyStroke"));
     // default
     m_declaringType = declaringType;
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractKeyStroke)[0];

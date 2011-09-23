@@ -68,7 +68,7 @@ public class CalendarFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public CalendarFieldNewWizardPage(IType declaringType) {
     super(CalendarFieldNewWizard.class.getName());
     setTitle(Texts.get("NewCalendarField"));
-    setDefaultMessage(Texts.get("CreateANewCalendarField"));
+    setDescription(Texts.get("CreateANewCalendarField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.ICalendarField);
 

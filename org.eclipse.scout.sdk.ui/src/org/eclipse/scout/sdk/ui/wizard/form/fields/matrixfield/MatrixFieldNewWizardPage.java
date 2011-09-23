@@ -68,7 +68,7 @@ public class MatrixFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public MatrixFieldNewWizardPage(IType declaringType) {
     super(MatrixFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewMatrixField"));
-    setDefaultMessage(Texts.get("CreateANewMatrixField"));
+    setDescription(Texts.get("CreateANewMatrixField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IMatrixField);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractMatrixField));

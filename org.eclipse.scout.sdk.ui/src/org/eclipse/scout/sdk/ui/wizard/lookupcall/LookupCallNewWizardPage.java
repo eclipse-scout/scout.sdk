@@ -87,7 +87,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     super(LookupCallNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewLookupCall"));
-    setDefaultMessage(Texts.get("CreateANewLookupCall"));
+    setDescription(Texts.get("CreateANewLookupCall"));
     setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
     setServiceSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractSqlLookupService)[0]);
 

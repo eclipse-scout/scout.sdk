@@ -92,7 +92,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   public MenuNewWizardPage(IType declaringType) {
     super(Texts.get("NewMenu"));
     setTitle(Texts.get("NewMenu"));
-    setDefaultMessage(Texts.get("CreateANewMenu"));
+    setDescription(Texts.get("CreateANewMenu"));
     m_declaringType = declaringType;
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractMenuType)[0];
     setSiblingInternal(SiblingProposal.SIBLING_END);

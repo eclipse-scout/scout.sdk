@@ -68,7 +68,7 @@ public class StringFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public StringFieldNewWizardPage(IType declaringType) {
     super(StringFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewStringField"));
-    setDefaultMessage(Texts.get("CreateANewStringField"));
+    setDescription(Texts.get("CreateANewStringField"));
     m_declaringType = declaringType;
     m_definitionType = ScoutSdk.getType(RuntimeClasses.IStringField);
     setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractStringField));

@@ -74,7 +74,7 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
   public RadioButtonGroupFieldNewWizardPage(IType declaringType) {
     super(RadioButtonGroupFieldNewWizardPage.class.getName());
     setTitle(Texts.get("NewRadioButtonGroup"));
-    setDefaultMessage(Texts.get("CreateANewRadioButtonGroup"));
+    setDescription(Texts.get("CreateANewRadioButtonGroup"));
     m_declaringType = declaringType;
     // default
     setSuperType(abstractRadioButtonGroup);

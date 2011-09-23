@@ -82,7 +82,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     super(SearchFormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
     setTitle(Texts.get("SearchForm2"));
-    setDefaultMessage(Texts.get("CreateANewSearchForm"));
+    setDescription(Texts.get("CreateANewSearchForm"));
     setSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractSearchForm)[0]);
   }
 

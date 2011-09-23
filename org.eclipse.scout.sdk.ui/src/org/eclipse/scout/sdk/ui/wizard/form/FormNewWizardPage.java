@@ -88,7 +88,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     super(FormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
     setTitle(Texts.get("Form"));
-    setDefaultMessage(Texts.get("CreateANewForm"));
+    setDescription(Texts.get("CreateANewForm"));
     setSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractForm)[0]);
     setCreateFormId(true);
   }
@@ -98,7 +98,6 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, Texts.get("Name"));
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
-      @SuppressWarnings("null")
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
 
