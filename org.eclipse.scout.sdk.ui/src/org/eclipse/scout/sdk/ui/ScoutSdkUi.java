@@ -52,6 +52,7 @@ import org.osgi.framework.ServiceRegistration;
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ui";

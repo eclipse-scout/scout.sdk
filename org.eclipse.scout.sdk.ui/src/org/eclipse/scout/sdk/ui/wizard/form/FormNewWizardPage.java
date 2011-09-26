@@ -109,7 +109,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
           }
           NlsProposal newName = (NlsProposal) event.proposal;
           setNlsNameInternal(newName);
-          if (newName != null) {
+          if (newName != null && oldEntry != null) {
             if (StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText()) || oldEntry.getKey().equals(m_typeNameField.getModifiableText())) {
               m_typeNameField.setText(newName.getNlsEntry().getKey());
             }

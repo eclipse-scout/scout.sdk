@@ -26,7 +26,6 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
@@ -221,8 +220,8 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
 
     @Override
     public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-      TemplateVariableSet variables = TemplateVariableSet.createNew(m_page1.getProjectName(), m_page1.getProjectNamePostfix(), m_page1.getProjectAlias());
       // XXX
+//      TemplateVariableSet variables = TemplateVariableSet.createNew(m_page1.getProjectName(), m_page1.getProjectNamePostfix(), m_page1.getProjectAlias());
 //      NewBsiCaseGroupStep1Operation op1 = new NewBsiCaseGroupStep1Operation(variables);
 //      op1.setCreateUiSwing(m_page1.isCreateUiSwing());
 //      op1.setCreateUiSwt(m_page1.isCreateUiSwt());
