@@ -46,10 +46,12 @@ public class ClientNodePage extends AbstractPage {
 
   private ICachedTypeHierarchy m_clientSessionHierarchy;
   private ICachedTypeHierarchy m_desktopHierarchy;
+  private ICachedTypeHierarchy m_desktopExtensionHierarchy;
 
   private final IScoutBundle m_clientProject;
   private IType iClientSession = ScoutSdk.getType(RuntimeClasses.IClientSession);
   private IType iDesktop = ScoutSdk.getType(RuntimeClasses.IDesktop);
+  private IType iDesktopExtension = ScoutSdk.getType(RuntimeClasses.IDesktopExtension);
 
   public ClientNodePage(AbstractPage parent, IScoutBundle clientProject) {
     setParent(parent);
@@ -63,6 +65,10 @@ public class ClientNodePage extends AbstractPage {
     if (m_desktopHierarchy != null) {
       m_desktopHierarchy.removeHierarchyListener(getPageDirtyListener());
       m_desktopHierarchy = null;
+    }
+    if (m_desktopExtensionHierarchy != null) {
+      m_desktopExtensionHierarchy.removeHierarchyListener(getPageDirtyListener());
+      m_desktopExtensionHierarchy = null;
     }
     if (m_clientSessionHierarchy != null) {
       m_clientSessionHierarchy.removeHierarchyListener(getPageDirtyListener());
@@ -101,6 +107,10 @@ public class ClientNodePage extends AbstractPage {
       m_desktopHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iDesktop);
       m_desktopHierarchy.addHierarchyListener(getPageDirtyListener());
     }
+    if (m_desktopExtensionHierarchy == null) {
+      m_desktopExtensionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iDesktopExtension);
+      m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
+    }
     // client session
     IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
     if (clientSessions.length > 1) {
@@ -123,6 +133,12 @@ public class ClientNodePage extends AbstractPage {
     for (IType desktop : desktops) {
       new DesktopNodePage(this, desktop);
     }
+    // desktop extension
+    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    for (IType desktopExtension : desktopExtensions) {
+      new DesktopExtensionNodePage(this, desktopExtension);
+    }
+    //others
     new FormTablePage(this);
     new SearchFormTablePage(this);
     new WizardTablePage(this);

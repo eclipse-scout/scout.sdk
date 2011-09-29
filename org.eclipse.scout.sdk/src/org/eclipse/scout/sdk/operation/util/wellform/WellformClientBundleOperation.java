@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -63,6 +63,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     wellformDesktop(allTypes, monitor, workingCopyManager);
+    wellformDesktopExtension(allTypes, monitor, workingCopyManager);
     wellformClientSession(allTypes, monitor, workingCopyManager);
     wellformForms(allTypes, monitor, workingCopyManager);
     wellformSearchForms(allTypes, monitor, workingCopyManager);
@@ -114,6 +115,21 @@ public class WellformClientBundleOperation implements IOperation {
 
   protected void wellformDesktop(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
     IType idesktop = ScoutSdk.getType(RuntimeClasses.IDesktop);
+    IType[] desktops = ScoutSdk.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+    WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
+    try {
+      op.run(monitor, workingCopyManager);
+      for (IType desktop : desktops) {
+        types.remove(desktop);
+      }
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not wellform desktops of bundle '" + getBundle().getBundleName() + "'.", e);
+    }
+  }
+
+  protected void wellformDesktopExtension(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+    IType idesktop = ScoutSdk.getType(RuntimeClasses.IDesktopExtension);
     IType[] desktops = ScoutSdk.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {

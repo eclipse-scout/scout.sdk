@@ -935,6 +935,9 @@ public class SdkTypeUtility {
       else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IDesktop))) {
         return createStructuredDesktop(type);
       }
+      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IDesktopExtension))) {
+        return createStructuredDesktop(type);
+      }
       else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IOutline))) {
         return createStructuredOutline(type);
       }

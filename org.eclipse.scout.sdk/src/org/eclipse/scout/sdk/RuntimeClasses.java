@@ -65,6 +65,7 @@ public final class RuntimeClasses {
   public static final String AbstractCustomField = "org.eclipse.scout.rt.client.ui.form.fields.customfield.AbstractCustomField";
   public static final String AbstractDateField = "org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField";
   public static final String AbstractDesktop = "org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop";
+  public static final String AbstractDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension";
   public static final String AbstractDoubleField = "org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField";
   public static final String AbstractFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField";
   public static final String AbstractForm = "org.eclipse.scout.rt.client.ui.form.AbstractForm";
@@ -162,6 +163,7 @@ public final class RuntimeClasses {
   public static final String ICustomField = "org.eclipse.scout.rt.client.ui.form.fields.customfield.ICustomField";
   public static final String IDateField = "org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField";
   public static final String IDesktop = "org.eclipse.scout.rt.client.ui.desktop.IDesktop";
+  public static final String IDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension";
   public static final String IDoubleField = "org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField";
   public static final String IFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField";
   public static final String IForm = "org.eclipse.scout.rt.client.ui.form.IForm";

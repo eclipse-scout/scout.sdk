@@ -54,6 +54,7 @@ public abstract interface IScoutPageConstants {
   public static final String CUSTOM_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.CustomServiceTablePage";
   public static final String DATE_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.DateFieldNodePage";
   public static final String DESKTOP_NODE_PAGE = "org.eclipse.scout.sdk.page.DesktopNodePage";
+  public static final String DESKTOP_EXTENSION_NODE_PAGE = "org.eclipse.scout.sdk.page.DesktopExtensionNodePage";
   public static final String DESKTOP_OUTLINE_TABLE_PAGE = "org.eclipse.scout.sdk.page.DesktopOutlineTablePage";
   public static final String DOUBLE_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.DoubleFieldNodePage";
   public static final String FILE_CHOOSER_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.FileChooserFieldNodePage";
