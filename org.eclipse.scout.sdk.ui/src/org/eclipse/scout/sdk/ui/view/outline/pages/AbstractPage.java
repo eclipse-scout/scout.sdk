@@ -198,22 +198,23 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public final void loadChildren() {
-    loadChildrenImpl();
-    // extension point
-    ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
-    if (extensions != null) {
-      for (ExplorerPageExtension ext : extensions) {
-        if (ext.getFactoryClass() != null) {
-          IPageFactory factory = ext.createFactoryClass();
-          factory.createChildren(this);
-        }
-        else if (ext.getPageClass() != null) {
-          IPage childPage = ext.createPageInstance();
-          childPage.setParent(this);
+    try {
+      loadChildrenImpl();
+      // extension point
+      ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
+      if (extensions != null) {
+        for (ExplorerPageExtension ext : extensions) {
+          if (ext.getFactoryClass() != null) {
+            IPageFactory factory = ext.createFactoryClass();
+            factory.createChildren(this);
+          }
+          else if (ext.getPageClass() != null) {
+            IPage childPage = ext.createPageInstance();
+            childPage.setParent(this);
+          }
         }
       }
-    }
-    // call extensions to contribute their children
+      // call extensions to contribute their children
 //    for (IScoutSdkExtension ext : ScoutExtensionsExtensionPoint.getExtensions()) {
 //      try {
 //        ext.contributePageChildren(this);
@@ -222,7 +223,11 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 //        ScoutSdkUi.logWarning("contribution from " + ext.getClass().getSimpleName(), t);
 //      }
 //    }
-    m_childrenLoaded = true;
+    }
+    finally {
+      // crucial to mark children as loaded to prevent an infinite loop
+      m_childrenLoaded = true;
+    }
   }
 
   protected void loadChildrenImpl() {
