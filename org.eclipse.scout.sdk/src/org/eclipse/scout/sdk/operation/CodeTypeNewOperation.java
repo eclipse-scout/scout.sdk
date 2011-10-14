@@ -105,7 +105,7 @@ public class CodeTypeNewOperation implements IOperation {
 
     // constructor
     ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(getCreatedType(), false);
-    constructorOp.setExceptionSignatures(new String[]{Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)});
+    constructorOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
     constructorOp.setMethodFlags(Flags.AccPublic);
     constructorOp.setSimpleBody("super();");
     constructorOp.validate();

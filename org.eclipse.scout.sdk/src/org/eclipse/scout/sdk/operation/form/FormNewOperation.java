@@ -81,7 +81,7 @@ public class FormNewOperation implements IOperation {
     // create constructor
     ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(getCreatedFormType(), false);
     constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.setExceptionSignatures(new String[]{Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)});
+    constructorOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
     constructorOp.setSimpleBody("  super();");
     constructorOp.validate();
     constructorOp.run(monitor, workingCopyManager);

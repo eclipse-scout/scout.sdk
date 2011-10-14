@@ -48,13 +48,6 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   private IPageFilter m_pageFilter;
 
   public AbstractPage() {
-    // m_name = "...";
-//    if (isFolder()) {
-//      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FolderOpen);
-//    }
-//    else {
-//      m_imageDesc = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default);
-//    }
     m_pageDirtyListener = new PageDirtyListener(this);
     m_children = new ArrayList<IPage>();
   }
@@ -197,24 +190,25 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public final void loadChildren() {
-    try {
-      loadChildrenImpl();
-      // extension point
-      ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
-      if (extensions != null) {
-        for (ExplorerPageExtension ext : extensions) {
-          if (ext.getFactoryClass() != null) {
-            IPageFactory factory = ext.createFactoryClass();
-            factory.createChildren(this);
-          }
-          else if (ext.getPageClass() != null) {
-            IPage childPage = ext.createPageInstance();
-            childPage.setParent(this);
+  public final synchronized void loadChildren() {
+    if (!isChildrenLoaded()) {
+      try {
+        loadChildrenImpl();
+        // extension point
+        ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
+        if (extensions != null) {
+          for (ExplorerPageExtension ext : extensions) {
+            if (ext.getFactoryClass() != null) {
+              IPageFactory factory = ext.createFactoryClass();
+              factory.createChildren(this);
+            }
+            else if (ext.getPageClass() != null) {
+              IPage childPage = ext.createPageInstance();
+              childPage.setParent(this);
+            }
           }
         }
-      }
-      // call extensions to contribute their children
+        // call extensions to contribute their children
 //    for (IScoutSdkExtension ext : ScoutExtensionsExtensionPoint.getExtensions()) {
 //      try {
 //        ext.contributePageChildren(this);
@@ -223,10 +217,11 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 //        ScoutSdkUi.logWarning("contribution from " + ext.getClass().getSimpleName(), t);
 //      }
 //    }
-    }
-    finally {
-      // crucial to mark children as loaded to prevent an infinite loop
-      m_childrenLoaded = true;
+      }
+      finally {
+        // crucial to mark children as loaded to prevent an infinite loop
+        m_childrenLoaded = true;
+      }
     }
   }
 

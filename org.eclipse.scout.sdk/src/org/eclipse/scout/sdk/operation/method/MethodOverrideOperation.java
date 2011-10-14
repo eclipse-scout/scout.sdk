@@ -50,12 +50,7 @@ public class MethodOverrideOperation extends MethodCreateOperation {
     // find super method
     ITypeHierarchy superTypeHierarchy = getDeclaringType().newSupertypeHierarchy(monitor);
     IType superType = superTypeHierarchy.getSuperclass(getDeclaringType());
-    IMethod methodToOverride = null;
-    while (superType != null && !TypeUtility.exists(methodToOverride)) {
-      methodToOverride = TypeUtility.getMethod(superType, getMethodName());
-      superType = superTypeHierarchy.getSuperclass(superType);
-    }
-    m_methodToOverride = methodToOverride;
+    m_methodToOverride = findMethodToOverride(superType, getMethodName(), superTypeHierarchy);
     if (m_methodToOverride == null) {
       ScoutSdk.logError("method '" + getMethodName() + "' to override on a super type of '" + getDeclaringType().getFullyQualifiedName() + "' could not be found [stop operation].");
       return;
@@ -71,7 +66,7 @@ public class MethodOverrideOperation extends MethodCreateOperation {
     String[] paramNames = m_methodToOverride.getParameterNames();
     setParameterNames(paramNames);
     setParameterSignatures(ScoutSignature.getMethodParameterSignatureResolved(m_methodToOverride, getDeclaringType()));
-    addAnnotation(new AnnotationCreateOperation(null, Signature.createTypeSignature(Override.class.getName(), true)));
+    addAnnotation(AnnotationCreateOperation.OVERRIDE_OPERATION);
 
     super.run(monitor, workingCopyManager);
     if (isFormatSource()) {
@@ -79,6 +74,31 @@ public class MethodOverrideOperation extends MethodCreateOperation {
       op.validate();
       op.run(monitor, workingCopyManager);
     }
+  }
+
+  private IMethod findMethodToOverride(IType type, String methodName, ITypeHierarchy superTypeHierarchy) {
+    IMethod method = TypeUtility.getMethod(type, methodName);
+    if (TypeUtility.exists(method)) {
+      return method;
+    }
+    // super types
+    IType superType = superTypeHierarchy.getSuperclass(type);
+    if (TypeUtility.exists(superType) && !superType.getElementName().equals(Object.class.getName())) {
+      method = findMethodToOverride(superType, methodName, superTypeHierarchy);
+    }
+    if (TypeUtility.exists(method)) {
+      return method;
+    }
+    // interfaces
+    for (IType intType : superTypeHierarchy.getSuperInterfaces(type)) {
+      if (TypeUtility.exists(intType) && !intType.getElementName().equals(Object.class.getName())) {
+        method = findMethodToOverride(intType, methodName, superTypeHierarchy);
+      }
+      if (TypeUtility.exists(method)) {
+        return method;
+      }
+    }
+    return null;
   }
 
   protected IMethod getMethodToOverride() {

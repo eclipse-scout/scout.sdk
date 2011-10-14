@@ -104,7 +104,7 @@ public class SearchFormNewOperation implements IOperation {
     // create constructor
     ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(m_createdFormType);
     constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.setExceptionSignatures(new String[]{Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)});
+    constructorOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
     constructorOp.setSimpleBody("  super();");
     constructorOp.validate();
     constructorOp.run(monitor, workingCopyManager);

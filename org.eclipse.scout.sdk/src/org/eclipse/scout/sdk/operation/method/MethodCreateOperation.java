@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.method;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -46,8 +47,8 @@ public class MethodCreateOperation implements IOperation {
   private String m_returnTypeSignature;
   private String[] m_parameterSignatures;
   private String[] m_parameterNames;
-  private String[] m_exceptionSignatures;
   private List<AnnotationCreateOperation> m_annotations = new ArrayList<AnnotationCreateOperation>();
+  private List<String> m_exceptionSignatures = new ArrayList<String>();
   private IMethod m_createdMethod;
   private String m_simpleBody;
 
@@ -256,12 +257,21 @@ public class MethodCreateOperation implements IOperation {
     return m_simpleBody;
   }
 
+  public void addExceptionSignature(String exceptionSignature) {
+    m_exceptionSignatures.add(exceptionSignature);
+  }
+
+  public boolean removeExceptionSignature(String exceptionSignature) {
+    return m_exceptionSignatures.remove(exceptionSignature);
+  }
+
   public void setExceptionSignatures(String[] exceptionSignatures) {
-    m_exceptionSignatures = exceptionSignatures;
+    m_exceptionSignatures.clear();
+    m_exceptionSignatures.addAll(Arrays.asList(exceptionSignatures));
   }
 
   public String[] getExceptionSignatures() {
-    return m_exceptionSignatures;
+    return m_exceptionSignatures.toArray(new String[m_exceptionSignatures.size()]);
   }
 
   public void setParameterSignatures(String[] parameterSignatures) {

@@ -132,7 +132,7 @@ public class FormHandlerNewOperation implements IOperation {
         };
         startMethodOp.setFormatSource(true);
         startMethodOp.setReturnTypeSignature(Signature.SIG_VOID);
-        startMethodOp.setExceptionSignatures(new String[]{Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)});
+        startMethodOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
         startMethodOp.setSibling(getStartMethodSibling());
 
         startMethodOp.validate();

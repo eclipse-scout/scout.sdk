@@ -56,9 +56,13 @@ public class ServiceOperationNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+
     IImportValidator validator = new CompilationUnitImportValidator(m_serviceInterface.getCompilationUnit());
 
     StringBuilder methodBody = new StringBuilder("public " + getReturnType().getType() + " " + getMethodName() + "(");
+    for (String s : getReturnType().getFullyQuallifiedImports()) {
+      validator.addImport(s);
+    }
     ParameterArgument[] arguments = getArguments();
     if (arguments != null) {
       for (int i = 0; i < arguments.length; i++) {
@@ -66,16 +70,21 @@ public class ServiceOperationNewOperation implements IOperation {
         if (i < (arguments.length - 1)) {
           methodBody.append(", ");
         }
+        for (String imp : arguments[i].getFullyQuallifiedImports()) {
+          validator.addImport(imp);
+        }
       }
     }
     methodBody.append(") throws " + validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)));
-    // interface
 
+    // interface
+    workingCopyManager.register(m_serviceInterface.getCompilationUnit(), monitor);
     IMethod method = m_serviceInterface.createMethod(methodBody.toString() + ";", null, false, monitor);
     for (String imp : validator.getImportsToCreate()) {
       m_serviceInterface.getCompilationUnit().createImport(imp, null, monitor);
     }
     // implementation
+    methodBody.insert(0, "@" + Override.class.getSimpleName() + "\n");
     String defaultVal = ScoutUtility.getDefaultValueOf(method.getReturnType());
     methodBody.append("{\n" + ScoutIdeProperties.TAB);
     if (defaultVal != null) {
@@ -88,8 +97,23 @@ public class ServiceOperationNewOperation implements IOperation {
 
     // implementations
     for (IType implType : getServiceImplementations()) {
+      IImportValidator impValidator = new CompilationUnitImportValidator(implType.getCompilationUnit());
+      for (String s : getReturnType().getFullyQuallifiedImports()) {
+        impValidator.addImport(s);
+      }
+      if (arguments != null) {
+        for (int i = 0; i < arguments.length; i++) {
+          for (String imp : arguments[i].getFullyQuallifiedImports()) {
+            impValidator.addImport(imp);
+          }
+        }
+      }
+
       workingCopyManager.register(implType.getCompilationUnit(), monitor);
       implType.createMethod(methodBody.toString(), null, false, monitor);
+      for (String imp : impValidator.getImportsToCreate()) {
+        implType.getCompilationUnit().createImport(imp, null, monitor);
+      }
       implType.getCompilationUnit().createImport(RuntimeClasses.ProcessingException, null, monitor);
     }
 

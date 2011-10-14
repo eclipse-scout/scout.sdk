@@ -43,6 +43,8 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class AnnotationCreateOperation implements IOperation {
 
+  public static final AnnotationCreateOperation OVERRIDE_OPERATION = new AnnotationCreateOperation(null, Signature.createTypeSignature(Override.class.getName(), true));
+
   private final String m_signature;
   private final IMember m_annotationOwner;
   private List<String> m_parameters = new ArrayList<String>();

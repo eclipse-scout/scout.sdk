@@ -228,7 +228,6 @@ public class ProposalPopup extends Window {
   }
 
   public void setProposals(IContentProposalEx[] proposals) {
-
     // m_selectionIndex=-1;
     if (proposals == null) {
       proposals = new IContentProposalEx[0];
@@ -255,13 +254,10 @@ public class ProposalPopup extends Window {
     // Default to the first selection if there is no selection. This is the case, every time the popup is opened.
     if (m_tableViewer.getSelection().isEmpty()) {
       Object proposal = m_tableViewer.getElementAt(0);
-      if (proposal != null) {
-        updateDescription((IContentProposalEx) proposal);
-      }
       m_tableViewer.setSelection(new StructuredSelection(proposal));
-//      m_tableViewer.getTable().select(0);
     }
     m_itemCountLabel.setText(proposals.length + " " + Texts.get("ItemsFound"));
+    updateDescription(getSelectedProposal());
   }
 
   @Override
