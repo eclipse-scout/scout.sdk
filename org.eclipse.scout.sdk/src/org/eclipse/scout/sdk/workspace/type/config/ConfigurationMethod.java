@@ -111,6 +111,7 @@ public class ConfigurationMethod {
   }
 
   public IMethod getDefaultMethod() {
+    if (m_methodStack.size() == 1) return m_methodStack.get(0);
     for (int i = m_methodStack.size() - 1; i > -1; i--) {
       IMethod m = m_methodStack.get(i);
       if (!m.getDeclaringType().equals(getType())) {

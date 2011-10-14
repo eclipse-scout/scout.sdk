@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,6 +16,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMemberValuePair;
@@ -25,6 +27,7 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
@@ -88,7 +91,7 @@ public class ConfigPropertyType {
               String configPropertyType = null;
               for (IMemberValuePair p : a.getMemberValuePairs()) {
                 if ("value".equals(p.getMemberName())) {
-                  configPropertyType = (String) p.getValue();
+                  configPropertyType = getConfigPropertyType(p.getValue());
                   break;
                 }
               }
@@ -110,6 +113,27 @@ public class ConfigPropertyType {
         }
       }
     }
+  }
+
+  private static String getConfigPropertyType(Object val) throws JavaModelException {
+    if (val == null) return null;
+    String ret = val.toString();
+    String configPropClassName = ConfigProperty.class.getSimpleName();
+    if (ret.contains(configPropClassName)) {
+      // if the configuration method is a source method and no binary method the final static String constants are not replaced by the compiler yet.
+      // in this case not the value of the constant (e.g. "TEXT") is in the annotation value, but the reference to the constant (e.g. ConfigProperty.TEXT).
+      // then parse the value of the constant within the ConfigProperty class.
+      String constantName = ret.substring(configPropClassName.length() + 1);
+      String configPropClassSource = ScoutSdk.getType(ConfigProperty.class.getName()).getSource();
+      Matcher m = Pattern.compile("String\\s*" + constantName + "\\s*=\\s*\"(.*)\"\\s*\\;").matcher(configPropClassSource);
+      if (m.find()) {
+        ret = m.group(1);
+      }
+      else {
+        ret = constantName;
+      }
+    }
+    return ret;
   }
 
   public ConfigurationMethod getConfigurationMethod(String name) {
