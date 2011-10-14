@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -78,6 +79,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
         ITypeSourceBuilder builder = FormDataUtility.getInnerTypeFormDataSourceBuilder(superTypeSignature, formField, formFieldHierarchy);
         builder.setElementName(formDataElementName);
         builder.setSuperTypeSignature(superTypeSignature);
+        builder.setFlags(Flags.AccPublic | Flags.AccStatic);
         addBuilder(builder, CATEGORY_TYPE_FIELD);
         MethodSourceBuilder getterBuilder = new MethodSourceBuilder();
         getterBuilder.setElementName("get" + formDataElementName);
