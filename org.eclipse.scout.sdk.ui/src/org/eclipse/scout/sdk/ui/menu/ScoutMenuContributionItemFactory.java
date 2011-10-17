@@ -64,6 +64,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
         CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, cmd.getId(), cmd.getId(), SWT.PUSH);
         p.label = a.getLabel();
         p.icon = a.getImage();
+        p.tooltip = a.getToolTip();
 
         CommandContributionItem item = new CommandContributionItem(p);
 

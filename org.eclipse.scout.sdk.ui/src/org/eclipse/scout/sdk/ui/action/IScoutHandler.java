@@ -15,6 +15,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 /**
  *
@@ -61,6 +62,16 @@ public interface IScoutHandler {
   public String getLabel();
 
   public void setLabel(String label);
+
+  /**
+   * Currently not supported.
+   * 
+   * @see {@link CommandContributionItemParameter#tooltip}
+   * @param toolTip
+   */
+  public void setToolTip(String toolTip);
+
+  public String getToolTip();
 
   public ImageDescriptor getImage();
 

@@ -37,6 +37,7 @@ public class DeleteAction extends AbstractScoutHandler {
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+    box.setText(Texts.get("Question"));
     if (m_types.size() == 1) {
       box.setMessage(Texts.get("DeleteAction_ensureRequest", m_name));
     }

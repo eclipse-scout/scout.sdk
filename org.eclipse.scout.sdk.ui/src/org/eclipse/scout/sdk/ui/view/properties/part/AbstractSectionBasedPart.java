@@ -153,6 +153,13 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
     return section;
   }
 
+  protected final void removeSection(String sectionId) {
+    Section section = m_sections.remove(sectionId);
+    if (section != null && !section.isDisposed()) {
+      section.getUiSection().dispose();
+    }
+  }
+
   /**
    * @param sectionId
    *          an identifier to access the section with {@link AbstractSectionBasedPart#getSection(String)}

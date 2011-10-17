@@ -24,6 +24,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public abstract class AbstractScoutHandler extends AbstractHandler implements IScoutHandler {
   private String m_label;
+  private String m_toolTip;
   private ImageDescriptor m_image;
   private String m_keyStroke;
   private boolean m_multiSelectSupported;
@@ -67,6 +68,16 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
   @Override
   public void setLabel(String label) {
     m_label = label;
+  }
+
+  @Override
+  public String getToolTip() {
+    return m_toolTip;
+  }
+
+  @Override
+  public void setToolTip(String toolTip) {
+    m_toolTip = toolTip;
   }
 
   @Override
