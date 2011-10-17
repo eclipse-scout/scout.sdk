@@ -19,8 +19,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -311,6 +314,27 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     Menu menu = menuMgr.createContextMenu(m_viewer.getControl());
     m_viewer.getControl().setMenu(menu);
     getSite().registerContextMenu(menuMgr, m_viewer);
+    menuMgr.addMenuListener(new IMenuListener() {
+      @Override
+      public void menuAboutToShow(IMenuManager manager) {
+        ScoutExplorerPart.this.fillContextMenu(manager);
+      }
+    });
+  }
+
+  private void fillContextMenu(IMenuManager manager) {
+    manager.add(new Separator());
+    if (m_viewer.getSelection() instanceof IStructuredSelection) {
+      IStructuredSelection selection = (IStructuredSelection) m_viewer.getSelection();
+      if (selection.size() == 1) {
+        Object firstElement = selection.getFirstElement();
+        if (firstElement instanceof AbstractPage) {
+          AbstractPage page = (AbstractPage) firstElement;
+          page.addDebugMenus(manager);
+        }
+      }
+    }
+    // Other plug-ins can contribute their actions here
   }
 
   private void hookSelectionAction() {

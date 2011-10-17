@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
+import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
@@ -351,5 +352,11 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public void prepareMenuAction(AbstractScoutHandler menu) {
+  }
+
+  /**
+   * @param manager
+   */
+  public void addDebugMenus(IMenuManager manager) {
   }
 }

@@ -373,7 +373,7 @@ public class ScoutProposalUtility {
   }
 
   /**
-   * <h3>BCTypeProposalComparator</h3> The default comparator used to alphabetic asc ordering IContentProposalsEx.
+   * <h3>ContentProposalExComparator</h3> The default comparator used to alphabetic asc ordering IContentProposalsEx.
    */
   public static class ContentProposalExComparator implements Comparator<IContentProposalEx> {
     private final boolean m_expertMode;

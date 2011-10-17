@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -37,6 +38,7 @@ public class InstallTextFileOperation implements IOperation {
   protected final IProject m_dstProject;
   private final ITemplateVariableSet m_templateBinding;
   private final Bundle m_sourceBoundle;
+  private IFile m_createdFile;
 
   public InstallTextFileOperation(String srcPath, String dstPath, IProject dstProject) {
     this(srcPath, dstPath, dstProject, TemplateVariableSet.createNew(dstProject));
@@ -77,7 +79,7 @@ public class InstallTextFileOperation implements IOperation {
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       String s = new String(IOUtility.getContent(FileLocator.openStream(m_sourceBoundle, new Path(getSrcPath()), false)), "UTF-8");
-      for (Map.Entry<String, String> e : m_templateBinding.entrySet()) {
+      for (Map.Entry<String, String> e : getTemplateBinding().entrySet()) {
         s = s.replace("@@" + e.getKey() + "@@", e.getValue());
       }
       Matcher m = Pattern.compile("@@([^@]+)@@").matcher(s);
@@ -87,7 +89,8 @@ public class InstallTextFileOperation implements IOperation {
       File f = new File(new File(m_dstProject.getLocation().toOSString()), m_dstPath);
       f.getParentFile().mkdirs();
       IOUtility.writeContent(new FileWriter(f), s);
-      m_dstProject.getFile(new Path(m_dstPath)).refreshLocal(IResource.DEPTH_ZERO, monitor);
+      m_createdFile = m_dstProject.getFile(new Path(m_dstPath));
+      m_createdFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
     }
     catch (Exception e) {
       ScoutSdk.logError("could not install text file.", e);
@@ -110,4 +113,7 @@ public class InstallTextFileOperation implements IOperation {
     return m_templateBinding;
   }
 
+  public IFile getCreatedFile() {
+    return m_createdFile;
+  }
 }

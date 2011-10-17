@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -20,6 +23,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -46,9 +50,11 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
   private ScoutProjectTemplateWizardPage m_page2;
   private IScoutProject m_createdProject;
   private IWizardPage m_page;
+  private List<IJavaProject> m_createdBundles;
 
   public ScoutProjectNewWizard() {
     setWindowTitle(Texts.get("NewScoutProjectNoPopup"));
+    m_createdBundles = new ArrayList<IJavaProject>();
   }
 
   @Override
@@ -64,6 +70,25 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
     m_page2 = new ScoutProjectTemplateWizardPage();
     addPage(m_page2);
 
+  }
+
+  /**
+   * @param javaProject
+   */
+  public void addCreatedBundle(IJavaProject javaProject) {
+    m_createdBundles.add(javaProject);
+  }
+
+  /**
+   * @param javaProject
+   */
+  public IJavaProject getCreatedBundle(String bundleName) {
+    for (IJavaProject p : m_createdBundles) {
+      if (p.getElementName().equals(bundleName)) {
+        return p;
+      }
+    }
+    return null;
   }
 
   public IScoutProject getCreatedProject() {

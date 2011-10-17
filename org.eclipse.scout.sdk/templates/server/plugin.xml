@@ -20,12 +20,14 @@
     </servlet>
   </extension>
   <extension point="org.eclipse.scout.http.servletfilter.filters">
-    <filter aliases="/" class="org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter" ranking="20">
-      <init-param name="realm" value="BSIAG Development"/>
-      <init-param name="users" value="admin=manager,allen=allen,blake=blake"/>
+    <filter
+       aliases="/process /remotefiles /updatesite"
+       class="org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter" ranking="20">
+         <init-param name="realm" value="BSIAG Development"/>
+         <init-param name="users" value="admin=manager,allen=allen,blake=blake"/>
     </filter>
     <filter
-          aliases="/"
+          aliases="/process /remotefiles /updatesite"
           class="org.eclipse.scout.rt.server.servlet.filter.AnonymousSecurityFilter"
           ranking="30">
     </filter>

@@ -32,6 +32,7 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 
@@ -43,6 +44,7 @@ public class FileSelectionField extends TextField {
   private Button m_popupButton;
   private File m_file;
 
+  private boolean m_folderMode;
   private EventListenerList m_eventListeners;
   private OptimisticLock m_inputLock = new OptimisticLock();
   private String[] m_filterExtensions;
@@ -119,37 +121,46 @@ public class FileSelectionField extends TextField {
   }
 
   private void showFileChooserDialog() {
-    FileDialog dialog = new FileDialog(getShell());
-    if (getFileName() != null) {
-      dialog.setFileName(getFileName());
+    String fileName = null;
+    if (isFolderMode()) {
+      DirectoryDialog dialog = new DirectoryDialog(getShell());
+      fileName = dialog.open();
     }
-    dialog.setOverwrite(true);
-    if (getFilterExtensions() != null) {
-      dialog.setFilterExtensions(getFilterExtensions());
-    }
-    String fileName = dialog.open();
-    File newFile = null;
-    if (!StringUtility.isNullOrEmpty(fileName)) {
-      if (getFilterExtensions() != null && getFilterExtensions().length > 0) {
-        int extIndex = dialog.getFilterIndex();
-        Matcher m = Pattern.compile("\\.([^\\.]*)$").matcher(fileName);
-        String extension = null;
-        if (m.find()) {
-          for (String fExt : getFilterExtensions()) {
-            if (StringUtility.equalsIgnoreCase(fExt, "*." + m.group(1))) {
-              extension = m.group(1);
-              break;
+    else {
+      FileDialog dialog = new FileDialog(getShell());
+      if (getFileName() != null) {
+        dialog.setFileName(getFileName());
+      }
+      dialog.setOverwrite(true);
+      if (getFilterExtensions() != null) {
+        dialog.setFilterExtensions(getFilterExtensions());
+      }
+      fileName = dialog.open();
+      if (!StringUtility.isNullOrEmpty(fileName)) {
+        if (getFilterExtensions() != null && getFilterExtensions().length > 0) {
+          int extIndex = dialog.getFilterIndex();
+          Matcher m = Pattern.compile("\\.([^\\.]*)$").matcher(fileName);
+          String extension = null;
+          if (m.find()) {
+            for (String fExt : getFilterExtensions()) {
+              if (StringUtility.equalsIgnoreCase(fExt, "*." + m.group(1))) {
+                extension = m.group(1);
+                break;
+              }
+            }
+          }
+          if (extension == null) {
+            if (extIndex > -1 && extIndex < getFilterExtensions().length) {
+              extension = getFilterExtensions()[extIndex];
+              extension = extension.replaceFirst("\\**", "");
+              fileName = fileName + extension;
             }
           }
         }
-        if (extension == null) {
-          if (extIndex > -1 && extIndex < getFilterExtensions().length) {
-            extension = getFilterExtensions()[extIndex];
-            extension = extension.replaceFirst("\\**", "");
-            fileName = fileName + extension;
-          }
-        }
       }
+    }
+    File newFile = null;
+    if (!StringUtility.isNullOrEmpty(fileName)) {
       newFile = new File(fileName);
       try {
         if (m_inputLock.acquire()) {
@@ -161,6 +172,7 @@ public class FileSelectionField extends TextField {
       }
     }
     setFileInternal(newFile);
+
   }
 
   public void addProductSelectionListener(IFileSelectionListener listener) {
@@ -175,6 +187,14 @@ public class FileSelectionField extends TextField {
     for (IFileSelectionListener l : m_eventListeners.getListeners(IFileSelectionListener.class)) {
       l.fileSelected(file);
     }
+  }
+
+  public boolean isFolderMode() {
+    return m_folderMode;
+  }
+
+  public void setFolderMode(boolean folderMode) {
+    m_folderMode = folderMode;
   }
 
   /**

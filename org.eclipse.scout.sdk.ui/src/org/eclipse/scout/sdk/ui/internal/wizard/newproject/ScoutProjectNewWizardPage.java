@@ -20,13 +20,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension;
@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -213,7 +214,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   @Override
   public boolean performFinish(IProgressMonitor monitor) {
-    OperationJob job = new OperationJob(new P_PerformFinishOperation());
+    OperationJob job = new OperationJob(new P_PerformFinishOperation(getWizard()));
     job.schedule();
     try {
       job.join();
@@ -412,6 +413,14 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   private class P_PerformFinishOperation implements IOperation {
+
+    private final IScoutProjectWizard m_wizard;
+
+    public P_PerformFinishOperation(IScoutProjectWizard wizard) {
+      m_wizard = wizard;
+
+    }
+
     @Override
     public String getOperationName() {
       return "create bundles...";
@@ -423,13 +432,14 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
     @Override
     public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-      TemplateVariableSet variables = TemplateVariableSet.createNew(getProjectName(), getProjectNamePostfix(), getProjectAlias());
+
       for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
         if (m_bundleTree.isChecked(node)) {
           ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
           if (ext != null) {
             try {
-              ext.getBundleExtention().createBundle(variables, monitor, workingCopyManager);
+              IJavaProject javaProject = ext.getBundleExtention().createBundle(m_wizard, monitor, workingCopyManager);
+              getWizard().addCreatedBundle(javaProject);
             }
             catch (Exception e) {
               ScoutSdkUi.logError("could not create bundle of extension '" + ext.getBundleID() + "'.", e);
@@ -439,7 +449,6 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
 
     }
-
   }
 
   private class P_InitialCheckNodesFilter implements ITreeNodeFilter {

@@ -8,7 +8,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.CreateUiSwingPluginOperation;
 import org.eclipse.scout.sdk.operation.project.FillUiSwingPluginOperation;
-import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
+import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
@@ -34,7 +34,8 @@ public class SwingScoutBundleExtension implements IScoutBundleProvider {
   }
 
   @Override
-  public IJavaProject createBundle(ITemplateVariableSet variables, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  public IJavaProject createBundle(IScoutProjectWizard wizard, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+    TemplateVariableSet variables = TemplateVariableSet.createNew(wizard.getProjectWizardPage().getProjectName(), wizard.getProjectWizardPage().getProjectNamePostfix(), wizard.getProjectWizardPage().getProjectAlias());
     try {
       CreateUiSwingPluginOperation swingBundleOp = new CreateUiSwingPluginOperation(variables);
       swingBundleOp.run(monitor, workingCopyManager);
