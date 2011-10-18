@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.BundleContext;
 
 import org.eclipse.scout.rt.server.scheduler.Scheduler;
-import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 
 public class Activator extends Plugin{
 
