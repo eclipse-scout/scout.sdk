@@ -119,7 +119,7 @@ public class PropertyViewExtensionPoint {
     if (bundle != null) {
       if (!StringUtility.isNullOrEmpty(clazzName)) {
         try {
-          clazz = bundle.loadClass(clazzName);
+          clazz = (Class<? extends T>) bundle.loadClass(clazzName);
         }
         catch (Throwable tt) {
           ScoutSdkUi.logWarning("could not load class '" + clazzName + "' of bunlde '" + bundle.getSymbolicName() + "'.", tt);
@@ -138,7 +138,7 @@ public class PropertyViewExtensionPoint {
         String clazzName = elements[0].getAttribute(attribute);
         if (!StringUtility.isNullOrEmpty(clazzName)) {
           try {
-            clazz = bundle.loadClass(clazzName);
+            clazz = (Class<? extends T>) bundle.loadClass(clazzName);
           }
           catch (Throwable tt) {
             ScoutSdkUi.logWarning("could not load class of extension '" + elements[0].getName() + "'.", tt);
