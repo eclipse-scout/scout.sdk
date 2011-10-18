@@ -15,7 +15,7 @@ import javax.security.auth.Subject;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.scout.net.NetActivator;
-import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;

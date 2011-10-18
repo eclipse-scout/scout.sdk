@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.net.NetActivator;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
-import org.eclipse.scout.rt.shared.services.common.security.SimplePrincipal;
+import org.eclipse.scout.commons.security.SimplePrincipal;
 import org.eclipse.scout.rt.ui.swing.AbstractSwingApplication;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
 import org.eclipse.scout.service.SERVICES;
