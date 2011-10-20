@@ -153,7 +153,7 @@ public class ServerNodePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class};
+    return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class, ExportServerWarAction.class};
   }
 
   @Override

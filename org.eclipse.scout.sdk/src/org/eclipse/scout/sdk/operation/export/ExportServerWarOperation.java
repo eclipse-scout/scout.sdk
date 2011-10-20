@@ -130,6 +130,7 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   private void buildClientProduct(IProgressMonitor monitor) throws CoreException {
+    if (getClientProduct() == null) return;
     WorkspaceProductModel clientModel = new WorkspaceProductModel(getClientProduct(), false);
     clientModel.load();
     try {

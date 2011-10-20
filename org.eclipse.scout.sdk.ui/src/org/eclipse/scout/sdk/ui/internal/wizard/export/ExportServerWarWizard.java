@@ -25,5 +25,4 @@ public class ExportServerWarWizard extends AbstractWorkspaceWizard {
     m_page1 = new ExportServerWarWizardPage(serverBundle.getScoutProject());
     addPage(m_page1);
   }
-
 }
