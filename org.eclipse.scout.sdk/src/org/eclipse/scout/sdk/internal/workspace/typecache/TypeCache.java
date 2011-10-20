@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.typecache;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IResource;
@@ -39,11 +42,11 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 public class TypeCache {
 
   private Object m_cacheLock;
-  private HashMap<String, IType> m_cache;
+  private HashMap<String, List<IType>> m_cache;
   private P_ResourceListener m_resourceChangeListener;
 
   public TypeCache() {
-    m_cache = new HashMap<String, IType>();
+    m_cache = new HashMap<String, List<IType>>();
     m_cacheLock = new Object();
     m_resourceChangeListener = new P_ResourceListener();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener);
@@ -62,73 +65,72 @@ public class TypeCache {
   }
 
   public IType getType(String fullyQualifiedName) {
-    if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
-      return null;
+    IType[] types = getTypes(fullyQualifiedName);
+    if (types.length == 1) {
+      return types[0];
     }
+    else if (types.length > 1) {
+      ScoutSdk.logWarning("found more than one type matches for '" + fullyQualifiedName + "' (matches: '" + types.length + "').");
+      return types[0];
+    }
+    return null;
+  }
 
+  public IType[] getTypes(String fullyQualifiedName) {
+    if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
+      return new IType[0];
+    }
     fullyQualifiedName = fullyQualifiedName.replaceAll("\\$", "\\.");
-    IType type = null;
+    List<IType> types = new ArrayList<IType>();
     synchronized (m_cacheLock) {
-      type = m_cache.get(fullyQualifiedName);
+      types = m_cache.get(fullyQualifiedName);
+      if (types == null) {
+        types = new ArrayList<IType>();
+      }
       // keep cache clean
-      if (type != null && !type.exists()) {
+      if (types.size() > 0) {
+        Iterator<IType> it = types.iterator();
+        while (it.hasNext()) {
+          IType type = it.next();
+          if (type != null && !type.exists()) {
+            it.remove();
+          }
+        }
+      }
+      if (types.size() == 0) {
         m_cache.remove(fullyQualifiedName);
-        type = null;
       }
     }
-    if (type == null) {
+    if (types.size() == 0) {
       try {
-        type = resolveType(fullyQualifiedName);
+        types = resolveType(fullyQualifiedName);
       }
       catch (CoreException e) {
         ScoutSdk.logError("error during resolving type '" + fullyQualifiedName + "'.", e);
       }
-      if (type != null) {
-        synchronized (m_cacheLock) {
-          m_cache.put(fullyQualifiedName, type);
+      synchronized (m_cacheLock) {
+        if (types.size() > 0) {
+          m_cache.put(fullyQualifiedName, types);
+        }
+        else {
+          m_cache.remove(fullyQualifiedName);
+          ScoutSdk.logWarning("could not resolve type '" + fullyQualifiedName + "'.");
         }
       }
-      else {
-        ScoutSdk.logWarning("could not resolve type '" + fullyQualifiedName + "'.");
-      }
     }
-    return type;
+    return types.toArray(new IType[types.size()]);
   }
 
   public boolean existsType(String fullyQualifiedName) {
     if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
       return false;
     }
-
-    fullyQualifiedName = fullyQualifiedName.replaceAll("\\$", "\\.");
-    IType type = null;
-    synchronized (m_cacheLock) {
-      type = m_cache.get(fullyQualifiedName);
-      // keep cache clean
-      if (type != null && !type.exists()) {
-        m_cache.remove(fullyQualifiedName);
-        type = null;
-      }
-    }
-    if (type == null) {
-      try {
-        type = resolveType(fullyQualifiedName);
-      }
-      catch (CoreException e) {
-        ScoutSdk.logError("error during resolving type '" + fullyQualifiedName + "'.", e);
-      }
-      if (type != null) {
-        synchronized (m_cacheLock) {
-          m_cache.put(fullyQualifiedName, type);
-        }
-      }
-    }
-    return TypeUtility.exists(type);
+    return TypeUtility.exists(getType(fullyQualifiedName));
   }
 
-  private IType resolveType(final String fqn) throws CoreException {
+  private List<IType> resolveType(final String fqn) throws CoreException {
     if (StringUtility.isNullOrEmpty(fqn)) {
-      return null;
+      return new ArrayList<IType>();
     }
 
     final TreeMap<CompositeLong, IType> matchList = new TreeMap<CompositeLong, IType>();
@@ -139,7 +141,7 @@ public class TypeCache {
       fastPat = fastPat.substring(i + 1);
     }
     if (!StringUtility.hasText(fastPat)) {
-      return null;
+      return new ArrayList<IType>();
     }
 
     new SearchEngine().search(
@@ -155,7 +157,6 @@ public class TypeCache {
               IType t = (IType) typeMatch.getElement();
 //              matchList.put(new CompositeLong(t.isBinary() ? 1 : 0, matchList.size()), t);
               if (t.getFullyQualifiedName('.').indexOf(fqn) >= 0) {
-
                 matchList.put(new CompositeLong(t.isBinary() ? 1 : 0, matchList.size()), t);
               }
             }
@@ -163,13 +164,8 @@ public class TypeCache {
         },
         null
         );
-    if (matchList.size() > 1) {
-      ScoutSdk.logWarning("found more than one type matches for '" + fqn + "' (matches: '" + matchList.size() + "').");
-    }
-    else if (matchList.size() < 1) {
-      return null;
-    }
-    return matchList.firstEntry().getValue();
+
+    return new ArrayList<IType>(matchList.values());
   }
 
   private class P_ResourceListener implements IResourceChangeListener {

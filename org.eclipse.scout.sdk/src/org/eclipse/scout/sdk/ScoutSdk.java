@@ -190,6 +190,10 @@ public class ScoutSdk extends Plugin {
     return getDefault().getTypeCache().getType(fullyQualifiedName);
   }
 
+  public static IType[] getTypes(String fullyQualifiedName) {
+    return getDefault().getTypeCache().getTypes(fullyQualifiedName);
+  }
+
   public static boolean existsType(String fullyQualifiedName) {
     return getDefault().getTypeCache().existsType(fullyQualifiedName);
   }
