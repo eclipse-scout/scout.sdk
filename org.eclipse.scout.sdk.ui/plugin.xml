@@ -34,6 +34,15 @@
          <viewShortcut
                id="org.eclipse.scout.sdk.designer.internal.view.DesignerView">
          </viewShortcut>
+         <perspectiveShortcut
+               id="org.eclipse.debug.ui.DebugPerspective">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="org.eclipse.jdt.ui.JavaPerspective">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="org.eclipse.pde.ui.PDEPerspective">
+         </perspectiveShortcut>
       </perspectiveExtension>
    </extension>
       <extension
