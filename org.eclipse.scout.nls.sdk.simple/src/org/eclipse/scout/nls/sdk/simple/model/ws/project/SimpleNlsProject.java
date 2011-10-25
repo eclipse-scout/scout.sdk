@@ -46,6 +46,7 @@ import org.eclipse.scout.nls.sdk.simple.ui.dialog.language.TranslationFileNewDia
 import org.eclipse.scout.nls.sdk.simple.ui.dialog.language.TranslationFileNewModel;
 import org.eclipse.scout.nls.sdk.ui.action.INewLanguageContext;
 import org.eclipse.swt.widgets.Shell;
+import org.osgi.framework.Bundle;
 
 /**
  *
@@ -122,16 +123,23 @@ public class SimpleNlsProject extends AbstractNlsProject {
   @SuppressWarnings("unchecked")
 private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, String bundleId) throws CoreException {
     ArrayList<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
-    Enumeration<Object> eee = Platform.getBundle(bundleId).findEntries(nlsType.getTranslationsFolderName(), nlsType.getTranslationsPrefix() + "*.properties", false);
-    if (eee != null) {
-      while (eee.hasMoreElements()) {
-        Object o = eee.nextElement();
-        if (o instanceof URL) {
-          try {
-            translationFiles.add(new PlatformTranslationFile(((URL) o).openStream(), NlsSdkSimple.getLanguage(((URL) o).getFile())));
-          }
-          catch (IOException e) {
-            NlsCore.logError("could not load NLS files of bundle '" + bundleId + "'", e);
+    //TODO [mvi]: Platform.getBundle does not find bundles set by a .target file. find other possibility to get the resource?
+    Bundle b = Platform.getBundle(bundleId);
+    if(b == null) {
+      NlsCore.logWarning("Bundle " + bundleId + " could not be found in the platform. Will be ignored.");
+    }
+    else {
+      Enumeration<Object> eee = b.findEntries(nlsType.getTranslationsFolderName(), nlsType.getTranslationsPrefix() + "*.properties", false);
+      if (eee != null) {
+        while (eee.hasMoreElements()) {
+          Object o = eee.nextElement();
+          if (o instanceof URL) {
+            try {
+              translationFiles.add(new PlatformTranslationFile(((URL) o).openStream(), NlsSdkSimple.getLanguage(((URL) o).getFile())));
+            }
+            catch (IOException e) {
+              NlsCore.logError("could not load NLS files of bundle '" + bundleId + "'", e);
+            }
           }
         }
       }
