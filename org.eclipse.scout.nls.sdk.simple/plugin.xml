@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="com.bsiag.nls.category"
+            name="NLS"/>
+      <wizard
+            category="com.bsiag.nls.category"
+            class="org.eclipse.scout.nls.sdk.simple.ui.wizard.NewNlsFileWizard"
+            icon="resources/icons/file.gif"
+            id="com.bsiag.nls.file"
+            name="New NLS File"
+            project="false"/>
+   </extension>
+   <extension
+         point="org.eclipse.scout.nls.sdk.nlsProvider">
+      <provider
+            class="org.eclipse.scout.nls.sdk.simple.model.ws.project.SimpleNlsProjectProvider">
+      </provider>
+   </extension>
+</plugin>

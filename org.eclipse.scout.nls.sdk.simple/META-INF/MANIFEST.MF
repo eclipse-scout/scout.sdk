@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Simple Scout Multilanguage Support
+Bundle-SymbolicName: org.eclipse.scout.nls.sdk.simple;singleton:=true
+Bundle-Version: 3.7.1.qualifier
+Bundle-Activator: org.eclipse.scout.nls.sdk.simple.NlsSdkSimple
+Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.eclipse.scout.nls.sdk;bundle-version="3.7.1",
+ org.eclipse.core.resources;bundle-version="3.6.1",
+ org.eclipse.jdt.core;bundle-version="3.6.2",
+ org.eclipse.ui.ide;bundle-version="3.6.2",
+ org.eclipse.jdt.ui;bundle-version="3.6.2",
+ org.eclipse.pde.core;bundle-version="3.6.2",
+ org.eclipse.pde.ui;bundle-version="3.6.1",
+ org.eclipse.scout.commons;bundle-version="3.7.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.scout.nls.sdk.simple,
+ org.eclipse.scout.nls.sdk.simple.model.ws,
+ org.eclipse.scout.nls.sdk.simple.model.ws.project,
+ org.eclipse.scout.nls.sdk.simple.operations,
+ org.eclipse.scout.nls.sdk.simple.ui.wizard
