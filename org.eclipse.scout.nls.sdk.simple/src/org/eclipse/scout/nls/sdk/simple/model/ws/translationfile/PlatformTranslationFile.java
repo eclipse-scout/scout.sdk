@@ -19,11 +19,8 @@ import org.eclipse.scout.nls.sdk.model.workspace.translationResource.AbstractTra
 
 public class PlatformTranslationFile extends AbstractTranslationResource {
 
-  private String m_fileName;
-
   public PlatformTranslationFile(InputStream is, Language language) {
     super(language);
-    m_fileName = language.getDispalyName();
     try {
       parseResource(is);
     }

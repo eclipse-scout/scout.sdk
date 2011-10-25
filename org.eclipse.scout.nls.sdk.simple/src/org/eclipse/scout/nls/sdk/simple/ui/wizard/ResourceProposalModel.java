@@ -158,10 +158,6 @@ public class ResourceProposalModel extends LabelProvider implements IContentProp
       return getContent();
     }
 
-    public IResource getResource() {
-      return m_resource;
-    }
-
     public Image getImage() {
       if (m_resource instanceof IFolder) {
         return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_FOLDER);

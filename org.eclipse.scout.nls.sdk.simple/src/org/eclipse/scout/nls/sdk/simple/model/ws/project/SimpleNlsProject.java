@@ -119,9 +119,10 @@ public class SimpleNlsProject extends AbstractNlsProject {
     return translationFiles.toArray(new ITranslationResource[translationFiles.size()]);
   }
 
-  private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, String bundleId) throws CoreException {
+  @SuppressWarnings("unchecked")
+private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, String bundleId) throws CoreException {
     ArrayList<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
-    Enumeration eee = Platform.getBundle(bundleId).findEntries(nlsType.getTranslationsFolderName(), nlsType.getTranslationsPrefix() + "*.properties", false);
+    Enumeration<Object> eee = Platform.getBundle(bundleId).findEntries(nlsType.getTranslationsFolderName(), nlsType.getTranslationsPrefix() + "*.properties", false);
     if (eee != null) {
       while (eee.hasMoreElements()) {
         Object o = eee.nextElement();

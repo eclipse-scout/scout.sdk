@@ -61,6 +61,18 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
   }
 
   @Override
+  protected void handleLabelLinkSelected() {
+    if (getMethod().isImplemented()) {
+      // if the method exists in the current file -> show
+      showJavaElementInEditor(getMethod().peekMethod());
+    }
+    else {
+      // if the method does not exist -> add and show
+      overrideMethod();
+    }
+  }
+
+  @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     super.init(method);
     ((GridData) m_addButton.getLayoutData()).exclude = getMethod().isImplemented();

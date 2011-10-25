@@ -23,17 +23,14 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -46,14 +43,11 @@ import org.eclipse.jdt.ui.JavaElementSorter;
 import org.eclipse.jdt.ui.StandardJavaElementContentProvider;
 import org.eclipse.jdt.ui.wizards.NewTypeWizardPage;
 import org.eclipse.jface.bindings.keys.KeyStroke;
-import org.eclipse.jface.fieldassist.IContentProposal;
-import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
@@ -64,7 +58,6 @@ import org.eclipse.scout.nls.sdk.internal.ui.TextField;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.ResourceDialog;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.IInputChangedListener;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.TextProposalField;
-import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputFormatter;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
 import org.eclipse.scout.nls.sdk.simple.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.operations.NewNlsFileOperationDesc;
@@ -329,7 +322,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
   @Override
   protected IPackageFragmentRoot chooseContainer() {
     IJavaElement initElement = getPackageFragmentRoot();
-    Class[] acceptedClasses = new Class[]{IPackageFragmentRoot.class, IJavaProject.class};
+    Class<?>[] acceptedClasses = new Class[]{IPackageFragmentRoot.class, IJavaProject.class};
     TypedElementSelectionValidator validator = new TypedElementSelectionValidator(acceptedClasses, false) {
       @Override
       public boolean isSelectedValid(Object element) {
@@ -487,84 +480,6 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
     }
   }
 
-  private class P_RootPackageFormatter implements IInputFormatter<IPackageFragmentRoot> {
-    @Override
-    public String format(Object source, IPackageFragmentRoot value) {
-      if (value == null) {
-        return "";
-      }
-      return value.toString();
-    }
-
-    @Override
-    public IPackageFragmentRoot parse(Object source, String input) {
-      IPath path = new Path(input);
-      String prjectname = path.segment(0);
-      IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(prjectname);
-      if (project == null || !project.exists()) {
-        return null;
-      }
-      try {
-
-        if (project.hasNature(PDE.PLUGIN_NATURE)) {
-          IJavaProject jp = JavaCore.create(project);
-          if (path.segmentCount() > 1) {
-            path = path.removeFirstSegments(1);
-            for (IPackageFragmentRoot root : jp.getPackageFragmentRoots()) {
-              if (root.isOpen() && root.getElementName().equalsIgnoreCase(path.toPortableString())) {
-                setMessage(null);
-                return root;
-              }
-            }
-            setMessage("Invalid source folder name", WizardPage.WARNING);
-            return null;
-          }
-        }
-        else {
-          setMessage("Nls files must be in PDE plugins", WizardPage.WARNING);
-        }
-      }
-      catch (CoreException e) {
-        NlsCore.logWarning(e);
-      }
-      return null;
-    }
-  } // end class P_RootPackageFormatter
-
-  private class P_PackageFormatter implements IInputFormatter<IPackageFragment> {
-    @Override
-    public String format(Object source, IPackageFragment value) {
-      if (value == null) {
-        return "";
-      }
-      return value.getElementName();
-    }
-
-    @Override
-    public IPackageFragment parse(Object source, String input) {
-      IPath path = new Path(input);
-      if (m_desc.getSourceContainer() == null) {
-        setMessage("Source Location must be specified!", WizardPage.WARNING);
-        return null;
-      }
-      IJavaProject project = JavaCore.create(m_desc.getPlugin());
-      if (project == null) {
-        setMessage("src container must be specified first!", WizardPage.WARNING);
-        return null;
-      }
-      try {
-        IPackageFragment frag = (IPackageFragment) project.findElement(path);
-        if (frag != null) {
-          return frag;
-        }
-      }
-      catch (JavaModelException e) {
-        NlsCore.logWarning(e);
-      }
-      return null;
-    }
-  } // end class P_RootPackageFormatter
-
   private class P_RootContainerModifyListener implements ModifyListener {
     private HashMap<String, IClasspathEntry> m_map = new HashMap<String, IClasspathEntry>();
 
@@ -606,46 +521,6 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
           m_lock.release();
         }
       }
-    }
-  }
-
-  private class P_PackageFieldModifyListener implements ModifyListener {
-    @Override
-    public void modifyText(ModifyEvent e) {
-
-    }
-  }
-
-  private class P_PackageContentProposalProvider implements IContentProposalProvider {
-
-    private P_PackageContentProposalProvider() {
-
-    }
-
-    @Override
-    public IContentProposal[] getProposals(String contents, int position) {
-
-      return new IContentProposal[]{new IContentProposal() {
-        @Override
-        public String getContent() {
-          return null;
-        }
-
-        @Override
-        public int getCursorPosition() {
-          return 0;
-        }
-
-        @Override
-        public String getDescription() {
-          return null;
-        }
-
-        @Override
-        public String getLabel() {
-          return null;
-        }
-      }};
     }
   }
 }

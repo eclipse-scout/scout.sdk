@@ -67,6 +67,10 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
     }
   }
 
+  public void updateTextNoFire(String key, String newText, IProgressMonitor monitor) {
+    setTranslation(key, newText, false, monitor);
+  }
+
   @Override
   public void updateText(String key, String newText, IProgressMonitor monitor) {
     setTranslation(key, newText, monitor);

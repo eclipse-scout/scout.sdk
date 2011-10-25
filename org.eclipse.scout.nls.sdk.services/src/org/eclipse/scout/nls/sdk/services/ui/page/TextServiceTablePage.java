@@ -8,8 +8,6 @@ import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.services.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceNewAction;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
@@ -23,7 +21,6 @@ import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 public class TextServiceTablePage extends AbstractPage {
 
-  private final IType iTextService = ScoutSdk.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
   private ICachedTypeHierarchy m_serviceHierarchy;
   private PackageContentChangedListener m_packageContentListener;
   private IPackageFragment m_textServicePackage;

@@ -88,11 +88,11 @@ public abstract class AbstractNlsProject implements INlsProject {
     return m_resourceProvider.getAllLanguages();
   }
 
-  private ITranslationResource getTranslationResource(Language language) {
+  public ITranslationResource getTranslationResource(Language language) {
     return m_resourceProvider.getResource(language);
   }
 
-  private ITranslationResource[] getAllTranslationResources() {
+  public ITranslationResource[] getAllTranslationResources() {
     return m_resourceProvider.getSortedResources();
   }
 
