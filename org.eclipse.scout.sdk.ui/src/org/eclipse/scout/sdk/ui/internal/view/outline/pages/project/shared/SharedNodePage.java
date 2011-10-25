@@ -70,9 +70,7 @@ public class SharedNodePage extends AbstractPage {
         new IconNodePage(this, iconTypes[0]);
       }
     }
-    if (getScoutResource().getScoutProject().getNlsProject() != null) {
-      new NlsTextsNodePage(this);
-    }
+
     new PermissionTablePage(this);
     new CodeTypeTablePage(this);
     try {

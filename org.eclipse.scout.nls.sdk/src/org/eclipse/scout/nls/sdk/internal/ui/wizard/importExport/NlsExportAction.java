@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -27,11 +27,11 @@ import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.widgets.Shell;
 
-/** <h4> NlsExportAction </h4>
- *
+/**
+ * <h4>NlsExportAction</h4>
+ * 
  * @author Andreas Hoegger
  * @since 1.1.0 (12.11.2010)
- *
  */
 public class NlsExportAction extends Action {
 
@@ -43,8 +43,8 @@ public class NlsExportAction extends Action {
     m_nlsProject = nlsProject;
     m_parentShell = shell;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.ICON_TOOL_EXPORT));
+    setEnabled(nlsProject != null);
   }
-
 
   @Override
   public void run() {

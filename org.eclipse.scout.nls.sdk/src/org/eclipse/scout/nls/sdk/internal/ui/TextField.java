@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,6 +37,8 @@ public class TextField<T> extends Composite {
 
   public static final int VALIDATE_ON_MODIFY = 1 << 99;
   public static final int VALIDATE_ON_FOCUS_LOST = 1 << 98;
+  public static final int MULTI_LINE_TEXT_FIELD = 1 << 97;
+  public static final int LABEL_NO_ALIGN = 1 << 96;
 
   private Text m_text;
   private Label m_label;
@@ -59,7 +61,16 @@ public class TextField<T> extends Composite {
    */
   public TextField(Composite parent, int style) {
     this(parent, style, "");
+  }
 
+  public void setLabelVisible(boolean visible) {
+    FormData labelData = new FormData();
+    labelData.top = new FormAttachment(0, 0);
+    labelData.left = new FormAttachment(0, 0);
+    if (visible) labelData.right = new FormAttachment(40, 0);
+    labelData.bottom = new FormAttachment(100, 0);
+    m_label.setLayoutData(labelData);
+    m_label.setVisible(visible);
   }
 
   public TextField(Composite parent, int style, String labelName) {
@@ -71,12 +82,20 @@ public class TextField<T> extends Composite {
   }
 
   private void createComposite(Composite parent, int style) {
+
     m_label = new Label(parent, SWT.NONE);
     m_label.setAlignment(SWT.RIGHT);
-    m_text = new Text(parent, SWT.BORDER);
-    if ((style & VALIDATE_ON_MODIFY) != 0) {
 
+    int txtStyle = SWT.BORDER;
+    if ((style & MULTI_LINE_TEXT_FIELD) != 0) {
+      txtStyle = SWT.BORDER | SWT.MULTI;
+    }
+
+    m_text = new Text(parent, txtStyle);
+
+    if ((style & VALIDATE_ON_MODIFY) != 0) {
       m_text.addModifyListener(new ModifyListener() {
+        @Override
         public void modifyText(ModifyEvent e) {
           validateInput();
         }
@@ -95,7 +114,9 @@ public class TextField<T> extends Composite {
     FormData labelData = new FormData();
     labelData.top = new FormAttachment(0, 0);
     labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(40, 0);
+    if ((style & LABEL_NO_ALIGN) == 0) {
+      labelData.right = new FormAttachment(40, 0);
+    }
     labelData.bottom = new FormAttachment(100, 0);
     m_label.setLayoutData(labelData);
 

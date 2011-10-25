@@ -15,13 +15,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.nls.sdk.NlsCore;
-import org.eclipse.scout.nls.sdk.model.workspace.INlsConstants;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -35,6 +34,7 @@ public class ScoutProject implements IScoutProject {
   private final Object bundleMapLock = new Object();
   private final String m_projectName;
   private INlsProject m_nlsProject;
+  private INlsProject m_docsNlsProject;
   private IIconProvider m_iconProvider;
   private final ScoutWorkspace m_scoutWorkspace;
 
@@ -225,13 +225,26 @@ public class ScoutProject implements IScoutProject {
   public INlsProject getNlsProject() {
     if (m_nlsProject == null && getSharedBundle() != null) {
       try {
-        m_nlsProject = NlsCore.getNlsWorkspace().findNlsProject(getSharedBundle().getProject(), INlsConstants.NLS_FILE_PATH, new NullProgressMonitor());
+        m_nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.TEXTS)});
       }
       catch (CoreException e) {
         ScoutSdk.logError("during loading NLS project for: " + getProjectName(), e);
       }
     }
     return m_nlsProject;
+  }
+
+  @Override
+  public INlsProject getDocsNlsProject() {
+    if (m_docsNlsProject == null && getSharedBundle() != null) {
+      try {
+        m_docsNlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.IDocumentationTextProviderService)});
+      }
+      catch (CoreException e) {
+        ScoutSdk.logError("during loading Docs NLS project for: " + getProjectName(), e);
+      }
+    }
+    return m_docsNlsProject;
   }
 
   @Override

@@ -161,7 +161,7 @@ public class LinkWithEditorAction extends Action {
         SafeRunner.run(new ISafeRunnable() {
           @Override
           public void run() throws Exception {
-            IPage startPage = m_viewPart.getInvisibleRoot();
+            IPage startPage = m_viewPart.getRoot();
             IStructuredSelection selection = (IStructuredSelection) m_viewPart.getTreeViewer().getSelection();
             if (selection != null && selection.size() > 0) {
               startPage = (IPage) selection.getFirstElement();
@@ -186,11 +186,8 @@ public class LinkWithEditorAction extends Action {
             ScoutSdkUi.logError(e);
           }
         });
-
       }
-
       return Status.OK_STATUS;
     }
-
   }
 }

@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import java.util.HashMap;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -21,7 +23,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
@@ -50,6 +51,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Lookup
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupServiceProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MasterFieldPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MultiLineStringPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.NlsDocsTextPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.NlsTextPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.OutlineRootPagePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.OutlinesPresenter;
@@ -72,10 +74,14 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * <h3>JdtTypePropertyPart</h3> ...
@@ -125,7 +131,14 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       @Override
       public void linkActivated(HyperlinkEvent e) {
         try {
-          JavaUI.openInEditor(getPage().getType());
+          IResource r = getPage().getType().getCompilationUnit().getResource();
+          if (r instanceof IFile) {
+            IFile f = (IFile) r;
+            String editorId = IDE.getEditorDescriptor(f).getId();
+            IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            activePage.openEditor(new FileEditorInput(f), editorId, true, IWorkbenchPage.MATCH_ID | IWorkbenchPage.MATCH_INPUT);
+          }
+          //JavaUI.openInEditor(getPage().getType());
         }
         catch (Exception e1) {
           ScoutSdkUi.logError("could not open '" + getPage().getType().getElementName() + "' in editor.", e1);
@@ -351,6 +364,11 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
     else if (propertyType.equals("TEXT")) {
       presenter = new NlsTextPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if (propertyType.equals("DOC")) {
+      presenter = new NlsDocsTextPresenter(getFormToolkit(), parent);
+      ((NlsDocsTextPresenter) presenter).setType(getPage().getType());
       presenter.setMethod(method);
     }
     else if (propertyType.equals("VERTICAL_ALIGNMENT")) {

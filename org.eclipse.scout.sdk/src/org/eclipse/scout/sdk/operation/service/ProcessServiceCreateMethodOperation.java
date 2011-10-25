@@ -142,7 +142,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getCreatePermission() != null) {
         builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getFullyQuallifiedNlsClassName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here.") + "\n");
@@ -174,7 +174,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getReadPermission() != null) {
         builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getReadPermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getFullyQuallifiedNlsClassName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");
@@ -206,7 +206,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getCreatePermission() != null) {
         builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getFullyQuallifiedNlsClassName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");
@@ -238,7 +238,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getUpdatePermission() != null) {
         builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getUpdatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getFullyQuallifiedNlsClassName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");

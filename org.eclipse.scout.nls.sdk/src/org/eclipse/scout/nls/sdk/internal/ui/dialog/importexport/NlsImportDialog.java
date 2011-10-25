@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -62,6 +62,7 @@ public class NlsImportDialog extends TitleAreaDialog {
     selectCsv.setExtendsionFilter(new String[]{"*.csv; *.properties; *.xls"});
     selectCsv.setLabelText("File:");
     selectCsv.addInputChangedListener(SWT.Modify, new IInputChangedListener<String>() {
+      @Override
       public void inputChanged(String input) {
         m_model.setImportFile(input);
       }
@@ -104,9 +105,11 @@ public class NlsImportDialog extends TitleAreaDialog {
   }
 
   private class P_PropertyChangedListener implements PropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (getContents() != null && !getContents().isDisposed()) {
         getContents().getDisplay().asyncExec(new UiRunnable(new Object[]{evt}) {
+          @Override
           public void run() {
             syncPropertyChange((PropertyChangeEvent) p_args[0]);
           }

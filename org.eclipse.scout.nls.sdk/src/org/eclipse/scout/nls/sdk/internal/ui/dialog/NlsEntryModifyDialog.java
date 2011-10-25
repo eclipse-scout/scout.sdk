@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,10 +24,6 @@ import org.eclipse.swt.widgets.Shell;
 /** <h4>NlsEntryModifyDialog</h4> */
 public class NlsEntryModifyDialog extends AbstractNlsEntryDialog {
 
-  public NlsEntryModifyDialog(Shell parentShell, String title, INlsProject project) {
-    this(parentShell, title, new NlsEntry("", project), project);
-  }
-
   public NlsEntryModifyDialog(Shell parentShell, String title, NlsEntry row, INlsProject project) {
     super(parentShell, title, row, project);
   }
@@ -36,14 +32,10 @@ public class NlsEntryModifyDialog extends AbstractNlsEntryDialog {
   protected void postCreate() {
     getKeyField().setInputValidator(InputValidator.getNlsKeyValidator(getNlsProject(), new String[]{getNlsEntry().getKey()}));
     getKeyField().setEnabled(false);
-    // getKeyField().addValidationListener(new IValidationListener(){
-    // public void validationChanged(IStatus valid) {
-    // revalidate();
-    // }
-    // });
     TextField<String> defaultField = getDefaultTranslationField();
     defaultField.setInputValidator(InputValidator.getDefaultTranslationValidator());
     defaultField.addValidationListener(new IValidationListener() {
+      @Override
       public void validationChanged(IStatus valid) {
         revalidate();
       }
@@ -63,7 +55,7 @@ public class NlsEntryModifyDialog extends AbstractNlsEntryDialog {
       getButton(Dialog.OK).setEnabled(false);
     }
     else {
-      setMessage(null);
+      setMessage("Modify this Translation entry.");
       getButton(Dialog.OK).setEnabled(true);
     }
   }

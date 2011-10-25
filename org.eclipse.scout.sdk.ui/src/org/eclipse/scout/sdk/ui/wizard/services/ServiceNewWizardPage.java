@@ -79,7 +79,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("Super Type"));
+    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("SuperType"));
     if (getLocationBundle() != null) {
       ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getAbstractTypesOnClasspath(m_definitionType, getLocationBundle().getJavaProject()));
       m_superTypeField.setContentProposalProvider(new DefaultProposalProvider(proposals));

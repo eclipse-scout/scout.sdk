@@ -67,7 +67,7 @@ public class NlsProposalTextField extends ProposalTextField {
       String key = getNewKey(proposalFieldText);
       NlsEntry row = new NlsEntry(key, getNlsProject());
       row.addTranslation(getNlsProject().getDevelopmentLanguage(), proposalFieldText);
-      NlsEntryNewAction action = new NlsEntryNewAction(row, true, getNlsProject());
+      NlsEntryNewAction action = new NlsEntryNewAction(row, getNlsProject());
       action.run();
       try {
         action.join();
@@ -114,7 +114,7 @@ public class NlsProposalTextField extends ProposalTextField {
   private void createContextMenu(MenuManager manager) {
     IContentProposalEx prop = getSelectedProposal();
     if (prop instanceof NlsProposal) {
-      manager.add(new NlsEntryModifyAction(new NlsEntry(((NlsProposal) prop).getNlsEntry()), true, getNlsProject()));
+      manager.add(new NlsEntryModifyAction(new NlsEntry(((NlsProposal) prop).getNlsEntry()), getNlsProject()));
     }
   }
 

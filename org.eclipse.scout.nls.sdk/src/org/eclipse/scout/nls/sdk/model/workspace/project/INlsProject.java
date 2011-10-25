@@ -4,126 +4,174 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.model.workspace.project;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.osgi.util.NLS;
-import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
-import org.eclipse.scout.nls.sdk.model.workspace.INlsConstants;
-import org.eclipse.scout.nls.sdk.model.workspace.INlsType;
-import org.eclipse.scout.nls.sdk.model.workspace.translationFile.ITranslationFile;
+import org.eclipse.scout.nls.sdk.ui.action.INewLanguageContext;
 
 /**
- * The <b>INlsProject</b> is the basis class of an nls support in a plugin. Each Plugin may have more than one
- * NlsProject (*.nls file). In case of dynamic NLS support a NlsProject may have a parent and each translated text is
- * inherited by the child project or may be overwritten. In addition a NlsProject defines additional translations. A
- * translation is defined in a class extends {@link AbstractDynamicNls} or {@link NLS} as a static variable. All
- * translations are kept in resource bundles. Use the NLS support creation wizard to generate a NLS support in a plugin.
- * Furthermore all translations should be edited in the NLS Editor (edit the .nls file).
- *
- * @see INlsConstants
+ * The <b>INlsProject</b> is the basis class of an NLS support in a plugin. Each plugin may have more than one
+ * NlsProject. A NlsProject may have a parent and each translated text is inherited by the child project or may
+ * be overwritten.
+ * Furthermore all translations should be edited in the NLS Editor.
  */
-public interface INlsProject extends INlsConstants {
-
-  void addProjectListener(INlsProjectListener projectListener);
-
-  void removeProjectListener(INlsProjectListener projectListener);
-
-  IProject getProject();
-
-  // /** returns all supported languages of the nls project.
-  // * @return a list of all supported iso codes (e.g. en, de, it) or INlsConstants.LANGUGE_DEFAULT
-  // */
-  // List<String> getAllSupportedIsoCodes();
+public interface INlsProject {
 
   /**
-   * returns all keys of the current nls project. The keys are defined in the
-   * nls class.
-   *
+   * Adds an event listener to this project.
+   * The last listener added is the first to be called.
+   * If a listener is added that already exists in the list, the listener is added an additional time.
+   * 
+   * @param projectListener
+   *          The new listener.
+   */
+  void addProjectListener(INlsProjectListener projectListener);
+
+  /**
+   * Removes all registrations of the given listener.
+   * the listeners are identified using reference equality (==).
+   * 
+   * @param projectListener
+   */
+  void removeProjectListener(INlsProjectListener projectListener);
+
+  /**
+   * Clears the cache and completely reloads the translations from the providers.
+   */
+  void refresh();
+
+  /**
+   * returns all keys of the current NLS project.
+   * 
    * @return
    */
   String[] getAllKeys();
 
-  String getFullyQuallifiedNlsClassName();
+  /**
+   * Gets the name of the nls project. This e.g. used in the editor to display which project is displayed.
+   * 
+   * @return The project name.
+   */
+  String getName();
 
-  INlsType getNlsType();
-
+  /**
+   * Gets the entry with the given key.
+   * 
+   * @param key
+   *          The key to search for.
+   * @return The cached entry.
+   */
   INlsEntry getEntry(String key);
 
+  /**
+   * Returns all entries with a key starting with the given prefix.
+   * 
+   * @param prefix
+   *          The prefix to search for
+   * @param caseSensitive
+   *          if true, the search is done case sensitive.
+   * @return The entries found.
+   */
   INlsEntry[] getEntries(String prefix, boolean caseSensitive);
 
+  /**
+   * Get all entries in this project.
+   * 
+   * @return The complete list.
+   */
   INlsEntry[] getAllEntries();
 
   /**
+   * Gets the parent project or null if no parent exists.
+   * 
    * @return
    */
   INlsProject getParent();
 
   /**
-   * @return
+   * Gets all languages of this project.
+   * 
+   * @return The existing languages.
    */
   Language[] getAllLanguages();
 
+  /**
+   * Checks whether the given language exists in this project.
+   * 
+   * @param languge
+   *          The language to search.
+   * @return True if the given language exists.
+   */
   boolean containsLanguage(Language languge);
 
   /**
-   * @return
-   */
-  public String getName();
-
-  /**
+   * Updates (or creates if not existing) the given row.
+   * If the key is inherited, this method does nothing.
+   * 
    * @param row
-   */
-  void updateRow(INlsEntry row);
-
-  /**
-   * @param row
-   * @param createLanguageFiles
+   *          The row to update or create.
    * @param monitor
    */
   void updateRow(INlsEntry row, IProgressMonitor monitor);
 
+  /**
+   * Changes the key of the entry with the same key as the given row
+   * 
+   * @param row
+   *          The entry with the same key as in row is updated.
+   * @param newKey
+   *          The new key of the entry found.
+   * @param monitor
+   */
   void updateKey(INlsEntry row, String newKey, IProgressMonitor monitor);
 
-  void createTranslationFile(Language language, INlsFolder folder, IProgressMonitor monitor) throws CoreException;
+  /**
+   * Gets a fresh NewLanguageContext that can be used to create new languages in a project specific way.
+   * 
+   * @return a newly created NewLanguageContext
+   */
+  INewLanguageContext getTranslationCreationContext();
+
+  IStatus removeEntries(INlsEntry[] entries);
 
   /**
    * To find the best matching language supported of the project:
    * <p>
-   *
+   * 
    * <pre>
-   * e.g. Supported languages = [default, en, de , de_ch, fr]
+   * Example:<br/>
+   * Supported languages = [default, en, de , de_ch, fr]
    * INPUT: de_ch OUTPUT: de_ch
    * INPUT: de_de OUTPUT: de
    * INPUT: it OUTPUT: default
    * </pre>
-   *
+   * 
+   * </p>
+   * 
    * @param language
-   * @return the project supporting language best matching to the given language
+   * @return the best matching language supported by this project
    */
   Language getBestMatchingProjectLanguage(Language language);
 
   /**
-   * @return
-   */
-  ITranslationFile[] getTranslationFiles();
-
-  /**
+   * Gets the best matching language of the eclipse instance running.
+   * 
    * @return
    */
   Language getDevelopmentLanguage();
 
   /**
+   * Gets the type that is used to access translations at runtime (e.g. Texts or TEXTS)
+   * 
    * @return
    */
-  IType[] getReferenceTypes();
+  IType getNlsAccessorType();
 }

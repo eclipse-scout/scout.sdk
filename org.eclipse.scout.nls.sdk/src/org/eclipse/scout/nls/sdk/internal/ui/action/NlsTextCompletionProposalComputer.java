@@ -19,7 +19,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
@@ -50,7 +49,7 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
   private static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
   private final Image m_image = NlsCore.getImage(NlsCore.ICON_COMMENT);
 
-  @SuppressWarnings("unchecked")
+  @Override
   public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)) {
       return Collections.EMPTY_LIST;
@@ -59,7 +58,7 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
     return Arrays.asList(computeProposals(javaContext));
   }
 
-  @SuppressWarnings("unchecked")
+  @Override
   public List computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     return new ArrayList<IContextInformation>();
   }
@@ -67,6 +66,7 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
   /*
    * @see org.eclipse.jface.text.contentassist.ICompletionProposalComputer#getErrorMessage()
    */
+  @Override
   public String getErrorMessage() {
     return "";
   }
@@ -74,12 +74,14 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
   /*
    * @see org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer#sessionStarted()
    */
+  @Override
   public void sessionStarted() {
   }
 
   /*
    * @see org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer#sessionEnded()
    */
+  @Override
   public void sessionEnded() {
   }
 
@@ -98,7 +100,7 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
         String replacement = m.group(2);
         IType referencedType = getReferencedType(findContextType(context.getCompilationUnit(), offset), m.group(1));
         if (referencedType != null) {
-          INlsProject nlsProject = NlsCore.getNlsWorkspace().findNlsProject(referencedType, new NullProgressMonitor());
+          INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{referencedType});
           if (nlsProject == null) {
             return NO_PROPOSALS;
           }
@@ -112,7 +114,7 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
 
     }
     catch (Exception e) {
-      NlsCore.logWarning("could not compute nls proposals.",e);
+      NlsCore.logWarning("could not compute nls proposals.", e);
     }
     return NO_PROPOSALS;
   }

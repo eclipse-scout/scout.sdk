@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ package org.eclipse.scout.sdk.internal.workspace;
  */
 public interface IScoutBundleConstantes {
   public static final String EXTENSION_ELEMENT_SERVICE = "service";
+  public static final String EXTENSION_SERVICE_RANKING = "ranking";
   public static final String EXTENSION_POINT_SERVICES = "org.eclipse.scout.service.services";
 
   public static final String CLIENT_EXTENSION_POINT_SERVICE_PROXIES = "org.eclipse.scout.service.services";

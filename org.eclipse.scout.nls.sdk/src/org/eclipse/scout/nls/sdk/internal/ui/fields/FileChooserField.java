@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,6 +51,7 @@ public class FileChooserField extends Composite {
     m_label = new Label(parent, SWT.NONE);
     m_text = new Text(parent, SWT.BORDER);
     m_text.addModifyListener(new ModifyListener() {
+      @Override
       public void modifyText(ModifyEvent e) {
         for (IInputChangedListener<String> listener : m_modifyListener) {
           listener.inputChanged(m_text.getText());
@@ -170,7 +171,7 @@ public class FileChooserField extends Composite {
       dialog.setFilterExtensions(m_extendsionFilter);
     }
     dialog.setText(m_title);
-    if(!StringUtility.isNullOrEmpty(getFileName())){
+    if (!StringUtility.isNullOrEmpty(getFileName())) {
       dialog.setFileName(getFileName());
     }
     String file = dialog.open();
@@ -191,7 +192,8 @@ public class FileChooserField extends Composite {
   }
 
   /**
-   * @param fileName the fileName to set
+   * @param fileName
+   *          the fileName to set
    */
   public void setFileName(String fileName) {
     m_fileName = fileName;

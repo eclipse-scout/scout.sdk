@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -48,6 +48,7 @@ public class NlsEntry implements INlsEntry {
     return m_project;
   }
 
+  @Override
   public int getType() {
     return TYPE_LOCAL;
   }
@@ -64,10 +65,12 @@ public class NlsEntry implements INlsEntry {
     m_referenceCount = refEntry.getReferenceCount();
   }
 
+  @Override
   public String getKey() {
     return m_key;
   }
 
+  @Override
   public Map<Language, String> getAllTranslations() {
     return new HashMap<Language, String>(m_translations);
   }
@@ -87,10 +90,12 @@ public class NlsEntry implements INlsEntry {
     m_translations.remove(language);
   }
 
+  @Override
   public String getTranslation(Language language) {
     return getTranslation(language, false);
   }
 
+  @Override
   public String getTranslation(Language language, boolean defaultIfNotExist) {
     String translation = m_translations.get(language);
     if (translation == null && defaultIfNotExist) {
@@ -110,6 +115,7 @@ public class NlsEntry implements INlsEntry {
     return translation;
   }
 
+  @Override
   public int getReferenceCount() {
     return m_referenceCount;
   }

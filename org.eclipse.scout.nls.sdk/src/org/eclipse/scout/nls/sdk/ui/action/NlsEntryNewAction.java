@@ -26,16 +26,16 @@ public class NlsEntryNewAction extends AbstractWorkspaceAction {
 
   private NlsEntry m_initialEntry;
 
-  public NlsEntryNewAction(boolean interactWithUi, INlsProject project) {
-    this(null, interactWithUi, project);
-
+  public NlsEntryNewAction(INlsProject project) {
+    this(null, project);
   }
 
-  public NlsEntryNewAction(NlsEntry entry, boolean interactWithUi, INlsProject project) {
-    super("New Entry...", interactWithUi);
+  public NlsEntryNewAction(NlsEntry entry, INlsProject project) {
+    super("New Entry...", true);
     m_initialEntry = entry;
     m_project = project;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.TextAdd));
+    setEnabled(project != null);
   }
 
   @Override

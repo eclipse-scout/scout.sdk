@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -66,6 +66,7 @@ import org.eclipse.swt.widgets.Widget;
  * @see FieldDecorationRegistry
  * @see DecoratedField
  */
+@SuppressWarnings("deprecation")
 public class ControlDecoration {
   /**
    * Debug flag for tracing
@@ -232,6 +233,7 @@ public class ControlDecoration {
       hoverShell.setForeground(display
           .getSystemColor(SWT.COLOR_INFO_FOREGROUND));
       hoverShell.addPaintListener(new PaintListener() {
+        @Override
         public void paintControl(PaintEvent pe) {
           pe.gc.drawText(text, hm, hm);
           if (!CARBON) {
@@ -419,6 +421,7 @@ public class ControlDecoration {
    */
   private void addControlListeners() {
     disposeListener = new DisposeListener() {
+      @Override
       public void widgetDisposed(DisposeEvent event) {
         dispose();
       }
@@ -427,6 +430,7 @@ public class ControlDecoration {
     control.addDisposeListener(disposeListener);
 
     focusListener = new FocusListener() {
+      @Override
       public void focusGained(FocusEvent event) {
         hasFocus = true;
         if (showOnlyOnFocus) {
@@ -434,6 +438,7 @@ public class ControlDecoration {
         }
       }
 
+      @Override
       public void focusLost(FocusEvent event) {
         hasFocus = false;
         if (showOnlyOnFocus) {
@@ -446,9 +451,10 @@ public class ControlDecoration {
 
     // Listener for painting the decoration
     paintListener = new PaintListener() {
+      @Override
       public void paintControl(PaintEvent event) {
-        Control control = (Control) event.widget;
-        Rectangle rect = getDecorationRectangle(control);
+        Control c = (Control) event.widget;
+        Rectangle rect = getDecorationRectangle(c);
         if (shouldShowDecoration()) {
           event.gc.drawImage(getImage(), rect.x, rect.y);
         }
@@ -458,6 +464,7 @@ public class ControlDecoration {
     // Listener for tracking the end of a hover. Only installed
     // after a hover begins.
     mouseMoveListener = new MouseMoveListener() {
+      @Override
       public void mouseMove(MouseEvent event) {
         if (showHover) {
           if (!decorationRectangle.contains(event.x, event.y)) {
@@ -474,6 +481,7 @@ public class ControlDecoration {
 
     // Listener for tracking the beginning of a hover. Always installed.
     mouseListener = new MouseTrackListener() {
+      @Override
       public void mouseExit(MouseEvent event) {
         // Just in case we didn't catch it before.
         Control target = (Control) event.widget;
@@ -485,6 +493,7 @@ public class ControlDecoration {
         hideHover();
       }
 
+      @Override
       public void mouseHover(MouseEvent event) {
         if (showHover) {
           decorationRectangle = getDecorationRectangle((Control) event.widget);
@@ -511,6 +520,7 @@ public class ControlDecoration {
         }
       }
 
+      @Override
       public void mouseEnter(MouseEvent event) {
         // Nothing to do until a hover occurs.
       }

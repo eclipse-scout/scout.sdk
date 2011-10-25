@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -35,13 +35,16 @@ public class NlsEntryNewDialog extends AbstractNlsEntryDialog {
   protected void postCreate() {
     getKeyField().setInputValidator(InputValidator.getNlsKeyValidator(getNlsProject()));
     getKeyField().addValidationListener(new IValidationListener() {
+      @Override
       public void validationChanged(IStatus valid) {
         revalidate();
       }
     });
+
     TextField<String> defaultField = getDefaultTranslationField();
     defaultField.setInputValidator(InputValidator.getDefaultTranslationValidator());
     defaultField.addValidationListener(new IValidationListener() {
+      @Override
       public void validationChanged(IStatus valid) {
         revalidate();
       }
@@ -61,9 +64,8 @@ public class NlsEntryNewDialog extends AbstractNlsEntryDialog {
       getButton(Dialog.OK).setEnabled(false);
     }
     else {
-      setMessage(null);
+      setMessage("Create a new Translation entry.");
       getButton(Dialog.OK).setEnabled(true);
     }
   }
-
 }

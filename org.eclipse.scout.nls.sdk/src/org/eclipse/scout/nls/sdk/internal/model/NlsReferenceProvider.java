@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,6 +24,7 @@ public class NlsReferenceProvider implements IReferenceProvider {
     m_matches = matches;
   }
 
+  @Override
   public int getReferenceCount(INlsEntry entry) {
     if (m_matches.containsKey(entry.getKey())) {
       return m_matches.get(entry.getKey()).size();
@@ -31,6 +32,7 @@ public class NlsReferenceProvider implements IReferenceProvider {
     return 0;
   }
 
+  @Override
   public Match[] getReferences(INlsEntry entry) {
     if (m_matches.containsKey(entry.getKey())) {
       List<Match> list = m_matches.get(entry.getKey());

@@ -650,12 +650,6 @@
          </singlePart>
       </part>
       <part
-            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.NlsTextsNodePage">
-         <singlePart
-               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.NlsPropertyViewPart">
-         </singlePart>
-      </part>
-      <part
             page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.IconNodePage">
          <singlePart
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.IconsPropertyViewPart">

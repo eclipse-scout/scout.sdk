@@ -4,13 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
@@ -18,31 +19,58 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-public class TableTextEditor extends Composite {
-
+public class TableTextEditor {
   private static final int BORDER_WIDTH = 1;
-  private Text m_text;
+  private final Text m_text;
+  private final Shell m_shell;
 
   /**
    * @param parent
-   * @param style
    */
-  public TableTextEditor(Composite parent) {
-    super(parent, SWT.NONE);
-    super.setBackground(getDisplay().getSystemColor(SWT.COLOR_GREEN));
-    createContent(this);
+  public TableTextEditor(TableCursor parent, int style) {
+    Point pos = parent.toDisplay(new Point(0, 0));
+    Point size = null;
+    if ((style & SWT.MULTI) != 0) {
+      size = new Point(594, 100);
+    }
+    else {
+      size = new Point(parent.getBounds().width, parent.getBounds().height);
+    }
+    m_shell = new Shell(parent.getShell(), SWT.TOOL);
+    m_shell.setBounds(pos.x, pos.y, size.x, size.y);
+    m_shell.setBackground(parent.getShell().getDisplay().getSystemColor(SWT.COLOR_GREEN));
+
     FillLayout layout = new FillLayout();
     layout.marginHeight = BORDER_WIDTH;
     layout.marginWidth = BORDER_WIDTH;
-    setLayout(layout);
+    m_shell.setLayout(layout);
+
+    m_text = new Text(m_shell, style);
+    m_text.setBackground(m_text.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
   }
 
-  private void createContent(Composite parent) {
-    m_text = new Text(parent, SWT.NONE);
-    m_text.setBackground(m_text.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+  public void setFocus() {
+    m_shell.setFocus();
+  }
+
+  public void open() {
+    m_shell.open();
+  }
+
+  public void dispose() {
+    m_shell.dispose();
+  }
+
+  public Display getDisplay() {
+    return m_shell.getDisplay();
+  }
+
+  public boolean isDisposed() {
+    return m_shell.isDisposed();
   }
 
   /**
@@ -50,6 +78,10 @@ public class TableTextEditor extends Composite {
    */
   public void setText(String input) {
     m_text.setText(input);
+  }
+
+  public void insertText(String text) {
+    m_text.insert(text);
   }
 
   public String getText() {
@@ -75,7 +107,6 @@ public class TableTextEditor extends Composite {
    * @param listener
    * @see org.eclipse.swt.widgets.Control#addFocusListener(org.eclipse.swt.events.FocusListener)
    */
-  @Override
   public void addFocusListener(FocusListener listener) {
     m_text.addFocusListener(listener);
   }
@@ -84,7 +115,6 @@ public class TableTextEditor extends Composite {
    * @param listener
    * @see org.eclipse.swt.widgets.Control#addKeyListener(org.eclipse.swt.events.KeyListener)
    */
-  @Override
   public void addKeyListener(KeyListener listener) {
     m_text.addKeyListener(listener);
   }
@@ -109,7 +139,6 @@ public class TableTextEditor extends Composite {
    * @param listener
    * @see org.eclipse.swt.widgets.Control#removeFocusListener(org.eclipse.swt.events.FocusListener)
    */
-  @Override
   public void removeFocusListener(FocusListener listener) {
     m_text.removeFocusListener(listener);
   }
@@ -118,7 +147,6 @@ public class TableTextEditor extends Composite {
    * @param listener
    * @see org.eclipse.swt.widgets.Control#removeKeyListener(org.eclipse.swt.events.KeyListener)
    */
-  @Override
   public void removeKeyListener(KeyListener listener) {
     m_text.removeKeyListener(listener);
   }
@@ -143,7 +171,6 @@ public class TableTextEditor extends Composite {
    * @return
    * @see org.eclipse.swt.widgets.Control#getBackground()
    */
-  @Override
   public Color getBackground() {
     return m_text.getBackground();
   }
@@ -152,7 +179,6 @@ public class TableTextEditor extends Composite {
    * @return
    * @see org.eclipse.swt.widgets.Control#getForeground()
    */
-  @Override
   public Color getForeground() {
     return m_text.getForeground();
   }
@@ -161,7 +187,6 @@ public class TableTextEditor extends Composite {
    * @param color
    * @see org.eclipse.swt.widgets.Control#setBackground(org.eclipse.swt.graphics.Color)
    */
-  @Override
   public void setBackground(Color color) {
     m_text.setBackground(color);
   }
@@ -170,9 +195,7 @@ public class TableTextEditor extends Composite {
    * @param color
    * @see org.eclipse.swt.widgets.Control#setForeground(org.eclipse.swt.graphics.Color)
    */
-  @Override
   public void setForeground(Color color) {
     m_text.setForeground(color);
   }
-
 }

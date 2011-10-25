@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -26,23 +26,29 @@ public class NlsWorkingSet implements IWorkingSet {
     m_projects = projects;
   }
 
+  @Override
   public IAdaptable[] getElements() {
     return m_projects.toArray(new IAdaptable[m_projects.size()]);
   }
 
+  @Override
   public String getId() {
     return null;
   }
 
+  @SuppressWarnings("deprecation")
+  @Override
   @Deprecated
   public ImageDescriptor getImage() {
     return null;
   }
 
+  @Override
   public ImageDescriptor getImageDescriptor() {
     return null;
   }
 
+  @Override
   public String getLabel() {
     String name = "";
     for (IProject project : m_projects) {
@@ -51,6 +57,7 @@ public class NlsWorkingSet implements IWorkingSet {
     return name;
   }
 
+  @Override
   public String getName() {
     String name = "";
     for (IProject project : m_projects) {
@@ -59,66 +66,63 @@ public class NlsWorkingSet implements IWorkingSet {
     return name;
   }
 
+  @Override
   public boolean isAggregateWorkingSet() {
     return false;
   }
 
+  @Override
   public boolean isEditable() {
     return false;
   }
 
+  @Override
   public boolean isEmpty() {
     return m_projects.isEmpty();
   }
 
+  @Override
   public boolean isSelfUpdating() {
-    // TODO Auto-generated method stub
     return false;
   }
 
+  @Override
   public boolean isVisible() {
-    // TODO Auto-generated method stub
     return false;
   }
 
+  @Override
   public void setElements(IAdaptable[] elements) {
-    // TODO Auto-generated method stub
-
   }
 
+  @Override
   public void setId(String id) {
-    // TODO Auto-generated method stub
-
   }
 
+  @Override
   public void setLabel(String label) {
-    // TODO Auto-generated method stub
-
   }
 
+  @Override
   public void setName(String name) {
-    // TODO Auto-generated method stub
-
   }
 
+  @Override
   public String getFactoryId() {
-    // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public void saveState(IMemento memento) {
-    // TODO Auto-generated method stub
-
   }
 
+  @Override
   public Object getAdapter(Class adapter) {
-    // TODO Auto-generated method stub
     return null;
   }
 
+  @Override
   public IAdaptable[] adaptElements(IAdaptable[] objects) {
-    // TODO Auto-generated method stub
     return null;
   }
-
 }

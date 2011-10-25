@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -151,6 +151,7 @@ public class SmartDialog {
     m_viewer.setLabelProvider(m_smartTableModel);
     m_viewer.setContentProvider(m_smartTableModel);
     m_viewer.addDoubleClickListener(new IDoubleClickListener() {
+      @Override
       public void doubleClick(DoubleClickEvent event) {
         handleItemSelection(((StructuredSelection) event
             .getSelection()).getFirstElement());
@@ -331,13 +332,16 @@ public class SmartDialog {
       }
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return m_items.toArray();
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
         return m_smartModel.getImage(((P_CompareableSmartItem) element).getItem());
@@ -345,6 +349,7 @@ public class SmartDialog {
       return null;
     }
 
+    @Override
     public String getColumnText(Object element, int columnIndex) {
       if (columnIndex == 0) {
         return m_smartModel.getText(((P_CompareableSmartItem) element).getItem());
@@ -352,16 +357,20 @@ public class SmartDialog {
       return "";
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public void dispose() {
     }
 
@@ -374,6 +383,7 @@ public class SmartDialog {
       m_item = item;
     }
 
+    @Override
     public int compareTo(P_CompareableSmartItem o) {
 
       return s_collator.compare(m_smartModel.getText(m_item), m_smartModel.getText(o.getItem()));

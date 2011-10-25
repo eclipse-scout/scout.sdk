@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -66,6 +66,7 @@ public class ProjectChooserDialog extends TitleAreaDialog {
 
     m_viewer = CheckboxTableViewer.newCheckList(rootArea, SWT.BORDER);
     m_viewer.addCheckStateListener(new ICheckStateListener() {
+      @Override
       public void checkStateChanged(CheckStateChangedEvent event) {
         handleSelectionChanged((IProject) event.getElement(), event.getChecked());
       }
@@ -182,31 +183,39 @@ public class ProjectChooserDialog extends TitleAreaDialog {
       m_pluginProjects = workspaceProjects;
     }
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return m_pluginProjects.toArray();
     }
 
+    @Override
     public Image getColumnImage(Object element, int column) {
       return PlatformUI.getWorkbench().getSharedImages().getImage(IDE.SharedImages.IMG_OBJ_PROJECT);
     }
 
+    @Override
     public String getColumnText(Object element, int column) {
       return ((IProject) element).getName();
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -43,11 +43,10 @@ public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperat
     TemplateVariableSet bindings = TemplateVariableSet.createNew(project, m_templateBindings);
     new InstallTextFileOperation("templates/shared/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/translation.nls", "translation.nls", project, bindings).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/resources/texts/Texts.properties", "resources/texts/Texts.properties", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/resources/texts/Texts_de.properties", "resources/texts/Texts_de.properties", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/resources/texts/Texts_fr.properties", "resources/texts/Texts_fr.properties", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/resources/texts/Texts_it.properties", "resources/texts/Texts_it.properties", project, bindings).run(monitor, workingCopyManager);
-
   }
 }

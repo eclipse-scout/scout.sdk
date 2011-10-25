@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,6 +29,7 @@ public abstract class AbstractOperation implements IWorkspaceRunnable {
     catch (final Exception e) {
       NlsCore.logError("exception during AbstractOpertion '" + getClass().getName() + "'. ", e);
       Display.getDefault().asyncExec(new Runnable() {
+        @Override
         public void run() {
           new NlsStatusDialog(Display.getDefault().getActiveShell(), new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, "could not run operation ", e));
         }
@@ -37,6 +38,7 @@ public abstract class AbstractOperation implements IWorkspaceRunnable {
   }
 
   private class P_WorkspaceOperation implements IWorkspaceRunnable {
+    @Override
     public void run(IProgressMonitor monitor) throws CoreException {
       AbstractOperation.this.run(monitor);
     }

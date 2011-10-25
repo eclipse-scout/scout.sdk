@@ -177,7 +177,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
   }
 
-  public ScoutExplorerRootNodePage getInvisibleRoot() {
+  public ScoutExplorerRootNodePage getRoot() {
     return m_invisibleRoot;
   }
 

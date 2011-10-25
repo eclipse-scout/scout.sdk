@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -91,6 +91,7 @@ public class ScoutIdeProperties {
   public static final String SUFFIX_CALENDAR_SERVICE = "CalendarService";
   public static final String SUFFIX_SMTP_SERVICE = "SmtpService";
   public static final String SUFFIX_SQL_SERVICE = "SqlService";
+  public static final String SUFFIX_TEXT_SERVICE = "TextProviderService";
   public static final String SUFFIX_TABLE_COLUMN = "Column";
   public static final String SUFFIX_TOOL = "Tool";
   public static final String SUFFIX_TREE = "Tree";

@@ -24,10 +24,10 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.InheritedFilter;
 import org.eclipse.scout.nls.sdk.internal.model.NlsTableModel;
-import org.eclipse.scout.nls.sdk.internal.model.workspace.project.NlsProject;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
+import org.eclipse.scout.nls.sdk.model.workspace.project.AbstractNlsProject;
 import org.eclipse.scout.nls.sdk.ui.INlsTableActionHanlder;
 import org.eclipse.scout.nls.sdk.ui.INlsTableCursorManangerListener;
 import org.eclipse.scout.nls.sdk.util.concurrent.AbstractJob;
@@ -50,8 +50,8 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * The represenation of a NlsProject.
- *
- * @see NlsProject
+ * 
+ * @see AbstractNlsProject
  * @see NlsTableModel
  */
 public class NlsTable extends Composite {
@@ -106,15 +106,18 @@ public class NlsTable extends Composite {
 
     m_cursorManager = new NlsTableCursor(m_table);
     m_cursorManager.addCursorMangerListener(new INlsTableCursorManangerListener() {
+      @Override
       public void textChangend(INlsEntry row, int i, String string) {
         handleTextUpdate(row, i, string);
       }
     });
 
     m_viewer = new TableViewer(m_table);
+
     m_filterComp.setTableViewer(m_viewer);
     m_viewer.setUseHashlookup(true);
     m_viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         StructuredSelection selection = (StructuredSelection) event.getSelection();
         if (selection.size() > 1) {
@@ -129,7 +132,7 @@ public class NlsTable extends Composite {
       @Override
       public void keyPressed(KeyEvent e) {
         if (e.keyCode == SWT.F5) {
-          m_actionHanlder.handleRefreshTable(e.stateMask == SWT.SHIFT);
+          m_actionHanlder.handleRefreshTable();
         }
         if (e.keyCode == SWT.F6) {
           if (e.stateMask == SWT.SHIFT) {
@@ -204,13 +207,16 @@ public class NlsTable extends Composite {
   }
 
   private Language getLanguageOfTableColumn(int columnIndex) {
-    return m_tableModel.getProject().getAllLanguages()[columnIndex - (INDEX_COLUMN_KEYS + 1)];
+    return m_tableModel.getProjects().getAllLanguages()[columnIndex - (INDEX_COLUMN_KEYS + 1)];
   }
 
   public void setModel(NlsTableModel model) {
     try {
       m_viewer.getTable().setRedraw(false);
       m_tableModel = model;
+
+      //final Language[] allLangs = m_tableModel.getProjects().getAllLanguages();
+
       createColumns(m_table);
       m_viewer.setLabelProvider(m_tableModel);
       m_viewer.setContentProvider(m_tableModel);
@@ -244,7 +250,7 @@ public class NlsTable extends Composite {
     colRefs.addSelectionListener(new P_SortSelectionAdapter(0));
 
     int i = NlsTable.INDEX_COLUMN_KEYS;
-    // nls java file column
+    // nls java column
 
     TableColumn jColumn = new TableColumn(table, SWT.LEFT);
     jColumn.setText(Language.LANGUAGE_KEY.getDispalyName());
@@ -253,10 +259,12 @@ public class NlsTable extends Composite {
     jColumn.setWidth(200);
     jColumn.addSelectionListener(new P_SortSelectionAdapter(i++));
 
-    for (Language language : m_tableModel.getProject().getAllLanguages()) {
-      createTableColumnInternal(language);
+    if (m_tableModel.getProjects() != null) {
+      for (Language language : m_tableModel.getProjects().getAllLanguages()) {
+        createTableColumnInternal(language);
+      }
+      m_filterComp.columnsChanged();
     }
-    m_filterComp.columnsChanged();
   }
 
   public void createTableColumnInternal(Language language) {
@@ -307,8 +315,8 @@ public class NlsTable extends Composite {
   private boolean handleTextUpdate(INlsEntry row, int column, String newText) {
     if (column == INDEX_COLUMN_KEYS) {
       // update key
-      m_tableModel.getProject().updateKey(row, newText, new NullProgressMonitor());
-      ((NlsEntry)row).setKey(newText);
+      m_tableModel.getProjects().updateKey(row, newText, new NullProgressMonitor());
+      ((NlsEntry) row).setKey(newText);
       m_viewer.refresh(row);
       return true;
     }
@@ -319,8 +327,8 @@ public class NlsTable extends Composite {
       AbstractJob job = new AbstractJob("update text", new Object[]{copy}) {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
-          INlsEntry row = (INlsEntry) args[0];
-          m_tableModel.getProject().updateRow(row, monitor);
+          INlsEntry r = (INlsEntry) args[0];
+          m_tableModel.getProjects().updateRow(r, monitor);
           return Status.OK_STATUS;
         }
       };
@@ -330,7 +338,6 @@ public class NlsTable extends Composite {
         job.join();
       }
       catch (InterruptedException e) {
-        // TODO Auto-generated catch block
         NlsCore.logWarning(e);
       }
       return job.getResult().isOK();
@@ -339,6 +346,7 @@ public class NlsTable extends Composite {
 
   public void asyncRefresh(INlsEntry row) {
     m_table.getDisplay().asyncExec(new UiRunnable(new Object[]{row}) {
+      @Override
       public void run() {
         refresh((INlsEntry) p_args[0]);
       }
@@ -357,6 +365,7 @@ public class NlsTable extends Composite {
   public void refreshAllAsync(final boolean recreateColumns) {
     if (!isDisposed()) {
       getDisplay().asyncExec(new Runnable() {
+        @Override
         public void run() {
           refreshAll(recreateColumns);
         }

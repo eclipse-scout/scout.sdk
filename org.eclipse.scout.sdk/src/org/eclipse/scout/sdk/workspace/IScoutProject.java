@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -22,18 +22,6 @@ public interface IScoutProject extends IScoutContainer {
 
   String getProjectName();
 
-  // IScoutProject getParentProject();
-  //
-  // boolean hasParentProject();
-
-  /**
-   * @return
-   */
-  // IScoutProject[] getSubProjects();
-
-  // boolean hasChildProjects();
-
-  // boolean hasParentOrChildProjects();
   /**
    * @return
    */
@@ -59,6 +47,8 @@ public interface IScoutProject extends IScoutContainer {
   IScoutBundle getServerBundle();
 
   INlsProject getNlsProject();
+
+  INlsProject getDocsNlsProject();
 
   /**
    * @return the nls provider of the shared bundle in this project or null if this project

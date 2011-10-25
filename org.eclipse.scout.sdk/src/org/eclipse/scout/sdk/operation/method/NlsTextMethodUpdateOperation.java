@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -53,7 +53,7 @@ public class NlsTextMethodUpdateOperation extends ConfigPropertyMethodUpdateOper
     StringBuilder source = new StringBuilder();
     source.append("  return ");
     if (getNlsEntry() != null) {
-      String nlsTypeSig = Signature.createTypeSignature(getNlsEntry().getProject().getFullyQuallifiedNlsClassName(), true);
+      String nlsTypeSig = Signature.createTypeSignature(getNlsEntry().getProject().getNlsAccessorType().getFullyQualifiedName(), true);
       source.append(ScoutSdkUtility.getSimpleTypeRefName(nlsTypeSig, validator));
       source.append(".get(\"" + getNlsEntry().getKey() + "\");");
     }

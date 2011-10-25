@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk;
 
-/** <h4> INlsIcons </h4>
- *
+/**
+ * <h4>INlsIcons</h4>
+ * 
  * @author Andreas Hoegger
  * @since 1.1.0 (30.11.2010)
- *
  */
 public interface INlsIcons {
 
@@ -31,5 +31,6 @@ public interface INlsIcons {
   String Text = "text";
   String TextAdd = "text_add";
   String TextRemove = "text_remove";
+  String FindObject = "find_obj";
 
 }

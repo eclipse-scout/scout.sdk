@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -66,6 +66,7 @@ public class ButtonTextField<T> extends Composite {
     if ((style & VALIDATE_ON_MODIFY) != 0) {
 
       m_text.addModifyListener(new ModifyListener() {
+        @Override
         public void modifyText(ModifyEvent e) {
           if (!m_text.getText().equals(m_lastVerifiedInput)) {
             handleInputChanged();

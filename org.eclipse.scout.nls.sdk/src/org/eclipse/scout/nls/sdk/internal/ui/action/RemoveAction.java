@@ -14,45 +14,32 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.nls.sdk.NlsCore;
-import org.eclipse.scout.nls.sdk.internal.model.workspace.project.NlsProject;
-import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsStatusDialog;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.nls.sdk.model.workspace.translationFile.ITranslationFile;
-import org.eclipse.scout.nls.sdk.model.workspace.util.NlsUtil;
+import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.util.concurrent.AbstractJob;
-import org.eclipse.swt.widgets.Display;
-
 
 public class RemoveAction extends Action {
-  private NlsProject m_nlsProject;
+  private INlsProject m_nlsProject;
   private IStatus m_status;
   private final INlsEntry[] m_entries;
-  public RemoveAction(String name, NlsProject project, INlsEntry entry) {
+
+  public RemoveAction(String name, INlsProject project, INlsEntry entry) {
     this(name, project, new INlsEntry[]{entry});
   }
-  public RemoveAction(String name, NlsProject project, INlsEntry[] entries) {
+
+  public RemoveAction(String name, INlsProject project, INlsEntry[] entries) {
     super(name);
     m_nlsProject = project;
     m_entries = entries;
+    setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.TextRemove));
   }
 
   @Override
   public void run() {
-    AbstractJob job = new AbstractJob("update translation files") {
+    AbstractJob job = new AbstractJob("update translations") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        IStatus status = null;
-        for (ITranslationFile file : m_nlsProject.getAllTranslationFiles()) {
-          for(INlsEntry e : m_entries){
-            status = file.remove(e.getKey(), monitor);
-            if (!status.isOK()) {
-              new NlsStatusDialog(Display.getDefault().getActiveShell(), status).open();
-              break;
-            }
-          }
-        }
-        // m_nlsProject.commitChanges(monitor);
-        return status;
+        return m_nlsProject.removeEntries(m_entries);
       }
     };
     job.setUser(false);
@@ -63,12 +50,26 @@ public class RemoveAction extends Action {
       m_status = job.getResult();
     }
     catch (InterruptedException e) {
-      NlsCore.logError("cold not remove the row key: " + NlsUtil.getVerbose(m_entries) + " in translation files", e);
+      NlsCore.logError("cold not remove the row key: " + getVerbose(m_entries) + " in translation resources", e);
     }
+  }
+
+  private static String getVerbose(INlsEntry[] entries) {
+    if (entries == null) {
+      return "[no entries]";
+    }
+    StringBuilder builder = new StringBuilder("[");
+    for (int i = 0; i < entries.length; i++) {
+      builder.append("'" + entries[i].getKey() + "'");
+      if (i + 1 != entries.length) {
+        builder.append(", ");
+      }
+    }
+    builder.append("]");
+    return builder.toString();
   }
 
   public IStatus getStatus() {
     return m_status;
   }
-
 }

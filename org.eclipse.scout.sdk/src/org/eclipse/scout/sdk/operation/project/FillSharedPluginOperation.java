@@ -49,7 +49,7 @@ public class FillSharedPluginOperation implements IOperation {
     String destPathPref = "src/" + (getProject().getName().replace('.', '/')) + "/";
     new InstallJavaFileOperation("templates/shared/src/Activator.java", destPathPref + "Activator.java", getProject(), bindings).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/Icons.java", destPathPref + "Icons.java", getProject(), bindings).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/shared/src/Texts.java", destPathPref + "Texts.java", getProject(), bindings).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/shared/src/DefaultTextProviderService.java", destPathPref + "services/common/text/DefaultTextProviderService.java", getProject(), bindings).run(monitor, workingCopyManager);
     getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 

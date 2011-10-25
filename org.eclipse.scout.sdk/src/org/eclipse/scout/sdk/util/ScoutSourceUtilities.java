@@ -68,17 +68,18 @@ public class ScoutSourceUtilities {
     if (nlsProject == null) {
       return name;
     }
-    IType[] referenceTypes = nlsProject.getReferenceTypes();
-    if (referenceTypes != null && referenceTypes.length > 0) {
+    IType referenceTypes = nlsProject.getNlsAccessorType();
+    if (referenceTypes != null/* && referenceTypes.length > 0*/) {
       StringBuilder classBuilder = new StringBuilder();
       //boolean returnTypeName = true;
       classBuilder.append("(");
-      for (int i = 0; i < referenceTypes.length; i++) {
-        classBuilder.append(referenceTypes[i].getElementName());
-        if (i < (referenceTypes.length - 1)) {
-          classBuilder.append("|");
-        }
-      }
+      classBuilder.append(referenceTypes.getFullyQualifiedName());
+//      for (int i = 0; i < referenceTypes.length; i++) {
+//        classBuilder.append(referenceTypes[i].getFullyQualifiedName());
+//        if (i < (referenceTypes.length - 1)) {
+//          classBuilder.append("|");
+//        }
+//      }
       classBuilder.append(")");
       String methodSource = null;
       try {

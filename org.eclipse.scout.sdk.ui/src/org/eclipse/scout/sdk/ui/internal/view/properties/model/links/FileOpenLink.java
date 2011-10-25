@@ -19,9 +19,11 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Resource;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.model.IWorkbenchAdapter;
+import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * <h3>FileOpenLink</h3> ...
@@ -79,11 +81,12 @@ public class FileOpenLink extends AbstractLink {
   @Override
   public void execute() {
     try {
+      IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
       if (StringUtility.isNullOrEmpty(m_editorId)) {
-        IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), getFile(), true);
+        IDE.openEditor(activePage, getFile(), true);
       }
       else {
-        IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), getFile(), m_editorId, true);
+        activePage.openEditor(new FileEditorInput(getFile()), m_editorId, true, IWorkbenchPage.MATCH_ID | IWorkbenchPage.MATCH_INPUT);
       }
     }
     catch (Exception e) {

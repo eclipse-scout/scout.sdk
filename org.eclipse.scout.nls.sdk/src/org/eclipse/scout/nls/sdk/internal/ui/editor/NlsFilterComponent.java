@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,7 +50,7 @@ public class NlsFilterComponent extends Composite {
     m_filterFields = new HashMap<Language, Text>();
     setBackground(parent.getBackground());
     m_resetButton = new Button(this, SWT.PUSH);
-    m_resetButton.setText("reset");
+    m_resetButton.setText("Reset");
     m_resetButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -66,6 +66,7 @@ public class NlsFilterComponent extends Composite {
   public void setTableViewer(TableViewer tableViewer) {
     m_tableViewer = tableViewer;
     m_tableViewer.getTable().addListener(SWT.Paint, new Listener() {
+      @Override
       public void handleEvent(Event event) {
         layout();
       }
@@ -123,6 +124,7 @@ public class NlsFilterComponent extends Composite {
       m_columnIndex = columnIndex;
     }
 
+    @Override
     public void modifyText(ModifyEvent e) {
       handleFilterModified(m_columnIndex);
     }

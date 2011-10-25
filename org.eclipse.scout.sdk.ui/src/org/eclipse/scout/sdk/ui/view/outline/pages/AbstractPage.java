@@ -332,7 +332,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
     }
   }
 
-  private int visitChildren(INodeVisitor visitor) {
+  protected int visitChildren(INodeVisitor visitor) {
     if (!isChildrenLoaded()) {
       loadChildren();
     }

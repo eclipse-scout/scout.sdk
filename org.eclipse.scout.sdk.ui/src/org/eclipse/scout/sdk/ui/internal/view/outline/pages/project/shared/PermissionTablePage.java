@@ -34,7 +34,6 @@ public class PermissionTablePage extends AbstractPage {
     setParent(parent);
     setName(Texts.get("PermissionTablePage"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Permissions));
-
   }
 
   @Override

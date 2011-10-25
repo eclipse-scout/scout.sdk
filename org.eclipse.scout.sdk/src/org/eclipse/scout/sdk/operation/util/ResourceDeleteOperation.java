@@ -64,7 +64,7 @@ public class ResourceDeleteOperation implements IOperation {
       }
 
       try {
-        resource.refreshLocal(1, new NullProgressMonitor());
+        resource.refreshLocal(IResource.DEPTH_ONE, new NullProgressMonitor());
       }
       catch (CoreException e) {
         // nop
@@ -79,7 +79,7 @@ public class ResourceDeleteOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
     for (IResource resource : m_resourcesToDelete) {
-      resource.delete(1, monitor);
+      resource.delete(IResource.FORCE, monitor);
     }
   }
 }

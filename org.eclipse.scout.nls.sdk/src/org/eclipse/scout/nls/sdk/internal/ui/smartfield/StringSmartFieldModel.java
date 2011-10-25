@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,9 +24,9 @@ public class StringSmartFieldModel implements ISmartFieldModel {
     for (Object item : items) {
       m_items.add(item);
     }
-
   }
 
+  @Override
   public List<Object> getProposals(String pattern) {
     LinkedList<Object> items = new LinkedList<Object>();
     for (Object item : m_items) {
@@ -41,10 +41,12 @@ public class StringSmartFieldModel implements ISmartFieldModel {
 
   }
 
+  @Override
   public String getText(Object item) {
     return item.toString();
   }
 
+  @Override
   public Image getImage(Object item) {
     return null;
   }

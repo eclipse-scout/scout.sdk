@@ -84,7 +84,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.CodeT
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.CodeTypeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.IconNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.LookupCallTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.NlsTextsNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.PermissionNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.PermissionTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedContextPropertyNodePage;
@@ -105,7 +104,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 public class EditorSelectionVisitor implements INodeVisitor {
 
-  public IPage m_nodeToSelect;
+  private IPage m_nodeToSelect;
 
   private Iterator<IJavaElement> m_elementIterator;
   private IJavaElement m_currentElement;
@@ -139,19 +138,19 @@ public class EditorSelectionVisitor implements INodeVisitor {
       recCollectDeclaringTypes(declaringType, collector);
       m_elements = collector;
       m_elementIterator = collector.iterator();
-      m_currentElement = m_elementIterator.next();
+      setCurrentElement(m_elementIterator.next());
     }
   }
 
   public IPage findPageToSelect(IPage startPage) {
     IPage visitPage = startPage;
-    IJavaElement currElement = m_currentElement;
+    IJavaElement currElement = getCurrentElement();
     while (visitPage != null) {
       if (visitPage instanceof ITypePage) {
         ITypePage tp = (ITypePage) visitPage;
         while (currElement != null) {
           if (CompareUtility.equals(currElement, tp.getType())) {
-            m_currentElement = currElement;
+            setCurrentElement(currElement);
             break;
           }
           if (m_elementIterator.hasNext()) {
@@ -176,11 +175,11 @@ public class EditorSelectionVisitor implements INodeVisitor {
       }
     }
 
-    if (m_currentElement == null) {
+    if (getCurrentElement() == null) {
       m_elementIterator = m_elements.iterator();
-      m_currentElement = m_elementIterator.next();
+      setCurrentElement(m_elementIterator.next());
     }
-    if (m_currentElement != null) {
+    if (getCurrentElement() != null) {
       IPage page = findPageToSelectRec(startPage);
       return page;
     }
@@ -190,14 +189,14 @@ public class EditorSelectionVisitor implements INodeVisitor {
   private IPage findPageToSelectRec(IPage startPage) {
     if (startPage != null) {
       startPage.accept(this);
-      if (m_nodeToSelect != null) {
-        return m_nodeToSelect;
+      if (getNodeToSelect() != null) {
+        return getNodeToSelect();
       }
       else {
         return findPageToSelectRec(startPage.getParent());
       }
     }
-    return m_nodeToSelect;
+    return getNodeToSelect();
   }
 
   private void recCollectDeclaringTypes(IType type, ArrayList<IJavaElement> collector) {
@@ -245,9 +244,6 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitProjectNode((IProjectNodePage) page);
     }
     else if (page instanceof IconNodePage) {
-      return CANCEL_SUBTREE;
-    }
-    else if (page instanceof NlsTextsNodePage) {
       return CANCEL_SUBTREE;
     }
     else if (page instanceof ClientNodePage) {
@@ -330,7 +326,6 @@ public class EditorSelectionVisitor implements INodeVisitor {
     }
     else if (page instanceof WizardNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
-
     }
     else if (page instanceof WizardStepTablePage) {
       return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IWizardStep));
@@ -451,21 +446,21 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   private int visitProjectNode(IProjectNodePage page) {
-    if (page.getScoutResource().contains(m_currentElement)) {
+    if (page.getScoutResource().contains(getCurrentElement())) {
       return CONTINUE_BRANCH;
     }
     return CANCEL_SUBTREE;
   }
 
   private int visitBundleNodePage(IScoutBundle bundle) {
-    if (bundle.getProject().exists(m_currentElement.getResource().getProjectRelativePath())) {
+    if (bundle.getProject().exists(getCurrentElement().getResource().getProjectRelativePath())) {
       return CONTINUE_BRANCH;
     }
     return CANCEL_SUBTREE;
   }
 
   protected int visitTypeInHierarchyPage(IType superType) {
-    ITypeHierarchy hierarchy = getCachedTypeHierarchy(m_currentElement);
+    ITypeHierarchy hierarchy = getCachedTypeHierarchy(getCurrentElement());
     if (hierarchy != null && hierarchy.contains(superType)) {
       return CONTINUE_BRANCH;
     }
@@ -473,10 +468,10 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitPageWithType(AbstractScoutTypePage page) {
-    if (CompareUtility.equals(m_currentElement, page.getType())) {
-      m_nodeToSelect = page;
+    if (CompareUtility.equals(getCurrentElement(), page.getType())) {
+      setNodeToSelect(page);
       if (m_elementIterator.hasNext()) {
-        m_currentElement = m_elementIterator.next();
+        setCurrentElement(m_elementIterator.next());
         return CONTINUE_BRANCH;
       }
       else {
@@ -487,7 +482,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   private int visitDesktopOutlineTablePage(DesktopOutlineTablePage page) {
-    ITypeHierarchy hierarchy = getCachedTypeHierarchy(m_currentElement);
+    ITypeHierarchy hierarchy = getCachedTypeHierarchy(getCurrentElement());
     if (hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IOutline))) {
       IType desktopType = page.getDesktopType();
       IMethod outlineMethods = TypeUtility.getMethod(desktopType, "getConfiguredOutlines");
@@ -502,7 +497,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   private int visitFormTablePage(FormTablePage page) {
-    ITypeHierarchy hierarchy = getCachedTypeHierarchy(m_currentElement);
+    ITypeHierarchy hierarchy = getCachedTypeHierarchy(getCurrentElement());
     if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IForm)) && !hierarchy.contains(ScoutSdk.getType(RuntimeClasses.ISearchForm))) {
       return CONTINUE_BRANCH;
     }
@@ -510,8 +505,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitBeanPropertyTablePage(BeanPropertyTablePage page) {
-    if (m_currentElement.getElementType() == IJavaElement.METHOD) {
-      IMethod method = (IMethod) m_currentElement;
+    if (getCurrentElement().getElementType() == IJavaElement.METHOD) {
+      IMethod method = (IMethod) getCurrentElement();
       if (TypeUtility.exists(method.getAnnotation(NamingUtility.getSimpleName(RuntimeClasses.ConfigPropertyValue)))) {
         return CONTINUE_BRANCH;
       }
@@ -521,10 +516,10 @@ public class EditorSelectionVisitor implements INodeVisitor {
 
   protected int visitBeanPropertyNodePage(BeanPropertyNodePage page) {
     IPropertyBean desc = page.getPropertyDescriptor();
-    if (m_currentElement.equals(desc.getReadMethod()) || m_currentElement.equals(desc.getWriteMethod())) {
-      m_nodeToSelect = page;
+    if (getCurrentElement().equals(desc.getReadMethod()) || getCurrentElement().equals(desc.getWriteMethod())) {
+      setNodeToSelect(page);
       if (m_elementIterator.hasNext()) {
-        m_currentElement = m_elementIterator.next();
+        setCurrentElement(m_elementIterator.next());
         return CONTINUE_BRANCH;
       }
       else {
@@ -540,19 +535,19 @@ public class EditorSelectionVisitor implements INodeVisitor {
 
   protected int visitShareContextPropertyTablePage(SharedContextPropertyTablePage page) {
     // since client session or server session is already checked only method has to be proved
-    if (m_currentElement != null && m_currentElement.getElementType() == IJavaElement.METHOD) {
+    if (getCurrentElement() != null && getCurrentElement().getElementType() == IJavaElement.METHOD) {
       return CONTINUE;
     }
     return CANCEL_SUBTREE;
   }
 
   protected int visitSharedContextPropertyNodePage(SharedContextPropertyNodePage page) {
-    if (m_currentElement != null && m_currentElement.getElementType() == IJavaElement.METHOD) {
+    if (getCurrentElement() != null && getCurrentElement().getElementType() == IJavaElement.METHOD) {
       IPropertyBean serverBeanDesc = page.getServerDesc();
-      if (m_currentElement.equals(serverBeanDesc.getReadMethod()) || m_currentElement.equals(serverBeanDesc.getWriteMethod())) {
+      if (getCurrentElement().equals(serverBeanDesc.getReadMethod()) || getCurrentElement().equals(serverBeanDesc.getWriteMethod())) {
         if (m_elementIterator.hasNext()) {
-          m_currentElement = m_elementIterator.next();
-          m_nodeToSelect = page;
+          setCurrentElement(m_elementIterator.next());
+          setNodeToSelect(page);
           return CONTINUE_BRANCH;
         }
       }
@@ -562,8 +557,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitOutlineServiceTablePage(OutlineServiceTablePage page) {
-    if (isType(m_currentElement)) {
-      IType currentElement = (IType) m_currentElement;
+    if (isType(getCurrentElement())) {
+      IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
@@ -577,8 +572,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitProcessServiceTablePage(ProcessServiceTablePage page) {
-    if (isType(m_currentElement)) {
-      IType currentElement = (IType) m_currentElement;
+    if (isType(getCurrentElement())) {
+      IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
@@ -592,8 +587,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitCustomServiceTablePage(CustomServiceTablePage page) {
-    if (isType(m_currentElement)) {
-      IType currentElement = (IType) m_currentElement;
+    if (isType(getCurrentElement())) {
+      IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
@@ -607,13 +602,13 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitServiceNodePage(AbstractServiceNodePage page) {
-    if (CompareUtility.equals(m_currentElement, page.getInterfaceType()) || CompareUtility.equals(m_currentElement, page.getType())) {
+    if (CompareUtility.equals(getCurrentElement(), page.getInterfaceType()) || CompareUtility.equals(getCurrentElement(), page.getType())) {
       if (m_elementIterator.hasNext()) {
-        m_currentElement = m_elementIterator.next();
+        setCurrentElement(m_elementIterator.next());
         return CONTINUE_BRANCH;
       }
       else {
-        m_nodeToSelect = page;
+        setNodeToSelect(page);
         return CANCEL;
       }
     }
@@ -621,8 +616,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitServerServicesCommonNodePage(CommonServicesNodePage page) {
-    if (isType(m_currentElement)) {
-      IType currentElement = (IType) m_currentElement;
+    if (isType(getCurrentElement())) {
+      IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
@@ -636,8 +631,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   protected int visitCustomServicePackageNodePage(CustomServicePackageNodePage page) {
-    if (isType(m_currentElement)) {
-      IType currentElement = (IType) m_currentElement;
+    if (isType(getCurrentElement())) {
+      IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
@@ -661,4 +656,15 @@ public class EditorSelectionVisitor implements INodeVisitor {
     return false;
   }
 
+  private void setCurrentElement(IJavaElement currentElement) {
+    m_currentElement = currentElement;
+  }
+
+  public IJavaElement getCurrentElement() {
+    return m_currentElement;
+  }
+
+  public void setNodeToSelect(IPage nodeToSelect) {
+    m_nodeToSelect = nodeToSelect;
+  }
 }

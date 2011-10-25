@@ -105,6 +105,7 @@ public final class RuntimeClasses {
   public static final String AbstractSMTPService = "org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService";
   public static final String AbstractSqlLookupService = "org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService";
   public static final String AbstractSqlService = "org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService";
+  public static final String AbstractDynamicNlsTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService";
 
   public static final String AbstractStringField = "org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField";
   public static final String AbstractTabBox = "org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox";
@@ -136,6 +137,7 @@ public final class RuntimeClasses {
   public static final String ConfigPropertyValue = "org.eclipse.scout.commons.annotations.ConfigPropertyValue";
   public static final String DefaultOutlineTableForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm";
   public static final String DefaultOutlineTreeForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm";
+  public static final String DefaultServiceFactory = "org.eclipse.scout.service.DefaultServiceFactory";
 
   public static final String DynamicNls = "org.eclipse.scout.nls.DynamicNls";
   public static final String ExampleWorkflowTablePage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.workflow.ExampleWorkflowTablePage";
@@ -221,6 +223,8 @@ public final class RuntimeClasses {
   public static final String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter";
   public static final String ServerServiceFactory = "org.eclipse.scout.rt.server.services.ServerServiceFactory";
   public static final String SERVICES = "org.eclipse.scout.service.SERVICES";
+  public static final String TEXTS = "org.eclipse.scout.rt.shared.TEXTS";
+  public static final String IDocumentationTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.IDocumentationTextProviderService";
   public static final String ProcessingException = "org.eclipse.scout.commons.exception.ProcessingException";
   public static final String ValidationRule = "org.eclipse.scout.rt.shared.data.form.ValidationRule";
   public static final String VetoException = "org.eclipse.scout.commons.exception.VetoException";

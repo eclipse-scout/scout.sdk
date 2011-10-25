@@ -4,14 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.NlsReferenceProvider;
 import org.eclipse.scout.nls.sdk.internal.model.NlsTableModel;
@@ -32,10 +31,9 @@ public class UpdateReferenceCountAction extends Action {
     m_project = project;
     m_table = table;
     m_tableModel = model;
-    setText("Show nls entry usage");
-    ImageDescriptor imageDescriptor = NlsCore.getImageDescriptor(NlsCore.ICON_TOOL_UPDATE);
-    setImageDescriptor(imageDescriptor);
-
+    setEnabled(project != null);
+    setText("Show NLS Entry usage");
+    setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.FindObject));
   }
 
   @Override
@@ -47,35 +45,37 @@ public class UpdateReferenceCountAction extends Action {
 
   private void handleBeginSearch() {
     m_table.getDisplay().asyncExec(new Runnable() {
+      @Override
       public void run() {
         UpdateReferenceCountAction.this.setEnabled(false);
-      };
+      }
     });
   }
 
   private void handleEndSearch() {
     m_table.getDisplay().asyncExec(new Runnable() {
+      @Override
       public void run() {
         UpdateReferenceCountAction.this.setEnabled(true);
         m_tableModel.setReferenceProvider(new NlsReferenceProvider(m_job.getMatches()));
         m_table.refreshAll(false);
-      };
+      }
     });
   }
 
   private class P_JobListener implements INlsKeySearchListener {
+    @Override
     public void beginReporting() {
       handleBeginSearch();
     }
 
+    @Override
     public void foundMatch(String key, Match match) {
-      // TODO Auto-generated method stub
-
     }
 
+    @Override
     public void endReporting() {
       handleEndSearch();
-
     }
   }
 }

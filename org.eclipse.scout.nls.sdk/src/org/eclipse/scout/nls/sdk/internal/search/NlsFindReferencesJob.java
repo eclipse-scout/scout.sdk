@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -52,7 +52,7 @@ public class NlsFindReferencesJob extends Job {
   public NlsFindReferencesJob(INlsProject project, String text) {
     super(text);
     m_project = project;
-    m_nlsType = project.getNlsType().getType();
+    m_nlsType = project.getNlsAccessorType();
     m_searchRequstor = new DefaultNlsKeySearchRequestor(getProject());
   }
 
@@ -73,7 +73,7 @@ public class NlsFindReferencesJob extends Job {
     }
     IJavaSearchScope scope = SearchEngine.createJavaSearchScope(jProjects.toArray(new IJavaElement[jProjects.size()]), true);
 
-    SearchPattern pattern = SearchPattern.createPattern(getProject().getNlsType().getType(), IJavaSearchConstants.REFERENCES);
+    SearchPattern pattern = SearchPattern.createPattern(m_nlsType, IJavaSearchConstants.REFERENCES);
     SearchEngine engine = new SearchEngine();
 
     try {
@@ -112,5 +112,4 @@ public class NlsFindReferencesJob extends Job {
   public IType getNlsType() {
     return m_nlsType;
   }
-
 }

@@ -46,7 +46,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  */
 public class NlsTextPresenter extends AbstractMethodPresenter {
 
-  private NlsProposalTextField m_proposalField;
+  protected NlsProposalTextField m_proposalField;
   private INlsEntry m_currentSourceTuple;
   private INlsEntry m_defaultTuple;
   private INlsProject m_nlsProject;
@@ -73,7 +73,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   @Override
   public void setEnabled(boolean enabled) {
     if (!isDisposed()) {
-      m_proposalField.setEnabled(enabled);
+      m_proposalField.setEnabled(enabled && getNlsProject() != null);
     }
     super.setEnabled(enabled);
   }
@@ -86,11 +86,15 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
     return false;
   }
 
+  protected INlsProject getNlsProject(ConfigurationMethod method) {
+    return SdkTypeUtility.findNlsProject(method.getType());
+  }
+
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     if (method == null) return;
     super.init(method);
-    setNlsProject(SdkTypeUtility.findNlsProject(method.getType()));
+    m_nlsProject = getNlsProject(method);
     m_proposalField.setNlsProject(getNlsProject());
     if (getNlsProject() == null) {
       m_proposalField.setEnabled(false);
@@ -139,7 +143,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
         String key = getNewKey(proposalFieldText);
         NlsEntry row = new NlsEntry(key, getNlsProject());
         row.addTranslation(getNlsProject().getDevelopmentLanguage(), proposalFieldText);
-        NlsEntryNewAction action = new NlsEntryNewAction(row, true, getNlsProject());
+        NlsEntryNewAction action = new NlsEntryNewAction(row, getNlsProject());
         action.run();
         try {
           action.join();
@@ -197,8 +201,8 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
           }
         }
         else {
-          op = new NlsTextMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), false);
           if (proposal != null) {
+            op = new NlsTextMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), false);
             ((NlsTextMethodUpdateOperation) op).setNlsEntry(proposal.getNlsEntry());
           }
         }
@@ -212,12 +216,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
     }
   }
 
-  public void setNlsProject(INlsProject nlsProject) {
-    m_nlsProject = nlsProject;
-  }
-
   public INlsProject getNlsProject() {
     return m_nlsProject;
   }
-
 }

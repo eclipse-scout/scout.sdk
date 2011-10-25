@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Display;
 
 public class CopyPasteAction extends Action {
 
-  private String m_menuName;
-  private String m_toCopy;
-  private Display m_display;
+  private final String m_menuName;
+  private final String m_toCopy;
+  private final Display m_display;
 
   public CopyPasteAction(String menuName, String toCopy, Display display) {
     m_toCopy = toCopy;
@@ -32,7 +32,7 @@ public class CopyPasteAction extends Action {
   @Override
   public void run() {
     Clipboard clipboard = new Clipboard(m_display);
-    String rtfData = "{\\rtf1\\b\\i " + m_toCopy + "}";
+    String rtfData = "{\\rtf1\\b\\i " + m_toCopy + "}"; // formatted as bold and italic
     TextTransfer textTransfer = TextTransfer.getInstance();
     RTFTransfer rtfTransfer = RTFTransfer.getInstance();
     Transfer[] transfers = new Transfer[]{textTransfer, rtfTransfer};
@@ -43,7 +43,6 @@ public class CopyPasteAction extends Action {
 
   @Override
   public String getText() {
-
     return m_menuName;
   }
 }

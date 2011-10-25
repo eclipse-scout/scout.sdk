@@ -3,12 +3,16 @@ package org.eclipse.scout.sdk.ui.internal.extensions;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
-public class ContextMenuContributorExtensionPoint extends SdkExtensionPointHelper {
+public class ContextMenuContributorExtensionPoint {
 
   private static Object contextMenuExtensionsCacheLock = new Object();
   private static AbstractScoutHandler[] contextMenuExtensions;
@@ -26,6 +30,10 @@ public class ContextMenuContributorExtensionPoint extends SdkExtensionPointHelpe
     }
   }
 
+  interface IExtensionVisitor {
+    boolean visit(IConfigurationElement element);
+  }
+
   public static IContextMenuContributor[] getContextMenuContributors(IPage page) {
     ArrayList<IContextMenuContributor> ret = new ArrayList<IContextMenuContributor>();
     for (MenuContributionInfo i : getContributors()) {
@@ -41,10 +49,10 @@ public class ContextMenuContributorExtensionPoint extends SdkExtensionPointHelpe
       synchronized (contextMenuContributorExtensionsCacheLock) {
         if (contextMenuContributorExtensions == null) {
           final ArrayList<MenuContributionInfo> list = new ArrayList<MenuContributionInfo>();
-          SdkExtensionPointHelper.visitExtensions("contextMenuContributor", "contributor", new IExtensionVisitor() {
+          visitExtensions("contextMenuContributor", "contributor", new IExtensionVisitor() {
             @SuppressWarnings("unchecked")
             @Override
-            public void visit(IConfigurationElement element) {
+            public boolean visit(IConfigurationElement element) {
               try {
                 String pageClassName = element.getAttribute("page");
                 IContextMenuContributor ext = (IContextMenuContributor) element.createExecutableExtension("class");
@@ -59,6 +67,7 @@ public class ContextMenuContributorExtensionPoint extends SdkExtensionPointHelpe
               catch (Throwable t) {
                 ScoutSdkUi.logError("create context menu contributor: " + element.getAttribute("class"), t);
               }
+              return true;
             }
           });
           contextMenuContributorExtensions = list.toArray(new MenuContributionInfo[list.size()]);
@@ -68,14 +77,30 @@ public class ContextMenuContributorExtensionPoint extends SdkExtensionPointHelpe
     return contextMenuContributorExtensions;
   }
 
+  public static void visitExtensions(String extensionPointName, String elementName, IExtensionVisitor v) {
+    IExtensionRegistry reg = Platform.getExtensionRegistry();
+    IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, extensionPointName);
+    IExtension[] extensions = xp.getExtensions();
+    for (IExtension extension : extensions) {
+      IConfigurationElement[] elements = extension.getConfigurationElements();
+      for (IConfigurationElement element : elements) {
+        if (elementName.equals(element.getName())) {
+          if (!v.visit(element)) {
+            return; // cancel when requested
+          }
+        }
+      }
+    }
+  }
+
   public static AbstractScoutHandler[] getAllRegisteredContextMenus() {
     if (contextMenuExtensions == null) {
       synchronized (contextMenuExtensionsCacheLock) {
         if (contextMenuExtensions == null) {
           final ArrayList<AbstractScoutHandler> list = new ArrayList<AbstractScoutHandler>();
-          SdkExtensionPointHelper.visitExtensions("contextMenu", "contextMenu", new IExtensionVisitor() {
+          visitExtensions("contextMenu", "contextMenu", new IExtensionVisitor() {
             @Override
-            public void visit(IConfigurationElement element) {
+            public boolean visit(IConfigurationElement element) {
               try {
                 AbstractScoutHandler ext = (AbstractScoutHandler) element.createExecutableExtension("class");
                 list.add(ext);
@@ -83,6 +108,7 @@ public class ContextMenuContributorExtensionPoint extends SdkExtensionPointHelpe
               catch (Throwable t) {
                 ScoutSdkUi.logError("create context menu: " + element.getAttribute("class"), t);
               }
+              return true;
             }
           });
           contextMenuExtensions = list.toArray(new AbstractScoutHandler[list.size()]);

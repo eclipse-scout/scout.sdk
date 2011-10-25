@@ -15,7 +15,7 @@ import java.util.Collection;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.action.Action;
-import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtHandler;
+import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.ProjectChooserDialog;
 import org.eclipse.ui.IWorkbenchSite;
 
@@ -40,6 +40,6 @@ public class FindReferencesForegroundAction extends Action {
       dailog.open();
       projects = dailog.getSelection();
     }
-    NlsJdtHandler.findReferencesForeground(m_site, m_element, projects);
+    NlsJdtUtility.findReferencesForeground(m_site, m_element, projects);
   }
 }

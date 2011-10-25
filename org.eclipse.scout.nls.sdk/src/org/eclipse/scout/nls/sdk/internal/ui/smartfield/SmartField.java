@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -45,17 +45,24 @@ public class SmartField extends Composite {
   private String m_lastVerifiedInput = "";
   private Font m_font;
   private Image m_smartImage;
+  private final int m_labelColWidth;
   private List<ISmartFieldListener> m_smartFieldListenerList = new LinkedList<ISmartFieldListener>();
 
   public SmartField(Composite parent, int style) {
+    this(parent, style, 40);
+  }
+
+  public SmartField(Composite parent, int style, int labelColWidth) {
     super(parent, style);
     m_smartImage = NlsCore.getImage(NlsCore.ICON_MAGNIFIER);
+    m_labelColWidth = labelColWidth;
     createComponent(this);
   }
 
   protected void createComponent(Composite parent) {
     m_smartDialog = new SmartDialog(parent.getShell());
     m_smartDialog.addSmartDialogListener(new ISmartDialogListener() {
+      @Override
       public void itemSelected(Object item) {
         m_text.setText(m_smartFieldModel.getText(item));
         m_lastVerifiedInput = m_text.getText();
@@ -109,7 +116,7 @@ public class SmartField extends Composite {
     data.top = new FormAttachment(0, 0);
     data.left = new FormAttachment(0, 0);
     data.bottom = new FormAttachment(100, 0);
-    data.right = new FormAttachment(40, 0);
+    data.right = new FormAttachment(m_labelColWidth, 0);
     m_label.setLayoutData(data);
 
     data = new FormData();
@@ -133,6 +140,7 @@ public class SmartField extends Composite {
     }
     else {
       m_text.getDisplay().asyncExec(new Runnable() {
+        @Override
         public void run() {
           showSmartDialogLazy(m_text.getText());
         }
@@ -175,6 +183,7 @@ public class SmartField extends Composite {
   public void setValue(Object value) {
     m_text.setText(m_smartFieldModel.getText(value));
     m_lastVerifiedInput = m_text.getText();
+    fireInputChanged(value);
   }
 
   @Override
@@ -185,7 +194,6 @@ public class SmartField extends Composite {
 
   @Override
   public boolean getEnabled() {
-
     return m_smartButton.getEnabled();
   }
 

@@ -30,11 +30,11 @@ public class Texts extends DynamicNls {
   }
 
   public static String get(String key, String... messageArguments) {
-    return instance.getText(key, messageArguments);
+    return getInstance().getText(key, messageArguments);
   }
 
   public static String get(String key) {
-    return instance.getText(key, new String[0]);
+    return getInstance().getText(key, new String[0]);
   }
 
   protected Texts() {

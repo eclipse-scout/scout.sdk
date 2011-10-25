@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -152,12 +152,14 @@ public class ServiceNewOperation implements IOperation {
             sessionType = serverSessions[0];
           }
         }
-        if (sessionType != null) {
-          ScoutUtility.registerServiceClass(sb.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, getCreatedServiceImplementation().getFullyQualifiedName(), sessionType.getFullyQualifiedName(), serviceFactory, monitor);
+        else if (sb.getType() == IScoutBundle.BUNDLE_SHARED) {
+          sessionType = null;
+          serviceFactory = RuntimeClasses.DefaultServiceFactory;
         }
-        else {
-          ScoutSdk.logWarning("could not find a session to register service '" + getServiceName() + "' in bundle '" + sb.getBundleName() + "'.");
-        }
+
+        ScoutUtility.registerServiceClass(sb.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES,
+            IScoutBundle.EXTENSION_ELEMENT_SERVICE, getCreatedServiceImplementation().getFullyQualifiedName(),
+            sessionType == null ? null : sessionType.getFullyQualifiedName(), serviceFactory, monitor);
       }
     }
   }

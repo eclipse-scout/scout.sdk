@@ -31,11 +31,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.text.edits.ReplaceEdit;
 
-/** <h4> NlsProposal </h4>
- *
+/**
+ * <h4>NlsProposal</h4>
+ * 
  * @author Andreas Hoegger
  * @since 1.1.0 (12.01.2011)
- *
  */
 public class NlsProposal implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
   private final INlsEntry m_nlsEntry;
@@ -52,14 +52,17 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
     m_image = image;
   }
 
+  @Override
   public void apply(IDocument document) {
     apply(null, '\0', 0, m_offset);
   }
 
+  @Override
   public Point getSelection(IDocument document) {
     return new Point(m_offset - m_prefix.length() + m_nlsEntry.getKey().length(), 0);
   }
 
+  @Override
   public String getAdditionalProposalInfo() {
     // html
     Map<Language, String> allTranslations = m_nlsEntry.getAllTranslations();
@@ -76,18 +79,22 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
 
   }
 
+  @Override
   public String getDisplayString() {
     return m_nlsEntry.getKey();
   }
 
+  @Override
   public Image getImage() {
     return m_image;
   }
 
+  @Override
   public IContextInformation getContextInformation() {
     return null;
   }
 
+  @Override
   public void apply(IDocument document, char trigger, int offset) {
     int offDiff = offset - m_offset;
     ReplaceEdit replaceEdit = new ReplaceEdit(m_offset - m_prefix.length(), m_prefix.length() + offDiff, m_nlsEntry.getKey());
@@ -99,28 +106,35 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
     }
   }
 
+  @Override
   public boolean isValidFor(IDocument document, int offset) {
     return validate(document, offset, null);
   }
 
+  @Override
   public char[] getTriggerCharacters() {
     return null;
   }
 
+  @Override
   public int getContextInformationPosition() {
     return 0;
   }
 
+  @Override
   public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
     apply(viewer.getDocument(), trigger, offset);
   }
 
+  @Override
   public void selected(ITextViewer viewer, boolean smartToggle) {
   }
 
+  @Override
   public void unselected(ITextViewer viewer) {
   }
 
+  @Override
   public boolean validate(IDocument document, int offset, DocumentEvent event) {
     try {
       String prefix = m_prefix + document.get(m_offset, offset - m_offset);
@@ -132,18 +146,22 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
     }
   }
 
+  @Override
   public IInformationControlCreator getInformationControlCreator() {
     return null;
   }
 
+  @Override
   public CharSequence getPrefixCompletionText(IDocument document, int completionOffset) {
     return m_nlsEntry.getKey();
   }
 
+  @Override
   public int getPrefixCompletionStart(IDocument document, int completionOffset) {
     return m_offset - m_prefix.length();
   }
 
+  @Override
   public boolean isAutoInsertable() {
     return true;
   }

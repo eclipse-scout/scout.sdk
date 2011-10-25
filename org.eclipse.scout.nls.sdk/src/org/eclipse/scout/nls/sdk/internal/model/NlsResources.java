@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -50,18 +50,18 @@ public class NlsResources {
     return s_instance;
   }
 
-  public void addResourceListener(IResource resource, IResourceChangeListener listener) {
-    addResourceListener(resource, listener, null);
+  public void addResourceListener(IResource resource, IResourceChangeListener l) {
+    addResourceListener(resource, l, null);
   }
 
-  public void addResourceListener(IResource resource, IResourceChangeListener listener, Shell shell) {
+  public void addResourceListener(IResource resource, IResourceChangeListener l, Shell shell) {
     List<P_ResourceListener> list = getOrCreateFor(resource);
-    list.add(new P_ResourceListener(listener, shell));
+    list.add(new P_ResourceListener(l, shell));
   }
 
-  public void removeResourceListener(IResource resource, IResourceChangeListener listener) {
+  public void removeResourceListener(IResource resource, IResourceChangeListener l) {
     List<P_ResourceListener> list = getOrCreateFor(resource);
-    list.remove(new WeakReference<IResourceChangeListener>(listener));
+    list.remove(new WeakReference<IResourceChangeListener>(l));
 
   }
 
@@ -76,19 +76,16 @@ public class NlsResources {
   }
 
   private class P_InternalResourceListener implements IResourceChangeListener {
+    @Override
     public void resourceChanged(IResourceChangeEvent event) {
       IResourceDelta delta = event.getDelta();
       try {
         if (delta != null) {
           delta.accept(new IResourceDeltaVisitor() {
-            public boolean visit(IResourceDelta delta) {
-              IResource resource = delta.getResource();
-              // if (kind == IResourceDelta.ADDED){
-              asyncStructureChanged(resource, delta);
-              // }
-              // else if (kind==IResourceDelta.REMOVED){
-              // asyncStructureChanged((IFile)resource,delta);
-              // }
+            @Override
+            public boolean visit(IResourceDelta d) {
+              IResource resource = d.getResource();
+              asyncStructureChanged(resource, d);
               return true;
             }
           });
@@ -107,15 +104,16 @@ public class NlsResources {
       if (list != null) {
         List<P_ResourceListener> toRemove = new ArrayList<P_ResourceListener>(2);
         for (P_ResourceListener reference : list) {
-          IResourceChangeListener listener = reference.getListener();
-          if (listener == null) {
+          IResourceChangeListener l = reference.getListener();
+          if (l == null) {
             // prepare to delete
             toRemove.add(reference);
           }
           else {
             IResourceChangeEvent event = new P_ResourceChangedEvent(resource, delta, -1);
             if (reference.getShell() != null && !reference.getShell().isDisposed()) {
-              reference.getShell().getDisplay().asyncExec(new UiRunnable(new Object[]{listener, event}) {
+              reference.getShell().getDisplay().asyncExec(new UiRunnable(new Object[]{l, event}) {
+                @Override
                 public void run() {
                   try {
                     ((IResourceChangeListener) p_args[0]).resourceChanged((IResourceChangeEvent) p_args[1]);
@@ -127,7 +125,7 @@ public class NlsResources {
               });
             }
             try {
-              listener.resourceChanged(event);
+              l.resourceChanged(event);
             }
             catch (Throwable e) {
               NlsCore.logError("listener throwed an Exception", e);
@@ -172,26 +170,32 @@ public class NlsResources {
       m_type = type;
     }
 
+    @Override
     public IMarkerDelta[] findMarkerDeltas(String type, boolean includeSubtypes) {
       return null;
     }
 
+    @Override
     public int getBuildKind() {
       return m_delta.getKind();
     }
 
+    @Override
     public IResourceDelta getDelta() {
       return m_delta;
     }
 
+    @Override
     public IResource getResource() {
       return m_resource;
     }
 
+    @Override
     public Object getSource() {
       return NlsResources.this;
     }
 
+    @Override
     public int getType() {
       return m_type;
     }

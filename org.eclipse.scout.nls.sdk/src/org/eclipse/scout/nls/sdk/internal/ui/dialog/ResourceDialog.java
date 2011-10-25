@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -71,6 +71,7 @@ public class ResourceDialog extends TitleAreaDialog {
     Tree m_tree = new Tree(rootArea, SWT.SINGLE);
     m_viewer = new TreeViewer(m_tree);
     m_viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         StructuredSelection selection = (StructuredSelection) event.getSelection();
         if (!selection.isEmpty()) {
@@ -158,6 +159,7 @@ public class ResourceDialog extends TitleAreaDialog {
 
   private class P_TreeContentProvider implements ITreeContentProvider, ILabelProvider {
 
+    @Override
     public Object[] getElements(Object inputElement) {
       return new Object[]{m_root};
       // try {
@@ -168,6 +170,7 @@ public class ResourceDialog extends TitleAreaDialog {
       // }
     }
 
+    @Override
     public Object[] getChildren(Object parentElement) {
       try {
         if (parentElement instanceof IContainer) {
@@ -183,6 +186,7 @@ public class ResourceDialog extends TitleAreaDialog {
       }
     }
 
+    @Override
     public Object getParent(Object element) {
       if (element instanceof IResource) {
         return ((IResource) element).getParent();
@@ -192,24 +196,27 @@ public class ResourceDialog extends TitleAreaDialog {
       }
     }
 
+    @Override
     public boolean hasChildren(Object element) {
 
       try {
         return ((element instanceof IContainer) && (((IContainer) element).members().length > 0));
       }
       catch (CoreException e) {
-        // TODO Auto-generated catch block
         NlsCore.logWarning(e);
         return false;
       }
     }
 
+    @Override
     public void dispose() {
     }
 
+    @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
 
+    @Override
     public String getText(Object element) {
       if (element instanceof IResource) {
         return ((IResource) element).getName();
@@ -217,17 +224,21 @@ public class ResourceDialog extends TitleAreaDialog {
       return "";
     }
 
+    @Override
     public Image getImage(Object element) {
       return null;
     }
 
+    @Override
     public boolean isLabelProperty(Object element, String property) {
       return false;
     }
 
+    @Override
     public void addListener(ILabelProviderListener listener) {
     }
 
+    @Override
     public void removeListener(ILabelProviderListener listener) {
     }
   } // end class P_TreeContentProvider

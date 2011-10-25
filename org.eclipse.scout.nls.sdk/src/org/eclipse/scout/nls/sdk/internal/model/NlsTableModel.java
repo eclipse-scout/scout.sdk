@@ -30,32 +30,28 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   private int m_sortIndex = -2;
   private boolean m_ascSorting = false;
-  private final INlsProject m_project;
+  private final INlsProject m_projects;
   private IReferenceProvider m_referenceProvider;
 
-  public NlsTableModel(INlsProject project) {
-    m_project = project;
+  public NlsTableModel(INlsProject projects) {
+    m_projects = projects;
   }
 
+  @Override
   public Object[] getElements(Object inputElement) {
-    return getProject().getAllEntries();
-    // ArrayList<INlsEntry> rows = new ArrayList<INlsEntry> (getProject().getAllRows().values());
-    // INlsProject parentProject = getProject().getParent();
-    // while(parentProject != null){
-    // for(INlsEntry r : parentProject.getall){
-    // rows.add(new InheritedNlsEntry(r));
-    // }
-    // parentProject = parentProject.getParent();
-    // }
-    // return rows.toArray(new INlsEntry[rows.size()]);//m_entries.values().toArray();//m_model.getAllKeys().toArray();
+    if (getProjects() == null) return new Object[]{};
+    return getProjects().getAllEntries();
   }
 
+  @Override
   public void dispose() {
   }
 
+  @Override
   public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
   }
 
+  @Override
   public Image getColumnImage(Object element, int columnIndex) {
     Image img = null;
     if (columnIndex == 0) {
@@ -65,6 +61,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   }
 
+  @Override
   public String getColumnText(Object element, int columnIndex) {
     INlsEntry row = (INlsEntry) element;
     switch (columnIndex) {
@@ -81,18 +78,18 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
       default: {
         String text = "";
         if (columnIndex > 0) {
-          Language lang = getProject().getAllLanguages()[columnIndex - (NlsTable.AMOUNT_UTILITY_COLS + 1)];
+          Language lang = getProjects().getAllLanguages()[columnIndex - (NlsTable.AMOUNT_UTILITY_COLS + 1)];
           text = row.getTranslation(lang);
           if (text == null) {
             return "";
           }
         }
-        return text;
-
+        return text.replace("\n", " ").replace("\r", "");
       }
     }
   }
 
+  @Override
   public Color getBackground(Object element, int columnIndex) {
     // if(columnIndex < 2){
     // return null;
@@ -106,6 +103,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
     return null;
   }
 
+  @Override
   public Color getForeground(Object element, int columnIndex) {
     Color c = null;
     if (element instanceof InheritedNlsEntry) {
@@ -156,23 +154,21 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
     m_sortIndex = index;
   }
 
+  @Override
   public void addListener(ILabelProviderListener listener) {
-    // TODO Auto-generated method stub
-
   }
 
+  @Override
   public boolean isLabelProperty(Object element, String property) {
-    // TODO Auto-generated method stub
     return false;
   }
 
+  @Override
   public void removeListener(ILabelProviderListener listener) {
-    // TODO Auto-generated method stub
-
   }
 
-  public INlsProject getProject() {
-    return m_project;
+  public INlsProject getProjects() {
+    return m_projects;
   }
 
   public void setReferenceProvider(IReferenceProvider referenceProvider) {
@@ -182,5 +178,4 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
   public IReferenceProvider getReferenceProvider() {
     return m_referenceProvider;
   }
-
 }
