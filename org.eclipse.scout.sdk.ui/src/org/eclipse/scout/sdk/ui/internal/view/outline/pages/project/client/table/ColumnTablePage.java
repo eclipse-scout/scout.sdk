@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -85,12 +86,14 @@ public class ColumnTablePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TableColumnNewAction.class};
+    return new Class[]{TableColumnNewAction.class, TableColumnWidthsPasteAction.class};
   }
 
   @Override
   public void prepareMenuAction(AbstractScoutHandler menu) {
-    ((TableColumnNewAction) menu).init(getColumnDeclaringType());
+    if (menu instanceof TableColumnNewAction) {
+      ((TableColumnNewAction) menu).init(getColumnDeclaringType());
+    }
   }
 
   public IType getColumnDeclaringType() {

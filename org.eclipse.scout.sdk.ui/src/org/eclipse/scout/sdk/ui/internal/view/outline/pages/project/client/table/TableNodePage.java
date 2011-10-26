@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.tabl
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -52,6 +53,6 @@ public class TableNodePage extends AbstractScoutTypePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ShowJavaReferencesAction.class};
+    return new Class[]{ShowJavaReferencesAction.class, TableColumnWidthsPasteAction.class};
   }
 }

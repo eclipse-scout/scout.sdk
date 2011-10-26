@@ -13,7 +13,12 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
+import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
+import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.TableNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -40,6 +45,13 @@ public class TableFieldNodePage extends AbstractFormFieldNodePage {
       tableNodePage.setParent(this);
       tableNodePage.setType(tables[0]);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ShowJavaReferencesAction.class, FormDataUpdateAction.class,
+        CreateTemplateAction.class, FormFieldRenameAction.class, FormFieldDeleteAction.class, TableColumnWidthsPasteAction.class};
   }
 
   @Override

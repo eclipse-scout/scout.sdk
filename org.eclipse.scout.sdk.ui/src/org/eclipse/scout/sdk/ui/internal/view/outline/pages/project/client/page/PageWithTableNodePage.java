@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction;
@@ -100,7 +101,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
   @Override
   public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class, SearchFormNewAction.class,
-        PageNewAction.class, PageLinkAction.class, WellformScoutTypeAction.class};
+        PageNewAction.class, PageLinkAction.class, WellformScoutTypeAction.class, TableColumnWidthsPasteAction.class};
   }
 
   @Override
