@@ -36,16 +36,17 @@ import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.events.IHyperlinkListener;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
@@ -57,7 +58,9 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
   private ConfigurationMethod m_configurationMethod;
   private Hyperlink m_labelLink;
+  private Label m_label;
   private Composite m_body;
+  private Composite m_linkComposite;
   private MethodErrorPresenterContent m_errorContent;
   private JavadocTooltip m_tooltip;
   private ImageHyperlink m_deleteButton;
@@ -67,13 +70,37 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     create(getContainer());
   }
 
-  protected void init(ConfigurationMethod method) throws CoreException {
-    m_labelLink.setText(ScoutIdeProperties.getMethodPresenterName(method.peekMethod()));
-    m_labelLink.setEnabled(true);
-    m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, method.isImplemented()));
-    m_labelLink.getParent().layout();
-    m_tooltip.setMember(method.peekMethod());
+  protected boolean isLinkMode() {
+    return m_configurationMethod != null && m_configurationMethod.isImplemented();
+  }
 
+  protected boolean showLinksInBold() {
+    return false;
+  }
+
+  protected void init(ConfigurationMethod method) throws CoreException {
+    if (m_labelLink != null) m_labelLink.dispose();
+    if (m_label != null) m_label.dispose();
+
+    if (isLinkMode()) {
+      m_labelLink = getToolkit().createHyperlink(m_linkComposite, ScoutIdeProperties.getMethodPresenterName(method.peekMethod()), SWT.NONE);
+      m_labelLink.addHyperlinkListener(new HyperlinkAdapter() {
+        @Override
+        public void linkActivated(HyperlinkEvent e) {
+          handleLabelLinkSelected();
+        }
+      });
+      m_labelLink.setEnabled(true);
+      m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, showLinksInBold()));
+      m_labelLink.getParent().layout();
+      m_tooltip = new JavadocTooltip(m_labelLink);
+    }
+    else {
+      m_label = getToolkit().createLabel(m_linkComposite, ScoutIdeProperties.getMethodPresenterName(method.peekMethod()));
+      m_label.setForeground(new Color(m_linkComposite.getDisplay(), 0, 0, 128));
+      m_tooltip = new JavadocTooltip(m_label);
+    }
+    m_tooltip.setMember(method.peekMethod());
   }
 
   protected void create(Composite parent) {
@@ -95,17 +122,8 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
   private Control createBody(Composite parent) {
     m_body = getToolkit().createComposite(parent);
-    Composite linkComposite = getToolkit().createComposite(m_body);
-    m_labelLink = getToolkit().createHyperlink(linkComposite, "", SWT.NONE);
+    m_linkComposite = getToolkit().createComposite(m_body);
 
-    IHyperlinkListener actionListener = new HyperlinkAdapter() {
-      @Override
-      public void linkActivated(HyperlinkEvent e) {
-        handleLabelLinkSelected();
-      }
-    };
-    m_labelLink.addHyperlinkListener(actionListener);
-    m_tooltip = new JavadocTooltip(m_labelLink);
     Control content = createContent(m_body);
     Composite buttonArea = getToolkit().createComposite(m_body);
 //    buttonArea.setSize(0, 0);
@@ -123,7 +141,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
     GridData linkCompData = new GridData();
     linkCompData.widthHint = 130;
-    linkComposite.setLayoutData(linkCompData);
+    m_linkComposite.setLayoutData(linkCompData);
 
     GridData contentData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
     content.setLayoutData(contentData);
@@ -139,7 +157,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     linkCompLayout.marginRight = 0;
     linkCompLayout.marginTop = 0;
     linkCompLayout.spacing = 0;
-    linkComposite.setLayout(linkCompLayout);
+    m_linkComposite.setLayout(linkCompLayout);
 
     GridLayout buttonBarLayout = new GridLayout(100, false);
     buttonBarLayout.horizontalSpacing = 0;

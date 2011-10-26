@@ -35,18 +35,6 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
   }
 
   @Override
-  protected void handleLabelLinkSelected() {
-    if (getMethod().isImplemented()) {
-      // if the method exists in the current file -> show
-      showJavaElementInEditor(getMethod().peekMethod());
-    }
-    else {
-      // if the method does not exist -> add and show
-      overrideMethod();
-    }
-  }
-
-  @Override
   protected void overrideMethod() {
     if (!getMethod().isImplemented()) {
       try {
