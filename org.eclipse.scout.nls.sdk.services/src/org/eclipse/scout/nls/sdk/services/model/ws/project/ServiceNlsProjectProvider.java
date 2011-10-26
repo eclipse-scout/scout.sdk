@@ -24,6 +24,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutStatus;
 import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
@@ -39,7 +40,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   /**
    * Gets the registered (in plugin.xml) text provider service types ordered by priority.
-   * 
+   *
    * @param returnDocServices
    *          If true, only Docs text provider services (implementing marker interface
    *          <code>IDocumentationTextProviderService</code>) are returned. Otherwise only non-docs text provider
@@ -190,10 +191,13 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
 
     NlsServiceType type = new NlsServiceType(serviceType);
-    if (type != null && type.getTranslationsFolderName() != null) {
-      return new ServiceNlsProject(type);
+    if (type.getTranslationsFolderName() == null) {
+      NlsCore.logWarning("The NLS Service for Type '" + serviceType.getFullyQualifiedName() + "' could not be parsed. Ensure that the method '"
+    		  + NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER + "' is available and returns a String literal like \"resources.texts.Texts\" directly.");
+      return null;
     }
-    return null;
+
+    return new ServiceNlsProject(type);
   }
 
   private INlsProject getNlsProjectTree(boolean returnDocServices) throws CoreException {
@@ -218,6 +222,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
         // remember the previous provider for the next iteration
         previous = p;
+      } else if(root == null) {
+    	  // first Type in the chain could not be parsed.
+    	  // this is also the Type that e.g. the editor would show -> show error
+    	  //NlsCore.logError("The NLS Service for Type " + type.getFullyQualifiedName() + " could not be parsed.");
+    	  throw new CoreException(new ScoutStatus("The NLS Service for Type " + type.getFullyQualifiedName() + " could not be parsed."));
       }
     }
     return root;
