@@ -88,7 +88,7 @@ public class TextField<T> extends Composite {
 
     int txtStyle = SWT.BORDER;
     if ((style & MULTI_LINE_TEXT_FIELD) != 0) {
-      txtStyle = SWT.BORDER | SWT.MULTI | SWT.V_SCROLL;
+      txtStyle = SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL;
     }
 
     m_text = new Text(parent, txtStyle);
