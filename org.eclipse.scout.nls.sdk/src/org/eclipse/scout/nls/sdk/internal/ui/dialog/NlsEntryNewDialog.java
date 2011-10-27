@@ -23,12 +23,12 @@ import org.eclipse.swt.widgets.Shell;
 
 public class NlsEntryNewDialog extends AbstractNlsEntryDialog {
 
-  public NlsEntryNewDialog(Shell parentShell, String title, INlsProject project) {
-    this(parentShell, title, new NlsEntry("", project), project);
+  public NlsEntryNewDialog(Shell parentShell, INlsProject project) {
+    this(parentShell, new NlsEntry("", project), project);
   }
 
-  public NlsEntryNewDialog(Shell parentShell, String title, NlsEntry row, INlsProject project) {
-    super(parentShell, title, row, project);
+  public NlsEntryNewDialog(Shell parentShell, NlsEntry row, INlsProject project) {
+    super(parentShell, "New Entry", row, project);
   }
 
   @Override

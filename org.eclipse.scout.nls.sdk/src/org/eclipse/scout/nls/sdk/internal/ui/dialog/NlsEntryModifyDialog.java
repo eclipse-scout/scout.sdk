@@ -24,8 +24,8 @@ import org.eclipse.swt.widgets.Shell;
 /** <h4>NlsEntryModifyDialog</h4> */
 public class NlsEntryModifyDialog extends AbstractNlsEntryDialog {
 
-  public NlsEntryModifyDialog(Shell parentShell, String title, NlsEntry row, INlsProject project) {
-    super(parentShell, title, row, project);
+  public NlsEntryModifyDialog(Shell parentShell, NlsEntry row, INlsProject project) {
+    super(parentShell, "Modify Entry", row, project);
   }
 
   @Override

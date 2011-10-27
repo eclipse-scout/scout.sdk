@@ -207,7 +207,7 @@ public class NlsTableCursor {
     if (m_editingText != null && !m_editingText.isDisposed()) {
       m_editingText.dispose();
     }
-    int style = SWT.NONE | SWT.MULTI;
+    int style = SWT.NONE | SWT.MULTI | SWT.V_SCROLL;
     if (m_cursor.getColumn() == NlsTable.INDEX_COLUMN_KEYS) {
       style = SWT.NONE;
     }

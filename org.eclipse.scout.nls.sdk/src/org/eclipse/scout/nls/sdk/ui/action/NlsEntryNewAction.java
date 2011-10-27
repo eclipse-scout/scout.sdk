@@ -46,7 +46,7 @@ public class NlsEntryNewAction extends AbstractWorkspaceAction {
     else {
       m_entry = m_initialEntry;
     }
-    NlsEntryNewDialog dialog = new NlsEntryNewDialog(Display.getDefault().getActiveShell(), "New Entry", m_entry, m_project);
+    NlsEntryNewDialog dialog = new NlsEntryNewDialog(Display.getDefault().getActiveShell(), m_entry, m_project);
     m_entry = dialog.show();
     return m_entry != null;
   }
