@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -47,8 +48,11 @@ import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -73,6 +77,9 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_lookupCallField;
   private ProposalTextField m_codeTypeField;
   private ProposalTextField m_siblingField;
+
+  private Button m_addAditionalColumn;
+  private TableColumnNewWizardPage1 m_nextPage;
 
   // process members
   private final IType m_declaringType;
@@ -182,6 +189,28 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         m_sibling = (SiblingProposal) event.proposal;
         pingStateChanging();
+      }
+    });
+
+    m_addAditionalColumn = getFieldToolkit().createCheckboxField(parent, Texts.get("AddOneMoreColumn"));
+    m_addAditionalColumn.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        Wizard wzrd = (Wizard) getWizard();
+        if (m_addAditionalColumn.getSelection()) {
+          if (m_nextPage == null) {
+            m_nextPage = new TableColumnNewWizardPage1(m_declaringType);
+            wzrd.addPage(m_nextPage);
+          }
+          m_nextPage.setExcludePage(false);
+          pingStateChanging();
+        }
+        else {
+          if (m_nextPage != null) {
+            m_nextPage.setExcludePage(true);
+            pingStateChanging();
+          }
+        }
       }
     });
 
