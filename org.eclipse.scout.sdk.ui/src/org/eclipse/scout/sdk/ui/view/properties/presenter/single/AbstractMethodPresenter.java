@@ -74,10 +74,6 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     return m_configurationMethod != null && m_configurationMethod.isImplemented();
   }
 
-  protected boolean showLinksInBold() {
-    return false;
-  }
-
   protected void init(ConfigurationMethod method) throws CoreException {
     if (m_labelLink != null) m_labelLink.dispose();
     if (m_label != null) m_label.dispose();
@@ -91,7 +87,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
         }
       });
       m_labelLink.setEnabled(true);
-      m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, showLinksInBold()));
+      m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, true));
       m_labelLink.getParent().layout();
       m_tooltip = new JavadocTooltip(m_labelLink);
     }

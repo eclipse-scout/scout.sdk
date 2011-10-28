@@ -73,16 +73,6 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
   }
 
   @Override
-  protected boolean showLinksInBold() {
-    return getMethod().isImplemented();
-  }
-
-  @Override
-  protected boolean isLinkMode() {
-    return true;
-  }
-
-  @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     super.init(method);
     ((GridData) m_addButton.getLayoutData()).exclude = getMethod().isImplemented();
