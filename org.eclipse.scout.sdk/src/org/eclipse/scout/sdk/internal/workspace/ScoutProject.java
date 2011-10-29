@@ -169,7 +169,8 @@ public class ScoutProject implements IScoutProject {
     return result.toArray(new IScoutBundle[result.size()]);
   }
 
-  protected IScoutBundle[] getAllBundles(int type) {
+  @Override
+  public IScoutBundle[] getAllBundles(int type) {
     List<IScoutBundle> bundles = new ArrayList<IScoutBundle>();
     synchronized (bundleMapLock) {
       for (IScoutBundle b : m_scoutBundles) {

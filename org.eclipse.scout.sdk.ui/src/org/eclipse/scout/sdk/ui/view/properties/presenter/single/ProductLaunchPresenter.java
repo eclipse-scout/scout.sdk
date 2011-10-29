@@ -35,6 +35,7 @@ import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
@@ -92,7 +93,10 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     String prodName = null;
     String regexp = "name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"";
     String productFileContent = "";
+    WorkspaceProductModel productModel = null;
     try {
+      productModel = ScoutSdkUtility.getProductModel(productFile, true);
+
       productFileContent = IOUtility.getContent(new InputStreamReader(productFile.getContents()));
     }
     catch (Exception e) {
@@ -107,6 +111,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       prodName = productFile.getParent().getName() + " " + productFile.getName();
     }
     m_productName = prodName;
+    System.out.println("name: " + productModel.getProduct().getName() + " " + m_productName);
     create(getContainer(), productFile);
     m_launchListener = new P_LaunchListener();
     DebugPlugin.getDefault().getLaunchManager().addLaunchListener(m_launchListener);

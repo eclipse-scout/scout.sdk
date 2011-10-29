@@ -46,6 +46,11 @@ public class SharedNodePage extends AbstractPage {
   }
 
   @Override
+  public int getOrder() {
+    return 200;
+  }
+
+  @Override
   public boolean isFolder() {
     return true;
   }

@@ -68,13 +68,18 @@ public class ServerNodePage extends AbstractPage {
   }
 
   @Override
-  public void unloadPage() {
-    m_serverSessionHierarchy.removeHierarchyListener(getPageDirtyListener());
+  public String getPageId() {
+    return IScoutPageConstants.SERVER_NODE_PAGE;
   }
 
   @Override
-  public String getPageId() {
-    return IScoutPageConstants.SERVER_NODE_PAGE;
+  public int getOrder() {
+    return 300;
+  }
+
+  @Override
+  public void unloadPage() {
+    m_serverSessionHierarchy.removeHierarchyListener(getPageDirtyListener());
   }
 
   @Override

@@ -68,4 +68,10 @@ public interface IScoutProject extends IScoutContainer {
    */
   IIconProvider findIconProvider();
 
+  /**
+   * @param type
+   * @return
+   */
+  IScoutBundle[] getAllBundles(int type);
+
 }

@@ -12,12 +12,17 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
-import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
@@ -35,7 +40,7 @@ import org.eclipse.swt.graphics.Point;
 public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   private String m_name;
-  private ArrayList<IPage> m_children;
+  private Map<CompositeObject, IPage> m_children;
   private IPage m_parent;
   private boolean m_recursive;
   private boolean m_childrenLoaded;
@@ -50,7 +55,12 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   public AbstractPage() {
     m_pageDirtyListener = new PageDirtyListener(this);
-    m_children = new ArrayList<IPage>();
+    m_children = new TreeMap<CompositeObject, IPage>();
+  }
+
+  @Override
+  public int getOrder() {
+    return -1;
   }
 
   @Override
@@ -115,7 +125,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   public void addChild(IPage child) {
     if (child == null) throw new IllegalArgumentException("adding null child to " + getName());
     synchronized (m_children) {
-      m_children.add(child);
+      m_children.put(new CompositeObject(child.getOrder(), m_children.size(), child), child);
     }
   }
 
@@ -124,8 +134,15 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
     if (childPage == null) throw new IllegalArgumentException("remove null child to " + getName());
     childPage.setParent(null);
     synchronized (m_children) {
-      return m_children.remove(childPage);
+      for (Iterator<Entry<CompositeObject, IPage>> it = m_children.entrySet().iterator(); it.hasNext();) {
+        Entry<CompositeObject, IPage> entry = it.next();
+        if (childPage.equals(entry.getValue())) {
+          it.remove();
+          return true;
+        }
+      }
     }
+    return false;
   }
 
   @Override
@@ -137,7 +154,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   public IPage[] getChildArray(IPageFilter filter) {
     ArrayList<IPage> children = new ArrayList<IPage>();
     synchronized (m_children) {
-      for (IPage p : m_children) {
+      for (IPage p : m_children.values()) {
         if (filter == null || filter.accept(p)) {
           children.add(p);
         }
@@ -149,7 +166,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   @Override
   public List<IPage> getChildren() {
     synchronized (m_children) {
-      return Collections.unmodifiableList(new ArrayList<IPage>(m_children));
+      return Collections.unmodifiableList(new ArrayList<IPage>(m_children.values()));
     }
   }
 
@@ -167,7 +184,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   @Override
   public final void unloadChildren() {
     synchronized (m_children) {
-      for (IPage page : m_children) {
+      for (IPage page : m_children.values()) {
         page.setParent(null);
         page.unloadChildren();
         page.unloadPage();
@@ -209,15 +226,6 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
             }
           }
         }
-        // call extensions to contribute their children
-//    for (IScoutSdkExtension ext : ScoutExtensionsExtensionPoint.getExtensions()) {
-//      try {
-//        ext.contributePageChildren(this);
-//      }
-//      catch (Throwable t) {
-//        ScoutSdkUi.logWarning("contribution from " + ext.getClass().getSimpleName(), t);
-//      }
-//    }
       }
       finally {
         // crucial to mark children as loaded to prevent an infinite loop
@@ -355,8 +363,8 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   /**
-   * @param manager
+   * @param debugActions
    */
-  public void addDebugMenus(IMenuManager manager) {
+  public void addDebugMenus(List<Action> debugActions) {
   }
 }

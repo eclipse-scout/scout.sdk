@@ -61,6 +61,16 @@ public class ClientNodePage extends AbstractPage {
   }
 
   @Override
+  public String getPageId() {
+    return IScoutPageConstants.CLIENT_NODE_PAGE;
+  }
+
+  @Override
+  public int getOrder() {
+    return 100;
+  }
+
+  @Override
   public void unloadPage() {
     if (m_desktopHierarchy != null) {
       m_desktopHierarchy.removeHierarchyListener(getPageDirtyListener());
@@ -74,11 +84,6 @@ public class ClientNodePage extends AbstractPage {
       m_clientSessionHierarchy.removeHierarchyListener(getPageDirtyListener());
       m_clientSessionHierarchy = null;
     }
-  }
-
-  @Override
-  public String getPageId() {
-    return IScoutPageConstants.CLIENT_NODE_PAGE;
   }
 
   @Override

@@ -38,6 +38,11 @@ public class UiSwtNodePage extends AbstractPage {
   }
 
   @Override
+  public int getOrder() {
+    return 10;
+  }
+
+  @Override
   public boolean isChildrenLoaded() {
     return true;
   }

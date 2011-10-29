@@ -90,6 +90,8 @@ public class ProjectGraph {
     ScoutProjectDescription invisibleScoutProject = new ScoutProjectDescription(null);
     invisibleScoutProject.addNode(bundleGraph.findNode(RuntimeClasses.ScoutUiSwtBundleId));
     invisibleScoutProject.addNode(bundleGraph.findNode(RuntimeClasses.ScoutUiSwingBundleId));
+    // XXX find a better way to include rap
+    invisibleScoutProject.addNode(bundleGraph.findNode("org.eclipse.scout.rt.ui.rap"));
     invisibleScoutProject.addNode(bundleGraph.findNode(RuntimeClasses.ScoutClientBundleId));
     invisibleScoutProject.addNode(bundleGraph.findNode(RuntimeClasses.ScoutSharedBundleId));
     invisibleScoutProject.addNode(bundleGraph.findNode(RuntimeClasses.ScoutServerBundleId));
@@ -211,6 +213,20 @@ public class ProjectGraph {
         findChildProjectsRec(childProject, visitedNodes, bundleGraph);
       }
     }
+    //TODO RAP only rap Find a better way
+    BundleGraphNode parentRap = parentDesc.getNode(BundleGraphNodeFilters.getFilterByType(8));
+    if (parentRap != null) {
+      IBundleGraphNodeFilter rapFilter = BundleGraphNodeFilters.getMultiFilter(BundleGraphNodeFilters.getFilterByType(8), BundleGraphNodeFilters.getNotInSetFilter(visitedNodes));
+      for (BundleGraphNode rapNode : bundleGraph.getDirectChildren(parentRap, rapFilter)) {
+        ScoutProjectDescription childProject = new ScoutProjectDescription(parentDesc);
+        childProject.addNode(rapNode);
+        buildProjectDesc(childProject, parentDesc, visitedNodes, bundleGraph);
+        parentDesc.addSubProjectDescription(childProject);
+        visitedNodes.addAll(Arrays.asList(childProject.getAllNodes()));
+        findChildProjectsRec(childProject, visitedNodes, bundleGraph);
+      }
+    }
+
     // only server
     BundleGraphNode parentServer = parentDesc.getNode(BundleGraphNodeFilters.getFilterByType(IScoutElement.BUNDLE_SERVER));
     if (parentServer != null) {
@@ -254,9 +270,9 @@ public class ProjectGraph {
   }
 
   private void fillUiNodes(ScoutProjectDescription desc, ScoutProjectDescription parentDesc, Set<BundleGraphNode> visitedNodes, BundleGraph bundleGraph) {
-    // ui swing
     BundleGraphNode clientNode = desc.getNode(BundleGraphNodeFilters.getFilterByType(IScoutElement.BUNDLE_CLIENT));
     if (clientNode != null) {
+      // ui swing
       BundleGraphNode parentSwingNode = parentDesc.getNode(BundleGraphNodeFilters.getFilterByType(IScoutElement.BUNDLE_UI_SWING));
       BundleGraphNode uiSwingNode = findCommonChildNode(parentSwingNode, clientNode, IScoutElement.BUNDLE_UI_SWING, visitedNodes, bundleGraph);
       if (uiSwingNode != null) {
@@ -267,6 +283,12 @@ public class ProjectGraph {
       BundleGraphNode uiSwtNode = findCommonChildNode(parentSwtNode, clientNode, IScoutElement.BUNDLE_UI_SWT, visitedNodes, bundleGraph);
       if (uiSwtNode != null) {
         desc.addNode(uiSwtNode);
+      }
+      //TODO RAP find a better way ui rap
+      BundleGraphNode parentRapNode = parentDesc.getNode(BundleGraphNodeFilters.getFilterByType(8));
+      BundleGraphNode uiRapNode = findCommonChildNode(parentRapNode, clientNode, 8, visitedNodes, bundleGraph);
+      if (uiRapNode != null) {
+        desc.addNode(uiRapNode);
       }
     }
   }

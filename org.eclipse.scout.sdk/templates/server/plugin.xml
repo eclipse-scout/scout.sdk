@@ -22,13 +22,13 @@
   <extension point="org.eclipse.scout.http.servletfilter.filters">
     <filter
        aliases="/process /remotefiles /updatesite"
-       class="org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter" ranking="20">
+       class="org.eclipse.scout.http.servletfilter.security.BasicSecurityFilter" ranking="20">
          <init-param name="realm" value="BSIAG Development"/>
          <init-param name="users" value="admin=manager,allen=allen,blake=blake"/>
     </filter>
     <filter
           aliases="/process /remotefiles /updatesite"
-          class="org.eclipse.scout.rt.server.servlet.filter.AnonymousSecurityFilter"
+          class="org.eclipse.scout.http.servletfilter.security.AnonymousSecurityFilter"
           ranking="30">
     </filter>
   </extension>

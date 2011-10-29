@@ -31,6 +31,8 @@ public interface IPage {
 
   IPage getParent();
 
+  int getOrder();
+
   IScoutElement getScoutResource();
 
   ScoutExplorerPart getOutlineView();

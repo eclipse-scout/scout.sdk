@@ -32,6 +32,7 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
 
   private String m_execEnvId;
   private IJavaProject m_javaProject;
+  private boolean m_createResourcesFolder = false;
 
   @SuppressWarnings("restriction")
   public CreateEclipseJavaPluginOperation() {
@@ -39,6 +40,7 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
     m_execEnvId = "JavaSE-1.6";
     addNature(org.eclipse.pde.internal.core.natures.PDE.PLUGIN_NATURE);
     addNature(JavaCore.NATURE_ID);
+    m_createResourcesFolder = true;
   }
 
   public void setExecutionEnvironment(String s) {
@@ -69,7 +71,7 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
     }
     // resources folder
     folder = project.getFolder("resources");
-    if (!folder.exists()) {
+    if (isCreateResourcesFolder() && !folder.exists()) {
       PdeUtility.createFolder(folder);
     }
     //
@@ -111,6 +113,14 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
   @SuppressWarnings("restriction")
   private IClasspathEntry createContainerEntry() {
     return JavaCore.newContainerEntry(org.eclipse.pde.internal.core.PDECore.REQUIRED_PLUGINS_CONTAINER_PATH);
+  }
+
+  public void setCreateResourcesFolder(boolean createResourcesFolder) {
+    m_createResourcesFolder = createResourcesFolder;
+  }
+
+  public boolean isCreateResourcesFolder() {
+    return m_createResourcesFolder;
   }
 
 }

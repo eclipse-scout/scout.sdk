@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -46,7 +46,6 @@ public class ExplorerPageExtensionPoint {
     IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, explorerPageExtensionId);
     IExtension[] extensions = xp.getExtensions();
     for (IExtension extension : extensions) {
-
       IConfigurationElement[] elements = extension.getConfigurationElements();
       for (IConfigurationElement element : elements) {
         if (element.getName().equals(pageAttribute)) {

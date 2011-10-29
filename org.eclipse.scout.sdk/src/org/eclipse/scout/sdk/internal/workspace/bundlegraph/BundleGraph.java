@@ -124,6 +124,14 @@ public class BundleGraph {
       freeNodes.add(serverNode);
       m_nodeLinks.put(serverNode.getIdentifier(), serverNode);
     }
+    // XXX RAP replace by better code
+    IPluginModelBase rapModel = PluginRegistry.findModel("org.eclipse.scout.rt.ui.rap");
+    if (rapModel != null) {
+      BundleGraphNode rapNode = new BundleGraphNode(rapModel, 8);
+      freeNodes.add(rapNode);
+      m_nodeLinks.put(rapNode.getIdentifier(), rapNode);
+    }
+    // XXX
     HashSet<BundleGraphNode> parentNodes = new HashSet<BundleGraphNode>();
     m_invisibleRootNode = new P_InvisibleRootNode();
     parentNodes.add(m_invisibleRootNode);
@@ -234,6 +242,11 @@ public class BundleGraph {
     else if (requiredDescs.containsKey(RuntimeClasses.ScoutUiSwtBundleId)) {
       id = IScoutElement.BUNDLE_UI_SWT;
     }
+    // XXX to code in a better way
+    else if (requiredDescs.containsKey("org.eclipse.scout.rt.ui.rap")) {
+      id = 8;
+    }
+    // XXX end do
     else if (requiredDescs.containsKey(RuntimeClasses.ScoutClientBundleId)) {
       id = IScoutElement.BUNDLE_CLIENT;
     }
@@ -270,7 +283,12 @@ public class BundleGraph {
     for (int i = 0; i < level; i++) {
       indent = indent + "\t";
     }
-    out.println(indent + "-- BUNDLE '" + node.getIdentifier() + " " + node.getScoutBundle().getProject().exists() + "'--");
+    String scoutProjectName = "NA";
+    if (node.getScoutBundle() != null && node.getScoutBundle().getScoutProject() != null) {
+      scoutProjectName = node.getScoutBundle().getScoutProject().getProjectName();
+    }
+    int bundleType = node.getNodeType();
+    out.println(indent + "-- BUNDLE '" + node.getIdentifier() + " " + scoutProjectName + "'-" + bundleType + "-");
     for (BundleGraphNode c : node.getChildren()) {
       printNodeRect(out, c, level + 1);
     }

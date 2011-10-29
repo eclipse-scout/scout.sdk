@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,6 +20,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -90,12 +94,14 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   private boolean m_linkingEnabled;
   private LinkWithEditorAction m_linkWithEditorAction;
   private P_ReloadNodeJob m_reloadJob = new P_ReloadNodeJob();
+  private HashSet<IContributionItem> m_debugMenus;
 
   /**
    * The constructor.
    */
   public ScoutExplorerPart() {
     m_dirtyManager = new DirtyUpdateManager(this);
+    m_debugMenus = new HashSet<IContributionItem>();
   }
 
   public TreeViewer getTreeViewer() {
@@ -323,14 +329,31 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   }
 
   private void fillContextMenu(IMenuManager manager) {
-    manager.add(new Separator());
+    if (m_debugMenus != null) {
+      for (IContributionItem a : m_debugMenus) {
+        manager.remove(a);
+      }
+      m_debugMenus.clear();
+    }
+
     if (m_viewer.getSelection() instanceof IStructuredSelection) {
       IStructuredSelection selection = (IStructuredSelection) m_viewer.getSelection();
       if (selection.size() == 1) {
         Object firstElement = selection.getFirstElement();
         if (firstElement instanceof AbstractPage) {
+          ArrayList<Action> debugActions = new ArrayList<Action>();
           AbstractPage page = (AbstractPage) firstElement;
-          page.addDebugMenus(manager);
+          page.addDebugMenus(debugActions);
+          if (debugActions.size() > 0) {
+            Separator sep = new Separator();
+            m_debugMenus.add(sep);
+            manager.add(sep);
+            for (Action a : debugActions) {
+              ActionContributionItem item = new ActionContributionItem(a);
+              manager.add(item);
+              m_debugMenus.add(item);
+            }
+          }
         }
       }
     }
@@ -570,4 +593,5 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
 
   }
+
 }
