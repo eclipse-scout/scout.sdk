@@ -18,13 +18,16 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 public class TableTextEditor {
   private static final int BORDER_WIDTH = 1;
+  private static Point MULTILINE_EDITOR_SIZE = new Point(594, 100);
   private final Text m_text;
   private final Shell m_shell;
 
@@ -32,16 +35,8 @@ public class TableTextEditor {
    * @param parent
    */
   public TableTextEditor(TableCursor parent, int style) {
-    Point pos = parent.toDisplay(new Point(0, 0));
-    Point size = null;
-    if ((style & SWT.MULTI) != 0) {
-      size = new Point(594, 100);
-    }
-    else {
-      size = new Point(parent.getBounds().width, parent.getBounds().height);
-    }
     m_shell = new Shell(parent.getShell(), SWT.TOOL);
-    m_shell.setBounds(pos.x, pos.y, size.x, size.y);
+    m_shell.setBounds(computeBounds(parent, style));
     m_shell.setBackground(parent.getShell().getDisplay().getSystemColor(SWT.COLOR_GREEN));
 
     FillLayout layout = new FillLayout();
@@ -51,6 +46,43 @@ public class TableTextEditor {
 
     m_text = new Text(m_shell, style);
     m_text.setBackground(m_text.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+  }
+
+  private Rectangle computeBounds(TableCursor cursor, int style) {
+    Rectangle bounds = new Rectangle(0, 0, 0, 0);
+
+    Point size = null;
+    if ((style & SWT.MULTI) != 0) {
+      size = new Point(MULTILINE_EDITOR_SIZE.x, MULTILINE_EDITOR_SIZE.y);
+    }
+    else {
+      size = new Point(cursor.getBounds().width, cursor.getBounds().height);
+    }
+    // max size is the table size
+    Composite table = cursor.getParent();
+    Point tableSize = table.getSize();
+    size.x = Math.min(tableSize.x, size.x);
+    size.y = Math.min(tableSize.y, size.y);
+    bounds.width = size.x;
+    bounds.height = size.y;
+
+    Point tableLocation = table.toDisplay(table.getLocation());
+    Rectangle tableBoundsAbsolute = new Rectangle(0, 0, 0, 0);
+    tableBoundsAbsolute.x = tableLocation.x;
+    tableBoundsAbsolute.y = tableLocation.y;
+    tableBoundsAbsolute.width = tableSize.x;
+    tableBoundsAbsolute.height = tableSize.y;
+
+    Point shellPosition = cursor.toDisplay(new Point(0, 0));
+    if ((shellPosition.x + size.x) > (tableBoundsAbsolute.x + tableBoundsAbsolute.width)) {
+      shellPosition.x = tableBoundsAbsolute.x + tableBoundsAbsolute.width - size.x;
+    }
+    if ((shellPosition.y + size.y) > (tableBoundsAbsolute.y + tableBoundsAbsolute.height)) {
+      shellPosition.y = tableBoundsAbsolute.y + tableBoundsAbsolute.height - size.y;
+    }
+    bounds.x = shellPosition.x;
+    bounds.y = shellPosition.y;
+    return bounds;
   }
 
   public void setFocus() {
