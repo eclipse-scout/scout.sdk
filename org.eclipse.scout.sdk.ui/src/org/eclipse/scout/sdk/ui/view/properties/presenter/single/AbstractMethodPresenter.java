@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
 import java.io.Reader;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
@@ -209,7 +208,6 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
       ((GridData) m_deleteButton.getLayoutData()).exclude = !configurationMethod.isImplemented();
       m_deleteButton.setVisible(configurationMethod.isImplemented());
       m_deleteButton.setToolTipText(Texts.get("RemoveXinY", getMethod().getMethodName(), getMethod().getType().getElementName()));
-
     }
     finally {
       getContainer().setRedraw(true);
@@ -265,7 +263,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
   protected final String readInitalValue() throws CoreException {
     try {
-      Matcher m = Pattern.compile(Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, Pattern.DOTALL).matcher(getMethod().peekMethod().getSource());
+      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(getMethod().peekMethod().getSource());
       if (m.find()) {
         return m.group(1);
       }

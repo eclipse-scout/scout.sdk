@@ -115,7 +115,6 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
         }
         else {
           m_proposalField.acceptProposal(new NlsProposal(m_currentSourceTuple, getNlsProject().getDevelopmentLanguage()));
-
         }
       }
       else {

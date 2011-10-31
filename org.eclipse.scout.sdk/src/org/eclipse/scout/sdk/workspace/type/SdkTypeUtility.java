@@ -61,6 +61,8 @@ public class SdkTypeUtility {
   static final IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
   static final IType iValueField = ScoutSdk.getType(RuntimeClasses.IValueField);
   static final IType iCompositeField = ScoutSdk.getType(RuntimeClasses.ICompositeField);
+  static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
+
   private static SdkTypeUtility instance = new SdkTypeUtility();
 
   private SdkTypeUtility() {
@@ -167,7 +169,7 @@ public class SdkTypeUtility {
         }
         else if ("sdkCommand".equals(memberName)) {
           try {
-            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+            Matcher m = PATTERN.matcher((String) value);
             if (m.find() && m.group().length() > 0) {
               String opString = m.group();
               sdkCommand = SdkCommand.valueOf(opString);
@@ -178,7 +180,7 @@ public class SdkTypeUtility {
           }
 //          if (isOwner) {
 //            try {
-//              Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+//              Matcher m = PATTERN.matcher((String) value);
 //              if (m.find() && m.group().length() > 0) {
 //                String opString = m.group();
 //                SdkCommand op = SdkCommand.valueOf(opString);
@@ -205,7 +207,7 @@ public class SdkTypeUtility {
         }
         else if ("defaultSubtypeSdkCommand".equals(memberName)) {
           try {
-            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+            Matcher m = PATTERN.matcher((String) value);
             if (m.find() && m.group().length() > 0) {
               String opString = m.group();
               subTypeCommand = DefaultSubtypeSdkCommand.valueOf(opString);
@@ -215,7 +217,7 @@ public class SdkTypeUtility {
             ScoutSdk.logError("could not parse formdata annotation defaultSubtypeCommand '" + value + "'.", e);
           }
 //          try {
-//            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+//            Matcher m = PATTERN.matcher((String) value);
 //            if (m.find() && m.group().length() > 0) {
 //              String opString = m.group();
 //              DefaultSubtypeSdkCommand op = DefaultSubtypeSdkCommand.valueOf(opString);
@@ -289,7 +291,7 @@ public class SdkTypeUtility {
 //        Object value = p.getValue();
 //        if ("value".equals(memberName)) {
 //          try {
-//            Matcher m = Pattern.compile("[^\\.]*$").matcher((String) value);
+//            Matcher m = PATTERN.matcher((String) value);
 //            if (m.find() && m.group().length() > 0) {
 //              String opString = m.group();
 //              Operation op = Operation.valueOf(opString);

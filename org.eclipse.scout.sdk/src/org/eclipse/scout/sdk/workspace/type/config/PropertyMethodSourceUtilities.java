@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 public class PropertyMethodSourceUtilities {
 
-  private static final String REGEX_STRING_SIMPLE = "^(\\\")([^\\\"]*)(\\\")$";
+  private static final Pattern REGEX_STRING_SIMPLE = Pattern.compile("^(\\\")([^\\\"]*)(\\\")$");
   /**
    * with "com.bsiag.test.ClassA.Field"
    * group1 = com.bsiag.test.ClassA.
@@ -41,13 +41,13 @@ public class PropertyMethodSourceUtilities {
    * group2 = null
    * group3 = Field
    */
-  public final static String REGEX_FIELD_NEW = "\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?([A-Za-z][a-zA-Z0-9_]*)\\b";
-  public final static String REGEX_NUMBER_PREFIX = "^(\\+|\\-)?([A-Za-z0-9_\\.]*)$";
-  public final static String REGEX_NUMBER_INFINITY = "^(\\-)?(inf)$";
-  private final static String REGEX_SIMPLE_DOUBLE = "^[\\+\\-0-9eEf\\.\\,']*[Dd]?$";
-  private final static String REGEX_SIMPLE_INTEGER = "^[\\+\\-0-9eE']*$";
-  private final static String REGEX_SIMPLE_LONG = "^[\\+\\-0-9eE']*[lL]?$";
-  private final static String REGEX_SIMPLE_BOOLEAN = "^(false|true)$";
+  private final static Pattern REGEX_FIELD_NEW = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?([A-Za-z][a-zA-Z0-9_]*)\\b");
+  private final static Pattern REGEX_NUMBER_PREFIX = Pattern.compile("^(\\+|\\-)?([A-Za-z0-9_\\.]*)$");
+  private final static Pattern REGEX_NUMBER_INFINITY = Pattern.compile("^(\\-)?(inf)$");
+  private final static Pattern REGEX_SIMPLE_DOUBLE = Pattern.compile("^[\\+\\-0-9eEf\\.\\,']*[Dd]?$");
+  private final static Pattern REGEX_SIMPLE_INTEGER = Pattern.compile("^[\\+\\-0-9eE']*$");
+  private final static Pattern REGEX_SIMPLE_LONG = Pattern.compile("^[\\+\\-0-9eE']*[lL]?$");
+  private final static Pattern REGEX_SIMPLE_BOOLEAN = Pattern.compile("^(false|true)$");
   /**
    * with com.bsiag.Test.class
    * group1 = com.bsiag.Test.
@@ -58,12 +58,13 @@ public class PropertyMethodSourceUtilities {
    * group2 = Test.
    * group3 = class
    */
-  private final static String REGEX_CLASS_REFERENCE = "\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?(class)\\b";
-  private final static String REGEX_NULL = "\\bnull\\b";
+  private final static Pattern REGEX_CLASS_REFERENCE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?(class)\\b");
+  private final static Pattern REGEX_NULL = Pattern.compile("\\bnull\\b");
 
-  private final static String REGEX_NLS_DEFAULT_SCOUT = "\\s*ScoutTexts.get\\(\\s*null\\s*\\)\\s*";
-  private final static String REGEX_METHOD_RETURN_NON_NLS_TEXT = "\\s*\"(.*)\"\\s*";
-  private final static String REGEX_METHOD_RETURN_NLS_TEXT = "[A-Za-z0-9_-]*\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*";
+  //private final static String REGEX_NLS_DEFAULT_SCOUT = "\\s*ScoutTexts.get\\(\\s*null\\s*\\)\\s*";
+
+  private final static Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\s*\"(.*)\"\\s*");
+  private final static Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("[A-Za-z0-9_-]*\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*");
 
   private static PropertyMethodSourceUtilities instance = new PropertyMethodSourceUtilities();
 
@@ -90,7 +91,7 @@ public class PropertyMethodSourceUtilities {
 
   private String getMethodReturnValueImpl(IMethod method) throws CoreException {
     try {
-      Matcher m = Pattern.compile(Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, Pattern.DOTALL).matcher(method.getSource());
+      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(method.getSource());
       if (m.find()) {
         return m.group(1).trim();
       }
@@ -122,17 +123,17 @@ public class PropertyMethodSourceUtilities {
   }
 
   private String parseReturnParameterStringImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    if (parameter.matches(REGEX_NULL)) {
+    if (REGEX_NULL.matcher(parameter).matches()) {
       return null;
     }
-    Matcher matcher = Pattern.compile(REGEX_STRING_SIMPLE).matcher(parameter);
+    Matcher matcher = REGEX_STRING_SIMPLE.matcher(parameter);
     if (matcher.find()) {
       return matcher.group(2);
     }
     else {
       String referencedValue = findReferencedValue(parameter, method, superTypeHierarchy);
       if (referencedValue != null) {
-        matcher = Pattern.compile(REGEX_STRING_SIMPLE).matcher(referencedValue);
+        matcher = REGEX_STRING_SIMPLE.matcher(referencedValue);
         if (matcher.find()) {
           return matcher.group(2);
         }
@@ -157,7 +158,7 @@ public class PropertyMethodSourceUtilities {
   }
 
   private Double parseReturnParameterDoubleImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    if (parameter.matches(REGEX_NULL) || parameter.equals("")) {
+    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
     if (parameter.equals("Double.MAX_VALUE")) {
@@ -167,7 +168,7 @@ public class PropertyMethodSourceUtilities {
     if (parameter.equals("-Double.MAX_VALUE")) {
       return -Double.MAX_VALUE;
     }
-    Matcher infMatcher = Pattern.compile(REGEX_NUMBER_INFINITY).matcher(parameter);
+    Matcher infMatcher = REGEX_NUMBER_INFINITY.matcher(parameter);
     if (infMatcher.find()) {
       if (infMatcher.group(1) != null) {
         return -Double.MAX_VALUE;
@@ -176,7 +177,7 @@ public class PropertyMethodSourceUtilities {
         return Double.MAX_VALUE;
       }
     }
-    if (parameter.matches(REGEX_SIMPLE_DOUBLE)) {
+    if (REGEX_SIMPLE_DOUBLE.matcher(parameter).matches()) {
       parameter = parameter.replace('e', 'E');
       parameter = parameter.replace("E+", "E");
       try {
@@ -187,7 +188,7 @@ public class PropertyMethodSourceUtilities {
       }
     }
     String prefix = "";
-    Matcher matcher = Pattern.compile(REGEX_NUMBER_PREFIX).matcher(parameter);
+    Matcher matcher = REGEX_NUMBER_PREFIX.matcher(parameter);
     if (matcher.find()) {
       if (matcher.group(1) != null) {
         prefix = matcher.group(1);
@@ -230,7 +231,7 @@ public class PropertyMethodSourceUtilities {
       // void try to find referenced value
     }
     String prefix = "";
-    Matcher matcher = Pattern.compile(REGEX_NUMBER_PREFIX).matcher(parameter);
+    Matcher matcher = REGEX_NUMBER_PREFIX.matcher(parameter);
     if (matcher.find()) {
       if (matcher.group(1) != null) {
         prefix = matcher.group(1);
@@ -252,7 +253,7 @@ public class PropertyMethodSourceUtilities {
   }
 
   private Integer parseReturnParameterIntegerImpl(String parameter) throws CoreException {
-    if (parameter.matches(REGEX_NULL) || parameter.equals("")) {
+    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
     if (parameter.equals("Integer.MAX_VALUE")) {
@@ -262,7 +263,7 @@ public class PropertyMethodSourceUtilities {
     if (parameter.equals("-Integer.MAX_VALUE")) {
       return -Integer.MAX_VALUE;
     }
-    Matcher infMatcher = Pattern.compile(REGEX_NUMBER_INFINITY).matcher(parameter);
+    Matcher infMatcher = REGEX_NUMBER_INFINITY.matcher(parameter);
     if (infMatcher.find()) {
       if (infMatcher.group(1) != null) {
         return -Integer.MAX_VALUE;
@@ -271,7 +272,7 @@ public class PropertyMethodSourceUtilities {
         return Integer.MAX_VALUE;
       }
     }
-    if (parameter.matches(REGEX_SIMPLE_INTEGER)) {
+    if (REGEX_SIMPLE_INTEGER.matcher(parameter).matches()) {
       parameter = parameter.replace('e', 'E');
       parameter = parameter.replace("E+", "E");
       try {
@@ -306,7 +307,7 @@ public class PropertyMethodSourceUtilities {
       // void work on with referenced values
     }
     String prefix = "";
-    Matcher matcher = Pattern.compile(REGEX_NUMBER_PREFIX).matcher(parameter);
+    Matcher matcher = REGEX_NUMBER_PREFIX.matcher(parameter);
     if (matcher.find()) {
       if (matcher.group(1) != null) {
         prefix = matcher.group(1);
@@ -329,7 +330,7 @@ public class PropertyMethodSourceUtilities {
   }
 
   private Long parseReturnParameterLongImpl(String parameter) throws CoreException {
-    if (parameter.matches(REGEX_NULL) || parameter.equals("")) {
+    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
     // handle MIN_VAL / MAX_VAL
@@ -340,7 +341,7 @@ public class PropertyMethodSourceUtilities {
     if (parameter.equals("Long.MIN_VALUE")) {
       return Long.MIN_VALUE;
     }
-    Matcher infMatcher = Pattern.compile(REGEX_NUMBER_INFINITY).matcher(parameter);
+    Matcher infMatcher = REGEX_NUMBER_INFINITY.matcher(parameter);
     if (infMatcher.find()) {
       if (infMatcher.group(1) != null) {
         return Long.MIN_VALUE;
@@ -349,7 +350,7 @@ public class PropertyMethodSourceUtilities {
         return Long.MAX_VALUE;
       }
     }
-    if (parameter.matches(REGEX_SIMPLE_LONG)) {
+    if (REGEX_SIMPLE_LONG.matcher(parameter).matches()) {
       parameter = parameter.replace('e', 'E');
       parameter = parameter.replace("E+", "E");
       try {
@@ -367,10 +368,10 @@ public class PropertyMethodSourceUtilities {
   }
 
   private boolean parseReturnParameterBooleanImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    if (parameter.matches(REGEX_SIMPLE_BOOLEAN)) {
+    if (REGEX_SIMPLE_BOOLEAN.matcher(parameter).matches()) {
       return Boolean.parseBoolean(parameter);
     }
-    Matcher matcher = Pattern.compile(REGEX_NUMBER_PREFIX).matcher(parameter);
+    Matcher matcher = REGEX_NUMBER_PREFIX.matcher(parameter);
     if (matcher.find()) {
       parameter = matcher.group(2);
       String referencedValue = findReferencedValue(parameter, method, superTypeHierarchy);
@@ -393,10 +394,10 @@ public class PropertyMethodSourceUtilities {
 
   private IType parseReturnParameterClassImpl(String parameter, IMethod method) throws CoreException {
     try {
-      if (parameter.matches(REGEX_NULL)) {
+      if (REGEX_NULL.matcher(parameter).matches()) {
         return null;
       }
-      Matcher matcher = Pattern.compile(REGEX_CLASS_REFERENCE).matcher(parameter);
+      Matcher matcher = REGEX_CLASS_REFERENCE.matcher(parameter);
       if (matcher.find()) {
         String className = matcher.group(1);
         className = className.substring(0, className.length() - 1);
@@ -417,7 +418,7 @@ public class PropertyMethodSourceUtilities {
   }
 
   private String findReferencedValue(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    Matcher matcher = Pattern.compile(REGEX_FIELD_NEW).matcher(parameter);
+    Matcher matcher = REGEX_FIELD_NEW.matcher(parameter);
     if (matcher.find()) {
       try {
         if (matcher.group(2) != null) {
@@ -452,7 +453,7 @@ public class PropertyMethodSourceUtilities {
     if (input.equals("null")) {
       return "";
     }
-    Matcher matcher = Pattern.compile(REGEX_FIELD_NEW).matcher(input);
+    Matcher matcher = REGEX_FIELD_NEW.matcher(input);
     if (matcher.find()) {
       try {
         if (matcher.group(2) != null) {
@@ -515,15 +516,15 @@ public class PropertyMethodSourceUtilities {
     if (input == null || input.equals("null")) {
       return null;
     }
-    if (input.matches(REGEX_NLS_DEFAULT_SCOUT)) {
+    /*if (input.matches(REGEX_NLS_DEFAULT_SCOUT)) {
       return null;
-    }
-    Matcher m = Pattern.compile(REGEX_METHOD_RETURN_NON_NLS_TEXT).matcher(input);
+    }*/
+    Matcher m = REGEX_METHOD_RETURN_NON_NLS_TEXT.matcher(input);
     if (m.matches()) {
       String s = m.group(1);
       return s;
     }
-    m = Pattern.compile(Regex.replace(REGEX_METHOD_RETURN_NLS_TEXT)).matcher(input);
+    m = REGEX_METHOD_RETURN_NLS_TEXT.matcher(input);
     if (m.matches()) {
       String key = m.group(1);
       return key;

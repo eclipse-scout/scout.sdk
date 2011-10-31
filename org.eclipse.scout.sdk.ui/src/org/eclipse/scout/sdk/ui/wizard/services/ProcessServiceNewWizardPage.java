@@ -153,10 +153,10 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(ScoutIdeProperties.SUFFIX_PROCESS_SERVICE)) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
-    if (getTypeName().matches(Regex.REGEX_WELLFORMD_JAVAFIELD)) {
+    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
-    else if (getTypeName().matches(Regex.REGEX_JAVAFIELD)) {
+    else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
       return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {

@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.scout.sdk.util.Regex;
@@ -183,8 +182,6 @@ public class ScoutIdeProperties {
   public static final String NULL = "None";
   public static final String INPUT_MULTI_UNDEFINED = "###";
 
-  private static Pattern propertyMethodTrim = Pattern.compile(Regex.REGEX_PROPERTY_METHOD_TRIM);
-
   private ScoutIdeProperties() {
   }
 
@@ -224,7 +221,7 @@ public class ScoutIdeProperties {
 
   public static String getMethodPresenterName(IMethod method) {
     String name = method.getElementName();
-    Matcher m = propertyMethodTrim.matcher(name);
+    Matcher m = Regex.REGEX_PROPERTY_METHOD_TRIM.matcher(name);
     if (m.find()) {
       name = m.group(1);
     }

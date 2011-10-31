@@ -54,6 +54,7 @@ import org.osgi.framework.Bundle;
 public class SimpleNlsProject extends AbstractNlsProject {
   private NlsType m_nlsClass;
   private PropertyChangeListener m_nlsClassPropertyListener;
+  private final static Pattern PATTERN = Pattern.compile("^([^_]*)_[0-9]+\\.[0-9]+\\.[0-9]+(\\.[^.]+)?\\.jar$");
 
   public SimpleNlsProject(NlsType type) {
     super(type.getType());
@@ -86,7 +87,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
       IJavaElement root = type.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
       String bundleId = null;
       if (root != null) {
-        Matcher matcher = Pattern.compile("^([^_]*)_[0-9]+\\.[0-9]+\\.[0-9]+(\\.[^.]+)?\\.jar$").matcher(root.getElementName());
+        Matcher matcher = PATTERN.matcher(root.getElementName());
         if (matcher.matches()) {
           bundleId = matcher.group(1);
         }

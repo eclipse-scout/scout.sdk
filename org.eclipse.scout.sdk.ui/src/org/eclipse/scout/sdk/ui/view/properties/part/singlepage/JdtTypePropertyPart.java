@@ -178,7 +178,9 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       filterPresenter.getContainer().setLayoutData(layoutData);
       getSection(SECTION_ID_FILTER).setExpanded(false);
     }
+
     m_configPropertyType = new ConfigPropertyType(getPage().getType());
+
     ConfigurationMethod[] configPropertyMethods = m_configPropertyType.getConfigurationMethods(ConfigurationMethod.PROPERTY_METHOD);
     if (configPropertyMethods != null && configPropertyMethods.length > 0) {
       ISection configPropertiesSection = createSection(SECTION_ID_PROPERTIES, Texts.get("Properties"));
@@ -408,6 +410,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     else {
       ScoutSdkUi.logWarning("Could not find a presenter for property '" + propertyType + "'.");
     }
+
     return presenter;
   }
 

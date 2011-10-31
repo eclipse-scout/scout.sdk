@@ -52,12 +52,12 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
 
   @Override
   public IJavaElement[] readSource() throws CoreException {
-    ICachedTypeHierarchy outlineHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iOutline);
+    //ICachedTypeHierarchy outlineHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iOutline);
     ArrayList<IJavaElement> props = new ArrayList<IJavaElement>();
     for (IType type : TypeUtility.getTypeOccurenceInMethod(getMethod().peekMethod())) {
-      if (outlineHierarchy.isSubtype(iOutline, type)) {
-        props.add(type);
-      }
+      //if (outlineHierarchy.isSubtype(iOutline, type)) {
+      props.add(type);
+      //}
     }
     return props.toArray(new IJavaElement[props.size()]);
   }

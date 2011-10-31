@@ -55,7 +55,6 @@ public class ScoutSourceUtilities {
     if (StringUtility.isNullOrEmpty(methodName)) {
       return name;
     }
-
     IMethod method = findMethodInHierarchy(type, methodName);
     if (method == null || !method.exists()) {
       return name;
@@ -69,18 +68,7 @@ public class ScoutSourceUtilities {
       return name;
     }
     IType referenceTypes = nlsProject.getNlsAccessorType();
-    if (referenceTypes != null/* && referenceTypes.length > 0*/) {
-      StringBuilder classBuilder = new StringBuilder();
-      //boolean returnTypeName = true;
-      classBuilder.append("(");
-      classBuilder.append(referenceTypes.getFullyQualifiedName());
-//      for (int i = 0; i < referenceTypes.length; i++) {
-//        classBuilder.append(referenceTypes[i].getFullyQualifiedName());
-//        if (i < (referenceTypes.length - 1)) {
-//          classBuilder.append("|");
-//        }
-//      }
-      classBuilder.append(")");
+    if (referenceTypes != null) {
       String methodSource = null;
       try {
         methodSource = method.getSource();
@@ -89,16 +77,9 @@ public class ScoutSourceUtilities {
         ScoutSdk.logWarning("could not find nls text of method '" + method.getElementName() + "'.", e);
         return name;
       }
-      Matcher m = Pattern.compile(Regex.REGEX_METHOD_RETURN_NLS_TEXT_DEFAULT, Pattern.DOTALL).matcher(methodSource);
-      if (m.find()) {
-        return name;
-      }
-      m = Pattern.compile(Regex.REGEX_METHOD_RETURN_NON_NLS_TEXT, Pattern.DOTALL).matcher(methodSource);
-      if (m.find()) {
-        String s = m.group(1);
-        return name + " (" + s + ")";
-      }
-      m = Pattern.compile(Regex.replace(Regex.REGEX_METHOD_RETURN_NLS_TEXT, classBuilder.toString()), Pattern.DOTALL).matcher(methodSource);
+
+      // check for TEXTS.get("...") value
+      Matcher m = Regex.REGEX_METHOD_RETURN_NLS_TEXT.matcher(methodSource);
       if (m.find()) {
         String key = m.group(2);
         String translation = key;
@@ -108,18 +89,12 @@ public class ScoutSourceUtilities {
         }
         return name + " (" + translation + ")";
       }
-      m = Pattern.compile(Regex.replace(Regex.REGEX_METHOD_RETURN_NLS_TEXT_WITH_KEY, classBuilder.toString()), Pattern.DOTALL).matcher(methodSource);
+
+      // check for constant value
+      m = Regex.REGEX_METHOD_RETURN_NON_NLS_TEXT.matcher(methodSource);
       if (m.find()) {
-        String key = m.group(3);
-        String translation = key;
-        INlsEntry entry = nlsProject.getEntry(key);
-        if (entry != null) {
-          translation = entry.getTranslation(nlsProject.getDevelopmentLanguage(), true);
-        }
-        return name + " (" + translation + ")";
-      }
-      else {
-        // no label defined
+        String s = m.group(1);
+        return name + " (" + s + ")";
       }
     }
     return name;
@@ -127,7 +102,7 @@ public class ScoutSourceUtilities {
 
   private IMethod findMethodInHierarchy(IType type, String methodName) {
     IMethod method = TypeUtility.getMethod(type, methodName);
-    if (method != null && method.exists()) {
+    if (TypeUtility.exists(method)) {
       return method;
     }
     try {
@@ -135,7 +110,7 @@ public class ScoutSourceUtilities {
       IType declaringType = superTypeHierarchy.getSuperclass(type);
       while (declaringType != null) {
         method = TypeUtility.getMethod(declaringType, methodName);
-        if (method != null && method.exists()) {
+        if (TypeUtility.exists(method)) {
           return method;
         }
         declaringType = superTypeHierarchy.getSuperclass(declaringType);
@@ -171,7 +146,7 @@ public class ScoutSourceUtilities {
     return retVal;
   }
 
-  private Pattern m_fieldValue = Pattern.compile("=\\s*([^\\s\\;]*)\\s*\\;", Pattern.DOTALL);
+  private static final Pattern m_fieldValue = Pattern.compile("=\\s*([^\\s\\;]*)\\s*\\;", Pattern.DOTALL);
 
   private String findFieldValueInHierarchyImpl(IType type, String name, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
@@ -236,8 +211,7 @@ public class ScoutSourceUtilities {
   } // end class P_CompareableSourceRange
 
   public static String removeLeadingCommentAndAnnotationLines(String methodBody) {
-    Pattern methodDefinition = Pattern.compile(Regex.REGEX_METHOD_DEFINITION, Pattern.DOTALL);
-    Matcher matcherMethodDefinition = methodDefinition.matcher(methodBody);
+    Matcher matcherMethodDefinition = Regex.REGEX_METHOD_DEFINITION.matcher(methodBody);
     if (matcherMethodDefinition.find()) {
       methodBody = methodBody.substring(matcherMethodDefinition.start());
     }

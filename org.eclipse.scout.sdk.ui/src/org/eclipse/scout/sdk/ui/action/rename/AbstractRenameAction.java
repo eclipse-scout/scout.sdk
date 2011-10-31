@@ -90,10 +90,10 @@ public abstract class AbstractRenameAction extends AbstractScoutHandler {
     if (newName.equals(getReadOnlySuffix())) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Name can not be null or empty");
     }
-    if (newName.matches(Regex.REGEX_WELLFORMD_JAVAFIELD)) {
+    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(newName).matches()) {
       return Status.OK_STATUS;
     }
-    if (newName.matches(Regex.REGEX_JAVAFIELD)) {
+    if (Regex.REGEX_JAVAFIELD.matcher(newName).matches()) {
       return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     return Status.OK_STATUS;

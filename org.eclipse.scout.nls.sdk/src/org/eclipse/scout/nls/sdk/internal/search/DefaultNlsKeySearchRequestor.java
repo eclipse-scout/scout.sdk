@@ -28,6 +28,7 @@ import org.eclipse.search.ui.text.Match;
 public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor {
   private Map<String, List<Match>> m_matches;
   private EventListenerList m_eventListeners = new EventListenerList();
+  private static final Pattern PATTERN = Pattern.compile("\\A\\s*\\.\\s*get\\s*\\(\\s*\\\"([^\\\"]*)\\\"\\s*[\\)\\,\\s]{1}", Pattern.MULTILINE);
 
   /**
    * @param project
@@ -91,9 +92,9 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
     if (startIndex > 0 && startIndex < statement.length()) {
       statement = statement.substring(startIndex);
     }
-    Pattern p = Pattern.compile("\\A\\s*\\.\\s*get\\s*\\(\\s*\\\"([^\\\"]*)\\\"\\s*[\\)\\,\\s]{1}", Pattern.MULTILINE);
+
     // Create a matcher with an input string
-    Matcher m = p.matcher(statement);
+    Matcher m = PATTERN.matcher(statement);
     if (m.find()) {
       return statement.substring(m.start(1), m.end(1));
     }

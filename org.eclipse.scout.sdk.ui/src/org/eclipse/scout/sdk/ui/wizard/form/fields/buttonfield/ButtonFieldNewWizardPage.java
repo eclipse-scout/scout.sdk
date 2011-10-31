@@ -188,10 +188,10 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     if (TypeUtility.findInnerType(m_declaringType, getTypeName()) != null) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
-    if (getTypeName().matches(Regex.REGEX_WELLFORMD_JAVAFIELD)) {
+    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
-    else if (getTypeName().matches(Regex.REGEX_JAVAFIELD)) {
+    else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
       return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {

@@ -22,9 +22,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
 import org.eclipse.scout.nls.sdk.internal.ui.NlsUi;
@@ -33,6 +35,8 @@ import org.eclipse.scout.nls.sdk.internal.ui.fields.IInputChangedListener;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.TextProposalField;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
 import org.eclipse.scout.nls.sdk.services.NlsSdkService;
+import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
+import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
 import org.eclipse.scout.nls.sdk.services.operation.NewNlsServiceModel;
 import org.eclipse.scout.nls.sdk.simple.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.ui.wizard.ResourceProposalModel;
@@ -59,12 +63,36 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
   private TextField<String> m_translationFileName;
 
   private final NewNlsServiceModel m_desc;
+  private final NlsServiceType[] m_existingServicesInPlugin;
 
   public NewTextProviderServiceWizardPage(String pageName, NewNlsServiceModel desc) {
     super(pageName);
     setTitle("Create a new Text Provider Service");
     setDescription("Creates a new Text Provider Service.");
     m_desc = desc;
+    m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
+  }
+
+  private NlsServiceType[] getTextProviderServicesInSamePlugin() {
+    IType[] candidates;
+    try {
+      candidates = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
+      ArrayList<NlsServiceType> ret = new ArrayList<NlsServiceType>(candidates.length);
+
+      for (IType t : candidates) {
+        if (m_desc.getBundle().getProject().equals(t.getJavaProject().getProject())) {
+          NlsServiceType type = new NlsServiceType(t);
+          if (type.getTranslationsFolderName() != null) {
+            ret.add(type);
+          }
+        }
+      }
+      return ret.toArray(new NlsServiceType[ret.size()]);
+    }
+    catch (JavaModelException e) {
+      NlsCore.logWarning(e);
+      return null;
+    }
   }
 
   @Override
@@ -173,7 +201,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_translationFileName.setInputValidator(new IInputValidator() {
       @Override
       public IStatus isValid(String value) {
-        if (value.matches(Regex.REGEX_JAVAFIELD)) {
+        if (Regex.REGEX_JAVAFIELD.matcher(value).matches()) {
           return Status.OK_STATUS;
         }
         return Status.CANCEL_STATUS;
@@ -225,7 +253,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     if (m_desc.getClassName() == null) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The class name must be specified."));
     }
-    else if (!m_desc.getClassName().matches(Regex.REGEX_JAVAFIELD)) {
+    else if (!Regex.REGEX_JAVAFIELD.matcher(m_desc.getClassName()).matches()) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The service class name is invalid."));
     }
 
@@ -236,7 +264,26 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     if (m_desc.getTranlationFileName() == null) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The translation file name must be specified."));
     }
+
+    for (NlsServiceType existing : m_existingServicesInPlugin) {
+      if (CompareUtility.equals(cleanFolder(existing.getTranslationsFolderName()), cleanFolder(m_desc.getTranslationFolder())) &&
+          CompareUtility.equals(existing.getTranslationsPrefix(), m_desc.getTranlationFileName())) {
+        multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "A service for the given translations does already exist."));
+        break;
+      }
+    }
+
     multiStatus.add(Status.OK_STATUS);
+  }
+
+  private static String cleanFolder(String f) {
+    if (f != null && f.startsWith("/")) {
+      f = f.substring(1);
+    }
+    if (f != null && f.endsWith("/")) {
+      f = f.substring(0, f.length() - 1);
+    }
+    return f;
   }
 
   private void attachGridData(Control c) {

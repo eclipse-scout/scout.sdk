@@ -274,7 +274,7 @@ public class TypeUtility {
     ArrayList<IType> types = new ArrayList<IType>();
     if (TypeUtility.exists(method)) {
       try {
-        Matcher matcher = Pattern.compile(Regex.REGEX_METHOD_NEW_TYPE_OCCURRENCES, Pattern.DOTALL).matcher(method.getSource());
+        Matcher matcher = Regex.REGEX_METHOD_NEW_TYPE_OCCURRENCES.matcher(method.getSource());
         while (matcher.find()) {
           try {
             String resolvedSignature = ScoutSignature.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), method.getDeclaringType());
@@ -311,7 +311,7 @@ public class TypeUtility {
   public static IType[] getTypeOccurenceInSnippet(IMember container, String snippet) {
     ArrayList<IType> types = new ArrayList<IType>();
     try {
-      Matcher matcher = Pattern.compile(Regex.REGEX_METHOD_CLASS_TYPE_OCCURRENCES, Pattern.DOTALL).matcher(snippet);
+      Matcher matcher = Regex.REGEX_METHOD_CLASS_TYPE_OCCURRENCES.matcher(snippet);
       while (matcher.find()) {
         try {
           String resolvedSignature = ScoutSignature.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), container.getDeclaringType());

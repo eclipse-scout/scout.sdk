@@ -47,7 +47,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   private int m_quality;
   private PageDirtyListener m_pageDirtyListener;
   // child filter cached
-  private PageFilter m_cachedPageFilter;
+  //private PageFilter m_cachedPageFilter;
 
   private ImageDescriptor m_imageDesc;
   private String m_textColorId;

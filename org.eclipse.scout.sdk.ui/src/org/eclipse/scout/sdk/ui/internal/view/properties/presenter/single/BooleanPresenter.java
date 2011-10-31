@@ -4,14 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaModelException;
@@ -102,7 +101,7 @@ public class BooleanPresenter extends AbstractMethodPresenter {
   }
 
   protected void parseMethodBody() throws CoreException {
-    Matcher m = Pattern.compile(Regex.REGEX_PROPERTY_METHOD_REPRESENTER_BOOLEAN, Pattern.DOTALL).matcher(getMethod().getSource());
+    Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_BOOLEAN.matcher(getMethod().getSource());
     if (m.find()) {
       m_checkbox.setSelection(Boolean.valueOf(m.group(1)));
     }

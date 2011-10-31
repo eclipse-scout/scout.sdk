@@ -36,8 +36,8 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
  *
  */
 public class ConfigPropertyType {
-  private String m_configPropertyRegex;
-  private String m_configOperationRegex;
+  private final static Pattern CONFIG_PROPERTY_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigProperty.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(Signature.createTypeSignature(RuntimeClasses.ConfigProperty, true)) + ")$");
+  private final static Pattern CONFIG_OPERATION_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigOperation.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(Signature.createTypeSignature(RuntimeClasses.ConfigOperation, true)) + ")$");
 
   private final IType m_type;
   private TreeMap<String, ConfigurationMethod> m_configurationMethods;
@@ -46,8 +46,6 @@ public class ConfigPropertyType {
 
   public ConfigPropertyType(IType type) {
     m_type = type;
-    m_configPropertyRegex = "^(" + RuntimeClasses.ConfigProperty.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(Signature.createTypeSignature(RuntimeClasses.ConfigProperty, true)) + ")$";
-    m_configOperationRegex = "^(" + RuntimeClasses.ConfigOperation.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(Signature.createTypeSignature(RuntimeClasses.ConfigOperation, true)) + ")$";
     // visit methods
     try {
       TreeMap<String, ConfigurationMethod> configurationMethods = new TreeMap<String, ConfigurationMethod>(new P_MethodNameComparator());
@@ -87,7 +85,7 @@ public class ConfigPropertyType {
         for (IAnnotation a : m.getAnnotations()) {
           if (TypeUtility.exists(a)) {
             String annotationName = a.getElementName();
-            if (annotationName.matches(m_configPropertyRegex)) {
+            if (CONFIG_PROPERTY_REGEX.matcher(annotationName).matches()) {
               String configPropertyType = null;
               for (IMemberValuePair p : a.getMemberValuePairs()) {
                 if ("value".equals(p.getMemberName())) {
@@ -103,7 +101,7 @@ public class ConfigPropertyType {
                 break;
               }
             }
-            else if (annotationName.matches(m_configOperationRegex)) {
+            else if (CONFIG_OPERATION_REGEX.matcher(annotationName).matches()) {
               configMethod = new ConfigurationMethod(getType(), superTypeHierarchy, methodName, ConfigurationMethod.OPERATION_METHOD);
               configMethod.pushMethod(m);
               collector.put(methodName, configMethod);
@@ -180,7 +178,7 @@ public class ConfigPropertyType {
             for (IAnnotation a : m.getAnnotations()) {
               if (TypeUtility.exists(a)) {
                 String annotationName = a.getElementName();
-                if (annotationName.matches(m_configPropertyRegex)) {
+                if (CONFIG_PROPERTY_REGEX.matcher(annotationName).matches()) {
                   String configPropertyType = null;
                   for (IMemberValuePair p : a.getMemberValuePairs()) {
                     if ("value".equals(p.getMemberName())) {
@@ -195,7 +193,7 @@ public class ConfigPropertyType {
                     break;
                   }
                 }
-                else if (annotationName.matches(m_configOperationRegex)) {
+                else if (CONFIG_OPERATION_REGEX.matcher(annotationName).matches()) {
                   newMethod = new ConfigurationMethod(getType(), m_superTypeHierarchy, methodName, ConfigurationMethod.OPERATION_METHOD);
                   newMethod.pushMethod(m);
                   break;

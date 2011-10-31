@@ -139,10 +139,10 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
           m_notAllowedNames.contains("is" + getBeanName(true)))) {
         return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
-      if (propertyName.matches(Regex.REGEX_WELLFORMED_PROPERTY)) {
+      if (Regex.REGEX_WELLFORMED_PROPERTY.matcher(propertyName).matches()) {
         return Status.OK_STATUS;
       }
-      if (propertyName.matches(Regex.REGEX_JAVAFIELD)) {
+      if (Regex.REGEX_JAVAFIELD.matcher(propertyName).matches()) {
         return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
       }
       else {

@@ -573,14 +573,20 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
         }
         if (filter != null) {
           int size = elements.length;
-          ArrayList<IPage> out = new ArrayList<IPage>(size);
+          ArrayList<Object> out = new ArrayList<Object>(size);
           for (int i = 0; i < size; ++i) {
-            IPage element = (IPage) elements[i];
-            if (filter.accept(element)) {
-              out.add(element);
+            if (elements[i] instanceof IPage) {
+              IPage element = (IPage) elements[i];
+              if (filter.accept(element)) {
+                out.add(element);
+              }
+            }
+            else {
+              // e.g. "Loading..." node
+              out.add(elements[i]);
             }
           }
-          return out.toArray(new IPage[out.size()]);
+          return out.toArray(new Object[out.size()]);
         }
       }
       return elements;

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
-import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,9 +32,7 @@ import org.eclipse.pde.internal.core.iproduct.IConfigurationFileInfo;
 import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
-import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
@@ -82,6 +79,8 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   private P_RecomputeLaunchStateJob m_stateUpdateJob;
   private WorkspaceProductModel m_productModel;
 
+  private final static Pattern PATTERN = Pattern.compile("name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"", Pattern.MULTILINE);
+
   /**
    * @param toolkit
    * @param parent
@@ -91,9 +90,8 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     m_productFile = productFile;
     m_bundle = bundle;
     String prodName = null;
-    String regexp = "name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"";
     String productFileContent = "";
-    WorkspaceProductModel productModel = null;
+    /*WorkspaceProductModel productModel = null;
     try {
       productModel = ScoutSdkUtility.getProductModel(productFile, true);
 
@@ -102,8 +100,8 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     catch (Exception e) {
       ScoutSdkUi.logError("could not read product file '" + productFile.getFullPath() + "'.", e);
 
-    }
-    Matcher m = Pattern.compile(regexp, Pattern.MULTILINE).matcher(productFileContent);
+    }*/
+    Matcher m = PATTERN.matcher(productFileContent);
     if (m.find()) {
       prodName = m.group(2);
     }
@@ -111,7 +109,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       prodName = productFile.getParent().getName() + " " + productFile.getName();
     }
     m_productName = prodName;
-    System.out.println("name: " + productModel.getProduct().getName() + " " + m_productName);
+    //System.out.println("name: " + productModel.getProduct().getName() + " " + m_productName);
     create(getContainer(), productFile);
     m_launchListener = new P_LaunchListener();
     DebugPlugin.getDefault().getLaunchManager().addLaunchListener(m_launchListener);

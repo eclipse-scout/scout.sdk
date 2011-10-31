@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.util;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
@@ -32,7 +31,7 @@ public final class SdkMethodUtility {
 
   public static String getMethodReturnValue(IMethod method) {
     try {
-      Matcher m = Pattern.compile(Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, Pattern.DOTALL).matcher(method.getSource());
+      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(method.getSource());
       if (m.find()) {
         return m.group(1).trim();
       }
@@ -42,24 +41,6 @@ public final class SdkMethodUtility {
     }
     catch (JavaModelException e) {
       ScoutSdk.logError("could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
-    }
-    return null;
-  }
-
-  public static String getReturnTranslatedNlsText(IMethod method) throws CoreException {
-    String value = getMethodReturnValue(method);
-    if (value == null || value.equals("null")) {
-      return null;
-    }
-    // simple text like "blubber"
-    Matcher m = Pattern.compile("\\s*\"(.*)\"\\s*").matcher(value);
-    if (m.matches()) {
-      String s = m.group(1);
-      return s;
-    }
-    INlsEntry entry = getReturnNlsEntry(value, method);
-    if (entry != null) {
-      return entry.getTranslation(entry.getProject().getDevelopmentLanguage());
     }
     return null;
   }

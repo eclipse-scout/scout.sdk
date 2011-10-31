@@ -51,6 +51,9 @@ public class ScoutSdkUtility {
   public static String BUNDLE_ID_HTTP_REGISTRY = "org.eclipse.equinox.http.registry";
   public static String BUNDLE_ID_HTTP_SERVLETBRIDGE = "org.eclipse.equinox.http.servletbridge";
 
+  private final static Pattern QUALIFIED_SIG_REGEX = Pattern.compile("^([\\+\\[]*)([^\\<\\(\\;]*)(.*)$");
+  private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
+
   private static final ScoutSdkUtility instance = new ScoutSdkUtility();
 
   private ScoutSdkUtility() {
@@ -239,8 +242,7 @@ public class ScoutSdkUtility {
       return signature;
     }
     else {
-      String regex = "^([\\+\\[]*)([^\\<\\(\\;]*)(.*)$";
-      Matcher m = Pattern.compile(regex).matcher(signature);
+      Matcher m = QUALIFIED_SIG_REGEX.matcher(signature);
       if (m.find()) {
         String prefix = m.group(1);
         String simpleSignature = m.group(2);
@@ -310,7 +312,7 @@ public class ScoutSdkUtility {
     String workingSig = signature.replaceAll("/", ".");
     workingSig = Signature.getTypeErasure(workingSig);
     StringBuilder signatureBuilder = new StringBuilder();
-    Matcher prefMatcher = Pattern.compile("^([\\+\\[]+)(.*)$").matcher(workingSig);
+    Matcher prefMatcher = PREF_REGEX.matcher(workingSig);
     if (prefMatcher.find()) {
       signatureBuilder.append(prefMatcher.group(1));
       workingSig = prefMatcher.group(2);
@@ -352,7 +354,7 @@ public class ScoutSdkUtility {
     StringBuilder unresolvedSignature = new StringBuilder();
     // remove generic
     String typeErasure = Signature.getTypeErasure(signature);
-    Matcher prefMatcher = Pattern.compile("^([\\+\\[]+)(.*)$").matcher(typeErasure);
+    Matcher prefMatcher = PREF_REGEX.matcher(typeErasure);
     if (prefMatcher.find()) {
       unresolvedSignature.append(prefMatcher.group(1));
       typeErasure = prefMatcher.group(2);
