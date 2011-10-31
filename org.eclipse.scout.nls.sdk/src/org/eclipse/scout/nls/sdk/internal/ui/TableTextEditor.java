@@ -20,7 +20,6 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
@@ -50,7 +49,6 @@ public class TableTextEditor {
 
   private Rectangle computeBounds(TableCursor cursor, int style) {
     Rectangle bounds = new Rectangle(0, 0, 0, 0);
-
     Point size = null;
     if ((style & SWT.MULTI) != 0) {
       size = new Point(MULTILINE_EDITOR_SIZE.x, MULTILINE_EDITOR_SIZE.y);
@@ -59,29 +57,23 @@ public class TableTextEditor {
       size = new Point(cursor.getBounds().width, cursor.getBounds().height);
     }
     // max size is the table size
-    Composite table = cursor.getParent();
-    Point tableSize = table.getSize();
-    size.x = Math.min(tableSize.x, size.x);
-    size.y = Math.min(tableSize.y, size.y);
+    Rectangle displayBounds = cursor.getDisplay().getBounds();
+    size.x = Math.min(displayBounds.width, size.x);
+    size.y = Math.min(displayBounds.height, size.y);
     bounds.width = size.x;
     bounds.height = size.y;
 
-    Point tableLocation = table.toDisplay(table.getLocation());
-    Rectangle tableBoundsAbsolute = new Rectangle(0, 0, 0, 0);
-    tableBoundsAbsolute.x = tableLocation.x;
-    tableBoundsAbsolute.y = tableLocation.y;
-    tableBoundsAbsolute.width = tableSize.x;
-    tableBoundsAbsolute.height = tableSize.y;
-
     Point shellPosition = cursor.toDisplay(new Point(0, 0));
-    if ((shellPosition.x + size.x) > (tableBoundsAbsolute.x + tableBoundsAbsolute.width)) {
-      shellPosition.x = tableBoundsAbsolute.x + tableBoundsAbsolute.width - size.x;
-    }
-    if ((shellPosition.y + size.y) > (tableBoundsAbsolute.y + tableBoundsAbsolute.height)) {
-      shellPosition.y = tableBoundsAbsolute.y + tableBoundsAbsolute.height - size.y;
-    }
     bounds.x = shellPosition.x;
     bounds.y = shellPosition.y;
+
+    if ((bounds.x + bounds.width) > (displayBounds.x + displayBounds.width)) {
+      bounds.x = displayBounds.x + displayBounds.width - bounds.width;
+    }
+    if ((bounds.y + bounds.height) > (displayBounds.y + displayBounds.height)) {
+      bounds.x = displayBounds.y + displayBounds.height - bounds.height;
+    }
+
     return bounds;
   }
 
