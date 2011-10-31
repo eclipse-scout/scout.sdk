@@ -77,18 +77,22 @@ public class PluginModelModificationHelper {
    *          If the dependency should be re-exported.
    * @param optional
    *          If the dependency should be optional
+   * @return the created import or null is already exists.
    * @throws CoreException
    */
-  public void addDependency(String pluginId, boolean reexport, boolean optional) throws CoreException {
+  public IPluginImport addDependency(String pluginId, boolean reexport, boolean optional) throws CoreException {
     synchronized (m_model.getProject()) { // synchronized on project level to ensure a dependency is not added twice.
       for (IPluginImport existing : m_model.getPluginBase().getImports()) {
-        if (existing.getId().equals(pluginId)) return; // exists already
+        if (existing.getId().equals(pluginId)) {
+          return null; // exists already
+        }
       }
 
       IPluginImport imp = m_model.getBundlePluginModel().createImport(pluginId);
       imp.setReexported(reexport);
       imp.setOptional(optional);
       m_model.getPluginBase().add(imp);
+      return imp;
     }
   }
 
