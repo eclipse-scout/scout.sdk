@@ -56,11 +56,13 @@ public class MethodOverrideOperation extends MethodCreateOperation {
       return;
     }
     // generic substitutions
-    String returnTypeSig = ScoutSignature.getReturnTypeSignatureResolved(m_methodToOverride, getDeclaringType());
-    if (getGenericWildcardReplacement() != null) {
-      returnTypeSig = returnTypeSig.replaceAll("\\" + Signature.C_STAR, getGenericWildcardReplacement());
+    if (getReturnTypeSignature() == null) {
+      String returnTypeSig = ScoutSignature.getReturnTypeSignatureResolved(m_methodToOverride, getDeclaringType());
+      if (getGenericWildcardReplacement() != null) {
+        returnTypeSig = returnTypeSig.replaceAll("\\" + Signature.C_STAR, getGenericWildcardReplacement());
+      }
+      setReturnTypeSignature(returnTypeSig);
     }
-    setReturnTypeSignature(returnTypeSig);
     setMethodFlags(m_methodToOverride.getFlags());
     setExceptionSignatures(m_methodToOverride.getExceptionTypes());
     String[] paramNames = m_methodToOverride.getParameterNames();

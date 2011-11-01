@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
@@ -103,17 +102,17 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
+          String oldKey = "";
           if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
+            oldKey = getNlsName().getNlsEntry().getKey();
           }
           NlsProposal newName = (NlsProposal) event.proposal;
           setNlsNameInternal(newName);
-          if (newName != null && oldEntry != null) {
-            if (StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText()) || oldEntry.getKey().equals(m_typeNameField.getModifiableText())) {
+          if (newName != null) {
+            if (StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText()) || oldKey.equals(m_typeNameField.getModifiableText())) {
               m_typeNameField.setText(newName.getNlsEntry().getKey());
             }
-            if (StringUtility.isNullOrEmpty(m_formIdField.getModifiableText()) || oldEntry.getKey().equals(m_formIdField.getModifiableText())) {
+            if (StringUtility.isNullOrEmpty(m_formIdField.getModifiableText()) || oldKey.equals(m_formIdField.getModifiableText())) {
               m_formIdField.setText(newName.getNlsEntry().getKey());
             }
           }

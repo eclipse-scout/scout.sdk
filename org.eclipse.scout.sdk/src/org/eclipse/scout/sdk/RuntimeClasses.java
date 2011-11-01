@@ -197,6 +197,7 @@ public final class RuntimeClasses {
   public static final String ISequenceBox = "org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox";
   public static final String IServerSession = "org.eclipse.scout.rt.server.IServerSession";
   public static final String IService = "org.eclipse.scout.service.IService";
+  public static final String IService2 = "org.eclipse.scout.service.IService2";
   public static final String ISmartField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField";
   public static final String ISMTPService = "org.eclipse.scout.rt.server.services.common.smtp.ISMTPService";
   public static final String ISplitBox = "org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox";

@@ -112,7 +112,7 @@ public class ServiceNewOperation implements IOperation {
       }
     }
     if (getImplementationBundle() != null) {
-      String intSig = Signature.createTypeSignature(RuntimeClasses.IService, true);
+      String intSig = Signature.createTypeSignature(RuntimeClasses.IService2, true);
       if (getCreatedServiceInterface() != null) {
         intSig = Signature.createTypeSignature(getCreatedServiceInterface().getFullyQualifiedName(), true);
       }
