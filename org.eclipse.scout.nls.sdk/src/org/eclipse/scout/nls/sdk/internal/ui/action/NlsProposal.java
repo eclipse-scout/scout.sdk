@@ -69,7 +69,7 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
     if (allTranslations != null && allTranslations.size() > 0) {
       StringBuilder b = new StringBuilder();
       for (Entry<Language, String> e : allTranslations.entrySet()) {
-        b.append("'<b>" + e.getValue() + "</b>' [" + e.getKey().getDispalyName() + "]<br>");
+        b.append("'<b>" + e.getValue().replace("\n", "<br>") + "</b>' [" + e.getKey().getDispalyName() + "]<br>");
       }
       return b.toString();
     }

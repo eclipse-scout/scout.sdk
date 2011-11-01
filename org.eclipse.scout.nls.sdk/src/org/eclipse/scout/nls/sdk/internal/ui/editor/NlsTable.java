@@ -99,7 +99,6 @@ public class NlsTable extends Composite {
   }
 
   private void createContent(Composite parent) {
-    m_filterComp = new NlsFilterComponent(parent);
     m_table = new Table(parent, SWT.FULL_SELECTION | SWT.MULTI);
     m_table.setHeaderVisible(true);
     m_table.setLinesVisible(true);
@@ -114,6 +113,7 @@ public class NlsTable extends Composite {
 
     m_viewer = new TableViewer(m_table);
 
+    m_filterComp = new NlsFilterComponent(parent);
     m_filterComp.setTableViewer(m_viewer);
     m_viewer.setUseHashlookup(true);
     m_viewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -234,7 +234,6 @@ public class NlsTable extends Composite {
   }
 
   private void createColumns(Table table) {
-
     // cleare old columns
     TableColumn[] cols = m_table.getColumns();
     for (TableColumn col : cols) {
@@ -322,12 +321,11 @@ public class NlsTable extends Composite {
     }
     else {
       // update translation
-      NlsEntry copy = new NlsEntry(row);
-      copy.addTranslation(getLanguageOfTableColumn(column), newText);
-      AbstractJob job = new AbstractJob("update text", new Object[]{copy}) {
+      ((NlsEntry) row).addTranslation(getLanguageOfTableColumn(column), newText);
+      AbstractJob job = new AbstractJob("update text", new Object[]{new NlsEntry(row)}) {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
-          INlsEntry r = (INlsEntry) args[0];
+          NlsEntry r = (NlsEntry) args[0];
           m_tableModel.getProjects().updateRow(r, monitor);
           return Status.OK_STATUS;
         }
@@ -340,6 +338,7 @@ public class NlsTable extends Composite {
       catch (InterruptedException e) {
         NlsCore.logWarning(e);
       }
+      m_viewer.refresh(row);
       return job.getResult().isOK();
     }
   }
@@ -358,7 +357,8 @@ public class NlsTable extends Composite {
       refreshAll(false);
     }
     else {
-      m_viewer.update(row, null);
+      m_viewer.refresh(row);
+      //m_viewer.update(row, null);
     }
   }
 
@@ -396,7 +396,6 @@ public class NlsTable extends Composite {
   }
 
   public void showEditor() {
-
     TableCursor cursor = m_cursorManager.getCursor();
     Assert.isTrue(cursor.getColumn() == INDEX_COLUMN_KEYS);
     m_cursorManager.createEditableText();

@@ -99,9 +99,10 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
       if (m.find()) {
         String prefix = linePart.substring(m.start(2), offset - lineInfo.getOffset());
         String replacement = m.group(2);
-        IType referencedType = getReferencedType(findContextType(context.getCompilationUnit(), offset), m.group(1));
+        IType contextType = findContextType(context.getCompilationUnit(), offset);
+        IType referencedType = getReferencedType(contextType, m.group(1));
         if (referencedType != null) {
-          INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{referencedType});
+          INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{referencedType, contextType});
           if (nlsProject == null) {
             return NO_PROPOSALS;
           }

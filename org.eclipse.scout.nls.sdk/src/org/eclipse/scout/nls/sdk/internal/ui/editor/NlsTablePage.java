@@ -185,7 +185,7 @@ public class NlsTablePage extends Composite {
           m_table.getViewer().setSelection(new StructuredSelection(event.getEntry()));
           break;
         case NlsProjectEvent.TYPE_ENTRY_MODIFYED:
-          m_table.refresh(event.getEntry());
+          m_table.refreshAll(false);
           break;
         case NlsProjectEvent.TYPE_ENTRY_REMOVEED:
           m_table.getViewer().remove(event.getEntry());

@@ -212,6 +212,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     else {
       operation.setSibling(getSibling().getScoutType());
     }
+    operation.validate();
     operation.run(monitor, workingCopyManager);
     m_createdColumn = operation.getCreatedColumn();
     return true;

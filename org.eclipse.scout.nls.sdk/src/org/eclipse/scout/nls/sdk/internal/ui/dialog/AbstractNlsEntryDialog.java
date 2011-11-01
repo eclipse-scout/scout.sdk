@@ -12,6 +12,7 @@ package org.eclipse.scout.nls.sdk.internal.ui.dialog;
 
 import java.util.HashMap;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;
@@ -20,6 +21,8 @@ import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -64,6 +67,8 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     Control contents = super.createContents(parent);
     setTitle(m_title);
     postCreate();
+
+    getButton(IDialogConstants.OK_ID).setText("&Ok");
     return contents;
   }
 
@@ -85,6 +90,13 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     });
 
     final TabFolder translationGroup = new TabFolder(rootArea, SWT.NULL);
+    translationGroup.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        // on click on a language tab: set focus to text-area
+        translationGroup.getItem(translationGroup.getSelectionIndex()).getControl().setFocus();
+      }
+    });
     for (Language l : m_nlsProject.getAllLanguages()) {
       TranslationField field = new TranslationField(l);
       TextField<String> control = field.create(translationGroup);

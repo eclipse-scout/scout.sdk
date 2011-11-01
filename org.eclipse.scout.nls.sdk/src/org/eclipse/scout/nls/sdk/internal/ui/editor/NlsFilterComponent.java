@@ -41,9 +41,8 @@ import org.eclipse.swt.widgets.Text;
 public class NlsFilterComponent extends Composite {
 
   private TableViewer m_tableViewer;
-  private Button m_resetButton;
-
-  private HashMap<Language, Text> m_filterFields;
+  private final Button m_resetButton;
+  private final HashMap<Language, Text> m_filterFields;
 
   public NlsFilterComponent(Composite parent) {
     super(parent, SWT.DOUBLE_BUFFERED);
@@ -99,7 +98,6 @@ public class NlsFilterComponent extends Composite {
   }
 
   protected void handleFilterModified(int index) {
-
     // update filters
     ArrayList<ViewerFilter> filters = new ArrayList<ViewerFilter>();
     // backup old filters
@@ -113,8 +111,13 @@ public class NlsFilterComponent extends Composite {
         filters.add(new P_ViewerFilter(e.getKey(), e.getValue().getText()));
       }
     }
-    m_tableViewer.setFilters(filters.toArray(new ViewerFilter[filters.size()]));
-
+    try {
+      m_tableViewer.getTable().setRedraw(false);
+      m_tableViewer.setFilters(filters.toArray(new ViewerFilter[filters.size()]));
+    }
+    finally {
+      m_tableViewer.getTable().setRedraw(true);
+    }
   }
 
   private class P_FilterModifyListener implements ModifyListener {

@@ -112,9 +112,6 @@ public class TableTextEditor {
     return m_text.getText();
   }
 
-  /**
-   * @param length
-   */
   public void setSelection(int start) {
     m_text.setSelection(start);
   }

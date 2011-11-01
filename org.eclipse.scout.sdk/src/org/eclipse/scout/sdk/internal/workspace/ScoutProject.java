@@ -37,11 +37,13 @@ public class ScoutProject implements IScoutProject {
   private INlsProject m_docsNlsProject;
   private IIconProvider m_iconProvider;
   private final ScoutWorkspace m_scoutWorkspace;
+  private boolean m_docsNlsProjectInitialized;
 
   public ScoutProject(String projectName, ScoutWorkspace scoutWorkspace) {
     m_projectName = projectName;
     m_scoutWorkspace = scoutWorkspace;
     m_scoutBundles = new HashSet<ScoutBundle>();
+    m_docsNlsProjectInitialized = false;
   }
 
   @Override
@@ -226,7 +228,7 @@ public class ScoutProject implements IScoutProject {
   public INlsProject getNlsProject() {
     if (m_nlsProject == null && getSharedBundle() != null) {
       try {
-        m_nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.TEXTS)});
+        m_nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.TEXTS), this});
       }
       catch (CoreException e) {
         ScoutSdk.logError("during loading NLS project for: " + getProjectName(), e);
@@ -237,9 +239,11 @@ public class ScoutProject implements IScoutProject {
 
   @Override
   public INlsProject getDocsNlsProject() {
-    if (m_docsNlsProject == null && getSharedBundle() != null) {
+    // a lot of projects do not have a documentation text provider. then the getNlsProjects will return null -> nls workspace would be triggered each time.
+    if (!m_docsNlsProjectInitialized && getSharedBundle() != null) {
       try {
-        m_docsNlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.IDocumentationTextProviderService)});
+        m_docsNlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.IDocumentationTextProviderService), this});
+        m_docsNlsProjectInitialized = true;
       }
       catch (CoreException e) {
         ScoutSdk.logError("during loading Docs NLS project for: " + getProjectName(), e);

@@ -26,6 +26,8 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -87,7 +89,8 @@ public class TextField<T> extends Composite {
     m_label.setAlignment(SWT.RIGHT);
 
     int txtStyle = SWT.BORDER;
-    if ((style & MULTI_LINE_TEXT_FIELD) != 0) {
+    boolean isMultiLineTextField = (style & MULTI_LINE_TEXT_FIELD) != 0;
+    if (isMultiLineTextField) {
       txtStyle = SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL;
     }
 
@@ -106,6 +109,18 @@ public class TextField<T> extends Composite {
         @Override
         public void focusLost(FocusEvent e) {
           validateInput();
+        }
+      });
+    }
+
+    // text-areas do not support tabs -> move focus to next position
+    if (isMultiLineTextField) {
+      m_text.addTraverseListener(new TraverseListener() {
+        @Override
+        public void keyTraversed(TraverseEvent e) {
+          if (e.detail == SWT.TRAVERSE_TAB_NEXT) {
+            e.doit = true;
+          }
         }
       });
     }
