@@ -181,6 +181,7 @@ public final class RuntimeClasses {
   public static final String ILongField = "org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField";
   public static final String ILookupService = "org.eclipse.scout.rt.shared.services.lookup.ILookupService";
   public static final String IMailField = "org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField";
+  public static final String ITextProviderService = "org.eclipse.scout.rt.shared.services.common.text.ITextProviderService";
 
   public static final String IMatrixField = "org.eclipse.scout.rt.client.ui.form.fields.matrixfield.IMatrixField";
   public static final String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu";

@@ -167,14 +167,13 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
             wzrd.addPage(m_nextPage);
           }
           m_nextPage.setExcludePage(false);
-          pingStateChanging();
         }
         else {
           if (m_nextPage != null) {
             m_nextPage.setExcludePage(true);
-            pingStateChanging();
           }
         }
+        pingStateChanging();
       }
     });
 

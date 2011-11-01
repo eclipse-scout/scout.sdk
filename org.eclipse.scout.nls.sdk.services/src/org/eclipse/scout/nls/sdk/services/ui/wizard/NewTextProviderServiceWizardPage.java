@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.services.ui.wizard;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IFolder;
@@ -27,6 +26,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
 import org.eclipse.scout.nls.sdk.internal.ui.NlsUi;
@@ -37,13 +37,25 @@ import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
 import org.eclipse.scout.nls.sdk.services.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
-import org.eclipse.scout.nls.sdk.services.operation.NewNlsServiceModel;
 import org.eclipse.scout.nls.sdk.simple.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.ui.wizard.ResourceProposalModel;
+import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
+import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
+import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
+import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
+import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.fields.proposal.TypeProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -58,19 +70,35 @@ import org.eclipse.swt.widgets.Group;
 
 public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPage {
 
+  // base interface
+  private final IType iTextProviderService = ScoutSdk.getType(RuntimeClasses.ITextProviderService);
+
+  // properties
+  private static final String PROP_TRANSLATION_FOLDER = "translationFolder";
+  private static final String PROP_TRANSLATION_FILE = "translationFile";
+  private static final String PROP_SUPER_TYPE = "superType";
+  private static final String PROP_CLASS_NAME = "className";
+
+  // ui fields
+  private ProposalTextField m_superTypeField;
   private StyledTextField m_className;
   private TextProposalField m_translationFolderField;
   private TextField<String> m_translationFileName;
 
-  private final NewNlsServiceModel m_desc;
+  // process members
+  private final IScoutBundle m_bundle;
+  private final HashSet<String> m_languagesToCreate;
   private final NlsServiceType[] m_existingServicesInPlugin;
+  private final TypeProposal m_defaultProposal;
 
-  public NewTextProviderServiceWizardPage(String pageName, NewNlsServiceModel desc) {
-    super(pageName);
+  public NewTextProviderServiceWizardPage(IScoutBundle bundle) {
+    super(NewTextProviderServiceWizardPage.class.getName());
     setTitle("Create a new Text Provider Service");
     setDescription("Creates a new Text Provider Service.");
-    m_desc = desc;
+    m_bundle = bundle;
+    m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
+    m_defaultProposal = new TypeProposal(ScoutSdk.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
   }
 
   private NlsServiceType[] getTextProviderServicesInSamePlugin() {
@@ -80,7 +108,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       ArrayList<NlsServiceType> ret = new ArrayList<NlsServiceType>(candidates.length);
 
       for (IType t : candidates) {
-        if (m_desc.getBundle().getProject().equals(t.getJavaProject().getProject())) {
+        if (m_bundle.getProject().equals(t.getJavaProject().getProject())) {
           NlsServiceType type = new NlsServiceType(t);
           if (type.getTranslationsFolderName() != null) {
             ret.add(type);
@@ -98,43 +126,52 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
   @Override
   public void createContent(Composite parent) {
     parent.setLayout(new GridLayout(1, true));
+
     createServiceGroup(parent);
     createTranslationGroup(parent);
     createLanguagesGroup(parent);
+
     initDefaultValues();
-    initUi();
   }
 
   private void initDefaultValues() {
     m_translationFileName.setValue("Texts");
     m_translationFolderField.setText("resources/texts");
-  }
-
-  private void initUi() {
-    m_desc.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        revalidate();
-      }
-    });
-    revalidate();
+    m_languagesToCreate.add(null); // default language
+    m_superTypeField.acceptProposal(m_defaultProposal);
   }
 
   private void createServiceGroup(Composite parent) {
     Group group = new Group(parent, SWT.NONE);
     group.setText("Text Provider Service Class");
 
+    IContentProposalProvider proposalProvider = null;
+    if (m_bundle != null) {
+      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getAbstractTypesOnClasspath(iTextProviderService, m_bundle.getJavaProject()));
+      proposalProvider = new DefaultProposalProvider(new IContentProposalEx[]{m_defaultProposal}, proposals);
+    }
+    m_superTypeField = getFieldToolkit().createProposalField(group, proposalProvider, "Super Class");
+    m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        setSuperTypeInternal(((ITypeProposal) event.proposal).getType());
+        pingStateChanging();
+      }
+    });
+
     m_className = getFieldToolkit().createStyledTextField(group, "Service Name");
     m_className.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_TEXT_SERVICE);
     m_className.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
-        m_desc.setClassName(m_className.getText());
+        setClassNameInternal(m_className.getText());
+        pingStateChanging();
       }
     });
 
     group.setLayout(new GridLayout(1, true));
     attachGridData(group);
+    attachGridData(m_superTypeField);
     attachGridData(m_className);
   }
 
@@ -167,9 +204,9 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     });
 
     List<IProject> projectList = new ArrayList<IProject>();
-    if (m_desc.getBundle().getProject() != null) {
+    if (m_bundle.getProject() != null) {
       try {
-        projectList = NlsSdkSimple.getProjectGroup(m_desc.getBundle().getProject());
+        projectList = NlsSdkSimple.getProjectGroup(m_bundle.getProject());
       }
       catch (Exception e) {
         NlsCore.logWarning(e);
@@ -184,7 +221,8 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_translationFolderField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
-        m_desc.setTranslationFolder(m_translationFolderField.getText());
+        setTranslationFolderInternal(m_translationFolderField.getText());
+        pingStateChanging();
       }
     });
     NlsUi.decorate(m_translationFolderField, false);
@@ -195,7 +233,8 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_translationFileName.addInputChangedListener(new IInputChangedListener<String>() {
       @Override
       public void inputChanged(String input) {
-        m_desc.setTranlationFileName(input);
+        setTranlationFileNameInternal(input);
+        pingStateChanging();
       }
     });
     m_translationFileName.setInputValidator(new IInputValidator() {
@@ -229,11 +268,12 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
         @Override
         public void widgetSelected(SelectionEvent e) {
           if (chk.getSelection()) {
-            m_desc.addLanguage(entry[1]);
+            m_languagesToCreate.add(entry[1]);
           }
           else {
-            m_desc.removeLanguage(entry[1]);
+            m_languagesToCreate.remove(entry[1]);
           }
+          pingStateChanging();
         }
       });
       if (entry[1] == null) {
@@ -250,24 +290,24 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    if (m_desc.getClassName() == null) {
+    if (StringUtility.isNullOrEmpty(getClassName())) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The class name must be specified."));
     }
-    else if (!Regex.REGEX_JAVAFIELD.matcher(m_desc.getClassName()).matches()) {
+    else if (!Regex.REGEX_JAVAFIELD.matcher(getClassName()).matches()) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The service class name is invalid."));
     }
 
-    if (m_desc.getTranslationFolder() == null) {
+    if (StringUtility.isNullOrEmpty(getTranslationFolder())) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The translation folder must be specified."));
     }
 
-    if (m_desc.getTranlationFileName() == null) {
+    if (StringUtility.isNullOrEmpty(getTranlationFileName())) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The translation file name must be specified."));
     }
 
     for (NlsServiceType existing : m_existingServicesInPlugin) {
-      if (CompareUtility.equals(cleanFolder(existing.getTranslationsFolderName()), cleanFolder(m_desc.getTranslationFolder())) &&
-          CompareUtility.equals(existing.getTranslationsPrefix(), m_desc.getTranlationFileName())) {
+      if (CompareUtility.equals(cleanFolder(existing.getTranslationsFolderName()), cleanFolder(getTranslationFolder())) &&
+          CompareUtility.equals(existing.getTranslationsPrefix(), getTranlationFileName())) {
         multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "A service for the given translations does already exist."));
         break;
       }
@@ -288,5 +328,96 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
   private void attachGridData(Control c) {
     c.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+  }
+
+  public void setClassName(String input) {
+    try {
+      setStateChanging(true);
+      setClassNameInternal(input);
+      if (isControlCreated()) {
+        m_className.setText(input);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setClassNameInternal(String input) {
+    if (input == null || input.equals("")) {
+      input = null;
+    }
+    setPropertyString(PROP_CLASS_NAME, input);
+  }
+
+  public String getClassName() {
+    return getPropertyString(PROP_CLASS_NAME);
+  }
+
+  public void setTranslationFolder(String folder) {
+    try {
+      setStateChanging(true);
+      setTranslationFolderInternal(folder);
+      if (isControlCreated()) {
+        m_translationFolderField.setText(folder);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTranslationFolderInternal(String folder) {
+    setPropertyString(PROP_TRANSLATION_FOLDER, folder);
+  }
+
+  public String getTranslationFolder() {
+    return getPropertyString(PROP_TRANSLATION_FOLDER);
+  }
+
+  public void setTranlationFileName(String filename) {
+    try {
+      setStateChanging(true);
+      setTranlationFileNameInternal(filename);
+      if (isControlCreated()) {
+        m_translationFileName.setValue(filename);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTranlationFileNameInternal(String filename) {
+    setPropertyString(PROP_TRANSLATION_FILE, filename);
+  }
+
+  public String getTranlationFileName() {
+    return getPropertyString(PROP_TRANSLATION_FILE);
+  }
+
+  public void setSuperType(IType superType) {
+    try {
+      setStateChanging(true);
+      setSuperTypeInternal(superType);
+      if (isControlCreated()) {
+        m_superTypeField.acceptProposal(new TypeProposal(superType));
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setSuperTypeInternal(IType type) {
+    setProperty(PROP_SUPER_TYPE, type);
+  }
+
+  public IType getSuperType() {
+    return (IType) getProperty(PROP_SUPER_TYPE);
+  }
+
+  public String[] getLanguages() {
+    return m_languagesToCreate.toArray(new String[m_languagesToCreate.size()]);
   }
 }
