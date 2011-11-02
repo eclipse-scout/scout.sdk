@@ -97,7 +97,12 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
         action.setTargetDeclaringType(targetPage.getType());
       }
       else {
-        action.setTargetDeclaringType(targetPage.getType().getDeclaringType());
+        if (targetPage instanceof AbstractBoxNodePage) {
+          action.setTargetDeclaringType(targetPage.getType());
+        }
+        else {
+          action.setTargetDeclaringType(targetPage.getType().getDeclaringType());
+        }
         action.setNeighborField(targetPage.getType());
       }
       action.run();

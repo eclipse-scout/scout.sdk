@@ -126,14 +126,17 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
       ScoutSdk.logWarning("could not create new source.", e);
       return;
     }
-    if (getMode() == MODE_MOVE) {
-      // delete old
-      deleteType(getType(), monitor, workingCopyManager);
-      structuredType = SdkTypeUtility.createStructuredType(getTargetDeclaringType());
-    }
 
-    // create new
-    m_newType = createNewType(getTargetDeclaringType(), typeSimpleName, fieldSourceDoc.get(), imports.toArray(new String[imports.size()]), position.sibling, structuredType, monitor, workingCopyManager);
+    // when the parent is unchanged and the sibling is the field itself: nothing changed -> do not move / copy
+    if (!(getType().equals(position.sibling) && getTargetDeclaringType().equals(getType().getDeclaringType()))) {
+      if (getMode() == MODE_MOVE) {
+        // delete old
+        deleteType(getType(), monitor, workingCopyManager);
+        structuredType = SdkTypeUtility.createStructuredType(getTargetDeclaringType());
+      }
+      // create new
+      m_newType = createNewType(getTargetDeclaringType(), typeSimpleName, fieldSourceDoc.get(), imports.toArray(new String[imports.size()]), position.sibling, structuredType, monitor, workingCopyManager);
+    }
     // format
     JavaElementFormatOperation formatOp = new JavaElementFormatOperation(TypeUtility.getToplevelType(getTargetDeclaringType()), true);
     formatOp.validate();
