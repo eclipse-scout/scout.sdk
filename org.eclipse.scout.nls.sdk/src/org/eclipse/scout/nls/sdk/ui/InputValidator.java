@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.ui;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
@@ -57,23 +56,44 @@ public class InputValidator {
   }
 
   private class P_KeyEntryValidator implements IInputValidator {
-    private HashSet<String> m_keys = new HashSet<String>();
+    private final HashSet<String> m_exceptions;
+    private final INlsProject m_project;
 
-    public P_KeyEntryValidator(INlsProject project, String[] exeptions) {
-      m_keys = new HashSet<String>(Arrays.asList(NlsCore.getProjectKeys(project)));
-      for (String k : exeptions) {
-        m_keys.remove(k);
+    public P_KeyEntryValidator(INlsProject project, String[] exceptions) {
+      m_exceptions = new HashSet<String>(exceptions.length);
+      for (String s : exceptions) {
+        m_exceptions.add(s);
       }
+      m_project = project;
+    }
+
+    private boolean containsKey(String key) {
+      return containsKey(m_project, key);
+    }
+
+    private boolean containsKey(INlsProject project, String key) {
+      if (project == null) {
+        return false;
+      }
+      if (project.getEntry(key) != null) {
+        return true;
+      }
+
+      return containsKey(project.getParent(), key);
     }
 
     @Override
     public IStatus isValid(String value) {
-      if (m_keys.contains(value)) {
-        return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "A key '" + value + "' already exists!", null);
+      if (!m_exceptions.contains(value)) {
+        if (containsKey(value)) {
+          return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "A key '" + value + "' already exists!", null);
+        }
       }
+
       if (!REGEX_NLS_KEY_NAME.matcher(value).matches()) {
         return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "The key name is not valid.", null);
       }
+
       return Status.OK_STATUS;
     }
   } // end class P_KeyEntryValidator

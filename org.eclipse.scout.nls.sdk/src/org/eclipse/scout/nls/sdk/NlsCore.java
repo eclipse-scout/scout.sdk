@@ -10,15 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk;
 
-import java.util.HashSet;
-
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.nls.sdk.internal.model.workspace.NlsWorkspace;
 import org.eclipse.scout.nls.sdk.model.workspace.INlsWorkspace;
-import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
@@ -186,26 +183,6 @@ public class NlsCore extends AbstractUIPlugin implements INlsIcons {
 
   private INlsWorkspace getNlsWorkspaceImpl() {
     return m_nlsWorkspace;
-  }
-
-  /**
-   * @param project
-   * @return all keys of the whole project hierarchy
-   */
-  public static String[] getProjectKeys(INlsProject project) {
-    HashSet<String> collector = new HashSet<String>();
-    plugin.addKeysRec(project, collector);
-    return collector.toArray(new String[collector.size()]);
-  }
-
-  private void addKeysRec(INlsProject project, HashSet<String> collector) {
-    if (project == null) {
-      return;
-    }
-    for (String k : project.getAllKeys()) {
-      collector.add(k);
-    }
-    addKeysRec(project.getParent(), collector);
   }
 
   public static IStatus getHighestSeverityStatus(IStatus status) {
