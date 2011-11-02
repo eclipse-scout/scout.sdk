@@ -102,6 +102,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
 
     IType superType = ScoutSdk.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+    if (superType == null) return null;
+
     ITypeHierarchy nlsHierarchy = superType.newTypeHierarchy(new NullProgressMonitor());
     IType[] serviceImpls = nlsHierarchy.getAllSubtypes(superType);
     HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.length);
@@ -271,8 +273,14 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static IScoutBundle[] getScoutBundlesForType(IType type) {
-    IScoutProject root = ScoutSdk.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject()).getScoutProject();
-    return getScoutBundlesForProject(root);
+    IScoutBundle b = ScoutSdk.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
+    if (b != null) {
+      IScoutProject root = b.getScoutProject();
+      return getScoutBundlesForProject(root);
+    }
+    else {
+      return null;
+    }
   }
 
   private static IScoutBundle[] getScoutBundlesForProject(IScoutProject root) {
@@ -283,6 +291,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   private INlsProject getNlsProjectTree(IType type) throws CoreException {
     IType[] nlsProviders = getRegisteredTextProviderTypes(isDocsService(type), getProjectNames(getScoutBundlesForType(type)));
+    if (nlsProviders == null) return null;
+
     String searchString = getTypeIdentifyer(type);
     ArrayList<IType> filtered = new ArrayList<IType>(nlsProviders.length);
     boolean minFound = false;
