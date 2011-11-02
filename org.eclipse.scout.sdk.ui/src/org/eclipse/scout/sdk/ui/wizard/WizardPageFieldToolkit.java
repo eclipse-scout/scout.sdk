@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.wizard;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ui.fields.CheckBoxField;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalProvider;
@@ -24,14 +25,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposalProvider;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 
 public class WizardPageFieldToolkit {
 
@@ -52,27 +46,9 @@ public class WizardPageFieldToolkit {
     return field;
   }
 
-  public Button createCheckboxField(Composite parent, String label) {
-    Composite checkComposite = new Composite(parent, SWT.NONE);
-    Label l = new Label(checkComposite, SWT.NONE);
-    Button chk = new Button(checkComposite, SWT.CHECK);
-    chk.setText(label);
-
-    checkComposite.setLayout(new FormLayout());
-    FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 0);
-    labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(40, 0);
-    labelData.bottom = new FormAttachment(100, 0);
-    l.setLayoutData(labelData);
-
-    FormData chkData = new FormData();
-    chkData.top = new FormAttachment(0, 0);
-    chkData.left = new FormAttachment(l, 5);
-    chkData.right = new FormAttachment(100, 0);
-    chkData.bottom = new FormAttachment(100, 0);
-    chk.setLayoutData(chkData);
-    checkComposite.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+  public CheckBoxField createCheckbox(Composite parent, String label) {
+    CheckBoxField chk = new CheckBoxField(parent);
+    chk.setLabel(label);
     return chk;
   }
 

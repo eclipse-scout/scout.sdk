@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -29,6 +28,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.TableColumnNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.fields.CheckBoxField;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -40,19 +40,22 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Group;
 
 /**
  * <h3>DefaultTableColumnNewWizardPage</h3> ...
@@ -71,8 +74,9 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   private ProposalTextField m_genericTypeField;
   private ProposalTextField m_siblingField;
 
-  private Button m_addAditionalColumn;
-  private TableColumnNewWizardPage1 m_nextPage;
+  private CheckBoxField m_addAdditionalColumnField;
+  private boolean m_addAdditionalColumn;
+  //private TableColumnNewWizardPage1 m_nextPage;
 
   // process members
   private final IType m_declaringType;
@@ -91,7 +95,45 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, Texts.get("Name"));
+
+    createFieldGroup(parent);
+    createNextStepsGroup(parent);
+
+    parent.setLayout(new GridLayout(1, false));
+  }
+
+  private void createNextStepsGroup(Composite p) {
+    Group g = new Group(p, SWT.NONE);
+    g.setText(Texts.get("NextStep"));
+
+    Composite chkComposite = new Composite(g, SWT.NONE);
+    chkComposite.setLayout(new GridLayout(1, false));
+
+    m_addAdditionalColumnField = getFieldToolkit().createCheckbox(chkComposite, Texts.get("CreateMoreColumn"));
+    m_addAdditionalColumnField.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        m_addAdditionalColumn = m_addAdditionalColumnField.getSelection();
+      }
+    });
+
+    // layout
+    g.setLayout(new GridLayout(1, false));
+    g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+
+    GridData addData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    addData.grabExcessVerticalSpace = true;
+    addData.minimumHeight = 30;
+    chkComposite.setLayoutData(addData);
+
+    m_addAdditionalColumnField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH | GridData.VERTICAL_ALIGN_CENTER));
+  }
+
+  private void createFieldGroup(Composite p) {
+    Group g = new Group(p, SWT.NONE);
+    g.setText(Texts.get("Column"));
+
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, null, Texts.get("Name"));
     INlsProject nlsProject = SdkTypeUtility.findNlsProject(m_declaringType);
     if (nlsProject != null) {
       m_nlsNameField.setNlsProject(nlsProject);
@@ -122,7 +164,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    m_typeNameField = getFieldToolkit().createStyledTextField(g, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_TABLE_COLUMN);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -133,7 +175,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, SdkTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(g, SdkTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -145,7 +187,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     });
 
     SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(SdkTypeUtility.getColumns(m_declaringType));
-    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
+    m_siblingField = getFieldToolkit().createProposalField(g, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -156,29 +198,9 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       }
     });
 
-    m_addAditionalColumn = getFieldToolkit().createCheckboxField(parent, Texts.get("AddOneMoreColumn"));
-    m_addAditionalColumn.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        Wizard wzrd = (Wizard) getWizard();
-        if (m_addAditionalColumn.getSelection()) {
-          if (m_nextPage == null) {
-            m_nextPage = new TableColumnNewWizardPage1(m_declaringType);
-            wzrd.addPage(m_nextPage);
-          }
-          m_nextPage.setExcludePage(false);
-        }
-        else {
-          if (m_nextPage != null) {
-            m_nextPage.setExcludePage(true);
-          }
-        }
-        pingStateChanging();
-      }
-    });
-
     // layout
-    parent.setLayout(new GridLayout(1, true));
+    g.setLayout(new GridLayout(1, false));
+    g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
@@ -188,6 +210,20 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+
+    if (m_addAdditionalColumn) {
+      // start another wizard if one additional column should be created.
+      Display.getDefault().asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          TableColumnNewWizard wizard = new TableColumnNewWizard();
+          wizard.initWizard(m_declaringType);
+          ScoutWizardDialog wizardDialog = new ScoutWizardDialog(wizard);
+          wizardDialog.open();
+        }
+      });
+    }
+
     TableColumnNewOperation operation = new TableColumnNewOperation(m_declaringType, true);
     // write back members
     IType superTypeProp = getSuperType();
@@ -354,5 +390,4 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       setStateChanging(false);
     }
   }
-
 }
