@@ -316,13 +316,14 @@ public class NlsTable extends Composite {
       // update key
       m_tableModel.getProjects().updateKey(row, newText, new NullProgressMonitor());
       ((NlsEntry) row).setKey(newText);
-      m_viewer.refresh(row);
+      m_viewer.refresh(false);
       return true;
     }
     else {
       // update translation
-      ((NlsEntry) row).addTranslation(getLanguageOfTableColumn(column), newText);
-      AbstractJob job = new AbstractJob("update text", new Object[]{new NlsEntry(row)}) {
+      NlsEntry copy = new NlsEntry(row);
+      copy.addTranslation(getLanguageOfTableColumn(column), newText);
+      AbstractJob job = new AbstractJob("update text", new Object[]{copy}) {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           NlsEntry r = (NlsEntry) args[0];
@@ -338,7 +339,7 @@ public class NlsTable extends Composite {
       catch (InterruptedException e) {
         NlsCore.logWarning(e);
       }
-      m_viewer.refresh(row);
+      m_viewer.refresh(false);
       return job.getResult().isOK();
     }
   }
