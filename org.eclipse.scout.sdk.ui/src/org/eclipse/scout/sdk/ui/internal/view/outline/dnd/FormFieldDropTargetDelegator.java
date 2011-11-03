@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.dnd;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
@@ -71,12 +72,38 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       if (selectedType.equals(targetType)) {
         return false;
       }
+
+      // target and source field are in the same container -> check that they are not direct neighbors
+      IType targetContainer = targetType.getDeclaringType();
+      if (targetContainer != null && targetContainer.equals(selectedType.getDeclaringType())) {
+        int targetPos = getPositionInDeclaringType(targetType); // index of the target type in its declaring type
+        int sourcePos = getPositionInDeclaringType(selectedType);// index of the source type in its declaring type
+        if (targetPos > sourcePos && event.getCurrentLocation() == ViewerDropAdapter.LOCATION_AFTER) {
+          targetPos++;
+        }
+        if (Math.abs(targetPos - sourcePos) == 1) {
+          // the distance between source and target is one -> they are neighbors -> no need to move.
+          return false;
+        }
+      }
+
       return true;
     }
     catch (Exception e) {
       ScoutSdk.logWarning("could not validate drop location.", e);
     }
     return false;
+  }
+
+  private int getPositionInDeclaringType(IType element) throws JavaModelException {
+    int i = -1;
+    if (element != null) {
+      for (IType candidate : element.getDeclaringType().getTypes()) {
+        i++;
+        if (element.equals(candidate)) return i;
+      }
+    }
+    return i;
   }
 
   @Override
@@ -97,12 +124,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
         action.setTargetDeclaringType(targetPage.getType());
       }
       else {
-        if (targetPage instanceof AbstractBoxNodePage) {
-          action.setTargetDeclaringType(targetPage.getType());
-        }
-        else {
-          action.setTargetDeclaringType(targetPage.getType().getDeclaringType());
-        }
+        action.setTargetDeclaringType(targetPage.getType().getDeclaringType());
         action.setNeighborField(targetPage.getType());
       }
       action.run();

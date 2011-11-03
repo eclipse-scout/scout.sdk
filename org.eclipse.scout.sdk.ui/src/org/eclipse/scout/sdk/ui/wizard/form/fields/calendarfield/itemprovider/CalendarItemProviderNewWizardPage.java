@@ -154,6 +154,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     else {
       operation.setSibling(getSibling().getScoutType());
     }
+    operation.validate();
     operation.run(monitor, workingCopyManager);
     m_createdField = operation.getCreatedField();
     return true;
