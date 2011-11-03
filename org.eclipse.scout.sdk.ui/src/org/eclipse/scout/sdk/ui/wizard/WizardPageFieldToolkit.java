@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.wizard;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.fields.CheckBoxField;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalProvider;
@@ -44,12 +43,6 @@ public class WizardPageFieldToolkit {
     ProposalTextField field = new ProposalTextField(parent, contentProposalProvider);
     field.setLabelText(label);
     return field;
-  }
-
-  public CheckBoxField createCheckbox(Composite parent, String label) {
-    CheckBoxField chk = new CheckBoxField(parent);
-    chk.setLabel(label);
-    return chk;
   }
 
   public ProposalTextField createSignatureProposalField(Composite parent, IScoutBundle bundle, String label) {

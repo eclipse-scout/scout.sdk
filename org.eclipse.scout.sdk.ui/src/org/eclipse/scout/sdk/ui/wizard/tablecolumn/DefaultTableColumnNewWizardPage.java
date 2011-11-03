@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.TableColumnNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.fields.CheckBoxField;
+import org.eclipse.scout.sdk.ui.fields.SelectionButtonGroup;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -49,8 +49,6 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -74,9 +72,8 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   private ProposalTextField m_genericTypeField;
   private ProposalTextField m_siblingField;
 
-  private CheckBoxField m_addAdditionalColumnField;
   private boolean m_addAdditionalColumn;
-  //private TableColumnNewWizardPage1 m_nextPage;
+  private SelectionButtonGroup<Boolean> m_nextStepOptions;
 
   // process members
   private final IType m_declaringType;
@@ -105,28 +102,20 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   private void createNextStepsGroup(Composite p) {
     Group g = new Group(p, SWT.NONE);
     g.setText(Texts.get("NextStep"));
-
-    Composite chkComposite = new Composite(g, SWT.NONE);
-    chkComposite.setLayout(new GridLayout(1, false));
-
-    m_addAdditionalColumnField = getFieldToolkit().createCheckbox(chkComposite, Texts.get("CreateMoreColumn"));
-    m_addAdditionalColumnField.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        m_addAdditionalColumn = m_addAdditionalColumnField.getSelection();
-      }
-    });
-
-    // layout
     g.setLayout(new GridLayout(1, false));
     g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
-    GridData addData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    addData.grabExcessVerticalSpace = true;
-    addData.minimumHeight = 30;
-    chkComposite.setLayoutData(addData);
-
-    m_addAdditionalColumnField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH | GridData.VERTICAL_ALIGN_CENTER));
+    m_nextStepOptions = new SelectionButtonGroup<Boolean>(g, SelectionButtonGroup.BUTTON_TYPE_RADIO);
+    m_nextStepOptions.addButton(Texts.get("CreateMoreColumn"), true);
+    m_nextStepOptions.addButton(Texts.get("FinishWizard"), false);
+    m_nextStepOptions.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        m_addAdditionalColumn = m_nextStepOptions.getValue();
+      }
+    });
+    m_nextStepOptions.setValue(false);
+    m_nextStepOptions.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   private void createFieldGroup(Composite p) {
