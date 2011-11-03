@@ -20,6 +20,8 @@ import org.eclipse.scout.sdk.ui.action.WizardAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypeOrderChangedPageDirtyListener;
+import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.wizard.form.fields.calendarfield.itemprovider.CalendarItemProviderNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
@@ -31,6 +33,9 @@ public class CalendarItemProviderTablePage extends AbstractPage {
 
   final IType iCalendarItemProvider = ScoutSdk.getType(RuntimeClasses.ICalendarItemProvider);
 
+  private InnerTypePageDirtyListener m_innerTypeListener;
+  private InnerTypeOrderChangedPageDirtyListener m_orderChangedListener;
+
   private final IType m_calendarType;
 
   public CalendarItemProviderTablePage(IPage parent, IType calendarType) {
@@ -38,6 +43,19 @@ public class CalendarItemProviderTablePage extends AbstractPage {
     m_calendarType = calendarType;
     setName(Texts.get("CalendarItemProducerTablePage"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviders));
+  }
+
+  @Override
+  public void unloadPage() {
+    if (m_innerTypeListener != null) {
+      ScoutSdk.removeInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
+      m_innerTypeListener = null;
+    }
+    if (m_orderChangedListener != null) {
+      ScoutSdk.removeJavaResourceChangedListener(m_orderChangedListener);
+      m_orderChangedListener = null;
+    }
+    super.unloadPage();
   }
 
   @Override
@@ -60,6 +78,15 @@ public class CalendarItemProviderTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    if (m_innerTypeListener == null) {
+      m_innerTypeListener = new InnerTypePageDirtyListener(this, iCalendarItemProvider);
+      ScoutSdk.addInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
+    }
+    if (m_orderChangedListener == null) {
+      m_orderChangedListener = new InnerTypeOrderChangedPageDirtyListener(this, iCalendarItemProvider, getCalendarType());
+      ScoutSdk.addJavaResourceChangedListener(m_orderChangedListener);
+    }
+
     IType[] innerTypes = SdkTypeUtility.getCalendarItemProviders(getCalendarType());
     for (IType provider : innerTypes) {
       CalendarItemProviderNodePage childPage = new CalendarItemProviderNodePage();

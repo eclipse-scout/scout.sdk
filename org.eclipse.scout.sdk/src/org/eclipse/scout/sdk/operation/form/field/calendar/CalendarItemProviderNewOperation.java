@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
@@ -46,6 +45,7 @@ public class CalendarItemProviderNewOperation implements IOperation {
     m_formatSource = foramtSource;
   }
 
+  @Override
   public String getOperationName() {
     return "new calendar item provider...";
   }
@@ -60,8 +60,9 @@ public class CalendarItemProviderNewOperation implements IOperation {
     }
   }
 
+  @Override
   public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
-    InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_TABLEFIELD_TABLE, getCreatedField(), false);
+    InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     tableNewOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCalendarItemProvider, true));
     tableNewOp.addTypeModifier(Flags.AccPublic);
     AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));
