@@ -45,7 +45,8 @@ import org.eclipse.text.edits.MultiTextEdit;
  */
 public class FormDataUtility {
 
-  private static HashSet<String> keyWords = new HashSet<String>();
+  private static final HashSet<String> keyWords = new HashSet<String>();
+  private static final Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
   static {
     keyWords.add("abstract");
     keyWords.add("assert");
@@ -97,7 +98,6 @@ public class FormDataUtility {
     keyWords.add("void");
     keyWords.add("volatile");
     keyWords.add("while");
-
   }
 
   public static ITypeSourceBuilder getPrimaryTypeFormDataSourceBuilder(String superTypeSignature, IType formField, ITypeHierarchy hierarchy) {
@@ -173,6 +173,11 @@ public class FormDataUtility {
       }
     }
     return builder.toString();
+  }
+
+  public static String getConstantName(String name) {
+    String[] words = CONSTANT_NAME_PATTERN.split(name);
+    return StringUtility.join("_", words).toUpperCase();
   }
 
   public static String unboxPrimitiveSignature(String signature) {

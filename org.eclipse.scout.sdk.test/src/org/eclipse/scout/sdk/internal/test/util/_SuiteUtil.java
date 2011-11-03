@@ -14,6 +14,7 @@
 package org.eclipse.scout.sdk.internal.test.util;
 
 import org.eclipse.scout.sdk.internal.test.util.signature._SuiteSignature;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataUtilityTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -27,6 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
     RegexTest.class,
+    FormDataUtilityTest.class,
     // suites
     _SuiteSignature.class})
 public class _SuiteUtil {

@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ScoutSdkUtility;
@@ -30,6 +34,7 @@ import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
  * @since 1.0.8 19.02.2011
  */
 public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
+  private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
   private final IType iTable = ScoutSdk.getType(RuntimeClasses.ITable);
   private final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
   private final IType m_tableField;
@@ -64,6 +69,22 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
 
     final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(iColumn, hierarchy), TypeComparators.getOrderAnnotationComparator());
     final String[] colunmSignatures = new String[columns.length];
+    final Map<Integer, String> columnIdMap = new HashMap<Integer, String>();
+
+    if (columns.length > 0) {
+      for (int i = 0; i < columns.length; i++) {
+        IType column = columns[i];
+
+        String constantColName = FormDataUtility.getConstantName(FormDataUtility.getFieldNameWithoutSuffix(column.getElementName())) + COLUMN_ID_SUFFIX;
+        ConstantIntSourceBuilder constantBuilder = new ConstantIntSourceBuilder();
+        constantBuilder.setElementName(constantColName);
+        constantBuilder.setConstantValue(i);
+
+        addBuilder(constantBuilder, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 1, i, 1, constantBuilder));
+
+        columnIdMap.put(Integer.valueOf(i), constantColName);
+      }
+    }
     for (int i = 0; i < columns.length; i++) {
       try {
         IType column = columns[i];
@@ -78,10 +99,10 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         columnSetter.setElementName("set" + upperColName);
         columnSetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
         columnSetter.addParameter(new MethodParameter(colSignature, methodParameterName));
-        columnSetter.setSimpleBody("setValueInternal(row, " + i + ", " + methodParameterName + ");");
-        addBuilder(columnSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 1, i, 1, columnSetter));
+        columnSetter.setSimpleBody("setValueInternal(row, " + getColumnConstantName(i, columnIdMap) + ", " + methodParameterName + ");");
+        addBuilder(columnSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, i, 1, columnSetter));
         // getter
-        final int finalColumnIndex = i;
+        final String finalColumnName = getColumnConstantName(i, columnIdMap);
         MethodSourceBuilder columnGetter = new MethodSourceBuilder() {
           @Override
           protected String createMethodBody(IImportValidator validator) {
@@ -91,14 +112,14 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
               String simpleRef = ScoutSdkUtility.getSimpleTypeRefName(colSignature, validator);
               getterBody.append("(" + simpleRef + ") ");
             }
-            getterBody.append("getValueInternal(row, " + finalColumnIndex + ");");
+            getterBody.append("getValueInternal(row, " + finalColumnName + ");");
             return getterBody.toString();
           }
         };
         columnGetter.setElementName("get" + upperColName);
         columnGetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
         columnGetter.setReturnSignature(colSignature);
-        addBuilder(columnGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 1, i, 2, columnSetter));
+        addBuilder(columnGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, i, 2, columnSetter));
       }
       catch (JavaModelException e) {
         ScoutSdk.logWarning("could not add column '" + columns[i].getFullyQualifiedName() + "' to form data.", e);
@@ -113,7 +134,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
           StringBuilder builder = new StringBuilder();
           builder.append("  switch(column){\n");
           for (int i = 0; i < columns.length; i++) {
-            builder.append("    case " + i + ":\n return get");
+            builder.append("    case " + getColumnConstantName(i, columnIdMap) + ":\n return get");
             builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
             builder.append("(row);\n");
           }
@@ -127,7 +148,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
       globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
       globalGetter.setReturnSignature(Signature.createTypeSignature(Object.class.getName(), true));
-      addBuilder(globalGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, globalGetter.getElementName(), globalGetter));
+      addBuilder(globalGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, globalGetter.getElementName(), globalGetter));
 
       // gobal setter
       MethodSourceBuilder globalSetter = new MethodSourceBuilder() {
@@ -136,7 +157,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
           StringBuilder builder = new StringBuilder();
           builder.append("  switch(column){\n");
           for (int i = 0; i < columns.length; i++) {
-            builder.append("    case " + i + ": set");
+            builder.append("    case " + getColumnConstantName(i, columnIdMap) + ": set");
             builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
             builder.append("(row,");
             if (!colunmSignatures[i].equals("Ljava.lang.Object;")) {
@@ -154,7 +175,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
       globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
       globalSetter.addParameter(new MethodParameter(Signature.createTypeSignature(Object.class.getName(), true), "value"));
-      addBuilder(globalSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, globalSetter.getElementName(), globalSetter));
+      addBuilder(globalSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, globalSetter.getElementName(), globalSetter));
 
       // column count
       MethodSourceBuilder columnCount = new MethodSourceBuilder();
@@ -162,8 +183,12 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       columnCount.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
       columnCount.setReturnSignature(Signature.SIG_INT);
       columnCount.setSimpleBody("return " + columns.length + ";");
-      addBuilder(columnCount, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, columnCount.getElementName(), columnCount));
+      addBuilder(columnCount, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, columnCount.getElementName(), columnCount));
     }
+  }
+
+  private String getColumnConstantName(int i, Map<Integer, String> map) {
+    return StringUtility.nvl(map.get(Integer.valueOf(i)), String.valueOf(i));
   }
 
   private String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws JavaModelException {
