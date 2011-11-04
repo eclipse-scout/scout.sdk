@@ -68,11 +68,19 @@ public class NlsTextProposalProvider implements IContentProposalProvider {
     ArrayList<IContentProposalEx> props = new ArrayList<IContentProposalEx>();
     String matchString = content.substring(0, cursorPosition);
     matchString = matchString.toLowerCase() + "*";
-    for (IContentProposalEx prop : m_proposals) {
-
-      if (CharOperation.match(matchString.toCharArray(), prop.getLabel(false, false).toCharArray(), false)) {
-
+    for (NlsProposal prop : m_proposals) {
+      // check key
+      if (CharOperation.match(matchString.toCharArray(), prop.getNlsEntry().getKey().toCharArray(), false)) {
         props.add(prop);
+      }
+      else {
+        // also check all languages
+        for (String s : prop.getNlsEntry().getAllTranslations().values()) {
+          if (CharOperation.match(matchString.toCharArray(), s.toCharArray(), false)) {
+            props.add(prop);
+            break;
+          }
+        }
       }
     }
     props.add(new NlsNewProposal());
