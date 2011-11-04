@@ -166,7 +166,7 @@ public class TextField<T> extends Composite {
     }
     // validate
     validate();
-    if (m_status.isOK()) {
+    if (m_status.getSeverity() != IStatus.ERROR) {
       m_text.setForeground(null);
       // notify
       for (IInputChangedListener<T> listener : m_inputChangedListener) {

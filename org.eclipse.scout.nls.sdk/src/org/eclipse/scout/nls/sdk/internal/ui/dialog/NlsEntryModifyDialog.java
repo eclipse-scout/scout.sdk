@@ -50,14 +50,13 @@ public class NlsEntryModifyDialog extends AbstractNlsEntryDialog {
     status.add(getKeyField().getStatus());
     status.add(getDefaultTranslationField().getStatus());
     IStatus highestSeverity = NlsCore.getHighestSeverityStatus(status);
-    if (!highestSeverity.isOK()) {
-      setMessage(highestSeverity.getMessage(), highestSeverity.getSeverity());
-      getButton(Dialog.OK).setEnabled(false);
+
+    if (highestSeverity.isOK()) {
+      setMessage("Modify this Translation entry.");
     }
     else {
-      setMessage("Modify this Translation entry.");
-      getButton(Dialog.OK).setEnabled(true);
+      setMessage(highestSeverity);
     }
+    getButton(Dialog.OK).setEnabled(highestSeverity.getSeverity() != IStatus.ERROR);
   }
-
 }

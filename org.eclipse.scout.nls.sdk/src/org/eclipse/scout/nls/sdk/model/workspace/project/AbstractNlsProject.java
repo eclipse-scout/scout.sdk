@@ -115,9 +115,15 @@ public abstract class AbstractNlsProject implements INlsProject {
             nlsEntry = new NlsEntry(key, this);
             m_entries.put(key, nlsEntry);
           }
-          if (nlsEntry.getType() == INlsEntry.TYPE_LOCAL) {
-            nlsEntry.addTranslation(r.getLanguage(), r.getTranslation(key));
+
+          if (nlsEntry.getType() == INlsEntry.TYPE_INHERITED) {
+            // the key exists in a parent project and here -> change the type from inherited to local
+            m_entries.remove(key);
+            nlsEntry = new NlsEntry(nlsEntry);
+            m_entries.put(key, nlsEntry);
           }
+
+          nlsEntry.addTranslation(r.getLanguage(), r.getTranslation(key));
         }
       }
     }
@@ -259,8 +265,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         NlsEntry existingEntry = m_entries.get(row.getKey());
         if (existingEntry != null) {
           if (existingEntry.getType() == INlsEntry.TYPE_INHERITED) {
-            NlsCore.logError("The inherited NLS entry '" + existingEntry.getKey() + "' can not be modified", new Exception());
-            return;
+            createNewRowInternal(row, monitor); // override
           }
           else {
             updateExistingRowInternal(existingEntry, row, monitor);
@@ -472,15 +477,31 @@ public abstract class AbstractNlsProject implements INlsProject {
             addEvents.put(entry, new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_ADDED));
           }
           else {
-            NlsCore.logWarning("translation resource fired an add event of the existing NLS entry:'" + entry.getKey() + "'");
+            modifyEvents.put(entry, new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_MODIFYED));
           }
           break;
         case TranslationResourceEvent.TYPE_ENTRY_REMOVE:
-          if (entry != null) {
+          if (entry != null && entry.getType() == INlsEntry.TYPE_LOCAL) {
             entry.addTranslation(event.getSource().getLanguage(), null);
-            if (entry.isEmpty()) {
+
+            boolean isEmpty = true;
+            for (ITranslationResource r : getAllTranslationResources()) {
+              if (r.getTranslation(entry.getKey()) != null) {
+                // the current resources still contain values for that key.
+                isEmpty = false;
+                break;
+              }
+            }
+
+            if (isEmpty) {
               // remove
               m_entries.remove(entry.getKey());
+              if (m_parent != null) {
+                INlsEntry e = m_parent.getEntry(entry.getKey());
+                if (e != null) {
+                  m_entries.put(entry.getKey(), new InheritedNlsEntry(e, this));
+                }
+              }
               removeEvents.put(entry, new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_REMOVEED));
               modifyEvents.remove(entry);
             }
@@ -488,12 +509,13 @@ public abstract class AbstractNlsProject implements INlsProject {
               // modify
               modifyEvents.put(entry, new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_MODIFYED));
             }
-
           }
           break;
         case TranslationResourceEvent.TYPE_ENTRY_MODIFY:
           if (entry != null) {
-            entry.addTranslation(event.getSource().getLanguage(), translation);
+            if (entry.getType() == INlsEntry.TYPE_LOCAL) {
+              entry.addTranslation(event.getSource().getLanguage(), translation);
+            }
             modifyEvents.put(entry, new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_MODIFYED));
           }
           break;

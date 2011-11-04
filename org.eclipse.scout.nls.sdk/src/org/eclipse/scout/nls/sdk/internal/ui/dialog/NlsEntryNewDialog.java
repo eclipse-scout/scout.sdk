@@ -59,13 +59,12 @@ public class NlsEntryNewDialog extends AbstractNlsEntryDialog {
     status.add(getKeyField().getStatus());
     status.add(getDefaultTranslationField().getStatus());
     IStatus highestSeverity = NlsCore.getHighestSeverityStatus(status);
-    if (!highestSeverity.isOK()) {
-      setMessage(highestSeverity.getMessage(), highestSeverity.getSeverity());
-      getButton(Dialog.OK).setEnabled(false);
+    if (highestSeverity.isOK()) {
+      setMessage("Create a new Translation entry.");
     }
     else {
-      setMessage("Create a new Translation entry.");
-      getButton(Dialog.OK).setEnabled(true);
+      setMessage(highestSeverity);
     }
+    getButton(Dialog.OK).setEnabled(highestSeverity.getSeverity() != IStatus.ERROR);
   }
 }

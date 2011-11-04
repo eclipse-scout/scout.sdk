@@ -158,7 +158,6 @@ public class NlsTablePage extends Composite {
 
     public void handleReload() {
     }
-
   } // end class P_TableActionHandler
 
   protected void handleProjectChangedEvnet(NlsProjectEvent event) {
@@ -180,28 +179,22 @@ public class NlsTablePage extends Composite {
     else {
       switch (event.getType()) {
         case NlsProjectEvent.TYPE_ENTRY_ADDED:
-          m_table.getViewer().add(event.getEntry());
+          //m_table.getViewer().add(event.getEntry());
           m_table.getViewer().reveal(event.getEntry());
           m_table.getViewer().setSelection(new StructuredSelection(event.getEntry()));
-          break;
-        case NlsProjectEvent.TYPE_ENTRY_MODIFYED:
           m_table.refreshAll(false);
           break;
         case NlsProjectEvent.TYPE_ENTRY_REMOVEED:
           m_table.getViewer().remove(event.getEntry());
-          break;
-        case NlsProjectEvent.TYPE_REFRESH:
           m_table.refreshAll(false);
           break;
+        case NlsProjectEvent.TYPE_ENTRY_MODIFYED:
+        case NlsProjectEvent.TYPE_REFRESH:
         case NlsProjectEvent.TYPE_TRANSLATION_RESOURCE_ADDED:
         case NlsProjectEvent.TYPE_FULL_REFRESH:
           m_table.refreshAll(true);
-          break;
-        default:
-          break;
       }
     }
-
   }
 
   private class P_ProjectListener implements INlsProjectListener {
@@ -216,7 +209,6 @@ public class NlsTablePage extends Composite {
         });
       }
     }
-
   } // end class P_ProjectListener
 
   private class P_MenuListener implements IMenuListener {

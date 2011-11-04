@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
+import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.SWT;
 
@@ -67,26 +68,34 @@ public class InputValidator {
       m_project = project;
     }
 
-    private boolean containsKey(String key) {
-      return containsKey(m_project, key);
+    private INlsEntry getEntry(String key) {
+      return getEntry(m_project, key);
     }
 
-    private boolean containsKey(INlsProject project, String key) {
+    private INlsEntry getEntry(INlsProject project, String key) {
       if (project == null) {
-        return false;
-      }
-      if (project.getEntry(key) != null) {
-        return true;
+        return null;
       }
 
-      return containsKey(project.getParent(), key);
+      INlsEntry e = project.getEntry(key);
+      if (e != null) {
+        return e;
+      }
+
+      return getEntry(project.getParent(), key);
     }
 
     @Override
     public IStatus isValid(String value) {
       if (!m_exceptions.contains(value)) {
-        if (containsKey(value)) {
-          return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "A key '" + value + "' already exists!", null);
+        INlsEntry e = getEntry(value);
+        if (e != null) {
+          if (e.getType() == INlsEntry.TYPE_LOCAL) {
+            return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "A key '" + value + "' already exists!", null);
+          }
+          else {
+            return new Status(IStatus.WARNING, NlsCore.PLUGIN_ID, SWT.OK, "The key '" + value + "' overrides an inherited entry.", null);
+          }
         }
       }
 

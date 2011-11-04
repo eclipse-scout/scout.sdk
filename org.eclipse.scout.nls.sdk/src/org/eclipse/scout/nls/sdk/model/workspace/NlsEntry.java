@@ -133,19 +133,4 @@ public class NlsEntry implements INlsEntry {
   public void setKey(String key) {
     m_key = key;
   }
-
-  /**
-   * checks if there are local translations
-   * 
-   * @return
-   */
-  public boolean isEmpty() {
-    for (String text : m_translations.values()) {
-      if (text != null) {
-        return false;
-      }
-    }
-    return true;
-  }
-
 }

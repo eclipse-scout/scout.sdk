@@ -12,7 +12,9 @@ package org.eclipse.scout.nls.sdk.internal.ui.dialog;
 
 import java.util.HashMap;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;
@@ -154,6 +156,26 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
 
   protected TextField<String> getDefaultTranslationField() {
     return getTranslationField(Language.LANGUAGE_DEFAULT);
+  }
+
+  public void setMessage(IStatus status) {
+    int sev = IMessageProvider.NONE;
+    switch (status.getSeverity()) {
+      case IStatus.ERROR: {
+        sev = IMessageProvider.ERROR;
+        break;
+      }
+      case IStatus.WARNING: {
+        sev = IMessageProvider.WARNING;
+        break;
+      }
+      case IStatus.INFO: {
+        sev = IMessageProvider.INFORMATION;
+        break;
+      }
+    }
+
+    setMessage(status.getMessage(), sev);
   }
 
   public NlsEntry getNlsEntry() {
