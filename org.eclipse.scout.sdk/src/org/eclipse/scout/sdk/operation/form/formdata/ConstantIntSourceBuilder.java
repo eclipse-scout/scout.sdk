@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,6 @@ import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 /**
  * Simple source builder to add an integer (int primitive type) constant.
  * 
- * @author Jeremie Bresson
  * @since 29.09.2011
  */
 public class ConstantIntSourceBuilder implements ISourceBuilder {
