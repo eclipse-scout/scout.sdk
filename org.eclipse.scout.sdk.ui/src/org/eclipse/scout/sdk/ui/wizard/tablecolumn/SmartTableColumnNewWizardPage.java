@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,8 +29,9 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.SmartTableColumnNewOperation;
 import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.fields.SelectionButtonGroup;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
+import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroupListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -61,6 +64,10 @@ import org.eclipse.swt.widgets.Group;
  */
 public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
 
+  private static enum CONTINUE_OPERATION {
+    ADD_MORE_COLUMNS, FINISH
+  }
+
   final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
   final IType lookupCall = ScoutSdk.getType(RuntimeClasses.LookupCall);
   final IType iCodeType = ScoutSdk.getType(RuntimeClasses.ICodeType);
@@ -79,8 +86,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_codeTypeField;
   private ProposalTextField m_siblingField;
 
-  private boolean m_addAdditionalColumn;
-  private SelectionButtonGroup<Boolean> m_nextStepOptions;
+  private CONTINUE_OPERATION m_continueOperation;
 
   // process members
   private final IType m_declaringType;
@@ -222,22 +228,23 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     g.setLayout(new GridLayout(1, false));
     g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
-    m_nextStepOptions = new SelectionButtonGroup<Boolean>(g, SelectionButtonGroup.BUTTON_TYPE_RADIO);
-    m_nextStepOptions.addButton(Texts.get("CreateMoreColumn"), true);
-    m_nextStepOptions.addButton(Texts.get("FinishWizard"), false);
-    m_nextStepOptions.addModifyListener(new ModifyListener() {
+    ButtonGroup<CONTINUE_OPERATION> nextStepOptions = new ButtonGroup<CONTINUE_OPERATION>(g, SWT.RADIO);
+    nextStepOptions.addButton(Texts.get("CreateMoreColumn"), CONTINUE_OPERATION.ADD_MORE_COLUMNS);
+    nextStepOptions.addButton(Texts.get("FinishWizard"), CONTINUE_OPERATION.FINISH);
+    nextStepOptions.addButtonGroupListener(new ButtonGroupListener<CONTINUE_OPERATION>() {
+
       @Override
-      public void modifyText(ModifyEvent e) {
-        m_addAdditionalColumn = m_nextStepOptions.getValue();
+      public void handleSelectionChanged(List<CONTINUE_OPERATION> newSelection) {
+        m_continueOperation = newSelection.get(0);
       }
     });
-    m_nextStepOptions.setValue(false);
-    m_nextStepOptions.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    nextStepOptions.setValue(CONTINUE_OPERATION.FINISH);
+    nextStepOptions.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
-    if (m_addAdditionalColumn) {
+    if (CONTINUE_OPERATION.ADD_MORE_COLUMNS == m_continueOperation) {
       // start another wizard if one additional column should be created.
       Display.getDefault().asyncExec(new Runnable() {
         @Override

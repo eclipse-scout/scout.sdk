@@ -91,7 +91,8 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     if (superType == null) {
       superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractWizardStep)[0];
     }
-    setSuperTypeInternal(superType);
+    // XXX aho only demo
+//    setSuperTypeInternal(superType);
     setSibling(SiblingProposal.SIBLING_END);
   }
 
@@ -134,10 +135,10 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutSdk.getType(RuntimeClasses.AbstractWizardStep));
+//    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutSdk.getType(RuntimeClasses.AbstractWizardStep));
     ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getAbstractTypesOnClasspath(iWizardStep, m_declaringType.getJavaProject()));
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(proposals), Texts.get("SuperType"));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
