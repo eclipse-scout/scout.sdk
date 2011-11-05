@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.dnd;
 
+import java.util.List;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.util.LocalSelectionTransfer;
@@ -17,13 +19,17 @@ import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.dnd.FormFieldRelocateAction;
 import org.eclipse.scout.sdk.ui.extensions.IDropTargetDelegator;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.AbstractBoxNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.OutlineDropTargetEvent;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.TypeComparators;
+import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.dnd.DND;
 
 public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
@@ -34,57 +40,22 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       if (!LocalSelectionTransfer.getTransfer().isSupportedType(event.getTransferData())) {
         return false;
       }
-      Object currentTargetPage = event.getCurrentTarget();
-      IType targetType = null;
-      if (currentTargetPage instanceof AbstractBoxNodePage) {
-        targetType = ((AbstractBoxNodePage) currentTargetPage).getType();
-        if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON && targetType.getElementName().equals(ScoutIdeProperties.TYPE_NAME_MAIN_BOX)) {
-          return false;
-        }
+      AbstractScoutTypePage targetPage = getGroupBoxTargetType(event);
+      if (targetPage == null) {
+        targetPage = getFormFieldTargetType(event);
       }
-      else if (currentTargetPage instanceof AbstractFormFieldNodePage) {
-        if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {
-          return false;
-        }
-        targetType = ((AbstractFormFieldNodePage) currentTargetPage).getType();
-      }
-      if (targetType == null) {
+      if (targetPage == null) {
         return false;
       }
-      IType selectedType = null;
-      if (event.getSelectedObject() instanceof AbstractBoxNodePage) {
-        selectedType = ((AbstractBoxNodePage) event.getSelectedObject()).getType();
-      }
-      else if (event.getSelectedObject() instanceof AbstractFormFieldNodePage) {
-        selectedType = ((AbstractFormFieldNodePage) event.getSelectedObject()).getType();
-      }
-      if (selectedType == null || targetType.equals(selectedType)) {
+      AbstractScoutTypePage selectedPage = getSelectedPage(event);
+      if (selectedPage == null) {
         return false;
       }
-      // do not allow copy boxes with inner types within the same compilation unit -> import problems of inner fields
-      if (event.getOperation() == DND.DROP_COPY) {
-        if (selectedType.getCompilationUnit().equals(targetType.getCompilationUnit())) {
-          if (SdkTypeUtility.getFormFields(selectedType).length > 0) {
-            return false;
-          }
-        }
-      }
-      if (selectedType.equals(targetType)) {
+      if (!isValidTargetLocation(event, targetPage, selectedPage)) {
         return false;
       }
-
-      // target and source field are in the same container -> check that they are not direct neighbors
-      IType targetContainer = targetType.getDeclaringType();
-      if (targetContainer != null && targetContainer.equals(selectedType.getDeclaringType())) {
-        int targetPos = getPositionInDeclaringType(targetType); // index of the target type in its declaring type
-        int sourcePos = getPositionInDeclaringType(selectedType);// index of the source type in its declaring type
-        if (targetPos > sourcePos && event.getCurrentLocation() == ViewerDropAdapter.LOCATION_AFTER) {
-          targetPos++;
-        }
-        if (Math.abs(targetPos - sourcePos) == 1) {
-          // the distance between source and target is one -> they are neighbors -> no need to move.
-          return false;
-        }
+      if (isCopyAndSourceComplexAndTargetSameIcu(event, targetPage.getType(), selectedPage.getType())) {
+        return false;
       }
 
       return true;
@@ -95,10 +66,91 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
     return false;
   }
 
+  /**
+   * @return the target group box node page if valid target
+   */
+  private AbstractBoxNodePage getGroupBoxTargetType(OutlineDropTargetEvent event) {
+    if (event.getCurrentTarget() instanceof AbstractBoxNodePage) {
+      AbstractBoxNodePage targetPage = (AbstractBoxNodePage) event.getCurrentTarget();
+      if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON && targetPage.getType().getElementName().equals(ScoutIdeProperties.TYPE_NAME_MAIN_BOX)) {
+        return null;
+      }
+      else {
+        return targetPage;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * do not allow to move a field on an other field.
+   */
+  private AbstractFormFieldNodePage getFormFieldTargetType(OutlineDropTargetEvent event) {
+    if (event.getCurrentTarget() instanceof AbstractFormFieldNodePage) {
+      if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {
+        return null;
+      }
+      return (AbstractFormFieldNodePage) event.getCurrentTarget();
+    }
+    return null;
+  }
+
+  private AbstractScoutTypePage getSelectedPage(OutlineDropTargetEvent event) {
+    if (event.getSelectedObject() instanceof AbstractBoxNodePage) {
+      return (AbstractBoxNodePage) event.getSelectedObject();
+    }
+    else if (event.getSelectedObject() instanceof AbstractFormFieldNodePage) {
+      return (AbstractFormFieldNodePage) event.getSelectedObject();
+    }
+    return null;
+  }
+
+  private boolean isValidTargetLocation(OutlineDropTargetEvent event, AbstractScoutTypePage targetPage, AbstractScoutTypePage selectedPage) {
+    if (event.getOperation() == DND.DROP_MOVE) {
+      if (targetPage.equals(selectedPage)) {
+        return false;
+      }
+      if (targetPage.getParent().equals(selectedPage.getParent())) {
+        List<IPage> children = targetPage.getParent().getChildren();
+        int selectedIndex = children.indexOf(selectedPage);
+        if (selectedIndex < 0) {
+          ScoutSdkUi.logError("could not find child index of selected node.");
+          return false;
+        }
+        if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_AFTER) {
+          if (selectedIndex > 0 && children.get(selectedIndex - 1).equals(targetPage)) {
+            return false;
+          }
+        }
+        else if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_BEFORE) {
+          if (selectedIndex < children.size() && children.get(selectedIndex + 1).equals(targetPage)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  /**
+   * do not allow copy boxes with inner types within the same compilation unit -> import problems of inner fields
+   */
+  private boolean isCopyAndSourceComplexAndTargetSameIcu(OutlineDropTargetEvent event, IType targetType, IType selectedType) {
+    if (event.getOperation() == DND.DROP_COPY) {
+      if (selectedType.getCompilationUnit().equals(targetType.getCompilationUnit())) {
+        if (SdkTypeUtility.getFormFields(selectedType).length > 0) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private int getPositionInDeclaringType(IType element) throws JavaModelException {
     int i = -1;
     if (element != null) {
-      for (IType candidate : element.getDeclaringType().getTypes()) {
+      for (IType candidate : TypeUtility.getInnerTypes(element, null, TypeComparators.getOrderAnnotationComparator())) {
+        System.out.println(candidate.getElementName());
         i++;
         if (element.equals(candidate)) return i;
       }
