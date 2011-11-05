@@ -188,7 +188,12 @@ public class ButtonGroup<T> extends Composite {
   private void fireSelectionChanged() {
     List<T> selection = getValues();
     for (ButtonGroupListener<T> l : m_eventListeners.getListeners(ButtonGroupListener.class)) {
-      l.handleSelectionChanged(selection);
+      try {
+        l.handleSelectionChanged(selection);
+      }
+      catch (Exception e) {
+        ScoutSdkUi.logError("error during listener notification.", e);
+      }
     }
   }
 
