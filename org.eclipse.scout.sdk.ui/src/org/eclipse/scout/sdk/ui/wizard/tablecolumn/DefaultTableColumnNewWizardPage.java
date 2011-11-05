@@ -112,8 +112,8 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     ButtonGroup<CONTINUE_OPERATION> nextStepOptions = new ButtonGroup<CONTINUE_OPERATION>(g, SWT.RADIO);
-    nextStepOptions.addButton(Texts.get("CreateMoreColumn"), CONTINUE_OPERATION.ADD_MORE_COLUMNS);
-    nextStepOptions.addButton(Texts.get("FinishWizard"), CONTINUE_OPERATION.FINISH);
+    nextStepOptions.createButton(Texts.get("CreateMoreColumn"), CONTINUE_OPERATION.ADD_MORE_COLUMNS);
+    nextStepOptions.createButton(Texts.get("FinishWizard"), CONTINUE_OPERATION.FINISH);
     nextStepOptions.addButtonGroupListener(new ButtonGroupListener<CONTINUE_OPERATION>() {
 
       @Override

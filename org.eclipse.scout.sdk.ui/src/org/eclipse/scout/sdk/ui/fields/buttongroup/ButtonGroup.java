@@ -91,7 +91,7 @@ public class ButtonGroup<T> extends Composite {
    *          the value this button should represent. should be unique.
    * @return The created button instance.
    */
-  public Button addButton(final String label, final T value) {
+  public Button createButton(final String label, final T value) {
     final Button newButton = new Button(this, m_type);
     newButton.setData(VALUE, value);
     newButton.setText(label);
