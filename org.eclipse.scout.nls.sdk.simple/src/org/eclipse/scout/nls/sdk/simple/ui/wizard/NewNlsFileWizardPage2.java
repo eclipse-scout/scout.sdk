@@ -77,22 +77,22 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 @SuppressWarnings({"restriction", "deprecation"})
 public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
 
-  protected Composite m_rootPane;
+  private Composite m_rootPane;
 
-  protected TextButtonField m_containerField;
-  protected TextProposalField m_package;
-  protected TextField<String> m_className;
+  private TextButtonField m_containerField;
+  private TextProposalField m_package;
+  private TextField<String> m_className;
 
-  protected TextProposalField m_translationFolderField;
-  protected TextField<String> m_translationFileName;
+  private TextProposalField m_translationFolderField;
+  private TextField<String> m_translationFileName;
 
-  protected final FieldValidator m_fieldValidator;
-  protected final P_RootContainerModifyListener m_containerFieldModifyListener;
+  private final FieldValidator m_fieldValidator;
+  private final P_RootContainerModifyListener m_containerFieldModifyListener;
 
-  protected final NewNlsFileOperationDesc m_desc;
+  private final NewNlsFileOperationDesc m_desc;
 
-  protected final Lock m_lock = new Lock();
-  protected final PackageProposalModel m_packageProposalModel;
+  private final Lock m_lock = new Lock();
+  private final PackageProposalModel m_packageProposalModel;
 
   public NewNlsFileWizardPage2(String pageName, NewNlsFileOperationDesc desc) {
     super(true, pageName);

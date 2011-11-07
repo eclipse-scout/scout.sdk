@@ -34,7 +34,7 @@ public abstract class AbstractCreateNlsProjectOperation extends Job {
 
   private final NewNlsFileOperationDesc m_desc;
 
-  public AbstractCreateNlsProjectOperation(NewNlsFileOperationDesc desc) {
+  protected AbstractCreateNlsProjectOperation(NewNlsFileOperationDesc desc) {
     super("Create new NLS Project...");
     m_desc = desc;
   }

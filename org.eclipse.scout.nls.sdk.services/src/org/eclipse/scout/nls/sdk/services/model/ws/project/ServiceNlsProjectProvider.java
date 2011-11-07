@@ -59,11 +59,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @return
    * @throws JavaModelException
    */
-  public static IType[] getRegisteredTextProviderTypes(Boolean returnDocServices, String[] projectFilter) throws JavaModelException {
+  private static IType[] getRegisteredTextProviderTypes(Boolean returnDocServices, String[] projectFilter) throws JavaModelException {
 
     class TextProviderService {
-      final IType textProvider;
-      final IJavaProject project;
+      private final IType textProvider;
+      private final IJavaProject project;
 
       private TextProviderService(IType t) {
         textProvider = t;
@@ -92,8 +92,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
 
     class TextProviderServiceDeclaration {
-      final TextProviderService svc;
-      final float prio;
+      private final TextProviderService svc;
+      private final float prio;
 
       private TextProviderServiceDeclaration(TextProviderService s, float p) {
         svc = s;

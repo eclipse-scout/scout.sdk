@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,9 +17,9 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 
 public class JavaFileInputReader {
-  public static final int TYPE_NONE = -1;
-  public static final int TYPE_MULTILINE_COMMENT = 1;
-  public static final int TYPE_SINGLELINE_COMMENT = 2;
+  private static final int TYPE_NONE = -1;
+  private static final int TYPE_MULTILINE_COMMENT = 1;
+  private static final int TYPE_SINGLELINE_COMMENT = 2;
 
   private int m_type = TYPE_NONE;
   private int m_counter = 0;

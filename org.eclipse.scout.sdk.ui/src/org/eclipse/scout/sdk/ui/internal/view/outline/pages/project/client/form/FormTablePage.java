@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformFormsOperation;
+import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
@@ -43,6 +44,7 @@ public class FormTablePage extends AbstractPage {
 
   public FormTablePage(AbstractPage parent) {
     setName(Texts.get("FormTablePage"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Forms));
     setParent(parent);
   }
 

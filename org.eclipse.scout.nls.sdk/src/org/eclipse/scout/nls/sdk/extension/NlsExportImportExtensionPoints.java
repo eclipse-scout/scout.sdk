@@ -34,7 +34,7 @@ public class NlsExportImportExtensionPoints {
   private static final NlsExportImportExtensionPoints instance = new NlsExportImportExtensionPoints();
   public static final String EXTENSION_POINT_ID_NLS_EXPORTER = "nlsExporter";
   public static final String EXTENSION_POINT_ID_NLS_IMPORTER = "nlsImporter";
-  HashMap<String/*extensionPointID*/, WizardExtension[] /*extensions*/> m_extensions;
+  private HashMap<String/*extensionPointID*/, WizardExtension[] /*extensions*/> m_extensions;
 
   private NlsExportImportExtensionPoints() {
     m_extensions = new HashMap<String, WizardExtension[]>();

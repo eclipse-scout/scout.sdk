@@ -12,7 +12,6 @@ package org.eclipse.scout.nls.sdk.extension;
 
 import org.eclipse.scout.nls.sdk.NlsCore;
 
-
 /**
  * <h4>ImportExportExtensionPoint</h4>
  * 
@@ -20,8 +19,8 @@ import org.eclipse.scout.nls.sdk.NlsCore;
  * @since 1.1.0 (11.11.2010)
  */
 public class WizardExtension {
-  public Class<? extends AbstractImportExportWizard> m_wizard;
-  public String m_name;
+  private Class<? extends AbstractImportExportWizard> m_wizard;
+  private String m_name;
   private String icon;
 
   /**

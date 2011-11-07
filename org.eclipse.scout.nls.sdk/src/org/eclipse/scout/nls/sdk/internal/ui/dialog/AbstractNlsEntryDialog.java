@@ -45,7 +45,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   private final HashMap<Language, TextField<String>> m_translationFields;
   private TextField<String> m_keyField;
 
-  public AbstractNlsEntryDialog(Shell parentShell, String title, NlsEntry row, INlsProject project) {
+  protected AbstractNlsEntryDialog(Shell parentShell, String title, NlsEntry row, INlsProject project) {
     super(parentShell);
     m_nlsProject = project;
     m_title = title;
@@ -190,11 +190,11 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     private TextField<String> m_input;
     private Language m_language;
 
-    public TranslationField(Language language) {
+    protected TranslationField(Language language) {
       m_language = language;
     }
 
-    public TextField<String> create(Composite parent) {
+    protected TextField<String> create(Composite parent) {
       m_input = new TextField<String>(parent, TextField.VALIDATE_ON_MODIFY | TextField.MULTI_LINE_TEXT_FIELD, "");
       m_input.setLabelVisible(false);
       m_input.addInputChangedListener(new IInputChangedListener<String>() {

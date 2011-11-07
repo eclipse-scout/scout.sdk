@@ -27,8 +27,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class DesktopNodePage extends AbstractScoutTypePage {
 
-  static final IType iMenuType = ScoutSdk.getType(RuntimeClasses.IMenu);
-  static final IType iToolButtonType = ScoutSdk.getType(RuntimeClasses.IToolButton);
+  private static final IType iToolButtonType = ScoutSdk.getType(RuntimeClasses.IToolButton);
 
   public DesktopNodePage(IPage parentPage, IType desktopType) {
     setParent(parentPage);

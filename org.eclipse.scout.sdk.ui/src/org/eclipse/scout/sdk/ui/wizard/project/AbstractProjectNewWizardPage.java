@@ -15,7 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 
 /**
- * <h3>AbstractWizardPage</h3> ...
+ * <h3>AbstractProjectNewWizardPage</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 06.03.2010

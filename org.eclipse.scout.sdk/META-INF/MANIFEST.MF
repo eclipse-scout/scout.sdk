@@ -36,7 +36,6 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.icon,
  org.eclipse.scout.sdk.internal;x-friends:="org.eclipse.scout.sdk.test",
- org.eclipse.scout.sdk.internal.jdt,
  org.eclipse.scout.sdk.internal.jdt.finegraned,
  org.eclipse.scout.sdk.internal.typecache,
  org.eclipse.scout.sdk.internal.typestructure,

@@ -73,7 +73,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return Status.OK_STATUS;
   }
 
-  protected byte[] getNlsFileContent() {
+  private byte[] getNlsFileContent() {
     StringWriter writer = new StringWriter();
     writer.append(getNlsFileHeader());
     writer.append(AbstractNlsFile.MANIFEST_CLASS + "=" + getDesc().getPackage() + "." + getDesc().getClassName() + NL);
@@ -85,7 +85,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     createLanguageFile(null, folder, getDesc().getFileName(), monitor);
   }
 
-  public static final String getNlsClassFileHeader(String translationFileName) {
+  private static final String getNlsClassFileHeader(String translationFileName) {
     StringBuilder builder = new StringBuilder();
     builder.append("/**" + NL);
     builder.append(" * This class provides the NLS support." + NL);
@@ -93,7 +93,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return builder.toString();
   }
 
-  public static final String getNlsFileHeader() {
+  private static final String getNlsFileHeader() {
     StringBuilder builder = new StringBuilder();
     builder.append("################################################" + NL);
     builder.append("# This file is maintained by the nls editor.   #" + NL);
@@ -103,7 +103,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return builder.toString();
   }
 
-  public static final String getTranslationFileHeader() {
+  private static final String getTranslationFileHeader() {
     StringBuilder builder = new StringBuilder();
     builder.append("##############################################################" + NL);
     builder.append("# This file is maintained by the NLS project and should not  #" + NL);
@@ -124,7 +124,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     }
   }
 
-  protected final void createNlsFile(IProgressMonitor monitor) throws CoreException {
+  private final void createNlsFile(IProgressMonitor monitor) throws CoreException {
     if (getDesc().getPlugin() != null) {
       IFile file = getDesc().getPlugin().getFile(getDesc().getFileName() + ".nls");
       if (!file.exists()) {
@@ -133,7 +133,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     }
   }
 
-  protected final void createJavaClass(IProgressMonitor monitor) throws CoreException {
+  private final void createJavaClass(IProgressMonitor monitor) throws CoreException {
     createJavaClass(getDesc().getPlugin(),
         getDesc().getSourceContainer(),
         getDesc().getPackage(),
@@ -152,7 +152,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return resourcePathString;
   }
 
-  protected byte[] getClassContent() throws CoreException {
+  private byte[] getClassContent() throws CoreException {
     NewNlsFileOperationDesc desc = getDesc();
     String className = desc.getClassName();
     IType parentType = null;
@@ -206,7 +206,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return writer.toString().getBytes();
   }
 
-  protected static byte[] getDefaultMessagesFileContent() {
+  private static byte[] getDefaultMessagesFileContent() {
     StringWriter writer = new StringWriter();
     writer.append(getTranslationFileHeader());
     return writer.toString().getBytes();

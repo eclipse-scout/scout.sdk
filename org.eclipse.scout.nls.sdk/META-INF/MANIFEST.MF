@@ -34,7 +34,6 @@ Export-Package: org.eclipse.scout.nls.sdk,
  org.eclipse.scout.nls.sdk.internal.ui,
  org.eclipse.scout.nls.sdk.internal.ui.action,
  org.eclipse.scout.nls.sdk.internal.ui.dialog,
- org.eclipse.scout.nls.sdk.internal.ui.dialog.importexport,
  org.eclipse.scout.nls.sdk.internal.ui.editor,
  org.eclipse.scout.nls.sdk.internal.ui.fields,
  org.eclipse.scout.nls.sdk.internal.ui.formatter,
@@ -48,7 +47,6 @@ Export-Package: org.eclipse.scout.nls.sdk,
  org.eclipse.scout.nls.sdk.pde,
  org.eclipse.scout.nls.sdk.ui,
  org.eclipse.scout.nls.sdk.ui.action,
- org.eclipse.scout.nls.sdk.ui.editor,
  org.eclipse.scout.nls.sdk.util.concurrent
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .

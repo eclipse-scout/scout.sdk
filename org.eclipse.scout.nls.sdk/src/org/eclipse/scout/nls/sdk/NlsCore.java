@@ -41,7 +41,7 @@ public class NlsCore extends AbstractUIPlugin implements INlsIcons {
 
   // The shared instance
   private static NlsCore plugin;
-  static String imagePath = "resources/icons/";
+  private static String imagePath = "resources/icons/";
   private BundleContext m_context;
 
   private ColorRegistry m_colorRegistry;

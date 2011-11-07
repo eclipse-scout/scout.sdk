@@ -17,7 +17,6 @@ import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jdt.internal.ui.javaeditor.JarEntryEditorInput;
 import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.nls.sdk.ui.editor.INlsEditor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IStorageEditorInput;
@@ -29,7 +28,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
 @SuppressWarnings("restriction")
-public class NlsEditor extends MultiPageEditorPart implements INlsEditor {
+public class NlsEditor extends MultiPageEditorPart {
 
   private int m_tablePageIndex = -1;
 

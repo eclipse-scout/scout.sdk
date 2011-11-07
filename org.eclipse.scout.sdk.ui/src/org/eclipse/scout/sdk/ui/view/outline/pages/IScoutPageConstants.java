@@ -22,14 +22,12 @@ public abstract interface IScoutPageConstants {
   public static final String BOOKMARK_STORAGE_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.BookmarkStorageServiceTablePage";
   public static final String BOOLEAN_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.BooleanFieldNodePage";
   public static final String BUTTON_NODE_PAGE = "org.eclipse.scout.sdk.page.ButtonNodePage";
-  public static final String BUTTON_TABLE_PAGE = "org.eclipse.scout.sdk.page.ButtonTablePage";
   public static final String CALENDAR_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.CalendarFieldNodePage";
   public static final String CALENDAR_ITEM_PROVIDER_NODE_PAGE = "org.eclipse.scout.sdk.page.CalendarItemProviderNodePage";
   public static final String CALENDAR_ITEM_PROVIDER_TABLE_PAGE = "org.eclipse.scout.sdk.page.CalendarItemProviderTablePage";
   public static final String CALENDAR_NODE_PAGE = "org.eclipse.scout.sdk.page.CalendarNodePage";
   public static final String CALENDAR_SERVICE_NODE_PAGE = "org.eclipse.scout.sdk.page.CalendarServiceNodePage";
   public static final String CALENDAR_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.CalendarServiceTablePage";
-  public static final String CHART_BOX_NODE_PAGE = "org.eclipse.scout.sdk.page.ChartBoxNodePage";
   public static final String CHECK_BOX_NODE_PAGE = "org.eclipse.scout.sdk.page.CheckBoxNodePage";
   public static final String CLIENT_LOOKUP_CALL_TABLE_PAGE = "org.eclipse.scout.sdk.page.ClientLookupCallTablePage";
   public static final String CLIENT_NODE_PAGE = "org.eclipse.scout.sdk.page.ClientNodePage";
@@ -37,7 +35,6 @@ public abstract interface IScoutPageConstants {
   public static final String CLIENT_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.ClientServiceTablePage";
   public static final String CLIENT_SESSION_NODE_PAGE = "org.eclipse.scout.sdk.page.ClientSessionNodePage";
   public static final String CODE_NODE_PAGE = "org.eclipse.scout.sdk.page.CodeNodePage";
-  public static final String CODE_TABLE_PAGE = "org.eclipse.scout.sdk.page.CodeTablePage";
   public static final String CODE_TYPE_NODE_PAGE = "org.eclipse.scout.sdk.page.CodeTypeNodePage";
   public static final String CODE_TYPE_TABLE_PAGE = "org.eclipse.scout.sdk.page.CodeTypeTablePage";
   public static final String COLUMN_NODE_PAGE = "org.eclipse.scout.sdk.page.ColumnNodePage";

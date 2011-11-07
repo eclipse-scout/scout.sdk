@@ -19,12 +19,12 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 
 /** <h4>AbstractWorkspaceOperation</h4> */
-public class AbstractWorkspaceAction extends Action {
+public abstract class AbstractWorkspaceAction extends Action {
 
   private Job m_job;
   private final boolean m_interactWithUi;
 
-  public AbstractWorkspaceAction(String name, boolean interactWithUi) {
+  protected AbstractWorkspaceAction(String name, boolean interactWithUi) {
     super(name);
     m_interactWithUi = interactWithUi;
   }
