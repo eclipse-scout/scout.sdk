@@ -47,7 +47,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   /**
    * Gets the registered (in plugin.xml) text provider service types ordered by priority.
-   * 
+   *
    * @param returnDocServices
    *          If true, only Docs text provider services (implementing marker interface
    *          <code>IDocumentationTextProviderService</code>) are returned. Otherwise only non-docs text provider
@@ -284,6 +284,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static IScoutBundle[] getScoutBundlesForProject(IScoutProject root) {
+	if(root == null) return null;
     HashSet<IScoutBundle> collector = new HashSet<IScoutBundle>();
     addBundlesRec(root, collector);
     return collector.toArray(new IScoutBundle[collector.size()]);
