@@ -32,7 +32,9 @@ public class OkButtonNewWizard extends ButtonFieldNewWizard {
     INlsProject nlsProject = ScoutSdk.getScoutWorkspace().getScoutBundle(declaringType.getJavaProject().getProject()).findBestMatchNlsProject();
     if (nlsProject != null) {
       INlsEntry entry = nlsProject.getEntry("Ok");
-      newProposal = new NlsProposal(entry, nlsProject.getDevelopmentLanguage());
+      if (entry != null) {
+        newProposal = new NlsProposal(entry, nlsProject.getDevelopmentLanguage());
+      }
       getButtonFieldWizardPage().setTypeName("OkButton");
     }
     getButtonFieldWizardPage().setNlsName(newProposal);

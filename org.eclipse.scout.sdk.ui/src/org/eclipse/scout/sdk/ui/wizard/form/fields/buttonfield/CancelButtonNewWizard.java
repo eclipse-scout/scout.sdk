@@ -32,7 +32,9 @@ public class CancelButtonNewWizard extends ButtonFieldNewWizard {
     INlsProject nlsProject = ScoutSdk.getScoutWorkspace().getScoutBundle(declaringType.getJavaProject().getProject()).findBestMatchNlsProject();
     if (nlsProject != null) {
       INlsEntry entry = nlsProject.getEntry("Cancel");
-      newProposal = new NlsProposal(entry, nlsProject.getDevelopmentLanguage());
+      if (entry != null) {
+        newProposal = new NlsProposal(entry, nlsProject.getDevelopmentLanguage());
+      }
       getButtonFieldWizardPage().setTypeName("CancelButton");
     }
     getButtonFieldWizardPage().setNlsName(newProposal);
