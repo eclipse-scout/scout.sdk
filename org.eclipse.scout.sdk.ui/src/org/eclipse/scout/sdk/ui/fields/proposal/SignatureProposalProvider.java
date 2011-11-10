@@ -131,12 +131,15 @@ public class SignatureProposalProvider implements IContentProposalProvider {
     P_SearchRequestor searchRequestor = new P_SearchRequestor(monitor);
     try {
 
-      // IJavaSearchScope searchScope=SearchEngine.createWorkspaceScope();
-      //
-      m_searchEngine.search(SearchPattern.createPattern(
+      SearchPattern p = SearchPattern.createPattern(
           contents.substring(0, position) + "*",
           IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS,
-          SearchPattern.R_PATTERN_MATCH), new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, m_searchScope, searchRequestor, null);
+          SearchPattern.R_PATTERN_MATCH);
+
+      // pattern can be null if the user enters an in ill-formed string -> no proposals should be found then.
+      if (p != null) {
+        m_searchEngine.search(p, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, m_searchScope, searchRequestor, null);
+      }
     }
     catch (CoreException e) {
       if (e.getStatus().matches(IStatus.ERROR)) {
