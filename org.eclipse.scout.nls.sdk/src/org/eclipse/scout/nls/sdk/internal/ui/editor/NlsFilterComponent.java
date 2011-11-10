@@ -78,21 +78,30 @@ public class NlsFilterComponent extends Composite {
   }
 
   protected void updateFilterFields(Composite parent) {
+    HashMap<Language, String> oldContents = new HashMap<Language, String>(m_filterFields.size());
     if (!m_filterFields.isEmpty()) {
-      // dispose old
-      for (Text field : m_filterFields.values()) {
-        field.dispose();
+      // dispose old text fields and backup the filter text to restore it afterwards in the new fields
+      for (Entry<Language, Text> entry : m_filterFields.entrySet()) {
+        oldContents.put(entry.getKey(), entry.getValue().getText());
+        entry.getValue().dispose();
       }
       m_filterFields.clear();
     }
+
     if (m_tableViewer != null && m_tableViewer.getTable().getColumnCount() > NlsTable.AMOUNT_UTILITY_COLS) {
       TableColumn[] columns = m_tableViewer.getTable().getColumns();
-      ArrayList<Text> filterFieldList = new ArrayList<Text>(columns.length - NlsTable.INDEX_COLUMN_KEYS);
       for (int i = NlsTable.INDEX_COLUMN_KEYS; i < columns.length; i++) {
+        Language l = (Language) columns[i].getData(NlsTable.LANGUAGE_COLUMN_ID);
         Text filterField = new Text(this, SWT.BORDER);
         filterField.addModifyListener(new P_FilterModifyListener(i));
-        filterFieldList.add(filterField);
-        m_filterFields.put((Language) columns[i].getData(NlsTable.LANGUAGE_COLUMN_ID), filterField);
+
+        // restore old filter text
+        String oldText = oldContents.get(l);
+        if (oldText != null) {
+          filterField.setText(oldText);
+        }
+
+        m_filterFields.put(l, filterField);
       }
     }
   }
