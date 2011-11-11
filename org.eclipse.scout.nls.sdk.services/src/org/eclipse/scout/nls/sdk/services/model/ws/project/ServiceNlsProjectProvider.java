@@ -10,12 +10,10 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.scout.nls.sdk.NlsCore;
@@ -47,7 +45,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   /**
    * Gets the registered (in plugin.xml) text provider service types ordered by priority.
-   *
+   * 
    * @param returnDocServices
    *          If true, only Docs text provider services (implementing marker interface
    *          <code>IDocumentationTextProviderService</code>) are returned. Otherwise only non-docs text provider
@@ -104,8 +102,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     IType superType = ScoutSdk.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
     if (superType == null) return null;
 
-    ITypeHierarchy nlsHierarchy = superType.newTypeHierarchy(new NullProgressMonitor());
-    IType[] serviceImpls = nlsHierarchy.getAllSubtypes(superType);
+    IType[] serviceImpls = ScoutSdk.getPrimaryTypeHierarchy(superType).getAllSubtypes(superType);
     HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.length);
     IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IScoutBundleConstantes.EXTENSION_POINT_SERVICES, true);
     for (IExtension e : allServiceExtensions) {
@@ -284,7 +281,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static IScoutBundle[] getScoutBundlesForProject(IScoutProject root) {
-	if(root == null) return null;
+    if (root == null) return null;
     HashSet<IScoutBundle> collector = new HashSet<IScoutBundle>();
     addBundlesRec(root, collector);
     return collector.toArray(new IScoutBundle[collector.size()]);
