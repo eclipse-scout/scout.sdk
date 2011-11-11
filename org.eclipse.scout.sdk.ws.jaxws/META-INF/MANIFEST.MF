@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JAX-WS Scout SDK
+Bundle-SymbolicName: org.eclipse.scout.sdk.ws.jaxws;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk
+Bundle-Vendor: BSI Business Systems Integration AG
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.scout.sdk,
+ org.eclipse.scout.sdk.ui,
+ org.eclipse.scout.commons,
+ javax.wsdl,
+ org.eclipse.debug.core,
+ org.eclipse.debug.ui
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
