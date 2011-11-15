@@ -10,8 +10,9 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.shared;visibility:=reexport
 Export-Package: test.shared,
- test.shared.services.process,
- test.shared.security
+ test.shared.security,
+ test.shared.services.common.text,
+ test.shared.services.process
 Import-Package: javax.activation;resolution:=optional,
  javax.jms;resolution:=optional,
  javax.mail;resolution:=optional,

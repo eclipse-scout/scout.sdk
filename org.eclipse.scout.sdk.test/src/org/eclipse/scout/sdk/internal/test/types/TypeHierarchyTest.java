@@ -10,27 +10,35 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.types;
 
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.workspace.type.TypeComparators;
 import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchyChangedListener;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * <h1>TypeHierarchyTest</h1>
  * <p>
  */
-@Ignore
 public class TypeHierarchyTest extends AbstractScoutSdkTest {
+
+  private static String BUNLDE_NAME_CLIENT = "test.client";
+  private static String BUNLDE_NAME_SHARED = "test.shared";
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
@@ -59,4 +67,43 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
     Assert.assertEquals(formFields[2].getElementName(), "DetailsGroup");
   }
 
+  @Test
+  public void testCreateNewPrimaryType() throws Exception {
+    final IJavaProject project = JavaCore.create(getProject(BUNLDE_NAME_CLIENT));
+    final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
+    final IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iForm);
+    IType[] subtypes = primaryFormFieldHierarchy.getAllSubtypes(iForm, TypeFilters.getClassesInProject(project));
+    Assert.assertEquals(1, subtypes.length);
+    final IntegerHolder formCountHolder = new IntegerHolder(-1);
+    primaryFormFieldHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
+      @Override
+      public void handleEvent(int eventType, IType type) {
+        switch (eventType) {
+          case POST_TYPE_REMOVING:
+          case POST_TYPE_ADDING:
+          case POST_TYPE_CHANGED:
+            formCountHolder.setValue(primaryFormFieldHierarchy.getAllSubtypes(iForm, TypeFilters.getClassesInProject(project)).length);
+            synchronized (formCountHolder) {
+              formCountHolder.notifyAll();
+            }
+            break;
+        }
+      }
+    });
+    FormNewOperation formOp = new FormNewOperation();
+    formOp.setTypeName("ANewForm");
+    formOp.setClientBundle(ScoutSdk.getScoutWorkspace().getScoutBundle(project.getProject()));
+    formOp.setSuperType(Signature.createTypeSignature(RuntimeClasses.AbstractForm, true));
+    OperationJob job = new OperationJob(formOp);
+    job.schedule();
+    job.join();
+    synchronized (formCountHolder) {
+      if (formCountHolder.getValue() == -1) {
+        formCountHolder.wait();
+      }
+    }
+    // expect created form
+    Assert.assertEquals(2, formCountHolder.getValue().intValue());
+
+  }
 }

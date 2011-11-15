@@ -21,13 +21,13 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.service.SERVICES;
 
 import test.client.ui.forms.CompanyForm.MainBox.DetailsGroup;
 import test.client.ui.forms.CompanyForm.MainBox.DetailsGroup.AnzahlField;
 import test.client.ui.forms.CompanyForm.MainBox.NameField;
 import test.client.ui.forms.CompanyForm.MainBox.SinceField;
-import test.shared.Texts;
 import test.shared.security.UpdateCompanyPermission;
 import test.shared.services.process.CompanyFormData;
 import test.shared.services.process.ICompanyProcessService;
@@ -43,7 +43,7 @@ public class CompanyForm extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return Texts.get("Company");
+    return TEXTS.get("Company");
   }
 
   @FormData
@@ -101,7 +101,7 @@ public class CompanyForm extends AbstractForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return Texts.get("Since");
+        return TEXTS.get("Since");
       }
     }
 
@@ -118,7 +118,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Anzahl");
+          return TEXTS.get("Anzahl");
         }
       }
     }

@@ -50,14 +50,14 @@ public class CompanyFormData extends AbstractFormData {
     }
   }
 
-  public class Anzahl extends AbstractValueFieldData<Integer> {
+  public static class Anzahl extends AbstractValueFieldData<Integer> {
     private static final long serialVersionUID = 1L;
 
     public Anzahl() {
     }
   }
 
-  public class Name extends AbstractValueFieldData<String> {
+  public static class Name extends AbstractValueFieldData<String> {
     private static final long serialVersionUID = 1L;
 
     public Name() {
@@ -73,7 +73,7 @@ public class CompanyFormData extends AbstractFormData {
     }
   }
 
-  public class Since extends AbstractValueFieldData<Date> {
+  public static class Since extends AbstractValueFieldData<Date> {
     private static final long serialVersionUID = 1L;
 
     public Since() {
