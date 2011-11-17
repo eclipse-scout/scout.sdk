@@ -18,14 +18,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.LookupServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -51,9 +51,9 @@ public class LookupCallNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     String namePrefix = getLookupCallName();
-    namePrefix = namePrefix.replaceAll(ScoutIdeProperties.SUFFIX_LOOKUP_CALL + "$", "");
+    namePrefix = namePrefix.replaceAll(SdkProperties.SUFFIX_LOOKUP_CALL + "$", "");
     // service
     IType lookupServiceInterface = getLookupService();
     if (lookupServiceInterface == null) {
@@ -61,9 +61,9 @@ public class LookupCallNewOperation implements IOperation {
         LookupServiceNewOperation serviceOp = new LookupServiceNewOperation();
         serviceOp.addProxyRegistrationBundle(getInterfaceRegistrationBundle());
         serviceOp.setImplementationBundle(getServiceImplementationBundle());
-        serviceOp.setServiceName(namePrefix + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+        serviceOp.setServiceName(namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
         serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
-        serviceOp.setServiceInterfaceName("I" + namePrefix + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+        serviceOp.setServiceInterfaceName("I" + namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
         serviceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.ILookupService, true));
         serviceOp.setServiceSuperTypeSignature(getServiceSuperTypeSignature());
         serviceOp.addServiceRegistrationBundle(getImplementationRegistrationBundle());

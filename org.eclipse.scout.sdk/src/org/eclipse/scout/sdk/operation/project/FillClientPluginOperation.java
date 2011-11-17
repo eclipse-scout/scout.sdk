@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillClientPluginOperation implements IOperation {
 
@@ -29,7 +29,6 @@ public class FillClientPluginOperation implements IOperation {
   public FillClientPluginOperation(IProject clientProject, ITemplateVariableSet templateBindings) {
     m_clientProject = clientProject;
     m_templateBindings = templateBindings;
-
   }
 
   @Override
@@ -45,7 +44,7 @@ public class FillClientPluginOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     TemplateVariableSet bindings = TemplateVariableSet.createNew(getClientProject(), m_templateBindings);
     String destPathPref = "src/" + (getClientProject().getName().replace('.', '/')) + "/";
     new InstallJavaFileOperation("templates/client/src/Activator.java", destPathPref + "Activator.java", getClientProject(), bindings).run(monitor, workingCopyManager);

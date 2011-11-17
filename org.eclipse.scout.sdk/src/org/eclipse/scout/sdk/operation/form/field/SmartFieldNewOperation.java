@@ -19,14 +19,14 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>SmartFieldNewOperation</h3> ...
@@ -73,7 +73,7 @@ public class SmartFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
@@ -95,7 +95,7 @@ public class SmartFieldNewOperation implements IOperation {
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder source = new StringBuilder();
           source.append("return ");
-          source.append(ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(getCodeType().getFullyQualifiedName(), true), validator));
+          source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getCodeType().getFullyQualifiedName(), true), validator));
           source.append(".class;");
           return source.toString();
         }

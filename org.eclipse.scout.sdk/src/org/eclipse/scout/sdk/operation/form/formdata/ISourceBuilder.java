@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 
 /**
  *
@@ -23,7 +24,7 @@ public interface ISourceBuilder {
 
   String getElementName();
 
-  String createSource(IImportValidator validator);
+  String createSource(IImportValidator validator) throws JavaModelException;
 
   int getType();
 

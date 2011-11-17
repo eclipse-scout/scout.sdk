@@ -15,8 +15,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  *
@@ -42,7 +42,7 @@ public class PackageDeleteOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_REMOVE, new IPackageFragment[]{getPackageFragment()}, true);
     manifestOp.run(monitor, workingCopyManager);
     getPackageFragment().delete(true, monitor);

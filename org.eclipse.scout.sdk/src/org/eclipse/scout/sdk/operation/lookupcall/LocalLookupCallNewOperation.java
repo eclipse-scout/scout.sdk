@@ -19,14 +19,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -47,7 +47,7 @@ public class LocalLookupCallNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
 
     // lookup call
     ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES_LOOKUP), getBundle());

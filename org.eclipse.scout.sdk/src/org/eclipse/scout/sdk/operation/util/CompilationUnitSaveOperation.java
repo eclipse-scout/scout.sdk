@@ -14,8 +14,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  *
@@ -41,7 +41,7 @@ public class CompilationUnitSaveOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (getCompilationUnit().isWorkingCopy()) {
       getCompilationUnit().getBuffer().save(monitor, true);
     }

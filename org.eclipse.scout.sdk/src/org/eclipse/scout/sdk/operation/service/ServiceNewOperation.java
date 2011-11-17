@@ -24,16 +24,16 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>{@link ServiceNewOperation}</h3> To create a new service a service consists out of:
@@ -51,8 +51,8 @@ import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
  * @since 1.0.8 03.02.2010
  */
 public class ServiceNewOperation implements IOperation {
-  final IType iClientSession = ScoutSdk.getType(RuntimeClasses.IClientSession);
-  final IType iServerSession = ScoutSdk.getType(RuntimeClasses.IServerSession);
+  final IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
+  final IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
 
   private String m_serviceName;
   private String m_servicePackageName;
@@ -93,7 +93,7 @@ public class ServiceNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (getInterfaceBundle() != null) {
       // create
       ScoutTypeNewOperation interfaceOp = new ScoutTypeNewOperation(getServiceInterfaceName(), getServiceInterfacePackageName(), getInterfaceBundle());
@@ -137,7 +137,7 @@ public class ServiceNewOperation implements IOperation {
         if (sb.getType() == IScoutBundle.BUNDLE_CLIENT) {
           serviceFactory = RuntimeClasses.ClientServiceFactory;
           // find client session
-          ICachedTypeHierarchy clientSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iClientSession);
+          ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
           IType[] clientSessions = clientSessionHierarchy.getAllSubtypes(iClientSession, sessionFilter, null);
           if (clientSessions.length > 0) {
             sessionType = clientSessions[0];
@@ -146,7 +146,7 @@ public class ServiceNewOperation implements IOperation {
         else if (sb.getType() == IScoutBundle.BUNDLE_SERVER) {
           serviceFactory = RuntimeClasses.ServerServiceFactory;
           // find server session
-          ICachedTypeHierarchy serverSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iServerSession);
+          ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
           IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, sessionFilter, null);
           if (serverSessions.length > 0) {
             sessionType = serverSessions[0];

@@ -16,18 +16,18 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class LookupServiceNewOperation extends ServiceNewOperation {
 
-  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
-  final IType abstractSqlLookupService = ScoutSdk.getType(RuntimeClasses.AbstractSqlLookupService);
+  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+  final IType abstractSqlLookupService = TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService);
 
   @Override
   public String getOperationName() {
@@ -35,7 +35,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
     IType serviceImplementation = getCreatedServiceImplementation();
     ITypeHierarchy superTypeHierarchy = serviceImplementation.newSupertypeHierarchy(monitor);
@@ -44,7 +44,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
       StringBuilder methodBuilder = new StringBuilder();
       methodBuilder.append("@Override\n");
       methodBuilder.append("public String getConfiguredSqlSelect(){\n");
-      methodBuilder.append(ScoutIdeProperties.TAB + "return \"\"; " + ScoutUtility.getCommentBlock("write select statement here.") + "\n}");
+      methodBuilder.append(SdkProperties.TAB + "return \"\"; " + ScoutUtility.getCommentBlock("write select statement here.") + "\n}");
       serviceImplementation.createMethod(methodBuilder.toString(), null, true, monitor);
     }
     else {
@@ -59,29 +59,29 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
       methodSource.append("getDataByAll(");
       methodSource.append(lookupCallRef + " call) ");
       methodSource.append("throws " + processingExceptionRef + " {\n");
-      methodSource.append(ScoutIdeProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
-      methodSource.append(ScoutIdeProperties.TAB + "return null;\n");
+      methodSource.append(SdkProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
+      methodSource.append(SdkProperties.TAB + "return null;\n");
       methodSource.append("}\n");
       serviceImplementation.createMethod(methodSource.toString(), null, true, monitor);
 
       methodSource = new StringBuffer();
       methodSource.append("public " + lookupRowRef + "[] getDataByKey(" + lookupCallRef + " call) throws " + processingExceptionRef + "{\n");
-      methodSource.append(ScoutIdeProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
-      methodSource.append(ScoutIdeProperties.TAB + "return null;\n");
+      methodSource.append(SdkProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
+      methodSource.append(SdkProperties.TAB + "return null;\n");
       methodSource.append("}\n");
       serviceImplementation.createMethod(methodSource.toString(), null, true, monitor);
 
       methodSource = new StringBuffer();
       methodSource.append("public " + lookupRowRef + "[] getDataByRec(" + lookupCallRef + " call) throws " + processingExceptionRef + "{\n");
-      methodSource.append(ScoutIdeProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
-      methodSource.append(ScoutIdeProperties.TAB + "return null;\n");
+      methodSource.append(SdkProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
+      methodSource.append(SdkProperties.TAB + "return null;\n");
       methodSource.append("}\n");
       serviceImplementation.createMethod(methodSource.toString(), null, true, monitor);
 
       methodSource = new StringBuffer();
       methodSource.append("public " + lookupRowRef + "[] getDataByText(" + lookupCallRef + " call) throws " + processingExceptionRef + "{\n");
-      methodSource.append(ScoutIdeProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
-      methodSource.append(ScoutIdeProperties.TAB + "return null;\n");
+      methodSource.append(SdkProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
+      methodSource.append(SdkProperties.TAB + "return null;\n");
       methodSource.append("}\n");
       serviceImplementation.createMethod(methodSource.toString(), null, true, monitor);
 

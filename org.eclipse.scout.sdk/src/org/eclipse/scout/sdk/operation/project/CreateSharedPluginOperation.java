@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * creates plugins like for example
@@ -37,7 +37,7 @@ public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperat
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
     IProject project = getCreatedProject();
     TemplateVariableSet bindings = TemplateVariableSet.createNew(project, m_templateBindings);

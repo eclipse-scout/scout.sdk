@@ -20,10 +20,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutStatus;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * Creates an eclipse project (without Manifest.mf, Activator.class and plugin.xml)
@@ -46,7 +46,7 @@ public class CreateEclipseProjectOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // check for exist
     if (ResourcesPlugin.getWorkspace().getRoot().getProject(getSymbolicName()).exists()) {
       ScoutSdk.logError("Bundle: " + getSymbolicName() + " exists already!");
@@ -81,7 +81,7 @@ public class CreateEclipseProjectOperation implements IOperation {
     return m_createdProject;
   }
 
-  protected IProject createProject(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  protected IProject createProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(getSymbolicName());
     project.create(monitor);
     project.open(monitor);

@@ -21,12 +21,13 @@ import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 
 /**
  *
@@ -54,7 +55,7 @@ public class WellformClientBundleOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     HashSet<IType> allTypes = new HashSet<IType>();
     IPackageFragmentRoot[] packageFragmentRoots = getBundle().getJavaProject().getPackageFragmentRoots();
     for (IPackageFragmentRoot pr : packageFragmentRoots) {
@@ -98,9 +99,9 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformClientSession(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
-    IType iClientSessions = ScoutSdk.getType(RuntimeClasses.IClientSession);
-    IType[] clientSessions = ScoutSdk.getPrimaryTypeHierarchy(iClientSessions).getAllSubtypes(iClientSessions, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+  protected void wellformClientSession(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    IType iClientSessions = TypeUtility.getType(RuntimeClasses.IClientSession);
+    IType[] clientSessions = TypeUtility.getPrimaryTypeHierarchy(iClientSessions).getAllSubtypes(iClientSessions, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(clientSessions, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -113,9 +114,9 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformDesktop(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
-    IType idesktop = ScoutSdk.getType(RuntimeClasses.IDesktop);
-    IType[] desktops = ScoutSdk.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+  protected void wellformDesktop(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
+    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -128,9 +129,9 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformDesktopExtension(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
-    IType idesktop = ScoutSdk.getType(RuntimeClasses.IDesktopExtension);
-    IType[] desktops = ScoutSdk.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+  protected void wellformDesktopExtension(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -143,7 +144,7 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformForms(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected void wellformForms(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     WellformFormsOperation op = new WellformFormsOperation(getBundle());
     try {
       op.run(monitor, workingCopyManager);
@@ -158,7 +159,7 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformSearchForms(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected void wellformSearchForms(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     WellformSearchFormsOperation op = new WellformSearchFormsOperation(getBundle());
     try {
       op.run(monitor, workingCopyManager);
@@ -173,7 +174,7 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformWizards(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected void wellformWizards(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     WellformWizardsOperation op = new WellformWizardsOperation(getBundle());
     try {
       op.run(monitor, workingCopyManager);
@@ -188,7 +189,7 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformLookupCalls(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected void wellformLookupCalls(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     WellformLookupCallsOperation op = new WellformLookupCallsOperation(getBundle());
     try {
       op.run(monitor, workingCopyManager);
@@ -203,7 +204,7 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformPages(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected void wellformPages(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     WellformPagesOperation op = new WellformPagesOperation(getBundle());
     try {
       op.run(monitor, workingCopyManager);
@@ -218,7 +219,7 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformOutlines(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected void wellformOutlines(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     WellformOutlinesOperation op = new WellformOutlinesOperation(getBundle());
     try {
       op.run(monitor, workingCopyManager);

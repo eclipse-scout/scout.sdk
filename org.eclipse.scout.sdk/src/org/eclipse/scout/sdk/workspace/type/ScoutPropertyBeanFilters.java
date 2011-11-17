@@ -11,14 +11,16 @@
 package org.eclipse.scout.sdk.workspace.type;
 
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
+import org.eclipse.scout.sdk.util.type.IPropertyBean;
+import org.eclipse.scout.sdk.util.type.IPropertyBeanFilter;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * Convenience class for commonly used {@link IPropertyBeanFilter}.
  */
-public final class PropertyBeanFilters {
+public final class ScoutPropertyBeanFilters {
 
-  private PropertyBeanFilters() {
+  private ScoutPropertyBeanFilters() {
   }
 
   /**

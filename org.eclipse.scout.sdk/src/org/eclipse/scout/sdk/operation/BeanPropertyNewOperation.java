@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>BeanPropertyNewOperation</h3> ...
@@ -85,7 +85,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(m_declaringType.getCompilationUnit(), monitor);
 //    ArrayList<String> imports = new ArrayList<String>();
 //    String beanTypeString = ScoutSdkUtility.getSimpleTypeSignature(getBeanTypeSignature(), imports);

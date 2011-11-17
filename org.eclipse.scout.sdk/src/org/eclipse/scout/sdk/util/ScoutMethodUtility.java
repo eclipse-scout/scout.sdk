@@ -18,15 +18,15 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  *
  */
-public final class SdkMethodUtility {
-  private SdkMethodUtility() {
+public final class ScoutMethodUtility {
+  private ScoutMethodUtility() {
   }
 
   public static String getMethodReturnValue(IMethod method) {
@@ -51,9 +51,9 @@ public final class SdkMethodUtility {
   }
 
   private static INlsEntry getReturnNlsEntry(String value, IMethod method) throws CoreException {
-    String key = PropertyMethodSourceUtilities.parseReturnParameterNlsKey(value);
+    String key = PropertyMethodSourceUtility.parseReturnParameterNlsKey(value);
     if (!StringUtility.isNullOrEmpty(key)) {
-      INlsProject nlsProject = SdkTypeUtility.findNlsProject(method);
+      INlsProject nlsProject = ScoutTypeUtility.findNlsProject(method);
       if (nlsProject == null) {
         ScoutSdk.logWarning("could not find nls project for method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'");
       }

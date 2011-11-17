@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link MultipleFormDataUpdateOperation}</h3> ...
@@ -43,7 +43,7 @@ public class MultipleFormDataUpdateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     validate();
     for (IType t : getTypes()) {
       new FormDataUpdateOperation(t).run(monitor, workingCopyManager);

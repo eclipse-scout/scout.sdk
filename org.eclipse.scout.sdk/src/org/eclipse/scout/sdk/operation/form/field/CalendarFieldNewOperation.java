@@ -23,16 +23,17 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 public class CalendarFieldNewOperation implements IOperation {
@@ -75,7 +76,7 @@ public class CalendarFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
@@ -91,7 +92,7 @@ public class CalendarFieldNewOperation implements IOperation {
       labelOp.run(monitor, workingCopyManager);
     }
     // calendar
-    InnerTypeNewOperation calendarOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_CALENDARFIELD_CALENDAR, getCreatedCalendarField());
+    InnerTypeNewOperation calendarOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR, getCreatedCalendarField());
     calendarOp.setTypeModifiers(Flags.AccPublic);
     calendarOp.setSibling(null);
     calendarOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCalendar, true));
@@ -101,14 +102,14 @@ public class CalendarFieldNewOperation implements IOperation {
     calendarOp.validate();
     calendarOp.run(monitor, workingCopyManager);
     // generic on calendar field
-    Pattern p = Pattern.compile("extends\\s*" + ScoutSdkUtility.getSimpleTypeSignature(getSuperTypeSignature()), Pattern.MULTILINE);
+    Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
     Matcher matcher = p.matcher(getCreatedCalendarField().getSource());
     if (matcher.find()) {
       Document doc = new Document(getCreatedCalendarField().getSource());
-      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedCalendarField().getElementName() + "." + ScoutIdeProperties.TYPE_NAME_CALENDARFIELD_CALENDAR + ">");
+      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedCalendarField().getElementName() + "." + SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR + ">");
       try {
         genericEdit.apply(doc);
-        TypeUtility.setSource(getCreatedCalendarField(), doc.get(), workingCopyManager, monitor);
+        ScoutTypeUtility.setSource(getCreatedCalendarField(), doc.get(), workingCopyManager, monitor);
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not set the generic type of the calendar field.", e);

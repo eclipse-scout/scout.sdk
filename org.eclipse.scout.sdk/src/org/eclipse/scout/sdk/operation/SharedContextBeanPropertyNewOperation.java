@@ -18,12 +18,11 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>SharedContextBeanPropertyNewOperation</h3> A shared context property looks like:
@@ -69,7 +68,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
       throw new IllegalArgumentException("bean signature is null or empty.");
     }
     else {
-      if (ScoutSdkUtility.getSignatureType(getBeanTypeSignature()) != Signature.CLASS_TYPE_SIGNATURE) {
+      if (SignatureUtility.getTypeSignatureKind(getBeanTypeSignature()) != Signature.CLASS_TYPE_SIGNATURE) {
         throw new IllegalArgumentException("bean signature is not a class type signature.");
       }
     }
@@ -82,7 +81,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getServerSession() != null) {
       runServer(getServerSession(), monitor, workingCopyManager);
     }
@@ -91,10 +90,10 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     }
   }
 
-  protected void runServer(IType serverSession, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected void runServer(IType serverSession, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     manager.register(serverSession.getCompilationUnit(), monitor);
     IImportValidator validator = new CompilationUnitImportValidator(serverSession.getCompilationUnit());
-    String beanReference = ScoutSignature.getTypeReference(getBeanTypeSignature(), serverSession, validator);
+    String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), serverSession, validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
     // setter
@@ -102,7 +101,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceSetter.append(methodFlagsToString());
     sourceSetter.append(" void set" + getBeanName(true) + "(");
     sourceSetter.append(beanReference);
-    sourceSetter.append(" " + getBeanName(false) + "){\n" + ScoutIdeProperties.TAB);
+    sourceSetter.append(" " + getBeanName(false) + "){\n" + SdkProperties.TAB);
     sourceSetter.append("setSharedContextVariable(\"" + getBeanName(false) + "\"," + sigTypeSimpleName + ".class," + getBeanName(false) + ");\n}\n");
     IMethod writeMethod = serverSession.createMethod(sourceSetter.toString(), getSiblingServerSession(), true, monitor);
     // getter
@@ -110,7 +109,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceGetter.append(methodFlagsToString());
     sourceGetter.append(" " + beanReference + " ");
 
-    sourceGetter.append("get" + getBeanName(true) + "() {\n" + ScoutIdeProperties.TAB);
+    sourceGetter.append("get" + getBeanName(true) + "() {\n" + SdkProperties.TAB);
     sourceGetter.append("return getSharedContextVariable(\"" + getBeanName(false) + "\"," + sigTypeSimpleName + ".class);\n}\n");
     serverSession.createMethod(sourceGetter.toString(), writeMethod, true, monitor);
     // imports
@@ -119,17 +118,17 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     }
   }
 
-  protected void runClient(IType clientSession, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected void runClient(IType clientSession, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     manager.register(clientSession.getCompilationUnit(), monitor);
     IImportValidator validator = new CompilationUnitImportValidator(clientSession.getCompilationUnit());
-    String beanReference = ScoutSignature.getTypeReference(getBeanTypeSignature(), clientSession, validator);
+    String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), clientSession, validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
     // getter
     StringBuffer sourceGetter = new StringBuffer();
     sourceGetter.append(methodFlagsToString());
     sourceGetter.append(" " + beanReference + " ");
-    sourceGetter.append("get" + getBeanName(true) + "() {\n" + ScoutIdeProperties.TAB);
+    sourceGetter.append("get" + getBeanName(true) + "() {\n" + SdkProperties.TAB);
     sourceGetter.append("return getSharedContextVariable(\"" + getBeanName(false) + "\"," + sigTypeSimpleName + ".class);\n}\n");
     clientSession.createMethod(sourceGetter.toString(), getSiblingClientSession(), true, monitor);
     // imports

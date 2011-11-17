@@ -25,10 +25,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutStatus;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
 
 public class InstallTextFileOperation implements IOperation {
@@ -76,7 +76,7 @@ public class InstallTextFileOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       String s = new String(IOUtility.getContent(FileLocator.openStream(m_sourceBoundle, new Path(getSrcPath()), false)), "UTF-8");
       for (Map.Entry<String, String> e : getTemplateBinding().entrySet()) {

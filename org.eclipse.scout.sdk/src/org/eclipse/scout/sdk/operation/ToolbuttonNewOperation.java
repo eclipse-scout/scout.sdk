@@ -19,18 +19,18 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>FormHandlerNewOperation</h3> ...
  */
 public class ToolbuttonNewOperation implements IOperation {
 
-  final IType iToolbutton = ScoutSdk.getType(RuntimeClasses.IToolButton);
+  final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
 
   private final IType m_declaringType;
   private INlsEntry m_nlsEntry;
@@ -67,7 +67,7 @@ public class ToolbuttonNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation toolButtonOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     toolButtonOp.setOrderDefinitionType(iToolbutton);
     toolButtonOp.setSibling(getSibling());

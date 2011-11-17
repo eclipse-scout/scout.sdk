@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 
 /**
  * <h3>{@link AnnotationSourceBuilder}</h3> ...

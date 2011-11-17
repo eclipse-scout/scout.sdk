@@ -28,13 +28,13 @@ import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.SourceRange;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.jdt.SourceRange;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
@@ -66,7 +66,7 @@ public class AnnotationCreateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     workingCopyManager.register(getAnnotationOwner().getCompilationUnit(), monitor);
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getAnnotationOwner().getCompilationUnit());
     Document doc = new Document(getAnnotationOwner().getCompilationUnit().getSource());
@@ -146,7 +146,7 @@ public class AnnotationCreateOperation implements IOperation {
 
   public String createSource(IImportValidator validator, String NL) throws JavaModelException {
     StringBuilder source = new StringBuilder();
-    source.append("@" + ScoutSdkUtility.getSimpleTypeRefName(getSignature(), validator));
+    source.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
     String[] params = getParameters();
     if (params != null && params.length > 0) {
       source.append("(");

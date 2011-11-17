@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.operation.template;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public interface IContentTemplate {
 
   String getName();
 
-  void apply(IType type, IScoutWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException;
+  void apply(IType type, IWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException;
 
 }

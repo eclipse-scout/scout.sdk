@@ -18,19 +18,19 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.model.IBindBase;
 import org.eclipse.scout.sdk.sql.binding.model.ISqlToken;
 import org.eclipse.scout.sdk.sql.binding.model.ParameterFragmentToken;
 import org.eclipse.scout.sdk.sql.binding.model.SqlStatement;
 import org.eclipse.scout.sdk.sql.binding.model.StringFragmentToken;
 import org.eclipse.scout.sdk.sql.binding.model.UnresolvedBindBase;
-import org.eclipse.scout.sdk.util.DefaultAstVisitor;
+import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link SqlMethodIvocationVisitor}</h3> ...

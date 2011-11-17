@@ -19,7 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutBundle;
 import org.eclipse.scout.sdk.internal.workspace.ScoutProject;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.helper.ScoutProjectDescription;

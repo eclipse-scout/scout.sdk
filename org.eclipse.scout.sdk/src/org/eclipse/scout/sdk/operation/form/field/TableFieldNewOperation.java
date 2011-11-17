@@ -23,16 +23,17 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 /**
@@ -66,7 +67,7 @@ public class TableFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
@@ -84,14 +85,14 @@ public class TableFieldNewOperation implements IOperation {
     m_createdTable = createTable(monitor, workingCopyManager);
 
     // generic type
-    Pattern p = Pattern.compile("extends\\s*" + ScoutSdkUtility.getSimpleTypeSignature(getSuperTypeSignature()), Pattern.MULTILINE);
+    Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
     Matcher matcher = p.matcher(getCreatedField().getSource());
     if (matcher.find()) {
       Document doc = new Document(getCreatedField().getSource());
-      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + ScoutIdeProperties.TYPE_NAME_TABLEFIELD_TABLE + ">");
+      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + SdkProperties.TYPE_NAME_TABLEFIELD_TABLE + ">");
       try {
         genericEdit.apply(doc);
-        TypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
+        ScoutTypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not set the generic type of the table field.", e);
@@ -105,8 +106,8 @@ public class TableFieldNewOperation implements IOperation {
     }
   }
 
-  private IType createTable(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_TABLEFIELD_TABLE, getCreatedField(), false);
+  private IType createTable(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE, getCreatedField(), false);
     tableNewOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTable, true));
     tableNewOp.addTypeModifier(Flags.AccPublic);
     AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));

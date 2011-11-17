@@ -4,18 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package @@BUNDLE_SERVER_NAME@@;
 
-import org.eclipse.scout.rt.server.ThreadContext;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.AbstractServerSession;
 import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.rt.server.ServerJob;
+import org.eclipse.scout.rt.server.AbstractServerSession;
 
 public class ServerSession extends AbstractServerSession{
   private static IScoutLogger logger=ScoutLogManager.getLogger(ServerSession.class);
@@ -28,7 +28,7 @@ public class ServerSession extends AbstractServerSession{
    * @return session in current ThreadContext
    */
   public static ServerSession get(){
-    return ThreadContext.get(ServerSession.class);
+    return ServerJob.getCurrentSession(ServerSession.class);
   }
 
   @FormData

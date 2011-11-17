@@ -14,10 +14,10 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.scout.sdk.jdt.ast.AstUtility;
-import org.eclipse.scout.sdk.jdt.ast.VariableType;
 import org.eclipse.scout.sdk.sql.binding.model.PropertyBasedBindBase;
-import org.eclipse.scout.sdk.util.DefaultAstVisitor;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
+import org.eclipse.scout.sdk.util.ast.VariableType;
+import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link TableHolderBindVisitor}</h3> ...

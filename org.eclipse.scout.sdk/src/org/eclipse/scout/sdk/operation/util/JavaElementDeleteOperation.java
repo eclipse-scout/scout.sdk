@@ -26,10 +26,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.ui.ide.undo.DeleteResourcesOperation;
 
 /**
@@ -83,7 +83,7 @@ public class JavaElementDeleteOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     HashSet<ICompilationUnit> icuForOrganizeImports = new HashSet<ICompilationUnit>();
     for (IJavaElement m : m_typesToDelete) {
       deleteMember(m, icuForOrganizeImports, monitor, workingCopyManager);
@@ -97,7 +97,7 @@ public class JavaElementDeleteOperation implements IOperation {
 
   }
 
-  protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     if (!member.exists()) {
       ScoutSdk.logWarning("Can not delete a non existing member '" + member.getElementName() + "'.");
       return;
@@ -151,7 +151,7 @@ public class JavaElementDeleteOperation implements IOperation {
     }
   }
 
-  private void deleteCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  private void deleteCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     manager.register(icu, false, monitor);
     for (IType t : icu.getTypes()) {
       t.delete(true, monitor);

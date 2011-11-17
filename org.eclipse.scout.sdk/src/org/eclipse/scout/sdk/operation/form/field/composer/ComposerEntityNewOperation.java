@@ -19,20 +19,19 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>WizardStepNewOperation</h3> ...
  */
 public class ComposerEntityNewOperation implements IOperation {
 
-  final IType iComposerEntity = ScoutSdk.getType(RuntimeClasses.IComposerEntity);
+  final IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
 
   // in member
   private final IType m_declaringType;
@@ -71,7 +70,7 @@ public class ComposerEntityNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     InnerTypeNewOperation typeNewOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     typeNewOp.setSibling(getSibling());
     typeNewOp.setSuperTypeSignature(getSuperTypeSignature());

@@ -17,12 +17,12 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.util.ScoutSignature;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  *
@@ -46,7 +46,7 @@ public class MethodOverrideOperation extends MethodCreateOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find super method
     ITypeHierarchy superTypeHierarchy = getDeclaringType().newSupertypeHierarchy(monitor);
     IType superType = superTypeHierarchy.getSuperclass(getDeclaringType());
@@ -57,7 +57,7 @@ public class MethodOverrideOperation extends MethodCreateOperation {
     }
     // generic substitutions
     if (getReturnTypeSignature() == null) {
-      String returnTypeSig = ScoutSignature.getReturnTypeSignatureResolved(m_methodToOverride, getDeclaringType());
+      String returnTypeSig = SignatureUtility.getReturnTypeSignatureResolved(m_methodToOverride, getDeclaringType());
       if (getGenericWildcardReplacement() != null) {
         returnTypeSig = returnTypeSig.replaceAll("\\" + Signature.C_STAR, getGenericWildcardReplacement());
       }
@@ -67,7 +67,7 @@ public class MethodOverrideOperation extends MethodCreateOperation {
     setExceptionSignatures(m_methodToOverride.getExceptionTypes());
     String[] paramNames = m_methodToOverride.getParameterNames();
     setParameterNames(paramNames);
-    setParameterSignatures(ScoutSignature.getMethodParameterSignatureResolved(m_methodToOverride, getDeclaringType()));
+    setParameterSignatures(SignatureUtility.getMethodParameterSignatureResolved(m_methodToOverride, getDeclaringType()));
     addAnnotation(AnnotationCreateOperation.OVERRIDE_OPERATION);
 
     super.run(monitor, workingCopyManager);

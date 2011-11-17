@@ -39,10 +39,7 @@ import org.eclipse.scout.commons.parsers.BindParser;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.ast.AstUtility;
-import org.eclipse.scout.sdk.jdt.ast.VariableType;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 import org.eclipse.scout.sdk.sql.binding.ast.SqlMethodIvocationVisitor;
 import org.eclipse.scout.sdk.sql.binding.model.BindBaseNVPair;
@@ -52,10 +49,13 @@ import org.eclipse.scout.sdk.sql.binding.model.PropertyBasedBindBase;
 import org.eclipse.scout.sdk.sql.binding.model.ServerSessionBindBase;
 import org.eclipse.scout.sdk.sql.binding.model.SqlStatement;
 import org.eclipse.scout.sdk.sql.binding.model.UnresolvedBindBase;
-import org.eclipse.scout.sdk.workspace.type.IMethodFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
+import org.eclipse.scout.sdk.util.ast.VariableType;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.IMethodFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 
 /**
  * <h3>{@link FormDataSqlBindingValidator}</h3> ...
@@ -207,8 +207,8 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
   protected HashMap<String, IBindBase> resolveServerSessionBindBases() {
     HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
     // server sessions
-    IType iServerSession = ScoutSdk.getType(RuntimeClasses.IServerSession);
-    IPrimaryTypeTypeHierarchy serverSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iServerSession);
+    IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
+    IPrimaryTypeTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
     for (IType serverSession : serverSessionHierarchy.getAllSubtypes(iServerSession, TypeFilters.getClassFilter())) {
       HashSet<String> binds = new HashSet<String>();
       try {
@@ -248,7 +248,7 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
     }
     HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
     for (String assignedSignature : assignedSignatures) {
-      HashSet<String> vars = getPropertyBindVars(ScoutSdk.getTypeBySignature(assignedSignature));
+      HashSet<String> vars = getPropertyBindVars(TypeUtility.getTypeBySignature(assignedSignature));
       if (!bindBases.isEmpty()) {
         HashMap<String, IBindBase> existingVars = bindBases;
         bindBases = new HashMap<String, IBindBase>();
@@ -271,7 +271,7 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
   protected HashMap<String, IBindBase> loadInnerTypeProperties(String typeSignature, final String propertyName, IBindBase bindbase) {
     HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
     try {
-      IType propertyObject = ScoutSdk.getTypeBySignature(typeSignature);
+      IType propertyObject = TypeUtility.getTypeBySignature(typeSignature);
       if (TypeUtility.exists(propertyObject)) {
         IMethod method = TypeUtility.getFirstMethod(propertyObject, new IMethodFilter() {
           @Override
@@ -280,9 +280,9 @@ public class FormDataSqlBindingValidator implements IRunnableWithProgress {
           }
         });
         if (method != null) {
-          String resolvedSignature = ScoutSdkUtility.getResolvedSignature(method.getReturnType(), propertyObject);
+          String resolvedSignature = SignatureUtility.getResolvedSignature(method.getReturnType(), propertyObject);
           if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
-            for (String s : getPropertyBindVars(ScoutSdk.getTypeBySignature(resolvedSignature))) {
+            for (String s : getPropertyBindVars(TypeUtility.getTypeBySignature(resolvedSignature))) {
               bindBases.put(propertyName + "." + s, bindbase);
             }
           }

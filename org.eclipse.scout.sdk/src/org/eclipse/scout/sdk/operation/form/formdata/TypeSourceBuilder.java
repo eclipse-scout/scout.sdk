@@ -14,11 +14,12 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  *
@@ -57,7 +58,7 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
   }
 
   @Override
-  public String createSource(IImportValidator validator) {
+  public String createSource(IImportValidator validator) throws JavaModelException {
     StringBuilder builder = new StringBuilder();
     for (AnnotationSourceBuilder as : getAnnotations()) {
       builder.append(as.createSource(validator) + ScoutUtility.NL);
@@ -83,7 +84,7 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     builder.append("class ");
     builder.append(getElementName() + " ");
     if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
-      builder.append("extends " + ScoutSdkUtility.getSimpleTypeRefName(getSuperTypeSignature(), validator) + " ");
+      builder.append("extends " + SignatureUtility.getTypeReference(getSuperTypeSignature(), validator) + " ");
     }
     builder.append("{" + ScoutUtility.NL);
     if (isCreateDefaultSerialVersionUid()) {

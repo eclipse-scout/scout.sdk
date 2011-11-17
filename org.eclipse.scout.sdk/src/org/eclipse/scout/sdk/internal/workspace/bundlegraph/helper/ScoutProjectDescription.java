@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.BundleGraphNode;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.BundleGraphNodeFilters;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.IBundleGraphNodeFilter;

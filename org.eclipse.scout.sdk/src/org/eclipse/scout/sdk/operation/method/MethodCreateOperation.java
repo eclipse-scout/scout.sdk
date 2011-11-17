@@ -24,15 +24,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.util.ScoutSignature;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  *
@@ -92,7 +91,7 @@ public class MethodCreateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getDeclaringType().getCompilationUnit());
     StringBuilder builder = new StringBuilder();
@@ -134,7 +133,7 @@ public class MethodCreateOperation implements IOperation {
     }
     // return value
     if (!StringUtility.isNullOrEmpty(getReturnTypeSignature())) {
-      builder.append(ScoutSignature.getTypeReference(getReturnTypeSignature(), getDeclaringType(), validator) + " ");
+      builder.append(SignatureUtility.getTypeReference(getReturnTypeSignature(), getDeclaringType(), validator) + " ");
     }
     builder.append(getMethodName() + "(");
     // parameters
@@ -149,7 +148,7 @@ public class MethodCreateOperation implements IOperation {
         }
       }
       for (int i = 0; i < parameterSignatures.length; i++) {
-        builder.append(ScoutSdkUtility.getSimpleTypeRefName(parameterSignatures[i], validator) + " ");
+        builder.append(SignatureUtility.getTypeReference(parameterSignatures[i], validator) + " ");
         builder.append(parameterNames[i]);
         if ((parameterSignatures.length - 1) > i) {
           builder.append(", ");
@@ -162,7 +161,7 @@ public class MethodCreateOperation implements IOperation {
     if (exceptionSignatures != null && exceptionSignatures.length > 0) {
 
       for (int i = 0; i < exceptionSignatures.length; i++) {
-        builder.append("throws " + ScoutSdkUtility.getSimpleTypeRefName(exceptionSignatures[i], validator));
+        builder.append("throws " + SignatureUtility.getTypeReference(exceptionSignatures[i], validator));
         builder.append(" ");
       }
     }
@@ -183,7 +182,7 @@ public class MethodCreateOperation implements IOperation {
 
   /**
    * can be overridden to provide a specific method body. The method body is defined as part between the method body{}.
-   * Use {@link ScoutSdkUtility#getSimpleTypeRefName(String, IImportValidator)} to determ class references (fully
+   * Use {@link SignatureUtility#getTypeReference(String, IImportValidator)} to determ class references (fully
    * quallified vs. simple name).
    * 
    * @param validator

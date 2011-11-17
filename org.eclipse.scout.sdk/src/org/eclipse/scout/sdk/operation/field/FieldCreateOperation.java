@@ -22,13 +22,13 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  *
@@ -71,7 +71,7 @@ public class FieldCreateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
     // find sibling
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getDeclaringType().getCompilationUnit());
@@ -118,7 +118,7 @@ public class FieldCreateOperation implements IOperation {
     }
 
     // field type
-    builder.append(ScoutSdkUtility.getSimpleTypeRefName(getSignature(), validator) + " ");
+    builder.append(SignatureUtility.getTypeReference(getSignature(), validator) + " ");
     // name
     builder.append(getName());
 
@@ -132,7 +132,7 @@ public class FieldCreateOperation implements IOperation {
 
   /**
    * can be overridden to provide a specific method body. The method body is defined as part between the method body{}.
-   * Use {@link ScoutSdkUtility#getSimpleTypeRefName(String, IImportValidator)} to determ class references (fully
+   * Use {@link SignatureUtility#getTypeReference(String, IImportValidator)} to determ class references (fully
    * quallified vs. simple name).
    * 
    * @param validator

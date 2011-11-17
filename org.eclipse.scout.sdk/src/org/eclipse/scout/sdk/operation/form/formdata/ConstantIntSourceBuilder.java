@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 
 /**
  * Simple source builder to add an integer (int primitive type) constant.

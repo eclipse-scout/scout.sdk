@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.operation.page;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class LinkPageOperation extends AbstractPageOperation {
 
@@ -35,7 +35,7 @@ public class LinkPageOperation extends AbstractPageOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     addToHolder(getPage(), monitor, workingCopyManager);
   }
 

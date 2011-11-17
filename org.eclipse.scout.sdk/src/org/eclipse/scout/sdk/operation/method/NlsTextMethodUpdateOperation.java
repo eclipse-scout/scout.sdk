@@ -15,9 +15,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  * <h3>NlsTextMethodOverrideOperation</h3> If the method is not implemented on the method owner, the method will be
@@ -54,7 +54,7 @@ public class NlsTextMethodUpdateOperation extends ConfigPropertyMethodUpdateOper
     source.append("  return ");
     if (getNlsEntry() != null) {
       String nlsTypeSig = Signature.createTypeSignature(getNlsEntry().getProject().getNlsAccessorType().getFullyQualifiedName(), true);
-      source.append(ScoutSdkUtility.getSimpleTypeRefName(nlsTypeSig, validator));
+      source.append(SignatureUtility.getTypeReference(nlsTypeSig, validator));
       source.append(".get(\"" + getNlsEntry().getKey() + "\");");
     }
     else {

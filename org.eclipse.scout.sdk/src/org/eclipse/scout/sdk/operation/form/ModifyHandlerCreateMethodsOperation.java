@@ -14,13 +14,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class ModifyHandlerCreateMethodsOperation implements IOperation {
 
@@ -50,14 +50,14 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    String TAB = ScoutIdeProperties.TAB;
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    String TAB = SdkProperties.TAB;
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getFormHandler().getCompilationUnit());
     workingCopyManager.register(getFormHandler().getCompilationUnit(), monitor);
-    String processingExceptionClass = ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ProcessingException, validator);
-    String serviceInterfaceName = ScoutSdkUtility.getSimpleTypeRefFromFqn(getServiceInterface().getFullyQualifiedName(), validator);
-    String servicesName = ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.SERVICES, validator);
-    String formDataName = ScoutSdkUtility.getSimpleTypeRefFromFqn(getFormData().getFullyQualifiedName(), validator);
+    String processingExceptionClass = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ProcessingException, validator);
+    String serviceInterfaceName = SignatureUtility.getTypeReferenceFromFqn(getServiceInterface().getFullyQualifiedName(), validator);
+    String servicesName = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.SERVICES, validator);
+    String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), validator);
     if (isCreateExecLoad()) {
       // execLoad on formhandler
       StringBuilder execLoadBuilder = new StringBuilder();
@@ -74,7 +74,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
       }
       execLoadBuilder.append(TAB + "importFormData(formData);\n");
       if (getUpdatePermission() != null) {
-        execLoadBuilder.append(TAB + "setEnabledPermission(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getUpdatePermission().getFullyQualifiedName(), validator) + "());\n");
+        execLoadBuilder.append(TAB + "setEnabledPermission(new " + SignatureUtility.getTypeReferenceFromFqn(getUpdatePermission().getFullyQualifiedName(), validator) + "());\n");
       }
       execLoadBuilder.append("}");
       getFormHandler().createMethod(execLoadBuilder.toString(), null, true, monitor);

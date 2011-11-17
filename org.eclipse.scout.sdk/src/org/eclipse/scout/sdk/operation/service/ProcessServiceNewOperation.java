@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -63,7 +63,7 @@ public class ProcessServiceNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // permissions
     if (getPermissionCreateBundle() != null) {
       PermissionNewOperation permissionOp = new PermissionNewOperation();

@@ -22,17 +22,17 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
-import org.eclipse.scout.sdk.workspace.type.PropertyBeanComparators;
-import org.eclipse.scout.sdk.workspace.type.PropertyBeanFilters;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.IPropertyBean;
+import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 
 /**
  * <h3>{@link SourceBuilderWithProperties}</h3> ...
@@ -50,19 +50,19 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
   }
 
   protected void visitProperties(IType type) {
-    IPropertyBean[] beanPropertyDescriptors = TypeUtility.getPropertyBeans(type, PropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
+    IPropertyBean[] beanPropertyDescriptors = TypeUtility.getPropertyBeans(type, ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
     if (beanPropertyDescriptors != null) {
       for (IPropertyBean desc : beanPropertyDescriptors) {
         try {
           if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
-            if (FormDataAnnotation.isCreate(SdkTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
-                FormDataAnnotation.isCreate(SdkTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
+            if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
+                FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
               String beanName = FormDataUtility.getValidMethodParameterName(desc.getBeanName());
               String lowerCaseBeanName = FormDataUtility.getBeanName(beanName, false);
               String upperCaseBeanName = FormDataUtility.getBeanName(beanName, true);
 
               String propName = upperCaseBeanName + "Property";
-              String resolvedSignature = ScoutSignature.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
+              String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
               String unboxedSignature = FormDataUtility.unboxPrimitiveSignature(resolvedSignature);
               // property class
               TypeSourceBuilder propertyBuilder = new TypeSourceBuilder();
@@ -142,7 +142,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
   protected void addValidationRules(IType type) {
     // validation rules
     try {
-      List<ValidationRuleMethod> list = SdkTypeUtility.getValidationRuleMethods(type);
+      List<ValidationRuleMethod> list = ScoutTypeUtility.getValidationRuleMethods(type);
       if (list.size() > 0) {
         for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
           ValidationRuleMethod vm = it.next();
@@ -188,7 +188,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
     @Override
     protected String createMethodBody(IImportValidator validator) {
-      validator.addImport("java.util.Map");
+      //validator.addImport("java.util.Map");
       StringBuilder buf = new StringBuilder();
       buf.append("super.initValidationRules(ruleMap);");
       for (ValidationRuleMethod vm : m_methods) {
@@ -238,11 +238,11 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
     private String filterGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
       if (sourceSnippet != null) {
-        IType[] refTypes = TypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
+        IType[] refTypes = ScoutTypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
         for (IType refType : refTypes) {
           //if the type is a form field type it is transformed to the corresponding form data field
-          ITypeHierarchy h = ScoutSdk.getSuperTypeHierarchy(refType);
-          if (h.contains(ScoutSdk.getType(RuntimeClasses.IFormField))) {
+          ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);
+          if (h.contains(TypeUtility.getType(RuntimeClasses.IFormField))) {
             String formDataFieldName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(refType.getElementName()), true);
             return formDataFieldName + ".class";
           }

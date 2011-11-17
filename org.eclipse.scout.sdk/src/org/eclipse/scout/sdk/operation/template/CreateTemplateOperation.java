@@ -34,10 +34,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.internal.javadoc.JavaDoc;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
@@ -45,18 +42,22 @@ import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.Regex;
-import org.eclipse.scout.sdk.util.ScoutSignature;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.javadoc.JavaDoc;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.DeleteEdit;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -67,8 +68,8 @@ import org.eclipse.text.edits.TextEdit;
  *
  */
 public class CreateTemplateOperation implements IOperation {
-  private IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
-  private IType iCompositeField = ScoutSdk.getType(RuntimeClasses.ICompositeField);
+  private IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
   private String m_templateName;
   private String m_packageName;
   private boolean m_replaceFieldWithTemplate;
@@ -99,13 +100,13 @@ public class CreateTemplateOperation implements IOperation {
     if (!TypeUtility.exists(getFormField())) {
       throw new IllegalArgumentException("Form field to create template of must exist.");
     }
-    if (ScoutSdk.existsType(getPackageName() + "." + getTemplateName())) {
+    if (TypeUtility.existsType(getPackageName() + "." + getTemplateName())) {
       throw new IllegalArgumentException("Template already exists.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutTypeNewOperation op = new ScoutTypeNewOperation(getTemplateName(), getPackageName(), getTemplateBundle()) {
       @Override
       protected void createContent(StringBuilder source, IImportValidator validator) {
@@ -133,14 +134,14 @@ public class CreateTemplateOperation implements IOperation {
 
     };
 
-    String superclassTypeSignature = ScoutSignature.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
+    String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
     if (!StringUtility.isNullOrEmpty(superclassTypeSignature)) {
       StringBuilder superclassSignatureBuilder = new StringBuilder(Signature.getTypeErasure(superclassTypeSignature));
       String[] typeParameters = Signature.getTypeArguments(superclassTypeSignature);
       if (typeParameters.length > 0) {
         superclassSignatureBuilder.replace(superclassSignatureBuilder.length() - 1, superclassSignatureBuilder.length(), "<");
         for (int i = 0; i < typeParameters.length; i++) {
-          IType parameterType = ScoutSdk.getTypeBySignature(typeParameters[i]);
+          IType parameterType = TypeUtility.getTypeBySignature(typeParameters[i]);
           if (TypeUtility.exists(parameterType) && parameterType.getParent().equals(getFormField())) {
             superclassSignatureBuilder.append(Signature.createTypeSignature(getTemplateName() + "." + parameterType.getElementName(), false));
             if (i < typeParameters.length - 1) {
@@ -178,9 +179,9 @@ public class CreateTemplateOperation implements IOperation {
     formatOp.run(monitor, workingCopyManager);
     workingCopyManager.reconcile(templateType.getCompilationUnit(), monitor);
     // getter fields
-    org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(templateType);
+    org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(templateType);
 
-    IStructuredType structuredForm = SdkTypeUtility.createStructuredForm(templateType);
+    IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(templateType);
     TreeMap<CompositeObject, IJavaElement> siblings = new TreeMap<CompositeObject, IJavaElement>();
     IJavaElement sibling = structuredForm.getSibling(CATEGORIES.METHOD_INNER_TYPE_GETTER);
     siblings.put(new CompositeObject(2, ""), sibling);
@@ -191,7 +192,7 @@ public class CreateTemplateOperation implements IOperation {
     if (isReplaceFieldWithTemplate()) {
       workingCopyManager.register(getFormField().getCompilationUnit(), monitor);
       IImportValidator validator = new CompilationUnitImportValidator(getFormField().getCompilationUnit());
-      ITypeHierarchy formFieldHierarhy = ScoutSdk.getLocalTypeHierarchy(getFormField());
+      ITypeHierarchy formFieldHierarhy = TypeUtility.getLocalTypeHierarchy(getFormField());
       MultiTextEdit edit = new MultiTextEdit();
       int start = Integer.MAX_VALUE;
       int end = Integer.MIN_VALUE;
@@ -212,9 +213,9 @@ public class CreateTemplateOperation implements IOperation {
         edit.addChild(new ReplaceEdit(getFormField().getSourceRange().getOffset() + superClassMatcher.start(1), superClassMatcher.end(1) - superClassMatcher.start(1),
             validator.getSimpleTypeRef(Signature.createTypeSignature(templateType.getFullyQualifiedName(), true))));
       }
-      IMethod templateFieldGetter = SdkTypeUtility.getFormFieldGetterMethod(getFormField(), hierarchy);
+      IMethod templateFieldGetter = ScoutTypeUtility.getFormFieldGetterMethod(getFormField(), hierarchy);
       if (TypeUtility.exists(templateFieldGetter)) {
-        for (IType formField : SdkTypeUtility.getFormFields(getFormField(), formFieldHierarhy)) {
+        for (IType formField : ScoutTypeUtility.getFormFields(getFormField(), formFieldHierarhy)) {
           updateFormFieldGetter(formField, templateFieldGetter, newFormFields, validator, edit, formFieldHierarhy);
         }
       }
@@ -250,9 +251,9 @@ public class CreateTemplateOperation implements IOperation {
     String fqFormFieldName = formField.getFullyQualifiedName();
     fqFormFieldName = fqFormFieldName.replaceAll("\\$", ".");
     try {
-      IMethod getterMethod = SdkTypeUtility.getFormFieldGetterMethod(formField, hierarchy);
+      IMethod getterMethod = ScoutTypeUtility.getFormFieldGetterMethod(formField, hierarchy);
       if (TypeUtility.exists(getterMethod)) {
-        String NL = ScoutUtility.getLineSeparator(getterMethod.getCompilationUnit());
+        String NL = JdtUtility.getLineSeparator(getterMethod.getCompilationUnit());
         P_FormField templateFormField = templateFormFields.get(formField.getElementName());
         // find import
         IImportDeclaration formFieldImport = formField.getCompilationUnit().getImport(fqFormFieldName);
@@ -282,13 +283,13 @@ public class CreateTemplateOperation implements IOperation {
     catch (JavaModelException e) {
       ScoutSdk.logError("could not update field getter for '" + fqFormFieldName + "'.", e);
     }
-    for (IType childField : SdkTypeUtility.getFormFields(formField, hierarchy)) {
+    for (IType childField : ScoutTypeUtility.getFormFields(formField, hierarchy)) {
       updateFormFieldGetter(childField, templateFieldGetter, templateFormFields, validator, edit, hierarchy);
     }
 
   }
 
-  protected void createFormFieldGetter(IType type, IType formType, TreeMap<CompositeObject, IJavaElement> siblings, HashMap<String, P_FormField> getterMethods, org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy hierarchy, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected void createFormFieldGetter(IType type, IType formType, TreeMap<CompositeObject, IJavaElement> siblings, HashMap<String, P_FormField> getterMethods, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     if (TypeUtility.exists(type)) {
       if (hierarchy.isSubtype(iFormField, type)) {
         InnerTypeGetterCreateOperation op = new InnerTypeGetterCreateOperation(type, formType, true);

@@ -17,8 +17,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  *
@@ -36,21 +36,21 @@ public class FormDataAnnotationCreateOperation extends AnnotationCreateOperation
   @Override
   public String createSource(IImportValidator validator, String NL) throws JavaModelException {
     StringBuilder source = new StringBuilder();
-    source.append("@" + ScoutSdkUtility.getSimpleTypeRefName(getSignature(), validator));
+    source.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
     if (hasArguments()) {
       ArrayList<String> args = new ArrayList<String>();
       if (getFormDataSignature() != null) {
-        args.add("value = " + ScoutSdkUtility.getSimpleTypeRefName(getFormDataSignature(), validator) + ".class");
+        args.add("value = " + SignatureUtility.getTypeReference(getFormDataSignature(), validator) + ".class");
       }
       if (getSdkCommand() != null) {
         StringBuilder b = new StringBuilder();
-        b.append("sdkCommand = " + ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(getSdkCommand().getDeclaringClass().getName(), true), validator));
+        b.append("sdkCommand = " + SignatureUtility.getTypeReference(Signature.createTypeSignature(getSdkCommand().getDeclaringClass().getName(), true), validator));
         b.append("." + getSdkCommand().name());
         args.add(b.toString());
       }
       if (getDefaultSubtypeCommand() != null) {
         StringBuilder b = new StringBuilder();
-        b.append("defaultSubtypeSdkCommand = " + ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(getDefaultSubtypeCommand().getDeclaringClass().getName(), true), validator));
+        b.append("defaultSubtypeSdkCommand = " + SignatureUtility.getTypeReference(Signature.createTypeSignature(getDefaultSubtypeCommand().getDeclaringClass().getName(), true), validator));
         b.append("." + getDefaultSubtypeCommand().name());
         args.add(b.toString());
       }

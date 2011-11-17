@@ -29,8 +29,8 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  *
@@ -122,7 +122,7 @@ public class ConfigPropertyType {
       // in this case not the value of the constant (e.g. "TEXT") is in the annotation value, but the reference to the constant (e.g. ConfigProperty.TEXT).
       // then parse the value of the constant within the ConfigProperty class.
       String constantName = ret.substring(configPropClassName.length() + 1);
-      String configPropClassSource = ScoutSdk.getType(ConfigProperty.class.getName()).getSource();
+      String configPropClassSource = TypeUtility.getType(ConfigProperty.class.getName()).getSource();
       Matcher m = Pattern.compile("String\\s*" + constantName + "\\s*=\\s*\"(.*)\"\\s*\\;").matcher(configPropClassSource);
       if (m.find()) {
         ret = m.group(1);

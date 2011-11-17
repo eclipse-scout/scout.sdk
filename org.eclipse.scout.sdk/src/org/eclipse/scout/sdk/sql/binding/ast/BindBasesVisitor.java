@@ -21,12 +21,12 @@ import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.jdt.ast.AstUtility;
-import org.eclipse.scout.sdk.jdt.ast.VariableType;
 import org.eclipse.scout.sdk.sql.binding.model.BindBaseNVPair;
 import org.eclipse.scout.sdk.sql.binding.model.IBindBase;
 import org.eclipse.scout.sdk.sql.binding.model.PropertyBasedBindBase;
-import org.eclipse.scout.sdk.util.DefaultAstVisitor;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
+import org.eclipse.scout.sdk.util.ast.VariableType;
+import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link BindBasesVisitor}</h3> ...

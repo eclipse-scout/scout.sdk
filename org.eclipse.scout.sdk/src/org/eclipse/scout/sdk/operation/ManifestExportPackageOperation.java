@@ -10,16 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation;
 
-import java.io.IOException;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.pde.PdeUtility;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>ManifestExportPackageOperation</h3> BSI CASE keeps the manifest exported packages part updated. This Operation
@@ -71,7 +69,7 @@ public class ManifestExportPackageOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     switch (m_type) {
       case TYPE_REMOVE_WHEN_EMTPY:
         runRemoveWhenEmpty(monitor);
@@ -107,12 +105,9 @@ public class ManifestExportPackageOperation implements IOperation {
       ScoutSdk.logInfo("the package: " + pck.getElementName() + " has not be added to the manifests exported packages. (internal package)");
       return;
     }
-    try {
-      PdeUtility.addExportPackage(pck.getJavaProject().getProject(), pck.getElementName());
-    }
-    catch (IOException e) {
-      ScoutSdk.logWarning("unexport package " + pck.getElementName(), e);
-    }
+    PluginModelHelper h = new PluginModelHelper(pck.getJavaProject().getProject());
+    h.Manifest.addExportPackage(pck);
+    h.save();
   }
 
   protected void runRemoveWhenEmpty(IProgressMonitor p) throws CoreException {
@@ -133,12 +128,8 @@ public class ManifestExportPackageOperation implements IOperation {
   }
 
   protected void removePackage(IPackageFragment pck) throws CoreException {
-    try {
-      PdeUtility.removeExportPackage(pck.getJavaProject().getProject(), pck.getElementName());
-    }
-    catch (IOException e) {
-      ScoutSdk.logWarning("unexport package " + pck.getElementName(), e);
-    }
+    PluginModelHelper h = new PluginModelHelper(pck.getJavaProject().getProject());
+    h.Manifest.removeExportPackage(pck);
+    h.save();
   }
-
 }

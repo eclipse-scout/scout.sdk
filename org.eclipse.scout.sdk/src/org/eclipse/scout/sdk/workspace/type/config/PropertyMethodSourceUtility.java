@@ -21,14 +21,14 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutStatus;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.Regex;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
-public class PropertyMethodSourceUtilities {
+public final class PropertyMethodSourceUtility {
 
   private static final Pattern REGEX_STRING_SIMPLE = Pattern.compile("^(\\\")([^\\\"]*)(\\\")$");
   /**
@@ -66,9 +66,7 @@ public class PropertyMethodSourceUtilities {
   private final static Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\s*\"(.*)\"\\s*");
   private final static Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("[A-Za-z0-9_-]*\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*");
 
-  private static PropertyMethodSourceUtilities instance = new PropertyMethodSourceUtilities();
-
-  private PropertyMethodSourceUtilities() {
+  private PropertyMethodSourceUtility() {
   }
 
   /**
@@ -86,10 +84,6 @@ public class PropertyMethodSourceUtilities {
    * @throws CoreException
    */
   public static String getMethodReturnValue(IMethod method) throws CoreException {
-    return instance.getMethodReturnValueImpl(method);
-  }
-
-  private String getMethodReturnValueImpl(IMethod method) throws CoreException {
     try {
       Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(method.getSource());
       if (m.find()) {
@@ -119,10 +113,6 @@ public class PropertyMethodSourceUtilities {
    * @throws CoreException
    */
   public static String parseReturnParameterString(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    return instance.parseReturnParameterStringImpl(parameter, method, superTypeHierarchy);
-  }
-
-  private String parseReturnParameterStringImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
     if (REGEX_NULL.matcher(parameter).matches()) {
       return null;
     }
@@ -154,10 +144,6 @@ public class PropertyMethodSourceUtilities {
    * @throws CoreException
    */
   public static Double parseReturnParameterDouble(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    return instance.parseReturnParameterDoubleImpl(parameter, method, superTypeHierarchy);
-  }
-
-  private Double parseReturnParameterDoubleImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
     if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
@@ -216,16 +202,8 @@ public class PropertyMethodSourceUtilities {
    * @throws CoreException
    */
   public static Integer parseReturnParameterInteger(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    return instance.parseReturnParameterIntegerImpl(parameter, method, superTypeHierarchy);
-  }
-
-  public static Integer parseReturnParameterInteger(String parameter) throws CoreException {
-    return instance.parseReturnParameterIntegerImpl(parameter);
-  }
-
-  private Integer parseReturnParameterIntegerImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
     try {
-      return parseReturnParameterIntegerImpl(parameter);
+      return parseReturnParameterInteger(parameter);
     }
     catch (CoreException e) {
       // void try to find referenced value
@@ -252,7 +230,7 @@ public class PropertyMethodSourceUtilities {
     throw new CoreException(new ScoutStatus(parameter));
   }
 
-  private Integer parseReturnParameterIntegerImpl(String parameter) throws CoreException {
+  public static Integer parseReturnParameterInteger(String parameter) throws CoreException {
     if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
@@ -292,16 +270,8 @@ public class PropertyMethodSourceUtilities {
    * @throws CoreException
    */
   public static Long parseReturnParameterLong(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    return instance.parseReturnParameterLongImpl(parameter, method, superTypeHierarchy);
-  }
-
-  public static Long parseReturnParameterLong(String parameter) throws CoreException {
-    return instance.parseReturnParameterLongImpl(parameter);
-  }
-
-  private Long parseReturnParameterLongImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
     try {
-      return parseReturnParameterLongImpl(parameter);
+      return parseReturnParameterLong(parameter);
     }
     catch (CoreException e) {
       // void work on with referenced values
@@ -329,7 +299,7 @@ public class PropertyMethodSourceUtilities {
     throw new CoreException(new ScoutStatus(parameter));
   }
 
-  private Long parseReturnParameterLongImpl(String parameter) throws CoreException {
+  public static Long parseReturnParameterLong(String parameter) throws CoreException {
     if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
@@ -364,10 +334,6 @@ public class PropertyMethodSourceUtilities {
   }
 
   public static boolean parseReturnParameterBoolean(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    return instance.parseReturnParameterBooleanImpl(parameter, method, superTypeHierarchy);
-  }
-
-  private boolean parseReturnParameterBooleanImpl(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
     if (REGEX_SIMPLE_BOOLEAN.matcher(parameter).matches()) {
       return Boolean.parseBoolean(parameter);
     }
@@ -389,10 +355,6 @@ public class PropertyMethodSourceUtilities {
    * @throws CoreException
    */
   public static IType parseReturnParameterClass(String parameter, IMethod method) throws CoreException {
-    return instance.parseReturnParameterClassImpl(parameter, method);
-  }
-
-  private IType parseReturnParameterClassImpl(String parameter, IMethod method) throws CoreException {
     try {
       if (REGEX_NULL.matcher(parameter).matches()) {
         return null;
@@ -417,7 +379,7 @@ public class PropertyMethodSourceUtilities {
     throw new CoreException(new ScoutStatus(parameter));
   }
 
-  private String findReferencedValue(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
+  private static String findReferencedValue(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
     Matcher matcher = REGEX_FIELD_NEW.matcher(parameter);
     if (matcher.find()) {
       try {
@@ -429,11 +391,11 @@ public class PropertyMethodSourceUtilities {
             ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
             throw new CoreException(new ScoutStatus(parameter));
           }
-          String fieldValue = ScoutSourceUtilities.findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
+          String fieldValue = ScoutSourceUtility.findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
           return fieldValue;
         }
         else {
-          String fieldValue = ScoutSourceUtilities.findReferencedFieldValue(method.getDeclaringType(), matcher.group(3), superTypeHierarchy);
+          String fieldValue = ScoutSourceUtility.findReferencedFieldValue(method.getDeclaringType(), matcher.group(3), superTypeHierarchy);
           return fieldValue;
         }
       }
@@ -446,10 +408,6 @@ public class PropertyMethodSourceUtilities {
   }
 
   public static String parseReturnParameterIcon(String input, IMethod method) throws CoreException {
-    return instance.parseReturnParameterIconImpl(input, method);
-  }
-
-  private String parseReturnParameterIconImpl(String input, IMethod method) throws CoreException {
     if (input.equals("null")) {
       return "";
     }
@@ -485,10 +443,6 @@ public class PropertyMethodSourceUtilities {
     throw new CoreException(new ScoutStatus("unexpected icon expression: " + input));
   }
 
-  public static String parseReturnParameterNlsKey(String input) throws CoreException {
-    return instance.parseReturnParameterNlsKeyImpl(input);
-  }
-
   /**
    * Tries to find a text value in the method body:
    * <xmp>
@@ -501,24 +455,19 @@ public class PropertyMethodSourceUtilities {
    * }
    * // b.getConfiguredTextValue() returns the translation of abc
    * public String c(){
-   * return Texts.get("abc");
+   * return TEXTS.get("abc");
    * }
    * // c.getConfiguredTextValue() returns the translation of the value abc
    * </xmp>
-   * public String a(){
-   * }
    * 
    * @param defaultValue
    * @return
    * @throws JavaModelException
    */
-  private String parseReturnParameterNlsKeyImpl(String input) throws CoreException {
-    if (input == null || input.equals("null")) {
+  public static String parseReturnParameterNlsKey(String input) throws CoreException {
+    if (input == null || input.trim().equals("null")) {
       return null;
     }
-    /*if (input.matches(REGEX_NLS_DEFAULT_SCOUT)) {
-      return null;
-    }*/
     Matcher m = REGEX_METHOD_RETURN_NON_NLS_TEXT.matcher(input);
     if (m.matches()) {
       String s = m.group(1);

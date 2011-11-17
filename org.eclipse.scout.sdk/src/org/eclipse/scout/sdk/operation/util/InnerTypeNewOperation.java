@@ -15,9 +15,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>InnerTypeNewOperation</h3> To generate a new inner type of the declaring type.
@@ -52,7 +52,7 @@ public class InnerTypeNewOperation extends AbstractScoutTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(getDeclaringtype().getCompilationUnit(), monitor);
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getDeclaringtype().getCompilationUnit());
     m_createdType = createImplementation(validator, monitor);

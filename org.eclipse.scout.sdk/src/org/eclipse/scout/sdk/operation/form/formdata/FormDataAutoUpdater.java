@@ -29,9 +29,9 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link FormDataAutoUpdater}</h3> ...
@@ -155,7 +155,7 @@ public class FormDataAutoUpdater {
               IType[] types = icu.getTypes();
               if (types.length > 0) {
                 IType type = types[0];
-                FormDataAnnotation annotatation = SdkTypeUtility.findFormDataAnnotation(type, ScoutSdk.getSuperTypeHierarchy(type));
+                FormDataAnnotation annotatation = ScoutTypeUtility.findFormDataAnnotation(type, TypeUtility.getSuperTypeHierarchy(type));
                 if (annotatation != null && FormDataAnnotation.isSdkCommandCreate(annotatation) &&
                     !StringUtility.isNullOrEmpty(annotatation.getFormDataTypeSignature())) {
                   monitor.subTask("update '" + type.getFullyQualifiedName() + "'.");

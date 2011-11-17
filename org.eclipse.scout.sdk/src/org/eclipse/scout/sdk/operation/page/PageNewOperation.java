@@ -23,17 +23,18 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 /**
@@ -41,7 +42,7 @@ import org.eclipse.text.edits.InsertEdit;
  */
 public class PageNewOperation extends AbstractPageOperation {
 
-  final IType iPageWithTable = ScoutSdk.getType(RuntimeClasses.IPageWithTable);
+  final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 
   private IScoutBundle m_clientBundle;
   private String m_typeName;
@@ -77,7 +78,7 @@ public class PageNewOperation extends AbstractPageOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES_PAGES), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.run(monitor, workingCopyManager);
@@ -92,7 +93,7 @@ public class PageNewOperation extends AbstractPageOperation {
     ITypeHierarchy superTypeHierarchy = getCreatedPage().newSupertypeHierarchy(monitor);
     if (superTypeHierarchy.contains(iPageWithTable)) {
       // create table
-      InnerTypeNewOperation tableOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE, getCreatedPage());
+      InnerTypeNewOperation tableOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE, getCreatedPage());
       tableOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
       tableOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTable, true));
       tableOp.run(monitor, workingCopyManager);
@@ -102,10 +103,10 @@ public class PageNewOperation extends AbstractPageOperation {
       Matcher matcher = p.matcher(getCreatedPage().getSource());
       if (matcher.find()) {
         Document doc = new Document(getCreatedPage().getSource());
-        InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedPage().getElementName() + "." + ScoutIdeProperties.TYPE_NAME_TABLEFIELD_TABLE + ">");
+        InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedPage().getElementName() + "." + SdkProperties.TYPE_NAME_TABLEFIELD_TABLE + ">");
         try {
           genericEdit.apply(doc);
-          TypeUtility.setSource(getCreatedPage(), doc.get(), workingCopyManager, monitor);
+          ScoutTypeUtility.setSource(getCreatedPage(), doc.get(), workingCopyManager, monitor);
         }
         catch (Exception e) {
           ScoutSdk.logWarning("could not set the generic type of the table field.", e);

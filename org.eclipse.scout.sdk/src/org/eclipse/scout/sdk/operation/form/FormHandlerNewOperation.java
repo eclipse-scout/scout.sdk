@@ -20,26 +20,26 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>FormHandlerNewOperation</h3> ...
  */
 public class FormHandlerNewOperation implements IOperation {
-  final IType iFormHandler = ScoutSdk.getType(RuntimeClasses.IFormHandler);
-  final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
+  final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
+  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
   // in members
   private final IType m_declaringType;
   private boolean m_formatSource;
@@ -81,7 +81,7 @@ public class FormHandlerNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
     // create handler
     InnerTypeNewOperation formHandlerOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType());
@@ -94,9 +94,9 @@ public class FormHandlerNewOperation implements IOperation {
 
     // start method
     String nameKey = getTypeName();
-    nameKey = nameKey.replaceFirst(ScoutIdeProperties.SUFFIX_FORM_HANDLER + "\\b", "");
+    nameKey = nameKey.replaceFirst(SdkProperties.SUFFIX_FORM_HANDLER + "\\b", "");
     if (!StringUtility.isNullOrEmpty(getStartMethodName())) {
-      ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(m_createdHandler.getCompilationUnit());
+      ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(m_createdHandler.getCompilationUnit());
       IType form = TypeUtility.getAncestor(m_createdHandler, TypeFilters.getSubtypeFilter(iForm, hierarchy));
       IType superType = hierarchy.getSuperclass(form);
       IMethod methodToOverride = null;
@@ -110,7 +110,7 @@ public class FormHandlerNewOperation implements IOperation {
           protected String createMethodBody(IImportValidator validator) throws JavaModelException {
             StringBuilder source = new StringBuilder();
             source.append("startInternal(new ");
-            source.append(ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(getCreatedHandler().getFullyQualifiedName(), true), validator));
+            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getCreatedHandler().getFullyQualifiedName(), true), validator));
             source.append("());");
             return source.toString();
           }
@@ -125,7 +125,7 @@ public class FormHandlerNewOperation implements IOperation {
           protected String createMethodBody(IImportValidator validator) throws JavaModelException {
             StringBuilder source = new StringBuilder();
             source.append("startInternal(new ");
-            source.append(ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(getCreatedHandler().getFullyQualifiedName(), true), validator));
+            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getCreatedHandler().getFullyQualifiedName(), true), validator));
             source.append("());");
             return source.toString();
           }
@@ -173,7 +173,7 @@ public class FormHandlerNewOperation implements IOperation {
   public void setTypeName(String typeName) {
     m_typeName = typeName;
     if (typeName != null && typeName.length() > 1) {
-      String startMethodName = typeName.replaceFirst(ScoutIdeProperties.SUFFIX_FORM_HANDLER + "\\b", "");
+      String startMethodName = typeName.replaceFirst(SdkProperties.SUFFIX_FORM_HANDLER + "\\b", "");
       if (startMethodName.length() > 1) {
         startMethodName = Character.toUpperCase(startMethodName.charAt(0)) + startMethodName.substring(1);
         startMethodName = "start" + startMethodName;

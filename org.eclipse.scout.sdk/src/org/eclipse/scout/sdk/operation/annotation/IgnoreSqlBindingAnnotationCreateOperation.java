@@ -20,8 +20,8 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.scout.commons.annotations.SqlBindingIgnoreValidation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link IgnoreSqlBindingAnnotationCreateOperation}</h3> ...
@@ -44,7 +44,7 @@ public class IgnoreSqlBindingAnnotationCreateOperation extends AnnotationCreateO
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IAnnotation existingAnnotation = TypeUtility.getAnnotation((IAnnotatable) getAnnotationOwner(), SqlBindingIgnoreValidation.class.getName());
     if (TypeUtility.exists(existingAnnotation)) {
       if (existingAnnotation.getSource().startsWith("@")) {

@@ -20,18 +20,18 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
@@ -44,7 +44,7 @@ public class FormDataUpdateOperation implements IOperation {
   private final IType m_type;
   private FormDataAnnotation m_formDataAnnotation;
   private IType m_formDataType;
-  private IScoutWorkingCopyManager m_workingCopyManager;
+  private IWorkingCopyManager m_workingCopyManager;
   private IProgressMonitor m_monitor;
   private String m_formDataIcuSource;
 
@@ -70,7 +70,7 @@ public class FormDataUpdateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     m_monitor = monitor;
     m_workingCopyManager = workingCopyManager;
     setup(monitor);
@@ -84,7 +84,7 @@ public class FormDataUpdateOperation implements IOperation {
   public void setup(IProgressMonitor monitor) {
     if (m_formDataAnnotation == null) {
       try {
-        m_formDataAnnotation = SdkTypeUtility.findFormDataAnnotation(getType(), ScoutSdk.getSuperTypeHierarchy(getType()));
+        m_formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getType(), TypeUtility.getSuperTypeHierarchy(getType()));
       }
       catch (JavaModelException e) {
         ScoutSdk.logWarning("could not find form data annotation for '" + getType().getElementName() + "'.", e);
@@ -97,7 +97,7 @@ public class FormDataUpdateOperation implements IOperation {
       return;
     }
 
-    m_formDataType = ScoutSdk.getTypeBySignature(getFormDataAnnotation().getFormDataTypeSignature());
+    m_formDataType = TypeUtility.getTypeBySignature(getFormDataAnnotation().getFormDataTypeSignature());
   }
 
   /**
@@ -126,7 +126,7 @@ public class FormDataUpdateOperation implements IOperation {
         request = (ICreateFormDataRequest) bundleContext.getService(serviceReference);
       }
       if (!TypeUtility.exists(m_formDataType)) {
-        IScoutBundle sharedBundle = findSharedBundle(SdkTypeUtility.getScoutProject(getType()));
+        IScoutBundle sharedBundle = findSharedBundle(ScoutTypeUtility.getScoutProject(getType()));
         if (sharedBundle == null) {
           return;
         }
@@ -143,7 +143,7 @@ public class FormDataUpdateOperation implements IOperation {
         if (createFormData) {
           ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(simpleName, packageName, sharedBundle) {
             @Override
-            public void run(IProgressMonitor localMonitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+            public void run(IProgressMonitor localMonitor, IWorkingCopyManager workingCopyManager) throws CoreException {
               super.run(localMonitor, workingCopyManager);
               // ensure the package of the form data is exported in the shared plugin
               ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{getCreatedType().getPackageFragment()}, true);
@@ -182,22 +182,22 @@ public class FormDataUpdateOperation implements IOperation {
       }
 
       if (TypeUtility.exists(m_formDataType)) {
-        ITypeHierarchy existingFormDataHierarchy = ScoutSdk.getSuperTypeHierarchy(m_formDataType);
+        ITypeHierarchy existingFormDataHierarchy = TypeUtility.getSuperTypeHierarchy(m_formDataType);
         if (m_formDataType.isReadOnly()) {
           if (request != null) {
             request.showQuestion("Read only Form Data", "Form data '" + m_formDataType.getFullyQualifiedName() + "' is read only. The update will be canceled!", SWT.ICON_WARNING | SWT.OK);
           }
           return;
         }
-        if (!existingFormDataHierarchy.contains(ScoutSdk.getType(RuntimeClasses.AbstractFormData)) &&
-            !existingFormDataHierarchy.contains(ScoutSdk.getType(RuntimeClasses.AbstractFormFieldData))) {
+        if (!existingFormDataHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractFormData)) &&
+            !existingFormDataHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractFormFieldData))) {
           if (request == null || SWT.NO == request.showQuestion("Unusal Form Data", "Are you sure to replace '" + m_formDataType.getFullyQualifiedName() + "' with new generated form data?", SWT.ICON_QUESTION | SWT.YES | SWT.NO)) {
             return;
           }
         }
 
         try {
-          ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(getType());
+          ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
           ITypeSourceBuilder sourceBuilder = FormDataUtility.getPrimaryTypeFormDataSourceBuilder(getFormDataAnnotation().getSuperTypeSignature(), getType(), hierarchy);
           sourceBuilder.setElementName(m_formDataType.getElementName());
           sourceBuilder.setSuperTypeSignature(FormDataUtility.getFormDataSuperTypeSignature(getFormDataAnnotation(), getType(), hierarchy));
@@ -211,7 +211,7 @@ public class FormDataUpdateOperation implements IOperation {
             ScoutSdk.logWarning("could not determ abstract flag of '" + getType().getFullyQualifiedName() + "'.", e);
           }
           sourceBuilder.setFlags(flags);
-          String icuSource = FormDataUtility.createCompilationUnitSource(sourceBuilder, m_formDataType.getPackageFragment().getElementName(), SdkTypeUtility.getScoutBundle(m_formDataType).getJavaProject(), monitor);
+          String icuSource = FormDataUtility.createCompilationUnitSource(sourceBuilder, m_formDataType.getPackageFragment().getElementName(), ScoutTypeUtility.getScoutBundle(m_formDataType).getJavaProject(), monitor);
           m_formDataIcuSource = icuSource;
         }
         catch (Exception e) {
@@ -306,7 +306,7 @@ public class FormDataUpdateOperation implements IOperation {
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
 
       ICompilationUnit icu = m_formDataType.getCompilationUnit();
       if (icu != null) {

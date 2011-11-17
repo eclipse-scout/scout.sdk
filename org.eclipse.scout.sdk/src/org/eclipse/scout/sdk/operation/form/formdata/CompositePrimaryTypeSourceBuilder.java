@@ -15,23 +15,23 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperties {
-  final IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
-  final IType iTableField = ScoutSdk.getType(RuntimeClasses.ITableField);
-  final IType iComposerField = ScoutSdk.getType(RuntimeClasses.IComposerField);
-  final IType iCompositeField = ScoutSdk.getType(RuntimeClasses.ICompositeField);
-  final IType iRadioButtonGroup = ScoutSdk.getType(RuntimeClasses.IRadioButtonGroup);
+  final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  final IType iTableField = TypeUtility.getType(RuntimeClasses.ITableField);
+  final IType iComposerField = TypeUtility.getType(RuntimeClasses.IComposerField);
+  final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
+  final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
 
   public CompositePrimaryTypeSourceBuilder(IType type) {
-    this(type, ScoutSdk.getLocalTypeHierarchy(type));
+    this(type, TypeUtility.getLocalTypeHierarchy(type));
   }
 
   public CompositePrimaryTypeSourceBuilder(IType type, ITypeHierarchy formFieldHierarchy) {
@@ -43,10 +43,10 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
     try {
       if (declaringType.getTypes().length > 0) {
         if (formFieldHierarchy == null) {
-          formFieldHierarchy = ScoutSdk.getLocalTypeHierarchy(declaringType);
+          formFieldHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
         }
         ITypeFilter formFieldFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(iFormField, formFieldHierarchy));//, TypeFilters.getClassFilter());
-        for (IType t : TypeUtility.getInnerTypes(declaringType, formFieldFilter, TypeComparators.getOrderAnnotationComparator())) {
+        for (IType t : TypeUtility.getInnerTypes(declaringType, formFieldFilter, ScoutTypeComparators.getOrderAnnotationComparator())) {
           try {
             addFormField(t, formFieldHierarchy);
           }
@@ -62,13 +62,13 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
   }
 
   protected void addFormField(IType formField, ITypeHierarchy formFieldHierarchy) throws JavaModelException {
-    FormDataAnnotation formDataAnnotation = SdkTypeUtility.findFormDataAnnotation(formField, formFieldHierarchy);
+    FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(formField, formFieldHierarchy);
     if (formDataAnnotation != null) {
       if (FormDataAnnotation.isCreate(formDataAnnotation)) {
         String formDataElementName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(formField.getElementName()), true);
         String superTypeSignature = formDataAnnotation.getSuperTypeSignature();
         if (formDataAnnotation.getGenericOrdinal() >= 0) {
-          IType superType = ScoutSdk.getTypeBySignature(superTypeSignature);
+          IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
           if (TypeUtility.isGenericType(superType)) {
             String genericTypeSig = org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility.computeFormFieldGenericType(formField, formFieldHierarchy);
             if (genericTypeSig != null) {

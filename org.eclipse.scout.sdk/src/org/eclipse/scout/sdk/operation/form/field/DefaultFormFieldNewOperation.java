@@ -19,7 +19,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>FormFieldNewOperation</h3> To create an instance of a form field. Usually this operation is used if no specific
@@ -58,7 +58,7 @@ public class DefaultFormFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
     newOp.setSuperTypeSignature(getSuperTypeSignature());

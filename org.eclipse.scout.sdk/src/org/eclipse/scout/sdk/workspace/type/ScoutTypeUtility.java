@@ -23,14 +23,18 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -39,41 +43,127 @@ import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.icon.IIconProvider;
-import org.eclipse.scout.sdk.internal.typestructure.StructuredType;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.SdkMethodUtility;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.IMethodFilter;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
 
-/**
- *
- */
-public class SdkTypeUtility {
-  static final IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
-  static final IType iValueField = ScoutSdk.getType(RuntimeClasses.IValueField);
-  static final IType iCompositeField = ScoutSdk.getType(RuntimeClasses.ICompositeField);
-  static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
+public class ScoutTypeUtility extends TypeUtility {
+  private static final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private static final IType iValueField = TypeUtility.getType(RuntimeClasses.IValueField);
+  private static final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
 
-  private static SdkTypeUtility instance = new SdkTypeUtility();
+  private static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
+  private static final Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
 
-  private SdkTypeUtility() {
+  private ScoutTypeUtility() {
+  }
+
+  public static IType[] getInnerTypesOrdered(IType declaringType, IType superType) {
+    return getInnerTypesOrdered(declaringType, superType, ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IScoutBundle getScoutBundle(IJavaElement element) {
-    return ScoutSdk.getScoutWorkspace().getScoutBundle(element.getJavaProject().getProject());
+    return ScoutSdkCore.getScoutWorkspace().getScoutBundle(element.getJavaProject().getProject());
   }
 
   public static IScoutProject getScoutProject(IJavaElement element) {
-    return ScoutSdk.getScoutWorkspace().getScoutBundle(element.getJavaProject().getProject()).getScoutProject();
+    return ScoutSdkCore.getScoutWorkspace().getScoutBundle(element.getJavaProject().getProject()).getScoutProject();
+  }
+
+  /**
+   * <xmp>
+   * public void execCreateChildPages(Collection<IPage> pageList){
+   * A a = new A();
+   * pageList.add(a);
+   * B b = new B();
+   * pageList.add(b);
+   * }
+   * // execCreateChildPages.getAllNewTypeOccurrences() returns BCType[]{A,B}
+   * </xmp>
+   * 
+   * @return
+   * @throws JavaModelException
+   */
+  public static IType[] getNewTypeOccurencesInMethod(IMethod method) {
+    ArrayList<IType> types = new ArrayList<IType>();
+    if (TypeUtility.exists(method)) {
+      try {
+        Matcher matcher = Regex.REGEX_METHOD_NEW_TYPE_OCCURRENCES.matcher(method.getSource());
+        while (matcher.find()) {
+          try {
+            String resolvedSignature = SignatureUtility.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), method.getDeclaringType());
+            if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
+              String pck = org.eclipse.jdt.core.Signature.getSignatureQualifier(resolvedSignature);
+              String simpleName = org.eclipse.jdt.core.Signature.getSignatureSimpleName(resolvedSignature);
+              if (!StringUtility.isNullOrEmpty(pck) && !StringUtility.isNullOrEmpty(simpleName)) {
+                types.add(TypeUtility.getType(pck + "." + simpleName));
+              }
+            }
+          }
+          catch (IllegalArgumentException e) {
+            ScoutSdk.logWarning("could not parse signature '" + matcher.group(1) + "' in method '" + method.getElementName() + "' of type '" + method.getDeclaringType().getFullyQualifiedName() + "'. Trying to find page occurences.");
+          }
+        }
+      }
+      catch (JavaModelException e) {
+        ScoutSdk.logError("could not find new type occurences in method '" + method.getElementName() + "' on type '" + method.getDeclaringType().getFullyQualifiedName() + "'.", e);
+      }
+    }
+    return types.toArray(new IType[types.size()]);
+  }
+
+  public static IType[] getTypeOccurenceInMethod(IMethod method) {
+    try {
+      return getTypeOccurenceInSnippet(method, method.getSource());
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not get source of method '" + method.getElementName() + "'.", e);
+    }
+    return new IType[0];
+  }
+
+  public static IType[] getTypeOccurenceInSnippet(IMember container, String snippet) {
+    ArrayList<IType> types = new ArrayList<IType>();
+    try {
+      Matcher matcher = Regex.REGEX_METHOD_CLASS_TYPE_OCCURRENCES.matcher(snippet);
+      while (matcher.find()) {
+        try {
+          String resolvedSignature = SignatureUtility.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), container.getDeclaringType());
+          if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
+            String pck = org.eclipse.jdt.core.Signature.getSignatureQualifier(resolvedSignature);
+            String simpleName = org.eclipse.jdt.core.Signature.getSignatureSimpleName(resolvedSignature);
+            if (!StringUtility.isNullOrEmpty(pck) && !StringUtility.isNullOrEmpty(simpleName)) {
+              types.add(TypeUtility.getType(pck + "." + simpleName));
+            }
+          }
+        }
+        catch (JavaModelException e) {
+          ScoutSdk.logWarning("could not resolve type reference '" + matcher.group(1) + "' in method '" + container.getElementName() + "'", e);
+        }
+      }
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not get source of method '" + container.getElementName() + "'.", e);
+    }
+    return types.toArray(new IType[types.size()]);
   }
 
   public static INlsProject findNlsProject(IJavaElement element) {
@@ -93,13 +183,13 @@ public class SdkTypeUtility {
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
-    return instance.findFormDataAnnnotationImpl(type, hierarchy);
+    return findFormDataAnnnotationImpl(type, hierarchy);
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IMethod method) throws JavaModelException {
     FormDataAnnotation annotation = new FormDataAnnotation();
     try {
-      instance.fillFormDataAnnotation(method, annotation, true);
+      fillFormDataAnnotation(method, annotation, true);
     }
     catch (Exception e) {
       ScoutSdk.logWarning("could not parse formdata annotation of method '" + method.getElementName() + "' on '" + method.getDeclaringType().getFullyQualifiedName() + "'", e);
@@ -108,7 +198,7 @@ public class SdkTypeUtility {
     return annotation;
   }
 
-  private FormDataAnnotation findFormDataAnnnotationImpl(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
+  private static FormDataAnnotation findFormDataAnnnotationImpl(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
     FormDataAnnotation anot = new FormDataAnnotation();
     try {
       parseFormDataAnnotationReq(anot, type, hierarchy, true);
@@ -120,7 +210,7 @@ public class SdkTypeUtility {
     return anot;
   }
 
-  private void parseFormDataAnnotationReq(FormDataAnnotation annotation, IType type, ITypeHierarchy hierarchy, boolean isOwner) {
+  private static void parseFormDataAnnotationReq(FormDataAnnotation annotation, IType type, ITypeHierarchy hierarchy, boolean isOwner) {
     if (TypeUtility.exists(type)) {
       IType superType = hierarchy.getSuperclass(type);
       parseFormDataAnnotationReq(annotation, superType, hierarchy, false);
@@ -134,7 +224,7 @@ public class SdkTypeUtility {
   }
 
   @SuppressWarnings("null")
-  private void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner) throws JavaModelException {
+  private static void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner) throws JavaModelException {
     IAnnotation annotation = null;
     if (element instanceof IAnnotatable) {
       annotation = TypeUtility.getAnnotation((IAnnotatable) element, RuntimeClasses.FormData);
@@ -381,18 +471,18 @@ public class SdkTypeUtility {
 //  }
 
   public static IType[] getPotentialMasterFields(IType field) {
-    ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(field.getCompilationUnit());
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(field.getCompilationUnit());
     IType mainbox = TypeUtility.getAncestor(field, TypeFilters.getRegexSimpleNameFilter("MainBox"));
     TreeSet<IType> collector = new TreeSet<IType>(TypeComparators.getTypeNameComparator());
     if (TypeUtility.exists(mainbox)) {
-      instance.collectPotentialMasterFields(mainbox, collector, hierarchy);
+      collectPotentialMasterFields(mainbox, collector, hierarchy);
     }
     collector.remove(field);
     return collector.toArray(new IType[collector.size()]);
 
   }
 
-  private void collectPotentialMasterFields(IType type, Set<IType> collector, ITypeHierarchy formFieldHierarchy) {
+  private static void collectPotentialMasterFields(IType type, Set<IType> collector, ITypeHierarchy formFieldHierarchy) {
     if (TypeUtility.exists(type)) {
       if (formFieldHierarchy.isSubtype(iValueField, type)) {
         collector.add(type);
@@ -405,7 +495,7 @@ public class SdkTypeUtility {
 
   public static IType[] getInnerTypes(IType declaringType, IType superType, Comparator<IType> comparator) {
     if (TypeUtility.exists(declaringType)) {
-      ITypeHierarchy typeHierarchy = ScoutSdk.getLocalTypeHierarchy(declaringType);
+      ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
       return TypeUtility.getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(superType, typeHierarchy), comparator);
     }
     return new IType[0];
@@ -422,7 +512,7 @@ public class SdkTypeUtility {
     Collection<IType> result = new ArrayList<IType>();
     try {
       for (IType t : icu.getTypes()) {
-        instance.collectTypesTypes(t, result, filter);
+        collectTypesTypes(t, result, filter);
       }
     }
     catch (JavaModelException e) {
@@ -431,7 +521,7 @@ public class SdkTypeUtility {
     return result.toArray(new IType[result.size()]);
   }
 
-  private void collectTypesTypes(IType type, Collection<IType> result, ITypeFilter filter) {
+  private static void collectTypesTypes(IType type, Collection<IType> result, ITypeFilter filter) {
     if (filter.accept(type)) {
       result.add(type);
     }
@@ -446,81 +536,91 @@ public class SdkTypeUtility {
   }
 
   public static IType[] getFormFields(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IFormField), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IFormField), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getFormFields(IType declaringType, ITypeHierarchy hierarchy) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IFormField), hierarchy, TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IFormField), hierarchy, ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getFormFieldsWithoutButtons(IType declaringType) {
-    return getFormFieldsWithoutButtons(declaringType, ScoutSdk.getLocalTypeHierarchy(declaringType));
+    return getFormFieldsWithoutButtons(declaringType, TypeUtility.getLocalTypeHierarchy(declaringType));
   }
 
   public static IType[] getFormFieldsWithoutButtons(IType declaringType, ITypeHierarchy hierarchy) {
-    ITypeFilter notButtonFilter = TypeFilters.invertFilter(TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IButton), hierarchy));
-    ITypeFilter formFieldFilter = TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IFormField), hierarchy);
+    ITypeFilter notButtonFilter = TypeFilters.invertFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IButton), hierarchy));
+    ITypeFilter formFieldFilter = TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IFormField), hierarchy);
     return TypeUtility.getInnerTypes(declaringType, TypeFilters.getMultiTypeFilter(formFieldFilter, notButtonFilter));
   }
 
   public static IType[] getTrees(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.ITree), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ITree), TypeComparators.getTypeNameComparator());
+  }
+
+  public static void setSource(IMember element, String source, IWorkingCopyManager workingCopyManager, IProgressMonitor monitor) throws CoreException {
+    ICompilationUnit icu = element.getCompilationUnit();
+    source = ScoutUtility.cleanLineSeparator(source, icu);
+    ISourceRange range = element.getSourceRange();
+    String oldSource = icu.getSource();
+    String newSource = oldSource.substring(0, range.getOffset()) + source + oldSource.substring(range.getOffset() + range.getLength());
+    icu.getBuffer().setContents(newSource);
+    workingCopyManager.reconcile(icu, monitor);
   }
 
   public static IType[] getTables(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.ITable), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ITable), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getColumns(IType table) {
-    return getInnerTypes(table, ScoutSdk.getType(RuntimeClasses.IColumn), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(table, TypeUtility.getType(RuntimeClasses.IColumn), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getCodes(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.ICode), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ICode), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getKeyStrokes(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IKeyStroke), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IKeyStroke), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getToolbuttons(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IToolButton), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getWizardSteps(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IWizardStep), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IWizardStep), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getCalendar(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.ICalendar), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ICalendar), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getCalendarItemProviders(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.ICalendarItemProvider), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ICalendarItemProvider), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getMenus(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IMenu), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IMenu), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getButtons(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IButton), TypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IButton), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getComposerEntities(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IComposerEntity), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IComposerEntity), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getComposerAttributes(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IComposerAttribute), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IComposerAttribute), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getFormFieldData(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.AbstractFormFieldData), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.AbstractFormFieldData), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getFormHandlers(IType declaringType) {
-    return getInnerTypes(declaringType, ScoutSdk.getType(RuntimeClasses.IFormHandler), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IFormHandler), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getServiceImplementations(IType serviceInterface) {
@@ -528,7 +628,7 @@ public class SdkTypeUtility {
   }
 
   public static IType[] getServiceImplementations(IType serviceInterface, ITypeFilter filter) {
-    ICachedTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(ScoutSdk.getType(RuntimeClasses.IService));
+    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IService));
     ITypeFilter serviceImplFilter = null;
     if (filter == null) {
       serviceImplFilter = TypeFilters.getMultiTypeFilter(
@@ -545,7 +645,7 @@ public class SdkTypeUtility {
   }
 
   public static IType getServiceInterface(IType service) {
-    ICachedTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(ScoutSdk.getType(RuntimeClasses.IService));
+    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IService));
     IType[] interfaces = serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
     if (interfaces.length > 0) {
       return interfaces[0];
@@ -554,13 +654,13 @@ public class SdkTypeUtility {
   }
 
   public static IType[] getAbstractTypesOnClasspath(IType superType, IJavaProject project) {
-    ICachedTypeHierarchy typeHierarchy = ScoutSdk.getPrimaryTypeHierarchy(superType);
+    ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(superType);
     IType[] abstractTypes = typeHierarchy.getAllSubtypes(superType, TypeFilters.getAbstractOnClasspath(project), TypeComparators.getTypeNameComparator());
     return abstractTypes;
   }
 
   public static IType[] getClassesOnClasspath(IType superType, IJavaProject project) {
-    ICachedTypeHierarchy typeHierarchy = ScoutSdk.getPrimaryTypeHierarchy(superType);
+    ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(superType);
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
         TypeFilters.getTypesOnClasspath(project),
         TypeFilters.getClassFilter());
@@ -569,13 +669,13 @@ public class SdkTypeUtility {
   }
 
   public static IMethod getFormFieldGetterMethod(final IType formField) {
-    ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(formField.getCompilationUnit());
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formField.getCompilationUnit());
     return getFormFieldGetterMethod(formField, hierarchy);
   }
 
   public static IMethod getFormFieldGetterMethod(final IType formField, ITypeHierarchy hierarchy) {
     IType form = TypeUtility.getAncestor(formField, TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IForm), hierarchy),
+        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
         TypeFilters.getToplevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {
@@ -588,8 +688,8 @@ public class SdkTypeUtility {
           if (candidate.getElementName().matches(regex)) {
             try {
               String returnTypeSignature = Signature.getReturnType(candidate.getSignature());
-              returnTypeSignature = ScoutSignature.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
-              return ScoutSignature.isEqualSignature(formFieldSignature, returnTypeSignature);
+              returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
+              return SignatureUtility.isEqualSignature(formFieldSignature, returnTypeSignature);
             }
             catch (JavaModelException e) {
               ScoutSdk.logError("could not parse signature of method '" + candidate.getElementName() + "' in type '" + candidate.getDeclaringType().getFullyQualifiedName() + "'.", e);
@@ -615,7 +715,7 @@ public class SdkTypeUtility {
         if (candidate.getElementName().matches(regex)) {
           try {
             String returnTypeSignature = Signature.getReturnType(candidate.getSignature());
-            returnTypeSignature = ScoutSignature.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
+            returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
             return formFieldSignature.equals(returnTypeSignature);
           }
           catch (JavaModelException e) {
@@ -639,7 +739,7 @@ public class SdkTypeUtility {
         if (candidate.getElementName().matches(regex)) {
           try {
             String returnTypeSignature = Signature.getReturnType(candidate.getSignature());
-            returnTypeSignature = ScoutSignature.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
+            returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
             return formFieldSignature.equals(returnTypeSignature);
           }
           catch (JavaModelException e) {
@@ -717,8 +817,6 @@ public class SdkTypeUtility {
     }
     return newMethod;
   }
-
-  public static final Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
 
   /**
    * @return a map with all validation rule names mapped to the method on the most specific declaring type
@@ -798,7 +896,7 @@ public class SdkTypeUtility {
           int lastDot = fieldSource.lastIndexOf('.');
           //fast check if scout rule
           if (fieldSource.startsWith("ValidationRule")) {
-            IType fieldBaseType = ScoutSdk.getType(RuntimeClasses.ValidationRule);
+            IType fieldBaseType = TypeUtility.getType(RuntimeClasses.ValidationRule);
             if (fieldBaseType != null) {
               ruleField = fieldBaseType.getField(fieldSource.substring(lastDot + 1));
               if (!TypeUtility.exists(ruleField)) {
@@ -851,7 +949,7 @@ public class SdkTypeUtility {
             implementedMethod = annotatedMethod;
           }
           //found most specific override of new rule
-          ruleGeneratedSourceCode = SdkMethodUtility.getMethodReturnValue(implementedMethod);
+          ruleGeneratedSourceCode = ScoutMethodUtility.getMethodReturnValue(implementedMethod);
         }
         else {
           implementedMethod = annotatedMethod;
@@ -872,7 +970,7 @@ public class SdkTypeUtility {
 
   public static IType getFistProcessButton(IType declaringType, ITypeHierarchy hierarchy) {
     Pattern returnTrueMatcher = Pattern.compile("return\\s*true", Pattern.MULTILINE);
-    ITypeFilter buttonFilter = TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IButton), hierarchy);
+    ITypeFilter buttonFilter = TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IButton), hierarchy);
     for (IType field : getFormFields(declaringType, hierarchy)) {
       if (buttonFilter.accept(field)) {
         IMethod m = TypeUtility.getMethod(field, "getConfiguredProcessButton");
@@ -898,88 +996,88 @@ public class SdkTypeUtility {
   public static IStructuredType createStructuredType(IType type) {
     try {
       org.eclipse.jdt.core.ITypeHierarchy supertypeHierarchy = type.newSupertypeHierarchy(null);
-      if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ICompositeField))) {
+      if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICompositeField))) {
         return createStructuredCompositeField(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ITableField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ITableField))) {
         return createStructuredTableField(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ITreeField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ITreeField))) {
         return createStructuredTreeField(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IPlannerField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPlannerField))) {
         return createStructuredPlannerField(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IComposerField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IComposerField))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IComposerAttribute))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IComposerAttribute))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IComposerEntity))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IComposerEntity))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IFormField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IFormField))) {
         return createStructuredFormField(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IForm))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IForm))) {
         return createStructuredForm(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ICalendar))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICalendar))) {
         return createStructuredCalendar(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ICodeType))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICodeType))) {
         return createStructuredCodeType(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ICode))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICode))) {
         return createStructuredCode(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IDesktop))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDesktop))) {
         return createStructuredDesktop(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IDesktopExtension))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDesktopExtension))) {
         return createStructuredDesktop(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IOutline))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IOutline))) {
         return createStructuredOutline(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IPageWithNodes))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPageWithNodes))) {
         return createStructuredPageWithNodes(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IPageWithTable))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPageWithTable))) {
         return createStructuredPageWithTable(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.ITable))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ITable))) {
         return createStructuredTable(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IWizard))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IWizard))) {
         return createStructuredWizard(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IWizardStep))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IWizardStep))) {
         return createStructuredWizardStep(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IMenu))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IMenu))) {
         return createStructuredMenu(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IColumn))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IColumn))) {
         return createStructuredColumn(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IActivityMap))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IActivityMap))) {
         return createStructuredActivityMap(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IFormHandler))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IFormHandler))) {
         return createStructuredFormHandler(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IKeyStroke))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IKeyStroke))) {
         return createStructuredKeyStroke(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IButton))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IButton))) {
         return createStructuredButton(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IViewButton))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IViewButton))) {
         return createStructuredViewButton(type);
       }
-      else if (supertypeHierarchy.contains(ScoutSdk.getType(RuntimeClasses.IToolButton))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IToolButton))) {
         return createStructuredToolButton(type);
       }
       else {
@@ -1035,7 +1133,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_FORM_HANDLER,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredButton(IType type) {
@@ -1051,7 +1149,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredViewButton(IType type) {
@@ -1067,7 +1165,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredToolButton(IType type) {
@@ -1084,7 +1182,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_TOOL_BUTTON,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredKeyStroke(IType type) {
@@ -1100,7 +1198,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredMenu(IType type) {
@@ -1118,7 +1216,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_MENU,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredColumn(IType type) {
@@ -1134,7 +1232,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredActivityMap(IType type) {
@@ -1151,7 +1249,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_MENU,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredDesktop(IType type) {
@@ -1172,7 +1270,7 @@ public class SdkTypeUtility {
         CATEGORIES.TYPE_KEYSTROKE,
         CATEGORIES.TYPE_UNCATEGORIZED
         );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredFormHandler(IType type) {
@@ -1188,7 +1286,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredForm(IType type) {
@@ -1211,7 +1309,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_FORM_HANDLER,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredOutline(IType type) {
@@ -1228,7 +1326,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredFormField(IType type) {
@@ -1244,7 +1342,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_LOCAL_BEAN,
           CATEGORIES.METHOD_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredComposer(IType type) {
@@ -1264,7 +1362,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_COMPOSER_ENTRY,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredPageWithNodes(IType type) {
@@ -1283,7 +1381,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_MENU,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredPageWithTable(IType type) {
@@ -1301,7 +1399,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_TABLE,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredTableField(IType type) {
@@ -1319,7 +1417,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_TABLE,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredTable(IType type) {
@@ -1338,7 +1436,7 @@ public class SdkTypeUtility {
         CATEGORIES.TYPE_COLUMN,
         CATEGORIES.TYPE_UNCATEGORIZED
         );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredCompositeField(IType type) {
@@ -1356,7 +1454,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_FORM_FIELD,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredCodeType(IType type) {
@@ -1374,7 +1472,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_CODE,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredCode(IType type) {
@@ -1392,7 +1490,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_CODE,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredTreeField(IType type) {
@@ -1410,7 +1508,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_TREE,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredPlannerField(IType type) {
@@ -1429,7 +1527,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_ACTIVITY_MAP,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredWizard(IType type) {
@@ -1448,7 +1546,7 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_WIZARD_STEP,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredWizardStep(IType type) {
@@ -1466,7 +1564,7 @@ public class SdkTypeUtility {
           CATEGORIES.METHOD_UNCATEGORIZED,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 
   public static IStructuredType createStructuredCalendar(IType type) {
@@ -1485,6 +1583,6 @@ public class SdkTypeUtility {
           CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER,
           CATEGORIES.TYPE_UNCATEGORIZED
           );
-    return new StructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled);
   }
 }

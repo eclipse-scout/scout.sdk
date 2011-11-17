@@ -20,21 +20,20 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>WizardStepNewOperation</h3> ...
  */
 public class WizardStepNewOperation implements IOperation {
 
-  final IType iWizardStep = ScoutSdk.getType(RuntimeClasses.IWizardStep);
+  final IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
 
   // in member
   private final IType m_declaringType;
@@ -73,7 +72,7 @@ public class WizardStepNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation wizardStepOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     wizardStepOp.setOrderDefinitionType(iWizardStep);
     wizardStepOp.setSibling(getSibling());

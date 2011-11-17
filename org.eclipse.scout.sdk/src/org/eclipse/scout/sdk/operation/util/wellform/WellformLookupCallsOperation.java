@@ -14,19 +14,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 /**
  *
  */
 public class WellformLookupCallsOperation implements IOperation {
 
-  final IType lookupCall = ScoutSdk.getType(RuntimeClasses.LookupCall);
+  final IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
 
   private final IScoutBundle m_bundle;
   private IType[] m_lookupCalls;
@@ -49,9 +49,9 @@ public class WellformLookupCallsOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find types
-    ICachedTypeHierarchy lookupCallHierarchy = ScoutSdk.getPrimaryTypeHierarchy(lookupCall);
+    ICachedTypeHierarchy lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(lookupCall);
     m_lookupCalls = lookupCallHierarchy.getAllSubtypes(lookupCall, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
     // format types
     if (monitor.isCanceled()) {

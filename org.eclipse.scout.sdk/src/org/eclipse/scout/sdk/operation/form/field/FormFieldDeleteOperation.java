@@ -18,9 +18,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>FormFieldDeleteOperation</h3> The operation to delete a inner class (form field) and its getter on the
@@ -49,13 +49,13 @@ public class FormFieldDeleteOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(getFormFieldType().getCompilationUnit(), true, monitor);
     IType declaringType = getFormFieldType().getDeclaringType();
 
     JavaElementDeleteOperation op = new JavaElementDeleteOperation();
     // getter method
-    IMethod getter = SdkTypeUtility.getFormFieldGetterMethod(getFormFieldType());
+    IMethod getter = ScoutTypeUtility.getFormFieldGetterMethod(getFormFieldType());
     if (TypeUtility.exists(getter)) {
       op.addMember(getter);
     }

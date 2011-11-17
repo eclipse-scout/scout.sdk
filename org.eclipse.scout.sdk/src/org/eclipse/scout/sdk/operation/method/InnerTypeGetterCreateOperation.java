@@ -14,8 +14,8 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  *
@@ -41,7 +41,7 @@ public class InnerTypeGetterCreateOperation extends MethodCreateOperation {
   protected String createMethodBody(IImportValidator validator) throws JavaModelException {
     StringBuilder source = new StringBuilder();
     source.append("return getFieldByClass(");
-    source.append(ScoutSignature.getTypeReference(Signature.createTypeSignature(m_field.getFullyQualifiedName(), true), m_field, validator) + ".class");
+    source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(m_field.getFullyQualifiedName(), true), m_field, validator) + ".class");
     source.append(");");
     return source.toString();
   }

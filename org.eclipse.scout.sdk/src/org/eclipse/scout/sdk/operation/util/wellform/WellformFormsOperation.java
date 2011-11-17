@@ -17,22 +17,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 /**
  *
  */
 public class WellformFormsOperation implements IOperation {
 
-  final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
-  final IType iSearchForm = ScoutSdk.getType(RuntimeClasses.ISearchForm);
+  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
 
   private final IScoutBundle m_clientBundle;
   private IType[] m_forms;
@@ -54,9 +54,9 @@ public class WellformFormsOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find all forms
-    ICachedTypeHierarchy formHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iForm);
+    ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
     IType[] searchForms = formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getClientBundle().getJavaProject()));
     ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
         TypeFilters.getClassesInProject(getClientBundle().getJavaProject()),

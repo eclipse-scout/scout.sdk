@@ -20,22 +20,22 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>CodeNewOperation</h3> ...
  */
 public class CodeNewOperation implements IOperation {
 
-  final IType iCode = ScoutSdk.getType(RuntimeClasses.ICode);
+  final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
 
   // in members
   private final IType m_declaringType;
@@ -73,7 +73,7 @@ public class CodeNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation codeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType());
     codeOp.setFormatSource(false);
     codeOp.setSibling(getSibling());

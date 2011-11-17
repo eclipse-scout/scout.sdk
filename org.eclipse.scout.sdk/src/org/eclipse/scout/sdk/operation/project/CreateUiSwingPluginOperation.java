@@ -17,12 +17,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * creates a swing application plugin with an application and a product
@@ -46,7 +46,7 @@ public class CreateUiSwingPluginOperation extends AbstractCreateScoutBundleOpera
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
     IProject project = getCreatedProject();
     TemplateVariableSet bindings = TemplateVariableSet.createNew(project, m_templateBindings);

@@ -18,11 +18,10 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  * <h3>AbstractBcTypeNewOperation</h3> ...
@@ -68,7 +67,7 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
     buf.append(getTypeName());
     // super type (extends)
     if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
-      String superTypeRefName = ScoutSignature.getTypeReference(getSuperTypeSignature(), validator);
+      String superTypeRefName = SignatureUtility.getTypeReference(getSuperTypeSignature(), validator);
       buf.append(" extends " + superTypeRefName);
     }
     // interfaces
@@ -76,7 +75,7 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
     if (interfaceSignatures.length > 0) {
       buf.append((hasModifier(Flags.AccInterface)) ? (" extends ") : (" implements "));
       for (int i = 0; i < interfaceSignatures.length; i++) {
-        String interfaceTypeRefName = ScoutSdkUtility.getSimpleTypeRefName(interfaceSignatures[i], validator);
+        String interfaceTypeRefName = SignatureUtility.getTypeReference(interfaceSignatures[i], validator);
         buf.append(interfaceTypeRefName + ((interfaceSignatures.length > (i + 1)) ? (", ") : ("")));
       }
     }

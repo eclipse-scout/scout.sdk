@@ -17,12 +17,12 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.template.IContentTemplate;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class DateFromToTemplate implements IContentTemplate {
   private IType m_fromType;
@@ -34,18 +34,18 @@ public class DateFromToTemplate implements IContentTemplate {
   }
 
   @Override
-  public void apply(IType type, IScoutWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
+  public void apply(IType type, IWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
     monitor.beginTask("apply " + getName() + " template.", IProgressMonitor.UNKNOWN);
 
     String superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractDateField, true);
 
     String parentName = type.getElementName();
-    int lastBoxIndex = parentName.lastIndexOf(ScoutIdeProperties.SUFFIX_BOX);
+    int lastBoxIndex = parentName.lastIndexOf(SdkProperties.SUFFIX_BOX);
     if (lastBoxIndex > 0) {
       parentName = parentName.substring(0, lastBoxIndex);
     }
     FormFieldNewOperation fromOp = new FormFieldNewOperation(type, false);
-    fromOp.setTypeName(parentName + ScoutIdeProperties.SUFFIX_FROM);
+    fromOp.setTypeName(parentName + SdkProperties.SUFFIX_FROM);
     fromOp.setSiblingField(null);
     fromOp.setSuperTypeSignature(superTypeSignature);
     fromOp.validate();
@@ -53,14 +53,14 @@ public class DateFromToTemplate implements IContentTemplate {
     m_fromType = fromOp.getCreatedFormField();
 
     FormFieldNewOperation toOp = new FormFieldNewOperation(type, false);
-    toOp.setTypeName(parentName + ScoutIdeProperties.SUFFIX_TO);
+    toOp.setTypeName(parentName + SdkProperties.SUFFIX_TO);
     toOp.setSiblingField(null);
     toOp.setSuperTypeSignature(superTypeSignature);
     toOp.validate();
     toOp.run(monitor, manager);
     m_toType = toOp.getCreatedFormField();
 
-    INlsProject nlsProject = SdkTypeUtility.findNlsProject(type);
+    INlsProject nlsProject = ScoutTypeUtility.findNlsProject(type);
     if (nlsProject != null) {
       INlsEntry fromEntry = nlsProject.getEntry("from");
       if (fromEntry != null) {

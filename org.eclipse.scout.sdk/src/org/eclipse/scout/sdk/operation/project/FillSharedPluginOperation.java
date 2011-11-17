@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillSharedPluginOperation implements IOperation {
 
@@ -44,7 +44,7 @@ public class FillSharedPluginOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     TemplateVariableSet bindings = TemplateVariableSet.createNew(getProject(), m_templateBindings);
     String destPathPref = "src/" + (getProject().getName().replace('.', '/')) + "/";
     new InstallJavaFileOperation("templates/shared/src/Activator.java", destPathPref + "Activator.java", getProject(), bindings).run(monitor, workingCopyManager);

@@ -18,15 +18,15 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  *
@@ -71,7 +71,7 @@ public class ConfigPropertyMethodUpdateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IMethod method = TypeUtility.getMethod(getDeclaringType(), getMethodName());
     if (TypeUtility.exists(method)) {
       MethodUpdateContentOperation op = new MethodUpdateContentOperation(method) {
@@ -100,13 +100,13 @@ public class ConfigPropertyMethodUpdateOperation implements IOperation {
   }
 
   protected IJavaElement computeSibling() {
-    IStructuredType structuredType = SdkTypeUtility.createStructuredType(getDeclaringType());
+    IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getDeclaringType());
     return structuredType.getSiblingMethodConfigGetConfigured(getMethodName());
   }
 
   /**
    * can be overridden to provide a specific method body. The method body is defined as part between the method body{}.
-   * Use {@link ScoutSdkUtility#getSimpleTypeRefName(String, IImportValidator)} to determ class references (fully
+   * Use {@link SignatureUtility#getTypeReference(String, IImportValidator)} to determ class references (fully
    * quallified vs. simple name).
    * 
    * @param validator

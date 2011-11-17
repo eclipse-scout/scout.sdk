@@ -22,19 +22,19 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationsUpdateOperation;
 import org.eclipse.scout.sdk.operation.form.field.IFieldPosition;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
 
@@ -85,9 +85,9 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find sibling
-    IStructuredType structuredType = SdkTypeUtility.createStructuredType(getTargetDeclaringType());
+    IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getTargetDeclaringType());
     TypePosition position = updateOrderNumbers(structuredType, monitor, workingCopyManager);
     String typeSimpleName = getNewTypeName();
     List<String> imports = new ArrayList<String>();
@@ -132,7 +132,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
       if (getMode() == MODE_MOVE) {
         // delete old
         deleteType(getType(), monitor, workingCopyManager);
-        structuredType = SdkTypeUtility.createStructuredType(getTargetDeclaringType());
+        structuredType = ScoutTypeUtility.createStructuredType(getTargetDeclaringType());
       }
       // create new
       m_newType = createNewType(getTargetDeclaringType(), typeSimpleName, fieldSourceDoc.get(), imports.toArray(new String[imports.size()]), position.sibling, structuredType, monitor, workingCopyManager);
@@ -143,13 +143,13 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     formatOp.run(monitor, workingCopyManager);
   }
 
-  protected void deleteType(IType type, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  protected void deleteType(IType type, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JavaElementDeleteOperation op = new JavaElementDeleteOperation();
     op.addMember(type);
     op.run(monitor, workingCopyManager);
   }
 
-  protected IType createNewType(IType declaringType, String simpleName, final String source, final String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected IType createNewType(IType declaringType, String simpleName, final String source, final String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     InnerTypeNewOperation fieldCopyOp = new InnerTypeNewOperation(simpleName, getTargetDeclaringType()) {
       @Override
       public String createSource(IImportValidator validator) throws JavaModelException {
@@ -165,7 +165,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     return fieldCopyOp.getCreatedType();
   }
 
-  protected TypePosition updateOrderNumbers(IStructuredType targetStructuredType, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  protected TypePosition updateOrderNumbers(IStructuredType targetStructuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
     TypePosition position = new TypePosition();
     OrderAnnotationsUpdateOperation orderAnnotationOp = new OrderAnnotationsUpdateOperation(getTargetDeclaringType());
 

@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.scout.sdk.util.DefaultAstVisitor;
+import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link StringVariableResolveVisitor}</h3> ...

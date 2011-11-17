@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.operation;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public interface IOperation {
 
@@ -25,6 +25,6 @@ public interface IOperation {
    */
   void validate() throws IllegalArgumentException;
 
-  void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException;
+  void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException;
 
 }

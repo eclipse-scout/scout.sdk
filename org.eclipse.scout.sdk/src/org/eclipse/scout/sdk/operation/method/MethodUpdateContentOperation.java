@@ -21,17 +21,17 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jdt.SourceRange;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.jdt.SourceRange;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.ReplaceEdit;
 
 /**
@@ -81,7 +81,7 @@ public class MethodUpdateContentOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ISourceRange contentRange = TypeUtility.getContentRange(getMethod());
     if (contentRange != null) {
       try {
@@ -136,7 +136,7 @@ public class MethodUpdateContentOperation implements IOperation {
 
   /**
    * can be overridden to provide a specific method body. The method body is defined as part between the method body{}.
-   * Use {@link ScoutSdkUtility#getSimpleTypeRefName(String, IImportValidator)} to determ class references (fully
+   * Use {@link SignatureUtility#getTypeReference(String, IImportValidator)} to determ class references (fully
    * qualified vs. simple name).
    * 
    * @param originalBody

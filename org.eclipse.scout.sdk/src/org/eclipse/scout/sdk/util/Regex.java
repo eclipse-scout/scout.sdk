@@ -17,30 +17,21 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 
 public class Regex {
-  //public static final Pattern REGEX_ORDER_ANNOTATION = Pattern.compile("^[^;{]*@Order\\s*\\(\\s*([^)f]+)f*\\s*\\)");
+
   public static final Pattern REGEX_WELLFORMD_JAVAFIELD = Pattern.compile("\\b[A-Z][a-zA-Z0-9_]{0,200}\\b");
   public static final Pattern REGEX_WELLFORMED_PROPERTY = Pattern.compile("\\b[a-zA-Z0-9_]{0,200}\\b");
-  //public static final Pattern REGEX_TYPE_CLOSING_CLASS_BRACKET = Pattern.compile("}\\s*\\z");
   public static final Pattern REGEX_JAVAFIELD = Pattern.compile("\\b[A-Za-z][a-zA-Z0-9_]{0,200}\\b");
-  //public static final String REGEX_PROPERTY_BEAN_FIELD_MATCH = "^.*(m_)?#0#$";
   public static final Pattern REGEX_PROPERTY_METHOD_TRIM = Pattern.compile("^getConfigured(.*)$");
 
-  //public static final Pattern REGEX_METHOD_RETURN_NLS_TEXT_DEFAULT = Pattern.compile("\\{\\s*return\\s*ScoutTexts\\.get\\s*\\(\\s*null\\s*\\)\\s*\\;\\s*\\}", Pattern.DOTALL);
   public static final Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\{\\s*return\\s*\"(.*)\"\\s*\\;\\s*\\}", Pattern.DOTALL);
   public static final Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("\\{\\s*return\\s*(" + RuntimeClasses.TEXTS + "|TEXTS|Texts|ScoutTexts)\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*\\;\\s*\\}", Pattern.DOTALL);
-  //public static final Pattern REGEX_METHOD_RETURN_NLS_TEXT_WITH_KEY = Pattern.compile("\\{\\s*return\\s*(" + RuntimeClasses.TEXTS + "|TEXTS|Texts|ScoutTexts)\\.get\\(\\s*(" + RuntimeClasses.TEXTS + "|TEXTS|Texts|ScoutTexts)\\.([^\\)\\s]*)\\)\\s*\\;\\s*\\}", Pattern.DOTALL);
 
-  //public static final Pattern REGEX_METHOD_RETURN_TYPE = Pattern.compile("return\\s*(.*)\\.class\\s*");
-  //public static final Pattern REGEX_METHOD_RETURN_BOOLEAN = Pattern.compile("return\\s*(true|false)\\s*");
   public static final Pattern REGEX_METHOD_CLASS_TYPE_OCCURRENCES = Pattern.compile("([a-zA-Z0-9_.$]+)\\.class", Pattern.DOTALL);
   public static final Pattern REGEX_METHOD_NEW_TYPE_OCCURRENCES = Pattern.compile("\\s*new\\s*([^\\(]*)\\([^\\)]*\\)\\s*", Pattern.DOTALL);
-  //public static final Pattern REGEX_METHOD_CONTENT = Pattern.compile("\\A[^\\{]*\\{(.*)\\}\\Z");
   public static final Pattern REGEX_METHOD_DEFINITION = Pattern.compile("[ \\t]*(public|protected|private)?\\s*(static)?\\s*(void|[^\\s]*)\\s*[^\\s\\(]*\\s*\\([^\\)]*\\)\\s*\\{", Pattern.DOTALL);
 
   public static final Pattern REGEX_PROPERTY_METHOD_REPRESENTER_VALUE = Pattern.compile("\\{\\s*return\\s*([^\\;]*)\\s*\\;.*\\}", Pattern.DOTALL);
   public static final Pattern REGEX_PROPERTY_METHOD_REPRESENTER_BOOLEAN = Pattern.compile("\\{\\s*return\\s*(true|false)\\s*\\;\\s*\\}", Pattern.DOTALL);
-
-  //public static final String REGEX_FIELD_GETTER_METHOD = "\\s*(public|private|protected)?\\s*(#0#)\\s*get#0#\\s*\\(\\s*\\).*";
 
   public static final Pattern REGEX_ICON_NAME = Pattern.compile("(\\\")?(([^\\\\/]*(/|\\\\))*)([^.\\\"]*)(\\.)?([^\"]*)(\\\")?");
   public static final Pattern REGEX_ICON_NAME_FIELD_SOURCE = Pattern.compile("\\=\\s*\\\"([^\"]*)\\\"");
@@ -92,24 +83,6 @@ public class Regex {
       }
     }
     return sb.toString();
-  }
-
-  public static String quoteRegexSpecialCharacters(String input) {
-    input = input.replace("\\", "\\\\");
-    input = input.replace(".", "\\.");
-    input = input.replace("+", "\\+");
-    input = input.replace("?", "\\?");
-    input = input.replace("^", "\\^");
-    input = input.replace("$", "\\$");
-    input = input.replace("[", "\\[");
-    input = input.replace("]", "\\]");
-    input = input.replace("(", "\\(");
-    input = input.replace(")", "\\)");
-    input = input.replace("{", "\\{");
-    input = input.replace("}", "\\}");
-    input = input.replace("*", "\\*");
-    input = input.replace("|", "\\|");
-    return input;
   }
 
   /**

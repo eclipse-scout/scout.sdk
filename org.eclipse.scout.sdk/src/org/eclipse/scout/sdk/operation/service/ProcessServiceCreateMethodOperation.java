@@ -20,15 +20,15 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class ProcessServiceCreateMethodOperation implements IOperation {
   private boolean m_createPrepareCreateMethod = false;
@@ -44,7 +44,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
 
   // internal members
   private final HashMap<String, IImportValidator> m_importValidator = new HashMap<String, IImportValidator>();
-  private static String TAB = ScoutIdeProperties.TAB;
+  private static String TAB = SdkProperties.TAB;
 
   @Override
   public String getOperationName() {
@@ -71,41 +71,41 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // prepare
     if (isCreatePrepareCreateMethod()) {
       // interface
-      createPrepareCreateMethod(getServiceInterface(), SdkTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
+      createPrepareCreateMethod(getServiceInterface(), ScoutTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
       // implementation
       for (IType impl : getServiceImplementations()) {
-        createPrepareCreateMethod(impl, SdkTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
+        createPrepareCreateMethod(impl, ScoutTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
       }
     }
     // create
     if (isCreateCreateMethod()) {
       // interface
-      createCreateMethod(getServiceInterface(), SdkTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
+      createCreateMethod(getServiceInterface(), ScoutTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
       // implementation
       for (IType impl : getServiceImplementations()) {
-        createCreateMethod(impl, SdkTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
+        createCreateMethod(impl, ScoutTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
       }
     }
     // load
     if (isCreateLoadMethod()) {
       // interface
-      createLoadMethod(getServiceInterface(), SdkTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
+      createLoadMethod(getServiceInterface(), ScoutTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
       // implementation
       for (IType impl : getServiceImplementations()) {
-        createLoadMethod(impl, SdkTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
+        createLoadMethod(impl, ScoutTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
       }
     }
     // store
     if (isCreateStoreMethod()) {
       // interface
-      createStoreMethod(getServiceInterface(), SdkTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
+      createStoreMethod(getServiceInterface(), ScoutTypeUtility.findNlsProject(getServiceInterface()), monitor, workingCopyManager);
       // implementation
       for (IType impl : getServiceImplementations()) {
-        createStoreMethod(impl, SdkTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
+        createStoreMethod(impl, ScoutTypeUtility.findNlsProject(impl), monitor, workingCopyManager);
       }
     }
     for (IType impl : m_serviceImplementations) {
@@ -120,15 +120,15 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
 
   }
 
-  private void createCreateMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws JavaModelException {
+  private void createCreateMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IWorkingCopyManager manager) throws JavaModelException {
     IMethod createMethod = TypeUtility.getMethod(parentType, "create");
     if (TypeUtility.exists(createMethod)) {
       return;
     }
     manager.register(parentType.getCompilationUnit(), monitor);
     IImportValidator impValidator = getOrCreateValidator(parentType.getCompilationUnit());
-    String formDataName = ScoutSdkUtility.getSimpleTypeRefFromFqn(getFormData().getFullyQualifiedName(), impValidator);
-    String processingExceptionName = ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ProcessingException, impValidator);
+    String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), impValidator);
+    String processingExceptionName = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ProcessingException, impValidator);
     StringBuilder builder = new StringBuilder();
     if (!parentType.isInterface()) {
       builder.append("@" + Override.class.getSimpleName() + "\n");
@@ -141,8 +141,8 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
     else {
       builder.append("{\n");
       if (getCreatePermission() != null) {
-        builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here.") + "\n");
@@ -152,15 +152,15 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
     parentType.createMethod(builder.toString(), null, true, monitor);
   }
 
-  private void createLoadMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws JavaModelException {
+  private void createLoadMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IWorkingCopyManager manager) throws JavaModelException {
     IMethod loadMethod = TypeUtility.getMethod(parentType, "load");
     if (TypeUtility.exists(loadMethod)) {
       return;
     }
     manager.register(parentType.getCompilationUnit(), monitor);
     IImportValidator impValidator = getOrCreateValidator(parentType.getCompilationUnit());
-    String formDataName = ScoutSdkUtility.getSimpleTypeRefFromFqn(getFormData().getFullyQualifiedName(), impValidator);
-    String processingExceptionName = ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ProcessingException, impValidator);
+    String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), impValidator);
+    String processingExceptionName = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ProcessingException, impValidator);
     StringBuilder builder = new StringBuilder();
     if (!parentType.isInterface()) {
       builder.append("@" + Override.class.getSimpleName() + "\n");
@@ -173,8 +173,8 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
     else {
       builder.append("{\n");
       if (getReadPermission() != null) {
-        builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getReadPermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getReadPermission().getFullyQualifiedName(), impValidator) + "())){\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");
@@ -184,15 +184,15 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
     parentType.createMethod(builder.toString(), null, true, monitor);
   }
 
-  private void createPrepareCreateMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws JavaModelException {
+  private void createPrepareCreateMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IWorkingCopyManager manager) throws JavaModelException {
     IMethod prepareCreateMethod = TypeUtility.getMethod(parentType, "prepareCreate");
     if (TypeUtility.exists(prepareCreateMethod)) {
       return;
     }
     manager.register(parentType.getCompilationUnit(), monitor);
     IImportValidator impValidator = getOrCreateValidator(parentType.getCompilationUnit());
-    String formDataName = ScoutSdkUtility.getSimpleTypeRefFromFqn(getFormData().getFullyQualifiedName(), impValidator);
-    String processingExceptionName = ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ProcessingException, impValidator);
+    String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), impValidator);
+    String processingExceptionName = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ProcessingException, impValidator);
     StringBuilder builder = new StringBuilder();
     if (!parentType.isInterface()) {
       builder.append("@" + Override.class.getSimpleName() + "\n");
@@ -205,8 +205,8 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
     else {
       builder.append("{\n");
       if (getCreatePermission() != null) {
-        builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");
@@ -216,15 +216,15 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
     parentType.createMethod(builder.toString(), null, true, monitor);
   }
 
-  private void createStoreMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws JavaModelException {
+  private void createStoreMethod(IType parentType, INlsProject nlsProject, IProgressMonitor monitor, IWorkingCopyManager manager) throws JavaModelException {
     IMethod storeMethod = TypeUtility.getMethod(parentType, "store");
     if (TypeUtility.exists(storeMethod)) {
       return;
     }
     manager.register(parentType.getCompilationUnit(), monitor);
     IImportValidator impValidator = getOrCreateValidator(parentType.getCompilationUnit());
-    String formDataName = ScoutSdkUtility.getSimpleTypeRefFromFqn(getFormData().getFullyQualifiedName(), impValidator);
-    String processingExceptionName = ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ProcessingException, impValidator);
+    String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), impValidator);
+    String processingExceptionName = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ProcessingException, impValidator);
     StringBuilder builder = new StringBuilder();
     if (!parentType.isInterface()) {
       builder.append("@" + Override.class.getSimpleName() + "\n");
@@ -237,8 +237,8 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
     else {
       builder.append("{\n");
       if (getUpdatePermission() != null) {
-        builder.append(TAB + "if(!" + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(getUpdatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + ScoutSdkUtility.getSimpleTypeRefFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + ScoutSdkUtility.getSimpleTypeRefFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + ScoutIdeProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getUpdatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");

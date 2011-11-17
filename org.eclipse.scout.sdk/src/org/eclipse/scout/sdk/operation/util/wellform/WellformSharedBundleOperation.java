@@ -20,10 +20,10 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -52,7 +52,7 @@ public class WellformSharedBundleOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     HashSet<IType> allTypes = new HashSet<IType>();
     IPackageFragmentRoot[] packageFragmentRoots = getBundle().getJavaProject().getPackageFragmentRoots();
     for (IPackageFragmentRoot pr : packageFragmentRoots) {
@@ -69,7 +69,7 @@ public class WellformSharedBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformCodeTypes(Set<IType> types, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected void wellformCodeTypes(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     WellformCodeTypesOperation op = new WellformCodeTypesOperation(getBundle());
     try {
       op.run(monitor, workingCopyManager);

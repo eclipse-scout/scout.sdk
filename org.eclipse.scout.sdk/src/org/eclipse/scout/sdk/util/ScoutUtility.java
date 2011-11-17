@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,14 +29,12 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jdt.internal.ui.javaeditor.DocumentAdapter;
 import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.pde.PluginXml;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
@@ -47,7 +46,6 @@ import org.eclipse.ui.part.MultiEditorInput;
 /**
  * <h3>BcUtilities</h3> ...
  */
-@SuppressWarnings("restriction")
 public final class ScoutUtility {
 
   public static String NL = System.getProperty("line.separator");
@@ -79,25 +77,6 @@ public final class ScoutUtility {
     return System.getProperty("line.separator");
   }
 
-  public static String getLineSeparator(ICompilationUnit icu) {
-    if (icu != null) {
-      // since jdt is not capable of decently handling various new line ranges, we must use this internal class
-      // to find out what new line char jdt expects....
-      try {
-        if (icu.getBuffer() instanceof DocumentAdapter) {
-          IDocument doc = ((DocumentAdapter) icu.getBuffer()).getDocument();
-          if (doc instanceof Document) {
-            return ((Document) doc).getDefaultLineDelimiter();
-          }
-        }
-      }
-      catch (Throwable t) {
-        // nop
-      }
-    }
-    return System.getProperty("line.separator");
-  }
-
   /**
    * strips a (IMethod) method body from its comments
    * this is needed in order to avoid wrong method property
@@ -124,7 +103,7 @@ public final class ScoutUtility {
   }
 
   public static String cleanLineSeparator(String buffer, ICompilationUnit icu) {
-    return cleanLineSeparatorImpl(buffer, getLineSeparator(icu));
+    return cleanLineSeparatorImpl(buffer, JdtUtility.getLineSeparator(icu));
   }
 
   public static String cleanLineSeparator(String buffer, Document doc) {
@@ -147,50 +126,38 @@ public final class ScoutUtility {
       IType decType = type.getDeclaringType();
       while (decType != null) {
         decType = decType.getDeclaringType();
-        indent += ScoutIdeProperties.TAB;
+        indent += SdkProperties.TAB;
       }
     }
     return indent;
   }
 
   public static void registerServiceClass(IProject project, String extensionPoint, String elemType, String className, String requiredSessionClass, String serviceFactoryClass, IProgressMonitor monitor) throws CoreException {
-    PluginXml pluginXml = new PluginXml(project);
-    SimpleXmlElement point = pluginXml.getOrCreateExtension(extensionPoint);
-    SimpleXmlElement elem = null;
-    for (SimpleXmlElement e : point.getChildren(elemType)) {
-      if (className.equalsIgnoreCase(e.getStringAttribute("class"))) {
-        elem = e;
-        break;
-      }
-    }
-    if (elem == null) {
-      elem = new SimpleXmlElement(elemType);
-      elem.setAttribute("class", className);
+    PluginModelHelper h = new PluginModelHelper(project);
+    HashMap<String, String> attributes = new HashMap<String, String>();
+    attributes.put("class", className);
+    if (!h.PluginXml.existsSimpleExtension(extensionPoint, elemType, attributes)) {
       if (requiredSessionClass != null) {
-        elem.setAttribute("session", requiredSessionClass);
+        attributes.put("session", requiredSessionClass);
       }
       if (serviceFactoryClass != null) {
-        elem.setAttribute("factory", serviceFactoryClass);
+        attributes.put("factory", serviceFactoryClass);
       }
-      point.addChild(elem);
-      pluginXml.store(monitor);
+      h.PluginXml.addSimpleExtension(extensionPoint, elemType, attributes);
+      h.save();
     }
   }
 
+  public static void unregisterServiceClass(IProject project, String extensionPoint, String elemType, String className, IProgressMonitor monitor) throws CoreException {
+    unregisterServiceClass(project, extensionPoint, elemType, className, null, monitor);
+  }
+
   public static void unregisterServiceClass(IProject project, String extensionPoint, String elemType, String className, String requiredSessionClass, IProgressMonitor monitor) throws CoreException {
-    PluginXml pluginXml = new PluginXml(project);
-    SimpleXmlElement point = pluginXml.getOrCreateExtension(extensionPoint);
-    SimpleXmlElement elem = null;
-    for (SimpleXmlElement e : point.getChildren(elemType)) {
-      if (className.equalsIgnoreCase(e.getStringAttribute("class"))) {
-        elem = e;
-        break;
-      }
-    }
-    if (elem != null) {
-      point.removeChild(elem);
-      pluginXml.store(monitor);
-    }
+    PluginModelHelper h = new PluginModelHelper(project);
+    HashMap<String, String> attributes = new HashMap<String, String>();
+    attributes.put("class", className);
+    h.PluginXml.removeSimpleExtension(extensionPoint, elemType, attributes);
+    h.save();
   }
 
   public static String getDefaultValueOf(String parameter) {
@@ -269,7 +236,7 @@ public final class ScoutUtility {
         fqName = fqName + ".";
       }
       fqName = fqName + resolvedTypeName[0][1];
-      IType foundType = ScoutSdk.getType(fqName);
+      IType foundType = TypeUtility.getType(fqName);
       if (foundType != null) {
         return foundType;
       }

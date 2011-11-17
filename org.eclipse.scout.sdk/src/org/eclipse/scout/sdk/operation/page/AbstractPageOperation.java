@@ -22,29 +22,29 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 public abstract class AbstractPageOperation implements IOperation {
 
-  final IType iOutline = ScoutSdk.getType(RuntimeClasses.IOutline);
-  final IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
-  final IType iPageWithNodes = ScoutSdk.getType(RuntimeClasses.IPageWithNodes);
-  final IType iPageWithTable = ScoutSdk.getType(RuntimeClasses.IPageWithTable);
+  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+  final IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
+  final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 
   private IType m_holderType;
 
-  protected void addToHolder(IType page, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  protected void addToHolder(IType page, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getHolderType() != null) {
       ITypeHierarchy superTypeHierarchy = getHolderType().newSupertypeHierarchy(monitor);
       if (superTypeHierarchy.contains(iOutline)) {
@@ -59,7 +59,7 @@ public abstract class AbstractPageOperation implements IOperation {
     }
   }
 
-  private void addToOutline(final IType pageType, IType outlineType, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  private void addToOutline(final IType pageType, IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String methodName = "execCreateChildPages";
     IMethod childPagesMethod = TypeUtility.getMethod(outlineType, methodName);
     if (TypeUtility.exists(childPagesMethod)) {
@@ -97,11 +97,11 @@ public abstract class AbstractPageOperation implements IOperation {
           String pageRef = validator.getSimpleTypeRef(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
           StringBuilder bodyBuilder = new StringBuilder();
-          bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + ScoutIdeProperties.TAB + "pageList.add(" + varName + ");\n");
+          bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
           return bodyBuilder.toString();
         }
       };
-      IStructuredType structuredType = SdkTypeUtility.createStructuredOutline(outlineType);
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredOutline(outlineType);
       overrideOp.setSibling(structuredType.getSiblingMethodConfigExec(methodName));
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
@@ -109,7 +109,7 @@ public abstract class AbstractPageOperation implements IOperation {
 
   }
 
-  private void addToPageWithNodes(final IType pageType, IType pageWithNodes, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  private void addToPageWithNodes(final IType pageType, IType pageWithNodes, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String methodName = "execCreateChildPages";
     IMethod childPagesMethod = TypeUtility.getMethod(pageWithNodes, methodName);
     if (TypeUtility.exists(childPagesMethod)) {
@@ -119,7 +119,7 @@ public abstract class AbstractPageOperation implements IOperation {
           StringBuilder sourceBuilder = new StringBuilder(originalBody);
           String pageRef = validator.getSimpleTypeRef(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
-          sourceBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + ScoutIdeProperties.TAB + "pageList.add(" + varName + ");\n");
+          sourceBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
           return sourceBuilder.toString();
         }
       };
@@ -134,18 +134,18 @@ public abstract class AbstractPageOperation implements IOperation {
           String pageRef = validator.getSimpleTypeRef(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
           StringBuilder bodyBuilder = new StringBuilder();
-          bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + ScoutIdeProperties.TAB + "pageList.add(" + varName + ");\n");
+          bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
           return bodyBuilder.toString();
         }
       };
-      IStructuredType structuredType = SdkTypeUtility.createStructuredPageWithNodes(pageWithNodes);
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredPageWithNodes(pageWithNodes);
       overrideOp.setSibling(structuredType.getSiblingMethodConfigExec(methodName));
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
     }
   }
 
-  private void addToPageWithTable(final IType pageType, IType pageWithTable, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  private void addToPageWithTable(final IType pageType, IType pageWithTable, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String methodName = "execCreateChildPage";
     IMethod childPagesMethod = TypeUtility.getMethod(pageWithTable, methodName);
     if (TypeUtility.exists(childPagesMethod)) {
@@ -176,7 +176,7 @@ public abstract class AbstractPageOperation implements IOperation {
           return b.toString();
         }
       };
-      IStructuredType structuredType = SdkTypeUtility.createStructuredPageWithTable(pageWithTable);
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredPageWithTable(pageWithTable);
       overrideOp.setSibling(structuredType.getSiblingMethodConfigExec(methodName));
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);

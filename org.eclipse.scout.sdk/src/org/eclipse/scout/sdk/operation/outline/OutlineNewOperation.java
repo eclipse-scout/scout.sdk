@@ -24,8 +24,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
@@ -33,11 +32,12 @@ import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 /**
@@ -68,7 +68,7 @@ public class OutlineNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.validate();
@@ -101,7 +101,7 @@ public class OutlineNewOperation implements IOperation {
 
   }
 
-  private void addOutlineToDesktop(final IType outlineType, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  private void addOutlineToDesktop(final IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
     String methodName = "getConfiguredOutlines";
     IMethod method = TypeUtility.getMethod(getDesktopType(), methodName);
@@ -148,7 +148,7 @@ public class OutlineNewOperation implements IOperation {
         }
       };
       overrideOp.setFormatSource(true);
-      IStructuredType structuredType = SdkTypeUtility.createStructuredType(getDesktopType());
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getDesktopType());
       overrideOp.setSibling(structuredType.getSiblingMethodConfigGetConfigured(methodName));
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);

@@ -23,16 +23,17 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 /**
@@ -71,7 +72,7 @@ public class TreeFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
@@ -89,14 +90,14 @@ public class TreeFieldNewOperation implements IOperation {
     m_createdTree = createTree(monitor, workingCopyManager);
 
     // generic type
-    Pattern p = Pattern.compile("extends\\s*" + ScoutSdkUtility.getSimpleTypeSignature(getSuperTypeSignature()), Pattern.MULTILINE);
+    Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
     Matcher matcher = p.matcher(getCreatedField().getSource());
     if (matcher.find()) {
       Document doc = new Document(getCreatedField().getSource());
-      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + ScoutIdeProperties.TYPE_NAME_TREEFIELD_TREE + ">");
+      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + SdkProperties.TYPE_NAME_TREEFIELD_TREE + ">");
       try {
         genericEdit.apply(doc);
-        TypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
+        ScoutTypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not set the generic type of the tree field.", e);
@@ -110,8 +111,8 @@ public class TreeFieldNewOperation implements IOperation {
     }
   }
 
-  private IType createTree(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_TREEBOX_TREE, getCreatedField());
+  private IType createTree(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_TREEBOX_TREE, getCreatedField());
     tableNewOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTree, true));
     tableNewOp.addTypeModifier(Flags.AccPublic);
     AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));

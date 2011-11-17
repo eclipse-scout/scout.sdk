@@ -4,31 +4,35 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.pde.Manifest;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class BundleImportOperation implements IOperation {
+
+  private static final String SCOUT_BUNDLE_TYPE_CLIENT = "client";
+  private static final String SCOUT_BUNDLE_TYPE_SHARED = "shared";
+  private static final String SCOUT_BUNDLE_TYPE_SERVER = "server";
+  private static final String SCOUT_BUNDLE_TYPE = "Scout-Bundle-Type";
+  private static final String SCOUT_PROJECT = "Scout-Project";
 
   private String m_projectId;
   private IPluginModelBase m_pluginModel;
@@ -44,9 +48,9 @@ public class BundleImportOperation implements IOperation {
     if (StringUtility.isNullOrEmpty(getProjectId())) {
       throw new IllegalArgumentException("Project ID can not be null");
     }
-    if ((getBundleType() & (ScoutIdeProperties.BUNDLE_TYPE_CLIENT | ScoutIdeProperties.BUNDLE_TYPE_CLIENT_APPLICATION | ScoutIdeProperties.BUNDLE_TYPE_SERVER |
-        ScoutIdeProperties.BUNDLE_TYPE_SERVER_APPLICATION | ScoutIdeProperties.BUNDLE_TYPE_SHARED | ScoutIdeProperties.BUNDLE_TYPE_TEST_CLIENT |
-        ScoutIdeProperties.BUNDLE_TYPE_UI_SWING | ScoutIdeProperties.BUNDLE_TYPE_UI_SWT | ScoutIdeProperties.BUNDLE_TYPE_UI_SWT_APPLICATION)) == 0) {
+    if ((getBundleType() & (SdkProperties.BUNDLE_TYPE_CLIENT | SdkProperties.BUNDLE_TYPE_CLIENT_APPLICATION | SdkProperties.BUNDLE_TYPE_SERVER |
+        SdkProperties.BUNDLE_TYPE_SERVER_APPLICATION | SdkProperties.BUNDLE_TYPE_SHARED | SdkProperties.BUNDLE_TYPE_TEST_CLIENT |
+        SdkProperties.BUNDLE_TYPE_UI_SWING | SdkProperties.BUNDLE_TYPE_UI_SWT | SdkProperties.BUNDLE_TYPE_UI_SWT_APPLICATION)) == 0) {
       throw new IllegalArgumentException("Unknown bundle type.");
     }
     if (getPluginModel() == null) {
@@ -55,37 +59,32 @@ public class BundleImportOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
 
-    Manifest manifest = new Manifest();
-    manifest.read((IFile) getPluginModel().getUnderlyingResource());
+    PluginModelHelper h = new PluginModelHelper(getPluginModel());
     // remove legacy
-    manifest.removeAttribute("BsiCase-ProjectGroupId");
-    manifest.removeAttribute("BsiCase-Alias");
-    manifest.removeAttribute("BsiCase-BundleType");
+    h.Manifest.removeEntry("BsiCase-ProjectGroupId");
+    h.Manifest.removeEntry("BsiCase-Alias");
+    h.Manifest.removeEntry("BsiCase-BundleType");
     // add new
-    manifest.setAttribute(Manifest.SCOUT_PROJECT, getProjectId());
+    h.Manifest.setEntryValue(SCOUT_PROJECT, getProjectId());
     String bundleType = null;
     switch (getBundleType()) {
-      case ScoutIdeProperties.BUNDLE_TYPE_CLIENT:
-        bundleType = Manifest.SCOUT_BUNDLE_TYPE_CLIENT;
+      case SdkProperties.BUNDLE_TYPE_CLIENT:
+        bundleType = SCOUT_BUNDLE_TYPE_CLIENT;
         break;
-      case ScoutIdeProperties.BUNDLE_TYPE_SERVER:
-        bundleType = Manifest.SCOUT_BUNDLE_TYPE_SERVER;
+      case SdkProperties.BUNDLE_TYPE_SERVER:
+        bundleType = SCOUT_BUNDLE_TYPE_SERVER;
         break;
-      case ScoutIdeProperties.BUNDLE_TYPE_SHARED:
-        bundleType = Manifest.SCOUT_BUNDLE_TYPE_SHARED;
+      case SdkProperties.BUNDLE_TYPE_SHARED:
+        bundleType = SCOUT_BUNDLE_TYPE_SHARED;
         break;
     }
     if (!StringUtility.isNullOrEmpty(bundleType)) {
-      manifest.setAttribute(Manifest.SCOUT_BUNDLE_TYPE, bundleType);
+      h.Manifest.setEntryValue(SCOUT_BUNDLE_TYPE, bundleType);
     }
-    try {
-      manifest.write((IFile) getPluginModel().getUnderlyingResource());
-    }
-    catch (IOException e) {
-      ScoutSdk.logError("could not write manifest.mf of '" + getPluginModel().getBundleDescription().getName() + "'.");
-    }
+    h.save();
+
     // nature
     IProject project = getPluginModel().getUnderlyingResource().getProject();
     IProjectDescription description = project.getDescription();

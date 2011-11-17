@@ -22,8 +22,8 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
-import org.eclipse.scout.sdk.pde.PdeUtility;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * Creates an eclipse project (without Manifest.mf, Activator.class and plugin.xml)
@@ -61,18 +61,18 @@ public class CreateEclipseJavaPluginOperation extends CreateEclipseProjectOperat
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
     IProject project = getCreatedProject();
     // src folder
     IFolder folder = project.getFolder("src");
     if (!folder.exists()) {
-      PdeUtility.createFolder(folder);
+      ResourcesUtility.createFolder(folder);
     }
     // resources folder
     folder = project.getFolder("resources");
     if (isCreateResourcesFolder() && !folder.exists()) {
-      PdeUtility.createFolder(folder);
+      ResourcesUtility.createFolder(folder);
     }
     //
     m_javaProject = JavaCore.create(project);

@@ -23,17 +23,18 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 /**
@@ -68,7 +69,7 @@ public class PlannerFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
@@ -90,14 +91,14 @@ public class PlannerFieldNewOperation implements IOperation {
     m_createdActivityMapType = createActivityMap(monitor, workingCopyManager);
 
     // generic type
-    Pattern p = Pattern.compile("extends\\s*" + ScoutSdkUtility.getSimpleTypeSignature(getSuperTypeSignature()), Pattern.MULTILINE);
+    Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
     Matcher matcher = p.matcher(getCreatedField().getSource());
     if (matcher.find()) {
       Document doc = new Document(getCreatedField().getSource());
-      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + ScoutIdeProperties.TYPE_NAME_PLANNERFIELD_TABLE + "," + getCreatedField().getElementName() + "." + ScoutIdeProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP + ">");
+      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE + "," + getCreatedField().getElementName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP + ">");
       try {
         genericEdit.apply(doc);
-        TypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
+        ScoutTypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not set the generic type of the calendar field.", e);
@@ -111,8 +112,8 @@ public class PlannerFieldNewOperation implements IOperation {
     }
   }
 
-  protected IType createPlannerTable(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation plannerTableOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_PLANNERFIELD_TABLE, getCreatedField(), false);
+  protected IType createPlannerTable(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    InnerTypeNewOperation plannerTableOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE, getCreatedField(), false);
     plannerTableOp.setTypeModifiers(Flags.AccPublic);
     plannerTableOp.setSibling(null);
     plannerTableOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTable, true));
@@ -134,8 +135,8 @@ public class PlannerFieldNewOperation implements IOperation {
     return createdType;
   }
 
-  protected IType createActivityMap(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation activityMapOp = new InnerTypeNewOperation(ScoutIdeProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP, getCreatedField(), false);
+  protected IType createActivityMap(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    InnerTypeNewOperation activityMapOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP, getCreatedField(), false);
     activityMapOp.setTypeModifiers(Flags.AccPublic);
     activityMapOp.setSibling(null);
     activityMapOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractActivityMap, true));

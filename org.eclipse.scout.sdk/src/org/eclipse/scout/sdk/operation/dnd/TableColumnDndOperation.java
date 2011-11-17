@@ -18,24 +18,23 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  *
  */
 public class TableColumnDndOperation extends AbstractTypeDndOperation {
 
-  final IType iTableField = ScoutSdk.getType(RuntimeClasses.ITableField);
-  final IType iCompositeField = ScoutSdk.getType(RuntimeClasses.ICompositeField);
+  final IType iTableField = TypeUtility.getType(RuntimeClasses.ITableField);
+  final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
 
   /**
    * @param type
@@ -47,7 +46,7 @@ public class TableColumnDndOperation extends AbstractTypeDndOperation {
   }
 
   @Override
-  protected IType createNewType(IType declaringType, String simpleName, String source, String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  protected IType createNewType(IType declaringType, String simpleName, String source, String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     IType newColumn = super.createNewType(declaringType, simpleName, source, fqImports, sibling, structuredType, monitor, manager);
 
     InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(newColumn, declaringType, false) {
@@ -55,7 +54,7 @@ public class TableColumnDndOperation extends AbstractTypeDndOperation {
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         StringBuilder methodSource = new StringBuilder();
         methodSource.append("return getColumnSet().getColumnByClass(");
-        methodSource.append(ScoutSignature.getTypeReference(Signature.createTypeSignature(getField().getFullyQualifiedName(), true), getDeclaringType(), validator) + ".class");
+        methodSource.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getField().getFullyQualifiedName(), true), getDeclaringType(), validator) + ".class");
         methodSource.append(");");
         return methodSource.toString();
       }
@@ -68,10 +67,10 @@ public class TableColumnDndOperation extends AbstractTypeDndOperation {
   }
 
   @Override
-  protected void deleteType(IType type, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  protected void deleteType(IType type, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
     delOp.addMember(type);
-    IMethod getter = SdkTypeUtility.getColumnGetterMethod(type);
+    IMethod getter = ScoutTypeUtility.getColumnGetterMethod(type);
     if (TypeUtility.exists(getter)) {
       delOp.addMember(getter);
     }

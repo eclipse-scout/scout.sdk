@@ -21,14 +21,14 @@ import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.SourceRange;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.jdt.SourceRange;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.ReplaceEdit;
 
 /**
@@ -74,7 +74,7 @@ public class WellformScoutTypeOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     for (IType t : getScoutTypes()) {
       if (monitor.isCanceled()) {
         return;
@@ -85,7 +85,7 @@ public class WellformScoutTypeOperation implements IOperation {
     }
   }
 
-  protected void wellformType(IType type, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws JavaModelException {
+  protected void wellformType(IType type, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws JavaModelException {
     workingCopyManager.register(type.getCompilationUnit(), monitor);
     IBuffer icuBuffer = type.getCompilationUnit().getBuffer();
     Document sourceDoc = new Document(icuBuffer.getContents());
@@ -134,7 +134,7 @@ public class WellformScoutTypeOperation implements IOperation {
         // remove leading spaces
         classHeader = classHeader.replaceAll("\\s*$", "");
         builder.append(classHeader + m_lineDelimiter);
-        IStructuredType structureHelper = SdkTypeUtility.createStructuredType(type);
+        IStructuredType structureHelper = ScoutTypeUtility.createStructuredType(type);
         append(structureHelper.getElements(CATEGORIES.FIELD_LOGGER, IField.class), builder);
         append(structureHelper.getElements(CATEGORIES.FIELD_STATIC, IField.class), builder);
         append(structureHelper.getElements(CATEGORIES.FIELD_MEMBER, IField.class), builder);

@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
  *
@@ -83,7 +83,7 @@ public class ConfigurationMethod {
   public String computeDefaultValue() {
     if (getMethodType() == PROPERTY_METHOD) {
       try {
-        return PropertyMethodSourceUtilities.getMethodReturnValue(getDefaultMethod());
+        return PropertyMethodSourceUtility.getMethodReturnValue(getDefaultMethod());
       }
       catch (CoreException e) {
         ScoutSdk.logError("could not parse default value of method '" + getDefaultMethod().getElementName() + "' in type '" + getType().getFullyQualifiedName() + "'.", e);
@@ -94,7 +94,7 @@ public class ConfigurationMethod {
 
   public String computeValue() throws CoreException {
     if (getMethodType() == PROPERTY_METHOD) {
-      return PropertyMethodSourceUtilities.getMethodReturnValue(peekMethod());
+      return PropertyMethodSourceUtility.getMethodReturnValue(peekMethod());
     }
     return null;
   }

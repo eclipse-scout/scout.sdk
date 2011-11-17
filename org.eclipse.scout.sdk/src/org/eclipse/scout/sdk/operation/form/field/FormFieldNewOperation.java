@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,28 +18,27 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationsUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  *
  */
 public class FormFieldNewOperation implements IOperation {
 
-  private final IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
   // in members
   private final IType m_declaringType;
@@ -84,7 +83,7 @@ public class FormFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException, IllegalArgumentException {
     manager.register(getDeclaringType().getCompilationUnit(), monitor);
     updateOrderNumbers(monitor, manager);
     InnerTypeNewOperation createInnerTypeOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType());
@@ -108,12 +107,12 @@ public class FormFieldNewOperation implements IOperation {
     }
   }
 
-  protected void updateOrderNumbers(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  protected void updateOrderNumbers(IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
     m_orderNr = -1.0;
-    IPrimaryTypeTypeHierarchy primaryHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iFormField);
+    IPrimaryTypeTypeHierarchy primaryHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
 
     ITypeHierarchy localHierarchy = primaryHierarchy.combinedTypeHierarchy(getDeclaringType());
-    IType[] innerTypes = localHierarchy.getAllSubtypes(iFormField, TypeFilters.getInnerClasses(getDeclaringType()), TypeComparators.getOrderAnnotationComparator());
+    IType[] innerTypes = localHierarchy.getAllSubtypes(iFormField, TypeFilters.getInnerClasses(getDeclaringType()), ScoutTypeComparators.getOrderAnnotationComparator());
     OrderAnnotationsUpdateOperation orderAnnotationOp = new OrderAnnotationsUpdateOperation(getDeclaringType());
     double tempOrderNr = 10.0;
     for (IType innerType : innerTypes) {
@@ -131,16 +130,16 @@ public class FormFieldNewOperation implements IOperation {
     orderAnnotationOp.run(monitor, manager);
   }
 
-  protected void createFormFieldGetter(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  protected void createFormFieldGetter(IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
     // find form
-    ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
     IType form = TypeUtility.getAncestor(getCreatedFormField(), TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IForm), hierarchy),
+        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
         TypeFilters.getToplevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {
       InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedFormField(), form, true);
-      IStructuredType sourceHelper = SdkTypeUtility.createStructuredForm(form);
+      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form);
       IJavaElement sibling = sourceHelper.getSiblingMethodFieldGetter("get" + getTypeName());
       if (sibling == null && getCreatedFormField().getDeclaringType().equals(form)) {
         sibling = getCreatedFormField();

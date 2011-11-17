@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
  * creates plugins like for example

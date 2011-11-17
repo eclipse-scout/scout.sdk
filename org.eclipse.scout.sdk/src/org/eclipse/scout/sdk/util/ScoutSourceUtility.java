@@ -18,27 +18,25 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  * <h3>BCSourceUtilities</h3> several source helper methods. Take a look at the public static methods.
  */
-public class ScoutSourceUtilities {
-  private static final ScoutSourceUtilities instance = new ScoutSourceUtilities();
+public class ScoutSourceUtility {
 
-  // private FileWriter m_fileWriter;
+  private static final Pattern m_fieldValue = Pattern.compile("=\\s*([^\\s\\;]*)\\s*\\;", Pattern.DOTALL);
 
-  private ScoutSourceUtilities() {
-    // m_fileWriter = new FileWriter("D:\\Temp\\max24h\\bsiCaseLog.txt");
+  private ScoutSourceUtility() {
   }
 
   /**
@@ -47,10 +45,6 @@ public class ScoutSourceUtilities {
    * @return simpleName (translatedName)
    */
   public static String getTranslatedMethodStringValue(IType type, String methodName) {
-    return instance.getTranslatedMethodStringValueImpl(type, methodName);
-  }
-
-  private String getTranslatedMethodStringValueImpl(IType type, String methodName) {
     String name = type.getElementName();
     if (StringUtility.isNullOrEmpty(methodName)) {
       return name;
@@ -59,7 +53,7 @@ public class ScoutSourceUtilities {
     if (method == null || !method.exists()) {
       return name;
     }
-    IScoutBundle scoutBundle = ScoutSdk.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
+    IScoutBundle scoutBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
     if (scoutBundle == null) {
       return name;
     }
@@ -100,7 +94,7 @@ public class ScoutSourceUtilities {
     return name;
   }
 
-  private IMethod findMethodInHierarchy(IType type, String methodName) {
+  private static IMethod findMethodInHierarchy(IType type, String methodName) {
     IMethod method = TypeUtility.getMethod(type, methodName);
     if (TypeUtility.exists(method)) {
       return method;
@@ -122,23 +116,8 @@ public class ScoutSourceUtilities {
     return null;
   }
 
-  /**
-   * @param type
-   * @param value
-   * @return
-   * @throws JavaModelException
-   * @Deprecated use {@link ScoutSourceUtilities#findReferencedFieldValue(IType, String, ITypeHierarchy)} instead
-   */
-  @Deprecated
-  public static String findReferencedFieldValue(IType type, String value) throws JavaModelException {
-    return instance.findReferencedFieldValueImpl(type, value, type.newSupertypeHierarchy(null));
-  }
-
   public static String findReferencedFieldValue(IType type, String value, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
-    return instance.findReferencedFieldValueImpl(type, value, superTypeHierarchy);
-  }
 
-  private String findReferencedFieldValueImpl(IType type, String value, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     String retVal = findFieldValueInDeclaringHierarchy(type, value);
     if (retVal == null) {
       retVal = findFieldValueInHierarchyImpl(type, value, superTypeHierarchy);
@@ -146,9 +125,7 @@ public class ScoutSourceUtilities {
     return retVal;
   }
 
-  private static final Pattern m_fieldValue = Pattern.compile("=\\s*([^\\s\\;]*)\\s*\\;", Pattern.DOTALL);
-
-  private String findFieldValueInHierarchyImpl(IType type, String name, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+  private static String findFieldValueInHierarchyImpl(IType type, String name, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
       return null;
     }
@@ -169,7 +146,7 @@ public class ScoutSourceUtilities {
     return null;
   }
 
-  private String findFieldValueInDeclaringHierarchy(IType type, String value) throws JavaModelException {
+  private static String findFieldValueInDeclaringHierarchy(IType type, String value) throws JavaModelException {
     if (type == null) {
       return null;
     }
@@ -185,30 +162,6 @@ public class ScoutSourceUtilities {
     }
     return null;
   }
-
-  private class P_CompareableSourceRange implements Comparable<P_CompareableSourceRange> {
-    private final ISourceRange m_range;
-    private final boolean m_ascending;
-
-    public P_CompareableSourceRange(ISourceRange range, boolean ascending) {
-      m_range = range;
-      m_ascending = ascending;
-    }
-
-    public ISourceRange getRange() {
-      return m_range;
-    }
-
-    @Override
-    public int compareTo(P_CompareableSourceRange o) {
-      if (m_ascending) {
-        return m_range.getOffset() - o.getRange().getOffset();
-      }
-      else {
-        return o.getRange().getOffset() - m_range.getOffset();
-      }
-    }
-  } // end class P_CompareableSourceRange
 
   public static String removeLeadingCommentAndAnnotationLines(String methodBody) {
     Matcher matcherMethodDefinition = Regex.REGEX_METHOD_DEFINITION.matcher(methodBody);
@@ -265,11 +218,7 @@ public class ScoutSourceUtilities {
    * @return the found inner type or null if not found.
    * @throws JavaModelException
    */
-  public static IType findInnerType(IType refType, String simpleName, boolean ignoreCase) throws JavaModelException {
-    return instance.findInnerTypeRec(refType, simpleName, ignoreCase);
-  }
-
-  private IType findInnerTypeRec(IType declaringType, String simpleName, boolean ignoreCase) throws JavaModelException {
+  public static IType findInnerType(IType declaringType, String simpleName, boolean ignoreCase) throws JavaModelException {
     if (ignoreCase) {
       if (declaringType.getElementName().equalsIgnoreCase(simpleName)) {
         return declaringType;
@@ -281,7 +230,7 @@ public class ScoutSourceUtilities {
       }
     }
     for (IType innerType : declaringType.getTypes()) {
-      return findInnerTypeRec(innerType, simpleName, ignoreCase);
+      return findInnerType(innerType, simpleName, ignoreCase);
     }
     return null;
   }

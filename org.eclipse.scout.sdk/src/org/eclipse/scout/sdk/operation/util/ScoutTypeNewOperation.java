@@ -17,10 +17,10 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.jdt.signature.SimpleImportValidator;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  * <h3>BCTypeNewOperation</h3> To create a new BCType. Can be used to create a class or an interface. To create an
@@ -69,7 +69,7 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IPackageFragment pck = getScoutBundle().getSpecificPackageFragment(getImplementationPackageName(), monitor, workingCopyManager);
     ICompilationUnit icu = pck.getCompilationUnit(getTypeName() + ".java");
     if (!TypeUtility.exists(icu)) {

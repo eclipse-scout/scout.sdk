@@ -18,18 +18,18 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>KeyStrokeNewOperation</h3> ...
  */
 public class KeyStrokeNewOperation implements IOperation {
 
-  final IType iKeyStroke = ScoutSdk.getType(RuntimeClasses.IKeyStroke);
+  final IType iKeyStroke = TypeUtility.getType(RuntimeClasses.IKeyStroke);
   // in members
   private final IType m_declaringType;
   private String m_typeName;
@@ -60,7 +60,7 @@ public class KeyStrokeNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation keyStrokeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     keyStrokeOp.setOrderDefinitionType(iKeyStroke);
     keyStrokeOp.setSibling(getSibling());

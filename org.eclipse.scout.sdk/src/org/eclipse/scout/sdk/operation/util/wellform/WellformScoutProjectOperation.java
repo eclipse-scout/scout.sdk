@@ -12,9 +12,9 @@ package org.eclipse.scout.sdk.operation.util.wellform;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
@@ -46,11 +46,11 @@ public class WellformScoutProjectOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     processProject(getProject(), monitor, workingCopyManager);
   }
 
-  private void processProject(IScoutProject project, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  private void processProject(IScoutProject project, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     if (project.getClientBundle() != null) {
       WellformClientBundleOperation op = new WellformClientBundleOperation(project.getClientBundle());
       try {

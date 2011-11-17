@@ -17,9 +17,9 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>OperationJob</h3> Use this class to ensure an operation is executed with the scheduling rule of workspace root.
@@ -77,7 +77,7 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   }
 
   @Override
-  protected void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     for (IOperation op : m_operations) {
       try {
         op.run(monitor, workingCopyManager);

@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>CalendarItemProviderNewOperation</h3> ...
@@ -61,7 +61,7 @@ public class CalendarItemProviderNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     tableNewOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCalendarItemProvider, true));
     tableNewOp.addTypeModifier(Flags.AccPublic);

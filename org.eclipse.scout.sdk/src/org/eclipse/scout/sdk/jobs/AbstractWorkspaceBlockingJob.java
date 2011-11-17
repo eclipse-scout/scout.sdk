@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,9 +18,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.TuningUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.internal.typecache.WorkingCopyManager;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 public abstract class AbstractWorkspaceBlockingJob extends Job {
 
@@ -54,7 +54,7 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
 
   private final IStatus doRun(IProgressMonitor monitor) {
     Throwable exception = null;
-    WorkingCopyManager level = new WorkingCopyManager();
+    IWorkingCopyManager level = TypeCacheAccessor.createWorkingCopyManger();
     try {
       try {
         validate();
@@ -85,7 +85,7 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
   protected void validate() throws IllegalArgumentException {
   }
 
-  protected abstract void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException;
+  protected abstract void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException;
 
   /**
    * Avoid deadlock: check if currently running job is blocking this one

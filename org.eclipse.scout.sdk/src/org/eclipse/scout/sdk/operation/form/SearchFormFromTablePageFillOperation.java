@@ -21,10 +21,6 @@ import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.form.field.BigdecimalFieldNewOperation;
 import org.eclipse.scout.sdk.operation.form.field.BooleanFieldNewOperation;
@@ -41,40 +37,43 @@ import org.eclipse.scout.sdk.operation.template.sequencebox.DateTimeFromToTempla
 import org.eclipse.scout.sdk.operation.template.sequencebox.DoubleFromToTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.IntegerFromToTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.LongFromToTemplate;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.SdkMethodUtility;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>SearchFormFromTablePageFillOperation</h3> assumes the given search form type is empty and created.
  */
 public class SearchFormFromTablePageFillOperation implements IOperation {
 
-  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
-  final IType iTable = ScoutSdk.getType(RuntimeClasses.ITable);
-  final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
-  final IType iBigDecimalColumn = ScoutSdk.getType(RuntimeClasses.IBigDecimalColumn);
-  final IType iBooleanColumn = ScoutSdk.getType(RuntimeClasses.IBooleanColumn);
-  final IType iDateColumn = ScoutSdk.getType(RuntimeClasses.IDateColumn);
-  final IType iDoubleColumn = ScoutSdk.getType(RuntimeClasses.IDoubleColumn);
-  final IType iIntegerColumn = ScoutSdk.getType(RuntimeClasses.IIntegerColumn);
-  final IType iLongColumn = ScoutSdk.getType(RuntimeClasses.ILongColumn);
-  final IType iSmartColumn = ScoutSdk.getType(RuntimeClasses.ISmartColumn);
-  final IType iStringColumn = ScoutSdk.getType(RuntimeClasses.IStringColumn);
-  final IType iTimeColumn = ScoutSdk.getType(RuntimeClasses.ITimeColumn);
+  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+  final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
+  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
+  final IType iBigDecimalColumn = TypeUtility.getType(RuntimeClasses.IBigDecimalColumn);
+  final IType iBooleanColumn = TypeUtility.getType(RuntimeClasses.IBooleanColumn);
+  final IType iDateColumn = TypeUtility.getType(RuntimeClasses.IDateColumn);
+  final IType iDoubleColumn = TypeUtility.getType(RuntimeClasses.IDoubleColumn);
+  final IType iIntegerColumn = TypeUtility.getType(RuntimeClasses.IIntegerColumn);
+  final IType iLongColumn = TypeUtility.getType(RuntimeClasses.ILongColumn);
+  final IType iSmartColumn = TypeUtility.getType(RuntimeClasses.ISmartColumn);
+  final IType iStringColumn = TypeUtility.getType(RuntimeClasses.IStringColumn);
+  final IType iTimeColumn = TypeUtility.getType(RuntimeClasses.ITimeColumn);
 
-  final IType abstractDateColumn = ScoutSdk.getType(RuntimeClasses.AbstractDateColumn);
-  final IType abstractStringColumn = ScoutSdk.getType(RuntimeClasses.AbstractStringColumn);
-  final IType abstractSmartColumn = ScoutSdk.getType(RuntimeClasses.AbstractSmartColumn);
-  final IType abstractDoubleColumn = ScoutSdk.getType(RuntimeClasses.AbstractDoubleColumn);
-  final IType abstractLongColumn = ScoutSdk.getType(RuntimeClasses.AbstractLongColumn);
-  final IType abstractBigDecimalColumn = ScoutSdk.getType(RuntimeClasses.AbstractBigDecimalColumn);
+  final IType abstractDateColumn = TypeUtility.getType(RuntimeClasses.AbstractDateColumn);
+  final IType abstractStringColumn = TypeUtility.getType(RuntimeClasses.AbstractStringColumn);
+  final IType abstractSmartColumn = TypeUtility.getType(RuntimeClasses.AbstractSmartColumn);
+  final IType abstractDoubleColumn = TypeUtility.getType(RuntimeClasses.AbstractDoubleColumn);
+  final IType abstractLongColumn = TypeUtility.getType(RuntimeClasses.AbstractLongColumn);
+  final IType abstractBigDecimalColumn = TypeUtility.getType(RuntimeClasses.AbstractBigDecimalColumn);
 
   private static final String NLS_KEY_SEARCH_CRITERIA = "searchCriteria";
   private IType m_tablePageType;
@@ -100,10 +99,10 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     workingCopyManager.register(getSearchFormType().getCompilationUnit(), monitor);
 
-    INlsProject nlsProvider = SdkTypeUtility.findNlsProject(getTablePageType());
+    INlsProject nlsProvider = ScoutTypeUtility.findNlsProject(getTablePageType());
 
     // // first, add needed methods for the table page
     // if (getConfSearchMethodFromTablePage() != null) {
@@ -131,11 +130,11 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       content.append("protected void execResetSearchFilter(");
       content.append(icuvalidator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.SearchFilter, true)) + " searchFilter) ");
       content.append("throws " + icuvalidator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)) + "{\n");
-      content.append(ScoutIdeProperties.TAB + "super.execResetSearchFilter(searchFilter);\n");
+      content.append(SdkProperties.TAB + "super.execResetSearchFilter(searchFilter);\n");
       String simpleFormDataName = icuvalidator.getSimpleTypeRef(Signature.createTypeSignature(m_formDataType.getFullyQualifiedName(), true));
-      content.append(ScoutIdeProperties.TAB + simpleFormDataName + " formData = new " + simpleFormDataName + "();\n");
-      content.append(ScoutIdeProperties.TAB + "exportFormData(formData);\n");
-      content.append(ScoutIdeProperties.TAB + "searchFilter.setFormData(formData);\n");
+      content.append(SdkProperties.TAB + simpleFormDataName + " formData = new " + simpleFormDataName + "();\n");
+      content.append(SdkProperties.TAB + "exportFormData(formData);\n");
+      content.append(SdkProperties.TAB + "searchFilter.setFormData(formData);\n");
       content.append("}");
       getSearchFormType().createMethod(content.toString(), null, true, monitor);
       for (String imp : icuvalidator.getImportsToCreate()) {
@@ -144,23 +143,23 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     }
     /* main box */
     GroupBoxNewOperation mainBoxOp = new GroupBoxNewOperation(getSearchFormType());
-    mainBoxOp.setTypeName(ScoutIdeProperties.TYPE_NAME_MAIN_BOX);
+    mainBoxOp.setTypeName(SdkProperties.TYPE_NAME_MAIN_BOX);
     mainBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
     mainBoxOp.run(monitor, workingCopyManager);
     IType mainBox = mainBoxOp.getCreatedField();
     // tab box
     TabBoxNewOperation tabBoxOp = new TabBoxNewOperation(mainBox);
-    tabBoxOp.setTypeName(ScoutIdeProperties.TYPE_NAME_TAB_BOX);
+    tabBoxOp.setTypeName(SdkProperties.TYPE_NAME_TAB_BOX);
     tabBoxOp.run(monitor, workingCopyManager);
     IType tabBox = tabBoxOp.getCreatedField();
     // button reset
     ButtonFieldNewOperation resetButtonOp = new ButtonFieldNewOperation(mainBox);
-    resetButtonOp.setTypeName("Reset" + ScoutIdeProperties.SUFFIX_BUTTON);
+    resetButtonOp.setTypeName("Reset" + SdkProperties.SUFFIX_BUTTON);
     resetButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractResetButton, true));
     resetButtonOp.run(monitor, workingCopyManager);
     // button search
     ButtonFieldNewOperation searchButtonOp = new ButtonFieldNewOperation(mainBox);
-    searchButtonOp.setTypeName("Search" + ScoutIdeProperties.SUFFIX_BUTTON);
+    searchButtonOp.setTypeName("Search" + SdkProperties.SUFFIX_BUTTON);
     searchButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSearchButton, true));
     searchButtonOp.run(monitor, workingCopyManager);
     // // criteria box
@@ -172,7 +171,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     // getConfiguredLabel
     // field box
     GroupBoxNewOperation fieldBoxOp = new GroupBoxNewOperation(tabBox);
-    fieldBoxOp.setTypeName("Field" + ScoutIdeProperties.SUFFIX_GROUP_BOX);
+    fieldBoxOp.setTypeName("Field" + SdkProperties.SUFFIX_GROUP_BOX);
     fieldBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
     fieldBoxOp.run(monitor, workingCopyManager);
     IType fieldBox = fieldBoxOp.getCreatedField();
@@ -188,7 +187,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     }
     StringBuilder getConfiguredLabelBuilder = new StringBuilder();
     getConfiguredLabelBuilder.append("@Override\npublic String getConfiguredLabel(){\n");
-    getConfiguredLabelBuilder.append(ScoutIdeProperties.TAB + " return ");
+    getConfiguredLabelBuilder.append(SdkProperties.TAB + " return ");
     if (searchCriteriaEntry == null) {
       getConfiguredLabelBuilder.append("\"Search Criteria\";\n}");
     }
@@ -197,7 +196,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     }
     fieldBox.createMethod(getConfiguredLabelBuilder.toString(), null, true, monitor);
 
-    ITypeHierarchy tablePageHierarchy = ScoutSdk.getLocalTypeHierarchy(getTablePageType());
+    ITypeHierarchy tablePageHierarchy = TypeUtility.getLocalTypeHierarchy(getTablePageType());
     IType[] tables = TypeUtility.getInnerTypes(getTablePageType(), TypeFilters.getSubtypeFilter(iTable, tablePageHierarchy));
     if (tables.length > 0) {
       IType table = tables[0];
@@ -208,8 +207,8 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       if (TypeUtility.exists(table)) {
         IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(iColumn, tablePageHierarchy));
         for (IType column : columns) {
-          ConfigurationMethod configurationMethod = SdkTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable");
-          String retVal = SdkMethodUtility.getMethodReturnValue(configurationMethod.peekMethod());
+          ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable");
+          String retVal = ScoutMethodUtility.getMethodReturnValue(configurationMethod.peekMethod());
           if ("true".equals(retVal)) {
             createField(fieldBox, column, tablePageHierarchy, monitor, workingCopyManager);
           }
@@ -283,14 +282,14 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     /* search handler */
     FormHandlerNewOperation formHandlerOp = new FormHandlerNewOperation(getSearchFormType());
     formHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
-    formHandlerOp.setTypeName(ScoutIdeProperties.TYPE_NAME_SEARCH_HANDLER);
-    formHandlerOp.setStartMethodSibling(SdkTypeUtility.createStructuredForm(getSearchFormType()).getSiblingMethodStartHandler(formHandlerOp.getStartMethodName()));
+    formHandlerOp.setTypeName(SdkProperties.TYPE_NAME_SEARCH_HANDLER);
+    formHandlerOp.setStartMethodSibling(ScoutTypeUtility.createStructuredForm(getSearchFormType()).getSiblingMethodStartHandler(formHandlerOp.getStartMethodName()));
     formHandlerOp.run(monitor, workingCopyManager);
     IType searchHandler = formHandlerOp.getCreatedHandler();
     StringBuilder execLoadBuilder = new StringBuilder();
     execLoadBuilder.append("@Override\n");
     execLoadBuilder.append("public void execLoad(){\n");
-    execLoadBuilder.append(ScoutIdeProperties.TAB + ScoutUtility.getCommentAutoGeneratedMethodStub() + "\n");
+    execLoadBuilder.append(SdkProperties.TAB + ScoutUtility.getCommentAutoGeneratedMethodStub() + "\n");
     execLoadBuilder.append("}\n");
     searchHandler.createMethod(execLoadBuilder.toString(), null, true, monitor);
 
@@ -299,19 +298,19 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
 //    formatOp.run(monitor, workingCopyManager);
   }
 
-  private IType createField(IType declaringType, IType column, ITypeHierarchy tablePageHierarchy, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  private IType createField(IType declaringType, IType column, ITypeHierarchy tablePageHierarchy, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
     IType createdField = null;
     // nls entry
     INlsEntry nlsEntry = null;
     IMethod nlsMethod = TypeUtility.getMethod(column, "getConfiguredHeaderText");
     if (TypeUtility.exists(nlsMethod)) {
-      nlsEntry = SdkMethodUtility.getReturnNlsEntry(nlsMethod);
+      nlsEntry = ScoutMethodUtility.getReturnNlsEntry(nlsMethod);
     }
-    String fieldNamePlain = column.getElementName().replace(ScoutIdeProperties.SUFFIX_COLUMN, "");
+    String fieldNamePlain = column.getElementName().replace(SdkProperties.SUFFIX_COLUMN, "");
     if (tablePageHierarchy.isSubtype(iBigDecimalColumn, column)) {
       BigdecimalFieldNewOperation op = new BigdecimalFieldNewOperation(declaringType, false);
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_FORM_FIELD);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();
@@ -319,7 +318,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     else if (tablePageHierarchy.isSubtype(iBooleanColumn, column)) {
       BooleanFieldNewOperation op = new BooleanFieldNewOperation(declaringType, false);
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_FORM_FIELD);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();
@@ -328,7 +327,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       SequenceBoxNewOperation op = new SequenceBoxNewOperation(declaringType, false);
       op.setContentTemplate(new DateFromToTemplate());
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_BOX);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_BOX);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();
@@ -337,7 +336,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       SequenceBoxNewOperation op = new SequenceBoxNewOperation(declaringType, false);
       op.setContentTemplate(new DoubleFromToTemplate());
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_BOX);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_BOX);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();
@@ -346,7 +345,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       SequenceBoxNewOperation op = new SequenceBoxNewOperation(declaringType, false);
       op.setContentTemplate(new IntegerFromToTemplate());
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_BOX);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_BOX);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();
@@ -355,7 +354,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       SequenceBoxNewOperation op = new SequenceBoxNewOperation(declaringType, false);
       op.setContentTemplate(new LongFromToTemplate());
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_BOX);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_BOX);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();
@@ -363,11 +362,11 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     else if (tablePageHierarchy.isSubtype(iSmartColumn, column)) {
       IMethod codeTypeMethod = TypeUtility.getMethod(column, "getConfiguredCodeType");
       if (TypeUtility.exists(codeTypeMethod)) {
-        final IType codeType = PropertyMethodSourceUtilities.parseReturnParameterClass(PropertyMethodSourceUtilities.getMethodReturnValue(codeTypeMethod), codeTypeMethod);
+        final IType codeType = PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(codeTypeMethod), codeTypeMethod);
         // listbox
         ListBoxFieldNewOperation op = new ListBoxFieldNewOperation(declaringType, false);
         op.setNlsEntry(nlsEntry);
-        op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_FORM_FIELD);
+        op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD);
         op.validate();
         op.run(monitor, manager);
         createdField = op.getCreatedField();
@@ -386,11 +385,11 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       else {
         IMethod lookupCallMethod = TypeUtility.getMethod(column, "getConfiguredLookupCall");
         if (TypeUtility.exists(lookupCallMethod)) {
-          final IType lookupCall = PropertyMethodSourceUtilities.parseReturnParameterClass(PropertyMethodSourceUtilities.getMethodReturnValue(lookupCallMethod), lookupCallMethod);
+          final IType lookupCall = PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(lookupCallMethod), lookupCallMethod);
           // smartfield
           SmartFieldNewOperation op = new SmartFieldNewOperation(declaringType, false);
           op.setNlsEntry(nlsEntry);
-          op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_FORM_FIELD);
+          op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD);
           op.validate();
           op.run(monitor, manager);
           createdField = op.getCreatedField();
@@ -411,7 +410,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     else if (tablePageHierarchy.isSubtype(iStringColumn, column)) {
       StringFieldNewOperation op = new StringFieldNewOperation(declaringType, false);
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_FORM_FIELD);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();
@@ -420,7 +419,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       SequenceBoxNewOperation op = new SequenceBoxNewOperation(declaringType, false);
       op.setContentTemplate(new DateTimeFromToTemplate());
       op.setNlsEntry(nlsEntry);
-      op.setTypeName(fieldNamePlain + ScoutIdeProperties.SUFFIX_BOX);
+      op.setTypeName(fieldNamePlain + SdkProperties.SUFFIX_BOX);
       op.validate();
       op.run(monitor, manager);
       createdField = op.getCreatedField();

@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
@@ -28,9 +27,10 @@ import org.eclipse.scout.sdk.operation.service.ProcessServiceCreateMethodOperati
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 public class FormStackNewOperation implements IOperation {
 
@@ -96,7 +96,7 @@ public class FormStackNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // create empty form data
     String formDataSignature = null;
     if (getFormDataBundle() != null) {
@@ -215,7 +215,7 @@ public class FormStackNewOperation implements IOperation {
       modifyHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
 
       modifyHandlerOp.setStartMethodSibling(formOp.getCreatedMainBoxGetter());
-      modifyHandlerOp.setTypeName("Modify" + ScoutIdeProperties.SUFFIX_FORM_HANDLER);
+      modifyHandlerOp.setTypeName("Modify" + SdkProperties.SUFFIX_FORM_HANDLER);
       modifyHandlerOp.run(monitor, workingCopyManager);
       m_outNewHandler = modifyHandlerOp.getCreatedHandler();
       if (getOutProcessServiceInterface() != null) {
@@ -236,7 +236,7 @@ public class FormStackNewOperation implements IOperation {
 
       newHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
       newHandlerOp.setStartMethodSibling(formOp.getCreatedMainBoxGetter());
-      newHandlerOp.setTypeName("New" + ScoutIdeProperties.SUFFIX_FORM_HANDLER);
+      newHandlerOp.setTypeName("New" + SdkProperties.SUFFIX_FORM_HANDLER);
       newHandlerOp.run(monitor, workingCopyManager);
       m_outNewHandler = newHandlerOp.getCreatedHandler();
       NewHandlerCreateMethodsOperation fillOp = new NewHandlerCreateMethodsOperation();

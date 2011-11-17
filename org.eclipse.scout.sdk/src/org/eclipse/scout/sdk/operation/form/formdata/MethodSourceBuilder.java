@@ -14,11 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  *
@@ -49,7 +50,7 @@ public class MethodSourceBuilder implements ISourceBuilder {
   }
 
   @Override
-  public String createSource(IImportValidator validator) {
+  public String createSource(IImportValidator validator) throws JavaModelException {
     StringBuilder builder = new StringBuilder();
     String javaDoc = createJavaDoc(validator);
     if (!StringUtility.isNullOrEmpty(javaDoc)) {
@@ -73,11 +74,11 @@ public class MethodSourceBuilder implements ISourceBuilder {
     if (Flags.isFinal(getFlags())) {
       builder.append("final ");
     }
-    builder.append(ScoutSdkUtility.getSimpleTypeRefName(getReturnSignature(), validator) + " ");
+    builder.append(SignatureUtility.getTypeReference(getReturnSignature(), validator) + " ");
     builder.append(getElementName() + "(");
     MethodParameter[] params = getParameters();
     for (int i = 0; i < params.length; i++) {
-      builder.append(ScoutSdkUtility.getSimpleTypeRefName(params[i].getSignature(), validator) + " ");
+      builder.append(SignatureUtility.getTypeReference(params[i].getSignature(), validator) + " ");
       builder.append(params[i].getName());
       if (i < (params.length - 1)) {
         builder.append(", ");
@@ -88,7 +89,7 @@ public class MethodSourceBuilder implements ISourceBuilder {
     if (exceptions.length > 0) {
       builder.append("throws ");
       for (int i = 0; i < exceptions.length; i++) {
-        builder.append(ScoutSdkUtility.getSimpleTypeRefName(exceptions[i], validator));
+        builder.append(SignatureUtility.getTypeReference(exceptions[i], validator));
         if (i < (exceptions.length - 1)) {
           builder.append(", ");
         }
@@ -115,7 +116,7 @@ public class MethodSourceBuilder implements ISourceBuilder {
     return getJavaDoc();
   }
 
-  protected String createMethodBody(IImportValidator validator) {
+  protected String createMethodBody(IImportValidator validator) throws JavaModelException {
     if (!StringUtility.isNullOrEmpty(getSimleBody())) {
       return getSimleBody();
     }

@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.IDeleteOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>ScoutTypeDeleteOperation</h3> Deleted a scout type. Might be used for primary and inner types.
@@ -46,7 +46,7 @@ public class TypeDeleteOperation implements IDeleteOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit icu = getType().getCompilationUnit();
     if (getType().getDeclaringType() != null) {
       workingCopyManager.register(icu, false, monitor);

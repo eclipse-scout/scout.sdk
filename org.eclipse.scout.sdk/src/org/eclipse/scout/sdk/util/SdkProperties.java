@@ -8,21 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk;
+package org.eclipse.scout.sdk.util;
 
 import java.util.HashMap;
 import java.util.regex.Matcher;
 
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.RuntimeClasses;
 
 /**
- * <h3>{@link ScoutIdeProperties}</h3> ...
+ * <h3>{@link SdkProperties}</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 24.10.2008
  */
-public class ScoutIdeProperties {
+public class SdkProperties {
 
   public static final int UI_STRATEGY_SWT = 1 << 0;
   public static final int UI_STRATEGY_SWING = 1 << 1;
@@ -32,8 +32,6 @@ public class ScoutIdeProperties {
   public static final String PRODUCT_PRODUCTION_FOLDER = "products/production";
   public static final String PRODUCT_FOLDER_DEVELOPMENT = "products/development";
   public static final String PRODUCT_FOLDER_TEST = "products/test";
-
-  // public static final String SCOUT_BUNDLE_TYPE_CLIENT = "client";
 
   public static final String DEFAULT_SOURCE_FOLDER_NAME = "src";
 
@@ -182,7 +180,7 @@ public class ScoutIdeProperties {
   public static final String NULL = "None";
   public static final String INPUT_MULTI_UNDEFINED = "###";
 
-  private ScoutIdeProperties() {
+  private SdkProperties() {
   }
 
   // public static String getClientApplicationSuffix() {

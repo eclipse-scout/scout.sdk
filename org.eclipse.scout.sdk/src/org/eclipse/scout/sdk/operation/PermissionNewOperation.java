@@ -18,12 +18,12 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -63,7 +63,7 @@ public class PermissionNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SECURITY), getSharedBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.run(monitor, workingCopyManager);
@@ -78,7 +78,7 @@ public class PermissionNewOperation implements IOperation {
     serialVersionUIDOp.run(monitor, workingCopyManager);
 
     // constructor
-    MethodCreateOperation constructorOp = new MethodCreateOperation(getCreatedPermission(), getTypeName(), "super(\"" + getTypeName().replaceAll(ScoutIdeProperties.SUFFIX_PERMISSION + "$", "") + "\");");
+    MethodCreateOperation constructorOp = new MethodCreateOperation(getCreatedPermission(), getTypeName(), "super(\"" + getTypeName().replaceAll(SdkProperties.SUFFIX_PERMISSION + "$", "") + "\");");
     constructorOp.setMethodFlags(Flags.AccPublic);
     constructorOp.validate();
     constructorOp.run(monitor, workingCopyManager);

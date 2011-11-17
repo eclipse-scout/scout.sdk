@@ -19,13 +19,13 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 /**
  * <h3>{@link TableFieldSourceBuilder}</h3> ...
@@ -35,8 +35,8 @@ import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
  */
 public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
   private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
-  private final IType iTable = ScoutSdk.getType(RuntimeClasses.ITable);
-  private final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
+  private final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
+  private final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
   private final IType m_tableField;
 
   public TableFieldSourceBuilder(IType tableField, ITypeHierarchy hierarchy) {
@@ -67,7 +67,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
 
   protected void visitTable(IType table, ITypeHierarchy hierarchy) {
 
-    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(iColumn, hierarchy), TypeComparators.getOrderAnnotationComparator());
+    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(iColumn, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     final String[] colunmSignatures = new String[columns.length];
     final Map<Integer, String> columnIdMap = new HashMap<Integer, String>();
 
@@ -105,11 +105,11 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         final String finalColumnName = getColumnConstantName(i, columnIdMap);
         MethodSourceBuilder columnGetter = new MethodSourceBuilder() {
           @Override
-          protected String createMethodBody(IImportValidator validator) {
+          protected String createMethodBody(IImportValidator validator) throws JavaModelException {
             StringBuilder getterBody = new StringBuilder();
             getterBody.append("return ");
             if (!colSignature.equals("Ljava.lang.Object;")) {
-              String simpleRef = ScoutSdkUtility.getSimpleTypeRefName(colSignature, validator);
+              String simpleRef = SignatureUtility.getTypeReference(colSignature, validator);
               getterBody.append("(" + simpleRef + ") ");
             }
             getterBody.append("getValueInternal(row, " + finalColumnName + ");");
@@ -153,7 +153,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       // gobal setter
       MethodSourceBuilder globalSetter = new MethodSourceBuilder() {
         @Override
-        protected String createMethodBody(IImportValidator validator) {
+        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder builder = new StringBuilder();
           builder.append("  switch(column){\n");
           for (int i = 0; i < columns.length; i++) {
@@ -161,7 +161,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
             builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
             builder.append("(row,");
             if (!colunmSignatures[i].equals("Ljava.lang.Object;")) {
-              String simpleRef = ScoutSdkUtility.getSimpleTypeRefName(colunmSignatures[i], validator);
+              String simpleRef = SignatureUtility.getTypeReference(colunmSignatures[i], validator);
               builder.append("(" + simpleRef + ") ");
             }
             builder.append("value); break;\n");
@@ -199,7 +199,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
     if (TypeUtility.exists(superType)) {
       if (TypeUtility.isGenericType(superType)) {
         String superTypeSig = type.getSuperclassTypeSignature();
-        return ScoutSdkUtility.getResolvedSignature(Signature.getTypeArguments(superTypeSig)[0], type);
+        return SignatureUtility.getResolvedSignature(Signature.getTypeArguments(superTypeSig)[0], type);
       }
       else {
         return getColumnSignature(superType, columnHierarchy);

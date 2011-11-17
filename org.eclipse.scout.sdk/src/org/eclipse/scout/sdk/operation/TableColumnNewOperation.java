@@ -20,22 +20,22 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>MenuNewOperation</h3> ...
  */
 public class TableColumnNewOperation implements IOperation {
-  final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
+  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
 
   // in members
   private final IType m_declaringType;
@@ -74,7 +74,7 @@ public class TableColumnNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation columnOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     columnOp.setOrderDefinitionType(iColumn);
     columnOp.setSibling(getSibling());
@@ -90,12 +90,12 @@ public class TableColumnNewOperation implements IOperation {
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         StringBuilder source = new StringBuilder();
         source.append("return getColumnSet().getColumnByClass(");
-        source.append(ScoutSignature.getTypeReference(Signature.createTypeSignature(getField().getFullyQualifiedName(), true), getDeclaringType(), validator) + ".class");
+        source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getField().getFullyQualifiedName(), true), getDeclaringType(), validator) + ".class");
         source.append(");");
         return source.toString();
       }
     };
-    IStructuredType structuredType = SdkTypeUtility.createStructuredTable(getDeclaringType());
+    IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(getDeclaringType());
     getterOp.setSibling(structuredType.getSiblingMethodFieldGetter(getterOp.getMethodName()));
     getterOp.validate();
     getterOp.run(monitor, workingCopyManager);

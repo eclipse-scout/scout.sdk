@@ -21,19 +21,19 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.util.ScoutSignature;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>MenuNewOperation</h3> ...
@@ -73,11 +73,11 @@ public class MenuNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation menuNewOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     menuNewOp.setSuperTypeSignature(getSuperTypeSignature());
     menuNewOp.setTypeModifiers(Flags.AccPublic);
-    menuNewOp.setOrderDefinitionType(ScoutSdk.getType(RuntimeClasses.IMenu));
+    menuNewOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IMenu));
     menuNewOp.setSibling(getSibling());
     menuNewOp.validate();
     menuNewOp.run(monitor, workingCopyManager);
@@ -110,19 +110,19 @@ public class MenuNewOperation implements IOperation {
     }
   }
 
-  private IMethod createExecActionMethod(IType menu, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  private IMethod createExecActionMethod(IType menu, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
     IMethod execActionMethod = null;
     if (getFormToOpen() != null) {
       MethodOverrideOperation execActionOp = new MethodOverrideOperation(menu, "execAction", false) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(getCreatedMenu().getCompilationUnit());
+          ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getCreatedMenu().getCompilationUnit());
 
           StringBuilder sourceBuilder = new StringBuilder();
-          String formTypeName = ScoutSignature.getTypeReference(Signature.createTypeSignature(getFormToOpen().getFullyQualifiedName(), true), getDeclaringType(), validator);
+          String formTypeName = SignatureUtility.getTypeReference(Signature.createTypeSignature(getFormToOpen().getFullyQualifiedName(), true), getDeclaringType(), validator);
           sourceBuilder.append(formTypeName + " " + FORM_NAME + " = new " + formTypeName + "();\n");
           if (getFormHandler() != null) {
-            IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.ITable), hierarchy));
+            IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy));
             if (TypeUtility.exists(table)) {
               createFormParameterSource(getFormToOpen(), getFormHandler(), table, hierarchy, sourceBuilder, validator);
               createStartFormSource(getFormToOpen(), getFormHandler(), table, sourceBuilder, validator);
@@ -147,12 +147,12 @@ public class MenuNewOperation implements IOperation {
   }
 
   private void createFormParameterSource(IType form, IType formHandler, IType table, ITypeHierarchy hierarchy, StringBuilder builder, IImportValidator validator) {
-    IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IColumn), hierarchy));
+    IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), hierarchy));
     for (IType col : columns) {
       try {
         IMethod primKeyMethod = TypeUtility.getMethod(col, "getConfiguredPrimaryKey");
         if (TypeUtility.exists(primKeyMethod)) {
-          String isPrimaryKey = PropertyMethodSourceUtilities.getMethodReturnValue(primKeyMethod);
+          String isPrimaryKey = PropertyMethodSourceUtility.getMethodReturnValue(primKeyMethod);
           if (Boolean.valueOf(isPrimaryKey)) {
             // find method on form
             String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
@@ -178,7 +178,7 @@ public class MenuNewOperation implements IOperation {
   }
 
   private void createReloadPage(IType form, IType formHandler, ITypeHierarchy hierarchy, StringBuilder builder, IImportValidator validator) {
-    IType pageWithTable = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(ScoutSdk.getType(RuntimeClasses.IPageWithTable), hierarchy));
+    IType pageWithTable = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IPageWithTable), hierarchy));
     if (TypeUtility.exists(pageWithTable)) {
       builder.append("\n" + FORM_NAME + ".waitFor();\n");
       builder.append("if (" + FORM_NAME + ".isFormStored()) {\n");

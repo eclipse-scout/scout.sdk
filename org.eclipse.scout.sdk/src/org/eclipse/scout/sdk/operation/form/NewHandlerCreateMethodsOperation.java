@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,12 +15,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class NewHandlerCreateMethodsOperation implements IOperation {
 
@@ -59,17 +59,17 @@ public class NewHandlerCreateMethodsOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (getServiceInterface() == null) {
       return;
     }
-    String TAB = ScoutIdeProperties.TAB;
+    String TAB = SdkProperties.TAB;
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getFormHandler().getCompilationUnit());
     workingCopyManager.register(getFormHandler().getCompilationUnit(), monitor);
-    String processingExceptionClass = ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true), validator);
-    String serviceInterfaceName = ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(getServiceInterface().getFullyQualifiedName(), true), validator);
-    String servicesName = ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(RuntimeClasses.SERVICES, true), validator);
-    String formDataName = ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(getFormData().getFullyQualifiedName(), true), validator);
+    String processingExceptionClass = SignatureUtility.getTypeReference(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true), validator);
+    String serviceInterfaceName = SignatureUtility.getTypeReference(Signature.createTypeSignature(getServiceInterface().getFullyQualifiedName(), true), validator);
+    String servicesName = SignatureUtility.getTypeReference(Signature.createTypeSignature(RuntimeClasses.SERVICES, true), validator);
+    String formDataName = SignatureUtility.getTypeReference(Signature.createTypeSignature(getFormData().getFullyQualifiedName(), true), validator);
     if (isCreateExecLoad()) {
       // execLoad on formhandler
       StringBuilder execLoadBuilder = new StringBuilder();

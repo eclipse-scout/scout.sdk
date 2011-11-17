@@ -21,7 +21,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
@@ -31,7 +30,8 @@ import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class FormNewOperation implements IOperation {
@@ -65,7 +65,7 @@ public class FormNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     if (!StringUtility.isNullOrEmpty(getFormDataSignature())) {
@@ -101,7 +101,7 @@ public class FormNewOperation implements IOperation {
     // main box
     FormFieldNewOperation mainBoxOp = new FormFieldNewOperation(getCreatedFormType());
     mainBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
-    mainBoxOp.setTypeName(ScoutIdeProperties.TYPE_NAME_MAIN_BOX);
+    mainBoxOp.setTypeName(SdkProperties.TYPE_NAME_MAIN_BOX);
     mainBoxOp.validate();
     mainBoxOp.run(monitor, workingCopyManager);
     m_createdMainBox = mainBoxOp.getCreatedFormField();

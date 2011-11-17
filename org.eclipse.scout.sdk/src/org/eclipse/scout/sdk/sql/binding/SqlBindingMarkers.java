@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.Marker;
 import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 

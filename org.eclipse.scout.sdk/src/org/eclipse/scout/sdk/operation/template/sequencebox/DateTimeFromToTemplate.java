@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class DateTimeFromToTemplate extends DateFromToTemplate {
 
@@ -24,7 +24,7 @@ public class DateTimeFromToTemplate extends DateFromToTemplate {
   }
 
   @Override
-  public void apply(IType type, IScoutWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
+  public void apply(IType type, IWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
     super.apply(type, manager, monitor);
     MethodOverrideOperation fromHasTimeOp = new MethodOverrideOperation(getFromType(), "getConfiguredHasTime");
     fromHasTimeOp.setSimpleBody("return true;");

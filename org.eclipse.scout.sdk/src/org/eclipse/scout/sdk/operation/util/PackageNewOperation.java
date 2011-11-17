@@ -17,7 +17,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class PackageNewOperation implements IOperation {
   private final IJavaProject m_project;
@@ -49,7 +49,7 @@ public class PackageNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IPackageFragmentRoot root = getProject().findPackageFragmentRoot(new Path("/" + getProject().getElementName() + "/" + m_srcPath));
     m_packageFragment = root.getPackageFragment(m_packageName);
     if (m_packageFragment == null || !m_packageFragment.exists()) {
