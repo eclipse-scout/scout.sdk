@@ -25,18 +25,17 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutFileLocator;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchyChangedListener;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.graphics.ImageData;
 
 public class ScoutProjectIcons implements IIconProvider {
@@ -47,7 +46,7 @@ public class ScoutProjectIcons implements IIconProvider {
   private HashMap<String, ScoutIconDesc> m_cachedIcons;
   private Object cacheLock = new Object();
 
-  final IType abstractIcons = ScoutSdk.getType(RuntimeClasses.AbstractIcons);
+  final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
   private final IScoutProject m_scoutProject;
 
   private IPrimaryTypeTypeHierarchy m_iconsHierarchy;
@@ -55,7 +54,7 @@ public class ScoutProjectIcons implements IIconProvider {
 
   public ScoutProjectIcons(IScoutProject scoutProject) {
     m_scoutProject = scoutProject;
-    m_iconsHierarchy = ScoutSdk.getPrimaryTypeHierarchy(abstractIcons);
+    m_iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
     m_iconsHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
       public void handleEvent(int eventType, IType type) {
@@ -130,7 +129,7 @@ public class ScoutProjectIcons implements IIconProvider {
       project = project.getParentProject();
     }
     if (sharedBundle != null) {
-      IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getInScoutBundles(sharedBundle));
+      IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(sharedBundle));
       if (iconTypes.length > 0) {
         if (TypeUtility.exists(iconTypes[0])) {
           try {
@@ -146,7 +145,7 @@ public class ScoutProjectIcons implements IIconProvider {
 
   protected void collectIconNamesOfType(IType iconType, Map<String, ScoutIconDesc> collector) throws JavaModelException, IllegalArgumentException {
     if (TypeUtility.exists(iconType)) {
-      boolean inherited = SdkTypeUtility.getScoutProject(iconType) == m_scoutProject;
+      boolean inherited = ScoutTypeUtility.getScoutProject(iconType) == m_scoutProject;
       for (IField field : iconType.getFields()) {
         if (Flags.isPublic(field.getFlags()) && field.getSource() != null && field.getSource().contains(" String ")) {
           String source = field.getSource();

@@ -18,11 +18,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
@@ -228,7 +229,7 @@ public class ScoutProject implements IScoutProject {
   public INlsProject getNlsProject() {
     if (m_nlsProject == null && getSharedBundle() != null) {
       try {
-        m_nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.TEXTS), this});
+        m_nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.TEXTS), this});
       }
       catch (CoreException e) {
         ScoutSdk.logError("during loading NLS project for: " + getProjectName(), e);
@@ -242,7 +243,7 @@ public class ScoutProject implements IScoutProject {
     // a lot of projects do not have a documentation text provider. then the getNlsProjects will return null -> nls workspace would be triggered each time.
     if (!m_docsNlsProjectInitialized && getSharedBundle() != null) {
       try {
-        m_docsNlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{ScoutSdk.getType(RuntimeClasses.IDocumentationTextProviderService), this});
+        m_docsNlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.IDocumentationTextProviderService), this});
         m_docsNlsProjectInitialized = true;
       }
       catch (CoreException e) {
@@ -272,8 +273,8 @@ public class ScoutProject implements IScoutProject {
     return m_iconProvider;
 
 //    if (m_iconProvider == null && getSharedBundle() != null) {
-//      IType abstractIcons = ScoutSdk.getType(RuntimeClasses.AbstractIcons);
-//      ICachedTypeHierarchy iconsHierarchy = ScoutSdk.getPrimaryTypeHierarchy(abstractIcons);
+//      IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
+//      ICachedTypeHierarchy iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
 //      IType[] allIconTypes = iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getClassesInProject(getSharedBundle().getJavaProject()), null);
 //      if (allIconTypes != null && allIconTypes.length > 0) {
 //      }

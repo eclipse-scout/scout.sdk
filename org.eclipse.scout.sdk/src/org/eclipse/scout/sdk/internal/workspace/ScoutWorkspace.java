@@ -24,13 +24,12 @@ import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.BundleGraph;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.BundleGraphNode;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.ProjectGraph;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.ProjectGraphNode;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.ScoutWorkspaceEventList;
-import org.eclipse.scout.sdk.pde.listener.ResourceChangeListenerWithVisitor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -41,13 +40,15 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 /**
  *
  */
-public class ScoutWorkspace implements IScoutWorkspace {
+public final class ScoutWorkspace implements IScoutWorkspace {
   private EventListenerList m_eventListeners = new EventListenerList();
+
+  private final static ScoutWorkspace INSTANCE = new ScoutWorkspace();
 
   private BundleGraph m_bundleGraph;
   private ProjectGraph m_projectGraph;
 
-  public ScoutWorkspace() {
+  private ScoutWorkspace() {
     m_bundleGraph = new BundleGraph();
     m_projectGraph = new ProjectGraph();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(new P_ProjectDiscoveryListener());
@@ -65,6 +66,10 @@ public class ScoutWorkspace implements IScoutWorkspace {
     rebuildGraphNoFire(eventCollector);
     eventCollector.addEvent(ScoutWorkspaceEvent.TYPE_WORKSPACE_INITIALIZED, null);
     fireWorkspaceEvnets(eventCollector.getAllEvents());
+  }
+
+  public static ScoutWorkspace getInstance() {
+    return INSTANCE;
   }
 
   @Override

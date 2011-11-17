@@ -29,17 +29,17 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.BundleDependencies;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.PackageNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
 
 /**
  * Project specific scout cache
@@ -163,16 +163,16 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public String getSourceFolderName() {
-    return ScoutIdeProperties.DEFAULT_SOURCE_FOLDER_NAME;
+    return SdkProperties.DEFAULT_SOURCE_FOLDER_NAME;
   }
 
   @Override
-  public IPackageFragment getRootPackage(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  public IPackageFragment getRootPackage(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     return getPackageFragment(getRootPackageName(), monitor, workingCopyManager);
   }
 
   @Override
-  public IPackageFragment getSpecificPackageFragment(String packageName, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  public IPackageFragment getSpecificPackageFragment(String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     return getPackageFragment(packageName, monitor, workingCopyManager);
   }
 
@@ -216,7 +216,7 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   @Override
-  public IPackageFragment getPackageFragment(String packageName, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  public IPackageFragment getPackageFragment(String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IPackageFragment pck = null;
     try {
       IPackageFragmentRoot root = getJavaProject().findPackageFragmentRoot(new Path("/" + getProject().getName() + "/" + getSourceFolderName()));

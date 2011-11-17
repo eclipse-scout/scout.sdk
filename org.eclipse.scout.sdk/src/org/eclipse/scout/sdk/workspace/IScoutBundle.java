@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public interface IScoutBundle extends IScoutContainer, IScoutBundleConstantes {
 
@@ -63,15 +63,15 @@ public interface IScoutBundle extends IScoutContainer, IScoutBundleConstantes {
 
   IType findType(String qualifiedClassName);
 
-  IPackageFragment getSpecificPackageFragment(String packageName, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager);
+  IPackageFragment getSpecificPackageFragment(String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager);
 
   String getSourceFolderName();
 
   String getRootPackageName();
 
-  IPackageFragment getRootPackage(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager);
+  IPackageFragment getRootPackage(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager);
 
-  IPackageFragment getPackageFragment(String packageName, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager);
+  IPackageFragment getPackageFragment(String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager);
 
   /**
    * @param extension
