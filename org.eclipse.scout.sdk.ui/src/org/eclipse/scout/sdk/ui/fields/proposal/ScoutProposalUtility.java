@@ -27,14 +27,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.BundleTypeProposal;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.ConstantFieldProposal;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
@@ -69,7 +69,7 @@ public class ScoutProposalUtility {
 //  private SiblingProposal[] getSiblingProposalsImpl(IType parentType, IType superType) {
 //    IRegion region = JavaCore.newRegion();
 //    region.add(parentType);
-//    ITypeHierarchy combindedHierarchy = ScoutSdk.getTypeHierarchyPrimaryTypes(superType).combinedTypeHierarchy(region);
+//    ITypeHierarchy combindedHierarchy = TypeUtility.getTypeHierarchyPrimaryTypes(superType).combinedTypeHierarchy(region);
 //    ArrayList<SiblingProposal> siblings = new ArrayList<SiblingProposal>();
 //    for (IType type : TypeUtility.getInnerTypes(parentType, TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getInHierarchyFilter(combindedHierarchy)), TypeComparators.getOrderAnnotationComparator())) {
 //      siblings.add(new SiblingProposal(type));
@@ -119,26 +119,26 @@ public class ScoutProposalUtility {
   private ITypeProposal[] getBcTypeProposalsImpl() throws JavaModelException {
     if (m_beanPropertyTypeProposals == null) {
       m_beanPropertyTypeProposals = new ITypeProposal[]{
-          new TypeProposal(ScoutSdk.getType(ArrayList.class.getName())),
-          new TypeProposal(ScoutSdk.getType(java.lang.Boolean.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Collection.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Date.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Double.class.getName())),
-          new TypeProposal(ScoutSdk.getType(java.util.Enumeration.class.getName())),
-          new TypeProposal(ScoutSdk.getType(java.lang.Float.class.getName())),
-          new TypeProposal(ScoutSdk.getType(HashMap.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Integer.class.getName())),
-          new TypeProposal(ScoutSdk.getType(List.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Long.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Map.class.getName())),
-          new TypeProposal(ScoutSdk.getType(java.lang.Number.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Object.class.getName())),
-          new TypeProposal(ScoutSdk.getType(java.lang.Runnable.class.getName())),
-          new TypeProposal(ScoutSdk.getType(Set.class.getName())),
-          new TypeProposal(ScoutSdk.getType(String.class.getName())),
-          new TypeProposal(ScoutSdk.getType(TreeMap.class.getName())),
-          new TypeProposal(ScoutSdk.getType(TreeSet.class.getName())),
-          new TypeProposal(ScoutSdk.getType(java.util.Vector.class.getName()))};
+          new TypeProposal(TypeUtility.getType(ArrayList.class.getName())),
+          new TypeProposal(TypeUtility.getType(java.lang.Boolean.class.getName())),
+          new TypeProposal(TypeUtility.getType(Collection.class.getName())),
+          new TypeProposal(TypeUtility.getType(Date.class.getName())),
+          new TypeProposal(TypeUtility.getType(Double.class.getName())),
+          new TypeProposal(TypeUtility.getType(java.util.Enumeration.class.getName())),
+          new TypeProposal(TypeUtility.getType(java.lang.Float.class.getName())),
+          new TypeProposal(TypeUtility.getType(HashMap.class.getName())),
+          new TypeProposal(TypeUtility.getType(Integer.class.getName())),
+          new TypeProposal(TypeUtility.getType(List.class.getName())),
+          new TypeProposal(TypeUtility.getType(Long.class.getName())),
+          new TypeProposal(TypeUtility.getType(Map.class.getName())),
+          new TypeProposal(TypeUtility.getType(java.lang.Number.class.getName())),
+          new TypeProposal(TypeUtility.getType(Object.class.getName())),
+          new TypeProposal(TypeUtility.getType(java.lang.Runnable.class.getName())),
+          new TypeProposal(TypeUtility.getType(Set.class.getName())),
+          new TypeProposal(TypeUtility.getType(String.class.getName())),
+          new TypeProposal(TypeUtility.getType(TreeMap.class.getName())),
+          new TypeProposal(TypeUtility.getType(TreeSet.class.getName())),
+          new TypeProposal(TypeUtility.getType(java.util.Vector.class.getName()))};
     }
     return m_beanPropertyTypeProposals;
   }
@@ -185,7 +185,7 @@ public class ScoutProposalUtility {
   @SuppressWarnings("unchecked")
   private ConstantFieldProposal<Integer>[] getButtonDisplayTypeProposalsImpl() {
     if (m_buttonDisplayTypeProposals == null) {
-      IType buttonType = ScoutSdk.getType(RuntimeClasses.IButton);
+      IType buttonType = TypeUtility.getType(RuntimeClasses.IButton);
       m_buttonDisplayTypeProposals = new ConstantFieldProposal[]{
           new ConstantFieldProposal<Integer>("Default", ScoutSdkUi.getImage(ScoutSdkUi.ButtonStyle), buttonType.getField("DISPLAY_STYLE_DEFAULT"), 0),
           new ConstantFieldProposal<Integer>("Radio", ScoutSdkUi.getImage(ScoutSdkUi.ButtonStyle), buttonType.getField("DISPLAY_STYLE_RADIO"), 2),
@@ -204,7 +204,7 @@ public class ScoutProposalUtility {
   @SuppressWarnings("unchecked")
   private ConstantFieldProposal<String>[] getFormViewIdTypeProposalsImpl() {
     if (m_formViewIdTypeProposals == null) {
-      IType iformType = ScoutSdk.getType(RuntimeClasses.IForm);
+      IType iformType = TypeUtility.getType(RuntimeClasses.IForm);
       m_formViewIdTypeProposals = new ConstantFieldProposal[]{
           new ConstantFieldProposal<String>("Outline", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_OUTLINE"), "OUTLINE"),
           new ConstantFieldProposal<String>("Outline Selector", ScoutSdkUi.getImage(ScoutSdkUi.Default), iformType.getField("VIEW_ID_OUTLINE_SELECTOR"), "OUTLINE_SELECTOR"),
@@ -234,7 +234,7 @@ public class ScoutProposalUtility {
   @SuppressWarnings("unchecked")
   private ConstantFieldProposal<Integer>[] getButtonSystemTypeProposalsImpl() {
     if (m_buttonSystemTypeProposals == null) {
-      IType buttonType = ScoutSdk.getType(RuntimeClasses.IButton);
+      IType buttonType = TypeUtility.getType(RuntimeClasses.IButton);
       m_buttonSystemTypeProposals = new ConstantFieldProposal[]{
           new ConstantFieldProposal<Integer>("None", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_NONE"), 0),
           new ConstantFieldProposal<Integer>("Cancel", ScoutSdkUi.getImage(ScoutSdkUi.Default), buttonType.getField("SYSTEM_TYPE_CANCEL"), 1),
@@ -261,7 +261,7 @@ public class ScoutProposalUtility {
   @SuppressWarnings("unchecked")
   private ConstantFieldProposal<Integer>[] getFormDisplayHintProposalsImpl() {
     if (m_formDisplayHintProposals == null) {
-      IType formType = ScoutSdk.getType(RuntimeClasses.IForm);
+      IType formType = TypeUtility.getType(RuntimeClasses.IForm);
       m_formDisplayHintProposals = new ConstantFieldProposal[]{
           new ConstantFieldProposal<Integer>("Dialog", ScoutSdkUi.getImage(ScoutSdkUi.Default), formType.getField("DISPLAY_HINT_DIALOG"), 0),
           new ConstantFieldProposal<Integer>("View", ScoutSdkUi.getImage(ScoutSdkUi.Default), formType.getField("DISPLAY_HINT_VIEW"), 20),};
@@ -310,7 +310,7 @@ public class ScoutProposalUtility {
   }
 
   public static String getFieldName(IType field, String labelMethodName) {
-    return ScoutSourceUtilities.getTranslatedMethodStringValue(field, labelMethodName);
+    return ScoutSourceUtility.getTranslatedMethodStringValue(field, labelMethodName);
 
   }
 
@@ -322,8 +322,8 @@ public class ScoutProposalUtility {
 
   private ITypeProposal[] getPageShortListProposalsImpl() {
     if (m_pageShortListProposals == null) {
-      m_pageShortListProposals = new ITypeProposal[]{new TypeProposal(ScoutSdk.getType(RuntimeClasses.AbstractPageWithNodes)),
-          new TypeProposal(ScoutSdk.getType(RuntimeClasses.AbstractPageWithTable))};
+      m_pageShortListProposals = new ITypeProposal[]{new TypeProposal(TypeUtility.getType(RuntimeClasses.AbstractPageWithNodes)),
+          new TypeProposal(TypeUtility.getType(RuntimeClasses.AbstractPageWithTable))};
     }
     return m_pageShortListProposals;
   }
@@ -337,14 +337,14 @@ public class ScoutProposalUtility {
   private BundleTypeProposal[] getAllBundleProposalsImpl() {
     if (m_bundleTypes == null) {
       m_bundleTypes = new BundleTypeProposal[]{
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_CLIENT, "Client"),
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_TEST_CLIENT, "Client Test"),
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_UI_SWING, "Client Swing"),
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_UI_SWT, "Client SWT"),
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_SHARED, "Shared"),
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_SERVER, "Server"),
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_UI_SWT_APPLICATION, "RCP Application (SWT)"),
-          new BundleTypeProposal(ScoutIdeProperties.BUNDLE_TYPE_SERVER_APPLICATION, "Server Appliaction")
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_CLIENT, "Client"),
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_TEST_CLIENT, "Client Test"),
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_UI_SWING, "Client Swing"),
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_UI_SWT, "Client SWT"),
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_SHARED, "Shared"),
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_SERVER, "Server"),
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_UI_SWT_APPLICATION, "RCP Application (SWT)"),
+          new BundleTypeProposal(SdkProperties.BUNDLE_TYPE_SERVER_APPLICATION, "Server Appliaction")
           };
     }
     return m_bundleTypes;

@@ -42,9 +42,9 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndPasteSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
@@ -146,12 +146,12 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     hookKeyActions();
     createToolbar();
     // add context help
-    PlatformUI.getWorkbench().getHelpSystem().setHelp(tree, ScoutSdk.PLUGIN_ID + ".doc.outline");
+    PlatformUI.getWorkbench().getHelpSystem().setHelp(tree, ScoutSdkUi.PLUGIN_ID + ".doc.outline");
 
     IContextService serivce = (IContextService) getSite().getService(IContextService.class);
     serivce.activateContext("org.eclipse.scout.sdk.explorer.context");
 
-    ScoutSdk.getScoutWorkspace().addWorkspaceListener(new IScoutWorkspaceListener() {
+    ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(new IScoutWorkspaceListener() {
       @Override
       public void worspaceChanged(ScoutWorkspaceEvent event) {
         switch (event.getType()) {

@@ -4,21 +4,22 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.ext;
 
+import java.util.HashMap;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.pde.PluginXml;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -76,18 +77,10 @@ public class WebServicePageFactory implements IPageFactory {
         return;
       }
       // plugin.xml of bundle
-      PluginXml pluginXml = new PluginXml(servletContributingBundle.getProject());
-      SimpleXmlElement point = pluginXml.getOrCreateExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS);
-      SimpleXmlElement registration = null;
-
-      // find JAX-WS servlet extension
-      for (SimpleXmlElement xmlElement : point.getChildren("servlet")) {
-        if (JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName().equals(xmlElement.getStringAttribute("class"))) {
-          registration = xmlElement;
-          break;
-        }
-      }
-      if (registration == null) {
+      PluginModelHelper h = new PluginModelHelper(servletContributingBundle.getProject());
+      HashMap<String, String> attributes = new HashMap<String, String>();
+      attributes.put("class", JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName());
+      if (!h.PluginXml.existsSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes)) {
         JaxWsServletRegistrationOperation op = new JaxWsServletRegistrationOperation();
         op.setBundle(bundle);
         op.setJaxWsAlias(JaxWsConstants.JAX_WS_ALIAS);

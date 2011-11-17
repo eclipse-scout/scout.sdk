@@ -4,25 +4,23 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package test.client;
 
 
-import org.eclipse.scout.rt.client.ClientJob;
-import org.eclipse.scout.commons.exception.ProcessingException;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import test.client.ui.desktop.Desktop;
-import org.eclipse.scout.rt.client.AbstractClientSession;
-import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.AbstractClientSession;
+import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 
+import test.client.ui.desktop.Desktop;
+
 public class ClientSession extends AbstractClientSession{
-  private static Logger logger=LoggerFactory.getLogger(ClientSession.class);
 
   public ClientSession(){
     super(true);

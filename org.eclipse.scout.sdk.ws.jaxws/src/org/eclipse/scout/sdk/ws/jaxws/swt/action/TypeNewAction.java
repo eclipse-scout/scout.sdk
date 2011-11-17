@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -29,12 +29,12 @@ import org.eclipse.jdt.internal.corext.template.java.SignatureUtil;
 import org.eclipse.jdt.ui.actions.OpenNewClassWizardAction;
 import org.eclipse.jdt.ui.wizards.NewClassWizardPage;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.internal.typecache.WorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.swt.widgets.Shell;
@@ -103,12 +103,12 @@ public abstract class TypeNewAction extends AbstractLinkAction {
 
     m_createdType = page.getCreatedType();
     if (TypeUtility.exists(m_createdType)) {
-      WorkingCopyManager level = new WorkingCopyManager();
+      IWorkingCopyManager level = TypeCacheAccessor.createWorkingCopyManger();
       try {
         level.register(m_createdType.getCompilationUnit(), new NullProgressMonitor());
-        ScoutSdk.getType(m_createdType.getFullyQualifiedName());
+        TypeUtility.getType(m_createdType.getFullyQualifiedName());
         level.reconcile(m_createdType.getCompilationUnit(), new NullProgressMonitor());
-        ScoutSdk.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.IServerSessionFactory).invalidate();
+        TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.IServerSessionFactory).invalidate();
       }
       catch (JavaModelException e) {
         // TODO Auto-generated catch block

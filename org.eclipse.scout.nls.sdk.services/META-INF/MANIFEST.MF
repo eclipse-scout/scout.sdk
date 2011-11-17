@@ -3,12 +3,21 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout Multilanguage Support for Scout Services
 Bundle-SymbolicName: org.eclipse.scout.nls.sdk.services;singleton:=true
 Bundle-Version: 3.7.1.qualifier
-Bundle-Activator: org.eclipse.scout.nls.sdk.services.NlsSdkService
+Bundle-Activator: org.eclipse.scout.nls.sdk.services.internal.NlsSdkService
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.nls.sdk;bundle-version="3.7.1",
  org.eclipse.scout.sdk;bundle-version="3.7.1",
  org.eclipse.scout.nls.sdk.simple;bundle-version="3.7.1",
- org.eclipse.scout.sdk.ui
+ org.eclipse.scout.sdk.ui,
+ org.eclipse.scout.sdk.util;bundle-version="3.7.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.scout.nls.sdk.services.internal,
+ org.eclipse.scout.nls.sdk.services.model.ws,
+ org.eclipse.scout.nls.sdk.services.model.ws.project,
+ org.eclipse.scout.nls.sdk.services.operation,
+ org.eclipse.scout.nls.sdk.services.ui.action,
+ org.eclipse.scout.nls.sdk.services.ui.page,
+ org.eclipse.scout.nls.sdk.services.ui.part,
+ org.eclipse.scout.nls.sdk.services.ui.wizard

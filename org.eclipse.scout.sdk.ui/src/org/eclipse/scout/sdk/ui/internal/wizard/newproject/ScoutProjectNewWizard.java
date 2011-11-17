@@ -30,14 +30,14 @@ import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
@@ -69,7 +69,6 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
     addPage(m_page1);
     m_page2 = new ScoutProjectTemplateWizardPage();
     addPage(m_page2);
-
   }
 
   /**
@@ -101,7 +100,6 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
 
   @Override
   public final boolean performFinish() {
-
     new P_PerformFinishJob(getContainer().getShell().getDisplay()).schedule();
     return true;
   }
@@ -244,7 +242,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
       // XXX
 //      TemplateVariableSet variables = TemplateVariableSet.createNew(m_page1.getProjectName(), m_page1.getProjectNamePostfix(), m_page1.getProjectAlias());
 //      NewBsiCaseGroupStep1Operation op1 = new NewBsiCaseGroupStep1Operation(variables);

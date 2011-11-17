@@ -24,7 +24,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 
 public final class NlsTypeUtility {
 

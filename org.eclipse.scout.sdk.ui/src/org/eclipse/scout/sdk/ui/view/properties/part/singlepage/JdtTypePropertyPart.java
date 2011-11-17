@@ -24,13 +24,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.RunnableWithData;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
-import org.eclipse.scout.sdk.jdt.JdtEvent;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.CompilationUnitSaveOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecResetSerchFilterMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
@@ -63,6 +60,9 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
+import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
@@ -206,8 +206,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
 
     if (m_methodChangedListener == null) {
       m_methodChangedListener = new P_MethodChangedListener();
-      ScoutSdk.addJavaResourceChangedListener(m_methodChangedListener);
-//      JavaCore.addElementChangedListener(m_methodChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_methodChangedListener);
     }
     try {
       setCompilationUnitDirty(getPage().getType().getCompilationUnit().isWorkingCopy() && getPage().getType().getCompilationUnit().getBuffer().hasUnsavedChanges());
@@ -220,8 +219,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   @Override
   protected void cleanup() {
     if (m_methodChangedListener != null) {
-      ScoutSdk.removeJavaResourceChangedListener(m_methodChangedListener);
-//      JavaCore.removeElementChangedListener(m_methodChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_methodChangedListener);
       m_methodChangedListener = null;
     }
   }

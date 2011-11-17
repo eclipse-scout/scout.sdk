@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -36,11 +36,12 @@ import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -299,7 +300,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     if (multiStatus.getSeverity() < IStatus.ERROR) {
       String fullyQualifiedName = StringUtility.join(".", getPackageName(), getTypeName());
       try {
-        if (ScoutSdk.existsType(fullyQualifiedName)) {
+        if (TypeUtility.existsType(fullyQualifiedName)) {
           multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TypeAlreadyExsits", fullyQualifiedName)));
         }
         else if (m_illegalTypeNames.contains(getTypeName())) {
@@ -337,8 +338,8 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
     try {
       String fqn = StringUtility.join(".", packageName, className);
-      if (ScoutSdk.existsType(fqn)) {
-        IType type = ScoutSdk.getType(fqn);
+      if (TypeUtility.existsType(fqn)) {
+        IType type = TypeUtility.getType(fqn);
         if (!type.newSupertypeHierarchy(new NullProgressMonitor()).contains(interfaceType)) {
           type.getJavadocRange().getOffset();
           type.getJavadocRange().getLength();
@@ -441,8 +442,8 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     if (isControlCreated()) {
       // display JavaDoc
       m_tooltipAuthenticationFactory.setMember(null);
-      if (ScoutSdk.existsType(authenticationHandler)) {
-        IType type = ScoutSdk.getType(authenticationHandler);
+      if (TypeUtility.existsType(authenticationHandler)) {
+        IType type = TypeUtility.getType(authenticationHandler);
         try {
           if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer)) {
             m_tooltipAuthenticationFactory.setMember(type);

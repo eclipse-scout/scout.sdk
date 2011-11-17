@@ -12,11 +12,10 @@ package org.eclipse.scout.sdk.internal.test.operation.formdata;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -37,7 +36,7 @@ public class ExternalCheckboxFieldTest extends AbstractScoutSdkTest {
   @Test
   public void testCreateFormData() throws Exception {
     String templateName = "AbstractTestCheckboxField";
-    IType template = ScoutSdk.getType("formdata.client.ui.template.formfield." + templateName);
+    IType template = TypeUtility.getType("formdata.client.ui.template.formfield." + templateName);
     Assert.assertTrue(TypeUtility.exists(template));
 
     IProject sharedProject = getProject("formdata.shared");

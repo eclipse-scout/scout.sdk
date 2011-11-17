@@ -19,12 +19,12 @@ import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -38,8 +38,8 @@ import org.eclipse.swt.widgets.Composite;
 public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedViewPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
-  final IType basicPermission = ScoutSdk.getType(RuntimeClasses.BasicPermission);
-  final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
+  final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
+  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
 
   public ProductLaunchPropertyPart() {
   }
@@ -56,7 +56,7 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
     int productCount = 0;
     IScoutBundle bundle = (IScoutBundle) getPage().getScoutResource();
     if (bundle != null) {
-      IResource resource = bundle.getProject().findMember(ScoutIdeProperties.PRODUCT_FOLDER);
+      IResource resource = bundle.getProject().findMember(SdkProperties.PRODUCT_FOLDER);
       if (resource != null && resource.exists() && resource.getType() == IResource.FOLDER) {
         // spider products
         IFolder productFolder = (IFolder) resource;

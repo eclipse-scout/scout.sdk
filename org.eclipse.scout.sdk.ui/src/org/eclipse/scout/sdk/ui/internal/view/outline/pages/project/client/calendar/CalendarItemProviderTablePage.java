@@ -12,25 +12,26 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.cale
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.CalendarItemProviderNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypeOrderChangedPageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>CalendarItemProducerTablePage</h3> ...
  */
 public class CalendarItemProviderTablePage extends AbstractPage {
 
-  final IType iCalendarItemProvider = ScoutSdk.getType(RuntimeClasses.ICalendarItemProvider);
+  final IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
 
   private InnerTypePageDirtyListener m_innerTypeListener;
   private InnerTypeOrderChangedPageDirtyListener m_orderChangedListener;
@@ -47,11 +48,11 @@ public class CalendarItemProviderTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     if (m_orderChangedListener != null) {
-      ScoutSdk.removeJavaResourceChangedListener(m_orderChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_orderChangedListener);
       m_orderChangedListener = null;
     }
     super.unloadPage();
@@ -79,14 +80,14 @@ public class CalendarItemProviderTablePage extends AbstractPage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCalendarItemProvider);
-      ScoutSdk.addInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
     }
     if (m_orderChangedListener == null) {
       m_orderChangedListener = new InnerTypeOrderChangedPageDirtyListener(this, iCalendarItemProvider, getCalendarType());
-      ScoutSdk.addJavaResourceChangedListener(m_orderChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_orderChangedListener);
     }
 
-    IType[] innerTypes = SdkTypeUtility.getCalendarItemProviders(getCalendarType());
+    IType[] innerTypes = ScoutTypeUtility.getCalendarItemProviders(getCalendarType());
     for (IType provider : innerTypes) {
       CalendarItemProviderNodePage childPage = new CalendarItemProviderNodePage();
       childPage.setParent(this);

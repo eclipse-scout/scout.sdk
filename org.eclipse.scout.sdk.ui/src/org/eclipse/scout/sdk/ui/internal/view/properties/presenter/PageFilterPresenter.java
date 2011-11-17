@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
 import org.eclipse.scout.sdk.ui.view.outline.pages.PageFilter;

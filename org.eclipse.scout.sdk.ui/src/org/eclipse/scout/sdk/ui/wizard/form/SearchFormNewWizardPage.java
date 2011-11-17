@@ -20,11 +20,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -34,12 +31,15 @@ import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -64,11 +64,11 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   /** {@link ITypeProposal} **/
   public static final String PROP_TABLE_PAGE = "tablePage";
 
-  final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
-  final IType iSearchForm = ScoutSdk.getType(RuntimeClasses.ISearchForm);
-  final IType abstractSearchForm = ScoutSdk.getType(RuntimeClasses.AbstractSearchForm);
-  final IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
-  final IType iPageWithTable = ScoutSdk.getType(RuntimeClasses.IPageWithTable);
+  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
+  final IType abstractSearchForm = TypeUtility.getType(RuntimeClasses.AbstractSearchForm);
+  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+  final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
   // ui fields
   private NlsProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
@@ -116,7 +116,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
-    m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_SEARCH_FORM);
+    m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_SEARCH_FORM);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -185,12 +185,12 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     INlsProject nlsProject = null;
     if (getClientBundle() != null) {
       nlsProject = getClientBundle().findBestMatchNlsProject();
-      ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutSdk.getType(RuntimeClasses.AbstractSearchForm));
-      ICachedTypeHierarchy searchFormHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iSearchForm);
+      ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(RuntimeClasses.AbstractSearchForm));
+      ICachedTypeHierarchy searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);
       IType[] abstractSearchForms = searchFormHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getAbstractOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
       ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractSearchForms);
       superTypeProvider = new DefaultProposalProvider(shotList, proposals);
-      IType[] pageWithTables = ScoutSdk.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+      IType[] pageWithTables = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
 
       ITypeProposal[] tpProposals = ScoutProposalUtility.getScoutTypeProposalsFor(pageWithTables);
       tablePageProvider = new DefaultProposalProvider(tpProposals);
@@ -250,28 +250,28 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(ScoutIdeProperties.SUFFIX_SEARCH_FORM)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_SEARCH_FORM)) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
-    if (ScoutSdk.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS) + "." + getTypeName())) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+    if (TypeUtility.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS) + "." + getTypeName())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
     else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

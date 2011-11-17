@@ -19,11 +19,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -49,7 +49,7 @@ public class WizardStepDeleteAction extends AbstractScoutHandler {
       JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
       for (IType stepToDelete : m_wizardSteps) {
         delOp.addMember(stepToDelete);
-        IMethod getter = SdkTypeUtility.getWizardStepGetterMethod(stepToDelete);
+        IMethod getter = ScoutTypeUtility.getWizardStepGetterMethod(stepToDelete);
         if (TypeUtility.exists(getter)) {
           delOp.addMember(getter);
         }

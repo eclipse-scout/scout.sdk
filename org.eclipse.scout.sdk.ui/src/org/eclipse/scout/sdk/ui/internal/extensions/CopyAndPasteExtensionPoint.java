@@ -19,9 +19,9 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.ICopySourceDelegator;
 import org.eclipse.scout.sdk.ui.extensions.IPasteTargetDelegator;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 public class CopyAndPasteExtensionPoint {
 

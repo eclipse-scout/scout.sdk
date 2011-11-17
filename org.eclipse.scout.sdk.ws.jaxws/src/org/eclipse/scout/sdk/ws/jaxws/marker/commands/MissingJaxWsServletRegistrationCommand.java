@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.operation.JaxWsServletRegistrationOperation;
@@ -37,7 +37,7 @@ public class MissingJaxWsServletRegistrationCommand extends AbstractExecutableMa
   }
 
   @Override
-  public void execute(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JaxWsServletRegistrationOperation op = new JaxWsServletRegistrationOperation();
     op.setBundle(m_bundle);
     op.setJaxWsAlias(JaxWsConstants.JAX_WS_ALIAS);

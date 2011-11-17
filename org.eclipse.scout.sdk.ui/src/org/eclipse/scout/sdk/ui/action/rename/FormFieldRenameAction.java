@@ -15,12 +15,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class FormFieldRenameAction extends AbstractRenameAction {
 
@@ -30,7 +29,7 @@ public class FormFieldRenameAction extends AbstractRenameAction {
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
     // find getter
     transaction.add(getFormField(), newName);
-    IMethod getter = SdkTypeUtility.getFormFieldGetterMethod(getFormField());
+    IMethod getter = ScoutTypeUtility.getFormFieldGetterMethod(getFormField());
     if (TypeUtility.exists(getter)) {
       transaction.add(getter, "get" + Character.toUpperCase(newName.charAt(0)) + newName.substring(1));
     }
@@ -43,13 +42,13 @@ public class FormFieldRenameAction extends AbstractRenameAction {
       return inheritedStatus;
     }
     try {
-      if (ScoutSourceUtilities.findInnerType(getFormField().getCompilationUnit().getAllTypes()[0], newName, true) != null) {
-        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Name already in use.");
+      if (ScoutSourceUtility.findInnerType(getFormField().getCompilationUnit().getAllTypes()[0], newName, true) != null) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
       }
     }
     catch (CoreException e) {
       ScoutSdkUi.logError("error during finding already existing types in form.", e);
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Exception in validation (see logfile).");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Exception in validation (see logfile).");
     }
     return inheritedStatus;
   }

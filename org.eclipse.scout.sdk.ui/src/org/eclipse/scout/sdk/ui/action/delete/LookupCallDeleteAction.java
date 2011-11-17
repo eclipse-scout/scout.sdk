@@ -27,22 +27,24 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -74,13 +76,13 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
     if (m_confirmDialog.open() == Dialog.OK) {
       JavaElementDeleteOperation op = new JavaElementDeleteOperation() {
         @Override
-        protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+        protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
           if (m_lookupServiceInterface != null && member.equals(m_lookupServiceInterface)) {
             ScoutUtility.unregisterServiceClass(m_lookupServiceInterface.getJavaProject().getProject(),
                 "org.eclipse.scout.rt.client.serviceProxies", "serviceProxy", m_lookupServiceInterface.getFullyQualifiedName(), null, monitor);
           }
           if (m_lookupService != null && member.equals(m_lookupService)) {
-            IScoutBundle implementationBundle = ScoutSdk.getScoutWorkspace().getScoutBundle(m_lookupService.getJavaProject().getProject());
+            IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(m_lookupService.getJavaProject().getProject());
             ScoutUtility.unregisterServiceClass(m_lookupService.getJavaProject().getProject(),
                 "org.eclipse.scout.rt.server.services", "service", m_lookupService.getFullyQualifiedName(), implementationBundle.getRootPackageName() + ".ServerSession", monitor);
           }
@@ -99,10 +101,10 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
     members.add(getLookupCall());
     selectedMembers.add(getLookupCall());
     // find lookup service
-    IType iService = ScoutSdk.getType(RuntimeClasses.ILookupService);
-    ICachedTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    IType iService = TypeUtility.getType(RuntimeClasses.ILookupService);
+    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     if (m_lookupServiceInterface == null) {
-      String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_LOOKUP_CALL + "$", "I$1" + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+      String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_CALL + "$", "I$1" + SdkProperties.SUFFIX_LOOKUP_SERVICE);
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getLookupCall().getJavaProject()), TypeFilters.getInterfaceFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().equals(serviceName)) {
@@ -112,9 +114,9 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
       }
     }
     if (m_lookupServiceInterface != null && m_lookupService == null) {
-      String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_LOOKUP_CALL + "$", "$1" + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+      String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_CALL + "$", "$1" + SdkProperties.SUFFIX_LOOKUP_SERVICE);
 
-      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getInScoutProject(ScoutSdk.getScoutWorkspace().getScoutBundle(getLookupCall().getJavaProject().getProject()).getScoutProject()), TypeFilters.getClassFilter());
+      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutProject(ScoutSdkCore.getScoutWorkspace().getScoutBundle(getLookupCall().getJavaProject().getProject()).getScoutProject()), TypeFilters.getClassFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().equals(serviceName)) {
           m_lookupService = candidate;

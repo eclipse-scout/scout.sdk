@@ -16,16 +16,16 @@ import java.util.HashMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.tooltip.CustomTooltip;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodErrorPresenterContent;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -63,7 +63,7 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
   public final void setMethodSet(ConfigurationMethodSet methodSet) {
     try {
       for (ConfigurationMethod method : methodSet.getMethods()) {
-        String key = method.getType().getFullyQualifiedName() + ScoutSignature.getMethodIdentifier(method.peekMethod());
+        String key = method.getType().getFullyQualifiedName() + SignatureUtility.getMethodIdentifier(method.peekMethod());
 
         MethodBean<T> methodBean = m_methodSources.get(key);
         if (methodBean == null) {
@@ -107,9 +107,9 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
   }
 
   protected void init(ConfigurationMethodSet methodSet) throws CoreException {
-    m_labelLink.setText(ScoutIdeProperties.getMethodPresenterName(getFirstMethod()));
+    m_labelLink.setText(SdkProperties.getMethodPresenterName(getFirstMethod()));
     for (MethodBean<T> bean : m_methodSources.values()) {
-      T sourceValue = parseSourceInput(PropertyMethodSourceUtilities.getMethodReturnValue(bean.getMethod().peekMethod()), bean.getMethod());
+      T sourceValue = parseSourceInput(PropertyMethodSourceUtility.getMethodReturnValue(bean.getMethod().peekMethod()), bean.getMethod());
       bean.setCurrentSourceValue(sourceValue);
       T defaultValue = parseSourceInput(bean.getMethod().computeDefaultValue(), bean.getMethod());
       bean.setDefaultValue(defaultValue);

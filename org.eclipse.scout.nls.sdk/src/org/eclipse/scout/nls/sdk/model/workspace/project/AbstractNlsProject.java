@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.workspace.InheritedNlsEntry;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsStatusDialog;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;

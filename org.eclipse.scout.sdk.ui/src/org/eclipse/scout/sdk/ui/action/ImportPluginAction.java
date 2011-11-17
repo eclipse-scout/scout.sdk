@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.action;
 
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.bundle.BundleImportWizard;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 

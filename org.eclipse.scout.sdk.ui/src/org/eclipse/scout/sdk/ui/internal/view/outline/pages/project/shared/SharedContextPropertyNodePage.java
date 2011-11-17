@@ -14,15 +14,15 @@ import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.NamingUtility;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
+import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.type.IPropertyBean;
 
 public class SharedContextPropertyNodePage extends AbstractPage {
   private final IPropertyBean m_serverDesc;

@@ -15,17 +15,17 @@ import java.util.Date;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.PrimitiveTypeProposal;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -50,7 +50,7 @@ public class PrimitiveTypePresenter extends AbstractProposalPresenter<PrimitiveT
     PrimitiveTypeProposal[] proposals = new PrimitiveTypeProposal[PRIMITIVE_TYPES.length];
 
     for (int i = 0; i < proposals.length; i++) {
-      proposals[i] = new PrimitiveTypeProposal(ScoutSdkUi.getImage(ScoutSdkUi.Default), ScoutSdk.getType(PRIMITIVE_TYPES[i].getName()));
+      proposals[i] = new PrimitiveTypeProposal(ScoutSdkUi.getImage(ScoutSdkUi.Default), TypeUtility.getType(PRIMITIVE_TYPES[i].getName()));
     }
     setProposals(proposals);
 
@@ -59,7 +59,7 @@ public class PrimitiveTypePresenter extends AbstractProposalPresenter<PrimitiveT
 
   @Override
   protected PrimitiveTypeProposal parseInput(String input) throws CoreException {
-    IType referedType = PropertyMethodSourceUtilities.parseReturnParameterClass(input, getMethod().peekMethod());
+    IType referedType = PropertyMethodSourceUtility.parseReturnParameterClass(input, getMethod().peekMethod());
     return findProposal(referedType);
   }
 
@@ -75,7 +75,7 @@ public class PrimitiveTypePresenter extends AbstractProposalPresenter<PrimitiveT
   @Override
   protected synchronized void storeValue(PrimitiveTypeProposal value) {
     IOperation op = null;
-    if (ScoutSdkUtility.equals(getDefaultValue(), value)) {
+    if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {
         op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
       }

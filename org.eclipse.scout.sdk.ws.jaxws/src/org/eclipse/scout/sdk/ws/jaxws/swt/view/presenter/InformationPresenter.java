@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;

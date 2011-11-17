@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -23,15 +23,15 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -52,8 +52,8 @@ public class HandlerTablePage extends AbstractPage {
     m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
     m_handlerHierarchyMap = new HashMap<IPrimaryTypeTypeHierarchy, IType>();
 
-    for (IType type : ScoutSdk.getTypes(Handler.class.getName())) {
-      IPrimaryTypeTypeHierarchy hierarchy = ScoutSdk.getPrimaryTypeHierarchy(type);
+    for (IType type : TypeUtility.getTypes(Handler.class.getName())) {
+      IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(type);
       hierarchy.addHierarchyListener(m_hierarchyChangedListener);
       m_handlerHierarchyMap.put(hierarchy, type);
     }
@@ -159,7 +159,7 @@ public class HandlerTablePage extends AbstractPage {
         case POST_TYPE_REMOVING:
         case POST_TYPE_ADDING:
         case POST_TYPE_CHANGED:
-          IScoutBundle bundle = ScoutSdk.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
+          IScoutBundle bundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
           if (bundle.getScoutProject() == getScoutResource().getScoutProject()) {
             markStructureDirty();
           }

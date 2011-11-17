@@ -25,13 +25,12 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -43,8 +42,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
-  final IType iToolbutton = ScoutSdk.getType(RuntimeClasses.IToolButton);
-  final IType abstractOutlineToolButton = ScoutSdk.getType(RuntimeClasses.AbstractOutlineToolButton);
+  final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
+  final IType abstractOutlineToolButton = TypeUtility.getType(RuntimeClasses.AbstractOutlineToolButton);
 
   private IType m_declaringType;
   private FilteredTable m_filteredTable;
@@ -74,7 +73,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     });
 
-    P_TableContentProvider provider = new P_TableContentProvider(SdkTypeUtility.getAbstractTypesOnClasspath(iToolbutton, m_declaringType.getJavaProject()));
+    P_TableContentProvider provider = new P_TableContentProvider(ScoutTypeUtility.getAbstractTypesOnClasspath(iToolbutton, m_declaringType.getJavaProject()));
     m_filteredTable.getViewer().setLabelProvider(provider);
     m_filteredTable.getViewer().setContentProvider(provider);
     m_filteredTable.getViewer().setInput(provider);
@@ -116,7 +115,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
       multiStatus.add(Status.OK_STATUS);
     }
     else {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
     }
   }
 

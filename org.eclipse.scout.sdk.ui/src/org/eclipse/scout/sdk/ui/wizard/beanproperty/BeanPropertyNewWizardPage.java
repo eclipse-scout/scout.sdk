@@ -20,18 +20,18 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IBeanPropertyNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposalProvider;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -129,7 +129,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   private IStatus getPropertyNameStatus() {
     String propertyName = getBeanName();
     if (propertyName == null || propertyName.length() == 0) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     else {
       // check existing method names
@@ -137,16 +137,16 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
           (m_notAllowedNames.contains("get" + getBeanName(true)) ||
               m_notAllowedNames.contains("set" + getBeanName(true)) ||
           m_notAllowedNames.contains("is" + getBeanName(true)))) {
-        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
       if (Regex.REGEX_WELLFORMED_PROPERTY.matcher(propertyName).matches()) {
         return Status.OK_STATUS;
       }
       if (Regex.REGEX_JAVAFIELD.matcher(propertyName).matches()) {
-        return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+        return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
       }
       else {
-        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", propertyName));
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", propertyName));
       }
     }
   }
@@ -154,13 +154,13 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   private IStatus getPropertyTypeStatus() {
     SignatureProposal signature = getBeanSignature();
     if (signature == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_beanTypeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_beanTypeNull"));
     }
     return Status.OK_STATUS;
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     m_operation.setBeanName(getBeanName());
     if (getBeanSignature() != null) {
       m_operation.setBeanTypeSignature(getBeanSignature().getSignature());

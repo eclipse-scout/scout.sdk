@@ -15,20 +15,15 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.BundleImportOperation;
-import org.eclipse.scout.sdk.pde.Manifest;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -39,6 +34,9 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.BundleTypeProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -79,7 +77,7 @@ public class BundleImportWizardPage extends AbstractWorkspaceWizardPage {
     ArrayList<PluginDescriptorProposal> proposals = new ArrayList<PluginDescriptorProposal>();
     for (IPluginModelBase pluginModel : workspaceModels) {
       IProject p = pluginModel.getUnderlyingResource().getProject();
-      if (ScoutSdk.getScoutWorkspace().getScoutBundle(p) == null) {
+      if (ScoutSdkCore.getScoutWorkspace().getScoutBundle(p) == null) {
         proposals.add(new PluginDescriptorProposal(pluginModel));
       }
     }
@@ -141,56 +139,50 @@ public class BundleImportWizardPage extends AbstractWorkspaceWizardPage {
     else {
       int legacyCoding = 0;
       // parse legacy
-      Manifest mf = new Manifest();
+      PluginModelHelper h = new PluginModelHelper(proposal.getPluginBase());
       String bundleName = proposal.getPluginBase().getBundleDescription().getName();
-      try {
-        mf.read((IFile) proposal.getPluginBase().getUnderlyingResource());
-        String groupId = mf.getAttribute("BsiCase-ProjectGroupId");
-        if (!StringUtility.isNullOrEmpty(groupId)) {
-          legacyCoding |= LEGACY_PROJECT_ID;
-          setProjectIdInternal(groupId);
-        }
-        String bundleType = mf.getAttribute("BsiCase-BundleType");
-        if (!StringUtility.isNullOrEmpty(bundleType)) {
-          if (bundleType.equals("client")) {
-            legacyCoding |= LEGACY_BUNDLE_TYPE;
-            setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_CLIENT));
-          }
-          else if (bundleType.equals("shared")) {
-            legacyCoding |= LEGACY_BUNDLE_TYPE;
-            setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_SHARED));
-          }
-          else if (bundleType.equals("server")) {
-            legacyCoding |= LEGACY_BUNDLE_TYPE;
-            setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_SERVER));
-          }
-        }
+      String groupId = h.Manifest.getEntry("BsiCase-ProjectGroupId");
+      if (!StringUtility.isNullOrEmpty(groupId)) {
+        legacyCoding |= LEGACY_PROJECT_ID;
+        setProjectIdInternal(groupId);
       }
-      catch (CoreException e) {
-        ScoutSdkUi.logWarning("could not parse manifest of '" + proposal.getPluginBase().getBundleDescription().getName() + "'.", e);
+      String bundleType = h.Manifest.getEntry("BsiCase-BundleType");
+      if (!StringUtility.isNullOrEmpty(bundleType)) {
+        if (bundleType.equals("client")) {
+          legacyCoding |= LEGACY_BUNDLE_TYPE;
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_CLIENT));
+        }
+        else if (bundleType.equals("shared")) {
+          legacyCoding |= LEGACY_BUNDLE_TYPE;
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_SHARED));
+        }
+        else if (bundleType.equals("server")) {
+          legacyCoding |= LEGACY_BUNDLE_TYPE;
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_SERVER));
+        }
       }
 
       if ((legacyCoding & LEGACY_BUNDLE_TYPE) == 0) {
         if (bundleName.matches("^.*client\\.test.*$")) {
-          setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_TEST_CLIENT));
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_TEST_CLIENT));
         }
         else if (bundleName.matches("^.*client.*$")) {
-          setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_CLIENT));
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_CLIENT));
         }
         else if (bundleName.matches("^.*shared.*$")) {
-          setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_SHARED));
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_SHARED));
         }
         else if (bundleName.matches("^.*server\\.app.*$")) {
-          setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_SERVER_APPLICATION));
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_SERVER_APPLICATION));
         }
         else if (bundleName.matches("^.*server.*$")) {
-          setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_SERVER));
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_SERVER));
         }
         else if (bundleName.matches("^.*ui\\.swt.*$")) {
-          setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_UI_SWT));
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_UI_SWT));
         }
         else if (bundleName.matches("^.*ui\\.swing.*$")) {
-          setBundleType(m_bundleProposals.get(ScoutIdeProperties.BUNDLE_TYPE_UI_SWING));
+          setBundleType(m_bundleProposals.get(SdkProperties.BUNDLE_TYPE_UI_SWING));
         }
       }
       Matcher m = Pattern.compile("^(([^.]*\\.)*)([^.]*)\\.(client|ui\\.swt\\.app|ui\\.swt|ui\\.swing|shared|server\\.app | server).*$").matcher(proposal.getPluginBase().getBundleDescription().getName());
@@ -206,11 +198,10 @@ public class BundleImportWizardPage extends AbstractWorkspaceWizardPage {
       }
     }
     m_pluginModel = proposal;
-
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     BundleImportOperation operation = new BundleImportOperation();
     operation.setProjectId(getProjectId());
     operation.setBundleType(getBundleType().getType());

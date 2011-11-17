@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -19,13 +19,12 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -44,7 +43,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // assemble supertype signature
     IType jaxWsPortType = null;
     if (TypeUtility.exists(getJaxWsPortType())) {
@@ -52,7 +51,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
       JaxWsSdk.logError("Could not link webservice consumer to port type as port type could not be found");
     }
     else {
-      jaxWsPortType = ScoutSdk.getType(Object.class.getName());
+      jaxWsPortType = TypeUtility.getType(Object.class.getName());
     }
     IType jaxWsServiceType = null;
     if (TypeUtility.exists(getJaxWsServiceType())) {
@@ -60,7 +59,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
       JaxWsSdk.logError("Could not link webservice consumer to service as service could not be found");
     }
     else {
-      jaxWsServiceType = ScoutSdk.getType(Service.class.getName());
+      jaxWsServiceType = TypeUtility.getType(Service.class.getName());
     }
 
     String superTypeSignature = "<";
@@ -109,10 +108,10 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
     workingCopyManager.reconcile(icu, monitor);
   }
 
-  private IType createType(String qualifiedTypeName, IType interfaceType, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  private IType createType(String qualifiedTypeName, IType interfaceType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IType type;
-    if (ScoutSdk.existsType(qualifiedTypeName)) {
-      type = ScoutSdk.getType(qualifiedTypeName);
+    if (TypeUtility.existsType(qualifiedTypeName)) {
+      type = TypeUtility.getType(qualifiedTypeName);
     }
     else {
       String typeName = Signature.getSimpleName(qualifiedTypeName);

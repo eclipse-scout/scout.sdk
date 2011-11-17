@@ -16,20 +16,19 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.dnd.FormFieldRelocateAction;
 import org.eclipse.scout.sdk.ui.extensions.IDropTargetDelegator;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.AbstractBoxNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.OutlineDropTargetEvent;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
 public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
@@ -61,7 +60,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       return true;
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not validate drop location.", e);
+      ScoutSdkUi.logWarning("could not validate drop location.", e);
     }
     return false;
   }
@@ -72,7 +71,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
   private AbstractBoxNodePage getGroupBoxTargetType(OutlineDropTargetEvent event) {
     if (event.getCurrentTarget() instanceof AbstractBoxNodePage) {
       AbstractBoxNodePage targetPage = (AbstractBoxNodePage) event.getCurrentTarget();
-      if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON && targetPage.getType().getElementName().equals(ScoutIdeProperties.TYPE_NAME_MAIN_BOX)) {
+      if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON && targetPage.getType().getElementName().equals(SdkProperties.TYPE_NAME_MAIN_BOX)) {
         return null;
       }
       else {
@@ -138,7 +137,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
   private boolean isCopyAndSourceComplexAndTargetSameIcu(OutlineDropTargetEvent event, IType targetType, IType selectedType) {
     if (event.getOperation() == DND.DROP_COPY) {
       if (selectedType.getCompilationUnit().equals(targetType.getCompilationUnit())) {
-        if (SdkTypeUtility.getFormFields(selectedType).length > 0) {
+        if (ScoutTypeUtility.getFormFields(selectedType).length > 0) {
           return true;
         }
       }
@@ -149,7 +148,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
   private int getPositionInDeclaringType(IType element) throws JavaModelException {
     int i = -1;
     if (element != null) {
-      for (IType candidate : TypeUtility.getInnerTypes(element, null, TypeComparators.getOrderAnnotationComparator())) {
+      for (IType candidate : TypeUtility.getInnerTypes(element, null, ScoutTypeComparators.getOrderAnnotationComparator())) {
         System.out.println(candidate.getElementName());
         i++;
         if (element.equals(candidate)) return i;

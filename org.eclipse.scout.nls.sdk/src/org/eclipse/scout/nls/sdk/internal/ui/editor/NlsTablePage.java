@@ -21,7 +21,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.NlsTableModel;
 import org.eclipse.scout.nls.sdk.internal.model.workspace.InheritedNlsEntry;
 import org.eclipse.scout.nls.sdk.internal.ui.action.CopyPasteAction;

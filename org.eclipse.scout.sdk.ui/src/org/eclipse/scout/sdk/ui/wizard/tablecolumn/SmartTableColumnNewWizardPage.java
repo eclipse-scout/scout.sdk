@@ -23,12 +23,8 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.SmartTableColumnNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroupListener;
@@ -42,14 +38,17 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -68,9 +67,9 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     ADD_MORE_COLUMNS, FINISH
   }
 
-  final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
-  final IType lookupCall = ScoutSdk.getType(RuntimeClasses.LookupCall);
-  final IType iCodeType = ScoutSdk.getType(RuntimeClasses.ICodeType);
+  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
+  final IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
+  final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
 
   private NlsProposal m_nlsName;
   private String m_typeName;
@@ -116,7 +115,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     Group g = new Group(p, SWT.NONE);
     g.setText(Texts.get("Column"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -141,7 +140,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_typeNameField = getFieldToolkit().createStyledTextField(g, Texts.get("TypeName"));
-    m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_TABLE_COLUMN);
+    m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_TABLE_COLUMN);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -151,7 +150,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(g, SdkTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(g, ScoutTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -161,7 +160,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    ITypeProposal[] lookupCallProps = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getClassesOnClasspath(lookupCall, getSharedBundle().getJavaProject()));
+    ITypeProposal[] lookupCallProps = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getClassesOnClasspath(lookupCall, getSharedBundle().getJavaProject()));
     m_lookupCallField = getFieldToolkit().createProposalField(g, new DefaultProposalProvider(lookupCallProps), Texts.get("LookupCall"));
     m_lookupCallField.acceptProposal(getLookupCall());
     m_lookupCallField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -180,7 +179,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] codeTypeProps = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getClassesOnClasspath(iCodeType, getSharedBundle().getJavaProject()));
+    ITypeProposal[] codeTypeProps = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getClassesOnClasspath(iCodeType, getSharedBundle().getJavaProject()));
     m_codeTypeField = getFieldToolkit().createProposalField(g, new DefaultProposalProvider(codeTypeProps), Texts.get("CodeType"));
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -198,7 +197,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(SdkTypeUtility.getColumns(m_declaringType));
+    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(ScoutTypeUtility.getColumns(m_declaringType));
     m_siblingField = getFieldToolkit().createProposalField(g, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
@@ -243,7 +242,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (CONTINUE_OPERATION.ADD_MORE_COLUMNS == m_continueOperation) {
       // start another wizard if one additional column should be created.
       Display.getDefault().asyncExec(new Runnable() {
@@ -281,7 +280,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setLookupCall(getLookupCall().getType());
     }*/
     if (getSibling() == SiblingProposal.SIBLING_END) {
-      IStructuredType structuredType = SdkTypeUtility.createStructuredTable(m_declaringType);
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_COLUMN));
     }
     else {
@@ -306,28 +305,28 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(ScoutIdeProperties.SUFFIX_TABLE_COLUMN)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_TABLE_COLUMN)) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
     if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
     else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
   }
 
   protected IStatus getStatusGenericType() throws JavaModelException {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
-        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
       }
     }
     return Status.OK_STATUS;
@@ -335,17 +334,17 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusLookupCallCodeType() {
     // if(getCodeType() == null && getLookupCall() == null){
-    // return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "A lookup call or a code type must be set.");
+    // return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "A lookup call or a code type must be set.");
     // }
     // else
     if (getCodeType() != null/* && getLookupCall() != null*/) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("OnlyOneOfCodeTypeOrLookupCallCanBeProcessed"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("OnlyOneOfCodeTypeOrLookupCallCanBeProcessed"));
     }
     return Status.OK_STATUS;
   }
 
   public IScoutBundle getClientBundle() {
-    return SdkTypeUtility.getScoutBundle(m_declaringType);
+    return ScoutTypeUtility.getScoutBundle(m_declaringType);
   }
 
   public IScoutBundle getSharedBundle() {

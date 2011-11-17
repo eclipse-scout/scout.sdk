@@ -4,20 +4,17 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 
-import java.io.IOException;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.ScoutStatus;
-import org.eclipse.scout.sdk.pde.PdeUtility;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
@@ -35,13 +32,10 @@ public class MissingClasspathEntryForJarFileCommand extends AbstractExecutableMa
   }
 
   @Override
-  public void execute(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String jarFilePath = JaxWsSdkUtility.normalizePath(m_stubJarFile.getProjectRelativePath().toPortableString(), SeparatorType.None);
-    try {
-      PdeUtility.addBundleClasspath(m_bundle.getProject(), jarFilePath);
-    }
-    catch (IOException e) {
-      new CoreException(new ScoutStatus(e));
-    }
+    PluginModelHelper h = new PluginModelHelper(m_bundle.getProject());
+    h.Manifest.addClasspathEntry(jarFilePath);
+    h.save();
   }
 }

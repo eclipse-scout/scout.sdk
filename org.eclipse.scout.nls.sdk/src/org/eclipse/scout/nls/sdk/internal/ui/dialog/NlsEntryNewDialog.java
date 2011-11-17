@@ -13,7 +13,7 @@ package org.eclipse.scout.nls.sdk.internal.ui.dialog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IValidationListener;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;

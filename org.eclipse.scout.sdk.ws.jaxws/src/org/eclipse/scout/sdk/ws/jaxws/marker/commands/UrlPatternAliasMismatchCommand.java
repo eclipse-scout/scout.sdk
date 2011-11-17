@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
@@ -38,7 +38,7 @@ public class UrlPatternAliasMismatchCommand extends AbstractExecutableMarkerComm
   }
 
   @Override
-  public void execute(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     m_sunJaxWsBean.setUrlPattern(m_urlPattern);
     XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
     sunJaxWsResource.storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED);

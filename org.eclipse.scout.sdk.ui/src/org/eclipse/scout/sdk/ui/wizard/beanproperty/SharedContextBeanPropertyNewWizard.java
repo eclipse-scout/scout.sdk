@@ -12,23 +12,24 @@ package org.eclipse.scout.sdk.ui.wizard.beanproperty;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.SharedContextBeanPropertyNewOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
-import org.eclipse.scout.sdk.workspace.type.IMethodFilter;
-import org.eclipse.scout.sdk.workspace.type.MethodFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.IMethodFilter;
+import org.eclipse.scout.sdk.util.type.MethodFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard {
 
   public SharedContextBeanPropertyNewWizard(IType serverSessionType, IType clientSessionType) {
     setWindowTitle(Texts.get("NewSharedContextProperty"));
-    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(ScoutSdk.getScoutWorkspace().getScoutBundle(serverSessionType.getJavaProject().getProject()).getSearchScope());
+    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(ScoutSdkCore.getScoutWorkspace().getScoutBundle(serverSessionType.getJavaProject().getProject()).getSearchScope());
 
     SharedContextBeanPropertyNewOperation op = new SharedContextBeanPropertyNewOperation(serverSessionType, clientSessionType);
     beanPropertyWizardPage.setOperation(op);
@@ -61,7 +62,7 @@ public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard 
   protected void collectMethodNames(IType type, Set<String> collector) {
     IMethodFilter filter = MethodFilters.getMultiMethodFilter(
         MethodFilters.getFlagsFilter(Flags.AccPublic),
-        MethodFilters.getNameRegexFilter("^(get|set|is).*"));
+        MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is).*")));
 
     for (IMethod m : TypeUtility.getMethods(type, filter)) {
       collector.add(m.getElementName());

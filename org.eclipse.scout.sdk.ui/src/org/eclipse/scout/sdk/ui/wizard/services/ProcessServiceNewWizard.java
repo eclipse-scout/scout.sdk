@@ -21,12 +21,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
@@ -34,9 +30,13 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.dnd.DND;
@@ -50,7 +50,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   public static final int TYPE_SERVICE_REG_CLIENT = 109;
   public static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  final IType abstractService = ScoutSdk.getType(RuntimeClasses.AbstractService);
+  final IType abstractService = TypeUtility.getType(RuntimeClasses.AbstractService);
 
   private final IScoutBundle m_serverBundle;
   private BundleTreeWizardPage m_locationWizardPage;
@@ -131,7 +131,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     try {
       m_operation.validate();
       m_operation.run(monitor, workingCopyManager);
@@ -153,12 +153,12 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (evt.getPropertyName().equals(ServiceNewWizardPage.PROP_TYPE_NAME)) {
         String typeName = m_serviceNewWizardPage.getTypeName();
         if (!StringUtility.isNullOrEmpty(typeName)) {
-          String prefix = typeName.replaceAll(ScoutIdeProperties.SUFFIX_PROCESS_SERVICE + "$", "");
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_CREATE)).setText("Create" + prefix + ScoutIdeProperties.SUFFIX_PERMISSION);
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_READ)).setText("Read" + prefix + ScoutIdeProperties.SUFFIX_PERMISSION);
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_UPDATE)).setText("Update" + prefix + ScoutIdeProperties.SUFFIX_PERMISSION);
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE);
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE);
+          String prefix = typeName.replaceAll(SdkProperties.SUFFIX_PROCESS_SERVICE + "$", "");
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_CREATE)).setText("Create" + prefix + SdkProperties.SUFFIX_PERMISSION);
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_READ)).setText("Read" + prefix + SdkProperties.SUFFIX_PERMISSION);
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_UPDATE)).setText("Update" + prefix + SdkProperties.SUFFIX_PERMISSION);
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
           m_locationWizardPage.refreshTree();
         }
         m_locationWizardPage.pingStateChanging();

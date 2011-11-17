@@ -17,10 +17,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -28,12 +25,15 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -58,9 +58,9 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     CREATE_NEW, USE_EXISTING, NO_SERVICE
   }
 
-  private static final IType iLookupService = ScoutSdk.getType(RuntimeClasses.ILookupService);
-  private static final IType abstractSqlLookupService = ScoutSdk.getType(RuntimeClasses.AbstractSqlLookupService);
-  private static final IType abstractLookupService = ScoutSdk.getType(RuntimeClasses.AbstractLookupService);
+  private static final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
+  private static final IType abstractSqlLookupService = TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService);
+  private static final IType abstractLookupService = TypeUtility.getType(RuntimeClasses.AbstractLookupService);
 
   /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
@@ -97,7 +97,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected void createContent(Composite parent) {
 
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
-    m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_LOOKUP_CALL);
+    m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -172,7 +172,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   private void updateSharedBundle() {
     DefaultProposalProvider lookupTypeProposalProvider = new DefaultProposalProvider();
     if (getSharedBundle() != null) {
-      ICachedTypeHierarchy lookupServiceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iLookupService);
+      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
       ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(lookupServices);
       lookupTypeProposalProvider = new DefaultProposalProvider(proposals);
@@ -191,7 +191,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     DefaultProposalProvider superTypeProvider = new DefaultProposalProvider();
     if (getServerBundle() != null) {
       ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(abstractLookupService, abstractSqlLookupService);
-      ICachedTypeHierarchy lookupServiceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iLookupService);
+      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
       ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractLookupServices);
       superTypeProvider = new DefaultProposalProvider(shotList, proposals);
@@ -225,35 +225,35 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(ScoutIdeProperties.SUFFIX_LOOKUP_CALL)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_LOOKUP_CALL)) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
-    if (ScoutSdk.existsType(getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP) + "." + getTypeName())) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+    if (TypeUtility.existsType(getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP) + "." + getTypeName())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
     else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.CREATE_NEW && getServiceSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }
 
   protected IStatus getStatusLookupService() throws JavaModelException {
     if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.USE_EXISTING && getLookupServiceType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheLookupCallCanNotBeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheLookupCallCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

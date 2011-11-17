@@ -10,20 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class KeyStrokeNodePage extends AbstractScoutTypePage {
 
   public KeyStrokeNodePage() {
-    super(ScoutIdeProperties.SUFFIX_KEY_STROKE);
+    super(SdkProperties.SUFFIX_KEY_STROKE);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Keystroke));
   }
 

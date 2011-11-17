@@ -20,34 +20,6 @@ import org.junit.Test;
 public class RegexTest {
 
   @Test
-  public void testQuoteRegexSpecialCharacters_grouping() {
-    Assert.assertEquals("\\(\\)", Regex.quoteRegexSpecialCharacters("()"));
-    Assert.assertEquals("\\(test\\)\\{3,6\\}", Regex.quoteRegexSpecialCharacters("(test){3,6}"));
-  }
-
-  @Test
-  public void testQuoteRegexSpecialCharacters_characterClass() {
-    Assert.assertEquals("\\[\\]", Regex.quoteRegexSpecialCharacters("[]"));
-    Assert.assertEquals("\\[a-z,A-Z&&\\\\p\\{Sc\\}\\]", Regex.quoteRegexSpecialCharacters("[a-z,A-Z&&\\p{Sc}]"));
-  }
-
-  @Test
-  public void testQuoteRegexSpecialCharacters_quantifiers() {
-    Assert.assertEquals("\\*", Regex.quoteRegexSpecialCharacters("*"));
-    Assert.assertEquals("\\+", Regex.quoteRegexSpecialCharacters("+"));
-    Assert.assertEquals("\\?", Regex.quoteRegexSpecialCharacters("?"));
-    Assert.assertEquals("\\{\\}", Regex.quoteRegexSpecialCharacters("{}"));
-  }
-
-  @Test
-  public void testQuoteRegexSpecialCharacters_others() {
-    Assert.assertEquals("\\|", Regex.quoteRegexSpecialCharacters("|"));
-    Assert.assertEquals("\\\\", Regex.quoteRegexSpecialCharacters("\\"));
-    Assert.assertEquals("\\^", Regex.quoteRegexSpecialCharacters("^"));
-    Assert.assertEquals("\\$", Regex.quoteRegexSpecialCharacters("$"));
-  }
-
-  @Test
   public void testRegexFieldDeclaration_validFieldDeclarations() {
     checkVariableDeclarationRightHandSide("int i = 5;", "5");
     checkVariableDeclarationRightHandSide("  int     i    =     5     ;", "5");

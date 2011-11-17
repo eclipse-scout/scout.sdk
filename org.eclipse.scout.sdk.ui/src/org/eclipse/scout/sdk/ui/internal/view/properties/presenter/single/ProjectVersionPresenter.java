@@ -15,9 +15,9 @@ import java.util.LinkedList;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.pde.Manifest;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.SWT;
@@ -33,7 +33,6 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
-import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 
 /**
@@ -42,20 +41,14 @@ import org.osgi.framework.Version;
 public class ProjectVersionPresenter extends AbstractPresenter {
   private Text m_versionField;
   private ImageHyperlink m_applyVersionLink;
-  private final HashMap<IProject, Manifest> m_bundles;
+  private final HashMap<IProject, PluginModelHelper> m_bundles;
 
   public ProjectVersionPresenter(FormToolkit toolkit, Composite parent, IScoutProject scoutProject) {
     super(toolkit, parent);
     IScoutBundle[] scoutBundles = scoutProject.getAllScoutBundles(); // do not include sub projects: they might have different versions
-    m_bundles = new HashMap<IProject, Manifest>(scoutBundles.length);
+    m_bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.length);
     for (IScoutBundle sb : scoutBundles) {
-      Manifest mf = new Manifest();
-      try {
-        mf.read(sb.getProject());
-        m_bundles.put(sb.getProject(), mf);
-      }
-      catch (Exception e) {
-      }
+      m_bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));
     }
 
     createContent(getContainer());
@@ -116,11 +109,11 @@ public class ProjectVersionPresenter extends AbstractPresenter {
       String newVersionStr = newVersion.toString();
       LinkedList<String> errPlugins = new LinkedList<String>();
       for (IProject p : m_bundles.keySet()) {
-        Manifest mf = m_bundles.get(p);
-        if (!newVersionStr.equals(mf.getAttribute(Constants.BUNDLE_VERSION))) {
+        PluginModelHelper mf = m_bundles.get(p);
+        if (!newVersionStr.equals(mf.Manifest.getVersionAsString())) {
           try {
-            mf.setAttribute(Constants.BUNDLE_VERSION, newVersionStr);
-            mf.write(p);
+            mf.Manifest.setVersion(newVersionStr);
+            mf.save();
           }
           catch (Exception e) {
             errPlugins.add(p.getName());
@@ -155,8 +148,8 @@ public class ProjectVersionPresenter extends AbstractPresenter {
 
   private String getCommonPluginVerionString() {
     String v = null;
-    for (Manifest b : m_bundles.values()) {
-      String bundleVersion = b.getAttribute(Constants.BUNDLE_VERSION);
+    for (PluginModelHelper b : m_bundles.values()) {
+      String bundleVersion = b.Manifest.getVersionAsString();
       if (v == null) {
         v = bundleVersion;
       }

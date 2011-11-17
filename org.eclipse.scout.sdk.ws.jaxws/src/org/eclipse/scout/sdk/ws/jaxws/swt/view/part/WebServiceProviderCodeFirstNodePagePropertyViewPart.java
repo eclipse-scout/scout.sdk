@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -17,15 +17,14 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.AbstractSinglePageSectionBasedViewPart;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -266,10 +265,10 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
     }
 
     String fqn = sunJaxWsBean.getImplementation();
-    if (!ScoutSdk.existsType(fqn)) {
+    if (!TypeUtility.existsType(fqn)) {
       return;
     }
-    IType wsProviderImplType = ScoutSdk.getType(fqn);
+    IType wsProviderImplType = TypeUtility.getType(fqn);
 
     // QuickLink 'Open PortType'
     TypeOpenAction a = new TypeOpenAction();
@@ -291,7 +290,7 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
       return;
     }
     AnnotationProperty property = JaxWsSdkUtility.parseAnnotationTypeValue(portType, annotation, "endpointInterface");
-    IType portTypeInterfaceType = ScoutSdk.getType(property.getFullyQualifiedName());
+    IType portTypeInterfaceType = TypeUtility.getType(property.getFullyQualifiedName());
     if (portTypeInterfaceType == null) {
       return;
     }
@@ -331,10 +330,10 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
           IType portType = getPage().getPortType();
           if (TypeUtility.exists(portType)) {
             String factoryFullyQualifiedName = (String) value;
-            if (!ScoutSdk.existsType(factoryFullyQualifiedName)) {
+            if (!TypeUtility.existsType(factoryFullyQualifiedName)) {
               return;
             }
-            IType factoryType = ScoutSdk.getType(factoryFullyQualifiedName);
+            IType factoryType = TypeUtility.getType(factoryFullyQualifiedName);
             AnnotationUpdateOperation op = new AnnotationUpdateOperation();
             op.setDeclaringType(portType);
             op.setAnnotationType(JaxWsRuntimeClasses.ScoutWebService);

@@ -12,29 +12,30 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CodeNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class CodeNodePage extends AbstractScoutTypePage {
-  final IType iCode = ScoutSdk.getType(RuntimeClasses.ICode);
+  final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public CodeNodePage(IPage parent, IType type) {
     setParent(parent);
     setType(type);
-    setName(ScoutSourceUtilities.getTranslatedMethodStringValue(getType(), "getConfiguredText"));
+    setName(ScoutSourceUtility.getTranslatedMethodStringValue(getType(), "getConfiguredText"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Code));
   }
 
@@ -57,7 +58,7 @@ public class CodeNodePage extends AbstractScoutTypePage {
   public void unloadPage() {
     super.unloadPage();
     if (m_innerTypeListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
   }
@@ -66,14 +67,14 @@ public class CodeNodePage extends AbstractScoutTypePage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCode);
-      ScoutSdk.addInnerTypeChangedListener(getType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
-//    ITypeHierarchy codeHierarchy = ScoutSdk.getTypeHierarchyPrimaryTypes(iCode).combinedTypeHierarchy(getType());
+//    ITypeHierarchy codeHierarchy = TypeUtility.getTypeHierarchyPrimaryTypes(iCode).combinedTypeHierarchy(getType());
 //    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
 //        TypeFilters.getSubtypeFilter(iCode, codeHierarchy),
 //        TypeFilters.getClassFilter());
 
-    IType[] codes = SdkTypeUtility.getCodes(getType());//TypeUtility.getInnerTypes(getType(), filter, TypeComparators.getOrderAnnotationComparator());
+    IType[] codes = ScoutTypeUtility.getCodes(getType());//TypeUtility.getInnerTypes(getType(), filter, TypeComparators.getOrderAnnotationComparator());
     for (IType code : codes) {
       new CodeNodePage(this, code);
     }

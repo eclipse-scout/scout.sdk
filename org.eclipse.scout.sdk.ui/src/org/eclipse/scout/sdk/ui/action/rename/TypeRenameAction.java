@@ -14,9 +14,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class TypeRenameAction extends AbstractRenameAction {
   private IType m_type;
@@ -40,7 +40,7 @@ public class TypeRenameAction extends AbstractRenameAction {
     }
     else {
       String packName = getType().getPackageFragment().getElementName();
-      if (ScoutSdk.existsType(packName + "." + newName)) {
+      if (TypeUtility.existsType(packName + "." + newName)) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
       }
     }

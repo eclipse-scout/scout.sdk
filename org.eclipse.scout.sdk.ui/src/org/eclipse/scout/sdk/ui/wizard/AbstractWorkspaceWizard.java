@@ -15,8 +15,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.widgets.Display;
 
 /**
@@ -66,7 +66,7 @@ public class AbstractWorkspaceWizard extends AbstractWizard {
    * @throws CoreException
    * @throws IllegalArgumentException
    */
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     for (IWizardPage page : getPages()) {
       boolean validPage = false;
       AbstractWorkspaceWizardPage bcPage = (AbstractWorkspaceWizardPage) page;
@@ -121,7 +121,7 @@ public class AbstractWorkspaceWizard extends AbstractWizard {
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       try {
         m_success = performFinish(monitor, workingCopyManager);
         m_display.asyncExec(new Runnable() {

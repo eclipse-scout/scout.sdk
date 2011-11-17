@@ -20,21 +20,21 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.ui.wizard.services.ServiceNewWizardPage;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -169,7 +169,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     try {
       m_operation.run(monitor, workingCopyManager);
       return true;
@@ -194,32 +194,32 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
       if (evt.getPropertyName().equals(ServiceNewWizardPage.PROP_TYPE_NAME)) {
         String typeName = m_formPage.getTypeName();
         if (!StringUtility.isNullOrEmpty(typeName)) {
-          String prefix = typeName.replaceAll(ScoutIdeProperties.SUFFIX_FORM + "$", "");
-          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_FORM)).setText(prefix + ScoutIdeProperties.SUFFIX_FORM);
+          String prefix = typeName.replaceAll(SdkProperties.SUFFIX_FORM + "$", "");
+          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_FORM)).setText(prefix + SdkProperties.SUFFIX_FORM);
           ITreeNode formDataNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_FORM_DATA));
           if (formDataNode != null) {
-            formDataNode.setText(prefix + ScoutIdeProperties.SUFFIX_FORM_DATA);
+            formDataNode.setText(prefix + SdkProperties.SUFFIX_FORM_DATA);
           }
           ITreeNode permissionCreateNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_PERMISSION_CREATE));
           if (permissionCreateNode != null) {
-            permissionCreateNode.setText("Create" + prefix + ScoutIdeProperties.SUFFIX_PERMISSION);
+            permissionCreateNode.setText("Create" + prefix + SdkProperties.SUFFIX_PERMISSION);
           }
           ITreeNode permissionReadNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_PERMISSION_READ));
           if (permissionReadNode != null) {
-            permissionReadNode.setText("Read" + prefix + ScoutIdeProperties.SUFFIX_PERMISSION);
+            permissionReadNode.setText("Read" + prefix + SdkProperties.SUFFIX_PERMISSION);
           }
 
           ITreeNode permissionUpdateNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_PERMISSION_UPDATE));
           if (permissionUpdateNode != null) {
-            permissionUpdateNode.setText("Update" + prefix + ScoutIdeProperties.SUFFIX_PERMISSION);
+            permissionUpdateNode.setText("Update" + prefix + SdkProperties.SUFFIX_PERMISSION);
           }
           ITreeNode serviceImplNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION));
           if (serviceImplNode != null) {
-            serviceImplNode.setText(prefix + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE);
+            serviceImplNode.setText(prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
           }
           ITreeNode serviceInterfaceNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE));
           if (serviceInterfaceNode != null) {
-            serviceInterfaceNode.setText("I" + prefix + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE);
+            serviceInterfaceNode.setText("I" + prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
           }
           m_locationPage.refreshTree();
         }

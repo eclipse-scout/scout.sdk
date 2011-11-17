@@ -12,22 +12,22 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.ClientServiceNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 public class ClientServiceTablePage extends AbstractPage {
 
-  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
+  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
   private ICachedTypeHierarchy m_servieHierarchy;
 
   public ClientServiceTablePage(IPage parentPage) {
@@ -74,7 +74,7 @@ public class ClientServiceTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_servieHierarchy == null) {
-      m_servieHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+      m_servieHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
       m_servieHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     IType[] serviceTypes = m_servieHierarchy.getAllSubtypes(iService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());

@@ -21,19 +21,20 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.JavaClassProposal;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -41,7 +42,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
 
   private String m_labelMethodName;
   private boolean m_includeNullProposal;
-  private static final JavaClassProposal NULL_PROPOSAL = new JavaClassProposal(ScoutIdeProperties.NULL, ScoutSdkUi.getImage(ScoutSdkUi.Default), null);
+  private static final JavaClassProposal NULL_PROPOSAL = new JavaClassProposal(SdkProperties.NULL, ScoutSdkUi.getImage(ScoutSdkUi.Default), null);
 
   public AbstractTypeProposalPresenter(FormToolkit toolkit, Composite parent, String labelMethodName, boolean includeNullProposal) {
     super(toolkit, parent);
@@ -66,14 +67,14 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
 
   @Override
   protected JavaClassProposal parseInput(String input) throws CoreException {
-    IType referedType = PropertyMethodSourceUtilities.parseReturnParameterClass(input, getMethod().peekMethod());
+    IType referedType = PropertyMethodSourceUtility.parseReturnParameterClass(input, getMethod().peekMethod());
     return findProposal(referedType);
   }
 
   @Override
   protected synchronized void storeValue(final JavaClassProposal value) {
     IOperation op = null;
-    if (ScoutSdkUtility.equals(getDefaultValue(), value)) {
+    if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {
         op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
       }
@@ -86,7 +87,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
           source.append("  return ");
           if (value != null && value.getJavaClass() != null) {
             IType javaClass = value.getJavaClass();
-            source.append(ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(javaClass.getFullyQualifiedName(), true), validator) + ".class;");
+            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(javaClass.getFullyQualifiedName(), true), validator) + ".class;");
           }
           else {
             source.append("null;");

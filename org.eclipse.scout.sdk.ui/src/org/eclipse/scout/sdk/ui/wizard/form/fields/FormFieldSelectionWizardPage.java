@@ -31,18 +31,18 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
-  private IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
+  private IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
   private final IType m_declaringType;
   private AbstractScoutWizardPage m_nextPage;
@@ -91,8 +91,8 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
         m_byExtensionEntries.add(ext);
       }
     }
-    IPrimaryTypeTypeHierarchy formFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(ScoutSdk.getType(RuntimeClasses.IFormField));
-    IType[] abstractFormFields = formFieldHierarchy.getAllSubtypes(iFormField, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getOrderAnnotationComparator());
+    IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IFormField));
+    IType[] abstractFormFields = formFieldHierarchy.getAllSubtypes(iFormField, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType formField : abstractFormFields) {
       m_byClassEntries.add(formField);
     }
@@ -197,7 +197,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
   private IStatus getStatusFieldList() {
     if (m_nextPage == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NoFieldSelected"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoFieldSelected"));
     }
     return Status.OK_STATUS;
   }

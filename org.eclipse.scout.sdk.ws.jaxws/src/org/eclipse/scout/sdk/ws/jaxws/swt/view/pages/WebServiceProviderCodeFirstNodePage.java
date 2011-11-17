@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -23,13 +23,12 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.marker.IMarkerRebuildListener;
 import org.eclipse.scout.sdk.ws.jaxws.marker.MarkerRebuildUtility;
@@ -134,8 +133,8 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
 
     if ((dataMask & DATA_JDT_TYPE) > 0) {
       m_portType = null;
-      if (m_sunJaxWsBean != null && m_sunJaxWsBean.getImplementation() != null && ScoutSdk.existsType(m_sunJaxWsBean.getImplementation())) {
-        m_portType = ScoutSdk.getType(m_sunJaxWsBean.getImplementation());
+      if (m_sunJaxWsBean != null && m_sunJaxWsBean.getImplementation() != null && TypeUtility.existsType(m_sunJaxWsBean.getImplementation())) {
+        m_portType = TypeUtility.getType(m_sunJaxWsBean.getImplementation());
       }
       m_portTypeChangedListener.setType(m_portType);
     }

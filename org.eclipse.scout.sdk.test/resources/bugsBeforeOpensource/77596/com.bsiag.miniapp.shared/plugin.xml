@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension point="org.eclipse.scout.service.services">
+    <service class="com.bsiag.miniapp.shared.services.common.text.DefaultTextProviderService" factory="org.eclipse.scout.service.DefaultServiceFactory"/>
+  </extension>
+</plugin>

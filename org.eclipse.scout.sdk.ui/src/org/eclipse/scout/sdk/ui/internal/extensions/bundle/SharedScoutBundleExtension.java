@@ -18,11 +18,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.project.FillSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  *
@@ -44,7 +44,7 @@ public class SharedScoutBundleExtension implements IScoutBundleProvider {
   }
 
   @Override
-  public IJavaProject createBundle(IScoutProjectWizard wizard, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  public IJavaProject createBundle(IScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     TemplateVariableSet variables = TemplateVariableSet.createNew(wizard.getProjectWizardPage().getProjectName(), wizard.getProjectWizardPage().getProjectNamePostfix(), wizard.getProjectWizardPage().getProjectAlias());
     try {
       CreateSharedPluginOperation op = new CreateSharedPluginOperation(variables);

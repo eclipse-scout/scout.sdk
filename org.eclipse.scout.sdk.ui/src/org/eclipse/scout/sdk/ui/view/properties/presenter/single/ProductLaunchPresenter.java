@@ -34,7 +34,7 @@ import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
@@ -300,8 +300,13 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     Job job = new Job("starting '" + getProductName() + "' product...") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        EclipseLaunchShortcut shortCut = new EclipseLaunchShortcut();
-        shortCut.launch(new StructuredSelection(m_productFile), (debug) ? (ILaunchManager.DEBUG_MODE) : (ILaunchManager.RUN_MODE));
+        try {
+          EclipseLaunchShortcut shortCut = new EclipseLaunchShortcut();
+          shortCut.launch(new StructuredSelection(m_productFile), (debug) ? (ILaunchManager.DEBUG_MODE) : (ILaunchManager.RUN_MODE));
+        }
+        catch (Exception e) {
+          ScoutSdkUi.logError("could not start product '" + getProductFile().getName() + "'", e);
+        }
         return Status.OK_STATUS;
       }
     };

@@ -20,19 +20,19 @@ import org.eclipse.jdt.ui.JavadocContentAccess;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutStatus;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
-import org.eclipse.scout.sdk.ui.jdt.JdtUiUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodErrorPresenterContent;
 import org.eclipse.scout.sdk.util.Regex;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -78,7 +78,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     if (m_label != null) m_label.dispose();
 
     if (isLinkMode()) {
-      m_labelLink = getToolkit().createHyperlink(m_linkComposite, ScoutIdeProperties.getMethodPresenterName(method.peekMethod()), SWT.NONE);
+      m_labelLink = getToolkit().createHyperlink(m_linkComposite, SdkProperties.getMethodPresenterName(method.peekMethod()), SWT.NONE);
       m_labelLink.addHyperlinkListener(new HyperlinkAdapter() {
         @Override
         public void linkActivated(HyperlinkEvent e) {
@@ -91,7 +91,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
       m_tooltip = new JavadocTooltip(m_labelLink);
     }
     else {
-      m_label = getToolkit().createLabel(m_linkComposite, ScoutIdeProperties.getMethodPresenterName(method.peekMethod()));
+      m_label = getToolkit().createLabel(m_linkComposite, SdkProperties.getMethodPresenterName(method.peekMethod()));
       m_label.setForeground(new Color(m_linkComposite.getDisplay(), 0, 0, 128));
       m_tooltip = new JavadocTooltip(m_label);
     }
@@ -258,7 +258,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   }
 
   protected void showJavaElementInEditor(IJavaElement e, boolean createNew) {
-    JdtUiUtility.showJavaElementInEditor(e, createNew);
+    UiUtility.showJavaElementInEditor(e, createNew);
   }
 
   protected final String readInitalValue() throws CoreException {
@@ -283,8 +283,8 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
       ScoutSdkUi.logWarning("methodBody of " + getMethod().getMethodName() + " in " + getMethod().getType().getFullyQualifiedName() + " is null");
     }
     String newBody = methodBody;
-    newBody = ScoutSourceUtilities.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().peekMethod().getDeclaringType()).length() + 1, newBody);
-    newBody = newBody.replaceAll("\t", ScoutIdeProperties.TAB);
+    newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().peekMethod().getDeclaringType()).length() + 1, newBody);
+    newBody = newBody.replaceAll("\t", SdkProperties.TAB);
     return newBody;
   }
 

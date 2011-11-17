@@ -18,15 +18,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.tooltip.CustomTooltip;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -106,7 +105,7 @@ public class MethodErrorPresenterContent extends Composite {
     area.setLayout(glayout);
     m_statusIcon.setLayoutData(new GridData(GridData.BEGINNING));
     m_statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-    GridData gData = new GridData(SWT.DEFAULT, ScoutIdeProperties.TOOL_BUTTON_SIZE);
+    GridData gData = new GridData(SWT.DEFAULT, SdkProperties.TOOL_BUTTON_SIZE);
 
     m_deleteButton.setLayoutData(gData);
     m_deleteButton.setEnabled(false);
@@ -144,7 +143,7 @@ public class MethodErrorPresenterContent extends Composite {
 
   public void setMethod(ConfigurationMethod method) {
     m_configurationMethod = method;
-    m_labelLink.setText(ScoutIdeProperties.getMethodPresenterName(method.peekMethod()));
+    m_labelLink.setText(SdkProperties.getMethodPresenterName(method.peekMethod()));
     m_labelLink.setEnabled(true);
     m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, getMethod().isImplemented()));
     try {
@@ -154,7 +153,7 @@ public class MethodErrorPresenterContent extends Composite {
       ScoutSdkUi.logWarning("could not create tooltip for '" + method.getMethodName() + "'", e1);
     }
     m_deleteButton.setEnabled(method.isImplemented());
-    setStatus(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Unaccepted value!"));
+    setStatus(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Unaccepted value!"));
   }
 
   public void setStatus(IStatus status) {
@@ -203,9 +202,9 @@ public class MethodErrorPresenterContent extends Composite {
 
   private String wellFormMethod() throws JavaModelException {
     String methodBody = getMethod().peekMethod().getSource();
-    String newBody = ScoutSourceUtilities.removeLeadingCommentAndAnnotationLines(methodBody);
-    newBody = ScoutSourceUtilities.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody);
-    newBody = newBody.replaceAll("\t", ScoutIdeProperties.TAB);
+    String newBody = ScoutSourceUtility.removeLeadingCommentAndAnnotationLines(methodBody);
+    newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody);
+    newBody = newBody.replaceAll("\t", SdkProperties.TAB);
     return newBody;
   }
 

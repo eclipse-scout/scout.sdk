@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field;
 
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
 
@@ -53,7 +53,7 @@ public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
       FormFieldRenameAction a = (FormFieldRenameAction) menu;
       a.setFormField(getType());
       a.setOldName(getType().getElementName());
-      a.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM_FIELD);
+      a.setReadOnlySuffix(SdkProperties.SUFFIX_FORM_FIELD);
     }
     else if (menu instanceof FormFieldDeleteAction) {
       FormFieldDeleteAction action = (FormFieldDeleteAction) menu;

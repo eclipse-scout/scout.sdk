@@ -11,15 +11,15 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
 import org.eclipse.jdt.core.IMember;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
 
   public CalendarItemProviderNodePage() {
-    super(ScoutIdeProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
+    super(SdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProvider));
   }
 

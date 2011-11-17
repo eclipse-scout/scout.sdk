@@ -11,14 +11,15 @@
 package org.eclipse.scout.sdk.ui.wizard.beanproperty;
 
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
-import org.eclipse.scout.sdk.workspace.type.MethodFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.MethodFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
 
@@ -29,7 +30,7 @@ public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
     beanPropertyWizardPage.setOperation(op);
     // find all used method names
     HashSet<String> notAllowedMethodNames = new HashSet<String>();
-    IMethod[] methods = TypeUtility.getMethods(declaringType, MethodFilters.getNameRegexFilter("^(get|set|is).*"));
+    IMethod[] methods = TypeUtility.getMethods(declaringType, MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is).*")));
     for (IMethod m : methods) {
       notAllowedMethodNames.add(m.getElementName());
     }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,18 +14,18 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiValuePresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -49,7 +49,7 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
       ar[i] = methodBeans[i].getCurrentSourceValue();
     }
     if (!allEqual(ar)) {
-      getTextComponent().setText(ScoutIdeProperties.INPUT_MULTI_UNDEFINED);
+      getTextComponent().setText(SdkProperties.INPUT_MULTI_UNDEFINED);
     }
     else {
       getTextComponent().setText(formatDisplayValue(ar[0]));
@@ -75,23 +75,23 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
   @Override
   protected String formatDisplayValue(Long value) throws CoreException {
     if (value.longValue() == Long.MAX_VALUE) {
-      return ScoutIdeProperties.NUMBER_MAX;
+      return SdkProperties.NUMBER_MAX;
     }
     else if (value.longValue() == Long.MIN_VALUE) {
-      return ScoutIdeProperties.NUMBER_MIN;
+      return SdkProperties.NUMBER_MIN;
     }
     return DecimalFormat.getNumberInstance().format(value);
   }
 
   @Override
   protected Long parseSourceInput(String input, ConfigurationMethod method) throws CoreException {
-    Long d = PropertyMethodSourceUtilities.parseReturnParameterLong(input, method.peekMethod(), method.getSuperTypeHierarchy());
+    Long d = PropertyMethodSourceUtility.parseReturnParameterLong(input, method.peekMethod(), method.getSuperTypeHierarchy());
     return d;
   }
 
   @Override
   protected Long parseDisplayInput(String input) throws CoreException {
-    Long d = PropertyMethodSourceUtilities.parseReturnParameterLong(input);
+    Long d = PropertyMethodSourceUtility.parseReturnParameterLong(input);
     return d;
   }
 
@@ -102,7 +102,7 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
       try {
         String sourceValue = formatSourceValue(value);
         ConfigurationMethod method = bean.getMethod();
-        if (ScoutSdkUtility.equals(bean.getDefaultValue(), sourceValue)) {
+        if (UiUtility.equals(bean.getDefaultValue(), sourceValue)) {
           if (method.isImplemented()) {
             list.add(new ScoutMethodDeleteOperation(method.peekMethod()));
           }

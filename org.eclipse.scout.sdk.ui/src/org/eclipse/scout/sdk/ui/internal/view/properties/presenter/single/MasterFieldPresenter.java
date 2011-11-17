@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.JavaClassProposal;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -31,7 +31,7 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
 
   @Override
   protected IType[] provideScoutTypes(IJavaProject project, IType ownerType) throws CoreException {
-    return SdkTypeUtility.getPotentialMasterFields(ownerType);
+    return ScoutTypeUtility.getPotentialMasterFields(ownerType);
   }
 
 }

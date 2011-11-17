@@ -1,5 +1,7 @@
 package formdata.shared.services.process;
 
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import java.util.Map;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -11,16 +13,22 @@ public class SimpleFormData extends AbstractFormData {
   public SimpleFormData() {
   }
 
-  public Long getSimpleNr() {
-    return getPropertyByClass(SimpleNrProperty.class).getValue();
-  }
-
   public SimpleNrProperty getSimpleNrProperty() {
     return getPropertyByClass(SimpleNrProperty.class);
   }
 
-  public void setSimpleNr(Long simpleNrProperty) {
-    getSimpleNrProperty().setValue(simpleNrProperty);
+  /**
+   * access method for property SimpleNr.
+   */
+  public Long getSimpleNr() {
+    return getSimpleNrProperty().getValue();
+  }
+
+  /**
+   * access method for property SimpleNr.
+   */
+  public void setSimpleNr(Long simpleNr) {
+    getSimpleNrProperty().setValue(simpleNr);
   }
 
   public SampleComposer getSampleComposer() {
@@ -44,38 +52,51 @@ public class SimpleFormData extends AbstractFormData {
 
     public SimpleNrProperty() {
     }
-
   }
 
-  public class SampleComposer extends AbstractComposerData {
+  public static class SampleComposer extends AbstractComposerData {
     private static final long serialVersionUID = 1L;
 
     public SampleComposer() {
     }
-
   }
 
-  public class SampleDouble extends AbstractValueFieldData<Double> {
+  public static class SampleDouble extends AbstractValueFieldData<Double> {
     private static final long serialVersionUID = 1L;
 
     public SampleDouble() {
     }
-
   }
 
-  public class SampleSmart extends AbstractValueFieldData<Long> {
+  public static class SampleSmart extends AbstractValueFieldData<Long> {
     private static final long serialVersionUID = 1L;
 
     public SampleSmart() {
     }
 
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.ZERO_NULL_EQUALITY, true);
+    }
   }
 
-  public class SampleString extends AbstractValueFieldData<String> {
+  public static class SampleString extends AbstractValueFieldData<String> {
     private static final long serialVersionUID = 1L;
 
     public SampleString() {
     }
 
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
+    }
   }
 }

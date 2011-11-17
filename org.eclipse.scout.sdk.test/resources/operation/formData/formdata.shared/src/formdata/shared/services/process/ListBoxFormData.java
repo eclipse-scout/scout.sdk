@@ -1,7 +1,7 @@
 package formdata.shared.services.process;
 
-import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 
 public class ListBoxFormData extends AbstractFormData {
   private static final long serialVersionUID = 1L;
@@ -13,11 +13,10 @@ public class ListBoxFormData extends AbstractFormData {
     return getFieldByClass(ListBox.class);
   }
 
-  public class ListBox extends AbstractValueFieldData {
+  public static class ListBox extends AbstractValueFieldData<Long[]> {
     private static final long serialVersionUID = 1L;
 
     public ListBox() {
     }
-
   }
 }

@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.view.property;
 
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.view.property.IMultiPropertyViewPart;
 import org.eclipse.scout.sdk.ui.extensions.view.property.ISinglePropertyViewPart;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**

@@ -25,8 +25,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.ui.refactoring.RenameSupport;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
-import org.eclipse.scout.sdk.ScoutStatus;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.swt.widgets.Shell;
 
 /**

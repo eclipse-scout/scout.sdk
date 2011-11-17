@@ -11,15 +11,15 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.calendar;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 public class CalendarServiceNodePage extends AbstractServiceNodePage {
 
   public CalendarServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
-    super(parent, type, interfaceType, ScoutIdeProperties.SUFFIX_CALENDAR_SERVICE);
+    super(parent, type, interfaceType, SdkProperties.SUFFIX_CALENDAR_SERVICE);
   }
 
   @Override

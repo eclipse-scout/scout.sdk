@@ -27,13 +27,13 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Composite;
  * <h3> {@link FormHandlerNewWizardPage1}</h3> ...
  */
 public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
-  final IType iFormHandler = ScoutSdk.getType(RuntimeClasses.IFormHandler);
+  final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
   private IType m_declaringType;
   private boolean m_showAllTemplates;
 
@@ -81,11 +81,11 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     });
     List<HandlerTemplate> templates = new ArrayList<HandlerTemplate>();
-    templates.add(new HandlerTemplate(Texts.get("FormHandlerNEW"), ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_NEW));
-    templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_MODIFY));
-    templates.add(new HandlerTemplate(Texts.get("FormHandler"), ScoutSdk.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_CUSTOM));
+    templates.add(new HandlerTemplate(Texts.get("FormHandlerNEW"), TypeUtility.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_NEW));
+    templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), TypeUtility.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_MODIFY));
+    templates.add(new HandlerTemplate(Texts.get("FormHandler"), TypeUtility.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_CUSTOM));
 
-    IType[] abstractFormHandlers = ScoutSdk.getPrimaryTypeHierarchy(iFormHandler).getAllSubtypes(iFormHandler, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] abstractFormHandlers = TypeUtility.getPrimaryTypeHierarchy(iFormHandler).getAllSubtypes(iFormHandler, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType t : abstractFormHandlers) {
       templates.add(new HandlerTemplate(t.getElementName(), t, HandlerTemplate.ID_DEFAULT));
     }
@@ -140,7 +140,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       multiStatus.add(Status.OK_STATUS);
     }
     else {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
     }
   }
 

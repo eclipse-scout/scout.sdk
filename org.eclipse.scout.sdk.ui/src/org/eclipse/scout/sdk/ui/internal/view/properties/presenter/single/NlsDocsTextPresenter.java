@@ -8,7 +8,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsDocsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -44,7 +44,7 @@ public class NlsDocsTextPresenter extends NlsTextPresenter {
   }
 
   private INlsProject findDocsNlsProject(IJavaElement element) {
-    IScoutBundle scoutBundle = SdkTypeUtility.getScoutBundle(element);
+    IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(element);
     return scoutBundle.getScoutProject().getDocsNlsProject();
   }
 }

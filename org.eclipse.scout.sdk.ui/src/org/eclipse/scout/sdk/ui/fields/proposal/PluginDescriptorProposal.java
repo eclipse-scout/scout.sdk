@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.fields.proposal;
 
 import org.eclipse.pde.core.plugin.IPluginModelBase;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 public class PluginDescriptorProposal implements IContentProposalEx {

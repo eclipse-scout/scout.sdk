@@ -13,13 +13,13 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ImportPluginAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -49,12 +49,12 @@ public class ScoutExplorerRootNodePage extends AbstractPage {
     setParent(parent);
     setName(Texts.get("RootNodeName"));
     m_view = view;
-    ScoutSdk.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
+    ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
   }
 
   @Override
   public void unloadPage() {
-    ScoutSdk.getScoutWorkspace().removeWorkspaceListener(m_workspaceListener);
+    ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(m_workspaceListener);
   }
 
   @Override
@@ -74,7 +74,7 @@ public class ScoutExplorerRootNodePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IScoutProject[] rootProjects = ScoutSdk.getScoutWorkspace().getRootProjects();
+    IScoutProject[] rootProjects = ScoutSdkCore.getScoutWorkspace().getRootProjects();
     ScoutSdkUi.logInfo("INVISIBLE ROOT NODE: found " + rootProjects.length + " root projects.");
     for (IScoutProject group : rootProjects) {
       new ProjectNodePage(this, group);
@@ -92,7 +92,7 @@ public class ScoutExplorerRootNodePage extends AbstractPage {
     debugActions.add(new Action("print bundle tree") {
       @Override
       public void run() {
-        ((ScoutWorkspace) ScoutSdk.getScoutWorkspace()).printBundleGraph();
+        ((ScoutWorkspace) ScoutSdkCore.getScoutWorkspace()).printBundleGraph();
       }
     });
   }

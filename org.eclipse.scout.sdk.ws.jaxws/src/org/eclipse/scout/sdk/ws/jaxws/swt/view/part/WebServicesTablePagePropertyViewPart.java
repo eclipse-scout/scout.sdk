@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.AbstractSinglePageSectionBasedViewPart;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -88,7 +88,7 @@ public class WebServicesTablePagePropertyViewPart extends AbstractSinglePageSect
       applyLayoutData(presenter);
 
       // JAX-WS library conflict
-      if (ScoutSdk.getTypes(javax.xml.ws.Service.class.getName()).length > 1) {
+      if (TypeUtility.getTypes(javax.xml.ws.Service.class.getName()).length > 1) {
         ISection section = createSection(SECTION_ID_INFORMATION, Texts.get("Information"), null, false);
         presenter = new InformationPresenter(section.getSectionClient(), "Multiple JAX-WS RI implementations detected which might cause problems at design and runtime. Please consider that the installed Scout JAX-WS integration supports JAX-WS RI 2.1.6 bundled with Java SE 6.", JaxWsSdk.getImageDescriptor(JaxWsIcons.LibraryConflict), new Point(48, 100), getFormToolkit());
         applyLayoutData(presenter);

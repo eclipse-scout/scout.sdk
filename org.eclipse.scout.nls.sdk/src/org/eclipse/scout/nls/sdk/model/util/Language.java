@@ -12,7 +12,7 @@ package org.eclipse.scout.nls.sdk.model.util;
 
 import java.util.Locale;
 
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 
 public class Language {
 

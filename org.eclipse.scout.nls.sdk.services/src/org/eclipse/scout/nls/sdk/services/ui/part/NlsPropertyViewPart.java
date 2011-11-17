@@ -20,8 +20,8 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresen
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.JdtTypePropertyPart;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 

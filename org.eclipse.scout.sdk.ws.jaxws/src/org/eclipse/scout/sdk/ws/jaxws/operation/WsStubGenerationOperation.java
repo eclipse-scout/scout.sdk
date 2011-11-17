@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -37,10 +37,10 @@ import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutStatus;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -86,7 +86,7 @@ public class WsStubGenerationOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     JaxWsSdk.getDefault().getMarkerQueueManager().suspend();
     try {
       // ensure stub folder created
@@ -267,7 +267,7 @@ public class WsStubGenerationOperation implements IOperation {
     }
 
     // check whether the required lib tools.jar is part of the workspace classpath (required for WsImport)
-    if (!ScoutSdk.existsType(JaxWsRuntimeClasses.WsImportType)) { // first check whether tools.jar is accessible
+    if (!TypeUtility.existsType(JaxWsRuntimeClasses.WsImportType)) { // first check whether tools.jar is accessible
       // manually add tool.jar to the classpath of the launch-configuration (from JRE).
       File toolsJarFile = locateToolsJar();
       if (toolsJarFile == null || !toolsJarFile.exists() || !toolsJarFile.isFile()) {

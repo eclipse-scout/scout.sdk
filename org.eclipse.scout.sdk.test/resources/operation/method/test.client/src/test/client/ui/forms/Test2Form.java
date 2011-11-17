@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,12 +21,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 import test.client.ui.forms.Test2Form.MainBox.ListboxField;
 import test.client.ui.forms.Test2Form.MainBox.SmartField;
 import test.client.ui.forms.Test2Form.MainBox.StringField;
 import test.client.ui.forms.Test2Form.MainBox.TableField;
-import test.shared.Texts;
 
 @FormData
 public class Test2Form extends AbstractForm {
@@ -39,7 +39,7 @@ public class Test2Form extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return Texts.get("Test2");
+    return TEXTS.get("Test2");
   }
 
   @FormData

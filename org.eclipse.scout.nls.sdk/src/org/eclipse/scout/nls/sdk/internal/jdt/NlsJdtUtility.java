@@ -50,7 +50,7 @@ import org.eclipse.jdt.ui.actions.OpenNewClassWizardAction;
 import org.eclipse.jdt.ui.refactoring.RenameSupport;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.pde.internal.core.natures.PDE;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsStatusDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchSite;

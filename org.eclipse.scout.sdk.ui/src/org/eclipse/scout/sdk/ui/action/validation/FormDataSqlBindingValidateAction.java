@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.sql.binding.FormDataSqlBindingValidator;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.widgets.Shell;
 
@@ -60,7 +60,7 @@ public class FormDataSqlBindingValidateAction extends AbstractScoutHandler {
           new FormDataSqlBindingValidator(getServices()).run(monitor);
         }
         catch (Exception e) {
-          ScoutSdk.logError("could not execute formdata sql binding validation.", e);
+          ScoutSdkUi.logError("could not execute formdata sql binding validation.", e);
         }
         return Status.OK_STATUS;
       }

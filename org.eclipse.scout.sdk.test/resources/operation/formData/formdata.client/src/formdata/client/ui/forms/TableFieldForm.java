@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
@@ -16,13 +16,11 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.shared.ScoutTexts;
 
 import formdata.client.ui.forms.TableFieldForm.MainBox.CompanyField;
 import formdata.client.ui.forms.TableFieldForm.MainBox.PersonTableField;
-import formdata.shared.Texts;
-import formdata.shared.services.process.TableFieldFormData;
 import formdata.client.ui.template.formfield.AbstractCompanyTableField;
+import formdata.shared.services.process.TableFieldFormData;
 
 @FormData(value = TableFieldFormData.class, sdkCommand = SdkCommand.CREATE)
 public class TableFieldForm extends AbstractForm {

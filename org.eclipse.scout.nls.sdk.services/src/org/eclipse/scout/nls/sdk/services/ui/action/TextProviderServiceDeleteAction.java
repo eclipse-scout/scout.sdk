@@ -16,8 +16,8 @@ import org.eclipse.scout.nls.sdk.services.operation.DeleteServiceNlsProjectOpera
 import org.eclipse.scout.nls.sdk.services.ui.page.TextServiceNodePage;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;

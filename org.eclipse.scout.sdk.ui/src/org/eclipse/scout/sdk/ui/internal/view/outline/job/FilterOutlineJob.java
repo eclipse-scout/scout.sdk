@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.job;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.widgets.Display;
 
 public class FilterOutlineJob extends AbstractWorkspaceBlockingJob {
@@ -29,7 +29,7 @@ public class FilterOutlineJob extends AbstractWorkspaceBlockingJob {
   }
 
   @Override
-  protected void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     Display display = m_view.getTreeViewer().getControl().getDisplay();
     if (!m_page.isChildrenLoaded()) {
       m_page.loadChildren();

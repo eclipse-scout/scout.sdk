@@ -11,14 +11,14 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar.CalendarNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class CalendarFieldNodePage extends AbstractFormFieldNodePage {
 
@@ -34,7 +34,7 @@ public class CalendarFieldNodePage extends AbstractFormFieldNodePage {
   @Override
   public void loadChildrenImpl() {
     new KeyStrokeTablePage(this, getType());
-    IType[] calendars = SdkTypeUtility.getCalendar(getType());
+    IType[] calendars = ScoutTypeUtility.getCalendar(getType());
     if (calendars.length > 0) {
       new CalendarNodePage(this, calendars[0]);
     }

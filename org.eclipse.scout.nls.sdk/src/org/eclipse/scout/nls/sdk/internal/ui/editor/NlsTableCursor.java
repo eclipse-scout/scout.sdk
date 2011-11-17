@@ -13,7 +13,7 @@ package org.eclipse.scout.nls.sdk.internal.ui.editor;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.workspace.InheritedNlsEntry;
 import org.eclipse.scout.nls.sdk.internal.ui.TableTextEditor;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;

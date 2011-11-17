@@ -16,16 +16,16 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchyChangedListener;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -52,15 +52,15 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
 
   @Test
   public void testPrimaryTypeHierarchy() {
-    IType companyForm = ScoutSdk.getType("test.client.ui.forms.CompanyForm");
+    IType companyForm = TypeUtility.getType("test.client.ui.forms.CompanyForm");
     Assert.assertTrue(TypeUtility.exists(companyForm));
-    IType iformField = ScoutSdk.getType(RuntimeClasses.IFormField);
-    IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iformField);
+    IType iformField = TypeUtility.getType(RuntimeClasses.IFormField);
+    IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iformField);
     ITypeHierarchy companyFormHierarchy = primaryFormFieldHierarchy.combinedTypeHierarchy(companyForm);
     Assert.assertTrue(primaryFormFieldHierarchy.isCreated());
     IType mainBox = companyForm.getType("MainBox");
     Assert.assertTrue(TypeUtility.exists(mainBox));
-    IType[] formFields = TypeUtility.getInnerTypes(mainBox, TypeFilters.getSubtypeFilter(iformField, companyFormHierarchy), TypeComparators.getOrderAnnotationComparator());
+    IType[] formFields = TypeUtility.getInnerTypes(mainBox, TypeFilters.getSubtypeFilter(iformField, companyFormHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     Assert.assertTrue(formFields.length == 3);
     Assert.assertEquals(formFields[0].getElementName(), "NameField");
     Assert.assertEquals(formFields[1].getElementName(), "SinceField");
@@ -70,8 +70,8 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
   @Test
   public void testCreateNewPrimaryType() throws Exception {
     final IJavaProject project = JavaCore.create(getProject(BUNLDE_NAME_CLIENT));
-    final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
-    final IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iForm);
+    final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+    final IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
     IType[] subtypes = primaryFormFieldHierarchy.getAllSubtypes(iForm, TypeFilters.getClassesInProject(project));
     Assert.assertEquals(1, subtypes.length);
     final IntegerHolder formCountHolder = new IntegerHolder(-1);
@@ -92,7 +92,7 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
     });
     FormNewOperation formOp = new FormNewOperation();
     formOp.setTypeName("ANewForm");
-    formOp.setClientBundle(ScoutSdk.getScoutWorkspace().getScoutBundle(project.getProject()));
+    formOp.setClientBundle(ScoutSdkCore.getScoutWorkspace().getScoutBundle(project.getProject()));
     formOp.setSuperType(Signature.createTypeSignature(RuntimeClasses.AbstractForm, true));
     OperationJob job = new OperationJob(formOp);
     job.schedule();
@@ -104,6 +104,5 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
     }
     // expect created form
     Assert.assertEquals(2, formCountHolder.getValue().intValue());
-
   }
 }

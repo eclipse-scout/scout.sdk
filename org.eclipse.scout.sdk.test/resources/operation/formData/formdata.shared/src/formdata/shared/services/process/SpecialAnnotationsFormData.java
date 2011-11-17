@@ -1,6 +1,5 @@
 package formdata.shared.services.process;
 
-import formdata.shared.services.process.SimpleFormData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 
 public class SpecialAnnotationsFormData extends AbstractFormData {
@@ -13,11 +12,10 @@ public class SpecialAnnotationsFormData extends AbstractFormData {
     return getFieldByClass(WrappedFormForm.class);
   }
 
-  public class WrappedFormForm extends SimpleFormData {
+  public static class WrappedFormForm extends SimpleFormData {
     private static final long serialVersionUID = 1L;
 
     public WrappedFormForm() {
     }
-
   }
 }

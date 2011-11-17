@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.fields.javacode;
 
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 public class JavaCodeFieldLabelProvider extends LabelProvider {

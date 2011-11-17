@@ -11,15 +11,15 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 public class CustomServiceNodePage extends AbstractServiceNodePage {
 
   public CustomServiceNodePage(AbstractPage parent, IType implementationType, IType interfaceType) {
-    super(parent, implementationType, interfaceType, ScoutIdeProperties.SUFFIX_CUSTOM_SERVICE);
+    super(parent, implementationType, interfaceType, SdkProperties.SUFFIX_CUSTOM_SERVICE);
   }
 
   @Override

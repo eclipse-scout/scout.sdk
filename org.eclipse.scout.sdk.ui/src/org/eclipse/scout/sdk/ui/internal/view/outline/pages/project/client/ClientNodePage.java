@@ -23,24 +23,24 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.SearchFormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.AllPagesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard.WizardTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 public class ClientNodePage extends AbstractPage {
 
@@ -49,9 +49,9 @@ public class ClientNodePage extends AbstractPage {
   private ICachedTypeHierarchy m_desktopExtensionHierarchy;
 
   private final IScoutBundle m_clientProject;
-  private IType iClientSession = ScoutSdk.getType(RuntimeClasses.IClientSession);
-  private IType iDesktop = ScoutSdk.getType(RuntimeClasses.IDesktop);
-  private IType iDesktopExtension = ScoutSdk.getType(RuntimeClasses.IDesktopExtension);
+  private IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
+  private IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
+  private IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
 
   public ClientNodePage(AbstractPage parent, IScoutBundle clientProject) {
     setParent(parent);
@@ -105,15 +105,15 @@ public class ClientNodePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_clientSessionHierarchy == null) {
-      m_clientSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iClientSession);
+      m_clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
       m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     if (m_desktopHierarchy == null) {
-      m_desktopHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iDesktop);
+      m_desktopHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
       m_desktopHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     if (m_desktopExtensionHierarchy == null) {
-      m_desktopExtensionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iDesktopExtension);
+      m_desktopExtensionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
       m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     // client session
@@ -208,10 +208,10 @@ public class ClientNodePage extends AbstractPage {
         null
         );
     if (matchList.size() > 1) {
-      ScoutSdk.logWarning("found more than one type matches for '" + fqn + "' (matches: '" + matchList.size() + "').");
+      ScoutSdkUi.logWarning("found more than one type matches for '" + fqn + "' (matches: '" + matchList.size() + "').");
     }
     else if (matchList.size() < 1) {
-      ScoutSdk.logWarning("found no type matches for '" + fqn + "'.");
+      ScoutSdkUi.logWarning("found no type matches for '" + fqn + "'.");
       return null;
     }
     return matchList.firstEntry().getValue();

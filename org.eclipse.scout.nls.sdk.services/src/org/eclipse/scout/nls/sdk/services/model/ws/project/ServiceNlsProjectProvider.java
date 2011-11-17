@@ -16,18 +16,19 @@ import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.internal.core.PDECore;
-import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutStatus;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 @SuppressWarnings("restriction")
 public class ServiceNlsProjectProvider implements INlsProjectProvider {
@@ -99,10 +100,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
 
-    IType superType = ScoutSdk.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+    IType superType = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
     if (superType == null) return null;
 
-    IType[] serviceImpls = ScoutSdk.getPrimaryTypeHierarchy(superType).getAllSubtypes(superType);
+    IType[] serviceImpls = TypeCacheAccessor.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType);
     HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.length);
     IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IScoutBundleConstantes.EXTENSION_POINT_SERVICES, true);
     for (IExtension e : allServiceExtensions) {
@@ -270,7 +271,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static IScoutBundle[] getScoutBundlesForType(IType type) {
-    IScoutBundle b = ScoutSdk.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
+    IScoutBundle b = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
     if (b != null) {
       IScoutProject root = b.getScoutProject();
       return getScoutBundlesForProject(root);

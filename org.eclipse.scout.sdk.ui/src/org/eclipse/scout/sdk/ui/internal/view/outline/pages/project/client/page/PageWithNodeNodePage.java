@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.NodePageChildPageTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;

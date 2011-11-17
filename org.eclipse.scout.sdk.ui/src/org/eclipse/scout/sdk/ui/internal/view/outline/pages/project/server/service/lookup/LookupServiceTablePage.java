@@ -12,24 +12,24 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchyChangedListener;
 
 public class LookupServiceTablePage extends AbstractPage {
 
-  final IType iLookupService = ScoutSdk.getType(RuntimeClasses.ILookupService);
+  final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
   ICachedTypeHierarchy m_serviceHierarchy;
 
   public LookupServiceTablePage(AbstractPage parent) {
@@ -80,7 +80,7 @@ public class LookupServiceTablePage extends AbstractPage {
 
   protected IType[] resolveAllLookupServices() {
     if (m_serviceHierarchy == null) {
-      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iLookupService);
+      m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     IType[] services = m_serviceHierarchy.getAllSubtypes(iLookupService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());

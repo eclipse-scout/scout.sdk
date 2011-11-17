@@ -14,17 +14,16 @@ import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  * <h3>PageNodePageHelper</h3> ...
  */
 public class PageNodePageHelper {
-  final IType iPageWithNodes = ScoutSdk.getType(RuntimeClasses.IPageWithNodes);
-  final IType iPageWithTable = ScoutSdk.getType(RuntimeClasses.IPageWithTable);
+  final IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
+  final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
   private static final PageNodePageHelper instance = new PageNodePageHelper();
 
   private PageNodePageHelper() {

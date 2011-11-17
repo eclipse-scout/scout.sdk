@@ -15,25 +15,25 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class WizardStepRenameAction extends AbstractRenameAction {
 
   private IType m_wizardStep;
 
   public WizardStepRenameAction() {
-    setReadOnlySuffix(ScoutIdeProperties.SUFFIX_WIZARD_STEP);
+    setReadOnlySuffix(SdkProperties.SUFFIX_WIZARD_STEP);
   }
 
   @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
     // find getter
     transaction.add(getWizardStep(), newName);
-    IMethod getter = SdkTypeUtility.getWizardStepGetterMethod(getWizardStep());
+    IMethod getter = ScoutTypeUtility.getWizardStepGetterMethod(getWizardStep());
     if (TypeUtility.exists(getter)) {
       transaction.add(getter, "get" + Character.toUpperCase(newName.charAt(0)) + newName.substring(1));
     }
@@ -46,7 +46,7 @@ public class WizardStepRenameAction extends AbstractRenameAction {
       return inheritedStatus;
     }
     if (TypeUtility.exists(getWizardStep().getDeclaringType().getType(newName))) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Name already in use.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
     }
     return inheritedStatus;
   }

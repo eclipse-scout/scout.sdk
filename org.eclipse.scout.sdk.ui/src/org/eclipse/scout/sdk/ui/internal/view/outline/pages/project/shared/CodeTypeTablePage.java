@@ -12,24 +12,24 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformCodeTypesOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 public class CodeTypeTablePage extends AbstractPage {
-  final IType iCodeType = ScoutSdk.getType(RuntimeClasses.ICodeType);
+  final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
 
   private ICachedTypeHierarchy m_codeTypeHierarchy;
 
@@ -75,7 +75,7 @@ public class CodeTypeTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_codeTypeHierarchy == null) {
-      m_codeTypeHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iCodeType);
+      m_codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
       m_codeTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());

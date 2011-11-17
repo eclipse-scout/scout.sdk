@@ -1,12 +1,10 @@
 package formdata.shared.services.process;
 
-import formdata.shared.services.process.AbstractExternalGroupBoxData;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import java.util.Map;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import formdata.shared.services.process.AbstractTestCheckboxFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.commons.annotations.FormDataChecksum;
 
-@FormDataChecksum(2975728837l)
 public class UsingTemplateFormData extends AbstractFormData {
   private static final long serialVersionUID = 1L;
 
@@ -25,27 +23,33 @@ public class UsingTemplateFormData extends AbstractFormData {
     return getFieldByClass(TestCheckbox.class);
   }
 
-  public class ExternalGroupBox extends AbstractExternalGroupBoxData {
+  public static class ExternalGroupBox extends AbstractExternalGroupBoxData {
     private static final long serialVersionUID = 1L;
 
     public ExternalGroupBox() {
     }
-
   }
 
-  public class InternalHtml extends AbstractValueFieldData<String> {
+  public static class InternalHtml extends AbstractValueFieldData<String> {
     private static final long serialVersionUID = 1L;
 
     public InternalHtml() {
     }
 
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, Integer.MAX_VALUE);
+    }
   }
 
-  public class TestCheckbox extends AbstractTestCheckboxFieldData {
+  public static class TestCheckbox extends AbstractTestCheckboxFieldData {
     private static final long serialVersionUID = 1L;
 
     public TestCheckbox() {
     }
-
   }
 }

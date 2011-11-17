@@ -4,24 +4,22 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.nls.sdk.NlsCore;
-import org.eclipse.scout.nls.sdk.services.NlsSdkService;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceNewAction;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 public class TextServiceTablePage extends AbstractPage {
 
-  private ICachedTypeHierarchy m_serviceHierarchy;
   private PackageContentChangedListener m_packageContentListener;
   private IPackageFragment m_textServicePackage;
 
@@ -40,9 +38,6 @@ public class TextServiceTablePage extends AbstractPage {
 
   @Override
   public void refresh(boolean clearCache) {
-    if (clearCache && m_serviceHierarchy != null) {
-      m_serviceHierarchy.invalidate();
-    }
     super.refresh(clearCache);
   }
 

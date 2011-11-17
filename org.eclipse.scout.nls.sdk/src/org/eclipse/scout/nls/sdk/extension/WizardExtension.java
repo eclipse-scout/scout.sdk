@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.extension;
 
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 
 /**
  * <h4>ImportExportExtensionPoint</h4>

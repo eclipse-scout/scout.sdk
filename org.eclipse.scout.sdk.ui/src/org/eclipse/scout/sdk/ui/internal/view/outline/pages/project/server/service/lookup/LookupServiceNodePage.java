@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
@@ -21,6 +20,7 @@ import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateActi
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 /**
  * represents the implementation of a service
@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.Abstra
 public class LookupServiceNodePage extends AbstractServiceNodePage {
 
   public LookupServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
-    super(parent, type, interfaceType, ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+    super(parent, type, interfaceType, SdkProperties.SUFFIX_LOOKUP_SERVICE);
   }
 
   @Override

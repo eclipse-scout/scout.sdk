@@ -19,24 +19,24 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.ui.action.NlsEntryNewAction;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.ScoutStatus;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.nls.NlsNewProposal;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.nls.NlsNullProposal;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -87,7 +87,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   }
 
   protected INlsProject getNlsProject(ConfigurationMethod method) {
-    return SdkTypeUtility.findNlsProject(method.getType());
+    return ScoutTypeUtility.findNlsProject(method.getType());
   }
 
   @Override
@@ -101,11 +101,11 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
       return;
     }
 
-    String defaultKey = PropertyMethodSourceUtilities.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
+    String defaultKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
     if (defaultKey != null) {
       m_defaultTuple = getNlsProject().getEntry(defaultKey);
     }
-    String currentSourceValueKey = PropertyMethodSourceUtilities.parseReturnParameterNlsKey(getMethod().computeValue());
+    String currentSourceValueKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeValue());
     try {
       storeValueLock.acquire();
       if (currentSourceValueKey != null) {
@@ -194,7 +194,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
     try {
       if (storeValueLock.acquire()) {
         IOperation op = null;
-        if (ScoutSdkUtility.equals(m_defaultTuple, proposal)) {
+        if (UiUtility.equals(m_defaultTuple, proposal)) {
           if (getMethod().isImplemented()) {
             op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
           }

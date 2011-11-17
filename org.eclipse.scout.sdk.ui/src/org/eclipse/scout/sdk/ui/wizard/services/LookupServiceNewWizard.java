@@ -21,12 +21,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.LookupServiceNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
@@ -35,9 +31,13 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.dnd.DND;
@@ -58,7 +58,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
     setWindowTitle(Texts.get("NewLookupService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serverBundle = serverBundle;
-    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewLookupService"), Texts.get("CreateANewLookupService"), ScoutSdk.getType(RuntimeClasses.ILookupService), ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewLookupService"), Texts.get("CreateANewLookupService"), TypeUtility.getType(RuntimeClasses.ILookupService), SdkProperties.SUFFIX_LOOKUP_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -71,7 +71,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(ScoutProposalUtility.getScoutTypeProposalsFor(ScoutSdk.getType(RuntimeClasses.AbstractSqlLookupService))[0]);
+    m_serviceNewWizardPage.setSuperType(ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService))[0]);
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
@@ -134,7 +134,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     try {
       m_operation.validate();
       m_operation.run(monitor, workingCopyManager);
@@ -156,9 +156,9 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
       if (evt.getPropertyName().equals(ServiceNewWizardPage.PROP_TYPE_NAME)) {
         String typeName = m_serviceNewWizardPage.getTypeName();
         if (!StringUtility.isNullOrEmpty(typeName)) {
-          String prefix = typeName.replaceAll(ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE + "$", "");
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + ScoutIdeProperties.SUFFIX_LOOKUP_SERVICE);
+          String prefix = typeName.replaceAll(SdkProperties.SUFFIX_LOOKUP_SERVICE + "$", "");
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
           m_locationWizardPage.refreshTree();
         }
         m_locationWizardPage.pingStateChanging();

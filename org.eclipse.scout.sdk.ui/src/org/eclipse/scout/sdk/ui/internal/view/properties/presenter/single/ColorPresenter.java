@@ -12,16 +12,16 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.ScoutStatus;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -66,7 +66,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
     Composite rootPane = getToolkit().createComposite(container);
     m_currentColorPresenter = new P_ColorPresenter(rootPane);
     getToolkit().adapt(m_currentColorPresenter);
-    GridData curValData = new GridData(ScoutIdeProperties.TOOL_BUTTON_SIZE, ScoutIdeProperties.TOOL_BUTTON_SIZE);
+    GridData curValData = new GridData(SdkProperties.TOOL_BUTTON_SIZE, SdkProperties.TOOL_BUTTON_SIZE);
     curValData.exclude = true;
     m_currentColorPresenter.setLayoutData(curValData);
     Control text = super.createContent(rootPane);
@@ -85,7 +85,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
     gLayout.marginWidth = 0;
     rootPane.setLayout(gLayout);
     text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-    m_chooserButton.setLayoutData(new GridData(ScoutIdeProperties.TOOL_BUTTON_SIZE, ScoutIdeProperties.TOOL_BUTTON_SIZE));
+    m_chooserButton.setLayoutData(new GridData(SdkProperties.TOOL_BUTTON_SIZE, SdkProperties.TOOL_BUTTON_SIZE));
     return rootPane;
   }
 
@@ -146,7 +146,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
 
   @Override
   protected RGB parseSourceInput(String input) throws CoreException {
-    String value = PropertyMethodSourceUtilities.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+    String value = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
     if (value == null) {
       value = "";
     }
@@ -192,7 +192,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
   @Override
   protected synchronized void storeValue(RGB value) throws CoreException {
     IOperation op = null;
-    if (ScoutSdkUtility.equals(getDefaultValue(), value)) {
+    if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {
         op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
       }

@@ -13,21 +13,22 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
-import org.eclipse.scout.sdk.jdt.JdtEvent;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePageHelper;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>NodePageChildPageTablePage</h3> all child pages of a page with nodes
@@ -36,7 +37,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
   static final String execCreateChildPages = "execCreateChildPages";
 
   private final IType m_nodePageType;
-  final IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
+  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private ICachedTypeHierarchy m_iPageTypeHierarchy;
   private P_MethodListener m_methodListener;
 
@@ -78,7 +79,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
       m_iPageTypeHierarchy = null;
     }
     if (m_methodListener != null) {
-      ScoutSdk.removeMethodChangedListener(getNodePageType(), m_methodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getNodePageType(), m_methodListener);
       m_methodListener = null;
     }
     super.unloadPage();
@@ -87,16 +88,16 @@ public class NodePageChildPageTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     if (m_iPageTypeHierarchy == null) {
-      m_iPageTypeHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iPage);
+      m_iPageTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_iPageTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
-      ScoutSdk.addMethodChangedListener(getNodePageType(), m_methodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getNodePageType(), m_methodListener);
     }
     IMethod createChildPagesMethods = TypeUtility.getMethod(getNodePageType(), execCreateChildPages);
     if (TypeUtility.exists(createChildPagesMethods)) {
-      PageNodePageHelper.createRepresentationFor(this, TypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethods), m_iPageTypeHierarchy);
+      PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethods), m_iPageTypeHierarchy);
     }
   }
 

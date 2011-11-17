@@ -14,11 +14,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.project.template.IProjectTemplate;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ClientScoutBundleExtension;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
@@ -43,7 +43,7 @@ public class DesktopFormTemplate implements IProjectTemplate {
   }
 
   @Override
-  public void apply(IScoutProject project, IProgressMonitor monitor, IScoutWorkingCopyManager manager) {
+  public void apply(IScoutProject project, IProgressMonitor monitor, IWorkingCopyManager manager) {
     try {
       SingleFormTemplateOperation op = new SingleFormTemplateOperation(project);
       op.validate();

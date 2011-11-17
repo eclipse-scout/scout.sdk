@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,8 +13,6 @@ package test.client.ui.desktop;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -24,21 +22,21 @@ import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm;
 import org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
 import org.eclipse.scout.service.SERVICES;
+
 import test.client.ClientSession;
-import test.shared.Texts;
 import test.shared.Icons;
 
 public class Desktop extends AbstractDesktop implements IDesktop{
-  private static Logger logger=LoggerFactory.getLogger(Desktop.class);
 
   public Desktop(){
   }
 
   @Override
   public String getConfiguredTitle(){
-    return Texts.get("ApplicationTitle");
+    return TEXTS.get("ApplicationTitle");
   }
 
   @Override
@@ -72,7 +70,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
 
     @Override
     public String getConfiguredText(){
-      return Texts.get("FileMenu");
+      return TEXTS.get("FileMenu");
     }
 
     @Order(100.0)
@@ -80,7 +78,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
 
       @Override
       public String getConfiguredText(){
-        return Texts.get("ExitMenu");
+        return TEXTS.get("ExitMenu");
       }
 
       @Override
@@ -95,7 +93,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
 
     @Override
     public String getConfiguredText(){
-      return Texts.get("ToolsMenu");
+      return TEXTS.get("ToolsMenu");
     }
   }
 
@@ -111,7 +109,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
 
     @Override
     public String getConfiguredText(){
-      return Texts.get("HelpMenu");
+      return TEXTS.get("HelpMenu");
     }
 
     @Order(10.0)
@@ -119,7 +117,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
 
       @Override
       public String getConfiguredText(){
-        return Texts.get("AboutMenu");
+        return TEXTS.get("AboutMenu");
       }
 
       @Override
@@ -128,7 +126,5 @@ public class Desktop extends AbstractDesktop implements IDesktop{
         form.startModify();
       }
     }
-
   }
-
 }

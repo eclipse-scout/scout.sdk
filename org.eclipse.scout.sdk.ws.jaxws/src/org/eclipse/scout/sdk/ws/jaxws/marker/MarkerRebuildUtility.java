@@ -35,10 +35,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.pde.PdeUtility;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -466,15 +465,9 @@ public final class MarkerRebuildUtility {
     }
     else {
       // ensure JAR file to be on project classpath
-      boolean found = false;
       try {
-        for (String classpath : PdeUtility.getBundleClasspaths(bundle.getProject())) {
-          if (classpath.equals(stubJarFile.getProjectRelativePath().toPortableString())) {
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
+        PluginModelHelper h = new PluginModelHelper(bundle.getProject());
+        if (!h.Manifest.existsClasspathEntry(stubJarFile.getProjectRelativePath().toPortableString())) {
           String markerSourceId = MarkerUtility.createMarker(wsdlResource.getFile(), MarkerType.StubJar, markerGroupUUID, Texts.get("JarFileXOfWsYMustBeOnClasspath", stubJarFile.getName(), buildJaxWsBean.getAlias()));
           JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingClasspathEntryForJarFileCommand(bundle, buildJaxWsBean.getAlias(), stubJarFile));
         }
@@ -515,7 +508,7 @@ public final class MarkerRebuildUtility {
           MarkerUtility.createMarker(ResourceFactory.getSunJaxWsResource(bundle).getFile(), MarkerType.HandlerClass, markerGroupUUID, "Missing handler class");
           return false;
         }
-        else if (!ScoutSdk.existsType(fullyQualifiedName)) {
+        else if (!TypeUtility.existsType(fullyQualifiedName)) {
           MarkerUtility.createMarker(ResourceFactory.getSunJaxWsResource(bundle).getFile(), MarkerType.HandlerClass, markerGroupUUID, "Configured handler class '" + fullyQualifiedName + "' could not be found.");
           return false;
         }
@@ -547,7 +540,7 @@ public final class MarkerRebuildUtility {
         return;
       }
       AnnotationProperty property = JaxWsSdkUtility.parseAnnotationTypeValue(portType, webServiceAnnotation, "endpointInterface");
-      IType portTypeInterfaceType = ScoutSdk.getType(property.getFullyQualifiedName());
+      IType portTypeInterfaceType = TypeUtility.getType(property.getFullyQualifiedName());
       if (portTypeInterfaceType == null) {
         String markerSourceId = MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, Texts.get("AnnotationXWithPropertyYRequired", WebService.class.getSimpleName(), "endpointInterface"));
         registerMissingEndpointCodeFirstCommand(portType, markerGroupUUID, markerSourceId);

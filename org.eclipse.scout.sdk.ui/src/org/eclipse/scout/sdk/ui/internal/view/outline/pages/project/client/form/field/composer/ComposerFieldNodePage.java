@@ -12,8 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute.AttributeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity.EntityTablePage;
@@ -21,14 +20,15 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.tree.
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
 
   private boolean m_hasTree;
-  protected IType abstractComposerField_tree = ScoutSdk.getType(RuntimeClasses.AbstractComposerField_Tree);
+  protected IType abstractComposerField_tree = TypeUtility.getType(RuntimeClasses.AbstractComposerField_Tree);
 
   private InnerTypePageDirtyListener m_innerTypeListener;
 
@@ -44,7 +44,7 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     super.unloadPage();
@@ -54,12 +54,12 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, abstractComposerField_tree);
-      ScoutSdk.addInnerTypeChangedListener(getType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
     new KeyStrokeTablePage(this, getType());
     // find tree
     m_hasTree = false;
-    ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(getType(), abstractComposerField_tree);
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType(), abstractComposerField_tree);
     if (hierarchy != null) {
       IType[] trees = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(abstractComposerField_tree, hierarchy));
       if (trees.length > 0) {

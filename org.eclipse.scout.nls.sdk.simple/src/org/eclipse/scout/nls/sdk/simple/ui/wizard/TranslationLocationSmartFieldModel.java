@@ -19,10 +19,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
 import org.eclipse.scout.nls.sdk.internal.ui.smartfield.ISmartFieldModel;
-import org.eclipse.scout.nls.sdk.simple.NlsSdkSimple;
+import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 

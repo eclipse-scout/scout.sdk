@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -100,7 +100,7 @@ public class ButtonGroup<T> extends Composite {
 
     // layout
     GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH);
-    data.horizontalIndent = 40;
+    data.horizontalIndent = 190;
 
     newButton.setLayoutData(data);
     return newButton;

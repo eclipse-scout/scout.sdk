@@ -14,9 +14,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class OkButtonNewWizard extends ButtonFieldNewWizard {
 
@@ -27,9 +28,9 @@ public class OkButtonNewWizard extends ButtonFieldNewWizard {
   @Override
   public void initWizard(IType declaringType) {
     super.initWizard(declaringType);
-    getButtonFieldWizardPage().setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractOkButton));
+    getButtonFieldWizardPage().setSuperType(TypeUtility.getType(RuntimeClasses.AbstractOkButton));
     NlsProposal newProposal = null;
-    INlsProject nlsProject = ScoutSdk.getScoutWorkspace().getScoutBundle(declaringType.getJavaProject().getProject()).findBestMatchNlsProject();
+    INlsProject nlsProject = ScoutSdkCore.getScoutWorkspace().getScoutBundle(declaringType.getJavaProject().getProject()).findBestMatchNlsProject();
     if (nlsProject != null) {
       INlsEntry entry = nlsProject.getEntry("Ok");
       if (entry != null) {

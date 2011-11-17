@@ -18,12 +18,11 @@ import junit.framework.Assert;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
-import org.eclipse.scout.sdk.workspace.type.PropertyBeanComparators;
-import org.eclipse.scout.sdk.workspace.type.PropertyBeanFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.IPropertyBean;
+import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -50,8 +49,8 @@ public class TypeUtilityTest extends AbstractScoutSdkTest {
 
   @Before
   public void setup() {
-    m_type = ScoutSdk.getType("a.BeanProperties");
-    m_propertyBeans = TypeUtility.getPropertyBeans(m_type, PropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
+    m_type = TypeUtility.getType("a.BeanProperties");
+    m_propertyBeans = TypeUtility.getPropertyBeans(m_type, ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
   }
 
   @After

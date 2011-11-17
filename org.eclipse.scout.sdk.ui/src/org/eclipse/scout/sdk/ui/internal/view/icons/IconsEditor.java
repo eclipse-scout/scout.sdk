@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.ui.internal.view.icons;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
 import org.eclipse.swt.SWT;
@@ -132,7 +132,7 @@ public class IconsEditor extends EditorPart {
     m_contentProvider = new IconTableContentProvider();
     if (input instanceof FileEditorInput) {
       IFile file = ((FileEditorInput) input).getFile();
-      IScoutBundle scoutProject = ScoutSdk.getScoutWorkspace().getScoutBundle(file.getProject());
+      IScoutBundle scoutProject = ScoutSdkCore.getScoutWorkspace().getScoutBundle(file.getProject());
       if (scoutProject.getType() == IScoutElement.BUNDLE_SHARED) {
         setScoutSharedBundle(scoutProject);
       }

@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.ITranslationResource;
 

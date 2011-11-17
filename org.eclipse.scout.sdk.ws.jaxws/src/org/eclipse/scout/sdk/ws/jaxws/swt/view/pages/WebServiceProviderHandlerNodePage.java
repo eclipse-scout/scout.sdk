@@ -20,12 +20,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.marker.IMarkerRebuildListener;
@@ -130,7 +129,7 @@ public class WebServiceProviderHandlerNodePage extends AbstractPage implements I
 
       @Override
       public boolean visit(ScoutXmlElement xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
-        IType type = ScoutSdk.getType(fullyQualifiedName);
+        IType type = TypeUtility.getType(fullyQualifiedName);
         if (TypeUtility.exists(type)) {
           qualityHolder.setValue(Math.max(qualityHolder.getValue(), ScoutSeverityManager.getInstance().getSeverityOf(type)));
           if (qualityHolder.getValue() >= IMarker.SEVERITY_ERROR) {

@@ -19,18 +19,18 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.internal.workspace.member.PropertyBean;
-import org.eclipse.scout.sdk.jdt.listener.ElementChangedListenerEx;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.SharedContextBeanPropertyNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.jdt.ElementChangedListenerEx;
+import org.eclipse.scout.sdk.util.type.IMethodFilter;
+import org.eclipse.scout.sdk.util.type.IPropertyBean;
+import org.eclipse.scout.sdk.util.type.PropertyBean;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
-import org.eclipse.scout.sdk.workspace.type.IMethodFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  * <h3>SharedContextPropertyTablePage</h3> ...

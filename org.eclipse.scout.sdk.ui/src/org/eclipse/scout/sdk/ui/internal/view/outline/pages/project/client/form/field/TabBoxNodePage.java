@@ -12,9 +12,6 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -22,20 +19,23 @@ import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.create.GroupBoxNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class TabBoxNodePage extends AbstractFormFieldNodePage {
-  IType igroupBox = ScoutSdk.getType(RuntimeClasses.IGroupBox);
-  IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
+  IType igroupBox = TypeUtility.getType(RuntimeClasses.IGroupBox);
+  IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
   private InnerTypePageDirtyListener m_innerTypeListener;
 
@@ -52,7 +52,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     super.unloadPage();
@@ -62,11 +62,11 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   protected void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormField);
-      ScoutSdk.addInnerTypeChangedListener(getType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
     new KeyStrokeTablePage(this, getType());
-    ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(getType());
-    IType[] allGroupboxes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(igroupBox, hierarchy), TypeComparators.getOrderAnnotationComparator());
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
+    IType[] allGroupboxes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(igroupBox, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType groupBox : allGroupboxes) {
       ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(groupBox, hierarchy);
       if (nodePage != null) {
@@ -89,7 +89,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
     super.prepareMenuAction(menu);
     if (menu instanceof FormFieldRenameAction) {
       FormFieldRenameAction a = (FormFieldRenameAction) menu;
-      a.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_BOX);
+      a.setReadOnlySuffix(SdkProperties.SUFFIX_BOX);
     }
     else if (menu instanceof FormFieldDeleteAction) {
       menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxRemove));

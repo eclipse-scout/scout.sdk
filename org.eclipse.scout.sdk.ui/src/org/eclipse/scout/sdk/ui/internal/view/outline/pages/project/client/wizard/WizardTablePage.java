@@ -12,27 +12,27 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wiza
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformWizardsOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.WizardNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>WizardTablePage</h3> ...
  */
 public class WizardTablePage extends AbstractPage {
 
-  final IType iWizard = ScoutSdk.getType(RuntimeClasses.IWizard);
+  final IType iWizard = TypeUtility.getType(RuntimeClasses.IWizard);
   private ICachedTypeHierarchy m_wizardHierarchy;
 
   public WizardTablePage(IPage parent) {
@@ -78,7 +78,7 @@ public class WizardTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_wizardHierarchy == null) {
-      m_wizardHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iWizard);
+      m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
       m_wizardHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());

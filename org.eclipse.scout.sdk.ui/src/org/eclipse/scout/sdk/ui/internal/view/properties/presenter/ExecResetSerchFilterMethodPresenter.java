@@ -14,17 +14,16 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -57,8 +56,8 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
   }
 
   private class P_OverrideExecResetSearchFilterMethod extends MethodOverrideOperation {
-    private final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
-    private final IType iSearchForm = ScoutSdk.getType(RuntimeClasses.ISearchForm);
+    private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+    private final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
     private IType m_formDataType;
     private IType m_formType;
 
@@ -71,14 +70,14 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
       super(declaringType, methodName, true);
       m_formDataType = null;
       m_formType = declaringType;
-      ICachedTypeHierarchy formHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iForm);
+      ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       if (TypeUtility.exists(m_formType) && formHierarchy.isSubtype(iSearchForm, m_formType)) {
-        String formDataSimpleName = m_formType.getElementName().replaceAll(ScoutIdeProperties.SUFFIX_FORM + "$", ScoutIdeProperties.SUFFIX_FORM_DATA);
-        IScoutBundle clientBundle = SdkTypeUtility.getScoutBundle(getDeclaringType());
+        String formDataSimpleName = m_formType.getElementName().replaceAll(SdkProperties.SUFFIX_FORM + "$", SdkProperties.SUFFIX_FORM_DATA);
+        IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getDeclaringType());
         for (IScoutBundle shared : clientBundle.getRequiredBundles(ScoutBundleFilters.getSharedFilter(), false)) {
           String formDataFqn = shared.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + formDataSimpleName;
-          if (ScoutSdk.existsType(formDataFqn)) {
-            m_formDataType = ScoutSdk.getType(formDataFqn);
+          if (TypeUtility.existsType(formDataFqn)) {
+            m_formDataType = TypeUtility.getType(formDataFqn);
             break;
           }
         }

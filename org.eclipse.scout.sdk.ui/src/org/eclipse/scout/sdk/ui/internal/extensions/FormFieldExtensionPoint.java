@@ -27,13 +27,13 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Bundle;
 
 public class FormFieldExtensionPoint {
@@ -102,11 +102,11 @@ public class FormFieldExtensionPoint {
    * @param modelType
    * @return the best match extensions node page.
    */
-  public static IPage createNodePage(IType modelType, org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy formFieldHierarchy) {
+  public static IPage createNodePage(IType modelType, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy formFieldHierarchy) {
     return instance.createNodePageImpl(modelType, formFieldHierarchy);
   }
 
-  private IPage createNodePageImpl(IType modelType, org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy formFieldHierarchy) {
+  private IPage createNodePageImpl(IType modelType, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy formFieldHierarchy) {
     for (IFormFieldExtension ext : getSortedExtensions(modelType, formFieldHierarchy.getJdtHierarchy())) {
       if (ext.getNodePage() != null) {
         return ext.createNodePage();
@@ -153,7 +153,7 @@ public class FormFieldExtensionPoint {
         if ("true".equalsIgnoreCase(element.getAttribute("active"))) {
           String name = element.getAttribute("name");
           String modClassName = element.getAttribute("model");
-          IType modelType = ScoutSdk.getType(modClassName);
+          IType modelType = TypeUtility.getType(modClassName);
           if (modelType == null) {
             ScoutSdkUi.logError("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
             break;

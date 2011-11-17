@@ -11,19 +11,19 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 /**
  * <h3>WizardNodePage</h3> ...
@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanProper
 public class WizardNodePage extends AbstractScoutTypePage {
 
   public WizardNodePage(IPage parent, IType wizardType) {
-    super(ScoutIdeProperties.SUFFIX_WIZARD);
+    super(SdkProperties.SUFFIX_WIZARD);
     setParent(parent);
     setType(wizardType);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Wizard));

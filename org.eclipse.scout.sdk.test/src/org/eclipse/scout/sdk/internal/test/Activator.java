@@ -4,16 +4,14 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.sdk.LogStatus;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -26,6 +24,7 @@ public class Activator extends Plugin {
 
   // The shared instance
   private static Activator plugin;
+  private static SdkLogManager logManager;
 
   /**
    * The constructor
@@ -33,68 +32,16 @@ public class Activator extends Plugin {
   public Activator() {
   }
 
-  public static void log(IStatus log) {
-    if (log instanceof LogStatus) {
-      logImpl((LogStatus) log);
-    }
-    else {
-      logImpl(new LogStatus(ScoutSdk.class, log.getSeverity(), log.getPlugin(), log.getMessage(), log.getException()));
-    }
-  }
-
-  private static void logImpl(LogStatus log) {
-    getDefault().getLog().log(log);
-  }
-
-  public static void logInfo(String message) {
-    logInfo(message, null);
-  }
-
-  public static void logInfo(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    logImpl(new LogStatus(ScoutSdk.class, IStatus.INFO, PLUGIN_ID, message, t));
-  }
-
-  public static void logWarning(String message) {
-    logWarning(message, null);
-  }
-
-  public static void logWarning(Throwable t) {
-    logWarning(null, t);
-  }
-
-  public static void logWarning(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    logImpl(new LogStatus(ScoutSdk.class, IStatus.WARNING, PLUGIN_ID, message, t));
-  }
-
-  public static void logError(Throwable t) {
-    logError("", t);
-  }
-
-  public static void logError(String message) {
-    logError(message, null);
-  }
-
-  public static void logError(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    logImpl(new LogStatus(ScoutSdk.class, IStatus.ERROR, PLUGIN_ID, message, t));
-  }
-
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
+    logManager = new SdkLogManager(this);
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
+    logManager = null;
     plugin = null;
     super.stop(context);
   }
@@ -108,4 +55,39 @@ public class Activator extends Plugin {
     return plugin;
   }
 
+  public static void logInfo(Throwable t) {
+    logManager.logInfo(t);
+  }
+
+  public static void logInfo(String message) {
+    logManager.logInfo(message);
+  }
+
+  public static void logInfo(String message, Throwable t) {
+    logManager.logInfo(message, t);
+  }
+
+  public static void logWarning(String message) {
+    logManager.logWarning(message);
+  }
+
+  public static void logWarning(Throwable t) {
+    logManager.logWarning(t);
+  }
+
+  public static void logWarning(String message, Throwable t) {
+    logManager.logWarning(message, t);
+  }
+
+  public static void logError(Throwable t) {
+    logManager.logError(t);
+  }
+
+  public static void logError(String message) {
+    logManager.logError(message);
+  }
+
+  public static void logError(String message, Throwable t) {
+    logManager.logError(message, t);
+  }
 }

@@ -16,9 +16,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.listener.ElementChangedListenerEx;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -28,22 +25,24 @@ import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.TablePageChildPageTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.TableNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
+import org.eclipse.scout.sdk.util.jdt.ElementChangedListenerEx;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>PageWithTableNodePage</h3> ...
  */
 public class PageWithTableNodePage extends AbstractScoutTypePage {
   public final static String METHOD_EXEC_CREATE_CHILD_PAGE = "execCreateChildPage";
-  final IType iTable = ScoutSdk.getType(RuntimeClasses.ITable);
+  final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
 
   private P_MethodChangedListener m_methodChangedListener;
 
@@ -86,7 +85,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
       m_methodChangedListener = new P_MethodChangedListener();
       JavaCore.addElementChangedListener(m_methodChangedListener);
     }
-    IType[] allSubtypes = SdkTypeUtility.getTables(getType());
+    IType[] allSubtypes = ScoutTypeUtility.getTables(getType());
     if (allSubtypes.length > 0) {
       TableNodePage tableNodePage = new TableNodePage();
       tableNodePage.setParent(this);

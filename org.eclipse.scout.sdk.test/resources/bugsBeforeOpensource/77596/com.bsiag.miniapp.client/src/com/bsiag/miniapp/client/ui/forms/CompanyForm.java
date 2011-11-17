@@ -63,6 +63,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 import com.bsiag.miniapp.client.ClientSession;
 import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.AlreadyExists_Button;
@@ -96,7 +97,6 @@ import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.TabBox.FinancialFig
 import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.TabBox.FinancialFiguresBox.OpenBillsField;
 import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.TabBox.NoteBox;
 import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.TabBox.NoteBox.NotesField;
-import com.bsiag.miniapp.shared.Texts;
 
 @FormData(value = com.bsiag.miniapp.shared.services.process.CompanyFormData.class, sdkCommand = SdkCommand.CREATE)
 public class CompanyForm extends AbstractForm {
@@ -306,7 +306,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("CompanyShortName");
+          return TEXTS.get("CompanyShortName");
         }
 
         @Override
@@ -330,7 +330,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Name");
+          return TEXTS.get("Name");
         }
 
         @Override
@@ -369,7 +369,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("CompanyNo");
+          return TEXTS.get("CompanyNo");
         }
       }
 
@@ -378,7 +378,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("MainAccountManager");
+          return TEXTS.get("MainAccountManager");
         }
 
         @Override
@@ -392,7 +392,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Active");
+          return TEXTS.get("Active");
         }
       }
 
@@ -591,7 +591,7 @@ public class CompanyForm extends AbstractForm {
         public class AddMenu extends AbstractMenu {
           @Override
           protected String getConfiguredText() {
-            return Texts.get("AddLogoMenu");
+            return TEXTS.get("AddLogoMenu");
           }
 
           @Override
@@ -622,7 +622,7 @@ public class CompanyForm extends AbstractForm {
         public class DeleteMenu extends AbstractMenu {
           @Override
           protected String getConfiguredText() {
-            return Texts.get("Delete2");
+            return TEXTS.get("Delete2");
           }
 
           @Override
@@ -647,7 +647,7 @@ public class CompanyForm extends AbstractForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return Texts.get("Detail");
+        return TEXTS.get("Detail");
       }
 
       @Order(10.0f)
@@ -655,7 +655,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Region");
+          return TEXTS.get("Region");
         }
 
         @Override
@@ -670,7 +670,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Sector");
+          return TEXTS.get("Sector");
         }
 
         @Override
@@ -685,7 +685,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Rating");
+          return TEXTS.get("Rating");
         }
 
       }
@@ -695,7 +695,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Language");
+          return TEXTS.get("Language");
         }
 
       }
@@ -705,7 +705,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("CompanyType");
+          return TEXTS.get("CompanyType");
         }
 
         @Override
@@ -796,7 +796,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("AddressType");
+              return TEXTS.get("AddressType");
             }
 
             @Override
@@ -815,7 +815,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("AdditionalName");
+              return TEXTS.get("AdditionalName");
             }
           }
 
@@ -824,7 +824,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("Street");
+              return TEXTS.get("Street");
             }
 
             @Override
@@ -843,7 +843,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("POBox");
+              return TEXTS.get("POBox");
             }
           }
 
@@ -852,7 +852,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("City");
+              return TEXTS.get("City");
             }
 
             @Override
@@ -866,7 +866,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("Phone");
+              return TEXTS.get("Phone");
             }
 
             @Override
@@ -885,7 +885,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("Fax");
+              return TEXTS.get("Fax");
             }
           }
 
@@ -899,7 +899,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("EMail");
+              return TEXTS.get("EMail");
             }
           }
 
@@ -908,7 +908,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredHeaderText() {
-              return Texts.get("Www");
+              return TEXTS.get("Www");
             }
 
             @Override
@@ -922,7 +922,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return Texts.get("NewMenu");
+              return TEXTS.get("NewMenu");
             }
 
             @Override
@@ -937,7 +937,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return Texts.get("Edit");
+              return TEXTS.get("Edit");
             }
 
             @Override
@@ -962,7 +962,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return Texts.get("DeleteMenu");
+              return TEXTS.get("DeleteMenu");
             }
 
             @Override
@@ -990,7 +990,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return Texts.get("TwixTel");
+              return TEXTS.get("TwixTel");
             }
 
             @Override
@@ -1023,7 +1023,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return Texts.get("Call2");
+              return TEXTS.get("Call2");
             }
 
             @Override
@@ -1055,7 +1055,7 @@ public class CompanyForm extends AbstractForm {
 
             @Override
             protected String getConfiguredText() {
-              return Texts.get("ShowInGoogleMapsMenu");
+              return TEXTS.get("ShowInGoogleMapsMenu");
             }
 
             @Override
@@ -1087,7 +1087,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Notes");
+          return TEXTS.get("Notes");
         }
 
         @Order(10.0f)
@@ -1130,7 +1130,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("FinancialFigures");
+          return TEXTS.get("FinancialFigures");
         }
 
         @Order(10.0f)
@@ -1148,7 +1148,7 @@ public class CompanyForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return Texts.get("OpenBills");
+            return TEXTS.get("OpenBills");
           }
 
           @Override
@@ -1162,7 +1162,7 @@ public class CompanyForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return Texts.get("Figures");
+            return TEXTS.get("Figures");
           }
 
           @Override
@@ -1221,7 +1221,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Year");
+                return TEXTS.get("Year");
               }
 
               @Override
@@ -1235,12 +1235,12 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Potential");
+                return TEXTS.get("Potential");
               }
 
               @Override
               protected String getConfiguredHeaderTooltipText() {
-                return Texts.get("ExclVAT");
+                return TEXTS.get("ExclVAT");
               }
 
               @Override
@@ -1254,12 +1254,12 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Budget");
+                return TEXTS.get("Budget");
               }
 
               @Override
               protected String getConfiguredHeaderTooltipText() {
-                return Texts.get("ExclVAT");
+                return TEXTS.get("ExclVAT");
               }
 
               @Override
@@ -1273,12 +1273,12 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Turnover");
+                return TEXTS.get("Turnover");
               }
 
               @Override
               protected String getConfiguredHeaderTooltipText() {
-                return Texts.get("InvoicesWrittenExclVAT");
+                return TEXTS.get("InvoicesWrittenExclVAT");
               }
 
               @Override
@@ -1304,7 +1304,7 @@ public class CompanyForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return Texts.get("InvoicesDue");
+            return TEXTS.get("InvoicesDue");
           }
 
           @Override
@@ -1318,7 +1318,7 @@ public class CompanyForm extends AbstractForm {
 
           @Override
           protected String getConfiguredLabel() {
-            return Texts.get("Figures");
+            return TEXTS.get("Figures");
           }
 
           @Override
@@ -1382,7 +1382,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Year");
+                return TEXTS.get("Year");
               }
 
               @Override
@@ -1396,12 +1396,12 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Potential");
+                return TEXTS.get("Potential");
               }
 
               @Override
               protected String getConfiguredHeaderTooltipText() {
-                return Texts.get("ExclVAT");
+                return TEXTS.get("ExclVAT");
               }
 
               @Override
@@ -1415,12 +1415,12 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Budget");
+                return TEXTS.get("Budget");
               }
 
               @Override
               protected String getConfiguredHeaderTooltipText() {
-                return Texts.get("ExclVAT");
+                return TEXTS.get("ExclVAT");
               }
 
               @Override
@@ -1434,12 +1434,12 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Turnover");
+                return TEXTS.get("Turnover");
               }
 
               @Override
               protected String getConfiguredHeaderTooltipText() {
-                return Texts.get("InvoicesWrittenExclVAT");
+                return TEXTS.get("InvoicesWrittenExclVAT");
               }
 
               @Override
@@ -1453,7 +1453,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredText() {
-                return Texts.get("Edit");
+                return TEXTS.get("Edit");
               }
 
               @Override
@@ -1475,7 +1475,7 @@ public class CompanyForm extends AbstractForm {
       public class AdditionalInformationBox extends AbstractGroupBox {
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("AdditionalInformation");
+          return TEXTS.get("AdditionalInformation");
         }
 
         @Order(10.0f)
@@ -1544,7 +1544,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("AdditionalInformation");
+                return TEXTS.get("AdditionalInformation");
               }
 
               @Override
@@ -1557,7 +1557,7 @@ public class CompanyForm extends AbstractForm {
             public class DisplayColumn extends AbstractStringColumn {
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Display");
+                return TEXTS.get("Display");
               }
 
               @Override
@@ -1575,7 +1575,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Text");
+                return TEXTS.get("Text");
               }
             }
 
@@ -1588,7 +1588,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Number");
+                return TEXTS.get("Number");
               }
             }
 
@@ -1601,7 +1601,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Date");
+                return TEXTS.get("Date");
               }
             }
 
@@ -1609,7 +1609,7 @@ public class CompanyForm extends AbstractForm {
             public class EditMenu extends AbstractMenu {
               @Override
               protected String getConfiguredText() {
-                return Texts.get("Edit");
+                return TEXTS.get("Edit");
               }
 
               @Override
@@ -1637,7 +1637,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Documents");
+          return TEXTS.get("Documents");
         }
 
         @Order(10.0f)
@@ -1650,7 +1650,7 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected String getConfiguredLabel() {
-          return Texts.get("Changes");
+          return TEXTS.get("Changes");
         }
 
         @Order(10.0f)
@@ -1700,7 +1700,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Type");
+                return TEXTS.get("Type");
               }
 
               @Override
@@ -1714,7 +1714,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Person");
+                return TEXTS.get("Person");
               }
 
               @Override
@@ -1733,7 +1733,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("Date");
+                return TEXTS.get("Date");
               }
 
               @Override
@@ -1747,7 +1747,7 @@ public class CompanyForm extends AbstractForm {
 
               @Override
               protected String getConfiguredHeaderText() {
-                return Texts.get("MainAccountManager");
+                return TEXTS.get("MainAccountManager");
               }
 
               @Override
@@ -1770,7 +1770,7 @@ public class CompanyForm extends AbstractForm {
 
       @Override
       protected String getConfiguredLabel() {
-        return Texts.get("AlreadyExists_");
+        return TEXTS.get("AlreadyExists_");
       }
     }
 

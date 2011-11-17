@@ -12,25 +12,25 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSharedBundleOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>SharedNodePage</h3> ...
  */
 public class SharedNodePage extends AbstractPage {
 
-  final IType abstractIcons = ScoutSdk.getType(RuntimeClasses.AbstractIcons);
+  final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
   private final IScoutBundle m_sharedProject;
 
   public SharedNodePage(IPage parent, IScoutBundle sharedProject) {
@@ -69,7 +69,7 @@ public class SharedNodePage extends AbstractPage {
   public void loadChildrenImpl() {
 
     if (getScoutResource().getScoutProject().getIconProvider() != null) {
-      ICachedTypeHierarchy iconHierarchy = ScoutSdk.getPrimaryTypeHierarchy(abstractIcons);
+      ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
       IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), null);
       if (iconTypes.length > 0) {
         new IconNodePage(this, iconTypes[0]);

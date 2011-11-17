@@ -12,16 +12,17 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.EntityNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link EntityTablePage}</h3> ...
@@ -31,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
  */
 public class EntityTablePage extends AbstractPage {
 
-  protected final IType iComposerEntity = ScoutSdk.getType(RuntimeClasses.IComposerEntity);
+  protected final IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
   private final IType m_declaringType;
 
   private InnerTypePageDirtyListener m_entityChangedListener;
@@ -58,7 +59,7 @@ public class EntityTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_entityChangedListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
       m_entityChangedListener = null;
     }
   }
@@ -67,9 +68,9 @@ public class EntityTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     if (m_entityChangedListener == null) {
       m_entityChangedListener = new InnerTypePageDirtyListener(this, iComposerEntity);
-      ScoutSdk.addInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
     }
-    for (IType entity : SdkTypeUtility.getComposerEntities(getDeclaringType())) {
+    for (IType entity : ScoutTypeUtility.getComposerEntities(getDeclaringType())) {
       new EntityNodePage(this, entity);
     }
   }

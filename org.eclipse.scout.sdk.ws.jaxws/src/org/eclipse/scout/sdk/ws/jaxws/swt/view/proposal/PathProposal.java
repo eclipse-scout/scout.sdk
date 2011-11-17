@@ -14,8 +14,8 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.proposal;
 
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 public class PathProposal implements IContentProposalEx {

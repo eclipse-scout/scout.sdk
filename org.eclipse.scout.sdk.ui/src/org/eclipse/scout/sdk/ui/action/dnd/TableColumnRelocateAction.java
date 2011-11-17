@@ -19,8 +19,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.dnd.TableColumnDndOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.dialog.RenameConfirmationDialog;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.widgets.Shell;
 
 public class TableColumnRelocateAction extends Action {

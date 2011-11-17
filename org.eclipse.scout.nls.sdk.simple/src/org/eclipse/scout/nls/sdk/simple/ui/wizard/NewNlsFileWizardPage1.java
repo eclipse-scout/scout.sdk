@@ -35,7 +35,7 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.ui.PDEPlugin;
 import org.eclipse.pde.internal.ui.dialogs.PluginSelectionDialog;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.FieldValidator;
 import org.eclipse.scout.nls.sdk.internal.ui.TextButtonField;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;

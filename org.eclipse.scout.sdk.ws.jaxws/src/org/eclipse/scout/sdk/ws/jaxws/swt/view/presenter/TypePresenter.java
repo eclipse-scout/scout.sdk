@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -35,12 +35,11 @@ import org.eclipse.jdt.ui.wizards.NewClassWizardPage;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -151,9 +150,9 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
   @Override
   protected void execLinkAction() throws CoreException {
     String fqn = m_textField.getText();
-    if (ScoutSdk.existsType(fqn)) {
+    if (TypeUtility.existsType(fqn)) {
       try {
-        JavaUI.openInEditor(ScoutSdk.getType(fqn));
+        JavaUI.openInEditor(TypeUtility.getType(fqn));
       }
       catch (Exception e) {
         JaxWsSdk.logWarning(e);
@@ -179,9 +178,9 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
     }
 
     String fqn = StringUtility.nvl(input, "");
-    if (ScoutSdk.existsType(fqn)) {
+    if (TypeUtility.existsType(fqn)) {
       setTooltip(Signature.getSimpleName(fqn));
-      m_javaDocTooltip.setMember(ScoutSdk.getType(fqn));
+      m_javaDocTooltip.setMember(TypeUtility.getType(fqn));
     }
     else {
       setTooltip(null);
@@ -284,8 +283,8 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
   private IType openBrowseTypesDialog() {
     String fqn = m_textField.getText();
     IType type = null;
-    if (ScoutSdk.existsType(fqn)) {
-      type = ScoutSdk.getType(fqn);
+    if (TypeUtility.existsType(fqn)) {
+      type = TypeUtility.getType(fqn);
     }
 
     try {
@@ -323,17 +322,17 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
   }
 
   private IType validateType(String fullyQualifiedName) {
-    if (!ScoutSdk.existsType(fullyQualifiedName)) {
+    if (!TypeUtility.existsType(fullyQualifiedName)) {
       setInfo(IMarker.SEVERITY_ERROR, Texts.get("TypeDoesNotExistClickOnXToCreate", Texts.get("class")));
       return null;
     }
 
-    IType type = ScoutSdk.getType(fullyQualifiedName);
+    IType type = TypeUtility.getType(fullyQualifiedName);
 
     // check validity of type
     if (m_interfaceSignatures != null) {
       for (String signature : m_interfaceSignatures) {
-        IType interfaceType = ScoutSdk.getType(stripSignatureToFQN(signature, true));
+        IType interfaceType = TypeUtility.getType(stripSignatureToFQN(signature, true));
         if (!JaxWsSdkUtility.isJdtSubType(interfaceType.getFullyQualifiedName(), type)) {
           setInfo(IMarker.SEVERITY_ERROR, Texts.get("XMustBeSubtypeOfY", type.getElementName(), interfaceType.getFullyQualifiedName()));
           return null;
@@ -351,8 +350,8 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
 
   @Override
   protected void updateSeverity(List<SeverityEntry> statusList) throws CoreException {
-    if (StringUtility.hasText(getValue()) && (ScoutSdk.existsType(getValue()))) {
-      int quality = ScoutSeverityManager.getInstance().getSeverityOf(ScoutSdk.getType(getValue()));
+    if (StringUtility.hasText(getValue()) && (TypeUtility.existsType(getValue()))) {
+      int quality = ScoutSeverityManager.getInstance().getSeverityOf(TypeUtility.getType(getValue()));
       if (quality > IMarker.SEVERITY_INFO) {
         statusList.add(new SeverityEntry(quality, "Unresolved compilation errors"));
       }
@@ -421,13 +420,13 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
             return;
           }
           String simpleName = Signature.getSimpleName(value);
-          if (ScoutSdk.existsType(value) &&
+          if (TypeUtility.existsType(value) &&
                 resource.getType() == IResource.FILE &&
                 resource.getFileExtension() != null &&
                 resource.getFileExtension().equalsIgnoreCase("java") &&
                 (resource.getName().endsWith(simpleName + ".java") ||
                 resource.getName().endsWith(simpleName + ".class"))) {
-            IType type = ScoutSdk.getType(getValue());
+            IType type = TypeUtility.getType(getValue());
             ICompilationUnit cu = JavaCore.createCompilationUnitFrom((IFile) resource);
 
             if (cu == null) {

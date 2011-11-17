@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,21 +14,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.IconProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -64,7 +65,7 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
     rootPane.setLayout(gLayout);
     text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 
-    GridData gData = new GridData(ScoutIdeProperties.TOOL_BUTTON_SIZE, ScoutIdeProperties.TOOL_BUTTON_SIZE);
+    GridData gData = new GridData(SdkProperties.TOOL_BUTTON_SIZE, SdkProperties.TOOL_BUTTON_SIZE);
     gData.exclude = true;
     m_currentIconPresenter.setLayoutData(gData);
     return rootPane;
@@ -91,14 +92,14 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
 
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
-    IScoutBundle scoutBundle = SdkTypeUtility.getScoutBundle(method.getType());
+    IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(method.getType());
     setProposals(ScoutProposalUtility.getScoutIconProposals(ScoutSdkUi.getDisplay(), scoutBundle));
     super.init(method);
   }
 
   @Override
   protected IconProposal parseInput(String input) throws CoreException {
-    String parsedString = PropertyMethodSourceUtilities.parseReturnParameterIcon(input, getMethod().peekMethod());
+    String parsedString = PropertyMethodSourceUtility.parseReturnParameterIcon(input, getMethod().peekMethod());
     IconProposal findProposal = findProposal(parsedString);
     return findProposal;
   }
@@ -106,7 +107,7 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
   @Override
   protected synchronized void storeValue(final IconProposal value) {
     IOperation op = null;
-    if (ScoutSdkUtility.equals(getDefaultValue(), value)) {
+    if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {
         op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
       }
@@ -119,7 +120,7 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
           source.append("return ");
           if (value != null) {
             String iconTypeSig = Signature.createTypeSignature(value.getImageDescription().getConstantField().getDeclaringType().getFullyQualifiedName(), false);
-            source.append("  " + ScoutSdkUtility.getSimpleTypeRefName(iconTypeSig, validator) + "." + value.getImageDescription().getConstantField().getElementName());
+            source.append("  " + SignatureUtility.getTypeReference(iconTypeSig, validator) + "." + value.getImageDescription().getConstantField().getElementName());
             source.append(";");
           }
           else {

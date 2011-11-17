@@ -12,26 +12,26 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformPagesOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>AllPagesTablePage</h3> ...
  */
 public class AllPagesTablePage extends AbstractPage {
-  final IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
+  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
 
   private ICachedTypeHierarchy m_cachedTypeHierarchy;
 
@@ -78,7 +78,7 @@ public class AllPagesTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_cachedTypeHierarchy == null) {
-      m_cachedTypeHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iPage);
+      m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_cachedTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     IType[] allPages = m_cachedTypeHierarchy.getAllClasses(TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());

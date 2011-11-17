@@ -20,12 +20,12 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.service.ServiceDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.widgets.Shell;
 
 public class ServiceDeleteAction extends AbstractScoutHandler {

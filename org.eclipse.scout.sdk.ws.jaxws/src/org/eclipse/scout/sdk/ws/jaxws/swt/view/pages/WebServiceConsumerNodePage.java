@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -29,13 +29,13 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.pde.RawManifest;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.marker.IMarkerRebuildListener;
@@ -96,7 +96,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     m_wsdlResourceListener = new P_WsdlResourceListener();
 
     m_manifestResource = new ManagedResource(m_bundle.getProject());
-    m_manifestResource.setFile(m_bundle.getProject().getFile(RawManifest.MAINFEST_MF_PATH));
+    m_manifestResource.setFile(new PluginModelHelper(m_bundle.getProject()).Manifest.getFile());
     m_manifestResourceListener = new P_ManifestResourceListener();
 
     m_stubJarResource = new ManagedResource(m_bundle.getProject());

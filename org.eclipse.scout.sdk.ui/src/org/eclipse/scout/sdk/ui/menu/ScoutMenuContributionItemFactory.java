@@ -15,10 +15,9 @@ import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.keys.KeyBinding;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.ContextMenuContributorExtensionPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.commands.ICommandService;
@@ -116,7 +115,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
         bs.addBinding(kb);
       }
       catch (ParseException e) {
-        ScoutSdk.logError(e);
+        ScoutSdkUi.logError(e);
       }
     }
   }

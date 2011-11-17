@@ -11,7 +11,7 @@
 package org.eclipse.scout.nls.sdk.internal.ui.action;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.NlsReferenceProvider;
 import org.eclipse.scout.nls.sdk.internal.model.NlsTableModel;
 import org.eclipse.scout.nls.sdk.internal.search.INlsKeySearchListener;

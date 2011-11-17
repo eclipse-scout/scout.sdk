@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -18,10 +18,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -57,7 +57,7 @@ public class WsConsumerDeleteOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     for (ElementBean element : m_elements) {
       switch (element.getId()) {
         case ID_REGISTRATION:
@@ -121,7 +121,7 @@ public class WsConsumerDeleteOperation implements IOperation {
 
   private void unregisterService(IScoutBundle bundle, IType type, IProgressMonitor monitor) throws CoreException {
     // unregister server side
-    IScoutBundle implementationBundle = ScoutSdk.getScoutWorkspace().getScoutBundle(bundle.getJavaProject().getProject());
+    IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(bundle.getJavaProject().getProject());
     for (IScoutBundle serverBundle : implementationBundle.getRequiredBundles(ScoutBundleFilters.getServerFilter(), true)) {
       ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, type.getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
     }

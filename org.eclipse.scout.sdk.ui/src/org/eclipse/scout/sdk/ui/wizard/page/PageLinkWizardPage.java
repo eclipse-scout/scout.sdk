@@ -19,21 +19,21 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.page.LinkPageOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -43,8 +43,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
 
-  private IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
-  private IType iOutline = ScoutSdk.getType(RuntimeClasses.IOutline);
+  private IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+  private IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
   private ITypeProposal m_holderType;
   private ITypeProposal m_pageType;
@@ -70,7 +70,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    IType[] pages = SdkTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
+    IType[] pages = ScoutTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
     m_pageTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(ScoutProposalUtility.getScoutTypeProposalsFor(pages)), Texts.get("Page"));
     m_pageTypeField.acceptProposal(getPageType());
     m_pageTypeField.setEnabled(isPageTypeFieldEnabled());
@@ -82,7 +82,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    IType[] outlines = SdkTypeUtility.getClassesOnClasspath(iOutline, getClientBundle().getJavaProject());
+    IType[] outlines = ScoutTypeUtility.getClassesOnClasspath(iOutline, getClientBundle().getJavaProject());
     IType[] propTypes = new IType[pages.length + outlines.length];
     System.arraycopy(pages, 0, propTypes, 0, pages.length);
     System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
@@ -107,7 +107,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // write back members
     getOperation().setHolderType(getHolderType().getType());
     getOperation().setPage(getPageType().getType());

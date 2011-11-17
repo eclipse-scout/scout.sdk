@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -185,7 +185,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
    * @see {@link AbstractScoutWizardPage#validatePage(MultiStatus)}
    */
   protected final void revalidate() {
-    MultiStatus multiStatus = new MultiStatus(ScoutSdk.PLUGIN_ID, -1, "multi status", null);
+    MultiStatus multiStatus = new MultiStatus(ScoutSdkUi.PLUGIN_ID, -1, "multi status", null);
     validatePage(multiStatus);
     for (IStatusProvider p : m_statusProvider) {
       p.validate(this, multiStatus);

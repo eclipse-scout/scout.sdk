@@ -14,9 +14,9 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
-import org.eclipse.scout.sdk.jdt.JdtEvent;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  *

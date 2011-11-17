@@ -21,10 +21,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.NamingUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwingNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwtNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientLookupCallTablePage;
@@ -98,9 +96,11 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanProper
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.IProjectNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
+import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.type.IPropertyBean;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class EditorSelectionVisitor implements INodeVisitor {
 
@@ -262,19 +262,19 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof MenuTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IMenu));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IMenu));
     }
     else if (page instanceof MenuNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof ToolButtonTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IToolButton));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IToolButton));
     }
     else if (page instanceof DesktopOutlineTablePage) {
       return visitDesktopOutlineTablePage((DesktopOutlineTablePage) page);
     }
     else if (page instanceof SearchFormTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.ISearchForm));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ISearchForm));
     }
     else if (page instanceof FormTablePage) {
       return visitFormTablePage((FormTablePage) page);
@@ -292,19 +292,19 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof KeyStrokeTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IKeyStroke));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IKeyStroke));
     }
     else if (page instanceof KeyStrokeNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof AttributeTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IComposerAttribute));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IComposerAttribute));
     }
     else if (page instanceof AttributeNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof EntityTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IComposerEntity));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IComposerEntity));
     }
     else if (page instanceof EntityNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
@@ -313,46 +313,46 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof FormHandlerTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IFormHandler));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IFormHandler));
     }
     else if (page instanceof FormHandlerNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof SearchFormTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.ISearchForm));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ISearchForm));
     }
     else if (page instanceof WizardTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IWizard));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IWizard));
     }
     else if (page instanceof WizardNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof WizardStepTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IWizardStep));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IWizardStep));
     }
     else if (page instanceof WizardStepNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof ClientLookupCallTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.LocalLookupCall));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.LocalLookupCall));
     }
     else if (page instanceof ClientServiceTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IService));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IService));
     }
     else if (page instanceof ClientServiceNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof OutlineTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IOutline));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IOutline));
     }
     else if (page instanceof OutlineNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof AllPagesTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IPage));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IPage));
     }
     else if (page instanceof NodePageChildPageTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IPage));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IPage));
     }
     else if (page instanceof PageWithNodeNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
@@ -364,7 +364,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof ColumnTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IColumn));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IColumn));
     }
     else if (page instanceof ColumnNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
@@ -376,13 +376,13 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitSharedContextPropertyNodePage((SharedContextPropertyNodePage) page);
     }
     else if (page instanceof PermissionTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.BasicPermission));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.BasicPermission));
     }
     else if (page instanceof PermissionNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof CodeTypeTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.ICodeType));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ICodeType));
     }
     else if (page instanceof CodeTypeNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
@@ -394,13 +394,13 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof LookupServiceTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.ILookupService));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ILookupService));
     }
     else if (page instanceof LookupServiceNodePage) {
       return visitServiceNodePage((LookupServiceNodePage) page);
     }
     else if (page instanceof LookupCallTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.LookupCall));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.LookupCall));
     }
     else if (page instanceof OutlineServiceTablePage) {
       return visitOutlineServiceTablePage((OutlineServiceTablePage) page);
@@ -418,19 +418,19 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitServerServicesCommonNodePage((CommonServicesNodePage) page);
     }
     else if (page instanceof SqlServiceTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.ISqlService));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ISqlService));
     }
     else if (page instanceof SqlServiceNodePage) {
       return visitServiceNodePage((SqlServiceNodePage) page);
     }
     else if (page instanceof BookmarkStorageServiceTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.IBookmarkStorageService));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IBookmarkStorageService));
     }
     else if (page instanceof BookmarkStorageServiceNodePage) {
       return visitServiceNodePage((BookmarkStorageServiceNodePage) page);
     }
     else if (page instanceof CalendarServiceTablePage) {
-      return visitTypeInHierarchyPage(ScoutSdk.getType(RuntimeClasses.ICalendarService));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ICalendarService));
     }
     else if (page instanceof CustomServiceTablePage) {
       return visitCustomServiceTablePage((CustomServiceTablePage) page);
@@ -483,10 +483,10 @@ public class EditorSelectionVisitor implements INodeVisitor {
 
   private int visitDesktopOutlineTablePage(DesktopOutlineTablePage page) {
     ITypeHierarchy hierarchy = getCachedTypeHierarchy(getCurrentElement());
-    if (hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IOutline))) {
+    if (hierarchy.contains(TypeUtility.getType(RuntimeClasses.IOutline))) {
       IType desktopType = page.getDesktopType();
       IMethod outlineMethods = TypeUtility.getMethod(desktopType, "getConfiguredOutlines");
-      IType[] allNewOccurences = TypeUtility.getNewTypeOccurencesInMethod(outlineMethods);
+      IType[] allNewOccurences = ScoutTypeUtility.getNewTypeOccurencesInMethod(outlineMethods);
       for (IType typeOccurence : allNewOccurences) {
         if (typeOccurence.equals(desktopType)) {
           return CONTINUE_BRANCH;
@@ -498,7 +498,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
 
   private int visitFormTablePage(FormTablePage page) {
     ITypeHierarchy hierarchy = getCachedTypeHierarchy(getCurrentElement());
-    if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IForm)) && !hierarchy.contains(ScoutSdk.getType(RuntimeClasses.ISearchForm))) {
+    if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IForm)) && !hierarchy.contains(TypeUtility.getType(RuntimeClasses.ISearchForm))) {
       return CONTINUE_BRANCH;
     }
     return CANCEL_SUBTREE;
@@ -560,7 +560,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     if (isType(getCurrentElement())) {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
+      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
         if (currentElement.getPackageFragment().getElementName().equals(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_OUTLINE))) {
           return CONTINUE_BRANCH;
@@ -575,7 +575,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     if (isType(getCurrentElement())) {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
+      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
         if (currentElement.getPackageFragment().getElementName().equals(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS))) {
           return CONTINUE_BRANCH;
@@ -590,7 +590,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     if (isType(getCurrentElement())) {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
+      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
         if (currentElement.getPackageFragment().getElementName().startsWith(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM))) {
           return CONTINUE_BRANCH;
@@ -619,7 +619,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     if (isType(getCurrentElement())) {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
+      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
         if (currentElement.getPackageFragment().getElementName().startsWith(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON))) {
           return CONTINUE_BRANCH;
@@ -634,7 +634,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     if (isType(getCurrentElement())) {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(ScoutSdk.getType(RuntimeClasses.IService))) {
+      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
         if (currentElement.getPackageFragment().getElementName().startsWith(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM))) {
           return CONTINUE_BRANCH;

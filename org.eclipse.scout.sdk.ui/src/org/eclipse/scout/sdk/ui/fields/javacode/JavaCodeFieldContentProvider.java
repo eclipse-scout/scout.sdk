@@ -32,9 +32,8 @@ import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 public class JavaCodeFieldContentProvider implements IContentProposalProvider {
 
@@ -159,7 +158,7 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
           m_foundTypes.put(new CompositeObject("A", type.getElementName(), type.getFullyQualifiedName()), new JavaTypeProposal(type));
         }
         if (counter++ > 98) {
-          throw new CoreException(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, "stopped after 50"));
+          throw new CoreException(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "stopped after 50"));
         }
 
       }

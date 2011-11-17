@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal;
 
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.swt.graphics.Image;
 
 public class SignatureProposal implements IContentProposalEx {
@@ -25,12 +27,27 @@ public class SignatureProposal implements IContentProposalEx {
 
   public SignatureProposal(String signature) {
     m_signature = signature;
-    m_isPrimitive = ScoutSdkUtility.getSignatureType(signature) == Signature.BASE_TYPE_SIGNATURE;
-    m_simpleTypeName = ScoutSdkUtility.getSimpleTypeSignature(signature);
+    m_isPrimitive = SignatureUtility.getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE;
+    try {
+      m_simpleTypeName = SignatureUtility.getTypeReference(signature, new SimpleImportValidator());
+    }
+    catch (JavaModelException e) {
+      ScoutSdkUi.logWarning("Unable to get type reference of signature : " + signature, e);
+      m_simpleTypeName = "";
+    }
     if (!m_isPrimitive) {
       m_packageName = Signature.getSignatureQualifier(m_signature);
-      m_fullyQuallifiedName = ScoutSdkUtility.getNonGenericSimpleName(m_signature);
+      m_fullyQuallifiedName = getNonGenericSimpleName(m_signature);
     }
+  }
+
+  private static String getNonGenericSimpleName(String signature) throws IllegalArgumentException {
+    String simpleName = signature.replaceAll("^[\\[]*([^\\<]*).*(\\;)$", "$1$2");
+    if (SignatureUtility.getTypeSignatureKind(simpleName) != Signature.CLASS_TYPE_SIGNATURE) {
+      throw new IllegalArgumentException("the signature must be a class type signature!");
+    }
+    simpleName = Signature.getSignatureSimpleName(simpleName);
+    return simpleName;
   }
 
   @Override
@@ -56,8 +73,7 @@ public class SignatureProposal implements IContentProposalEx {
   }
 
   private String getPrimitiveLabel(boolean selected, boolean expertMode) {
-    String label = m_simpleTypeName;
-    return label;
+    return m_simpleTypeName;
   }
 
   private String getTypeLabel(boolean selected, boolean expertMode) {

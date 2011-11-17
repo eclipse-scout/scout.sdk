@@ -25,14 +25,13 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ExportServerWarAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom.CustomServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
@@ -41,19 +40,20 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.servi
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 
 /**
  * <h3>ServerNodePage</h3> ...
  */
 public class ServerNodePage extends AbstractPage {
-  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
-  final IType iServerSession = ScoutSdk.getType(RuntimeClasses.IServerSession);
+  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+  final IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
 
   private final IScoutBundle m_serverBundle;
   private ICachedTypeHierarchy m_serverSessionHierarchy;
@@ -63,7 +63,7 @@ public class ServerNodePage extends AbstractPage {
     m_serverBundle = serverBundle;
     setName(getScoutResource().getSimpleName());
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle));
-    m_serverSessionHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iServerSession);
+    m_serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
     m_serverSessionHierarchy.addHierarchyListener(getPageDirtyListener());
   }
 
@@ -150,7 +150,7 @@ public class ServerNodePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
-    IPrimaryTypeTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     IType[] services = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
     return services;
   }
@@ -211,10 +211,10 @@ public class ServerNodePage extends AbstractPage {
         null
         );
     if (matchList.size() > 1) {
-      ScoutSdk.logWarning("found more than one type matches for '" + fqn + "' (matches: '" + matchList.size() + "').");
+      ScoutSdkUi.logWarning("found more than one type matches for '" + fqn + "' (matches: '" + matchList.size() + "').");
     }
     else if (matchList.size() < 1) {
-      ScoutSdk.logWarning("found no type matches for '" + fqn + "'.");
+      ScoutSdkUi.logWarning("found no type matches for '" + fqn + "'.");
       return null;
     }
     return matchList.firstEntry().getValue();

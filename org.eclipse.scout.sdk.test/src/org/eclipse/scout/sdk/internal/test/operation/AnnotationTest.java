@@ -15,11 +15,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -43,7 +42,7 @@ public class AnnotationTest extends AbstractScoutSdkTest {
 
   @Test
   public void testCreateAnnotation() throws Exception {
-    IType testForm = ScoutSdk.getType("test.client.ui.forms.Test1Form");
+    IType testForm = TypeUtility.getType("test.client.ui.forms.Test1Form");
     Assert.assertTrue(TypeUtility.exists(testForm));
     IMethod method = TypeUtility.getMethod(testForm, "getStringMember");
     Assert.assertTrue(TypeUtility.exists(method));
@@ -59,7 +58,7 @@ public class AnnotationTest extends AbstractScoutSdkTest {
 
   @Test
   public void testCreateAnnotationWithComment() throws Exception {
-    IType testForm = ScoutSdk.getType("test.client.ui.forms.Test1Form");
+    IType testForm = TypeUtility.getType("test.client.ui.forms.Test1Form");
     Assert.assertTrue(TypeUtility.exists(testForm));
     IMethod method = TypeUtility.getMethod(testForm, "setStringMember");
     Assert.assertTrue(TypeUtility.exists(method));

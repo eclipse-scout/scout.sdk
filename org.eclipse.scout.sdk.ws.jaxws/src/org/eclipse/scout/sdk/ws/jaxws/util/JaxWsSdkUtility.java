@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -14,7 +14,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -78,23 +77,23 @@ import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation
 import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation.IChooseImportQuery;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
 import org.eclipse.jdt.ui.SharedASTProvider;
+import org.eclipse.pde.core.plugin.IPluginAttribute;
+import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.pde.PdeUtility;
-import org.eclipse.scout.sdk.pde.PluginXml;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
-import org.eclipse.scout.sdk.util.ScoutSignature;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -184,7 +183,7 @@ public class JaxWsSdkUtility {
       try {
         // create the folders if they do not exist yet
         if (file.getParent() instanceof IFolder) {
-          PdeUtility.createFolder(file.getParent());
+          ResourcesUtility.createFolder(file.getParent());
         }
         // the file does not already exist. Therefore create an empty file
         InputStream inputStream = new ByteArrayInputStream(new byte[0]);
@@ -200,9 +199,11 @@ public class JaxWsSdkUtility {
       IFolder folder = (IFolder) file.getParent();
       if (!folder.getProjectRelativePath().toPortableString().contains("build")) {
         try {
-          PdeUtility.addBuildPropertiesDirectories(scoutBundle.getProject(), "bin.includes", new String[]{folder.getProjectRelativePath().toPortableString()});
+          PluginModelHelper h = new PluginModelHelper(scoutBundle.getProject());
+          h.BuildProperties.addBinaryBuildEntry(folder.getProjectRelativePath().toPortableString());
+          h.save();
         }
-        catch (Exception e) {
+        catch (CoreException e) {
           JaxWsSdk.logError("failed to register folder in build.properties", e);
         }
       }
@@ -221,7 +222,7 @@ public class JaxWsSdkUtility {
     if (!folder.exists() && autoCreate) {
       try {
         // create the folders if they do not exist yet
-        PdeUtility.createFolder(folder);
+        ResourcesUtility.createFolder(folder);
       }
       catch (CoreException e) {
         throw new RuntimeException("An unexpected error occured while creating the report design file", e);
@@ -231,9 +232,11 @@ public class JaxWsSdkUtility {
     // register folder in build properties
     if (autoCreate && !folder.getProjectRelativePath().toPortableString().contains("build")) {
       try {
-        PdeUtility.addBuildPropertiesDirectories(scoutBundle.getProject(), "bin.includes", new String[]{folder.getProjectRelativePath().toPortableString()});
+        PluginModelHelper h = new PluginModelHelper(scoutBundle.getProject());
+        h.BuildProperties.addBinaryBuildEntry(folder.getProjectRelativePath().toPortableString());
+        h.save();
       }
-      catch (Exception e) {
+      catch (CoreException e) {
         JaxWsSdk.logError("failed to register folder in build.properties", e);
       }
     }
@@ -683,8 +686,8 @@ public class JaxWsSdkUtility {
       String signature = typeArguments[index];
       String fullyQualifiedName = JaxWsSdkUtility.getFullyQualifiedNameFromSignature(type, signature);
 
-      if (ScoutSdk.existsType(fullyQualifiedName)) {
-        return ScoutSdk.getType(fullyQualifiedName);
+      if (TypeUtility.existsType(fullyQualifiedName)) {
+        return TypeUtility.getType(fullyQualifiedName);
       }
       return null;
     }
@@ -1171,7 +1174,7 @@ public class JaxWsSdkUtility {
       propertyValue.setInherited(true);
 
       String fqnAnnotationType = getFullyQualifiedNameFromName(declaringType, annotation.getElementName());
-      IType type = ScoutSdk.getType(fqnAnnotationType);
+      IType type = TypeUtility.getType(fqnAnnotationType);
       if (TypeUtility.exists(type)) {
         propertyValue.setFullyQualifiedName((String) type.getMethod(property, new String[0]).getDefaultValue().getValue());
       }
@@ -1193,7 +1196,7 @@ public class JaxWsSdkUtility {
   public static IType[] getJdtSubTypes(IScoutBundle bundle, String fqnSuperType, boolean includeInterfaces, boolean includeAbstractTypes, boolean includeFinalTypes, boolean sameProject) {
     List<IType> types = new LinkedList<IType>();
     try {
-      IType[] superTypes = ScoutSdk.getTypes(fqnSuperType);
+      IType[] superTypes = TypeUtility.getTypes(fqnSuperType);
       for (IType superType : superTypes) {
         ITypeHierarchy hierarchy = superType.newTypeHierarchy(new NullProgressMonitor());
         IType[] candidates = hierarchy.getAllSubtypes(superType);
@@ -1239,7 +1242,7 @@ public class JaxWsSdkUtility {
     if (candidateToCheck == null) {
       return false;
     }
-    IType[] superTypes = ScoutSdk.getTypes(fqnSuperType);
+    IType[] superTypes = TypeUtility.getTypes(fqnSuperType);
     try {
       ITypeHierarchy superTypeHierarchy = candidateToCheck.newSupertypeHierarchy(new NullProgressMonitor());
       for (IType superType : superTypes) {
@@ -1257,7 +1260,7 @@ public class JaxWsSdkUtility {
   public static String resolveTypeName(IType declaringType, IType typeToBeResolved) throws JavaModelException {
     String typeSignature = Signature.createTypeSignature(typeToBeResolved.getFullyQualifiedName(), true);
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(declaringType.getCompilationUnit());
-    return ScoutSignature.getTypeReference(typeSignature, declaringType, validator);
+    return SignatureUtility.getTypeReference(typeSignature, declaringType, validator);
   }
 
   public static String toValidFileName(String name) {
@@ -1497,19 +1500,17 @@ public class JaxWsSdkUtility {
         return null;
       }
 
-      IPrimaryTypeTypeHierarchy hierarchy = ScoutSdk.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.ServiceTunnelServlet);
+      IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.ServiceTunnelServlet);
 
       // iterate through all dependent bundles to find servlet contributing bundle
       IScoutBundle[] candiates = rootBundle.getDependentBundles(ScoutBundleFilters.getServerFilter(), true);
       for (IScoutBundle candiate : candiates) {
-        PluginXml pluginXml = new PluginXml(candiate.getProject());
-        Collection<SimpleXmlElement> extensions = pluginXml.getExtensions(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS);
-        for (SimpleXmlElement e : extensions) {
-          ArrayList<SimpleXmlElement> servlets = e.getChildren("servlet");
-          for (SimpleXmlElement servlet : servlets) {
-            String clazz = servlet.getStringAttribute("class");
-            IType servletType = ScoutSdk.getType(clazz);
-            if (hierarchy.contains(servletType)) {
+        PluginModelHelper h = new PluginModelHelper(candiate.getProject());
+        IPluginElement[] exts = h.PluginXml.getSimpleExtensions(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet");
+        for (IPluginElement ext : exts) {
+          IPluginAttribute a = ext.getAttribute("class");
+          if (a != null && a.getValue() != null && a.getValue().length() > 0) {
+            if (hierarchy.contains(TypeUtility.getType(a.getValue()))) {
               return candiate;
             }
           }
@@ -1553,30 +1554,15 @@ public class JaxWsSdkUtility {
     }
 
     // update Bundle-ClassPath in MANIFEST.MF
+    PluginModelHelper h = new PluginModelHelper(project);
     try {
-      List<String> cpeList = Arrays.asList(PdeUtility.getAttributeList(project, "Bundle-ClassPath"));
       if (remove) {
-        if (cpeList.contains(jarFilePath)) {
-          PdeUtility.reduceAttributeList(project, "Bundle-ClassPath", new String[]{jarFilePath});
-        }
+        h.Manifest.removeClasspathEntry(jarFilePath);
       }
       else {
-        if (!cpeList.contains(jarFilePath)) {
-          PdeUtility.addBundleClasspath(project, jarFilePath);
-        }
+        h.Manifest.addClasspathEntry(jarFilePath);
       }
-
-      // ensure . entry (project source) to be included in Bundle-ClassPath in MANIFEST.MF
-      boolean defaultCpeAvailable = false;
-      for (String cpe : cpeList) {
-        if (cpe.equals(".")) {
-          defaultCpeAvailable = true;
-          break;
-        }
-      }
-      if (!defaultCpeAvailable) {
-        PdeUtility.addBundleClasspath(project, ".");
-      }
+      h.Manifest.addClasspathDefaultEntry();
     }
     catch (Exception e) {
       JaxWsSdk.logError("could not update Bundle-ClassPath in MANIFEST.MF", e);
@@ -1585,15 +1571,16 @@ public class JaxWsSdkUtility {
 
     // update bin.includes in build.properties
     try {
-      PdeUtility.removeBuildPropertiesFiles(project, "bin.includes", new String[]{jarFilePath});
+      h.BuildProperties.removeBinaryBuildEntry(jarFilePath);
       if (!remove) {
-        PdeUtility.addBuildPropertiesFiles(project, "bin.includes", new String[]{jarFilePath});
+        h.BuildProperties.addBinaryBuildEntry(jarFilePath);
       }
     }
     catch (Exception e) {
       JaxWsSdk.logError("could not update bin.includes in build.properties", e);
       success = false;
     }
+    h.save();
 
     return success;
   }
@@ -1618,16 +1605,17 @@ public class JaxWsSdkUtility {
       String extensionPoint = JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS;
       String jaxWsServletClass = JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName();
 
-      PluginXml pluginXml = new PluginXml(rootServerBundle.getProject());
-      SimpleXmlElement point = pluginXml.getExtension(extensionPoint);
-      if (point == null) {
+      HashMap<String, String> attributes = new HashMap<String, String>();
+      attributes.put("class", jaxWsServletClass);
+      PluginModelHelper h = new PluginModelHelper(rootServerBundle.getProject());
+      IPluginElement ex = h.PluginXml.getSimpleExtension(extensionPoint, servletElement, attributes);
+      if (ex == null) {
         return null;
       }
-
-      // find JAX-WS servlet extension
-      for (SimpleXmlElement xmlElement : point.getChildren(servletElement)) {
-        if (jaxWsServletClass.equals(xmlElement.getStringAttribute("class"))) {
-          return xmlElement.getStringAttribute("alias");
+      else {
+        IPluginAttribute a = ex.getAttribute("alias");
+        if (a != null) {
+          return a.getValue();
         }
       }
     }

@@ -13,25 +13,26 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
-import org.eclipse.scout.sdk.jdt.JdtEvent;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.OutlineNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>DesktopOutlineTablePage</h3> ...
  */
 public class DesktopOutlineTablePage extends AbstractPage {
-  final IType iOutline = ScoutSdk.getType(RuntimeClasses.IOutline);
+  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
   final String getConfiguredOutlines = "getConfiguredOutlines";
   private IType m_desktopType;
   private P_MethodListener m_methodListener;
@@ -72,7 +73,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_methodListener != null) {
-      ScoutSdk.removeMethodChangedListener(getDesktopType(), m_methodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getDesktopType(), m_methodListener);
       m_methodListener = null;
     }
     if (m_outlineTypeHierarchy != null) {
@@ -85,17 +86,17 @@ public class DesktopOutlineTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_outlineTypeHierarchy == null) {
-      m_outlineTypeHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iOutline);
+      m_outlineTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
-      ScoutSdk.addMethodChangedListener(getDesktopType(), m_methodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getDesktopType(), m_methodListener);
     }
     try {
       IMethod outlinesMethod = TypeUtility.getMethod(getDesktopType(), getConfiguredOutlines);
       if (outlinesMethod != null) {
-        IType[] outlineCandidates = TypeUtility.getTypeOccurenceInMethod(outlinesMethod);
+        IType[] outlineCandidates = ScoutTypeUtility.getTypeOccurenceInMethod(outlinesMethod);
         for (IType candidate : outlineCandidates) {
           if (m_outlineTypeHierarchy.isSubtype(iOutline, candidate)) {
             new OutlineNodePage(this, candidate);

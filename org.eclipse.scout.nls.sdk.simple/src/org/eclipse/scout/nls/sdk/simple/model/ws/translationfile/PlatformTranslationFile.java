@@ -13,7 +13,7 @@ package org.eclipse.scout.nls.sdk.simple.model.ws.translationfile;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.AbstractTranslationResource;
 

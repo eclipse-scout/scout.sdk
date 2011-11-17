@@ -10,15 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 /**
  * <h3>ButtonNodePage</h3> ...
@@ -45,7 +45,7 @@ public class ButtonNodePage extends AbstractFormFieldNodePage {
     super.prepareMenuAction(menu);
     if (menu instanceof FormFieldRenameAction) {
       FormFieldRenameAction a = (FormFieldRenameAction) menu;
-      a.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_BUTTON);
+      a.setReadOnlySuffix(SdkProperties.SUFFIX_BUTTON);
     }
     else if (menu instanceof FormFieldDeleteAction) {
       menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ButtonRemove));

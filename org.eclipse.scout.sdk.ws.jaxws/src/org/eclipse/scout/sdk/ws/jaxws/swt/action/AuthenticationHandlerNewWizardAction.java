@@ -19,13 +19,12 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -105,7 +104,7 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
       }
       IType[] subTypes;
       if (m_onlyInterfaceTypes) {
-        IType[] candidates = ScoutSdk.getPrimaryTypeHierarchy(type).getAllSubtypes(type, new ITypeFilter() {
+        IType[] candidates = TypeUtility.getPrimaryTypeHierarchy(type).getAllSubtypes(type, new ITypeFilter() {
 
           @Override
           public boolean accept(IType candidate) {
@@ -127,7 +126,7 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
         subTypes[0] = type;
       }
       else {
-        subTypes = ScoutSdk.getPrimaryTypeHierarchy(type).getAllSubtypes(type, TypeFilters.getTypesOnClasspath(type.getJavaProject()));
+        subTypes = TypeUtility.getPrimaryTypeHierarchy(type).getAllSubtypes(type, TypeFilters.getTypesOnClasspath(type.getJavaProject()));
       }
       return SearchEngine.createJavaSearchScope(subTypes);
     }

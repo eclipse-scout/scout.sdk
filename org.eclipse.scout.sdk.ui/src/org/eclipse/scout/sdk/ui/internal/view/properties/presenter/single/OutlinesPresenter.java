@@ -24,19 +24,19 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.ui.dialog.JavaElementSelectionDialog;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractJavaElementListPresenter;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -44,7 +44,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * <h3>OutlinesPresenter</h3> ...
  */
 public class OutlinesPresenter extends AbstractJavaElementListPresenter {
-  final IType iOutline = ScoutSdk.getType(RuntimeClasses.IOutline);
+  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
   public OutlinesPresenter(FormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -52,9 +52,9 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
 
   @Override
   public IJavaElement[] readSource() throws CoreException {
-    //ICachedTypeHierarchy outlineHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iOutline);
+    //ICachedTypeHierarchy outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
     ArrayList<IJavaElement> props = new ArrayList<IJavaElement>();
-    for (IType type : TypeUtility.getTypeOccurenceInMethod(getMethod().peekMethod())) {
+    for (IType type : ScoutTypeUtility.getTypeOccurenceInMethod(getMethod().peekMethod())) {
       //if (outlineHierarchy.isSubtype(iOutline, type)) {
       props.add(type);
       //}
@@ -63,14 +63,14 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
   }
 
   private String getFieldName(IType field, String labelMethodName) {
-    return ScoutSourceUtilities.getTranslatedMethodStringValue(field, labelMethodName);
+    return ScoutSourceUtility.getTranslatedMethodStringValue(field, labelMethodName);
   }
 
   @Override
   protected void handleAddComponent() {
     HashSet<IJavaElement> sourceProposals = new HashSet<IJavaElement>(Arrays.asList(getSourceProps()));
     ArrayList<IJavaElement> candidates = new ArrayList<IJavaElement>();
-    ICachedTypeHierarchy outlineHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iOutline);
+    ICachedTypeHierarchy outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
     for (IType t : outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator())) {
       if (!sourceProposals.contains(t)) {
         candidates.add(t);
@@ -106,7 +106,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
         source.append("new Class[]{");
         if (proposals.length > 0) {
           for (int i = 0; i < proposals.length; i++) {
-            source.append(ScoutSdkUtility.getSimpleTypeRefName(Signature.createTypeSignature(((IType) proposals[i]).getFullyQualifiedName(), true), validator) + ".class");
+            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(((IType) proposals[i]).getFullyQualifiedName(), true), validator) + ".class");
             if (i < (proposals.length - 1)) {
               source.append(",\n  ");
             }

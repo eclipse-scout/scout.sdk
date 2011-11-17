@@ -13,13 +13,13 @@ package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public interface IMarkerCommand {
 
   boolean prepareForUi() throws CoreException;
 
-  void execute(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException;
+  void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException;
 
   void setDoExecute(boolean doExecute);
 

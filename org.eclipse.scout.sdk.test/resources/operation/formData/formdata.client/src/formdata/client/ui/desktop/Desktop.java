@@ -10,7 +10,6 @@
  ******************************************************************************/
 package formdata.client.ui.desktop;
 
-
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -21,84 +20,81 @@ import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
-import formdata.client.ClientSession;
-import formdata.shared.Texts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
-public class Desktop extends AbstractDesktop implements IDesktop{
+import formdata.client.ClientSession;
+
+public class Desktop extends AbstractDesktop implements IDesktop {
   private static IScoutLogger logger = ScoutLogManager.getLogger(Desktop.class);
 
-  public Desktop(){
+  public Desktop() {
   }
 
   @Override
-  public String getConfiguredTitle(){
-    return Texts.get("ApplicationTitle");
+  public String getConfiguredTitle() {
+    return TEXTS.get("ApplicationTitle");
   }
 
-
-
   @Order(10.0)
-  public class FileMenu extends AbstractMenu{
+  public class FileMenu extends AbstractMenu {
 
     @Override
-    public String getConfiguredText(){
-      return Texts.get("FileMenu");
+    public String getConfiguredText() {
+      return TEXTS.get("FileMenu");
     }
 
     @Order(100.0)
-    public class ExitMenu extends AbstractMenu{
+    public class ExitMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText(){
-        return Texts.get("ExitMenu");
+      public String getConfiguredText() {
+        return TEXTS.get("ExitMenu");
       }
 
       @Override
-      public void execAction() throws ProcessingException{
+      public void execAction() throws ProcessingException {
         ClientSyncJob.getCurrentSession(ClientSession.class).stopSession();
       }
     }
   }
 
   @Order(20.0)
-  public class ToolsMenu extends AbstractMenu{
+  public class ToolsMenu extends AbstractMenu {
 
     @Override
-    public String getConfiguredText(){
-      return Texts.get("ToolsMenu");
+    public String getConfiguredText() {
+      return TEXTS.get("ToolsMenu");
     }
   }
 
   @Order(25)
-  public class BookmarkMenu extends AbstractBookmarkMenu{
-    public BookmarkMenu(){
+  public class BookmarkMenu extends AbstractBookmarkMenu {
+    public BookmarkMenu() {
       super(Desktop.this);
     }
   }
 
   @Order(30.0)
-  public class HelpMenu extends AbstractMenu{
+  public class HelpMenu extends AbstractMenu {
 
     @Override
-    public String getConfiguredText(){
-      return Texts.get("HelpMenu");
+    public String getConfiguredText() {
+      return TEXTS.get("HelpMenu");
     }
 
     @Order(10.0)
-    public class AboutMenu extends AbstractMenu{
+    public class AboutMenu extends AbstractMenu {
 
       @Override
-      public String getConfiguredText(){
-        return Texts.get("AboutMenu");
+      public String getConfiguredText() {
+        return TEXTS.get("AboutMenu");
       }
 
       @Override
-      public void execAction() throws ProcessingException{
-        ScoutInfoForm form=new ScoutInfoForm();
+      public void execAction() throws ProcessingException {
+        ScoutInfoForm form = new ScoutInfoForm();
         form.startModify();
       }
     }
-
   }
-
 }

@@ -30,10 +30,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.AbstractTranslationResource;
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.TranslationResourceEvent;
-import org.eclipse.scout.nls.sdk.simple.NlsSdkSimple;
+import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 
 /**
  * <h4>WorkspaceTranslationFile</h4>

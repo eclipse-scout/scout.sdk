@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.ui.extensions.project.template;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
@@ -24,7 +24,7 @@ public interface IProjectTemplate {
 
   String getDescription();
 
-  void apply(IScoutProject project, IProgressMonitor monitor, IScoutWorkingCopyManager manager);
+  void apply(IScoutProject project, IProgressMonitor monitor, IWorkingCopyManager manager);
 
   boolean isApplicable(IScoutProjectWizard wizard);
 

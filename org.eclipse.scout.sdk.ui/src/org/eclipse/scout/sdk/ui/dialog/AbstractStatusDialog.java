@@ -16,8 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.WizardPageFieldToolkit;
 import org.eclipse.swt.widgets.Shell;
@@ -88,7 +87,7 @@ public abstract class AbstractStatusDialog extends TitleAreaDialog {
    * @see {@link AbstractScoutWizardPage#validatePage(MultiStatus)}
    */
   protected final void revalidate() {
-    MultiStatus multiStatus = new MultiStatus(ScoutSdk.PLUGIN_ID, -1, "multi status", null);
+    MultiStatus multiStatus = new MultiStatus(ScoutSdkUi.PLUGIN_ID, -1, "multi status", null);
     validate(multiStatus);
     setStatus(multiStatus, m_defaultOkStatus);
   }

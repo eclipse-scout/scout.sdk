@@ -27,11 +27,11 @@ import org.eclipse.scout.sdk.operation.template.sequencebox.DateTimeFromToTempla
 import org.eclipse.scout.sdk.operation.template.sequencebox.DoubleFromToTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.IntegerFromToTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.LongFromToTemplate;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.form.fields.EmptyTemplate;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -75,7 +75,7 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     if (m_selectedTemplate != null) {
       SequenceBoxNewWizardPage previousPage = (SequenceBoxNewWizardPage) getPreviousPage();
       IType sequenceBox = previousPage.getCreatedType();

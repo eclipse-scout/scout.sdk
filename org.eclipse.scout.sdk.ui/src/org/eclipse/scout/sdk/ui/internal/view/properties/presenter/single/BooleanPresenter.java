@@ -14,15 +14,15 @@ import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.ScoutStatus;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -113,7 +113,7 @@ public class BooleanPresenter extends AbstractMethodPresenter {
   private synchronized void handleCheckboxSelectionChanged() {
     IOperation op = null;
     String sourceValue = Boolean.toString(m_checkbox.getSelection());
-    if (ScoutSdkUtility.equals(getMethod().computeDefaultValue(), sourceValue)) {
+    if (UiUtility.equals(getMethod().computeDefaultValue(), sourceValue)) {
       if (getMethod().isImplemented()) {
         op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
       }

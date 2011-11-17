@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 import java.util.Set;
 
 import org.eclipse.scout.nls.sdk.model.util.Language;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;

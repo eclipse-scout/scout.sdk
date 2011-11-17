@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.ui.wizard.toolbutton;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class ToolbuttonNewWizard extends AbstractFormFieldWizard {
 
@@ -51,7 +51,7 @@ public class ToolbuttonNewWizard extends AbstractFormFieldWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     boolean validPage = false;
     try {
       validPage = m_page1.performFinish(monitor, workingCopyManager);

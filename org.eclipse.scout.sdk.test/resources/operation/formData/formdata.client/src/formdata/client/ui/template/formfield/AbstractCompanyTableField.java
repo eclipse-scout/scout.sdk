@@ -1,14 +1,14 @@
 package formdata.client.ui.template.formfield;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
-import formdata.shared.Texts;
 import formdata.shared.services.process.AbstractCompanyTableFieldData;
 
 @FormData(value = AbstractCompanyTableFieldData.class, sdkCommand = SdkCommand.CREATE)
@@ -16,7 +16,7 @@ public abstract class AbstractCompanyTableField extends AbstractTableField<Abstr
 
   @Override
   protected String getConfiguredLabel() {
-    return Texts.get("Company");
+    return TEXTS.get("Company");
   }
 
   @Order(10.0)

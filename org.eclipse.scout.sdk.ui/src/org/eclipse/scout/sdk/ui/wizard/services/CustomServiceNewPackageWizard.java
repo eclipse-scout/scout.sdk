@@ -15,10 +15,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.wizards.NewPackageCreationWizard;
 import org.eclipse.jdt.ui.wizards.NewPackageWizardPage;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.PackageNewOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 @SuppressWarnings("restriction")
@@ -37,7 +37,7 @@ public class CustomServiceNewPackageWizard extends NewPackageCreationWizard {
   public void addPages() {
     super.addPages();
     try {
-      String srcPath = "/" + m_javaProject.getElementName() + "/" + ScoutIdeProperties.DEFAULT_SOURCE_FOLDER_NAME;
+      String srcPath = "/" + m_javaProject.getElementName() + "/" + SdkProperties.DEFAULT_SOURCE_FOLDER_NAME;
       m_page1 = (NewPackageWizardPage) getPages()[0];
 
       m_page1.setPackageFragmentRoot(m_javaProject.findPackageFragmentRoot(new Path(srcPath)), false);
@@ -53,7 +53,7 @@ public class CustomServiceNewPackageWizard extends NewPackageCreationWizard {
   @Override
   public boolean performFinish() {
     String packageName = m_page1.getPackageText();
-    PackageNewOperation packageNewOperation = new PackageNewOperation(m_javaProject, ScoutIdeProperties.DEFAULT_SOURCE_FOLDER_NAME, packageName);
+    PackageNewOperation packageNewOperation = new PackageNewOperation(m_javaProject, SdkProperties.DEFAULT_SOURCE_FOLDER_NAME, packageName);
     OperationJob job = new OperationJob(packageNewOperation);
     job.schedule();
     try {

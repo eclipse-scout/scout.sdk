@@ -169,7 +169,7 @@ public abstract class AbstractScoutSdkTest {
     waitForFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
   }
 
-  private static void waitForFamily(Object family) {
+  protected static void waitForFamily(Object family) {
     boolean wasInterrupted = false;
     do {
       try {

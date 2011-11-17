@@ -14,24 +14,24 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 public class ProcessServiceTablePage extends AbstractPage {
-  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
+  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
 
   private ICachedTypeHierarchy m_serviceHierarchy;
   private PackageContentChangedListener m_packageContentListener;
@@ -95,7 +95,7 @@ public class ProcessServiceTablePage extends AbstractPage {
 
   protected IType[] resolveAllProcessServices() {
     if (m_serviceHierarchy == null || !m_serviceHierarchy.isCreated()) {
-      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+      m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     }
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
         TypeFilters.getClassesInProject(getScoutResource().getJavaProject()),

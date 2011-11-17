@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.ui.action.create;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
 import org.eclipse.scout.sdk.ui.wizard.page.PageNewWizard;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 public class PageNewAction extends AbstractWizardAction {
   private IType m_type;

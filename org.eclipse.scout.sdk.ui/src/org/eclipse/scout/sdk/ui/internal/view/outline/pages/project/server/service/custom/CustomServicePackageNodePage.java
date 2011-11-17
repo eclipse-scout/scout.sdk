@@ -14,25 +14,24 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.CustomServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
 
 public class CustomServicePackageNodePage extends AbstractPage {
 
-  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
+  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
 
   private PackageContentChangedListener m_packageContentListener;
   private IPackageFragment m_package;
@@ -86,7 +85,7 @@ public class CustomServicePackageNodePage extends AbstractPage {
 
   protected IType[] resolveServices() {
     if (m_serviceHierarchy == null) {
-      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+      m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     }
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
         TypeFilters.getClassFilter(),

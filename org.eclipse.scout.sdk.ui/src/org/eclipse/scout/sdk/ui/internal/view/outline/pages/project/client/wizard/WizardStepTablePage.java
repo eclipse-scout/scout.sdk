@@ -12,18 +12,18 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wiza
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 /**
  * <h3>WizardStepTablePage</h3> ...
@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 public class WizardStepTablePage extends AbstractPage {
 
   private final IType m_wizardType;
-  final IType iWizardStep = ScoutSdk.getType(RuntimeClasses.IWizardStep);
+  final IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public WizardStepTablePage(IPage parent, IType wizardType) {
@@ -55,7 +55,7 @@ public class WizardStepTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_innerTypeListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getWizardType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getWizardType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
   }
@@ -64,9 +64,9 @@ public class WizardStepTablePage extends AbstractPage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iWizardStep);
-      ScoutSdk.addInnerTypeChangedListener(getWizardType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getWizardType(), m_innerTypeListener);
     }
-    IType[] wizardSteps = TypeUtility.getInnerTypes(getWizardType(), TypeFilters.getSubtypeFilter(iWizardStep), TypeComparators.getOrderAnnotationComparator());
+    IType[] wizardSteps = TypeUtility.getInnerTypes(getWizardType(), TypeFilters.getSubtypeFilter(iWizardStep), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType wizardStep : wizardSteps) {
       WizardStepNodePage childPage = new WizardStepNodePage();
       childPage.setParent(this);

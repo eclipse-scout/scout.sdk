@@ -21,7 +21,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.ui.action.NlsEntryModifyAction;
 import org.eclipse.scout.nls.sdk.ui.action.NlsEntryNewAction;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.nls.NlsNewProposal;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.nls.NlsTextProposalProvider;
 import org.eclipse.swt.widgets.Composite;

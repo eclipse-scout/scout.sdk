@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.osgi.framework.Bundle;
 
 /**
@@ -35,7 +35,7 @@ public class SqlBindFromFormDataCompletionComputer implements IJavaCompletionPro
   @Override
   public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)
-        || Platform.getBundle(ScoutSdk.PLUGIN_ID).getState() != Bundle.ACTIVE) {
+        || Platform.getBundle(ScoutSdkUi.PLUGIN_ID).getState() != Bundle.ACTIVE) {
       return Collections.EMPTY_LIST;
     }
     if (m_processor == null) {

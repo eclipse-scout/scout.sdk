@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -31,11 +31,12 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -435,7 +436,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     if (multiStatus.getSeverity() < IStatus.ERROR) {
       String fullyQualifiedName = StringUtility.join(".", getPackageName(), getTypeName());
       try {
-        if (ScoutSdk.existsType(fullyQualifiedName)) {
+        if (TypeUtility.existsType(fullyQualifiedName)) {
           multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TypeAlreadyExsits", fullyQualifiedName)));
         }
       }
@@ -470,8 +471,8 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
     try {
       String fqn = StringUtility.join(".", packageName, className);
-      if (ScoutSdk.existsType(fqn)) {
-        IType type = ScoutSdk.getType(fqn);
+      if (TypeUtility.existsType(fqn)) {
+        IType type = TypeUtility.getType(fqn);
         if (!type.newSupertypeHierarchy(new NullProgressMonitor()).contains(interfaceType)) {
           type.getJavadocRange().getOffset();
           type.getJavadocRange().getLength();
@@ -576,8 +577,8 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       try {
         m_tooltipSessionFactory.setMember(null);
 
-        if (ScoutSdk.existsType(sessionFactory)) {
-          IType type = ScoutSdk.getType(sessionFactory);
+        if (TypeUtility.existsType(sessionFactory)) {
+          IType type = TypeUtility.getType(sessionFactory);
           if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.IServerSessionFactory)) {
             m_tooltipSessionFactory.setMember(type);
           }
@@ -612,8 +613,8 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     if (isControlCreated()) {
       // display JavaDoc
       m_tooltipAuthenticationHandler.setMember(null);
-      if (ScoutSdk.existsType(authenticationHandler)) {
-        IType type = ScoutSdk.getType(authenticationHandler);
+      if (TypeUtility.existsType(authenticationHandler)) {
+        IType type = TypeUtility.getType(authenticationHandler);
         try {
           if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.IAuthenticationHandlerProvider)) {
             m_tooltipAuthenticationHandler.setMember(type);
@@ -649,8 +650,8 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     if (isControlCreated()) {
       // display JavaDoc
       m_tooltipCredentialValidationStrategy.setMember(null);
-      if (ScoutSdk.existsType(credentialValidationStrategy)) {
-        IType type = ScoutSdk.getType(credentialValidationStrategy);
+      if (TypeUtility.existsType(credentialValidationStrategy)) {
+        IType type = TypeUtility.getType(credentialValidationStrategy);
         try {
           if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.ICredentialValidationStrategy)) {
             m_tooltipCredentialValidationStrategy.setMember(type);

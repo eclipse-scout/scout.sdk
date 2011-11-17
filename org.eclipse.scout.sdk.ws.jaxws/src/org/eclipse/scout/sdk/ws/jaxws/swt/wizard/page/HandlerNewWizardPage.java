@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -35,13 +35,13 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -98,12 +98,12 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
 
     try {
       String defaultSessionFactory = (String) JaxWsRuntimeClasses.ScoutWebService.getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
-      setSessionFactoryType(ScoutSdk.getType(defaultSessionFactory));
+      setSessionFactoryType(TypeUtility.getType(defaultSessionFactory));
     }
     catch (JavaModelException e) {
       JaxWsSdk.logError(e);
     }
-    setSuperType(ScoutSdk.getType(SOAPHandler.class.getName()));
+    setSuperType(TypeUtility.getType(SOAPHandler.class.getName()));
   }
 
   @Override
@@ -322,7 +322,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     if (multiStatus.getSeverity() < IStatus.ERROR) {
       try {
         String fqn = StringUtility.join(".", getPackageName(), getTypeName());
-        if (ScoutSdk.existsType(fqn)) {
+        if (TypeUtility.existsType(fqn)) {
           multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TypeAlreadyExsits", fqn)));
         }
       }
@@ -474,8 +474,8 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
   private IJavaSearchScope createSuperTypeSearchScope() {
     // do not use PrimaryTypeHierarchy to get subtypes due to static inner classes
     List<IType> types = new ArrayList<IType>();
-    types.add(ScoutSdk.getType(SOAPHandler.class.getName()));
-    types.add(ScoutSdk.getType(LogicalHandler.class.getName()));
+    types.add(TypeUtility.getType(SOAPHandler.class.getName()));
+    types.add(TypeUtility.getType(LogicalHandler.class.getName()));
 
     types.addAll(Arrays.asList(JaxWsSdkUtility.getJdtSubTypes(m_bundle, LogicalHandler.class.getName(), true, true, false, false)));
     types.addAll(Arrays.asList(JaxWsSdkUtility.getJdtSubTypes(m_bundle, SOAPHandler.class.getName(), true, true, false, false)));
@@ -483,12 +483,12 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     // remove authentication handlers (provider)
     IType[] providerAuthHandlers = JaxWsSdkUtility.getJdtSubTypes(m_bundle, JaxWsRuntimeClasses.IAuthenticationHandlerProvider.getFullyQualifiedName(), true, true, false, false);
     types.removeAll(Arrays.asList(providerAuthHandlers));
-    types.remove(ScoutSdk.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider.getFullyQualifiedName()));
+    types.remove(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider.getFullyQualifiedName()));
 
     // remove authentication handlers (consumer)
     IType[] consumerAuthHandlers = JaxWsSdkUtility.getJdtSubTypes(m_bundle, JaxWsRuntimeClasses.IAuthenticationHandlerConsumer.getFullyQualifiedName(), true, true, false, false);
     types.removeAll(Arrays.asList(consumerAuthHandlers));
-    types.remove(ScoutSdk.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer.getFullyQualifiedName()));
+    types.remove(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer.getFullyQualifiedName()));
 
     // remove internal classes
     Iterator<IType> iterator = types.iterator();

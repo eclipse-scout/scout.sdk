@@ -12,23 +12,24 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.KeyStrokeNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>KeyStrokesTablePage</h3> ...
  */
 public class KeyStrokeTablePage extends AbstractPage {
-  final IType iKeyStrokeType = ScoutSdk.getType(RuntimeClasses.IKeyStroke);
+  final IType iKeyStrokeType = TypeUtility.getType(RuntimeClasses.IKeyStroke);
 
   private final IType m_declaringType;
 
@@ -63,7 +64,7 @@ public class KeyStrokeTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_keystrokeChangedListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
       m_keystrokeChangedListener = null;
     }
   }
@@ -72,9 +73,9 @@ public class KeyStrokeTablePage extends AbstractPage {
   public void loadChildrenImpl() {
     if (m_keystrokeChangedListener == null) {
       m_keystrokeChangedListener = new InnerTypePageDirtyListener(this, iKeyStrokeType);
-      ScoutSdk.addInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
     }
-    for (IType keyStroke : SdkTypeUtility.getKeyStrokes(getDeclaringType())) {
+    for (IType keyStroke : ScoutTypeUtility.getKeyStrokes(getDeclaringType())) {
       KeyStrokeNodePage childPage = new KeyStrokeNodePage();
       childPage.setParent(this);
       childPage.setType(keyStroke);

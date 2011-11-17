@@ -6,9 +6,9 @@ import java.util.HashMap;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.ContextMenuContributorExtensionPoint;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 

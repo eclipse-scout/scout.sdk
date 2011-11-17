@@ -15,18 +15,18 @@ import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.RuntimeConstants;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TableFieldNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.ColumnTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.TableNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -64,7 +64,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private boolean fastDetection(String content) {
     try {
-      String identifier = (String) ScoutSdk.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(RuntimeConstants.TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER).getConstant();
+      String identifier = (String) TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(RuntimeConstants.TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER).getConstant();
       return content.startsWith(identifier);
     }
     catch (JavaModelException e) {
@@ -131,7 +131,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private void changeColumnWidths(IType tableType, HashMap<String, Integer> map) {
     // for all columns within the table
-    for (IType innerType : SdkTypeUtility.getColumns(tableType)) {
+    for (IType innerType : ScoutTypeUtility.getColumns(tableType)) {
       String className = innerType.getFullyQualifiedName();
       Integer columnWidth = map.get(className);
       // there is a corresponding entry in the clipboard for the current column?
@@ -151,7 +151,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
     }
     else if (page instanceof PageWithTableNodePage) {
       // it's a abstract page with table
-      IType[] tables = SdkTypeUtility.getTables(((PageWithTableNodePage) page).getType());
+      IType[] tables = ScoutTypeUtility.getTables(((PageWithTableNodePage) page).getType());
       if (tables.length > 0) {
         tableType = tables[0];
       }
@@ -165,7 +165,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
       if (page instanceof TableFieldNodePage) {
         // table field node page
-        IType[] tables = SdkTypeUtility.getTables(((TableFieldNodePage) page).getType());
+        IType[] tables = ScoutTypeUtility.getTables(((TableFieldNodePage) page).getType());
         if (tables.length > 0) {
           tableType = tables[0];
         }

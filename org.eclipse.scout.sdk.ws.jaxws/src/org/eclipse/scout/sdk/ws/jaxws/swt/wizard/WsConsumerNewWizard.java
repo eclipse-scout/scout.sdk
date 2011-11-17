@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -28,11 +28,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -178,7 +177,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     JaxWsSdk.getDefault().getMarkerQueueManager().suspend();
     try {
       for (ExternalFileCopyOperation op : m_copyOperations) {
@@ -230,7 +229,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
 
       m_stubGenerationOperation.validate();
       m_stubGenerationOperation.run(monitor, workingCopyManager);
-      ScoutSdk.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.AbstractWebServiceClient).invalidate();
+      TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.AbstractWebServiceClient).invalidate();
 
       IFile stubJarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_buildJaxWsEntryCreateOperation.getBuildProperties(), m_wsdlFileName);
       IType portTypeInterfaceType = JaxWsSdkUtility.resolvePortTypeInterfaceType(m_portTypeQName, stubJarFile);
@@ -259,7 +258,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
 
       // wait for port type to be part of the hierarchy
       maxWaitLoops = 10;
-      while (!TypeUtility.exists(ScoutSdk.getType(fqnWebserviceClient)) && maxWaitLoops > 0) {
+      while (!TypeUtility.exists(TypeUtility.getType(fqnWebserviceClient)) && maxWaitLoops > 0) {
         try {
           Thread.sleep(500);
         }

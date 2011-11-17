@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>AbstractProcessWizardPage</h3> ...
@@ -51,7 +51,7 @@ public abstract class AbstractWorkspaceWizardPage extends AbstractScoutWizardPag
    * @param manager
    * @return
    */
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     return true;
   }
 

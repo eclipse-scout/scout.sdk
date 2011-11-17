@@ -22,11 +22,11 @@ import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.service.SERVICES;
 
 import com.bsiag.miniapp.client.ui.forms.PersonForm.MainBox.CountryField;
 import com.bsiag.miniapp.client.ui.forms.PersonForm.MainBox.HugoField;
-import com.bsiag.miniapp.shared.Texts;
 import com.bsiag.miniapp.shared.security.UpdatePersonPermission;
 import com.bsiag.miniapp.shared.services.process.IPersonProcessService;
 import com.bsiag.miniapp.shared.services.process.PersonFormData;
@@ -95,7 +95,7 @@ public class PersonForm extends AbstractForm {
 
   @Override
   public String getConfiguredTitle() {
-    return Texts.get("Person");
+    return TEXTS.get("Person");
   }
 
   @Override
@@ -134,7 +134,7 @@ public class PersonForm extends AbstractForm {
 
       @Override
       public String getConfiguredLabel() {
-        return Texts.get("Hugo");
+        return TEXTS.get("Hugo");
       }
 
       @Override
@@ -148,7 +148,7 @@ public class PersonForm extends AbstractForm {
 
       @Override
       public String getConfiguredLabel() {
-        return Texts.get("Country");
+        return TEXTS.get("Country");
       }
     }
   }

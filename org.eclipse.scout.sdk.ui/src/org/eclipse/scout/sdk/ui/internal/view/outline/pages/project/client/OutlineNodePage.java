@@ -12,15 +12,15 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class OutlineNodePage extends AbstractScoutTypePage {
 
   public OutlineNodePage(IPage parentPage, IType outlineType) {
-    super(ScoutIdeProperties.SUFFIX_OUTLINE);
+    super(SdkProperties.SUFFIX_OUTLINE);
     setParent(parentPage);
     setType(outlineType);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Outline));

@@ -16,7 +16,7 @@ package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public abstract class AbstractNonExecutableMarkerCommand implements IMarkerCommand {
 
@@ -48,7 +48,7 @@ public abstract class AbstractNonExecutableMarkerCommand implements IMarkerComma
   }
 
   @Override
-  public final void execute(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public final void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // nop
   }
 

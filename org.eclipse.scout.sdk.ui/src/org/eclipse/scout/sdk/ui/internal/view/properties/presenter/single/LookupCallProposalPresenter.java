@@ -14,13 +14,13 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.scout.sdk.NamingUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
+import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * <h3>CodeTypePresenter</h3> ...
  */
 public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
-  final IType lookupCall = ScoutSdk.getType(RuntimeClasses.LookupCall);
+  final IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
 
   public LookupCallProposalPresenter(FormToolkit toolkit, Composite parent) {
     super(toolkit, parent, null, true);
@@ -36,7 +36,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
 
   @Override
   protected IType[] provideScoutTypes(IJavaProject project, IType ownerType) {
-    return ScoutSdk.getPrimaryTypeHierarchy(lookupCall).getAllSubtypes(lookupCall, TypeFilters.getTypesOnClasspath(project), TypeComparators.getTypeNameComparator());
+    return TypeUtility.getPrimaryTypeHierarchy(lookupCall).getAllSubtypes(lookupCall, TypeFilters.getTypesOnClasspath(project), TypeComparators.getTypeNameComparator());
   }
 
   @Override
@@ -47,8 +47,8 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
       if (lc != null) {
         String entityName = NamingUtility.removeSuffixes(lc.getElementName(), "Call");
         String lookupServiceFqn = lc.getPackageFragment().getElementName() + ".I" + entityName + "Service";
-        if (ScoutSdk.existsType(lookupServiceFqn)) {
-          final IType lookupServiceInterface = ScoutSdk.getType(lookupServiceFqn);
+        if (TypeUtility.existsType(lookupServiceFqn)) {
+          final IType lookupServiceInterface = TypeUtility.getType(lookupServiceFqn);
           if (lookupServiceInterface != null) {
             manager.add(new Action("Go to " + lookupServiceInterface.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
               @Override
@@ -59,8 +59,8 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
           }
         }
         String serviceFqn = lc.getPackageFragment().getElementName().replace(".shared.", ".server.") + "." + entityName + "Service";
-        if (ScoutSdk.existsType(serviceFqn)) {
-          final IType lookupServiceImplementation = ScoutSdk.getType(serviceFqn);
+        if (TypeUtility.existsType(serviceFqn)) {
+          final IType lookupServiceImplementation = TypeUtility.getType(serviceFqn);
           if (lookupServiceImplementation != null) {
             manager.add(new Action("Go to " + lookupServiceImplementation.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
               @Override

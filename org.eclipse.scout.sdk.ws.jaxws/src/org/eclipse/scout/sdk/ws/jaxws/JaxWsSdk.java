@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -25,6 +25,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.IMarkerCommand;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageReloadNotification;
 import org.eclipse.scout.sdk.ws.jaxws.worker.MarkerQueueManager;
@@ -44,7 +45,10 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ws.jaxws";
   private static final String IMAGE_PATH = "resources/icons/";
+
   private static JaxWsSdk m_plugin;
+  private static SdkLogManager logManager;
+
   private Map<String, IMarkerCommand> m_markerCommands;
   private MarkerQueueManager m_markerQueueManager;
   private Object m_pageRegistryLock;
@@ -60,7 +64,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     m_plugin = this;
-
+    logManager = new SdkLogManager(this);
     m_markerQueueManager = new MarkerQueueManager();
   }
 
@@ -70,11 +74,48 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
       m_markerQueueManager.cancelWorker();
       m_markerQueueManager = null;
     }
+    logManager = null;
     super.stop(context);
   }
 
   public static JaxWsSdk getDefault() {
     return m_plugin;
+  }
+
+  public static void logInfo(Throwable t) {
+    logManager.logInfo(t);
+  }
+
+  public static void logInfo(String message) {
+    logManager.logInfo(message);
+  }
+
+  public static void logInfo(String message, Throwable t) {
+    logManager.logInfo(message, t);
+  }
+
+  public static void logWarning(String message) {
+    logManager.logWarning(message);
+  }
+
+  public static void logWarning(Throwable t) {
+    logManager.logWarning(t);
+  }
+
+  public static void logWarning(String message, Throwable t) {
+    logManager.logWarning(message, t);
+  }
+
+  public static void logError(Throwable t) {
+    logManager.logError(t);
+  }
+
+  public static void logError(String message) {
+    logManager.logError(message);
+  }
+
+  public static void logError(String message, Throwable t) {
+    logManager.logError(message, t);
   }
 
   public IMarkerCommand getMarkerCommand(String markerSourceId) {
@@ -139,7 +180,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
             }
           }
           catch (Exception e) {
-            JaxWsSdk.logError("failed to notify listener", e);
+            logError("failed to notify listener", e);
           }
         }
         return Status.OK_STATUS;
@@ -179,51 +220,6 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
       }
       pages.remove(page);
     }
-  }
-
-  public static void log(IStatus log) {
-    getDefault().getLog().log(new JaxWsSdkStatus(log));
-  }
-
-  public static void logInfo(String message) {
-    logInfo(message, null);
-  }
-
-  public static void logInfo(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    log(new Status(IStatus.INFO, PLUGIN_ID, message, t));
-  }
-
-  public static void logWarning(String message) {
-    logWarning(message, null);
-  }
-
-  public static void logWarning(Throwable t) {
-    logWarning(null, t);
-  }
-
-  public static void logWarning(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    log(new Status(IStatus.WARNING, PLUGIN_ID, message, t));
-  }
-
-  public static void logError(Throwable t) {
-    logError(null, t);
-  }
-
-  public static void logError(String message) {
-    logError(message, null);
-  }
-
-  public static void logError(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    log(new Status(IStatus.ERROR, PLUGIN_ID, message, t));
   }
 
   @Override

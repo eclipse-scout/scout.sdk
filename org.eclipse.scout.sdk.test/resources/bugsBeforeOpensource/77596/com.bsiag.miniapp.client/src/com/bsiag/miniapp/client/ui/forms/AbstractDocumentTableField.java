@@ -34,10 +34,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.services.common.jdbc.ILegacySqlQueryService;
 import org.eclipse.scout.service.SERVICES;
-
-import com.bsiag.miniapp.shared.Texts;
 import com.bsiag.miniapp.shared.services.process.AbstractDocumentTableFieldData;
 
 /**
@@ -189,7 +188,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class NameColumn extends AbstractSmartColumn<String> {
       @Override
       protected String getConfiguredHeaderText() {
-        return Texts.get("Name");
+        return TEXTS.get("Name");
       }
 
       @Override
@@ -208,7 +207,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
 
       @Override
       protected String getConfiguredHeaderText() {
-        return Texts.get("Description");
+        return TEXTS.get("Description");
       }
     }
 
@@ -217,7 +216,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
 
       @Override
       protected String getConfiguredHeaderText() {
-        return Texts.get("DocumentType");
+        return TEXTS.get("DocumentType");
       }
 
       @Override
@@ -230,7 +229,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class RegisteredOnColumn extends AbstractDateColumn {
       @Override
       protected String getConfiguredHeaderText() {
-        return Texts.get("Date");
+        return TEXTS.get("Date");
       }
 
       @Override
@@ -243,7 +242,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class RegisteredByColumn extends AbstractSmartColumn<Long> {
       @Override
       protected String getConfiguredHeaderText() {
-        return Texts.get("Person");
+        return TEXTS.get("Person");
       }
 
       @Override
@@ -273,7 +272,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class NewMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return Texts.get("New2");
+        return TEXTS.get("New2");
       }
 
       @Override
@@ -292,7 +291,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class OpenDocumentMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return Texts.get("OpenDocument");
+        return TEXTS.get("OpenDocument");
       }
 
       @Override
@@ -316,7 +315,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class SaveNewVersionInDatabaseMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return Texts.get("SaveNewVersionInDatabase");
+        return TEXTS.get("SaveNewVersionInDatabase");
       }
 
       @Override
@@ -343,7 +342,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class EditMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return Texts.get("Edit");
+        return TEXTS.get("Edit");
       }
 
       @Override
@@ -367,7 +366,7 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     public class DeleteMenu extends AbstractMenu {
       @Override
       protected String getConfiguredText() {
-        return Texts.get("Delete2");
+        return TEXTS.get("Delete2");
       }
 
       @Override

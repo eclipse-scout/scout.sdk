@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class NlsServiceType extends NlsType {
   private static final Pattern REGEX_RESOURCE_BUNDLE_GETTER = Pattern.compile("return\\s*\\\"([^\\\"]*)\\\"\\s*\\;", Pattern.DOTALL);

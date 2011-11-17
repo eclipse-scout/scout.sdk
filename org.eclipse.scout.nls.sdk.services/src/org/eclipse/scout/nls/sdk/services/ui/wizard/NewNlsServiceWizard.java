@@ -3,9 +3,9 @@ package org.eclipse.scout.nls.sdk.services.ui.wizard;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.nls.sdk.services.operation.CreateServiceNlsProjectOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class NewNlsServiceWizard extends AbstractWorkspaceWizard {
@@ -33,7 +33,7 @@ public class NewNlsServiceWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     try {
       m_op.validate();
       m_op.run(monitor, workingCopyManager);

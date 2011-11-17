@@ -9,11 +9,11 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.CreateUiSwingPluginOperation;
 import org.eclipse.scout.sdk.operation.project.FillUiSwingPluginOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class SwingScoutBundleExtension implements IScoutBundleProvider {
   public static final String BUNDLE_ID = "org.eclipse.scout.sdk.ui.UiSwingBundle";
@@ -34,7 +34,7 @@ public class SwingScoutBundleExtension implements IScoutBundleProvider {
   }
 
   @Override
-  public IJavaProject createBundle(IScoutProjectWizard wizard, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  public IJavaProject createBundle(IScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     TemplateVariableSet variables = TemplateVariableSet.createNew(wizard.getProjectWizardPage().getProjectName(), wizard.getProjectWizardPage().getProjectNamePostfix(), wizard.getProjectWizardPage().getProjectAlias());
     try {
       CreateUiSwingPluginOperation swingBundleOp = new CreateUiSwingPluginOperation(variables);

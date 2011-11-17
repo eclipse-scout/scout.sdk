@@ -29,13 +29,12 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
-import org.eclipse.scout.sdk.jdt.JdtUtility;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -45,9 +44,9 @@ import org.eclipse.swt.graphics.Image;
  * @since 1.0.8 09.02.2010
  */
 public class SqlBindCompletionProposalProcessor {
-  final IType AbstractFormData = ScoutSdk.getType(RuntimeClasses.AbstractFormData);
-  final IType AbstractFormFieldData = ScoutSdk.getType(RuntimeClasses.AbstractFormFieldData);
-  final IType AbstractPropertyData = ScoutSdk.getType(RuntimeClasses.AbstractPropertyData);
+  final IType AbstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
+  final IType AbstractFormFieldData = TypeUtility.getType(RuntimeClasses.AbstractFormFieldData);
+  final IType AbstractPropertyData = TypeUtility.getType(RuntimeClasses.AbstractPropertyData);
 
   private final Image m_image;
   private static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
@@ -71,7 +70,7 @@ public class SqlBindCompletionProposalProcessor {
       }
       String prefix = getPrefix(context.getViewer(), context.getInvocationOffset());
       TreeMap<String, ICompletionProposal> result = new TreeMap<String, ICompletionProposal>();
-      ITypeHierarchy hierarchy = ScoutSdk.getLocalTypeHierarchy(formData);
+      ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formData);
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
         if (t.getElementName().toLowerCase().startsWith(prefix.toLowerCase())) {
           SqlBindProposal prop = new SqlBindProposal(t.getElementName(), prefix, context.getInvocationOffset(), m_image);
@@ -118,10 +117,10 @@ public class SqlBindCompletionProposalProcessor {
     if (element.getElementType() == IJavaElement.METHOD) {
       IMethod method = (IMethod) element;
       for (String parameter : method.getParameterTypes()) {
-        String fqs = ScoutSdkUtility.getQuallifiedSignature(parameter, method.getDeclaringType());
-        if (ScoutSdkUtility.getSignatureType(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
+        String fqs = SignatureUtility.getQuallifiedSignature(parameter, method.getDeclaringType());
+        if (SignatureUtility.getTypeSignatureKind(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
           String fqn = Signature.getSignatureQualifier(fqs) + "." + Signature.getSignatureSimpleName(fqs);
-          IType candidate = ScoutSdk.getType(fqn);
+          IType candidate = TypeUtility.getType(fqn);
           if (candidate.newSupertypeHierarchy(null).contains(AbstractFormData)) {
             return candidate;
           }

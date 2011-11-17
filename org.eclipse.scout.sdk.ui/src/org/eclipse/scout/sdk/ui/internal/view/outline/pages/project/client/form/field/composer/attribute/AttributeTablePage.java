@@ -12,16 +12,17 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.AttributeNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AttributeTablePage}</h3> ...
@@ -31,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
  */
 public class AttributeTablePage extends AbstractPage {
 
-  protected IType iComposerAttribute = ScoutSdk.getType(RuntimeClasses.IComposerAttribute);
+  protected IType iComposerAttribute = TypeUtility.getType(RuntimeClasses.IComposerAttribute);
   private final IType m_declaringType;
 
   private InnerTypePageDirtyListener m_attributeChangedListener;
@@ -58,7 +59,7 @@ public class AttributeTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_attributeChangedListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
       m_attributeChangedListener = null;
     }
   }
@@ -67,9 +68,9 @@ public class AttributeTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     if (m_attributeChangedListener == null) {
       m_attributeChangedListener = new InnerTypePageDirtyListener(this, iComposerAttribute);
-      ScoutSdk.addInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
     }
-    for (IType attribute : SdkTypeUtility.getComposerAttributes(getDeclaringType())) {
+    for (IType attribute : ScoutTypeUtility.getComposerAttributes(getDeclaringType())) {
       new AttributeNodePage(this, attribute);
     }
   }

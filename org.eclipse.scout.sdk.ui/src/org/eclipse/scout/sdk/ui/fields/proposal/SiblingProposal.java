@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.ITypeSibling;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 /**

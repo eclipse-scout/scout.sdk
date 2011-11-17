@@ -77,7 +77,7 @@ public class DirtyUpdateManager {
       m_currentRefreshSubTreeProcess = null;
     }
     m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeOperation(m_view, Texts.get("Refreshing"));
-    m_currentRefreshSubTreeProcess.schedule(200);
+    m_currentRefreshSubTreeProcess.schedule();
   }
 
   private synchronized void enqueueLabelsJob() {
@@ -86,7 +86,7 @@ public class DirtyUpdateManager {
       m_currentRefreshLabelsProcess = null;
     }
     m_currentRefreshLabelsProcess = new RefreshOutlineLabelsJob(m_view, Texts.get("Refreshing"));
-    m_currentRefreshLabelsProcess.schedule(200);
+    m_currentRefreshLabelsProcess.schedule();
   }
 
   public IPage[] fetchDirtyStructurePages() {

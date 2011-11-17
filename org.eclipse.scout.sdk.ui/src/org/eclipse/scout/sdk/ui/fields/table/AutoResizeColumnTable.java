@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.table;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;

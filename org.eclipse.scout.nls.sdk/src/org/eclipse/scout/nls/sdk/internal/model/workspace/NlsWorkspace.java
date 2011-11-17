@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.nls.sdk.NlsCore;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.INlsWorkspace;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 

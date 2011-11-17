@@ -4,20 +4,20 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -43,7 +43,7 @@ public class StringPresenter extends AbstractValuePresenter<String> {
 
   @Override
   protected String parseSourceInput(String input) throws CoreException {
-    String value = PropertyMethodSourceUtilities.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+    String value = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
     if (value == null) {
       value = "";
     }
@@ -58,7 +58,7 @@ public class StringPresenter extends AbstractValuePresenter<String> {
   @Override
   protected synchronized void storeValue(String value) throws CoreException {
     IOperation op = null;
-    if (ScoutSdkUtility.equals(getDefaultValue(), value)) {
+    if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {
         op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
       }

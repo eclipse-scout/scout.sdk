@@ -15,12 +15,12 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.form.SearchFormNewWizard;
-import org.eclipse.scout.sdk.util.SdkMethodUtility;
+import org.eclipse.scout.sdk.util.ScoutMethodUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  *
@@ -51,7 +51,7 @@ public class SearchFormNewAction extends AbstractWizardAction {
       IMethod titleMethod = TypeUtility.getMethod(m_type, "getConfiguredTitle");
       if (TypeUtility.exists(titleMethod)) {
         try {
-          wizard.setNlsEntry(SdkMethodUtility.getReturnNlsEntry(titleMethod));
+          wizard.setNlsEntry(ScoutMethodUtility.getReturnNlsEntry(titleMethod));
         }
         catch (CoreException e) {
           ScoutSdkUi.logWarning("could not parse nls entry for method '" + titleMethod.getElementName() + "'.", e);

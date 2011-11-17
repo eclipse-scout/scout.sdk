@@ -22,9 +22,9 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.annotation.IgnoreSqlBindingAnnotationCreateOperation;
 import org.eclipse.scout.sdk.sql.binding.SqlBindingMarkers;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.jdt.JdtUiUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.ui.IMarkerResolution;
 
 /**
@@ -72,7 +72,7 @@ public class SqlBindMarkerResolution implements IMarkerResolution {
           OperationJob job = new OperationJob(op);
           job.schedule();
           job.join();
-          JdtUiUtility.showJavaElementInEditor(element, false);
+          UiUtility.showJavaElementInEditor(element, false);
         }
       }
     }

@@ -19,11 +19,8 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -33,12 +30,15 @@ import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -59,8 +59,8 @@ import org.eclipse.swt.widgets.Group;
  */
 public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private static final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
-  private static final IType abstractForm = ScoutSdk.getType(RuntimeClasses.AbstractForm);
+  private static final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  private static final IType abstractForm = TypeUtility.getType(RuntimeClasses.AbstractForm);
 
   /** {@link NlsProposal} **/
   public static final String PROP_NLS_NAME = "nlsName";
@@ -124,7 +124,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
-    m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_FORM);
+    m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_FORM);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -173,7 +173,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_formIdField = getFieldToolkit().createStyledTextField(group, Texts.get("PropertyNameId"));
-    m_formIdField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_ID);
+    m_formIdField.setReadOnlySuffix(SdkProperties.SUFFIX_ID);
     m_formIdField.setText(getTypeName());
     m_formIdField.addModifyListener(new ModifyListener() {
       @Override
@@ -198,7 +198,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getClientBundle() != null) {
       nlsProject = getClientBundle().findBestMatchNlsProject();
       ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(abstractForm);
-      ICachedTypeHierarchy formHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iForm);
+      ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       IType[] abstractForms = formHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
       ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractForms);
       superTypeProvider = new DefaultProposalProvider(shotList, proposals);
@@ -253,7 +253,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusPropertyId() {
     if (isCreateFormId()) {
-      if (StringUtility.isNullOrEmpty(getFormId()) || getFormId().equals(ScoutIdeProperties.SUFFIX_ID)) {
+      if (StringUtility.isNullOrEmpty(getFormId()) || getFormId().equals(SdkProperties.SUFFIX_ID)) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("IdNameMissing"));
       }
     }
@@ -261,28 +261,28 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(ScoutIdeProperties.SUFFIX_FORM)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_FORM)) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
-    if (ScoutSdk.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS) + "." + getTypeName())) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+    if (TypeUtility.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS) + "." + getTypeName())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
     else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

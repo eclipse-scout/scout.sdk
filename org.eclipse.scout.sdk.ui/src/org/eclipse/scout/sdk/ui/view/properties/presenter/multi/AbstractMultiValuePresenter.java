@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.ui.view.properties.presenter.multi;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -90,7 +90,7 @@ public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethod
       switch (event.type) {
         case SWT.Verify:
           String string = event.text;
-          if (ScoutIdeProperties.INPUT_MULTI_UNDEFINED.equals(string)) {
+          if (SdkProperties.INPUT_MULTI_UNDEFINED.equals(string)) {
             // allow undefined focus lost
             return;
           }
@@ -101,7 +101,7 @@ public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethod
         case SWT.FocusOut:
 
           String input = getTextComponent().getText();
-          if (ScoutIdeProperties.INPUT_MULTI_UNDEFINED.equals(input)) {
+          if (SdkProperties.INPUT_MULTI_UNDEFINED.equals(input)) {
             // allow undefined focus lost
             return;
           }

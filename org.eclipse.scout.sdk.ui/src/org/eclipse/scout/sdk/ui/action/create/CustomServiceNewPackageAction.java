@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.ui.action.create;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.services.CustomServiceNewPackageWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 

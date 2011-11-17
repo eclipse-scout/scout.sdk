@@ -16,14 +16,14 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.PropertyBeanDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.member.IPropertyBean;
+import org.eclipse.scout.sdk.util.type.IPropertyBean;
 
 /**
  * <h3>BeanPropertyNodePage</h3> ...

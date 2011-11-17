@@ -12,35 +12,36 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.MainBoxNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>FormNodePage</h3> ...
  */
 public class FormNodePage extends AbstractScoutTypePage {
 
-  protected final IType iGroupBox = ScoutSdk.getType(RuntimeClasses.IGroupBox);
+  protected final IType iGroupBox = TypeUtility.getType(RuntimeClasses.IGroupBox);
   private InnerTypePageDirtyListener m_mainBoxListener;
 
   public FormNodePage(AbstractPage parent, IType type) {
-    super(ScoutIdeProperties.SUFFIX_FORM);
+    super(SdkProperties.SUFFIX_FORM);
     setParent(parent);
     setType(type);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Form));
@@ -59,7 +60,7 @@ public class FormNodePage extends AbstractScoutTypePage {
   @Override
   public void unloadPage() {
     if (m_mainBoxListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getType(), m_mainBoxListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_mainBoxListener);
     }
     super.unloadPage();
   }
@@ -68,12 +69,12 @@ public class FormNodePage extends AbstractScoutTypePage {
   public void loadChildrenImpl() {
     if (m_mainBoxListener == null) {
       m_mainBoxListener = new InnerTypePageDirtyListener(this, iGroupBox);
-      ScoutSdk.addInnerTypeChangedListener(getType(), m_mainBoxListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_mainBoxListener);
     }
     new BeanPropertyTablePage(this, getType());
     // find all main boxes
 
-    for (IType mainBoxType : TypeUtility.getInnerTypesOrdered(getType(), iGroupBox)) {
+    for (IType mainBoxType : ScoutTypeUtility.getInnerTypesOrdered(getType(), iGroupBox)) {
       MainBoxNodePage mainBoxNodePage = new MainBoxNodePage();
       mainBoxNodePage.setParent(this);
       mainBoxNodePage.setType(mainBoxType);

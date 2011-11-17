@@ -15,12 +15,12 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
-import org.eclipse.scout.sdk.util.ScoutSourceUtilities;
+import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -42,7 +42,7 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
   public void setType(IType type) {
     m_type = type;
     String methodNameForTranslatedText = getMethodNameForTranslatedText();
-    setName(ScoutSourceUtilities.getTranslatedMethodStringValue(getType(), methodNameForTranslatedText));
+    setName(ScoutSourceUtility.getTranslatedMethodStringValue(getType(), methodNameForTranslatedText));
   }
 
   @Override

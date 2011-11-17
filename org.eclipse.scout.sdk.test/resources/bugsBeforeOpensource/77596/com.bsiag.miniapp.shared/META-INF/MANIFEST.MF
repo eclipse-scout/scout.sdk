@@ -11,7 +11,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.shared;visibility:=reexport
 Export-Package: com.bsiag.miniapp.shared,
  com.bsiag.miniapp.shared.services.process,
- com.bsiag.miniapp.shared.security
+ com.bsiag.miniapp.shared.security,
+ com.bsiag.miniapp.shared.services.common.text
 Import-Package: javax.activation;resolution:=optional,
  javax.jms;resolution:=optional,
  javax.mail;resolution:=optional,

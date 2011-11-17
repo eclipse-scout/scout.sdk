@@ -22,9 +22,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.extensions.view.property.IMultiPropertyViewPart;
 import org.eclipse.scout.sdk.ui.extensions.view.property.ISinglePropertyViewPart;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.osgi.framework.Bundle;
 

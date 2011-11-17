@@ -10,4 +10,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.shared;visibility:=reexport
 Export-Package: formdata.shared,
  formdata.shared.services.process,
- formdata.shared.security
+ formdata.shared.security,
+ formdata.shared.services.common.text

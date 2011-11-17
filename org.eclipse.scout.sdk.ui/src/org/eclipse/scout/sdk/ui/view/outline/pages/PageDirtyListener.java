@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchyChangedListener;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 
 public class PageDirtyListener implements ITypeHierarchyChangedListener {
   private AbstractPage m_page;

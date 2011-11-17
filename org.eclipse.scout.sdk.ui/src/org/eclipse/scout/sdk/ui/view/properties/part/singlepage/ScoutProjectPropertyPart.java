@@ -24,10 +24,10 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.dialog.ProductSelectionDialog;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ProjectVersionPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
@@ -117,7 +117,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     TreeMap<CompositeObject, P_ProductFile> orderedProducts = new TreeMap<CompositeObject, P_ProductFile>();
     for (IFile productFile : products) {
       if (productFile != null && productFile.exists()) {
-        IScoutBundle scoutBundle = ScoutSdk.getScoutWorkspace().getScoutBundle(productFile.getProject());
+        IScoutBundle scoutBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(productFile.getProject());
         int productType = -1;
         if (scoutBundle != null) {
           productType = scoutBundle.getType();

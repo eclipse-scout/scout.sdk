@@ -15,22 +15,22 @@ import java.util.TreeMap;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
-import org.eclipse.scout.sdk.jdt.JdtEvent;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
 import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServiceOperationNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
+import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.type.MethodComparators;
+import org.eclipse.scout.sdk.util.type.MethodFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.MethodComparators;
-import org.eclipse.scout.sdk.workspace.type.MethodFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 
 /**
  * Page representing a service implementation
@@ -60,7 +60,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
   @Override
   public void unloadPage() {
     if (m_serviceMethodListener != null) {
-      ScoutSdk.removeMethodChangedListener(getType(), m_serviceMethodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getType(), m_serviceMethodListener);
       m_serviceMethodListener = null;
     }
     super.unloadPage();
@@ -73,7 +73,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     }
     if (m_serviceMethodListener == null) {
       m_serviceMethodListener = new P_ServiceMethodsListener();
-      ScoutSdk.addMethodChangedListener(getType(), m_serviceMethodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getType(), m_serviceMethodListener);
     }
     IMethod[] serviceMethods = TypeUtility.getMethods(getType(), MethodFilters.getFlagsFilter(Flags.AccPublic), MethodComparators.getNameComparator());
 

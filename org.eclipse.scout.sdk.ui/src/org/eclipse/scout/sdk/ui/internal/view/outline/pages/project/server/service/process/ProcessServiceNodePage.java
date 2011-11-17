@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.process;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
@@ -21,6 +20,7 @@ import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateActi
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class ProcessServiceNodePage extends AbstractServiceNodePage {
 
   public ProcessServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
-    super(parent, type, interfaceType, ScoutIdeProperties.SUFFIX_PROCESS_SERVICE);
+    super(parent, type, interfaceType, SdkProperties.SUFFIX_PROCESS_SERVICE);
   }
 
   @Override

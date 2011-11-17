@@ -16,10 +16,10 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -94,7 +94,7 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
       try {
         MethodOverrideOperation overrideOp = new MethodOverrideOperation(getMethod().getType(), getMethod().getMethodName(), true);
         IJavaElement sibling = null;
-        IStructuredType structuredType = SdkTypeUtility.createStructuredType(getMethod().getType());
+        IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getMethod().getType());
         sibling = structuredType.getSiblingMethodConfigExec(getMethod().getMethodName());
         overrideOp.setSibling(sibling);
         OperationJob job = new OperationJob(overrideOp);

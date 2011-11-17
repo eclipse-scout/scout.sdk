@@ -1,8 +1,10 @@
 package formdata.shared.services.process;
 
 import org.eclipse.scout.service.IService;
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import java.util.Map;
 import java.util.HashMap;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +24,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property BoolObject.
    */
   public Boolean getBoolObject() {
-    return getPropertyByClass(BoolObjectProperty.class).getValue();
+    return getBoolObjectProperty().getValue();
   }
 
   /**
@@ -40,7 +42,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property BoolPrimitive.
    */
   public boolean isBoolPrimitive() {
-    return (getPropertyByClass(BoolPrimitiveProperty.class).getValue() == null) ? (false) : (getPropertyByClass(BoolPrimitiveProperty.class).getValue());
+    return (getBoolPrimitiveProperty().getValue() == null) ? (false) : (getBoolPrimitiveProperty().getValue());
   }
 
   /**
@@ -58,7 +60,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property ByteArray.
    */
   public byte[] getByteArray() {
-    return getPropertyByClass(ByteArrayProperty.class).getValue();
+    return getByteArrayProperty().getValue();
   }
 
   /**
@@ -76,7 +78,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property ComplexArray.
    */
   public ArrayList<List<String>>[] getComplexArray() {
-    return getPropertyByClass(ComplexArrayProperty.class).getValue();
+    return getComplexArrayProperty().getValue();
   }
 
   /**
@@ -94,7 +96,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property ComplexInnerArray.
    */
   public ArrayList<List<String[]>> getComplexInnerArray() {
-    return getPropertyByClass(ComplexInnerArrayProperty.class).getValue();
+    return getComplexInnerArrayProperty().getValue();
   }
 
   /**
@@ -112,7 +114,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property DoubleArrayProperty.
    */
   public String[][] getDoubleArrayProperty() {
-    return getPropertyByClass(DoubleArrayPropertyProperty.class).getValue();
+    return getDoubleArrayPropertyProperty().getValue();
   }
 
   /**
@@ -130,7 +132,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property IntPrimitive.
    */
   public int getIntPrimitive() {
-    return (getPropertyByClass(IntPrimitiveProperty.class).getValue() == null) ? (0) : (getPropertyByClass(IntPrimitiveProperty.class).getValue());
+    return (getIntPrimitiveProperty().getValue() == null) ? (0) : (getIntPrimitiveProperty().getValue());
   }
 
   /**
@@ -148,7 +150,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property ObjectProperty.
    */
   public Object getObjectProperty() {
-    return getPropertyByClass(ObjectPropertyProperty.class).getValue();
+    return getObjectPropertyProperty().getValue();
   }
 
   /**
@@ -166,7 +168,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property PropertyTestNr.
    */
   public Long getPropertyTestNr() {
-    return getPropertyByClass(PropertyTestNrProperty.class).getValue();
+    return getPropertyTestNrProperty().getValue();
   }
 
   /**
@@ -184,7 +186,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property SingleArrayProperty.
    */
   public String[] getSingleArrayProperty() {
-    return getPropertyByClass(SingleArrayPropertyProperty.class).getValue();
+    return getSingleArrayPropertyProperty().getValue();
   }
 
   /**
@@ -202,7 +204,7 @@ public class PropertyTestFormData extends AbstractFormData {
    * access method for property Wizards.
    */
   public HashMap<String, List<IService>> getWizards() {
-    return getPropertyByClass(WizardsProperty.class).getValue();
+    return getWizardsProperty().getValue();
   }
 
   /**
@@ -221,7 +223,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public BoolObjectProperty() {
     }
-
   }
 
   public class BoolPrimitiveProperty extends AbstractPropertyData<Boolean> {
@@ -229,7 +230,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public BoolPrimitiveProperty() {
     }
-
   }
 
   public class ByteArrayProperty extends AbstractPropertyData<byte[]> {
@@ -237,7 +237,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public ByteArrayProperty() {
     }
-
   }
 
   public class ComplexArrayProperty extends AbstractPropertyData<ArrayList<List<String>>[]> {
@@ -245,7 +244,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public ComplexArrayProperty() {
     }
-
   }
 
   public class ComplexInnerArrayProperty extends AbstractPropertyData<ArrayList<List<String[]>>> {
@@ -253,7 +251,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public ComplexInnerArrayProperty() {
     }
-
   }
 
   public class DoubleArrayPropertyProperty extends AbstractPropertyData<String[][]> {
@@ -261,7 +258,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public DoubleArrayPropertyProperty() {
     }
-
   }
 
   public class IntPrimitiveProperty extends AbstractPropertyData<Integer> {
@@ -269,7 +265,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public IntPrimitiveProperty() {
     }
-
   }
 
   public class ObjectPropertyProperty extends AbstractPropertyData<Object> {
@@ -277,7 +272,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public ObjectPropertyProperty() {
     }
-
   }
 
   public class PropertyTestNrProperty extends AbstractPropertyData<Long> {
@@ -285,7 +279,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public PropertyTestNrProperty() {
     }
-
   }
 
   public class SingleArrayPropertyProperty extends AbstractPropertyData<String[]> {
@@ -293,7 +286,6 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public SingleArrayPropertyProperty() {
     }
-
   }
 
   public class WizardsProperty extends AbstractPropertyData<HashMap<String, List<IService>>> {
@@ -301,10 +293,9 @@ public class PropertyTestFormData extends AbstractFormData {
 
     public WizardsProperty() {
     }
-
   }
 
-  public class Name extends AbstractValueFieldData<String> {
+  public static class Name extends AbstractValueFieldData<String> {
     private static final long serialVersionUID = 1L;
 
     public Name() {
@@ -318,7 +309,7 @@ public class PropertyTestFormData extends AbstractFormData {
      * access method for property IntProperty.
      */
     public int getIntProperty() {
-      return (getPropertyByClass(IntPropertyProperty.class).getValue() == null) ? (0) : (getPropertyByClass(IntPropertyProperty.class).getValue());
+      return (getIntPropertyProperty().getValue() == null) ? (0) : (getIntPropertyProperty().getValue());
     }
 
     /**
@@ -333,7 +324,15 @@ public class PropertyTestFormData extends AbstractFormData {
 
       public IntPropertyProperty() {
       }
+    }
 
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 }

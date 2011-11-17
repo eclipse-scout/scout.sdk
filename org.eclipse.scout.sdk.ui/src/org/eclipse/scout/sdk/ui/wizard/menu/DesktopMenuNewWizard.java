@@ -16,16 +16,16 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>DesktopMenuNewWizard</h3> ...
@@ -61,7 +61,7 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // create menu
     m_operation = new MenuNewOperation(getDeclaringType(), true);
     // write back members
@@ -75,7 +75,7 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
       m_operation.setSuperTypeSignature(signature);
     }
     if (m_page1.getSibling() == SiblingProposal.SIBLING_END) {
-      IStructuredType structuredType = SdkTypeUtility.createStructuredDesktop(m_declaringType);
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredDesktop(m_declaringType);
       m_operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_MENU));
     }
     else {

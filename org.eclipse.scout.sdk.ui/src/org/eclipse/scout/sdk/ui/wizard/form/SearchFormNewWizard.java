@@ -22,11 +22,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.SearchFormNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
@@ -36,10 +33,13 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.ui.wizard.services.ServiceNewWizardPage;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -82,7 +82,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   public void setNlsEntry(INlsEntry nlsEntry) {
     if (nlsEntry != null) {
       m_page1.setNlsName(new NlsProposal(nlsEntry, nlsEntry.getProject().getDevelopmentLanguage()));
-      m_page1.setTypeName(nlsEntry.getKey() + ScoutIdeProperties.SUFFIX_SEARCH_FORM);
+      m_page1.setTypeName(nlsEntry.getKey() + SdkProperties.SUFFIX_SEARCH_FORM);
     }
     else {
       m_page1.setNlsName(null);
@@ -135,7 +135,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     try {
       m_operation.run(monitor, workingCopyManager);
       return true;
@@ -156,9 +156,9 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (evt.getPropertyName().equals(ServiceNewWizardPage.PROP_TYPE_NAME)) {
         String typeName = m_page1.getTypeName();
         if (!StringUtility.isNullOrEmpty(typeName)) {
-          String prefix = typeName.replaceAll(ScoutIdeProperties.SUFFIX_SEARCH_FORM + "$", "");
-          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SEARCH_FORM)).setText(prefix + ScoutIdeProperties.SUFFIX_SEARCH_FORM);
-          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SEARCH_FORM_DATA)).setText(prefix + ScoutIdeProperties.SUFFIX_SEARCH_FORM_DATA);
+          String prefix = typeName.replaceAll(SdkProperties.SUFFIX_SEARCH_FORM + "$", "");
+          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SEARCH_FORM)).setText(prefix + SdkProperties.SUFFIX_SEARCH_FORM);
+          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SEARCH_FORM_DATA)).setText(prefix + SdkProperties.SUFFIX_SEARCH_FORM_DATA);
           m_page2.refreshTree();
         }
         m_page2.pingStateChanging();

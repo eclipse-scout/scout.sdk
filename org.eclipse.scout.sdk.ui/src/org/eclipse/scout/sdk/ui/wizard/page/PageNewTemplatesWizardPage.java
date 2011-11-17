@@ -29,17 +29,17 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>PageNewWizardPage1</h3> ...
  */
 public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
-  final IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
+  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private FilteredTable m_filteredTable;
   private IType m_selectedType;
   private IScoutBundle m_clientBundle;
@@ -99,7 +99,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
 
       }
     });
-    ICachedTypeHierarchy hierarchy = ScoutSdk.getPrimaryTypeHierarchy(iPage);
+    ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
         TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()),
         TypeFilters.getFlagsFilter(Flags.AccAbstract));
@@ -122,7 +122,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
       multiStatus.add(Status.OK_STATUS);
     }
     else {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
     }
     PageNewAttributesWizardPage page = (PageNewAttributesWizardPage) getWizard().getPage(PageNewAttributesWizardPage.class.getName());
     if (page != null) {
@@ -133,7 +133,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
   protected void updateUi() {
     if (getClientBundle() != null) {
       HashSet<IType> templates = new HashSet<IType>();
-      for (IType t : SdkTypeUtility.getAbstractTypesOnClasspath(iPage, getClientBundle().getJavaProject())) {
+      for (IType t : ScoutTypeUtility.getAbstractTypesOnClasspath(iPage, getClientBundle().getJavaProject())) {
         if (!templates.contains(t)) {
           templates.add(t);
         }

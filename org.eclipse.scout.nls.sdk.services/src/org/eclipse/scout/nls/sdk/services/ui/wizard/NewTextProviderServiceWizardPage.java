@@ -27,21 +27,19 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
 import org.eclipse.scout.nls.sdk.internal.ui.NlsUi;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.IInputChangedListener;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.TextProposalField;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
-import org.eclipse.scout.nls.sdk.services.NlsSdkService;
+import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
-import org.eclipse.scout.nls.sdk.simple.NlsSdkSimple;
+import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.ui.wizard.ResourceProposalModel;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -54,8 +52,10 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.TypeProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -71,7 +71,7 @@ import org.eclipse.swt.widgets.Group;
 public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPage {
 
   // base interface
-  private final IType iTextProviderService = ScoutSdk.getType(RuntimeClasses.ITextProviderService);
+  private final IType iTextProviderService = TypeUtility.getType(RuntimeClasses.ITextProviderService);
 
   // properties
   private static final String PROP_TRANSLATION_FOLDER = "translationFolder";
@@ -98,7 +98,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_bundle = bundle;
     m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
-    m_defaultProposal = new TypeProposal(ScoutSdk.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
+    m_defaultProposal = new TypeProposal(TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
   }
 
   private NlsServiceType[] getTextProviderServicesInSamePlugin() {
@@ -147,7 +147,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
     IContentProposalProvider proposalProvider = null;
     if (m_bundle != null) {
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(SdkTypeUtility.getAbstractTypesOnClasspath(iTextProviderService, m_bundle.getJavaProject()));
+      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(iTextProviderService, m_bundle.getJavaProject()));
       proposalProvider = new DefaultProposalProvider(new IContentProposalEx[]{m_defaultProposal}, proposals);
     }
     m_superTypeField = getFieldToolkit().createProposalField(group, proposalProvider, "Super Class");
@@ -160,7 +160,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     });
 
     m_className = getFieldToolkit().createStyledTextField(group, "Service Name");
-    m_className.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_TEXT_SERVICE);
+    m_className.setReadOnlySuffix(SdkProperties.SUFFIX_TEXT_SERVICE);
     m_className.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {

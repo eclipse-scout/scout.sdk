@@ -13,26 +13,27 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jdt.IJavaResourceChangedListener;
-import org.eclipse.scout.sdk.jdt.JdtEvent;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePageHelper;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>OutlinePageChildPageTablePage</h3> all child pages of a outline
  */
 public class OutlinePageChildPageTablePage extends AbstractPage {
-  final IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
+  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
 
   private final IType m_outlineType;
   private P_MethodListener m_methodListener;
@@ -70,7 +71,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_methodListener != null) {
-      ScoutSdk.removeMethodChangedListener(getOutlineType(), m_methodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getOutlineType(), m_methodListener);
     }
     super.unloadPage();
   }
@@ -83,11 +84,11 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
-      ScoutSdk.addMethodChangedListener(getOutlineType(), m_methodListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getOutlineType(), m_methodListener);
     }
     IMethod createChildPagesMethod = TypeUtility.getMethod(getOutlineType(), "execCreateChildPages");
     if (TypeUtility.exists(createChildPagesMethod)) {
-      PageNodePageHelper.createRepresentationFor(this, TypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethod), ScoutSdk.getPrimaryTypeHierarchy(iPage));
+      PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethod), TypeUtility.getPrimaryTypeHierarchy(iPage));
     }
   }
 

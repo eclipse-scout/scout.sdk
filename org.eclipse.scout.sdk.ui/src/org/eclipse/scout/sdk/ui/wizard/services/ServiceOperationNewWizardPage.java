@@ -19,17 +19,17 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ParameterArgument;
 import org.eclipse.scout.sdk.operation.service.ServiceOperationNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.TextField;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.code.IParameterFieldListener;
 import org.eclipse.scout.sdk.ui.internal.fields.code.ParameterField;
 import org.eclipse.scout.sdk.ui.internal.fields.code.ReturnParameterField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -78,7 +78,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    IScoutBundle interfaceBundle = ScoutSdk.getScoutWorkspace().getScoutBundle(m_serviceInterface.getJavaProject().getProject());
+    IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(m_serviceInterface.getJavaProject().getProject());
 
     m_returnParameterField = new ReturnParameterField(parent, 20, m_returnParameter, interfaceBundle.getSearchScope());
     m_returnParameterField.setLabel(Texts.get("ReturnType"));
@@ -121,7 +121,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager manager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     ServiceOperationNewOperation op = new ServiceOperationNewOperation();
     ArrayList<ParameterArgument> args = new ArrayList<ParameterArgument>();
     if (m_parameterArg1 != null && !StringUtility.isNullOrEmpty(m_parameterArg1.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg1.getType())) {

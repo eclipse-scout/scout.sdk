@@ -12,23 +12,23 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.FormHandlerNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 /**
  * <h3>FormHandlersTablePage</h3> ...
  */
 public class FormHandlerTablePage extends AbstractPage {
 
-  final IType iFormHandler = ScoutSdk.getType(RuntimeClasses.IFormHandler);
+  final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   private final IType m_formType;
@@ -43,7 +43,7 @@ public class FormHandlerTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getFormType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getFormType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     super.unloadPage();
@@ -63,7 +63,7 @@ public class FormHandlerTablePage extends AbstractPage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormHandler);
-      ScoutSdk.addInnerTypeChangedListener(getFormType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getFormType(), m_innerTypeListener);
     }
     for (IType formHandlerType : TypeUtility.getInnerTypesOrdered(getFormType(), iFormHandler, TypeComparators.getTypeNameComparator())) {
       new FormHandlerNodePage(this, formHandlerType);

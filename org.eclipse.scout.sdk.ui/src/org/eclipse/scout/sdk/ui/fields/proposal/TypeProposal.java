@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.graphics.Image;
 
 public class TypeProposal implements ITypeProposal {
@@ -94,7 +94,7 @@ public class TypeProposal implements ITypeProposal {
   @Override
   public IType getType() {
     if (m_type == null) {
-      m_type = ScoutSdk.getType(getFullyQualifiedName());
+      m_type = TypeUtility.getType(getFullyQualifiedName());
     }
     return m_type;
   }

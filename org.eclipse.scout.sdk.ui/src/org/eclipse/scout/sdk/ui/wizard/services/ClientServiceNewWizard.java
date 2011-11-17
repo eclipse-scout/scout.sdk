@@ -21,12 +21,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
@@ -35,9 +31,13 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.dnd.DND;
 
@@ -55,7 +55,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
   public ClientServiceNewWizard(IScoutBundle clientBundle) {
     setWindowTitle(Texts.get("NewClientService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"), ScoutSdk.getType(RuntimeClasses.IService), ScoutIdeProperties.SUFFIX_SERVICE);
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"), TypeUtility.getType(RuntimeClasses.IService), SdkProperties.SUFFIX_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(clientBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -66,7 +66,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
     addPage(m_locationWizardPage);
     // init
-    m_serviceNewWizardPage.setSuperType(ScoutProposalUtility.getScoutTypeProposalsFor(ScoutSdk.getType(RuntimeClasses.AbstractService))[0]);
+    m_serviceNewWizardPage.setSuperType(ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(RuntimeClasses.AbstractService))[0]);
   }
 
   private ITreeNode createTree(IScoutBundle clientBundle) {
@@ -105,7 +105,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     try {
       m_operation.validate();
       m_operation.run(monitor, workingCopyManager);
@@ -127,9 +127,9 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
       if (evt.getPropertyName().equals(ServiceNewWizardPage.PROP_TYPE_NAME)) {
         String typeName = m_serviceNewWizardPage.getTypeName();
         if (!StringUtility.isNullOrEmpty(typeName)) {
-          String prefix = typeName.replaceAll(ScoutIdeProperties.SUFFIX_SERVICE + "$", "");
-          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + ScoutIdeProperties.SUFFIX_SERVICE);
-          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + ScoutIdeProperties.SUFFIX_SERVICE);
+          String prefix = typeName.replaceAll(SdkProperties.SUFFIX_SERVICE + "$", "");
+          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + SdkProperties.SUFFIX_SERVICE);
+          TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_SERVICE);
           m_locationWizardPage.refreshTree();
         }
         m_locationWizardPage.pingStateChanging();

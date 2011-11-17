@@ -13,11 +13,10 @@ package org.eclipse.scout.sdk.internal.test.operation.formdata;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -42,7 +41,7 @@ public class FormWithGroupboxesTest extends AbstractScoutSdkTest {
   public void testCreateFormData() throws Exception {
     if (m_formData == null) {
       String formName = "FormWithGroupBoxesForm";
-      IType form = ScoutSdk.getType("formdata.client.ui.forms." + formName);
+      IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
       Assert.assertTrue(TypeUtility.exists(form));
 
       IProject sharedProject = getProject("formdata.shared");

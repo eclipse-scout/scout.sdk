@@ -30,13 +30,13 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -50,8 +50,8 @@ import org.eclipse.swt.widgets.Composite;
  * <h3> {@link TableColumnNewWizardPage1}</h3> ...
  */
 public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
-  final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
-  final IType iSmartColumn = ScoutSdk.getType(RuntimeClasses.ISmartColumn);
+  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
+  final IType iSmartColumn = TypeUtility.getType(RuntimeClasses.ISmartColumn);
   private IType m_declaringType;
   private boolean m_showAllTemplates;
 
@@ -109,15 +109,15 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     });
 
     HashMap<String, P_BCTypeTemplate> templates = new HashMap<String, P_BCTypeTemplate>();
-    templates.put(RuntimeClasses.AbstractStringColumn, new P_BCTypeTemplate(Texts.get("StringColumn"), ScoutSdk.getType(RuntimeClasses.AbstractStringColumn)));
-    templates.put(RuntimeClasses.AbstractBooleanColumn, new P_BCTypeTemplate(Texts.get("BooleanColumn"), ScoutSdk.getType(RuntimeClasses.AbstractBooleanColumn)));
-    templates.put(RuntimeClasses.AbstractDateColumn, new P_BCTypeTemplate(Texts.get("DateColumn"), ScoutSdk.getType(RuntimeClasses.AbstractDateColumn)));
-    templates.put(RuntimeClasses.AbstractDoubleColumn, new P_BCTypeTemplate(Texts.get("DoubleColumn"), ScoutSdk.getType(RuntimeClasses.AbstractDoubleColumn)));
-    templates.put(RuntimeClasses.AbstractIntegerColumn, new P_BCTypeTemplate(Texts.get("IntegerColumn"), ScoutSdk.getType(RuntimeClasses.AbstractIntegerColumn)));
-    templates.put(RuntimeClasses.AbstractLongColumn, new P_BCTypeTemplate(Texts.get("LongColumn"), ScoutSdk.getType(RuntimeClasses.AbstractLongColumn)));
-    templates.put(RuntimeClasses.AbstractSmartColumn, new P_BCTypeTemplate(Texts.get("SmartColumn"), ScoutSdk.getType(RuntimeClasses.AbstractSmartColumn)));
+    templates.put(RuntimeClasses.AbstractStringColumn, new P_BCTypeTemplate(Texts.get("StringColumn"), TypeUtility.getType(RuntimeClasses.AbstractStringColumn)));
+    templates.put(RuntimeClasses.AbstractBooleanColumn, new P_BCTypeTemplate(Texts.get("BooleanColumn"), TypeUtility.getType(RuntimeClasses.AbstractBooleanColumn)));
+    templates.put(RuntimeClasses.AbstractDateColumn, new P_BCTypeTemplate(Texts.get("DateColumn"), TypeUtility.getType(RuntimeClasses.AbstractDateColumn)));
+    templates.put(RuntimeClasses.AbstractDoubleColumn, new P_BCTypeTemplate(Texts.get("DoubleColumn"), TypeUtility.getType(RuntimeClasses.AbstractDoubleColumn)));
+    templates.put(RuntimeClasses.AbstractIntegerColumn, new P_BCTypeTemplate(Texts.get("IntegerColumn"), TypeUtility.getType(RuntimeClasses.AbstractIntegerColumn)));
+    templates.put(RuntimeClasses.AbstractLongColumn, new P_BCTypeTemplate(Texts.get("LongColumn"), TypeUtility.getType(RuntimeClasses.AbstractLongColumn)));
+    templates.put(RuntimeClasses.AbstractSmartColumn, new P_BCTypeTemplate(Texts.get("SmartColumn"), TypeUtility.getType(RuntimeClasses.AbstractSmartColumn)));
 
-    ITypeHierarchy columnHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iColumn);
+    ITypeHierarchy columnHierarchy = TypeUtility.getPrimaryTypeHierarchy(iColumn);
     for (IType t : columnHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()))) {
       if (!templates.containsKey(t.getFullyQualifiedName())) {
         templates.put(t.getFullyQualifiedName(), new P_BCTypeTemplate(null, t));
@@ -188,7 +188,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       multiStatus.add(Status.OK_STATUS);
     }
     else {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ATemplateMustBeSelected")));
     }
   }
 

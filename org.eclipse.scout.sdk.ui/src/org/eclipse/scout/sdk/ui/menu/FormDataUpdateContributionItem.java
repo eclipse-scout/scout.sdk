@@ -3,7 +3,7 @@ package org.eclipse.scout.sdk.ui.menu;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;

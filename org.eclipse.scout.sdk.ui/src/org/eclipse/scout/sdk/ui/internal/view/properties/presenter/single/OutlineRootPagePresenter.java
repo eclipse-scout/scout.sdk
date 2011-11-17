@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
@@ -24,7 +24,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  * <h3>OutlineRootPagePresenter</h3> ...
  */
 public class OutlineRootPagePresenter extends AbstractTypeProposalPresenter {
-  final IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
+  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
 
   public OutlineRootPagePresenter(FormToolkit toolkit, Composite parent) {
     super(toolkit, parent, "getConfiguredTitle", true);
@@ -32,7 +32,7 @@ public class OutlineRootPagePresenter extends AbstractTypeProposalPresenter {
 
   @Override
   protected IType[] provideScoutTypes(IJavaProject project, IType ownerType) {
-    return ScoutSdk.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPage, TypeFilters.getTypesOnClasspath(project), TypeComparators.getTypeNameComparator());
+    return TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPage, TypeFilters.getTypesOnClasspath(project), TypeComparators.getTypeNameComparator());
 
   }
 

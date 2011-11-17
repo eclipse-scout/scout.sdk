@@ -20,12 +20,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.calendar.CalendarItemProviderNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -34,16 +30,19 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -55,9 +54,9 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
-  final IType iCalendarItemProvider = ScoutSdk.getType(RuntimeClasses.ICalendarItemProvider);
-  final IType abstractCalendarItemProvider = ScoutSdk.getType(RuntimeClasses.AbstractCalendarItemProvider);
+  final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  final IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
+  final IType abstractCalendarItemProvider = TypeUtility.getType(RuntimeClasses.AbstractCalendarItemProvider);
 
   private String m_typeName;
   private ITypeProposal m_superType;
@@ -89,7 +88,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
   protected void createContent(Composite parent) {
 
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
-    m_typeNameField.setReadOnlySuffix(ScoutIdeProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
+    m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -99,7 +98,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
       }
     });
 
-    IPrimaryTypeTypeHierarchy formFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iFormField);
+    IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
         TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()),
         TypeFilters.getSubtypeFilter(iCalendarItemProvider, formFieldHierarchy)
@@ -116,7 +115,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(SdkTypeUtility.getFormFields(m_declaringType));
+    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(ScoutTypeUtility.getFormFields(m_declaringType));
     m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
@@ -137,7 +136,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     CalendarItemProviderNewOperation operation = new CalendarItemProviderNewOperation(m_declaringType);
     operation.setFormatSource(true);
     // write back members
@@ -148,7 +147,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     }
 
     if (getSibling() == SiblingProposal.SIBLING_END) {
-      IStructuredType structuredType = SdkTypeUtility.createStructuredCalendar(m_declaringType);
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredCalendar(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER));
     }
     else {
@@ -172,27 +171,27 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(ScoutIdeProperties.SUFFIX_CALENDAR_ITEM_PROVIDER)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER)) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
     if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
     else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -21,9 +21,8 @@ import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -70,7 +69,7 @@ public class HandlerPresenter extends TypePresenter {
     addValueChangedListener(m_valueChangedListener);
 
     String interfaceSignature = Signature.createTypeSignature(SOAPHandler.class.getName() + "<" + SOAPMessageContext.class.getName() + ">", false);
-    IType interfaceType = ScoutSdk.getTypeBySignature(interfaceSignature);
+    IType interfaceType = TypeUtility.getTypeBySignature(interfaceSignature);
     setInterfaceSignatures(new String[]{interfaceSignature});
     setSearchScopeFactory(createSubClassesSearchScopeFactory(interfaceType));
 
@@ -201,7 +200,7 @@ public class HandlerPresenter extends TypePresenter {
   }
 
   private void updateTransactionalIcon(String fqn) {
-    IType type = ScoutSdk.getType(fqn);
+    IType type = TypeUtility.getType(fqn);
     ImageDescriptor icon = null;
     String tooltip = null;
     if (TypeUtility.exists(type)) {

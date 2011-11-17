@@ -12,26 +12,26 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.SmtpServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>SmtpServiceTablePage</h3> ...
  */
 public class SmtpServiceTablePage extends AbstractPage {
 
-  final IType iSMTPService = ScoutSdk.getType(RuntimeClasses.ISMTPService);
+  final IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
   ICachedTypeHierarchy m_serviceHierarchy;
 
   public SmtpServiceTablePage(AbstractPage parent) {
@@ -89,7 +89,7 @@ public class SmtpServiceTablePage extends AbstractPage {
 
   protected IType[] resolveServices() {
     if (m_serviceHierarchy == null) {
-      m_serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iSMTPService);
+      m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSMTPService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());

@@ -13,10 +13,9 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.operation.form.formdata.ScoutProjectUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutProjectOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.ImportPluginAction;
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedNodePage;
@@ -31,17 +31,19 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.IProjectNodePage;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
 
   private IScoutProject m_scoutProject;
-  final IType iService = ScoutSdk.getType(RuntimeClasses.IService);
+  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
 
   private IScoutWorkspaceListener m_workspaceListener = new IScoutWorkspaceListener() {
     @Override
@@ -59,12 +61,12 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
     m_scoutProject = p;
     setName(p.getProjectName());
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ScoutProject));
-    ScoutSdk.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
+    ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
   }
 
   @Override
   public void unloadPage() {
-    ScoutSdk.getScoutWorkspace().removeWorkspaceListener(m_workspaceListener);
+    ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(m_workspaceListener);
   }
 
   @Override
@@ -176,9 +178,9 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
   }
 
   protected IType[] resolveServices() {
-    IPrimaryTypeTypeHierarchy serviceHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iService);
+    IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(),
-        TypeFilters.getTypesInScoutProject(getScoutResource(), true));
+        ScoutTypeFilters.getTypesInScoutProject(getScoutResource(), true));
     IType[] services = serviceHierarchy.getAllSubtypes(iService, filter);
     return services;
   }

@@ -15,7 +15,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
 import org.eclipse.scout.nls.sdk.simple.model.ws.project.SimpleNlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  *
@@ -32,6 +32,6 @@ public class ServiceNlsProject extends SimpleNlsProject {
 
   @Override
   public IType getNlsAccessorType() {
-    return ScoutSdk.getType(RuntimeClasses.TEXTS);
+    return TypeUtility.getType(RuntimeClasses.TEXTS);
   }
 }

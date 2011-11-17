@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -17,10 +17,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.IJavaElementSearchConstants;
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.AnnotationUpdateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.TypeBrowseDialog;
@@ -35,7 +35,7 @@ public class MissingEndpointCodeFirstCommand extends AbstractExecutableMarkerCom
   public MissingEndpointCodeFirstCommand(IType implType) {
     super("Missing or invalid " + WebService.class.getSimpleName() + " annotation declaration");
     m_implType = implType;
-    m_annotationType = ScoutSdk.getType(WebService.class.getName());
+    m_annotationType = TypeUtility.getType(WebService.class.getName());
     m_property = "endpointInterface";
     setSolutionDescription("By using this task, the annotation declaration is updated.");
   }
@@ -52,7 +52,7 @@ public class MissingEndpointCodeFirstCommand extends AbstractExecutableMarkerCom
   }
 
   @Override
-  public void execute(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     AnnotationUpdateOperation op = new AnnotationUpdateOperation();
     op.setDeclaringType(m_implType);
     op.setAnnotationType(m_annotationType);

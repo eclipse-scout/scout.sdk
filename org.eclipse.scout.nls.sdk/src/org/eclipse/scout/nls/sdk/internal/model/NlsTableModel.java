@@ -16,7 +16,7 @@ import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.workspace.InheritedNlsEntry;
 import org.eclipse.scout.nls.sdk.internal.ui.editor.NlsTable;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;

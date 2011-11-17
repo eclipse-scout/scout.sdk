@@ -36,8 +36,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 public class SignatureProposalProvider implements IContentProposalProvider {
@@ -173,7 +172,7 @@ public class SignatureProposalProvider implements IContentProposalProvider {
     @Override
     public void acceptSearchMatch(SearchMatch match) throws CoreException {
       if (m_monitor.isCanceled()) {
-        throw new CoreException(new Status(IStatus.CANCEL, ScoutSdk.PLUGIN_ID, "canceled by monitor"));
+        throw new CoreException(new Status(IStatus.CANCEL, ScoutSdkUi.PLUGIN_ID, "canceled by monitor"));
       }
       if (match instanceof TypeDeclarationMatch) {
 
@@ -183,7 +182,7 @@ public class SignatureProposalProvider implements IContentProposalProvider {
         }
         m_foundTypes.put(new CompositeObject("A", type.getElementName(), type.getFullyQualifiedName()), new SignatureProposal(Signature.createTypeSignature(type.getFullyQualifiedName(), true)));
         if (counter++ > 98) {
-          throw new CoreException(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, "stopped after 100"));
+          throw new CoreException(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "stopped after 100"));
         }
 
       }

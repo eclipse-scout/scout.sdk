@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,17 +13,17 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.multi;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiMethodPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -101,7 +101,7 @@ public class MultiBooleanPresenter extends AbstractMultiMethodPresenter<Boolean>
 
   @Override
   protected Boolean parseSourceInput(String value, ConfigurationMethod method) throws CoreException {
-    Boolean bool = PropertyMethodSourceUtilities.parseReturnParameterBoolean(value, method.peekMethod(), method.getSuperTypeHierarchy());
+    Boolean bool = PropertyMethodSourceUtility.parseReturnParameterBoolean(value, method.peekMethod(), method.getSuperTypeHierarchy());
     return bool;
   }
 
@@ -123,7 +123,7 @@ public class MultiBooleanPresenter extends AbstractMultiMethodPresenter<Boolean>
       try {
         String sourceValue = formatSourceValue(m_checkbox.getSelection());
         ConfigurationMethod method = bean.getMethod();
-        if (ScoutSdkUtility.equals(method.computeDefaultValue(), sourceValue)) {
+        if (UiUtility.equals(method.computeDefaultValue(), sourceValue)) {
           if (method.isImplemented()) {
             list.add(new ScoutMethodDeleteOperation(method.peekMethod()));
           }

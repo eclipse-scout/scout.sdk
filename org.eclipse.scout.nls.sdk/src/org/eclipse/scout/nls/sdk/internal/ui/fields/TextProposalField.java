@@ -16,7 +16,7 @@ import org.eclipse.jface.fieldassist.IContentProposalListener;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.scout.nls.sdk.internal.ui.TextComposition;
+import org.eclipse.scout.nls.sdk.internal.ui.AbstractTextComposition;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyListener;
@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
-public class TextProposalField extends TextComposition {
+public class TextProposalField extends AbstractTextComposition {
 
   private Label m_label;
   private Text m_text;

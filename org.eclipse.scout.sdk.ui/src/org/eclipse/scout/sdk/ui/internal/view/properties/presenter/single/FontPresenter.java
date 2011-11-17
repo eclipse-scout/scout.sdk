@@ -14,17 +14,17 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdkUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.FontDialog;
 import org.eclipse.scout.sdk.ui.internal.dialog.FontSpec;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtilities;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -78,7 +78,7 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
     gLayout.marginWidth = 0;
     rootPane.setLayout(gLayout);
     text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-    m_chooserButton.setLayoutData(new GridData(ScoutIdeProperties.TOOL_BUTTON_SIZE, ScoutIdeProperties.TOOL_BUTTON_SIZE));
+    m_chooserButton.setLayoutData(new GridData(SdkProperties.TOOL_BUTTON_SIZE, SdkProperties.TOOL_BUTTON_SIZE));
     m_defaultFont = getTextComponent().getFont();
     return rootPane;
   }
@@ -141,7 +141,7 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
 
   @Override
   protected FontSpec parseSourceInput(String input) throws CoreException {
-    String value = PropertyMethodSourceUtilities.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+    String value = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
     if (value == null) {
       value = "";
     }
@@ -238,7 +238,7 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
   @Override
   protected synchronized void storeValue(FontSpec value) throws CoreException {
     IOperation op = null;
-    if (ScoutSdkUtility.equals(getDefaultValue(), value)) {
+    if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {
         op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
       }

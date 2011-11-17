@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.IPresenterAction;

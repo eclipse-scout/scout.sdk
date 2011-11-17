@@ -29,7 +29,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -225,26 +224,26 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
     }
 
     if (m_sunJaxWsXml == null || m_sunJaxWsXml.getRoot() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XdoesNotExistDueToInexistenceOrCorruptResource", ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName())));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XdoesNotExistDueToInexistenceOrCorruptResource", ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName())));
       return;
     }
     if (getWsdlDefinition() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("WsdlCouldNotBeParsed")));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("WsdlCouldNotBeParsed")));
       return;
     }
 
     if (getServiceProposals().length == 0) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "WSDL definition must contain one service element at least.\nPlease ensure to have specified the main WSDL file and not an imported, dependent one."));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "WSDL definition must contain one service element at least.\nPlease ensure to have specified the main WSDL file and not an imported, dependent one."));
       return;
     }
 
     // alias
     if (m_alias != null) {
       if (StringUtility.isNullOrEmpty(getAlias())) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_alias.getLabelText())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_alias.getLabelText())));
       }
       else if (m_illegalAliasNames.contains(getAlias())) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_alias.getLabelText(), getAlias())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_alias.getLabelText(), getAlias())));
       }
       else {
         IStatus status = m_bundle.getProject().getWorkspace().validateName(getAlias(), IResource.FILE);
@@ -257,27 +256,27 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
       // URL pattern
       String configuredUrlPattern = JaxWsSdkUtility.getJaxWsAlias(m_bundle);
       if (StringUtility.isNullOrEmpty(getUrlPattern()) || getUrlPattern().equals(configuredUrlPattern)) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPattern.getLabelText())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPattern.getLabelText())));
       }
       else if (!getUrlPattern().startsWith(configuredUrlPattern)) {
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), configuredUrlPattern)));
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), configuredUrlPattern)));
       }
       else if (getUrlPattern().matches(".*\\s+.*")) { // check for whitespaces
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("UrlXshouldNotContainWhitespaces", getUrlPattern())));
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("UrlXshouldNotContainWhitespaces", getUrlPattern())));
       }
       else if (m_illegalUrlPatterns.contains(getUrlPattern())) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_urlPattern.getLabelText(), getUrlPattern())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_urlPattern.getLabelText(), getUrlPattern())));
       }
     }
 
     if (getService() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_serviceField.getLabelText())));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_serviceField.getLabelText())));
     }
     else if (getPort() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_portField.getLabelText())));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_portField.getLabelText())));
     }
     else if (getPortType() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_portTypeField.getLabelText())));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_portTypeField.getLabelText())));
     }
   }
 

@@ -25,11 +25,11 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.nls.DynamicNls;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
-import org.eclipse.scout.nls.sdk.pde.PluginModelModificationHelper;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
 import org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile.AbstractNlsFile;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 
 public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOperation {
 
@@ -46,12 +46,12 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
       }
 
       try {
-        PluginModelModificationHelper ed = new PluginModelModificationHelper(getDesc().getPlugin());
-        ed.addDependency(NLS_RUNNTIME_PLUGIN, true);
+        PluginModelHelper ed = new PluginModelHelper(getDesc().getPlugin());
+        ed.Manifest.addDependency(NLS_RUNNTIME_PLUGIN, true);
         if (getDesc().getParentPlugin() != null && getDesc().getParentFile() != null) {
-          ed.addDependency(getDesc().getParentPlugin().getBundleDescription().getName());
+          ed.Manifest.addDependency(getDesc().getParentPlugin().getBundleDescription().getName());
         }
-        ed.addExportPackage(getDesc().getPackage());
+        ed.Manifest.addExportPackage(getDesc().getPackage());
         ed.save();
       }
       catch (Exception e1) {

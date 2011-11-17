@@ -14,12 +14,11 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -55,19 +54,19 @@ public class Bug87400Test extends AbstractScoutSdkTest {
 
   @Test
   public void testGetScoutBundle_ScoutType() throws Exception {
-    IType form = ScoutSdk.getType("a.client.form.AForm");
+    IType form = TypeUtility.getType("a.client.form.AForm");
     Assert.assertNotNull(form);
 
     IType mainBox = form.getType("MainBox");
     Assert.assertNotNull(mainBox);
 
-    Assert.assertEquals("a.client", SdkTypeUtility.getScoutBundle(form).getBundleName());
-    Assert.assertEquals("a.client", SdkTypeUtility.getScoutBundle(mainBox).getBundleName());
+    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(form).getBundleName());
+    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(mainBox).getBundleName());
   }
 
   @Test
   public void testGetScoutBundle_ScoutMethod() throws Exception {
-    IType form = ScoutSdk.getType("a.client.form.AForm");
+    IType form = TypeUtility.getType("a.client.form.AForm");
     Assert.assertNotNull(form);
 
     IType mainBox = form.getType("MainBox");
@@ -79,7 +78,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
 
   @Test
   public void testGetScoutBundle_ScoutExecMethod() throws Exception {
-    IType form = ScoutSdk.getType("a.client.form.AForm");
+    IType form = TypeUtility.getType("a.client.form.AForm");
     Assert.assertNotNull(form);
 
     IType mainBox = form.getType("MainBox");
@@ -90,7 +89,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
 
   @Test
   public void testGetScoutBundle_ScoutConfigPropertyMethod() throws Exception {
-    IType form = ScoutSdk.getType("a.client.form.AForm");
+    IType form = TypeUtility.getType("a.client.form.AForm");
     Assert.assertTrue(TypeUtility.exists(form));
 
     IType mainBox = form.getType("MainBox");
@@ -103,7 +102,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
     Assert.assertNotNull(field);
     IMethod method = getScoutMethod(methodName, field);
     Assert.assertTrue(TypeUtility.exists(method));
-    IScoutBundle scoutBundle = SdkTypeUtility.getScoutBundle(method);
+    IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(method);
     Assert.assertNotNull(scoutBundle);
     Assert.assertEquals("a.client", scoutBundle.getBundleName());
   }

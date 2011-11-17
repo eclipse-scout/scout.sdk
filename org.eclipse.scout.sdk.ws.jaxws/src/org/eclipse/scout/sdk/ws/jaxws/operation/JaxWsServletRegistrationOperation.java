@@ -4,24 +4,27 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.operation;
 
+import java.util.HashMap;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.pde.core.plugin.IPluginAttribute;
+import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.commons.xmlparser.SimpleXmlElement;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.pde.PluginXml;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -55,7 +58,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IScoutBundle servletContributingBundle = JaxWsSdkUtility.getServletContributingBundle(m_bundle);
     if (servletContributingBundle == null) {
       JaxWsSdk.logError("Failed to find servlet contributing bundle");
@@ -64,36 +67,31 @@ public class JaxWsServletRegistrationOperation implements IOperation {
 
     // plugin.xml of bundle
     String jaxWsServletClass = JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName();
-
-    PluginXml pluginXml = new PluginXml(servletContributingBundle.getProject());
-    SimpleXmlElement point = pluginXml.getOrCreateExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS);
-    SimpleXmlElement registration = null;
-
-    // find JAX-WS servlet extension
-    for (SimpleXmlElement xmlElement : point.getChildren(ELEMENT_SERVLET)) {
-      if (jaxWsServletClass.equals(xmlElement.getStringAttribute(ATTR_CLASS))) {
-        registration = xmlElement;
-        break;
-      }
-    }
-
     String servletAlias = StringUtility.trim(JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType));
     String oldServletAlias = null;
-    if (registration == null) {
-      registration = new SimpleXmlElement(ELEMENT_SERVLET);
-      registration.setAttribute(ATTR_ALIAS, servletAlias);
-      registration.setAttribute(ATTR_CLASS, jaxWsServletClass);
-      point.addChild(registration);
-      pluginXml.store(monitor);
-      updateSunJaxWsEntries(oldServletAlias);
-    }
-    else {
-      oldServletAlias = registration.getStringAttribute(ATTR_ALIAS);
+
+    PluginModelHelper h = new PluginModelHelper(servletContributingBundle.getProject());
+    HashMap<String, String> attributes = new HashMap<String, String>();
+    attributes.put(ATTR_CLASS, jaxWsServletClass);
+
+    IPluginElement e = h.PluginXml.getSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, ELEMENT_SERVLET, attributes);
+    if (e != null) {
+      oldServletAlias = null;
+      IPluginAttribute alias = e.getAttribute(ATTR_ALIAS);
+      if (alias != null) {
+        oldServletAlias = alias.getValue();
+      }
       if (oldServletAlias == null || !oldServletAlias.equals(servletAlias)) {
-        registration.setAttribute(ATTR_ALIAS, servletAlias);
-        pluginXml.store(monitor);
+        e.setAttribute(ATTR_ALIAS, servletAlias);
+        h.save();
         updateSunJaxWsEntries(oldServletAlias);
       }
+    }
+    else {
+      attributes.put(ATTR_ALIAS, servletAlias);
+      h.PluginXml.addSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, ELEMENT_SERVLET, attributes);
+      h.save();
+      updateSunJaxWsEntries(oldServletAlias);
     }
   }
 

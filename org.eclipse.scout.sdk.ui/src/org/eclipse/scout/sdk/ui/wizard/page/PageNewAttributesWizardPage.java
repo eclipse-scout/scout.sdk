@@ -25,12 +25,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.page.PageNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -41,13 +37,17 @@ import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -62,10 +62,10 @@ import org.eclipse.swt.widgets.Group;
  */
 public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
-  private IType iPage = ScoutSdk.getType(RuntimeClasses.IPage);
-  private IType iPageWithNodes = ScoutSdk.getType(RuntimeClasses.IPageWithNodes);
-  private IType iPageWithTable = ScoutSdk.getType(RuntimeClasses.IPageWithTable);
-  private IType iOutline = ScoutSdk.getType(RuntimeClasses.IOutline);
+  private IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+  private IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
+  private IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+  private IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
   private NlsProposal m_nlsName;
   private String m_typeName;
@@ -89,7 +89,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewPage"));
     setDescription(Texts.get("CreateANewPage"));
     m_nameSuffix = "";
-    setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractPageWithNodes));
+    setSuperType(TypeUtility.getType(RuntimeClasses.AbstractPageWithNodes));
     setOperation(new PageNewOperation(true));
   }
 
@@ -166,11 +166,11 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     if (clientBundle != null) {
       nlsProject = clientBundle.findBestMatchNlsProject();
       ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-          TypeFilters.getInScoutBundles(getClientBundle()),
+          ScoutTypeFilters.getInScoutBundles(getClientBundle()),
           TypeFilters.getClassFilter());
 
-      IType[] pages = ScoutSdk.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithNodes, filter);
-      IType[] outlines = ScoutSdk.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter);
+      IType[] pages = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithNodes, filter);
+      IType[] outlines = TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter);
       IType[] propTypes = new IType[pages.length + outlines.length];
       System.arraycopy(pages, 0, propTypes, 0, pages.length);
       System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
@@ -185,7 +185,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // write back members
     getOperation().setClientBundle(getClientBundle());
     if (getNlsName() != null) {
@@ -226,20 +226,20 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(m_nameSuffix)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
-    if (ScoutSdk.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES_PAGES) + "." + getTypeName())) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+    if (TypeUtility.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES_PAGES) + "." + getTypeName())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
     else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
   }
 
@@ -314,13 +314,13 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
         try {
           ITypeHierarchy superTypeHierarchy = superType.newSupertypeHierarchy(null);
           if (superTypeHierarchy.contains(iPageWithNodes)) {
-            m_nameSuffix = ScoutIdeProperties.SUFFIX_OUTLINE_NODE_PAGE;
+            m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_NODE_PAGE;
           }
           else if (superTypeHierarchy.contains(iPageWithTable)) {
-            m_nameSuffix = ScoutIdeProperties.SUFFIX_OUTLINE_TABLE_PAGE;
+            m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_TABLE_PAGE;
           }
           else {
-            m_nameSuffix = ScoutIdeProperties.SUFFIX_OUTLINE_PAGE;
+            m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_PAGE;
           }
         }
         catch (JavaModelException e) {

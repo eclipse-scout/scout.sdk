@@ -15,14 +15,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceDeleteAction;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.EditorSelectionVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -30,10 +30,10 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public class TextServiceNodePage extends AbstractServiceNodePage {
 
-  private final static IType ifType = ScoutSdk.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+  private final static IType ifType = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
 
   public TextServiceNodePage(AbstractPage parentPage, IType type) {
-    super(parentPage, type, ifType, ScoutIdeProperties.SUFFIX_TEXT_SERVICE);
+    super(parentPage, type, ifType, SdkProperties.SUFFIX_TEXT_SERVICE);
     setName(type.getElementName());
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Text));
   }

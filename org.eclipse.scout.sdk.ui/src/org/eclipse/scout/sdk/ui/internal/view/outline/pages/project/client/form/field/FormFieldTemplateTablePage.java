@@ -13,22 +13,23 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>{@link FormFieldTemplateTablePage}</h3> ...
@@ -38,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.typecache.ICachedTypeHierarchy;
  */
 public class FormFieldTemplateTablePage extends AbstractPage {
 
-  final IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
+  final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
   private ICachedTypeHierarchy m_formFieldHierarchy;
 
   public FormFieldTemplateTablePage(IPage parent) {
@@ -75,11 +76,11 @@ public class FormFieldTemplateTablePage extends AbstractPage {
 
   protected IType[] resolveFormFieldTemplates() {
     if (m_formFieldHierarchy == null) {
-      m_formFieldHierarchy = ScoutSdk.getPrimaryTypeHierarchy(iFormField);
+      m_formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
       m_formFieldHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getInScoutBundles(getScoutResource()),
+        ScoutTypeFilters.getInScoutBundles(getScoutResource()),
         TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic)
         );
     IType[] allSubtypes = m_formFieldHierarchy.getAllSubtypes(iFormField, filter, TypeComparators.getTypeNameComparator());

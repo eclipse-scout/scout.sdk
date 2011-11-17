@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -20,18 +20,17 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.util.ScoutSignature;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 
@@ -62,7 +61,7 @@ public class WsProviderImplNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutTypeNewOperation implNewTypeOp = new ScoutTypeNewOperation(m_typeName, m_packageName, m_bundle);
     if (TypeUtility.exists(m_portTypeInterfaceType)) {
       implNewTypeOp.addInterfaceSignature(Signature.createTypeSignature(m_portTypeInterfaceType.getFullyQualifiedName(), true));
@@ -77,12 +76,12 @@ public class WsProviderImplNewOperation implements IOperation {
       // override methods
       for (IMethod method : m_portTypeInterfaceType.getMethods()) {
         MethodCreateOperation op = new MethodCreateOperation(m_createdType, method.getElementName());
-        op.setReturnTypeSignature(ScoutSignature.getReturnTypeSignatureResolved(method, m_portTypeInterfaceType));
+        op.setReturnTypeSignature(SignatureUtility.getReturnTypeSignatureResolved(method, m_portTypeInterfaceType));
         op.setMethodFlags(method.getFlags());
         op.setExceptionSignatures(method.getExceptionTypes());
         String[] paramNames = method.getParameterNames();
         op.setParameterNames(paramNames);
-        op.setParameterSignatures(ScoutSignature.getMethodParameterSignatureResolved(method, m_portTypeInterfaceType));
+        op.setParameterSignatures(SignatureUtility.getMethodParameterSignatureResolved(method, m_portTypeInterfaceType));
         op.addAnnotation(new AnnotationCreateOperation(null, Signature.createTypeSignature(Override.class.getName(), true)));
         op.run(monitor, workingCopyManager);
 
@@ -95,7 +94,7 @@ public class WsProviderImplNewOperation implements IOperation {
     // create JAX-WS webservice annotation
     AnnotationUpdateOperation annotationOp = new AnnotationUpdateOperation();
     annotationOp.setDeclaringType(m_createdType);
-    annotationOp.setAnnotationType(ScoutSdk.getType(WebService.class.getName()));
+    annotationOp.setAnnotationType(TypeUtility.getType(WebService.class.getName()));
 
     if (TypeUtility.exists(m_portTypeInterfaceType)) {
       annotationOp.addStringProperty("endpointInterface", m_portTypeInterfaceType.getFullyQualifiedName());
@@ -144,10 +143,10 @@ public class WsProviderImplNewOperation implements IOperation {
     workingCopyManager.reconcile(icu, monitor);
   }
 
-  private IType createType(String qualifiedTypeName, IType interfaceType, IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  private IType createType(String qualifiedTypeName, IType interfaceType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IType type;
-    if (ScoutSdk.existsType(qualifiedTypeName)) {
-      type = ScoutSdk.getType(qualifiedTypeName);
+    if (TypeUtility.existsType(qualifiedTypeName)) {
+      type = TypeUtility.getType(qualifiedTypeName);
     }
     else {
       String typeName = Signature.getSimpleName(qualifiedTypeName);

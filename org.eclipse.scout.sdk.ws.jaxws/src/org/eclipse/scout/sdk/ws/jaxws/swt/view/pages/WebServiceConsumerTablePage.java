@@ -4,22 +4,23 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -45,7 +46,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
     m_bundle = getScoutResource();
 
     m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
-    m_hierarchy = ScoutSdk.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.AbstractWebServiceClient);
+    m_hierarchy = TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.AbstractWebServiceClient);
     m_hierarchy.addHierarchyListener(m_hierarchyChangedListener);
 
     // listener on build-jaxws.xml is necessary to reflect created consumers. That is because type listener is not notified about created types (bug).
@@ -119,7 +120,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
         case POST_TYPE_REMOVING:
         case POST_TYPE_ADDING:
         case POST_TYPE_CHANGED:
-          IScoutBundle bundle = ScoutSdk.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
+          IScoutBundle bundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
           if (bundle.getScoutProject() == getScoutResource().getScoutProject()) {
             markStructureDirty();
           }

@@ -17,12 +17,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.template.CreateTemplateOperation;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.TemplateFromFromFieldDialog;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -77,7 +77,7 @@ public class CreateTemplateAction extends AbstractScoutHandler {
 
   public void setType(IType type) {
     m_type = type;
-    m_bundle = SdkTypeUtility.getScoutBundle(m_type);
+    m_bundle = ScoutTypeUtility.getScoutBundle(m_type);
     m_packageName = m_bundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_TEMPLATE_FORM_FIELD);
   }
 

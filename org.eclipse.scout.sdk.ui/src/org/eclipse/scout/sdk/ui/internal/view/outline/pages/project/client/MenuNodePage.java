@@ -12,30 +12,30 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.MenuNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class MenuNodePage extends AbstractScoutTypePage {
-  static final IType iMenuType = ScoutSdk.getType(RuntimeClasses.IMenu);
+  static final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
 
   private InnerTypePageDirtyListener m_menuChangedListener;
 
   public MenuNodePage(IPage parentPage, IType menuType) {
-    super(ScoutIdeProperties.SUFFIX_MENU);
+    super(SdkProperties.SUFFIX_MENU);
     setParent(parentPage);
     setType(menuType);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Menu));
@@ -64,7 +64,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
   public void unloadPage() {
     super.unloadPage();
     if (m_menuChangedListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getType(), m_menuChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_menuChangedListener);
       m_menuChangedListener = null;
     }
   }
@@ -73,10 +73,10 @@ public class MenuNodePage extends AbstractScoutTypePage {
   public void loadChildrenImpl() {
     if (m_menuChangedListener == null) {
       m_menuChangedListener = new InnerTypePageDirtyListener(this, iMenuType);
-      ScoutSdk.addInnerTypeChangedListener(getType(), m_menuChangedListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_menuChangedListener);
     }
     // recursively add children
-    IType[] menus = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iMenuType), TypeComparators.getOrderAnnotationComparator());
+    IType[] menus = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iMenuType), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType menu : menus) {
       new MenuNodePage(this, menu);
     }

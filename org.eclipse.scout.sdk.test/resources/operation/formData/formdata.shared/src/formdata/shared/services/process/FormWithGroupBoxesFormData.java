@@ -1,10 +1,10 @@
 package formdata.shared.services.process;
 
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import java.util.Map;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
-import org.eclipse.scout.commons.annotations.FormDataChecksum;
 
-@FormDataChecksum(434700835l)
 public class FormWithGroupBoxesFormData extends AbstractFormData {
   private static final long serialVersionUID = 1L;
 
@@ -19,19 +19,26 @@ public class FormWithGroupBoxesFormData extends AbstractFormData {
     return getFieldByClass(InnerInteger.class);
   }
 
-  public class FlatString extends AbstractValueFieldData<String> {
+  public static class FlatString extends AbstractValueFieldData<String> {
     private static final long serialVersionUID = 1L;
 
     public FlatString() {
     }
 
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
+    }
   }
 
-  public class InnerInteger extends AbstractValueFieldData<Integer> {
+  public static class InnerInteger extends AbstractValueFieldData<Integer> {
     private static final long serialVersionUID = 1L;
 
     public InnerInteger() {
     }
-
   }
 }

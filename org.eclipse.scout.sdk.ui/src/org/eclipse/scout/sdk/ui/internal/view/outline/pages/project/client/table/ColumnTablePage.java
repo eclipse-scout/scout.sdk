@@ -12,25 +12,26 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.tabl
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>ColumnTablePage</h3> ...
  */
 public class ColumnTablePage extends AbstractPage {
 
-  final IType iColumn = ScoutSdk.getType(RuntimeClasses.IColumn);
+  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
   private IType m_columnDeclaringType;
 
   private InnerTypePageDirtyListener m_innerTypeListener;
@@ -65,7 +66,7 @@ public class ColumnTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_innerTypeListener != null) {
-      ScoutSdk.removeInnerTypeChangedListener(getColumnDeclaringType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getColumnDeclaringType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
   }
@@ -74,9 +75,9 @@ public class ColumnTablePage extends AbstractPage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iColumn);
-      ScoutSdk.addInnerTypeChangedListener(getColumnDeclaringType(), m_innerTypeListener);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getColumnDeclaringType(), m_innerTypeListener);
     }
-    for (IType innerType : SdkTypeUtility.getColumns(getColumnDeclaringType())) {
+    for (IType innerType : ScoutTypeUtility.getColumns(getColumnDeclaringType())) {
       ColumnNodePage childPage = new ColumnNodePage();
       childPage.setParent(this);
       childPage.setType(innerType);

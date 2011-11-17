@@ -13,8 +13,6 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
@@ -22,10 +20,12 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.TypeOpenLin
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
-import org.eclipse.scout.sdk.workspace.type.ITypeFilter;
-import org.eclipse.scout.sdk.workspace.type.TypeComparators;
-import org.eclipse.scout.sdk.workspace.type.TypeFilters;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
@@ -38,8 +38,8 @@ import org.eclipse.swt.widgets.Composite;
 public class ServicePropertyPart extends JdtTypePropertyPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
-  final IType basicPermission = ScoutSdk.getType(RuntimeClasses.BasicPermission);
-  final IType iForm = ScoutSdk.getType(RuntimeClasses.IForm);
+  final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
+  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
 
   @Override
   protected void createSections() {
@@ -68,26 +68,26 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
     if (!StringUtility.isNullOrEmpty(entityName)) {
       // form
       if (TypeUtility.exists(iForm)) /* can be null on a server-only-project (bugzilla ticket 325428) */{
-        String formRegex = entityName + ScoutIdeProperties.SUFFIX_FORM;
+        String formRegex = entityName + SdkProperties.SUFFIX_FORM;
         ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
             TypeFilters.getRegexSimpleNameFilter(formRegex),
             TypeFilters.getClassFilter(),
-            TypeFilters.getInScoutProject(getPage().getScoutResource().getScoutProject())
+            ScoutTypeFilters.getInScoutProject(getPage().getScoutResource().getScoutProject())
             );
         LinkGroup formGroup = model.getOrCreateGroup(Texts.get("Form"), 10);
-        for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(iForm).getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator())) {
+        for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(iForm).getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator())) {
           formGroup.addLink(new TypeOpenLink(candidate));
         }
       }
       // permissions
-      String permissionRegex = "(Create|Read|Update)" + entityName + ScoutIdeProperties.SUFFIX_PERMISSION;
+      String permissionRegex = "(Create|Read|Update)" + entityName + SdkProperties.SUFFIX_PERMISSION;
       ITypeFilter filter = TypeFilters.getMultiTypeFilter(
           TypeFilters.getRegexSimpleNameFilter(permissionRegex),
           TypeFilters.getClassFilter(),
-          TypeFilters.getInScoutProject(getPage().getScoutResource().getScoutProject())
+          ScoutTypeFilters.getInScoutProject(getPage().getScoutResource().getScoutProject())
           );
       LinkGroup permissionGroup = model.getOrCreateGroup(Texts.get("PermissionTablePage"), 20);
-      for (IType candidate : ScoutSdk.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
+      for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
         permissionGroup.addLink(new TypeOpenLink(candidate));
       }
 
@@ -104,26 +104,26 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
     if (StringUtility.isNullOrEmpty(serviceName)) {
       return serviceName;
     }
-    if (serviceName.endsWith(ScoutIdeProperties.SUFFIX_PROCESS_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_PROCESS_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_PROCESS_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_PROCESS_SERVICE + "$", "$1");
     }
-    if (serviceName.endsWith(ScoutIdeProperties.SUFFIX_OUTLINE_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_OUTLINE_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_OUTLINE_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_OUTLINE_SERVICE + "$", "$1");
     }
-    if (serviceName.endsWith(ScoutIdeProperties.SUFFIX_CUSTOM_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_CUSTOM_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_CUSTOM_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_CUSTOM_SERVICE + "$", "$1");
     }
-    if (serviceName.endsWith(ScoutIdeProperties.SUFFIX_CALENDAR_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_CALENDAR_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_CALENDAR_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_CALENDAR_SERVICE + "$", "$1");
     }
-    if (serviceName.endsWith(ScoutIdeProperties.SUFFIX_SMTP_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_SMTP_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_SMTP_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_SMTP_SERVICE + "$", "$1");
     }
-    if (serviceName.endsWith(ScoutIdeProperties.SUFFIX_SQL_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_SQL_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_SQL_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_SQL_SERVICE + "$", "$1");
     }
-    if (serviceName.endsWith(ScoutIdeProperties.SUFFIX_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + ScoutIdeProperties.SUFFIX_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_SERVICE + "$", "$1");
     }
     return serviceName;
   }

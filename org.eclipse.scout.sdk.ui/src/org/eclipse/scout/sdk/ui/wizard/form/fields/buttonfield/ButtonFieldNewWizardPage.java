@@ -21,12 +21,8 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutIdeProperties;
-import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.ButtonFieldNewOperation;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
-import org.eclipse.scout.sdk.ui.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
@@ -36,12 +32,15 @@ import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.SdkTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -53,8 +52,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iButton = ScoutSdk.getType(RuntimeClasses.IButton);
-  private final IType iFormField = ScoutSdk.getType(RuntimeClasses.IFormField);
+  private final IType iButton = TypeUtility.getType(RuntimeClasses.IButton);
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
   private NlsProposal m_nlsName;
   private String m_typeName;
@@ -72,7 +71,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdField;
 
   public ButtonFieldNewWizardPage(IType declaringType) {
-    this(declaringType, Texts.get("NewButtonField"), Texts.get("CreateANewButtonField"), ScoutIdeProperties.SUFFIX_BUTTON);
+    this(declaringType, Texts.get("NewButtonField"), Texts.get("CreateANewButtonField"), SdkProperties.SUFFIX_BUTTON);
   }
 
   public ButtonFieldNewWizardPage(IType declaringType, String title, String message, String suffix) {
@@ -84,14 +83,14 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
     setOperation(new ButtonFieldNewOperation(m_declaringType));
 
-    setSuperType(ScoutSdk.getType(RuntimeClasses.AbstractButton));
+    setSuperType(TypeUtility.getType(RuntimeClasses.AbstractButton));
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override
   protected void createContent(Composite parent) {
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, SdkTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -126,7 +125,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(SdkTypeUtility.getFormFields(m_declaringType));
+    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(ScoutTypeUtility.getFormFields(m_declaringType));
     m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
@@ -147,7 +146,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws CoreException {
+  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     getOperation().setFormatSource(true);
     // write back members
     if (getNlsName() != null) {
@@ -158,7 +157,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       getOperation().setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true));
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {
-      IStructuredType structuredType = SdkTypeUtility.createStructuredCompositeField(m_declaringType);
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
       getOperation().setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
@@ -182,26 +181,26 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(m_readOnlySuffix)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
     }
     // check not allowed names
     if (TypeUtility.findInnerType(m_declaringType, getTypeName()) != null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
     else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {
     if (getSuperType() == null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }

@@ -11,7 +11,7 @@
 package org.eclipse.scout.nls.sdk.ui.action;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.nls.sdk.NlsCore;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsEntryModifyDialog;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;

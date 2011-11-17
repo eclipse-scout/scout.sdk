@@ -15,12 +15,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.template.IContentTemplate;
-import org.eclipse.scout.sdk.typecache.IScoutWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class EmptyTemplate implements IContentTemplate {
 
   @Override
-  public void apply(IType type, IScoutWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
+  public void apply(IType type, IWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
     // void
   }
 
