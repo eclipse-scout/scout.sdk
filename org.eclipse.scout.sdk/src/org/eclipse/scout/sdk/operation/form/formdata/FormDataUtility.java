@@ -11,7 +11,9 @@
 package org.eclipse.scout.sdk.operation.form.formdata;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,8 +44,10 @@ import org.eclipse.text.edits.MultiTextEdit;
  */
 public class FormDataUtility {
 
-  private static final HashSet<String> keyWords = new HashSet<String>();
-  private static final Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
+  private final static HashSet<String> keyWords = new HashSet<String>();
+  private final static Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
+  private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
+  private final static Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
   static {
     keyWords.add("abstract");
     keyWords.add("assert");
@@ -248,41 +252,34 @@ public class FormDataUtility {
     if (TypeUtility.exists(superType)) {
       if (TypeUtility.isGenericType(superType)) {
         // compute generic parameter type by merging all super type generic parameter declarations
-        //List<GenericSignatureMapping> signatureMapping = new ArrayList<GenericSignatureMapping>();
+        List<GenericSignatureMapping> signatureMapping = new ArrayList<GenericSignatureMapping>();
         IType currentType = type;
         IType currentSuperType = superType;
         while (currentSuperType != null) {
           if (TypeUtility.isGenericType(currentSuperType)) {
-            //String superTypeGenericParameterName = currentSuperType.getTypeParameters()[0].getElementName();
+            String superTypeGenericParameterName = currentSuperType.getTypeParameters()[0].getElementName();
             String currentSuperTypeSig = currentType.getSuperclassTypeSignature();
             String[] typeArgs = Signature.getTypeArguments(currentSuperTypeSig);
             if (typeArgs.length < 1) {
               // if the class has no generic type defined, use java.lang.Object as type for the formdata
               typeArgs = new String[]{Signature.C_RESOLVED + Object.class.getName() + Signature.C_SEMICOLON};
             }
-            return SignatureUtility.getResolvedSignature(typeArgs[0], currentType);
-            //return SignatureUtility.getResolvedSignature(superTypeGenericParameterSignature, type);
-            /*signatureMapping.add(new GenericSignatureMapping(superTypeGenericParameterName, superTypeGenericParameterSignature));
+            String superTypeGenericParameterSignature = getResolvedGenericTypeSignature(typeArgs[0], currentType);
+            signatureMapping.add(0, new GenericSignatureMapping(superTypeGenericParameterName, superTypeGenericParameterSignature));
             currentType = currentSuperType;
-            currentSuperType = formFieldHierarchy.getSuperclass(currentSuperType);*/
+            currentSuperType = formFieldHierarchy.getSuperclass(currentSuperType);
           }
           else {
             break;
           }
         }
-        return null;
-        /*if (signatureMapping.size() < 1) {
-          return null;
+        String signature = signatureMapping.get(0).getSuperTypeGenericParameterSignature();
+        for (int i = 1; i < signatureMapping.size(); i++) {
+          String replacement = signatureMapping.get(i).getSuperTypeGenericParameterSignature();
+          replacement = replacement.substring(0, replacement.length() - 1);
+          signature = signature.replaceAll("[T,L,Q]" + signatureMapping.get(i).getSuperTypeGenericParameterName(), replacement);
         }
-        else {
-          String signature = signatureMapping.get(0).getSuperTypeGenericParameterSignature();
-          /*for (int i = 1; i < signatureMapping.size(); i++) {
-            String replacement = signatureMapping.get(i).getSuperTypeGenericParameterSignature();
-            replacement = replacement.substring(0, replacement.length() - 1);
-            signature = signature.replaceAll("[T,L,Q]" + signatureMapping.get(i).getSuperTypeGenericParameterName(), replacement);
-          }
-          return SignatureUtility.getResolvedSignature(signature, type);
-        }*/
+        return SignatureUtility.getResolvedSignature(signature, type);
       }
       else {
         return computeFormFieldGenericType(superType, formFieldHierarchy);
@@ -291,6 +288,46 @@ public class FormDataUtility {
     else {
       return null;
     }
+  }
+
+  private static String getResolvedGenericTypeSignature(String signature, IType type) throws JavaModelException {
+    String workingSig = signature.replace('/', '.');
+    workingSig = Signature.getTypeErasure(workingSig);
+    StringBuilder signatureBuilder = new StringBuilder();
+    Matcher prefMatcher = PREF_REGEX.matcher(workingSig);
+    if (prefMatcher.find()) {
+      signatureBuilder.append(prefMatcher.group(1));
+      workingSig = prefMatcher.group(2);
+    }
+    if (Signature.getTypeSignatureKind(workingSig) == Signature.BASE_TYPE_SIGNATURE) {
+      signatureBuilder.append(workingSig);
+      return signatureBuilder.toString();
+    }
+    else {
+      if (workingSig.length() > 0 && workingSig.charAt(0) == Signature.C_UNRESOLVED) {
+        String[][] resolvedTypeName = type.resolveType(Signature.getSignatureSimpleName(workingSig));
+        if (resolvedTypeName != null && resolvedTypeName.length == 1) {
+          String fqName = resolvedTypeName[0][0];
+          if (fqName != null && fqName.length() > 0) {
+            fqName = fqName + ".";
+          }
+          fqName = fqName + resolvedTypeName[0][1];
+          workingSig = Signature.createTypeSignature(fqName, true);
+        }
+      }
+      workingSig = SUFF_REGEX.matcher(workingSig).replaceAll("$1");
+      signatureBuilder.append(workingSig);
+      String[] typeArguments = Signature.getTypeArguments(signature);
+      if (typeArguments.length > 0) {
+        signatureBuilder.append("<");
+        for (int i = 0; i < typeArguments.length; i++) {
+          signatureBuilder.append(getResolvedGenericTypeSignature(typeArguments[i], type));
+        }
+        signatureBuilder.append(">");
+      }
+      signatureBuilder.append(";");
+    }
+    return signatureBuilder.toString();
   }
 
   private static class GenericSignatureMapping {
