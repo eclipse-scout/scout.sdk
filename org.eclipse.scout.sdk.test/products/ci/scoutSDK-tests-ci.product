@@ -111,11 +111,15 @@
       <plugin id="org.eclipse.pde.ui"/>
       <plugin id="org.eclipse.scout.commons"/>
       <plugin id="org.eclipse.scout.nls.sdk"/>
+      <plugin id="org.eclipse.scout.nls.sdk.services"/>
+      <plugin id="org.eclipse.scout.nls.sdk.simple"/>
       <plugin id="org.eclipse.scout.rt.shared"/>
       <plugin id="org.eclipse.scout.rt.testing.common.ant.optional.junit.fragment" fragment="true"/>
       <plugin id="org.eclipse.scout.rt.testing.shared"/>
       <plugin id="org.eclipse.scout.sdk"/>
       <plugin id="org.eclipse.scout.sdk.test"/>
+      <plugin id="org.eclipse.scout.sdk.util"/>
+      <plugin id="org.eclipse.scout.sdk.ws.jaxws"/>
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.search"/>
       <plugin id="org.eclipse.swt"/>
