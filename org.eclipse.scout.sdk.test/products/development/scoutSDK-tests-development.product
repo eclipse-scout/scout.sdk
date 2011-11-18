@@ -118,6 +118,7 @@
       <plugin id="org.eclipse.scout.rt.testing.shared"/>
       <plugin id="org.eclipse.scout.sdk"/>
       <plugin id="org.eclipse.scout.sdk.test"/>
+      <plugin id="org.eclipse.scout.sdk.util"/>
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.search"/>
       <plugin id="org.eclipse.swt"/>
