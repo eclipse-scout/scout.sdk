@@ -7,7 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -35,7 +35,7 @@ public final class LazyProductFileModel {
   private WorkspaceProductModel m_productModel;
   private IConfigurationFileInfo m_configFileInfo;
   private Properties m_configFileProperties;
-  private HashMap<Object, Object> m_origConfigFileProperties;
+  private Hashtable<Object, Object> m_origConfigFileProperties;
   private IFile m_configIniFile;
 
   public LazyProductFileModel(IFile productFile) {
@@ -82,7 +82,7 @@ public final class LazyProductFileModel {
         // remember all entries at the moment of property loading.
         // this allows to check if the config file is dirty later on.
         // shallow copy is sufficient as the properties map can only store Strings which are immutable.
-        m_origConfigFileProperties = (HashMap<Object, Object>) m_configFileProperties.clone();
+        m_origConfigFileProperties = (Hashtable<Object, Object>) m_configFileProperties.clone();
       }
       catch (IOException e) {
         m_configFileProperties = null; // throw away the empty unloaded instance so that we can try again next time.
