@@ -22,8 +22,9 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
@@ -67,7 +68,7 @@ public class ButtonGroup<T> extends Composite {
     m_eventListeners = new EventListenerList();
     m_buttons = new ArrayList<Button>();
     m_type = type;
-    setLayout(new GridLayout(1, true));
+    setLayout(new FormLayout());
   }
 
   public void addButtonGroupListener(ButtonGroupListener<T> listener) {
@@ -96,13 +97,16 @@ public class ButtonGroup<T> extends Composite {
     newButton.setData(VALUE, value);
     newButton.setText(label);
     newButton.addSelectionListener(m_internalListener);
-    m_buttons.add(newButton);
 
     // layout
-    GridData data = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH);
-    data.horizontalIndent = 190;
+    FormData formData = new FormData();
+    if (m_buttons.size() > 0) {
+      formData.top = new FormAttachment(m_buttons.get(m_buttons.size() - 1), 10);
+    }
+    formData.left = new FormAttachment(40, 5);
+    newButton.setLayoutData(formData);
 
-    newButton.setLayoutData(data);
+    m_buttons.add(newButton);
     return newButton;
   }
 
