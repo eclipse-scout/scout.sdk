@@ -37,17 +37,17 @@ import org.junit.Test;
  */
 public class TypeHierarchyTest extends AbstractScoutSdkTest {
 
-  private static String BUNLDE_NAME_CLIENT = "test.client";
-  private static String BUNLDE_NAME_SHARED = "test.shared";
+  private static String BUNDLE_NAME_CLIENT = "test.client";
+  private static String BUNDLE_NAME_SHARED = "test.shared";
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("util/typeCache", "test.client", "test.shared");
+    setupWorkspace("util/typeCache", BUNDLE_NAME_CLIENT, BUNDLE_NAME_SHARED);
   }
 
   @AfterClass
   public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("test.client", "test.shared");
+    deleteProjects(BUNDLE_NAME_CLIENT, BUNDLE_NAME_SHARED);
   }
 
   @Test
@@ -69,7 +69,7 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
 
   @Test
   public void testCreateNewPrimaryType() throws Exception {
-    final IJavaProject project = JavaCore.create(getProject(BUNLDE_NAME_CLIENT));
+    final IJavaProject project = JavaCore.create(getProject(BUNDLE_NAME_CLIENT));
     final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
     final IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
     IType[] subtypes = primaryFormFieldHierarchy.getAllSubtypes(iForm, TypeFilters.getClassesInProject(project));
