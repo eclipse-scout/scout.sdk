@@ -568,7 +568,7 @@
       <javaCompletionProposalComputer
             activate="true"
             categoryId="org.eclipse.scout.sdk.ui.sqlBindProposalCategory"
-            class="org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.SqlBindFromFormDataCompletionComputer">
+            class="org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.sql.SqlBindFromFormDataCompletionComputer">
          <partition
                type="__java_string">
          </partition>
