@@ -55,7 +55,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
 
   public boolean contains(IType type, IProgressMonitor monitor) {
     revalidate(monitor);
-    return m_hierarchy.contains(type) && TypeUtility.exists(type);
+    return TypeUtility.exists(type) && m_hierarchy.contains(type);
   }
 
   void revalidate(IProgressMonitor monitor) {
