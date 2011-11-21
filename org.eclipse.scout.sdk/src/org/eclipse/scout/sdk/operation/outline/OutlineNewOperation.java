@@ -109,6 +109,7 @@ public class OutlineNewOperation implements IOperation {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(method) {
         @Override
         protected void updateMethodBody(Document methodBody, IImportValidator validator) throws CoreException {
+          // try 'list.add(MyOutline.class)' pattern
           Matcher matcher = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(\\s*[a-zA-Z0-9\\_\\-]*\\.class\\s*\\)\\;", Pattern.MULTILINE).matcher(methodBody.get());
           int index = -1;
           String listName = null;
@@ -126,7 +127,23 @@ public class OutlineNewOperation implements IOperation {
             }
           }
           else {
-            ScoutSdk.logWarning("could find insert position for an additional outline in method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.");
+            // try 'return new Class[]{}' pattern
+            matcher = Pattern.compile("\\s*return\\s*new\\s*Class\\[\\]\\{([a-zA-Z0-9\\.\\,\\s\\_\\-]*)\\}\\s*\\;", Pattern.MULTILINE).matcher(methodBody.get());
+            if (matcher.find()) {
+              String list = matcher.group(1).trim();
+              boolean appendComma = !list.endsWith(",");
+              int pos = matcher.end(1);
+              InsertEdit edit = new InsertEdit(pos, (appendComma ? ", " : "") + "\n" + validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class");
+              try {
+                edit.apply(methodBody);
+              }
+              catch (Exception e) {
+                ScoutSdk.logError("could not update method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
+              }
+            }
+            else {
+              ScoutSdk.logWarning("could find insert position for an additional outline in method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.");
+            }
           }
         }
       };
