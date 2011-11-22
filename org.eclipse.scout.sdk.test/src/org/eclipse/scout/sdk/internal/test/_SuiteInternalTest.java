@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.test;
 
 import org.eclipse.scout.sdk.internal.test.bug.beforeopensource._SuiteBugsBeforeOpensource;
 import org.eclipse.scout.sdk.internal.test.operation._SuiteOperation;
+import org.eclipse.scout.sdk.internal.test.presenter._SuitePresenter;
 import org.eclipse.scout.sdk.internal.test.types._SuiteTypes;
 import org.eclipse.scout.sdk.internal.test.util._SuiteUtil;
 import org.junit.runner.RunWith;
@@ -22,6 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({
     _SuiteBugsBeforeOpensource.class,
     _SuiteOperation.class,
+    _SuitePresenter.class,
     _SuiteTypes.class,
     _SuiteUtil.class})
 public class _SuiteInternalTest {

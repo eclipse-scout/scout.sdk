@@ -83,7 +83,9 @@ public class ScoutProposalUtility {
   public static ITypeProposal[] getScoutTypeProposalsFor(IType... types) {
     ITypeProposal[] props = new ITypeProposal[types.length];
     for (int i = 0; i < types.length; i++) {
-      props[i] = new TypeProposal(types[i]);
+      if (types[i] != null) {
+        props[i] = new TypeProposal(types[i]);
+      }
     }
     return props;
   }
