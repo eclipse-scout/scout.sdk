@@ -372,7 +372,7 @@ public abstract class AbstractScoutSdkTest {
 
     }
     catch (IOException e) {
-      Activator.logWarning("could not copare files.", e);
+      Activator.logWarning("could not compare files.", e);
       return false;
     }
     finally {

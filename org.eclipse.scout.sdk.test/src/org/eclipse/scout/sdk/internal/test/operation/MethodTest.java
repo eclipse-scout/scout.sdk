@@ -25,14 +25,12 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * <h1>Bug 77'596</h1>
  * <p>
  */
-@Ignore
 public class MethodTest extends AbstractScoutSdkTest {
 
   @BeforeClass
@@ -102,7 +100,7 @@ public class MethodTest extends AbstractScoutSdkTest {
     Assert.assertTrue(equalContents(refIs, orig.getContents()));
   }
 
-  //@Test
+  @Test
   public void testOverrideFormExecMethods() throws Exception {
     IType testForm = TypeUtility.getType("test.client.ui.forms.Test2Form");
     // stringfield

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,8 +16,7 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
-
-import test.shared.Texts;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 @FormData
 public class Test1Form extends AbstractForm {
@@ -35,7 +34,7 @@ public class Test1Form extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return Texts.get("Test1");
+    return TEXTS.get("Test1");
   }
 
   @Override

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -24,12 +24,12 @@ import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.TEXTS;
 
 import test.client.ui.forms.Test2Form.MainBox.ListboxField;
 import test.client.ui.forms.Test2Form.MainBox.SmartField;
 import test.client.ui.forms.Test2Form.MainBox.StringField;
 import test.client.ui.forms.Test2Form.MainBox.TableField;
-import test.shared.Texts;
 
 @FormData
 public class Test2Form extends AbstractForm {
@@ -42,7 +42,7 @@ public class Test2Form extends AbstractForm {
 
   @Override
   protected String getConfiguredTitle() {
-    return Texts.get("Test2");
+    return TEXTS.get("Test2");
   }
 
   @FormData
@@ -87,13 +87,13 @@ public class Test2Form extends AbstractForm {
 
       @Override
       protected String execParseValue(String text) throws ProcessingException {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
         return null;
       }
 
       @Override
       protected String execValidateValue(String rawValue) throws ProcessingException {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
         return null;
       }
     }
@@ -103,23 +103,23 @@ public class Test2Form extends AbstractForm {
 
       @Override
       protected void execChangedValue() throws ProcessingException {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
       }
 
       @Override
       protected void execDataChanged(Object... dataTypes) throws ProcessingException {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
       }
 
       @Override
       protected String execFormatValue(Long validValue) {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
         return null;
       }
 
       @Override
       protected Long execParseValue(String text) throws ProcessingException {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
         return null;
       }
     }
@@ -128,14 +128,14 @@ public class Test2Form extends AbstractForm {
     public class ListboxField extends AbstractListBox<Long> {
 
       @Override
-      protected String execFormatValue(Long[] validValue) {
-        // TODO
+      protected Long[] execValidateValue(Long[] rawValue) throws ProcessingException {
+        //TODO [${user.name}] Auto-generated method stub.
         return null;
       }
 
       @Override
-      protected Long[] execValidateValue(Long[] rawValue) throws ProcessingException {
-        // TODO
+      protected String execFormatValue(Long[] validValue) {
+        //TODO [${user.name}] Auto-generated method stub.
         return null;
       }
     }
@@ -145,25 +145,25 @@ public class Test2Form extends AbstractForm {
 
       @Override
       protected void execDataChanged(Object... dataTypes) throws ProcessingException {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
       }
 
       @Override
       protected void execSaveUpdatedRow(ITableRow row) throws ProcessingException {
-        // TODO
+        //TODO [${user.name}] Auto-generated method stub.
       }
 
       @Order(10.0)
       public class Table extends AbstractTable {
 
         @Override
-        protected void execDecorateCell(Cell view, ITableRow row, IColumn col) throws ProcessingException {
-          // TODO
+        protected void execDecorateCell(Cell view, ITableRow row, IColumn<?> col) throws ProcessingException {
+          //TODO [${user.name}] Auto-generated method stub.
         }
 
         @Override
         protected void execRowClick(ITableRow row) throws ProcessingException {
-          // TODO
+          //TODO [${user.name}] Auto-generated method stub.
         }
       }
     }

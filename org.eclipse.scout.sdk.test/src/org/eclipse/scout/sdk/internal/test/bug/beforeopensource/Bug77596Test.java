@@ -21,14 +21,12 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * <h1>Bug 77'596</h1>
  * <p>
  */
-@Ignore
 public class Bug77596Test extends AbstractScoutSdkTest {
 
   @BeforeClass

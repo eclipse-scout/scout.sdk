@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -33,7 +32,7 @@ import org.junit.Test;
  * <b>Reason:</b> The way icons are listed in the AbstractIcons.java (Scout framework) and Icons.java (project) has
  * changed. The fields are no more final, but only static.
  */
-@Ignore
+
 public class Bug87486Test extends AbstractScoutSdkTest {
 
   @BeforeClass
@@ -44,11 +43,6 @@ public class Bug87486Test extends AbstractScoutSdkTest {
   @AfterClass
   public static void cleanUpWorkspace() throws Exception {
     deleteProjects("a.client", "a.shared");
-  }
-
-  @Test
-  public void testGetIcon_AbstractIcons_Folder() throws Exception {
-    checkResolveName("tree_node_closed", true);
   }
 
   @Test

@@ -21,10 +21,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class ListBoxFormTest extends AbstractScoutSdkTest {
 
   private IType m_formData;
