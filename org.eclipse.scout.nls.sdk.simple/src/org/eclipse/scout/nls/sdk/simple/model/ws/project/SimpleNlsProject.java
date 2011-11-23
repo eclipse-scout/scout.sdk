@@ -122,15 +122,15 @@ public class SimpleNlsProject extends AbstractNlsProject {
   }
 
   @SuppressWarnings("unchecked")
-private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, String bundleId) throws CoreException {
+  private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, String bundleId) throws CoreException {
     ArrayList<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
     //TODO [mvi]: Platform.getBundle does not find bundles set by a .target file. find other possibility to get the resource?
     Bundle b = Platform.getBundle(bundleId);
-    if(b == null) {
+    if (b == null) {
       NlsCore.logWarning("Bundle " + bundleId + " could not be found in the platform. Will be ignored.");
     }
     else {
-      Enumeration<Object> eee = b.findEntries(nlsType.getTranslationsFolderName(), nlsType.getTranslationsPrefix() + "*.properties", false);
+      Enumeration<Object> eee = (Enumeration<Object>) b.findEntries(nlsType.getTranslationsFolderName(), nlsType.getTranslationsPrefix() + "*.properties", false);
       if (eee != null) {
         while (eee.hasMoreElements()) {
           Object o = eee.nextElement();

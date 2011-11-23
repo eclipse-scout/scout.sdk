@@ -20,12 +20,10 @@ import org.eclipse.scout.nls.sdk.internal.model.PropertyBasedModel;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.ITranslationLocationChooserModel;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.simple.model.ws.project.SimpleNlsProject;
-import org.eclipse.scout.nls.sdk.ui.action.TranslationNewAction;
 
 /**
  * The description to generate a new translation file.
  * 
- * @see TranslationNewAction
  * @see TranslationFileNewDialog
  */
 public class TranslationFileNewModel extends PropertyBasedModel implements ITranslationLocationChooserModel {
