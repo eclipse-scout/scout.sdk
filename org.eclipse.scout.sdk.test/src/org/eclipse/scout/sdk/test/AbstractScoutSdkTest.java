@@ -42,6 +42,7 @@ import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameRequestor;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.test.Activator;
 import org.junit.Assert;
 
@@ -51,6 +52,7 @@ public abstract class AbstractScoutSdkTest {
 
   protected static void setupWorkspace(String baseFolder, String... projects) throws Exception {
     disableAutoBuild();
+    disableAutoFormdataUpdate();
     Assert.assertNotNull("baseFolder must not be null", baseFolder);
 
     if (projects == null || projects.length == 0) {
@@ -64,7 +66,10 @@ public abstract class AbstractScoutSdkTest {
       javaProject.open(null);
       refreshAndBuildProject(javaProject);
     }
+  }
 
+  private static void disableAutoFormdataUpdate() {
+    ScoutSdk.getDefault().setFormDataAutoUpdate(false);
   }
 
   private static void disableAutoBuild() throws CoreException {
