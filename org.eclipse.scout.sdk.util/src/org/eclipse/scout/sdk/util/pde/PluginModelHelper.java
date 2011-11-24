@@ -9,6 +9,7 @@ import java.util.Vector;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -90,6 +91,26 @@ public class PluginModelHelper {
     BuildProperties = new BuildPropertiesPart(model);
   }
 
+  /**
+   * Gets the project associated with this helper.
+   * 
+   * @return The project this helper was created with.
+   */
+  public IProject getProject() {
+    return Manifest.m_model.getProject();
+  }
+
+  private static String getProjectRelativeResourcePath(IResource r) {
+    if (r == null) return null;
+    String entry = r.getProjectRelativePath().toString();
+    if (r.getType() == IResource.FOLDER) {
+      if (!entry.endsWith("/")) {
+        entry = entry + "/";
+      }
+    }
+    return entry;
+  }
+
   public static class ManifestPart {
 
     private final LazyPluginModel m_model;
@@ -132,8 +153,8 @@ public class PluginModelHelper {
 
     /**
      * Adds the given plugin to the dependencies of the project associated with this helper.<br>
-     * If a dependency for the given plugin already exists (even if the existing dependency has different options), this
-     * method does nothing.<br>
+     * If the given plugin is null, empty or a dependency for the given plugin already exists
+     * (even if the existing dependency has different options), this method does nothing.<br>
      * This method is thread safe.
      * 
      * @param pluginId
@@ -146,6 +167,7 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public void addDependency(String pluginId, boolean reexport, boolean optional) throws CoreException {
+      if (pluginId == null || pluginId.length() < 1) return;
       synchronized (m_model.getProject()) {
         if (!existsDependency(pluginId)) {
           IPluginImport imp = m_model.getBundlePluginModel().createImport(pluginId);
@@ -164,12 +186,25 @@ public class PluginModelHelper {
      * @return true if the given plugin is already in the dependency list, false otherwise.
      */
     public boolean existsDependency(String pluginId) {
+      if (pluginId == null || pluginId.length() < 1) return false;
       for (IPluginImport existing : m_model.getPluginBase().getImports()) {
         if (existing.getId().equals(pluginId)) {
           return true; // exists already
         }
       }
       return false;
+    }
+
+    /**
+     * Checks whether the given package is already exported.
+     * 
+     * @param pck
+     *          The package name to check.
+     * @return true, if the given package is exported, false otherwise.
+     */
+    public boolean existsExportPackage(IPackageFragment pck) {
+      if (pck == null) return false;
+      return existsExportPackage(pck.getElementName());
     }
 
     /**
@@ -180,6 +215,7 @@ public class PluginModelHelper {
      * @return true, if the given package is exported, false otherwise.
      */
     public boolean existsExportPackage(String packageName) {
+      if (packageName == null || packageName.length() < 1) return false;
       ExportPackageHeader expHeader = getExportPackageHeader();
       return existsExportPackage(packageName, expHeader);
     }
@@ -190,13 +226,14 @@ public class PluginModelHelper {
 
     /**
      * Adds the given package to the exported packages of the project associated with this helper.<br>
-     * If the given package is already in the exported list, this method does nothing.<br>
+     * If the given package is null, empty or already in the exported list, this method does nothing.<br>
      * This method is thread safe.
      * 
      * @param packageName
      *          The fully qualified name of the package.
      */
     public void addExportPackage(String packageName) {
+      if (packageName == null || packageName.length() < 1) return;
       synchronized (m_model.getProject()) {
         ExportPackageHeader expHeader = getExportPackageHeader();
         if (!existsExportPackage(packageName, expHeader)) {
@@ -218,22 +255,26 @@ public class PluginModelHelper {
     }
 
     /**
-     * Removes the given package from the exported packages list of the project associated with this helper.
+     * Removes the given package from the exported packages list of the project associated with this helper.<br>
+     * This method does nothing if the give package is null.
      * 
      * @param pck
      *          The package to remove
      */
     public void removeExportPackage(IPackageFragment pck) {
+      if (pck == null) return;
       removeExportPackage(pck.getElementName());
     }
 
     /**
-     * Removes the given package from the exported packages list of the project associated with this helper.
+     * Removes the given package from the exported packages list of the project associated with this helper.<br>
+     * This method does nothing if the give package is null or empty.
      * 
      * @param packageName
      *          The fully qualified name of the package
      */
     public void removeExportPackage(String packageName) {
+      if (packageName == null || packageName.length() < 1) return;
       ExportPackageHeader expHeader = getExportPackageHeader();
       expHeader.removePackage(packageName);
       setEntryValue(Constants.EXPORT_PACKAGE, expHeader.getValue());
@@ -250,7 +291,8 @@ public class PluginModelHelper {
     }
 
     /**
-     * Creates or updates the given manifest header key to the given value.
+     * Creates or updates the given manifest header key to the given value.<br>
+     * This method does nothing if the given key is null or empty.
      * 
      * @param key
      *          The key. Will be created if it does not exist.
@@ -258,11 +300,13 @@ public class PluginModelHelper {
      *          The value that should be set for the given key. if value is null, the key is removed from the manifest.
      */
     public void setEntryValue(String key, String value) {
+      if (key == null || key.length() < 1) return;
       m_model.getBundle().setHeader(key, value);
     }
 
     /**
-     * Removes the given key from the manifest.
+     * Removes the given key from the manifest.<br>
+     * This method does nothing if the given key is null or empty.
      * 
      * @param key
      *          The key to remove.
@@ -295,12 +339,27 @@ public class PluginModelHelper {
     }
 
     /**
-     * Removes the given entry from the classpath.
+     * Removes the given entry from the classpath.<br>
+     * If a null resource is passed, this method does nothing.
+     * 
+     * @param resource
+     *          The entry to remove.
+     */
+    public void removeClasspathEntry(IResource resource) {
+      if (resource == null) return;
+      removeClasspathEntry(getProjectRelativeResourcePath(resource));
+    }
+
+    /**
+     * Removes the given entry from the classpath.<br>
+     * If a null entry or empty entry is passed, this method does nothing.
      * 
      * @param entry
      *          The entry to remove.
      */
     public void removeClasspathEntry(String entry) {
+      if (entry == null || entry.length() < 1) return;
+
       BundleClasspathHeader h = getBundleClasspathHeader();
       h.removeLibrary(entry);
       setEntryValue(Constants.BUNDLE_CLASSPATH, h.getValue());
@@ -317,11 +376,24 @@ public class PluginModelHelper {
     /**
      * Checks whether the given entry is already in the classpath entries of the project associated with this helper.
      * 
+     * @param resource
+     *          The entry to search
+     * @return false if the resource is null or does not exist, true otherwise.
+     */
+    public boolean existsClasspathEntry(IResource resource) {
+      if (resource == null) return false;
+      return existsClasspathEntry(getProjectRelativeResourcePath(resource));
+    }
+
+    /**
+     * Checks whether the given entry is already in the classpath entries of the project associated with this helper.
+     * 
      * @param entry
      *          The entry to search.
      * @return true if the given entry already exists, false otherwise.
      */
     public boolean existsClasspathEntry(String entry) {
+      if (entry == null || entry.length() < 1) return false;
       for (String e : getClasspathEntries()) {
         if (e.equals(entry)) return true;
       }
@@ -330,13 +402,28 @@ public class PluginModelHelper {
 
     /**
      * Adds the given classpath entry to the classpath of the project associated with this helper.<br>
-     * If the given entry already exists, this method does nothing.<br>
+     * If the resource is null, does not exist in the project or is already in the classpath, this method does nothing.<br>
+     * This method is thread safe.
+     * 
+     * @param resource
+     *          The classpath entry to add.
+     */
+    public void addClasspathEntry(IResource resource) {
+      if (resource == null) return;
+      if (!resource.exists()) return;
+      addClasspathEntry(getProjectRelativeResourcePath(resource));
+    }
+
+    /**
+     * Adds the given classpath entry to the classpath of the project associated with this helper.<br>
+     * If the given entry is null, an empty string or already exists in the classpath, this method does nothing.<br>
      * This method is thread safe.
      * 
      * @param entry
      *          The classpath entry to add.
      */
     public void addClasspathEntry(String entry) {
+      if (entry == null || entry.length() < 1) return;
       synchronized (m_model.getProject()) {
         if (!existsClasspathEntry(entry)) {
           BundleClasspathHeader h = getBundleClasspathHeader();
@@ -347,22 +434,26 @@ public class PluginModelHelper {
     }
 
     /**
-     * Sets the version of the plugin to the given value.
+     * Sets the version of the plugin to the given value.<br>
+     * If the given value is null, this method does nothing.
      * 
      * @param newVersion
      *          the new version
      */
     public void setVersion(Version newVersion) {
+      if (newVersion == null) return;
       setVersion(newVersion.toString());
     }
 
     /**
-     * Sets the version of the plugin to the given value.
+     * Sets the version of the plugin to the given value.<br>
+     * If the given value is empty or null, this method does nothing.
      * 
      * @param newVersion
      *          the new version
      */
     public void setVersion(String newVersion) {
+      if (newVersion == null || newVersion.length() < 1) return;
       setEntryValue(Constants.BUNDLE_VERSION, newVersion);
     }
 
@@ -702,13 +793,28 @@ public class PluginModelHelper {
     }
 
     /**
-     * Removes the given token from the binary build includes list.
+     * Removes the given resource from the binary build includes list.<br>
+     * If the resource is null, this method does nothing.
+     * 
+     * @param resource
+     *          The resource to remove.
+     * @throws CoreException
+     */
+    public void removeBinaryBuildEntry(IResource resource) throws CoreException {
+      if (resource == null) return;
+      removeBinaryBuildEntry(getProjectRelativeResourcePath(resource));
+    }
+
+    /**
+     * Removes the given token from the binary build includes list.<br>
+     * If the token is null or empty, this method does nothing.
      * 
      * @param token
      *          The token to remove.
      * @throws CoreException
      */
     public void removeBinaryBuildEntry(String token) throws CoreException {
+      if (token == null || token.length() < 1) return;
       IBuildEntry entry = m_model.getBuildModel().getBuild().getEntry(BINARY_BUILD_INCLUDES);
       if (entry != null) {
         entry.removeToken(token);
@@ -738,6 +844,20 @@ public class PluginModelHelper {
     }
 
     /**
+     * Checks whether the given resource exists in the binary build includes list of the project associated with this
+     * helper.
+     * 
+     * @param resource
+     *          The resource to search.
+     * @return true if the given resource is already in the binary build includes list, false otherwise.
+     * @throws CoreException
+     */
+    public boolean existsBinaryBuildEntry(IResource resource) throws CoreException {
+      if (resource == null) return false;
+      return existsBinaryBuildEntry(getProjectRelativeResourcePath(resource));
+    }
+
+    /**
      * Checks whether the given token exists in the binary build includes list of the project associated with this
      * helper.
      * 
@@ -747,6 +867,7 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public boolean existsBinaryBuildEntry(String token) throws CoreException {
+      if (token == null || token.length() < 1) return false;
       IBuildEntry entry = getBuildEntry(BINARY_BUILD_INCLUDES);
       return entry.contains(token);
     }
@@ -754,7 +875,23 @@ public class PluginModelHelper {
     /**
      * Adds the given token to the binary build includes.<br>
      * If no "bin.includes" exists, it is created.<br>
-     * If the token is already in the list, this method does nothing.<br>
+     * If the token is null, does not exist or is already in the list, this method does nothing.<br>
+     * This method is thread safe.
+     * 
+     * @param resource
+     *          The resource to add.
+     * @throws CoreException
+     */
+    public void addBinaryBuildEntry(IResource resource) throws CoreException {
+      if (resource == null) return;
+      if (!resource.exists()) return;
+      addBinaryBuildEntry(getProjectRelativeResourcePath(resource));
+    }
+
+    /**
+     * Adds the given token to the binary build includes.<br>
+     * If no "bin.includes" exists, it is created.<br>
+     * If the token is null, empty or is already in the list, this method does nothing.<br>
      * This method is thread safe.
      * 
      * @param token
@@ -762,6 +899,7 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public void addBinaryBuildEntry(String token) throws CoreException {
+      if (token == null || token.length() < 1) return;
       synchronized (m_model.getProject()) {
         IBuildEntry entry = getBuildEntry(BINARY_BUILD_INCLUDES);
         if (!entry.contains(token)) {
