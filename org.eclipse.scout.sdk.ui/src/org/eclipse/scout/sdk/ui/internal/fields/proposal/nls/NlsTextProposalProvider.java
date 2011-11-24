@@ -46,23 +46,6 @@ public class NlsTextProposalProvider implements IContentProposalProvider {
     m_proposals = proposals.values().toArray(new NlsProposal[proposals.size()]);
   }
 
-  // public void setProjectGroup(IBsiCaseProjectGroup group){
-  // m_group = group;
-  // m_language = BsiCaseProperties.getProjectGroupNlsLanguage(m_group);
-  // try {
-  // INlsEntry[] entries = m_group.getSharedProject().getAllNlsEntries();
-  // TreeMap<CompositeObject, NlsProposal> proposals = new TreeMap<CompositeObject, NlsProposal>();
-  // for (INlsEntry entry : entries) {
-  // NlsTuple t = new NlsTuple(entry, m_language);
-  // proposals.put(new CompositeObject(t.getText(), t.getKey()), new NlsProposal(t));
-  // }
-  // m_proposals = proposals.values().toArray(new NlsProposal[proposals.size()]);
-  // } catch (Exception e) {
-  // ScoutSdkUi.logError("could not find nls project of case group '"+m_group.getGroupId()+"'",e );
-  // m_proposals = new NlsProposal[0];
-  // }
-  // }
-
   @Override
   public IContentProposalEx[] getProposals(String content, int cursorPosition, IProgressMonitor monitor) {
     ArrayList<IContentProposalEx> props = new ArrayList<IContentProposalEx>();
@@ -76,7 +59,7 @@ public class NlsTextProposalProvider implements IContentProposalProvider {
       else {
         // also check all languages
         for (String s : prop.getNlsEntry().getAllTranslations().values()) {
-          if (CharOperation.match(matchString.toCharArray(), s.toCharArray(), false)) {
+          if (s != null && CharOperation.match(matchString.toCharArray(), s.toCharArray(), false)) {
             props.add(prop);
             break;
           }

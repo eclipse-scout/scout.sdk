@@ -54,11 +54,13 @@ public class NlsProposalTextField extends ProposalTextField {
     });
     getTextComponent().setMenu(menu);
     setProposalDescriptionProvider(new NlsProposalDescriptionProvider());
+    setEnabled(getNlsProject() != null);
   }
 
   @Override
   protected void handleCustomProposalSelected(ICustomProposal proposal) {
     // for new proposals
+    if (getNlsProject() == null) return;
     if (proposal instanceof NlsNewProposal) {
       String proposalFieldText = "";
       if (getLastRequestPattern() != null) {
@@ -91,7 +93,7 @@ public class NlsProposalTextField extends ProposalTextField {
   }
 
   protected String getNewKey(String value) {
-    List<String> existingKeys = Arrays.asList(getNlsProject().getAllKeys());// NlsCore.getAllEntries(getProjectGroup().getSharedProject().getNlsProject()).keySet();
+    List<String> existingKeys = Arrays.asList(getNlsProject().getAllKeys());
 
     if (value == null || value.length() == 0) {
       return null;
