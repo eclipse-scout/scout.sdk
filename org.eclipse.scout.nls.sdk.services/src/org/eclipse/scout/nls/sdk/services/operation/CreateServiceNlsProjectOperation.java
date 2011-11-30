@@ -95,6 +95,9 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     methodOp.setSimpleBody("return \"" + CreateSimpleNlsProjectOperation.getResourcePathString(getTranslationFolder(), getTranslationFilePrefix()) + "\";");
     methodOp.validate();
     methodOp.run(monitor, workingCopyManager);
+
+    // we have changed the NLS service hierarchy: clear the cache so that it will be re-created next time including our just created service.
+    getBundle().getScoutProject().clearNlsProjectCache();
   }
 
   public IType getSuperType() {

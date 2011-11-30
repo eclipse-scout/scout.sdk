@@ -128,14 +128,9 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     Group g = new Group(p, SWT.NONE);
     g.setText(Texts.get("Column"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, null, Texts.get("Name"));
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(m_declaringType);
-    if (nlsProject != null) {
-      m_nlsNameField.setNlsProject(nlsProject);
-    }
-    else {
-      m_nlsNameField.setEnabled(false);
-    }
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, null, Texts.get("Name"));
+    m_nlsNameField.setNlsProject(nlsProject);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

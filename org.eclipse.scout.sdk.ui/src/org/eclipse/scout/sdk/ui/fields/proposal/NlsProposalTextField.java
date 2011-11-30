@@ -137,6 +137,7 @@ public class NlsProposalTextField extends ProposalTextField {
         getProposalProvider().setNlsEntries(m_nlsProject.getAllEntries(), getNlsProject().getDevelopmentLanguage());
       }
     }
+    setEnabled(getNlsProject() != null);
   }
 
   public INlsProject getNlsProject() {

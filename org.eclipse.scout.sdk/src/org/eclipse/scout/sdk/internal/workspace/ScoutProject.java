@@ -226,7 +226,7 @@ public class ScoutProject implements IScoutProject {
   }
 
   @Override
-  public INlsProject getNlsProject() {
+  public synchronized INlsProject getNlsProject() {
     if (m_nlsProject == null && getSharedBundle() != null) {
       try {
         m_nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.TEXTS), this});
@@ -239,7 +239,14 @@ public class ScoutProject implements IScoutProject {
   }
 
   @Override
-  public INlsProject getDocsNlsProject() {
+  public synchronized void clearNlsProjectCache() {
+    m_nlsProject = null;
+    m_docsNlsProject = null;
+    m_docsNlsProjectInitialized = false;
+  }
+
+  @Override
+  public synchronized INlsProject getDocsNlsProject() {
     // a lot of projects do not have a documentation text provider. then the getNlsProjects will return null -> nls workspace would be triggered each time.
     if (!m_docsNlsProjectInitialized && getSharedBundle() != null) {
       try {

@@ -48,6 +48,8 @@ public interface IScoutProject extends IScoutContainer {
 
   INlsProject getNlsProject();
 
+  void clearNlsProjectCache();
+
   INlsProject getDocsNlsProject();
 
   /**

@@ -41,7 +41,7 @@ public class TextProviderServiceDeleteAction extends AbstractScoutHandler {
     if (box.open() == SWT.OK) {
       for (IPage page : selection) {
         TextServiceNodePage p = (TextServiceNodePage) page;
-        DeleteServiceNlsProjectOperation o = new DeleteServiceNlsProjectOperation(p.getType());
+        DeleteServiceNlsProjectOperation o = new DeleteServiceNlsProjectOperation(p.getType(), p.getScoutResource());
         o.validate();
         OperationJob job = new OperationJob(o);
         job.schedule();

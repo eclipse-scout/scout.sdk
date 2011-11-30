@@ -24,13 +24,16 @@ import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceDeleteOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class DeleteServiceNlsProjectOperation implements IOperation {
 
   private final IType m_serviceClass;
+  private final IScoutBundle m_scoutBundle;
 
-  public DeleteServiceNlsProjectOperation(IType serviceType) {
+  public DeleteServiceNlsProjectOperation(IType serviceType, IScoutBundle bundle) {
     m_serviceClass = serviceType;
+    m_scoutBundle = bundle;
   }
 
   @Override
@@ -44,13 +47,12 @@ public class DeleteServiceNlsProjectOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    final NlsServiceType t = new NlsServiceType(m_serviceClass);
+    final NlsServiceType t = new NlsServiceType(getServiceClass());
     if (t.getJavaProject() != null && t.getTranslationsFolderName() != null) {
       IProject p = t.getJavaProject().getProject();
       final IFolder propertiesFolder = p.getFolder(t.getTranslationsFolderName());
 
       // ensure sync
-      //p.refreshLocal(IResource.DEPTH_INFINITE, monitor);
       propertiesFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
       // collect resources to delete
@@ -83,13 +85,24 @@ public class DeleteServiceNlsProjectOperation implements IOperation {
       }
 
       ServiceDeleteOperation del = new ServiceDeleteOperation();
-      del.setServiceImplementation(m_serviceClass);
+      del.setServiceImplementation(getServiceClass());
       del.setAdditionalResourcesToBeDeleted(filesToDelete.toArray(new IResource[filesToDelete.size()]));
       del.validate();
       del.run(monitor, workingCopyManager);
+
+      // we have changed the NLS service hierarchy: clear the cache so that it will be re-created next time without the one we just deleted.
+      getScoutBundle().getScoutProject().clearNlsProjectCache();
     }
     else {
       NlsCore.logWarning("Invalid Text Provider Service to be deleted. Cannot parse the resources.");
     }
+  }
+
+  public IScoutBundle getScoutBundle() {
+    return m_scoutBundle;
+  }
+
+  public IType getServiceClass() {
+    return m_serviceClass;
   }
 }
