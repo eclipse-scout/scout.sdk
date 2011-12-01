@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.scout.sdk.test.feature"
+      label="%featureName"
+      version="3.7.1.qualifier"
+      provider-name="%providerName">
+
+   <description>
+      Scout SDK Test
+   </description>
+
+   <copyright>
+      Copyright (c) 2010 BSI Business Systems Integration AG.
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License
+v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html
+Contributors:
+BSI Business Systems Integration AG - initial API and implementation
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="Indigo" url="http://download.eclipse.org/releases/indigo"/>
+      <discovery label="Indigo" url="http://download.eclipse.org/releases/indigo"/>
+      <discovery label="Orbit" url="http://download.eclipse.org/tools/orbit/downloads/drops/updateSite"/>
+   </url>
+
+   <includes
+         id="org.eclipse.scout.sdk.test.feature.source"
+         version="0.0.0"
+         optional="true"/>
+
+   <requires>
+      <import feature="org.eclipse.scout.sdk.feature" version="3.5.0" match="compatible"/>
+      <import feature="org.eclipse.scout.sdk.feature.source" version="3.5.0" match="compatible"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.scout.sdk.test"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.rt.testing.shared"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>
