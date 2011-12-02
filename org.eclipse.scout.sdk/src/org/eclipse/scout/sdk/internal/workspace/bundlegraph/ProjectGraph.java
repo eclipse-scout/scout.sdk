@@ -42,11 +42,11 @@ public class ProjectGraph {
     m_projectLinks = new HashMap<ScoutProject, ProjectGraphNode>();
   }
 
-  public ProjectGraphNode getRootNode() {
+  public synchronized ProjectGraphNode getRootNode() {
     return m_invisibleRoot;
   }
 
-  public ScoutProject[] getRootProjects() {
+  public synchronized ScoutProject[] getRootProjects() {
     ArrayList<ScoutProject> projects = new ArrayList<ScoutProject>();
     for (ProjectGraphNode n : m_invisibleRoot.getSubProjects()) {
       projects.add(n.getScoutProject());
@@ -54,7 +54,7 @@ public class ProjectGraph {
     return projects.toArray(new ScoutProject[projects.size()]);
   }
 
-  public ScoutProject[] getSubProjects(IScoutProject project) {
+  public synchronized ScoutProject[] getSubProjects(IScoutProject project) {
     ArrayList<ScoutProject> projects = new ArrayList<ScoutProject>();
     ProjectGraphNode node = m_projectLinks.get(project);
     for (ProjectGraphNode n : node.getSubProjects()) {
@@ -63,7 +63,7 @@ public class ProjectGraph {
     return projects.toArray(new ScoutProject[projects.size()]);
   }
 
-  public ScoutProject getParentProject(ScoutProject project) {
+  public synchronized ScoutProject getParentProject(ScoutProject project) {
     ProjectGraphNode node = m_projectLinks.get(project);
     if (node != null) {
       return node.getParentProject().getScoutProject();
@@ -71,13 +71,13 @@ public class ProjectGraph {
     return null;
   }
 
-  public ProjectGraphNode getProjectNode(IScoutBundle bundle) {
+  public synchronized ProjectGraphNode getProjectNode(IScoutBundle bundle) {
     return m_bundleLinks.get(bundle);
   }
 
   // build tree
 
-  public void buildGraph(BundleGraph bundleGraph, ScoutWorkspaceEventList eventCollector) {
+  public synchronized void buildGraph(BundleGraph bundleGraph, ScoutWorkspaceEventList eventCollector) {
     HashMap<String, ScoutProject> backupProjects = new HashMap<String, ScoutProject>();
     for (ScoutProject p : m_projectLinks.keySet()) {
       backupProjects.put(p.getProjectName(), p);

@@ -14,16 +14,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
+import org.eclipse.pde.core.plugin.ModelEntry;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.internal.core.IPluginModelListener;
+import org.eclipse.pde.internal.core.PDECore;
+import org.eclipse.pde.internal.core.PluginModelDelta;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.BundleGraph;
 import org.eclipse.scout.sdk.internal.workspace.bundlegraph.BundleGraphNode;
@@ -40,6 +38,7 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 /**
  *
  */
+@SuppressWarnings("restriction")
 public final class ScoutWorkspace implements IScoutWorkspace {
   private EventListenerList m_eventListeners = new EventListenerList();
 
@@ -51,7 +50,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   private ScoutWorkspace() {
     m_bundleGraph = new BundleGraph();
     m_projectGraph = new ProjectGraph();
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(new P_ProjectDiscoveryListener());
+    PDECore.getDefault().getModelManager().addPluginModelListener(new P_PluginModelListener());
     // init
     ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
     for (IPluginModelBase m : PluginRegistry.getWorkspaceModels()) {
@@ -137,7 +136,6 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   public int getBundleType(ScoutBundle scoutBundle) {
-
     BundleGraphNode node = m_bundleGraph.getNode(scoutBundle);
     if (node != null) {
       return node.getNodeType();
@@ -256,18 +254,24 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   private boolean handleProjectAdded(IProject project) throws CoreException {
-    if (project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature")) {
-      if (project.isOpen() && project.exists()) {
-        ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
-        boolean result = addProjectNoFire(project, eventCollector);
-        if (result) {
-          rebuildGraphNoFire(eventCollector);
-          fireWorkspaceEvnets(eventCollector.getAllEvents());
+    try {
+      if (project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature")) {
+        if (project.isOpen() && project.exists()) {
+          ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
+          boolean result = addProjectNoFire(project, eventCollector);
+          if (result) {
+            rebuildGraphNoFire(eventCollector);
+            fireWorkspaceEvnets(eventCollector.getAllEvents());
+          }
+          return result;
         }
-        return result;
       }
     }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
     return false;
+
   }
 
   private boolean addProjectNoFire(IProject project, ScoutWorkspaceEventList eventCollector) throws CoreException {
@@ -283,22 +287,20 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   private void handleProjectChanged(IProject project) throws CoreException {
-    if (project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature")) {
-      if (project.isOpen() && project.exists()) {
-        ScoutBundle scoutBundle = m_bundleGraph.getScoutBundle(project);
-        if (scoutBundle == null) {
-          handleProjectAdded(project);
-        }
-        else if (scoutBundle.hasDependencyChanges()) {
-          rebuildGraph();
-        }
+    if (project.exists() && project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature")) {
+      ScoutBundle scoutBundle = m_bundleGraph.getScoutBundle(project);
+      if (scoutBundle == null) {
+        handleProjectAdded(project);
+      }
+      else if (scoutBundle.hasDependencyChanges()) {
+        rebuildGraph();
       }
     }
   }
 
-  private boolean handleProjectRemoved(IProject project) {
+  private boolean handleProjectRemoved(String bundleId) {
     ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
-    ScoutBundle bundle = m_bundleGraph.removeWorkspaceProject(project, eventCollector);
+    ScoutBundle bundle = m_bundleGraph.removeWorkspaceProject(bundleId, eventCollector);
     if (bundle != null) {
       rebuildGraphNoFire(eventCollector);
       fireWorkspaceEvnets(eventCollector.getAllEvents());
@@ -307,66 +309,42 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     return false;
   }
 
-  private class P_ProjectDiscoveryListener extends ResourceChangeListenerWithVisitor {
+  /**
+   *
+   */
+  private final class P_PluginModelListener implements IPluginModelListener {
     @Override
-    public void beforeChange(IResource r, int type) {
+    public void modelsChanged(PluginModelDelta delta) {
       try {
-        if (r instanceof IProject) {
-          final IProject p = (IProject) r;
-          switch (type) {
-            case IResourceChangeEvent.PRE_CLOSE:
-            case IResourceChangeEvent.PRE_DELETE:
-              // do not queue later, project is then gone
-              handleProjectRemoved(p);
-              break;
-
+        // process add events
+        if ((delta.getKind() & PluginModelDelta.ADDED) != 0) {
+          for (ModelEntry e : delta.getAddedEntries()) {
+            IPluginModelBase modelBase = e.getModel();
+            if (modelBase.getUnderlyingResource() != null) {
+              handleProjectAdded(modelBase.getUnderlyingResource().getProject());
+            }
           }
         }
-      }
-      catch (Exception e) {
-        ScoutSdk.logWarning("could not process resource change", e);
-      }
-    }
-
-    @Override
-    public void afterChange(IResource r, int type) {
-    }
-
-    @Override
-    public boolean visitDelta(IResourceDelta delta) {
-      try {
-        if (delta.getResource().getType() == IResource.PROJECT) {
-          final IProject p = (IProject) delta.getResource();
-          switch (delta.getKind()) {
-            case IResourceDelta.ADDED:
-            case IResourceDelta.OPEN:
-              handleProjectAdded(p);
-              break;
-            case IResourceDelta.CHANGED:
-              final BooleanHolder holder = new BooleanHolder(false);
-              delta.accept(new IResourceDeltaVisitor() {
-                @Override
-                public boolean visit(IResourceDelta innerDelta) throws CoreException {
-                  if (innerDelta.getResource().getName().equals("MANIFEST.MF")) {
-                    holder.setValue(true);
-                    return false;
-                  }
-                  return true;
-                }
-              });
-              if (holder.getValue()) {
-                handleProjectChanged(p);
-              }
-              break;
+        // process change events
+        if ((delta.getKind() & PluginModelDelta.CHANGED) != 0) {
+          for (ModelEntry e : delta.getChangedEntries()) {
+            IPluginModelBase modelBase = e.getModel();
+            if (modelBase.getUnderlyingResource() != null) {
+              handleProjectChanged(modelBase.getUnderlyingResource().getProject());
+            }
           }
         }
+        // removed
+        if ((delta.getKind() & PluginModelDelta.REMOVED) != 0) {
+          for (ModelEntry e : delta.getRemovedEntries()) {
+            handleProjectRemoved(e.getId());
+          }
+        }
+
       }
-      catch (Exception e) {
-        ScoutSdk.logWarning("could not process resource change", e);
+      catch (CoreException e) {
+        ScoutSdk.logError("error updating scout workspace.", e);
       }
-      return true;
     }
-
-  } // end class P_ProjectDiscoveryListener
-
+  }
 }

@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
@@ -74,6 +75,14 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
     ICompilationUnit icu = pck.getCompilationUnit(getTypeName() + ".java");
     if (!TypeUtility.exists(icu)) {
       icu = pck.createCompilationUnit(getTypeName() + ".java", "", true, monitor);
+    }
+    else {
+      // remove old types
+      JavaElementDeleteOperation op = new JavaElementDeleteOperation();
+      for (IJavaElement e : icu.getChildren()) {
+        op.addMember(e);
+      }
+      op.run(monitor, workingCopyManager);
     }
     workingCopyManager.register(icu, monitor);
     icu.createPackageDeclaration(pck.getElementName(), monitor);

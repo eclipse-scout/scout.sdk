@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceDescription;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -51,10 +52,9 @@ public abstract class AbstractScoutSdkTest {
   private static final String RESOURCES_FOLDER_NAME = "resources";
 
   protected static void setupWorkspace(String baseFolder, String... projects) throws Exception {
-    disableAutoBuild();
-    disableAutoFormdataUpdate();
+    setAutoBuild(false);
+    setAutoUpdateFormData(false);
     Assert.assertNotNull("baseFolder must not be null", baseFolder);
-
     if (projects == null || projects.length == 0) {
       projects = new String[]{null};
     }
@@ -68,16 +68,23 @@ public abstract class AbstractScoutSdkTest {
     }
   }
 
-  private static void disableAutoFormdataUpdate() {
-    ScoutSdk.getDefault().setFormDataAutoUpdate(false);
+  protected static void setAutoUpdateFormData(boolean autoBuild) {
+    ScoutSdk.getDefault().setFormDataAutoUpdate(autoBuild);
   }
 
-  private static void disableAutoBuild() throws CoreException {
+  protected static void setAutoBuild(boolean autoBuild) throws CoreException {
     IWorkspaceDescription description = ResourcesPlugin.getWorkspace().getDescription();
-    if (description.isAutoBuilding()) {
-      description.setAutoBuilding(false);
+    if (description.isAutoBuilding() != autoBuild) {
+      description.setAutoBuilding(autoBuild);
       ResourcesPlugin.getWorkspace().setDescription(description);
     }
+  }
+
+  protected static void buildWorkspace() throws Exception {
+    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
+    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
+    waitForManualBuild();
+    waitForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
   }
 
   protected static void deleteProjects(final String... projectNames) throws Exception {
@@ -100,7 +107,10 @@ public abstract class AbstractScoutSdkTest {
   }
 
   protected static void deleteProject(String name) throws Exception {
-    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
+    deleteProject(ResourcesPlugin.getWorkspace().getRoot().getProject(name));
+  }
+
+  protected static void deleteProject(IProject project) throws Exception {
     if (project == null) {
       return;
     }
@@ -225,6 +235,15 @@ public abstract class AbstractScoutSdkTest {
       }
     }
     return true;
+  }
+
+  protected static void clearWorkspace() throws Exception {
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    for (IProject p : root.getProjects()) {
+      deleteProject(p);
+    }
+    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+    waitForManualRefresh();
   }
 
   public static void deleteAndWaitUntilDeleted(IResource resource) throws Exception {
