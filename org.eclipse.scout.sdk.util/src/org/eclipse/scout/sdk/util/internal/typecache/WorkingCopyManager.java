@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>BCWorkingCopyLevel</h3> ...
+ * <h3>WorkingCopyManager</h3> ...
  */
 @SuppressWarnings("restriction")
 public class WorkingCopyManager implements IWorkingCopyManager {
@@ -78,19 +78,12 @@ public class WorkingCopyManager implements IWorkingCopyManager {
         }
       }
       //
-      //boolean wellform = false;
       synchronized (LOCK) {
         /*wellform = */m_wellformWorkingCopies.remove(icu);
       }
       if (!icu.exists()) {
         return;
       }
-      //if (!monitor.isCanceled() && wellform) {
-      // wellform asynchronous in workspace rule
-      // ProcessJob job = new ProcessJob(new WellformCompilationUnitOperation(icu));
-      // job.schedule();
-
-      //}
       synchronized (LOCK) {
         m_workingCopies.remove(icu);
       }

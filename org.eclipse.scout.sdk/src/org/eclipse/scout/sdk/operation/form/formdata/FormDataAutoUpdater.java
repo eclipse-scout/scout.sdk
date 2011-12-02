@@ -51,7 +51,6 @@ public class FormDataAutoUpdater {
 
   public FormDataAutoUpdater() {
     m_pendingCompilationUnits = new HashSet<ICompilationUnit>();
-    m_resourceChangedListener = new P_ResourceChangedListener();
   }
 
   public void dispose() {
@@ -76,14 +75,18 @@ public class FormDataAutoUpdater {
    * @param enabled
    *          the enabled to set
    */
-  public void setEnabled(boolean enabled) {
-    if (m_enabled != enabled) {
-      m_enabled = enabled;
-      if (m_enabled) {
+  public synchronized void setEnabled(boolean enabled) {
+    m_enabled = enabled;
+    if (m_enabled) {
+      if (m_resourceChangedListener == null) {
+        m_resourceChangedListener = new P_ResourceChangedListener();
         ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangedListener);
       }
-      else {
+    }
+    else {
+      if (m_resourceChangedListener != null) {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_resourceChangedListener);
+        m_resourceChangedListener = null;
       }
     }
   }

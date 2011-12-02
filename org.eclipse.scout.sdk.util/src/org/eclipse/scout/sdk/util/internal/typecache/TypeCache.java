@@ -108,7 +108,7 @@ public final class TypeCache implements ITypeCache {
         Iterator<IType> it = types.iterator();
         while (it.hasNext()) {
           IType type = it.next();
-          if (type != null && !type.exists()) {
+          if (type == null || !type.exists()) {
             it.remove();
           }
         }
@@ -173,7 +173,7 @@ public final class TypeCache implements ITypeCache {
 
               IType t = (IType) typeMatch.getElement();
 //              matchList.put(new CompositeLong(t.isBinary() ? 1 : 0, matchList.size()), t);
-              if (t.getFullyQualifiedName('.').indexOf(fqn) >= 0) {
+              if (t.exists() && t.getFullyQualifiedName('.').indexOf(fqn) >= 0) {
                 matchList.put(new CompositeLong(t.isBinary() ? 1 : 0, matchList.size()), t);
               }
             }

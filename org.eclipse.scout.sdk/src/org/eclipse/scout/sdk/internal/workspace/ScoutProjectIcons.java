@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutFileLocator;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -156,9 +157,7 @@ public class ScoutProjectIcons implements IIconProvider {
             collector.put(iconSimpleName, new ScoutIconDesc(field.getElementName(), Regex.getIconSimpleName(iconSimpleName), field, inherited));
           }
           catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(iconDeclaration);
-            // TODO: handle exception
+            ScoutSdk.logError(e);
           }
         }
       }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -29,8 +29,8 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
 
   private List<IOperation> m_operations;
 
-  public OperationJob(IOperation operation) {
-    this(Arrays.asList(new IOperation[]{operation}));
+  public OperationJob(IOperation... operations) {
+    this(Arrays.asList(operations));
   }
 
   public OperationJob(Collection<IOperation> operations) {

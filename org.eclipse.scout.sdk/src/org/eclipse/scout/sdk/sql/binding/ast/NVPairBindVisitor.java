@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.StringLiteral;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.model.BindBaseNVPair;
 import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
@@ -46,7 +47,7 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
   @Override
   public void preVisit(ASTNode node) {
     if (m_debug && !m_canceled) {
-      System.out.println(m_indent + "bindBaseRef " + node.getNodeType() + "  " + node + "     ");
+      ScoutSdk.logInfo(m_indent + "bindBaseRef " + node.getNodeType() + "  " + node + "     ");
       m_indent += "  ";
     }
   }
@@ -55,7 +56,7 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
   public void postVisit(ASTNode node) {
     if (m_debug && !m_canceled) {
       m_indent = m_indent.replaceFirst("\\s\\s$", "");
-      System.out.println(m_indent + "end " + node.getNodeType());
+      ScoutSdk.logInfo(m_indent + "end " + node.getNodeType());
     }
   }
 

@@ -231,7 +231,6 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       ScoutSdkUi.logError("error during waiting for auto build and refresh");
     }
     getWizard().setCreatedProject(ScoutSdkCore.getScoutWorkspace().findScoutProject(getWizard().getProjectWizardPage().getProjectName()));
-
     return true;
   }
 

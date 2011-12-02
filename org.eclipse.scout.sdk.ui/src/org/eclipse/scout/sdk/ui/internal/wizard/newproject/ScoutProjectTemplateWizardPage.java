@@ -104,7 +104,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
       performFinishJob.join();
     }
     catch (InterruptedException e) {
-      ScoutSdkUi.logWarning("perform finish job of Project Template step get canceled.",e);
+      ScoutSdkUi.logWarning("perform finish job of Project Template step get canceled.", e);
       return false;
     }
     return true;

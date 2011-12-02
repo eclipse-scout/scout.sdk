@@ -72,10 +72,6 @@ public class ProjectTemplateExtensionPoint {
         }
       }
     }
-    int i = 0;
-    for (ProjectTemplateExtension ext : m_extensions) {
-      System.out.println(i++ + " " + ext.getTemplate().getClass().getName() + " " + ext.getOrderNr());
-    }
   }
 
   public static final ProjectTemplateExtension[] getExtensions() {

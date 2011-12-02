@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.SimpleType;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.model.PropertyBasedBindBase;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.ast.VariableType;
@@ -45,7 +46,7 @@ public class TableHolderBindVisitor extends DefaultAstVisitor {
   @Override
   public void preVisit(ASTNode node) {
     if (m_debug && !m_canceled) {
-      System.out.println(m_indent + "bindBaseRef " + node.getNodeType() + "  " + node + "     ");
+      ScoutSdk.logInfo(m_indent + "bindBaseRef " + node.getNodeType() + "  " + node + "     ");
       m_indent += "  ";
     }
   }
@@ -53,7 +54,7 @@ public class TableHolderBindVisitor extends DefaultAstVisitor {
   @Override
   public void postVisit(ASTNode node) {
     if (m_debug && !m_canceled) {
-      System.out.println(m_indent + "end " + node.getNodeType());
+      ScoutSdk.logInfo(m_indent + "end " + node.getNodeType());
       m_indent = m_indent.replaceFirst("\\s\\s$", "");
     }
   }

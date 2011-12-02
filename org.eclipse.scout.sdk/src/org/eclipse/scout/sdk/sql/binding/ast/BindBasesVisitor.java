@@ -48,11 +48,6 @@ public class BindBasesVisitor extends DefaultAstVisitor {
   }
 
   @Override
-  public void preVisit(ASTNode node) {
-//    System.out.println("bind " + node.getNodeType() + "  " + node + "     ");
-  }
-
-  @Override
   public boolean visit(SimpleName node) {
     if (m_currentBase == null) {
       VariableType resolveVariable = AstUtility.resolveVariable(node.getFullyQualifiedName(), m_serviceMethod, m_rootNode, node);

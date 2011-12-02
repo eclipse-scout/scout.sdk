@@ -54,12 +54,12 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
 
   private final IStatus doRun(IProgressMonitor monitor) {
     Throwable exception = null;
-    IWorkingCopyManager level = TypeCacheAccessor.createWorkingCopyManger();
+    IWorkingCopyManager manager = TypeCacheAccessor.createWorkingCopyManger();
     try {
       try {
         validate();
         try {
-          run(monitor, level);
+          run(monitor, manager);
         }
         catch (Throwable e) {
           ScoutSdk.logError("Error occured while running Operation job '" + getName() + "'.", e);
@@ -71,7 +71,7 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
       }
     }
     finally {
-      level.unregisterAll(monitor);
+      manager.unregisterAll(monitor);
       monitor.done();
     }
     if (exception != null) {

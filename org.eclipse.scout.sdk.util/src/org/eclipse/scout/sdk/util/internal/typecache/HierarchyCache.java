@@ -325,28 +325,9 @@ public final class HierarchyCache implements IHierarchyCache {
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-      IJavaElement[] arr = null;
       synchronized (m_elements) {
-        arr = m_elements.toArray(new IJavaElement[m_elements.size()]);
+        m_elements.toArray(new IJavaElement[m_elements.size()]);
         m_elements.clear();
-      }
-      if (arr != null) {
-        for (IJavaElement e : arr) {
-          String elementType = null;
-          switch (e.getElementType()) {
-            case IJavaElement.TYPE:
-              elementType = "type";
-              break;
-            case IJavaElement.COMPILATION_UNIT:
-              elementType = "icu";
-              break;
-
-            default:
-              elementType = "unknown";
-              break;
-          }
-          System.out.println("CHANGED " + elementType + ": " + e.getElementName());
-        }
       }
       return Status.OK_STATUS;
     }

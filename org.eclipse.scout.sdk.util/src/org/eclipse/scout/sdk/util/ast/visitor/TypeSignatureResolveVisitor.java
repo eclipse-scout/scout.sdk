@@ -60,7 +60,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
   @Override
   public void preVisit(ASTNode node) {
     if (m_debug && !m_canceled) {
-      System.out.println(m_indent + "typeSigResolve " + node.getNodeType() + "  " + node + "     ");
+      SdkUtilActivator.logInfo(m_indent + "typeSigResolve " + node.getNodeType() + "  " + node + "     ");
       m_indent += "  ";
     }
   }
@@ -69,7 +69,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
   public void postVisit(ASTNode node) {
     if (m_debug && !m_canceled) {
       m_indent = m_indent.replaceFirst("\\s\\s$", "");
-      System.out.println(m_indent + "end " + node.getNodeType());
+      SdkUtilActivator.logInfo(m_indent + "end " + node.getNodeType());
     }
   }
 

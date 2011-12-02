@@ -109,7 +109,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       prodName = productFile.getParent().getName() + " " + productFile.getName();
     }
     m_productName = prodName;
-    //System.out.println("name: " + productModel.getProduct().getName() + " " + m_productName);
     create(getContainer(), productFile);
     m_launchListener = new P_LaunchListener();
     DebugPlugin.getDefault().getLaunchManager().addLaunchListener(m_launchListener);

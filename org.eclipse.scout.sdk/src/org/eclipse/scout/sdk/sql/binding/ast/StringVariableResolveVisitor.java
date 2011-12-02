@@ -39,7 +39,6 @@ public class StringVariableResolveVisitor extends DefaultAstVisitor {
 
   @Override
   public boolean visitNode(ASTNode node) {
-//    System.out.println("visit node " + node.getNodeType() + "  " + node);
     if (!m_canceled) {
       m_canceled = node.equals(m_stopNode);
     }

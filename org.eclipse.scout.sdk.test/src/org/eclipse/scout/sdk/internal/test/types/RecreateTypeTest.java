@@ -42,8 +42,6 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
 
   @Test
   public void testRecreateType() throws Exception {
-//    ((ScoutWorkspace) ScoutSdk.getScoutWorkspace()).printBundleGraph();
-//    waitUntilIndexesReady();
     IType iformField = TypeUtility.getType(RuntimeClasses.IFormField);
     IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iformField);
     Assert.assertFalse(primaryFormFieldHierarchy.isCreated());

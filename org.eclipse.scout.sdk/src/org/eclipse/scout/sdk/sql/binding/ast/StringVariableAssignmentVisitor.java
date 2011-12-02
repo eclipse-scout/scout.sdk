@@ -40,11 +40,6 @@ public class StringVariableAssignmentVisitor extends DefaultAstVisitor {
   }
 
   @Override
-  public void preVisit(ASTNode node) {
-//    System.out.println("varAssig " + node.getNodeType() + "  " + node + "     (lookup '" + m_variableName + "'-'" + m_currentValue + "')");
-  }
-
-  @Override
   public boolean visit(VariableDeclarationFragment node) {
     m_nextVarName = true;
     return true;

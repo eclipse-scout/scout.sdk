@@ -66,7 +66,7 @@ public class SqlMethodIvocationVisitor extends DefaultAstVisitor {
   @Override
   public void preVisit(ASTNode node) {
     if (m_debug) {
-      System.out.println(m_indent + "findSqlStatements " + node.getNodeType() + "  " + node + "     ");
+      ScoutSdk.logInfo(m_indent + "findSqlStatements " + node.getNodeType() + "  " + node + "     ");
       m_indent += "  ";
     }
   }
@@ -75,7 +75,7 @@ public class SqlMethodIvocationVisitor extends DefaultAstVisitor {
   public void postVisit(ASTNode node) {
     if (m_debug) {
       m_indent = m_indent.replaceFirst("\\s\\s$", "");
-      System.out.println(m_indent + "end " + node.getNodeType());
+      ScoutSdk.logInfo(m_indent + "end " + node.getNodeType());
     }
   }
 

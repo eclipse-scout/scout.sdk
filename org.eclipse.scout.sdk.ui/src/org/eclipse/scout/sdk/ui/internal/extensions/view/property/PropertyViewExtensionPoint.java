@@ -80,26 +80,6 @@ public class PropertyViewExtensionPoint {
             }
           }
         }
-//        PropertyViewExtension viewExt = new PropertyViewExtension();
-//        Class<? extends IPage> pageClazz = getClassOfContribution(contributerBundle, elements, "page", IPage.class);
-//        viewExt.setPageClass(pageClazz);
-//        for (IConfigurationElement element : elements) {
-//          System.out.println(element.getName());
-//          if (element.getName().equals(partAttribute)) {
-////            String pageClassName = element.getAttribute("page");
-////            viewExt.setPageName(pageClassName);
-//            IConfigurationElement[] singlePart = element.getChildren("singlePart");
-//            if (singlePart != null && singlePart.length == 1) {
-//              viewExt.setSingleViewPartClazz(getClassOfContribution(contributerBundle, singlePart, "viewPart", IPropertyViewPart.class));
-//            }
-//            IConfigurationElement[] multiParts = element.getChildren("multiPart");
-//            if (multiParts != null && multiParts.length == 1) {
-//              viewExt.setMultiViewPartClazz(getClassOfContribution(contributerBundle, multiParts, "viewPart", IMultiPropertyViewPart.class));
-//            }
-//            int dist = -distanceToIPage(pageClazz, 0);
-//            orderedExtensions.put(new CompositeObject(dist, element), viewExt);
-//          }
-//        }
       }
       // order extensions
       TreeMap<CompositeObject, PropertyViewExtension> orderedExtensions = new TreeMap<CompositeObject, PropertyViewExtension>();
@@ -109,8 +89,7 @@ public class PropertyViewExtensionPoint {
       m_extensions = new ArrayList<PropertyViewExtension>(orderedExtensions.values());
     }
     catch (Exception e) {
-      e.printStackTrace();
-      // TODO: handle exception
+      ScoutSdkUi.logError("Error during reading property view extensions.", e);
     }
   }
 

@@ -13,6 +13,7 @@ package org.eclipse.scout.nls.sdk.internal.ui;
 import org.eclipse.jface.fieldassist.DecoratedField;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -813,14 +814,13 @@ public class ControlDecoration {
     }
     if (DEBUG) {
       if (listenerInstalls > 0) {
-        System.out.println("LISTENER LEAK>>>CHECK TRACE ABOVE"); //$NON-NLS-1$
+        NlsCore.logWarning("LISTENER LEAK>>>CHECK TRACE ABOVE"); //$NON-NLS-1$
       }
       else if (listenerInstalls < 0) {
-        System.out
-            .println("REMOVED UNREGISTERED LISTENERS>>>CHECK TRACE ABOVE"); //$NON-NLS-1$
+        NlsCore.logWarning("REMOVED UNREGISTERED LISTENERS>>>CHECK TRACE ABOVE"); //$NON-NLS-1$
       }
       else {
-        System.out.println("ALL INSTALLED LISTENERS WERE REMOVED."); //$NON-NLS-1$
+        NlsCore.logWarning("ALL INSTALLED LISTENERS WERE REMOVED."); //$NON-NLS-1$
       }
     }
   }

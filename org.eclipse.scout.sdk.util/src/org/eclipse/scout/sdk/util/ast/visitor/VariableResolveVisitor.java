@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -63,7 +64,7 @@ public class VariableResolveVisitor extends DefaultAstVisitor {
       m_canceled = true;
     }
     if (m_debug && !m_canceled) {
-      System.out.println(m_indent + "varResolve " + node.getNodeType() + "  " + node + "     ");
+      SdkUtilActivator.logInfo(m_indent + "varResolve " + node.getNodeType() + "  " + node + "     ");
       m_indent += "  ";
     }
   }
@@ -72,7 +73,7 @@ public class VariableResolveVisitor extends DefaultAstVisitor {
   public void postVisit(ASTNode node) {
     if (m_debug && !m_canceled) {
       m_indent = m_indent.replaceFirst("\\s\\s$", "");
-      System.out.println(m_indent + "end " + node.getNodeType());
+      SdkUtilActivator.logInfo(m_indent + "end " + node.getNodeType());
     }
   }
 

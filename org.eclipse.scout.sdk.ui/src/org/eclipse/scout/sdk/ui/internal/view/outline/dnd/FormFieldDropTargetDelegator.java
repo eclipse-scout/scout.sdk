@@ -149,7 +149,6 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
     int i = -1;
     if (element != null) {
       for (IType candidate : TypeUtility.getInnerTypes(element, null, ScoutTypeComparators.getOrderAnnotationComparator())) {
-        System.out.println(candidate.getElementName());
         i++;
         if (element.equals(candidate)) return i;
       }
