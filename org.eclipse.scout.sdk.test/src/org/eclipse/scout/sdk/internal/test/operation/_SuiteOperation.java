@@ -15,6 +15,7 @@ package org.eclipse.scout.sdk.internal.test.operation;
 
 import org.eclipse.scout.sdk.internal.test.operation.form._SuiteForm;
 import org.eclipse.scout.sdk.internal.test.operation.formdata._SuiteFormData;
+import org.eclipse.scout.sdk.internal.test.operation.project._SuiteProject;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -31,7 +32,8 @@ import org.junit.runners.Suite.SuiteClasses;
     MethodTest.class,
     /*suites*/
     _SuiteFormData.class,
-    _SuiteForm.class})
+    _SuiteForm.class,
+    _SuiteProject.class})
 public class _SuiteOperation {
 
 }
