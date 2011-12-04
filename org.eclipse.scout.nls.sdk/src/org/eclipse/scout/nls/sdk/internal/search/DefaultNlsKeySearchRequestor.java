@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.search.ui.text.Match;
 
@@ -49,7 +50,12 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
   public void beginReporting() {
     m_matches = new HashMap<String, List<Match>>();
     for (INlsKeySearchListener l : m_eventListeners.getListeners(INlsKeySearchListener.class)) {
-      l.beginReporting();
+      try {
+        l.beginReporting();
+      }
+      catch (Throwable t) {
+        NlsCore.logError("error during listener notification.", t);
+      }
     }
   }
 
@@ -71,14 +77,24 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
     }
     list.add(match);
     for (INlsKeySearchListener l : m_eventListeners.getListeners(INlsKeySearchListener.class)) {
-      l.foundMatch(nlsKey, match);
+      try {
+        l.foundMatch(nlsKey, match);
+      }
+      catch (Throwable t) {
+        NlsCore.logError("error during listener notification.", t);
+      }
     }
   }
 
   @Override
   public void endReporting() {
     for (INlsKeySearchListener l : m_eventListeners.getListeners(INlsKeySearchListener.class)) {
-      l.endReporting();
+      try {
+        l.endReporting();
+      }
+      catch (Throwable t) {
+        NlsCore.logError("error during listener notification.", t);
+      }
     }
   }
 

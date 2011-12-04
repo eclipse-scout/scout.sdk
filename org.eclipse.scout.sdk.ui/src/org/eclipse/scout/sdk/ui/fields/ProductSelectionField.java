@@ -158,7 +158,12 @@ public class ProductSelectionField extends TextField {
 
   private void fireProductSelected(IFile productFile) {
     for (IProductSelectionListener l : m_eventListeners.getListeners(IProductSelectionListener.class)) {
-      l.productSelected(productFile);
+      try {
+        l.productSelected(productFile);
+      }
+      catch (Throwable t) {
+        ScoutSdkUi.logError("error during listener notification.", t);
+      }
     }
   }
 

@@ -89,7 +89,12 @@ public final class ScoutWorkspace implements IScoutWorkspace {
 
   private void fireWorkspaceEvent(ScoutWorkspaceEvent e) {
     for (IScoutWorkspaceListener l : m_eventListeners.getListeners(IScoutWorkspaceListener.class)) {
-      l.worspaceChanged(e);
+      try {
+        l.worspaceChanged(e);
+      }
+      catch (Throwable t) {
+        ScoutSdk.logError("error during listener notification.", t);
+      }
     }
   }
 

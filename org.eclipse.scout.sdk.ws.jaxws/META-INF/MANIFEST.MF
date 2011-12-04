@@ -9,9 +9,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
  org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.ui,
- javax.wsdl,
- org.eclipse.debug.core,
- org.eclipse.debug.ui,
- org.eclipse.scout.sdk.util;bundle-version="3.7.1"
+ javax.wsdl
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

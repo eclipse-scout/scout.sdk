@@ -6,11 +6,10 @@ Bundle-Version: 3.7.1.qualifier
 Bundle-Activator: org.eclipse.scout.nls.sdk.services.internal.NlsSdkService
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.scout.nls.sdk;bundle-version="3.7.1",
  org.eclipse.scout.sdk;bundle-version="3.7.1",
  org.eclipse.scout.nls.sdk.simple;bundle-version="3.7.1",
- org.eclipse.scout.sdk.ui,
- org.eclipse.scout.sdk.util;bundle-version="3.7.1"
+ org.eclipse.scout.sdk.ui;bundle-version="3.7.1",
+ org.eclipse.ui;bundle-version="3.6.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.nls.sdk.services.internal,

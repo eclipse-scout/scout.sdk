@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.dialog;
 
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
@@ -169,9 +171,15 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     m_listeners.remove(IMemberSelectionChangedListener.class, listener);
   }
 
-  protected void fireSelectionChanged(IMember[] selectedMembers) {
-    for (IMemberSelectionChangedListener listener : m_listeners.getListeners(IMemberSelectionChangedListener.class)) {
-      listener.handleSelectionChanged(selectedMembers);
+  protected void fireSelectionChanged(final IMember[] selectedMembers) {
+    for (final IMemberSelectionChangedListener listener : m_listeners.getListeners(IMemberSelectionChangedListener.class)) {
+      SafeRunner.run(new SafeRunnable() {
+        @Override
+        public void run() throws Exception {
+          listener.handleSelectionChanged(selectedMembers);
+        }
+
+      });
     }
   }
 

@@ -5,16 +5,18 @@ Bundle-SymbolicName: org.eclipse.scout.sdk.ui;singleton:=true
 Bundle-Version: 3.7.1.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.ui.internal.ScoutSdkUi
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.scout.commons;bundle-version="1.1.2";visibility:=reexport,
- org.eclipse.help;bundle-version="3.3.100",
- org.eclipse.help.ui;bundle-version="3.3.100",
- org.eclipse.scout.sdk;bundle-version="1.2.4",
- org.eclipse.ui,
- org.eclipse.pde.ui;bundle-version="3.5.1",
- org.eclipse.debug.core;bundle-version="3.5.1",
- org.eclipse.ltk.core.refactoring;bundle-version="3.5.0",
  org.eclipse.equinox.launcher,
- org.eclipse.scout.sdk.util;bundle-version="3.7.1"
+ org.eclipse.ui,
+ org.eclipse.ui.ide;bundle-version="3.6.2";visibility:=reexport,
+ org.eclipse.jdt.ui;bundle-version="3.6.2";visibility:=reexport,
+ org.eclipse.pde.ui;bundle-version="3.5.1";visibility:=reexport,
+ org.eclipse.debug.ui;bundle-version="3.6.3";visibility:=reexport,
+ org.eclipse.help.ui;bundle-version="3.3.100";visibility:=reexport,
+ org.eclipse.jface.text;bundle-version="3.6.1";visibility:=reexport,
+ org.eclipse.ui.console;bundle-version="3.5.0";visibility:=reexport,
+ org.eclipse.ui.editors;bundle-version="3.6.1";visibility:=reexport,
+ org.eclipse.ui.forms;bundle-version="3.5.2";visibility:=reexport,
+ org.eclipse.scout.sdk;bundle-version="1.2.4"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.scout.sdk.ui,

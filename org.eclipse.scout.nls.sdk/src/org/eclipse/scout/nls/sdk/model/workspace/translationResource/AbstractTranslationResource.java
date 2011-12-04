@@ -110,7 +110,12 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
 
   protected void fireTranslationResourceChanged(TranslationResourceEvent event) {
     for (ITranslationResourceListener listener : m_eventListeners.getListeners(ITranslationResourceListener.class)) {
-      listener.translationResourceChanged(event);
+      try {
+        listener.translationResourceChanged(event);
+      }
+      catch (Throwable t) {
+        NlsCore.logError("error during listener notification.", t);
+      }
     }
   }
 

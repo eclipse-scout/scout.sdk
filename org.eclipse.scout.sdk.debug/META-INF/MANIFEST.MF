@@ -6,12 +6,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.debug.internal.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- org.eclipse.jdt;bundle-version="3.5.2",
- org.eclipse.jdt.core;bundle-version="3.5.2",
  org.eclipse.ui.forms;bundle-version="3.4.1",
- org.eclipse.core.resources;bundle-version="3.6.1",
- org.eclipse.scout.sdk.ui;bundle-version="3.7.1",
- org.eclipse.scout.sdk.util;bundle-version="3.7.1"
+ org.eclipse.scout.sdk;bundle-version="3.7.1",
+ org.eclipse.scout.sdk.ui;bundle-version="3.7.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Scout Project

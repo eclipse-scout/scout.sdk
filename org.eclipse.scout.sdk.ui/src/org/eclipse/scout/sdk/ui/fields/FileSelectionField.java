@@ -186,7 +186,12 @@ public class FileSelectionField extends TextField {
 
   private void fireFileSelected(File file) {
     for (IFileSelectionListener l : m_eventListeners.getListeners(IFileSelectionListener.class)) {
-      l.fileSelected(file);
+      try {
+        l.fileSelected(file);
+      }
+      catch (Throwable t) {
+        ScoutSdkUi.logError("error during listener notification.", t);
+      }
     }
   }
 

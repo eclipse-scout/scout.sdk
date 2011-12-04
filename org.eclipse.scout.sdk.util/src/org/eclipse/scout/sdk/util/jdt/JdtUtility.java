@@ -17,9 +17,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.ui.javaeditor.DocumentAdapter;
-import org.eclipse.jface.text.Document;
-import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextSelection;
 
 @SuppressWarnings("restriction")
@@ -44,17 +41,17 @@ public class JdtUtility {
     if (icu != null) {
       // since jdt is not capable of decently handling various new line ranges, we must use this internal class
       // to find out what new line char jdt expects....
-      try {
-        if (icu.getBuffer() instanceof DocumentAdapter) {
-          IDocument doc = ((DocumentAdapter) icu.getBuffer()).getDocument();
-          if (doc instanceof Document) {
-            return ((Document) doc).getDefaultLineDelimiter();
-          }
-        }
-      }
-      catch (Throwable t) {
-        // nop
-      }
+//      try {
+//        if (icu.getBuffer() instanceof DocumentAdapter) {
+//          IDocument doc = ((DocumentAdapter) icu.getBuffer()).getDocument();
+//          if (doc instanceof Document) {
+//            return ((Document) doc).getDefaultLineDelimiter();
+//          }
+//        }
+//      }
+//      catch (Throwable t) {
+//        // nop
+//      }
     }
     return System.getProperty("line.separator");
   }

@@ -30,8 +30,6 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jface.operation.IRunnableWithProgress;
-import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.SqlBindingIgnoreValidation;
 import org.eclipse.scout.commons.parsers.BindModel;
@@ -63,28 +61,17 @@ import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
  * @author Andreas Hoegger
  * @since 1.0.8 24.02.2011
  */
-public class FormDataSqlBindingValidator implements IRunnableWithProgress {
+public class FormDataSqlBindingValidator {
 
   private final IType[] m_processServices;
-  private EventListenerList m_eventListeners;
 
   private HashMap<ICompilationUnit, CompilationUnit> m_astCache;
 
   public FormDataSqlBindingValidator(IType... processServices) {
     m_processServices = processServices;
     m_astCache = new HashMap<ICompilationUnit, CompilationUnit>();
-    m_eventListeners = new EventListenerList();
   }
 
-  public void addBindingValidateListener(ISqlFormDataBindingValidationListener listener) {
-    m_eventListeners.add(ISqlFormDataBindingValidationListener.class, listener);
-  }
-
-  public void removeBindingValidateListener(ISqlFormDataBindingValidationListener listener) {
-    m_eventListeners.remove(ISqlFormDataBindingValidationListener.class, listener);
-  }
-
-  @Override
   public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
     if (getProcessServices() != null) {
       for (IType t : getProcessServices()) {
