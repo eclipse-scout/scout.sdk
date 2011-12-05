@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.ITextSelection;
 
-@SuppressWarnings("restriction")
 public class JdtUtility {
   private static JdtUtility instance = new JdtUtility();
 
