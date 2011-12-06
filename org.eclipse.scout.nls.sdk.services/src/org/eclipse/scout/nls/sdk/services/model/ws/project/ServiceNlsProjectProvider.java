@@ -281,9 +281,18 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
   }
 
-  private static IScoutBundle[] getScoutBundlesForProject(IScoutProject root) {
-    if (root == null) return null;
+  private static IScoutBundle[] getScoutBundlesForProject(IScoutProject p) {
+    if (p == null) return null;
     HashSet<IScoutBundle> collector = new HashSet<IScoutBundle>();
+
+    // find root scout project of the given project (may be a sub project).
+    IScoutProject root = p;
+    while (root.getParentProject() != null) {
+      root = root.getParentProject();
+    }
+
+    // collect all bundles that belong to the root project that belongs to the project p.
+    // assume that all these bundles together build the application so all text services of these projects should be available.
     addBundlesRec(root, collector);
     return collector.toArray(new IScoutBundle[collector.size()]);
   }
