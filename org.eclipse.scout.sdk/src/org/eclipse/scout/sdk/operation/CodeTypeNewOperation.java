@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -35,6 +36,7 @@ public class CodeTypeNewOperation implements IOperation {
   private String m_nextCodeId;
   private String m_typeName;
   private String m_superTypeSignature;
+  private String m_genericTypeSignature;
   private INlsEntry m_nlsEntry;
   private IScoutBundle m_sharedBundle;
 
@@ -71,24 +73,9 @@ public class CodeTypeNewOperation implements IOperation {
     versionUidOp.validate();
     versionUidOp.run(monitor, workingCopyManager);
 
-    // XXX handle id behaviour unboxing!!! Long -> long
-    //String genericTypeSimpleName = "";
-    //String unboxedFieldName = "";
-    //if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
-    //  String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
-    //  if (typeArguments != null && typeArguments.length > 0) {
-    //    genericTypeSimpleName = Signature.getSignatureSimpleName(typeArguments[0]);
-    //    if (Signature.createTypeSignature(Long.class.getName(), true).equals(typeArguments[0])) {
-    //      unboxedFieldName = "long";
-    //    }
-    //  }
-    //}
-
-    String codeId = getNextCodeId();
-    final String todo = (StringUtility.isNullOrEmpty(codeId)) ? ("//TODO") : ("");
-    if (StringUtility.isNullOrEmpty(codeId)) {
-      codeId = "0L";
-    }
+    final boolean isCodeIdUndef = StringUtility.isNullOrEmpty(getNextCodeId());
+    final String todo = isCodeIdUndef ? ScoutUtility.getCommentBlock("Auto-generated value") : "";
+    final String codeId = isCodeIdUndef ? "null" : getNextCodeId();
     FieldCreateOperation idOp = new FieldCreateOperation(getCreatedType(), "ID", false) {
       @Override
       public void buildSource(StringBuilder builder, IImportValidator validator) throws JavaModelException {
@@ -98,8 +85,8 @@ public class CodeTypeNewOperation implements IOperation {
     };
 
     idOp.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
-    idOp.setSignature(Signature.SIG_LONG);
-    idOp.setSimpleInitValue("" + codeId);
+    idOp.setSignature(getGenericTypeSignature());
+    idOp.setSimpleInitValue(codeId);
     idOp.validate();
     idOp.run(monitor, workingCopyManager);
 
@@ -185,5 +172,13 @@ public class CodeTypeNewOperation implements IOperation {
 
   public void setSuperTypeSignature(String superTypeSignature) {
     m_superTypeSignature = superTypeSignature;
+  }
+
+  public void setGenericTypeSignature(String genericTypeSignature) {
+    m_genericTypeSignature = genericTypeSignature;
+  }
+
+  public String getGenericTypeSignature() {
+    return m_genericTypeSignature;
   }
 }

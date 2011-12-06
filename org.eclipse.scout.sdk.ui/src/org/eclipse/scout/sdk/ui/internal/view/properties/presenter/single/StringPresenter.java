@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -33,7 +34,7 @@ public class StringPresenter extends AbstractValuePresenter<String> {
 
   @Override
   protected String formatSourceValue(String value) throws CoreException {
-    return "\"" + value + "\"";
+    return JdtUtility.toStringLiteral(value);
   }
 
   @Override

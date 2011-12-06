@@ -19,47 +19,45 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.ITextSelection;
 
-public class JdtUtility {
-  private static JdtUtility instance = new JdtUtility();
-
+public final class JdtUtility {
   private JdtUtility() {
   }
 
   public static IJavaElement findJavaElement(IFile javaFile, ITextSelection selection) throws JavaModelException {
-    return instance.findJavaElementImpl(javaFile, selection);
-  }
-
-  private IJavaElement findJavaElementImpl(IFile javaFile, ITextSelection selection) throws JavaModelException {
     IJavaElement javaElement = JavaCore.create(javaFile);
-    javaElement = findBestMatch(javaElement, selection.getOffset(), selection.getLength());
+    javaElement = findJavaElement(javaElement, selection.getOffset(), selection.getLength());
     return javaElement;
-
   }
 
   public static String getLineSeparator(ICompilationUnit icu) {
-    if (icu != null) {
-      // since jdt is not capable of decently handling various new line ranges, we must use this internal class
-      // to find out what new line char jdt expects....
-//      try {
-//        if (icu.getBuffer() instanceof DocumentAdapter) {
-//          IDocument doc = ((DocumentAdapter) icu.getBuffer()).getDocument();
-//          if (doc instanceof Document) {
-//            return ((Document) doc).getDefaultLineDelimiter();
-//          }
-//        }
-//      }
-//      catch (Throwable t) {
-//        // nop
-//      }
-    }
     return System.getProperty("line.separator");
   }
 
-  public static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {
-    return instance.findBestMatch(element, offset, lenght);
+  /**
+   * Escape the given string in java style.
+   * 
+   * @param s
+   *          The string to escape.
+   * @return A new string with backslashes and double-quotes escaped in java style.
+   */
+  public static String escapeStringJava(String s) {
+    if (s == null) return null;
+    return s.replace("\\", "\\\\").replace("\"", "\\\"");
   }
 
-  private IJavaElement findBestMatch(IJavaElement element, int offset, int lenght) throws JavaModelException {
+  /**
+   * converts the given string into a string literal with leading and ending double-quotes including escaping of the
+   * given value.
+   * 
+   * @param s
+   *          the string to convert.
+   * @return the literal string.
+   */
+  public static String toStringLiteral(String s) {
+    return "\"" + escapeStringJava(s) + "\"";
+  }
+
+  public static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {
     switch (element.getElementType()) {
       case IJavaElement.COMPILATION_UNIT:
         ICompilationUnit icu = (ICompilationUnit) element;
@@ -67,7 +65,7 @@ public class JdtUtility {
         for (IType t : icuTypes) {
           if (t.getSourceRange().getOffset() < offset && (t.getSourceRange().getOffset() + t.getSourceRange().getLength()) > (offset + lenght)) {
             // step in
-            return findBestMatch(t, offset, lenght);
+            return findJavaElement(t, offset, lenght);
           }
         }
         if (icuTypes.length > 0) {
@@ -79,14 +77,14 @@ public class JdtUtility {
         for (IType t : ((IType) element).getTypes()) {
           if (t.getSourceRange().getOffset() < offset && (t.getSourceRange().getOffset() + t.getSourceRange().getLength()) > (offset + lenght)) {
             // step in
-            return findBestMatch(t, offset, lenght);
+            return findJavaElement(t, offset, lenght);
           }
         }
         // methods
         for (IMethod m : ((IType) element).getMethods()) {
           if (m.getSourceRange().getOffset() < offset && (m.getSourceRange().getOffset() + m.getSourceRange().getLength()) > (offset + lenght)) {
             // step in
-            return findBestMatch(m, offset, lenght);
+            return findJavaElement(m, offset, lenght);
           }
         }
         break;
@@ -103,5 +101,4 @@ public class JdtUtility {
     }
     return findDeclaringType(element.getParent());
   }
-
 }
