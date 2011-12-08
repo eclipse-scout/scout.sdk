@@ -1,6 +1,9 @@
 package org.eclipse.scout.sdk.internal.test.presenter;
 
+import java.io.InputStream;
+import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Properties;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.TuningUtility;
@@ -46,6 +49,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
   private static FormToolkit default_toolkit;
   private static Composite default_parent;
+  private static Properties reference_max_durations;
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
@@ -53,6 +57,26 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
     default_toolkit = new FormToolkit(Display.getDefault());
     default_parent = Display.getDefault().getActiveShell();
+
+    String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
+    InputStream is = null;
+    try {
+      is = getInputStream("presenter/refDurations/" + hostname + ".properties");
+      if (is == null) {
+        is = getInputStream("presenter/refDurations/default.properties");
+      }
+      reference_max_durations = new Properties();
+      reference_max_durations.load(is);
+    }
+    finally {
+      if (is != null) {
+        try {
+          is.close();
+        }
+        catch (Exception e) {
+        }
+      }
+    }
   }
 
   @AfterClass
@@ -60,6 +84,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
     deleteProjects(SHARED_PROJECT, SERVER_PROJECT, CLIENT_PROJECT);
     default_toolkit = null;
     default_parent = null;
+    reference_max_durations = null;
     TuningUtility.finishAll(true);
   }
 
@@ -99,13 +124,22 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
     }
   }
 
+  private static long getReferenceDuration(String key) {
+    try {
+      return Long.parseLong(reference_max_durations.getProperty(key, "0"));
+    }
+    catch (NumberFormatException e) {
+      return 0;
+    }
+  }
+
   @Test
   public void testBooleanPresenter() throws Exception {
     doPresenterTest(new AbstractPresenterTestInfo("presenter.test.client.ui.forms.DesktopForm.MainBox.BooleanPresenterTestField") {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000; //100ms
+        return getReferenceDuration("testBooleanPresenter");
       }
 
       @Override
@@ -123,7 +157,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 400 * 1000 * 1000;
+        return getReferenceDuration("testOutlinesPresenter");
       }
 
       @Override
@@ -141,7 +175,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 1100 * 1000 * 1000;
+        return getReferenceDuration("testCodeTypeProposalPresenter");
       }
 
       @Override
@@ -159,7 +193,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 500 * 1000 * 1000;
+        return getReferenceDuration("testLookupCallProposalPresenter");
       }
 
       @Override
@@ -177,7 +211,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 300 * 1000 * 1000;
+        return getReferenceDuration("testLookupServiceProposalPresenter");
       }
 
       @Override
@@ -195,7 +229,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 400 * 1000 * 1000;
+        return getReferenceDuration("testMasterFieldProposalPresenter");
       }
 
       @Override
@@ -213,7 +247,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 400 * 1000 * 1000;
+        return getReferenceDuration("testSearchFormProposalPresenter");
       }
 
       @Override
@@ -231,7 +265,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testButtonDisplayStylePresenter");
       }
 
       @Override
@@ -249,7 +283,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testButtonSystemTypePresenter");
       }
 
       @Override
@@ -267,7 +301,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testFormDisplayHintPresenter");
       }
 
       @Override
@@ -285,7 +319,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testFormViewIdPresenter");
       }
 
       @Override
@@ -303,7 +337,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testHorizontalAlignmentPresenter");
       }
 
       @Override
@@ -321,7 +355,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 500 * 1000 * 1000;
+        return getReferenceDuration("testIconPresenter");
       }
 
       @Override
@@ -339,7 +373,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testVerticalAlignmentPresenter");
       }
 
       @Override
@@ -357,7 +391,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testColorPresenter");
       }
 
       @Override
@@ -375,7 +409,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testDoublePresenter");
       }
 
       @Override
@@ -393,7 +427,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testFontPresenter");
       }
 
       @Override
@@ -411,7 +445,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testIntegerPresenter");
       }
 
       @Override
@@ -429,7 +463,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testLongPresenter");
       }
 
       @Override
@@ -447,7 +481,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testStringPresenter");
       }
 
       @Override
@@ -465,7 +499,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
       @Override
       public long getMaxPresenterCreationDuration() {
-        return 100 * 1000 * 1000;
+        return getReferenceDuration("testNlsTextProposalPresenter");
       }
 
       @Override
