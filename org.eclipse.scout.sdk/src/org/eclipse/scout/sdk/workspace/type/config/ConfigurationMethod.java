@@ -19,6 +19,8 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  *
@@ -88,6 +90,29 @@ public class ConfigurationMethod {
       catch (CoreException e) {
         ScoutSdk.logError("could not parse default value of method '" + getDefaultMethod().getElementName() + "' in type '" + getType().getFullyQualifiedName() + "'.", e);
       }
+    }
+    return null;
+  }
+
+  /**
+   * @return Gets the value of the first (bottom-up) @Order annotation in the method stack or null if no @Order
+   *         annotation can
+   *         be found.
+   */
+  public Double getOrder() {
+    try {
+      for (int i = m_methodStack.size() - 1; i > -1; i--) {
+        IMethod m = m_methodStack.get(i);
+        if (TypeUtility.exists(m)) {
+          Double order = ScoutTypeUtility.getOrderAnnotationValue(m);
+          if (order != null) {
+            return order;
+          }
+        }
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logError("Error retrieving the order for method " + getMethodName(), e);
     }
     return null;
   }

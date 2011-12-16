@@ -38,7 +38,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -77,6 +76,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     if (m_labelLink != null) m_labelLink.dispose();
     if (m_label != null) m_label.dispose();
 
+    GridData gd = new GridData(SWT.RIGHT, SWT.TOP, true, false);
     if (isLinkMode()) {
       m_labelLink = getToolkit().createHyperlink(m_linkComposite, SdkProperties.getMethodPresenterName(method.peekMethod()), SWT.NONE);
       m_labelLink.addHyperlinkListener(new HyperlinkAdapter() {
@@ -87,12 +87,14 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
       });
       m_labelLink.setEnabled(true);
       m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, true));
+      m_labelLink.setLayoutData(gd);
       m_labelLink.getParent().layout();
       m_tooltip = new JavadocTooltip(m_labelLink);
     }
     else {
       m_label = getToolkit().createLabel(m_linkComposite, SdkProperties.getMethodPresenterName(method.peekMethod()));
       m_label.setForeground(new Color(m_linkComposite.getDisplay(), 0, 0, 128));
+      m_label.setLayoutData(gd);
       m_tooltip = new JavadocTooltip(m_label);
     }
     m_tooltip.setMember(method.peekMethod());
@@ -100,19 +102,19 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
   protected void create(Composite parent) {
     m_errorContent = new MethodErrorPresenterContent(parent, getToolkit());
-    Control body = createBody(parent);
+    GridData errorLayoutData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
+    errorLayoutData.exclude = true;
+    m_errorContent.setLayoutData(errorLayoutData);
 
-    // layout
+    // layout parent
     GridLayout glayout = new GridLayout(1, true);
     glayout.horizontalSpacing = 0;
     glayout.marginHeight = 0;
     glayout.marginWidth = 0;
     glayout.verticalSpacing = 0;
     parent.setLayout(glayout);
-    body.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-    m_errorContent.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-    ((GridData) m_errorContent.getLayoutData()).exclude = true;
 
+    createBody(parent);
   }
 
   private Control createBody(Composite parent) {
@@ -134,25 +136,23 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     bodyLayout.verticalSpacing = 0;
     m_body.setLayout(bodyLayout);
 
+    GridData bodyLayoutData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
+    //bodyLayoutData.horizontalAlignment = SWT.LEFT;
+    m_body.setLayoutData(bodyLayoutData);
+
     GridData linkCompData = new GridData();
-    linkCompData.widthHint = 130;
+    linkCompData.widthHint = 180;
     m_linkComposite.setLayoutData(linkCompData);
 
     GridData contentData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    content.setLayoutData(contentData);
+    if (content != null) {
+      content.setLayoutData(contentData);
+    }
 
     GridData buttonAreaData = new GridData(GridData.FILL_VERTICAL);
-//    buttonAreaData.heightHint = 1;
-//    buttonAreaData.widthHint = 1;
     buttonArea.setLayoutData(buttonAreaData);
 
-    RowLayout linkCompLayout = new RowLayout(SWT.HORIZONTAL);
-    linkCompLayout.marginBottom = 0;
-    linkCompLayout.marginLeft = 0;
-    linkCompLayout.marginRight = 0;
-    linkCompLayout.marginTop = 0;
-    linkCompLayout.spacing = 0;
-    m_linkComposite.setLayout(linkCompLayout);
+    m_linkComposite.setLayout(new GridLayout(1, true));
 
     GridLayout buttonBarLayout = new GridLayout(100, false);
     buttonBarLayout.horizontalSpacing = 0;

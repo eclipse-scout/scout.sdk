@@ -2,12 +2,8 @@ package org.eclipse.scout.sdk.workspace.type;
 
 import java.util.Comparator;
 
-import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
@@ -40,30 +36,10 @@ public class ScoutTypeComparators extends TypeComparators {
         Double sortNo = null;
         if (TypeUtility.exists(type)) {
           try {
-            IAnnotation annotation = type.getAnnotation(NamingUtility.getSimpleName(RuntimeClasses.Order));
-            if (annotation.exists()) {
-              IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
-              for (IMemberValuePair p : memberValues) {
-                if ("value".equals(p.getMemberName())) {
-                  switch (p.getValueKind()) {
-                    case IMemberValuePair.K_DOUBLE:
-                      sortNo = ((Double) p.getValue()).doubleValue();
-                      break;
-                    case IMemberValuePair.K_FLOAT:
-                      sortNo = ((Float) p.getValue()).doubleValue();
-                      break;
-                    case IMemberValuePair.K_INT:
-                      sortNo = ((Integer) p.getValue()).doubleValue();
-                      break;
-                    default:
-                      ScoutSdk.logError("could not find order annotation of '" + type.getFullyQualifiedName() + "'. ");
-                      break;
-                  }
-                  break;
-                }
-              }
+            sortNo = ScoutTypeUtility.getOrderAnnotationValue(type);
+            if (sortNo == null) {
+              ScoutSdk.logInfo("could not find @Order annotation of '" + type.getFullyQualifiedName() + "'. ");
             }
-            return sortNo;
           }
           catch (Throwable t) {
             ScoutSdk.logWarning("no @Order annotation found on '" + type.getFullyQualifiedName() + "'.", t);

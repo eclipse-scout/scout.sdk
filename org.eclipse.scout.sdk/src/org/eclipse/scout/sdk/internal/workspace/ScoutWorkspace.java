@@ -325,7 +325,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
         if ((delta.getKind() & PluginModelDelta.ADDED) != 0) {
           for (ModelEntry e : delta.getAddedEntries()) {
             IPluginModelBase modelBase = e.getModel();
-            if (modelBase.getUnderlyingResource() != null) {
+            if (modelBase != null && modelBase.getUnderlyingResource() != null) {
               handleProjectAdded(modelBase.getUnderlyingResource().getProject());
             }
           }
@@ -334,7 +334,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
         if ((delta.getKind() & PluginModelDelta.CHANGED) != 0) {
           for (ModelEntry e : delta.getChangedEntries()) {
             IPluginModelBase modelBase = e.getModel();
-            if (modelBase.getUnderlyingResource() != null) {
+            if (modelBase != null && modelBase.getUnderlyingResource() != null) {
               handleProjectChanged(modelBase.getUnderlyingResource().getProject());
             }
           }

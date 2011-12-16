@@ -32,6 +32,7 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.JdtTypePropertyPart;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
@@ -293,8 +294,9 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
     }
     super.createSections();
 
-    if (getSection(JdtTypePropertyPart.SECTION_ID_PROPERTIES) != null) {
-      getSection(JdtTypePropertyPart.SECTION_ID_PROPERTIES).setExpanded(false);
+    ISection propSection = getSection(JdtTypePropertyPart.SECTION_ID_PROPS_ADVANCED);
+    if (propSection != null) {
+      propSection.setExpanded(false);
     }
   }
 

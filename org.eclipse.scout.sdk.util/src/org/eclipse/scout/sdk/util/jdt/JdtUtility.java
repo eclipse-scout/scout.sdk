@@ -11,13 +11,18 @@
 package org.eclipse.scout.sdk.util.jdt;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.jdt.core.IAnnotatable;
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public final class JdtUtility {
   private JdtUtility() {
@@ -31,6 +36,31 @@ public final class JdtUtility {
 
   public static String getLineSeparator(ICompilationUnit icu) {
     return System.getProperty("line.separator");
+  }
+
+  public static boolean hasAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
+    return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
+  }
+
+  public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
+    try {
+      IAnnotation annotation = element.getAnnotation(fullyQuallifiedAnnotation);
+      // workaround since annotations are not cached properly from jdt
+      if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
+        return annotation;
+      }
+      else {
+        String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
+        annotation = element.getAnnotation(simpleName);
+        if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
+          return annotation;
+        }
+      }
+    }
+    catch (JavaModelException e) {
+      SdkUtilActivator.logError("could not get annotation '" + fullyQuallifiedAnnotation + "' of '" + element + "'", e);
+    }
+    return null;
   }
 
   /**

@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -59,21 +60,25 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Vertic
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
+import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.PropertyViewConfig.ConfigTypes;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
@@ -91,8 +96,10 @@ import org.eclipse.ui.part.FileEditorInput;
  */
 public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart {
   protected static final String SECTION_ID_FILTER = "section.filter";
-  protected static final String SECTION_ID_PROPERTIES = "section.properties";
-  protected static final String SECTION_ID_OPERATIONS = "section.operations";
+  protected static final String SECTION_ID_PROPS_IMPORTANT = "section.properties.important";
+  protected static final String SECTION_ID_PROPS_ADVANCED = "section.properties.advanced";
+  protected static final String SECTION_ID_OPS_IMPORTANT = "section.operations.important";
+  protected static final String SECTION_ID_OPS_ADVANCED = "section.operations.advanced";
 
   private IJavaResourceChangedListener m_methodChangedListener;
   private ConfigPropertyType m_configPropertyType;
@@ -113,8 +120,22 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   }
 
   @Override
+  protected String getPartKey() {
+    if (getPage() == null || !TypeUtility.exists(getPage().getType())) return null;
+    return getPage().getType().getFullyQualifiedName();
+  }
+
+  @Override
   public AbstractScoutTypePage getPage() {
     return (AbstractScoutTypePage) super.getPage();
+  }
+
+  public ISection addSection(String sectionId, String title) {
+    return super.createSection(sectionId, title);
+  }
+
+  public boolean isDirty() {
+    return m_markDirtyJob.isDirty();
   }
 
   @Override
@@ -127,6 +148,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   protected Control createHead(Composite parent) {
     Composite headArea = getFormToolkit().createComposite(parent);
     Hyperlink title = getFormToolkit().createHyperlink(headArea, getPage().getName(), SWT.WRAP);
+    title.setFont(new Font(parent.getDisplay(), parent.getFont().getFontData()[0].getName(), 12, SWT.NORMAL));
     title.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
@@ -136,15 +158,16 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
             IFile f = (IFile) r;
             String editorId = IDE.getEditorDescriptor(f).getId();
             IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            activePage.openEditor(new FileEditorInput(f), editorId, true, IWorkbenchPage.MATCH_ID | IWorkbenchPage.MATCH_INPUT);
+            IEditorPart editorPart = activePage.openEditor(new FileEditorInput(f), editorId, true, IWorkbenchPage.MATCH_ID | IWorkbenchPage.MATCH_INPUT);
+            JavaUI.revealInEditor(editorPart, (IJavaElement) getPage().getType());
           }
-          //JavaUI.openInEditor(getPage().getType());
         }
         catch (Exception e1) {
           ScoutSdkUi.logError("could not open '" + getPage().getType().getElementName() + "' in editor.", e1);
         }
       }
     });
+
     m_saveButton = getFormToolkit().createButton(headArea, Texts.get("SaveFile"), SWT.PUSH);
     m_saveButton.setEnabled(false);
     m_saveButton.addSelectionListener(new SelectionAdapter() {
@@ -157,6 +180,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
         }
       }
     });
+
     // layout
     headArea.setLayout(new GridLayout(2, false));
     GridData titleData = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING | GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
@@ -170,37 +194,35 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     if (m_updateJob == null) {
       m_updateJob = new P_UpdateMethodsJob(getForm().getDisplay());
     }
+
+    // Filter Section
     if (getPage().isFolder()) {
       ISection filterSection = createSection(SECTION_ID_FILTER, Texts.get("Filter"));
       PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), filterSection.getSectionClient(), getPage());
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       filterPresenter.getContainer().setLayoutData(layoutData);
-      getSection(SECTION_ID_FILTER).setExpanded(false);
+      filterSection.setExpanded(wasSectionExpanded(SECTION_ID_FILTER, false));
     }
 
     m_configPropertyType = new ConfigPropertyType(getPage().getType());
 
-    ConfigurationMethod[] configPropertyMethods = m_configPropertyType.getConfigurationMethods(ConfigurationMethod.PROPERTY_METHOD);
-    if (configPropertyMethods != null && configPropertyMethods.length > 0) {
-      ISection configPropertiesSection = createSection(SECTION_ID_PROPERTIES, Texts.get("Properties"));
-      for (ConfigurationMethod m : configPropertyMethods) {
-        AbstractMethodPresenter presenter = null;
-        presenter = createConfigMethodPresenter(configPropertiesSection.getSectionClient(), m);
-        if (presenter != null) {
-          GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-          layoutData.widthHint = 200;
-          presenter.getContainer().setLayoutData(layoutData);
-          m_methodPresenters.put(m.getMethodName(), presenter);
-        }
-      }
+    // ensure consistent order
+    boolean noImpProps = !createImportantProperties();
+    if (noImpProps) {
+      createAdvancedProperties(false);
+      boolean created = createImportantOperations();
+      createAdvancedOperations(created);
     }
-
-    ConfigurationMethod[] operationPropertyMethods = m_configPropertyType.getConfigurationMethods(ConfigurationMethod.OPERATION_METHOD);
-    if (operationPropertyMethods != null && operationPropertyMethods.length > 0) {
-      ISection operationPropertiesSection = createSection(SECTION_ID_OPERATIONS, Texts.get("Operations"));
-      for (ConfigurationMethod m : operationPropertyMethods) {
-        createOperationPresenter(operationPropertiesSection.getSectionClient(), m);
+    else {
+      boolean noImpOps = !createImportantOperations();
+      if (noImpOps) {
+        createAdvancedOperations(false);
+        createAdvancedProperties(true);
+      }
+      else {
+        createAdvancedProperties(true);
+        createAdvancedOperations(true);
       }
     }
 
@@ -208,6 +230,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       m_methodChangedListener = new P_MethodChangedListener();
       TypeCacheAccessor.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_methodChangedListener);
     }
+
     try {
       setCompilationUnitDirty(getPage().getType().getCompilationUnit().isWorkingCopy() && getPage().getType().getCompilationUnit().getBuffer().hasUnsavedChanges());
     }
@@ -216,15 +239,40 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
   }
 
+  private boolean createImportantProperties() {
+    ConfigurationMethodSection impConfigPropsSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.PROPERTY_METHOD, ConfigTypes.Normal);
+    ISection impPropsSection = impConfigPropsSection.createContent(this, SECTION_ID_PROPS_IMPORTANT, Texts.get("Properties"), wasSectionExpanded(SECTION_ID_PROPS_IMPORTANT, true));
+    return impPropsSection != null;
+  }
+
+  private boolean createImportantOperations() {
+    ConfigurationMethodSection importantExecSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.OPERATION_METHOD, ConfigTypes.Normal);
+    ISection impOpsSection = importantExecSection.createContent(this, SECTION_ID_OPS_IMPORTANT, Texts.get("Operations"), wasSectionExpanded(SECTION_ID_OPS_IMPORTANT, true));
+    return impOpsSection != null;
+  }
+
+  private boolean createAdvancedProperties(boolean importantCreated) {
+    ConfigurationMethodSection advancedConfigPropsSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.PROPERTY_METHOD, ConfigTypes.Advanced);
+    ISection advPropsSection = advancedConfigPropsSection.createContent(this, SECTION_ID_PROPS_ADVANCED, Texts.get(importantCreated ? "AdvancedProperties" : "Properties"), wasSectionExpanded(SECTION_ID_PROPS_ADVANCED, !importantCreated));
+    return advPropsSection != null;
+  }
+
+  private boolean createAdvancedOperations(boolean importantCreated) {
+    ConfigurationMethodSection advancedExecSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.OPERATION_METHOD, ConfigTypes.Advanced);
+    ISection advOpsSection = advancedExecSection.createContent(this, SECTION_ID_OPS_ADVANCED, Texts.get(importantCreated ? "AdvancedOperations" : "Operations"), wasSectionExpanded(SECTION_ID_OPS_ADVANCED, !importantCreated));
+    return advOpsSection != null;
+  }
+
   @Override
   protected void cleanup() {
     if (m_methodChangedListener != null) {
       TypeCacheAccessor.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_methodChangedListener);
       m_methodChangedListener = null;
     }
+    super.cleanup();
   }
 
-  protected AbstractMethodPresenter createConfigMethodPresenter(Composite parent, ConfigurationMethod method) {
+  public AbstractMethodPresenter createConfigMethodPresenter(Composite parent, ConfigurationMethod method) {
     AbstractMethodPresenter presenter = null;
     String propertyType = method.getConfigAnnotationType();
 
@@ -236,11 +284,8 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new DoublePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-
     else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for DRAG_AND_DROP_TYPE
     }
     else if (propertyType.equals("INTEGER")) {
       presenter = new IntegerPresenter(getFormToolkit(), parent);
@@ -258,15 +303,12 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new FontPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-
     else if (propertyType.equals("COLOR")) {
       presenter = new ColorPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else if (propertyType.equals("OBJECT")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for OBJECT
     }
     else if (propertyType.equals("BUTTON_DISPLAY_STYLE")) {
       presenter = new ButtonDisplayStylePresenter(getFormToolkit(), parent);
@@ -281,25 +323,19 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter.setMethod(method);
     }
     else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
-      // TODO
-//      presenter = new Abc(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for COMPOSER_ATTRIBUTE_TYPE
     }
     else if (propertyType.equals("FILE_EXTENSIONS")) {
-      // TODO$
-//      presenter = new StringPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for FILE_EXTENSIONS
     }
     else if (propertyType.equals("FORM_DISPLAY_HINT")) {
       presenter = new FormDisplayHintPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-
     else if (propertyType.equals("FORM_VIEW_ID")) {
       presenter = new FormViewIdPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-
     else if (propertyType.equals("HORIZONTAL_ALIGNMENT")) {
       presenter = new HorizontalAlignmentPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -309,9 +345,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter.setMethod(method);
     }
     else if (propertyType.equals("KEY_STROKE")) {
-      // NOT in use
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for KEY_STROKE
     }
     else if (propertyType.equals("LOOKUP_CALL")) {
       presenter = new LookupCallProposalPresenter(getFormToolkit(), parent);
@@ -330,33 +364,24 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter.setMethod(method);
     }
     else if (propertyType.equals("OUTLINE")) {
-      // TODO
-//      presenter = new Outline(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for OUTLINE
     }
     else if (propertyType.equals("OUTLINES")) {
       presenter = new OutlinesPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else if (propertyType.equals("FORM")) {
-      // TODO
-//      presenter = new Form(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for FORM
     }
     else if (propertyType.equals("SEARCH_FORM")) {
-
       presenter = new SearchFormPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else if (propertyType.equals("NLS_PROVIDER")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for NLS_PROVIDER (obsolete?)
     }
     else if (propertyType.equals("SQL_STYLE")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for SQL_STYLE
     }
     else if (propertyType.equals("SQL")) {
       presenter = new MultiLineStringPresenter(getFormToolkit(), parent);
@@ -376,33 +401,28 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter.setMethod(method);
     }
     else if (propertyType.equals("CHART_QNAME")) {
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for CHART_QNAME
     }
     else if (propertyType.equals("HOUR_OF_DAY")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for HOUR_OF_DAY
     }
     else if (propertyType.equals("DURATION_MINUTES")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for DURATION_MINUTES
     }
     else if (propertyType.equals("MENU_CLASS")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: presenter for MENU_CLASS
     }
     else if (propertyType.equals("PRIMITIVE_TYPE")) {
       presenter = new PrimitiveTypePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
+
     // layout
     if (presenter != null) {
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       presenter.getContainer().setLayoutData(layoutData);
+      presenter.setEnabled(!isDirty());
       m_methodPresenters.put(method.getMethodName(), presenter);
     }
     else {
@@ -412,7 +432,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     return presenter;
   }
 
-  protected AbstractMethodPresenter createOperationPresenter(Composite parent, ConfigurationMethod method) {
+  public AbstractMethodPresenter createOperationPresenter(Composite parent, ConfigurationMethod method) {
     AbstractMethodPresenter presenter = null;
     if (method.getMethodName().equals("execResetSearchFilter")) {
       presenter = new ExecResetSerchFilterMethodPresenter(getFormToolkit(), parent);
@@ -427,6 +447,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       presenter.getContainer().setLayoutData(layoutData);
+      presenter.setEnabled(!isDirty());
       m_methodPresenters.put(method.getMethodName(), presenter);
     }
     return presenter;
@@ -473,7 +494,6 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   private class P_MethodChangedListener implements IJavaResourceChangedListener {
     @Override
     public void handleEvent(JdtEvent event) {
-
       switch (event.getEventType()) {
         case JdtEvent.ADDED:
         case JdtEvent.REMOVED:
@@ -497,7 +517,6 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
           }
           break;
       }
-
     }
   }
 

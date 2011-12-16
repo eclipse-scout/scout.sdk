@@ -35,6 +35,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -547,7 +548,7 @@ public class ScoutStructuredType implements IStructuredType {
     TreeMap<CompositeObject, IMethod> methods = new TreeMap<CompositeObject, IMethod>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
-      if (TypeUtility.hasAnnotation(method, RuntimeClasses.FormData)) {
+      if (JdtUtility.hasAnnotation(method, RuntimeClasses.FormData)) {
         CompositeObject methodKey = createPropertyMethodKey(method);
         if (methodKey != null) {
           methods.put(methodKey, method);

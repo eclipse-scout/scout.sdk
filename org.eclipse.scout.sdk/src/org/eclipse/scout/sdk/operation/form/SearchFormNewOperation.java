@@ -112,14 +112,8 @@ public class SearchFormNewOperation implements IOperation {
     FormDataUpdateOperation formDataOp = null;
     if (getSearchFormDataLocationBundle() != null) {
       formDataOp = new FormDataUpdateOperation(getCreatedFormType());
-      // formDataOp.setFormDataPackageName(getSearchFormDataLocationBundle().getPackageNameOutlineService());
       formDataOp.run(monitor, workingCopyManager);
       m_createdFormDataType = formDataOp.getFormDataType();
-
-//      // add formdata package to exported packages of shared plugin
-//      ManifestExportPackageOperation manifestOpFormData = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY,
-//          new IPackageFragment[]{m_createdFormDataType.getPackageFragment()}, true);
-//      manifestOpFormData.run(monitor, workingCopyManager);
     }
     if (getTablePage() != null) {
       SearchFormFromTablePageFillOperation fillOp = new SearchFormFromTablePageFillOperation();
@@ -145,20 +139,8 @@ public class SearchFormNewOperation implements IOperation {
           return "return " + simpleRef + ".class;";
         }
       };
-//      OperationJob job = new OperationJob(overrideOp);
-//      job.schedule(50);
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
-//      StringBuilder methodSource = new StringBuilder();
-//      IImportValidator tablePageImportValidator = new CompilationUnitImportValidator(getTablePage().getCompilationUnit());
-//      methodSource.append("@Override\n");
-//      methodSource.append("public Class<? extends " + tablePageImportValidator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.ISearchForm, true)) + "> getConfiguredSearchForm(){\n");
-//      methodSource.append(ScoutIdeProperties.TAB + "return " + tablePageImportValidator.getSimpleTypeRef(Signature.createTypeSignature(getCreatedFormType().getFullyQualifiedName(), true)) + ".class;\n}");
-//      getTablePage().createMethod(methodSource.toString(), null, true, monitor);
-//      for (String imp : tablePageImportValidator.getImportsToCreate()) {
-//        getTablePage().getCompilationUnit().createImport(imp, null, monitor);
-//      }
-//      workingCopyManager.register(getTablePage().getCompilationUnit(), true, monitor);
     }
     else {
       // main box

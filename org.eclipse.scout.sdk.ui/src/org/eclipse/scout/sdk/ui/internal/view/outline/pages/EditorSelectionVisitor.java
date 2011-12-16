@@ -97,6 +97,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.IProjectNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -649,7 +650,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
   private boolean isPropertyMethod(IJavaElement element) {
     if (TypeUtility.exists(element) && element.getElementType() == IJavaElement.METHOD) {
       IMethod method = (IMethod) element;
-      if (TypeUtility.hasAnnotation(method, RuntimeClasses.FormData)) {
+      if (JdtUtility.hasAnnotation(method, RuntimeClasses.FormData)) {
         return true;
       }
     }

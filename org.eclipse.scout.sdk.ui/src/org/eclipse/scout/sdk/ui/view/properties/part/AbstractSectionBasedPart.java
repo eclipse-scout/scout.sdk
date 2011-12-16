@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.view.property.IPropertyViewPart;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.TableWrapLayoutEx;
@@ -59,40 +58,47 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
     init();
     m_formToolkit = new FormToolkit(parent.getDisplay());
     m_form = m_formToolkit.createScrolledForm(parent);
-    m_form.setDelayedReflow(true);
-    m_form.setText(Texts.get("Properties"));
-    createHeadInternal(m_form);
-    // sections
-    Composite formBody = m_form.getBody();
+    try {
+      m_form.setRedraw(false);
+      m_form.setDelayedReflow(true);
+      //m_form.setText(Texts.get("Properties"));
+      createHeadInternal(m_form);
 
-    // root pane is used in order of layout errors in TableWrapLayout with
-    // scrollbars.
-    m_sectionContainer = getFormToolkit().createComposite(formBody);
-    formBody.setLayout(new FillLayout());
-    TableWrapLayoutEx layout = new TableWrapLayoutEx();
-    layout.makeColumnsEqualWidth = true;
-    layout.numColumns = 1;
-    layout.horizontalSpacing = 3;
-    layout.verticalSpacing = 3;
-    layout.rightMargin = 3;
-    layout.leftMargin = 3;
-    layout.topMargin = 3;
-    layout.bottomMargin = 3;
-    m_sectionContainer.setLayout(layout);
-    m_sections = new HashMap<String, Section>();
-    createSections();
-    m_form.updateToolBar();
-    m_form.reflow(true);
+      // sections
+      Composite formBody = m_form.getBody();
+
+      // root pane is used in order of layout errors in TableWrapLayout with scroll bars.
+      m_sectionContainer = getFormToolkit().createComposite(formBody);
+      formBody.setLayout(new FillLayout());
+      TableWrapLayoutEx layout = new TableWrapLayoutEx();
+      layout.makeColumnsEqualWidth = true;
+      layout.numColumns = 1;
+      layout.horizontalSpacing = 3;
+      layout.verticalSpacing = 3;
+      layout.rightMargin = 3;
+      layout.leftMargin = 3;
+      layout.topMargin = 3;
+      layout.bottomMargin = 3;
+      m_sectionContainer.setLayout(layout);
+
+      // create sections
+      m_sections = new HashMap<String, Section>();
+      createSections();
+
+      m_form.updateToolBar();
+      m_form.reflow(true);
+    }
+    finally {
+      m_form.setRedraw(true);
+    }
   }
 
   @Override
   public void init(IMemento memento) {
-
   }
 
   @Override
   public void save(IMemento memento) {
-
   }
 
   @Override
@@ -148,12 +154,16 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
   protected void createSections() {
   }
 
+  protected final Section[] getSections() {
+    return m_sections.values().toArray(new Section[m_sections.values().size()]);
+  }
+
   public ISection getSection(String sectionId) {
     Section section = m_sections.get(sectionId);
     return section;
   }
 
-  protected final void removeSection(String sectionId) {
+  public final void removeSection(String sectionId) {
     Section section = m_sections.remove(sectionId);
     if (section != null && !section.isDisposed()) {
       section.getUiSection().dispose();
@@ -200,7 +210,6 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
    * @return the section - create controls with the sections client {@link ISection#getSectionClient()} as parent
    */
   protected final ISection createSection(String sectionId, String title, String description, boolean twistle, String siblingSectionId) {
-
     Section section = m_sections.get(sectionId);
     if (section == null) {
       int style = org.eclipse.ui.forms.widgets.Section.TITLE_BAR | org.eclipse.ui.forms.widgets.Section.EXPANDED;
@@ -218,28 +227,6 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
       }
       section = new Section(sectionId, getForm());
       section.createSection(getFormToolkit(), m_sectionContainer, title, description, style, sibling);
-//      section.addExpansionListener(new ExpansionAdapter() {
-//        @Override
-//        public void expansionStateChanged(ExpansionEvent e) {
-//          getForm().reflow(true);
-//        }
-//      });
-//      section.setText(title);
-//      if (hasDescription) {
-//        section.setDescription(description);
-//      }
-//
-//      // layout
-//      TableWrapDataEx data = new TableWrapDataEx(TableWrapData.FILL_GRAB);
-//      section.setLayoutData(data);
-//      Composite sectionClient = getFormToolkit().createComposite(section);
-//      section.setClient(sectionClient);
-//      GridLayout layout = new GridLayout(1, true);
-//      layout.horizontalSpacing = 3;
-//      layout.verticalSpacing = 4;
-//      layout.marginHeight = 0;
-//      layout.marginWidth = 0;
-//      sectionClient.setLayout(layout);
       m_sections.put(sectionId, section);
     }
     return section;

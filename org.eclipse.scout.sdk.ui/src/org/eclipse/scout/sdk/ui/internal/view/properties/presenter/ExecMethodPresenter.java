@@ -25,7 +25,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -41,8 +40,7 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
 
   @Override
   protected Control createContent(Composite container) {
-    Label l = getToolkit().createLabel(container, "");
-    return l;
+    return null;
   }
 
   @Override
@@ -56,7 +54,7 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
         overrideMethod();
       }
     });
-    GridData buttonData = new GridData(GridData.VERTICAL_ALIGN_CENTER | GridData.GRAB_VERTICAL);
+    GridData buttonData = new GridData(SWT.LEFT, SWT.BOTTOM, false, false);
     m_addButton.setLayoutData(buttonData);
   }
 

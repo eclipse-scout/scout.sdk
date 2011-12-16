@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.sql.binding.model.SqlStatement;
 import org.eclipse.scout.sdk.sql.binding.model.UnresolvedBindBase;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.ast.VariableType;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -101,7 +102,7 @@ public class FormDataSqlBindingValidator {
   protected MethodSqlBindingModel processServiceMethod(IMethod serviceMethod, IProgressMonitor monitor) throws JavaModelException {
     HashMap<String, IBindBase> globalBindings = new HashMap<String, IBindBase>();
     globalBindings.putAll(resolveServerSessionBindBases());
-    IAnnotation ignoreBindAnnotation = TypeUtility.getAnnotation(serviceMethod, SqlBindingIgnoreValidation.class.getName());
+    IAnnotation ignoreBindAnnotation = JdtUtility.getAnnotation(serviceMethod, SqlBindingIgnoreValidation.class.getName());
     if (TypeUtility.exists(ignoreBindAnnotation)) {
       if (ignoreBindAnnotation.getSource().startsWith("@")) {
         for (IMemberValuePair p : ignoreBindAnnotation.getMemberValuePairs()) {

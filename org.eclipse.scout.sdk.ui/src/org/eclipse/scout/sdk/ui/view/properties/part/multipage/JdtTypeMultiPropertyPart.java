@@ -108,170 +108,116 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
       presenter.setMethodSet(methodSet);
     }
     else if (propertyType.equals("DOUBLE")) {
-//      presenter = new DoublePresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi double presenter
     }
-
     else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: multi DRAG_AND_DROP_TYPE presenter
     }
     else if (propertyType.equals("INTEGER")) {
       presenter = new MultiIntegerPresenter(getFormToolkit(), parent);
       presenter.setMethodSet(methodSet);
-//      presenter = new IntegerPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
     }
     else if (propertyType.equals("LONG")) {
       presenter = new MultiLongPresenter(getFormToolkit(), parent);
       presenter.setMethodSet(methodSet);
     }
     else if (propertyType.equals("STRING")) {
-//      presenter = new StringPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi string presenter
     }
     else if (propertyType.equals("FONT")) {
-      // TODO
-//      presenter = new StringPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi font presenter
     }
-
     else if (propertyType.equals("COLOR")) {
-//      presenter = new ColorPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi color presenter
     }
     else if (propertyType.equals("OBJECT")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi object presenter
     }
     else if (propertyType.equals("BUTTON_DISPLAY_STYLE")) {
-//      presenter = new ButtonDisplayStylePresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi BUTTON_DISPLAY_STYLE presenter
     }
     else if (propertyType.equals("BUTTON_SYSTEM_TYPE")) {
-//      presenter = new ButtonSystemTypePresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi BUTTON_SYSTEM_TYPE presenter
     }
     else if (propertyType.equals("CODE_TYPE")) {
-//      presenter = new CodeTypeProposalPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi CODE_TYPE presenter
     }
     else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
-      // TODO
-//      presenter = new Abc(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi COMPOSER_ATTRIBUTE_TYPE presenter
     }
     else if (propertyType.equals("FILE_EXTENSIONS")) {
-      // TODO$
-//      presenter = new StringPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      // TODO: multi FILE_EXTENSIONS presenter
     }
     else if (propertyType.equals("FORM_DISPLAY_HINT")) {
-//      presenter = new FormDisplayHintPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi FORM_DISPLAY_HINT presenter
     }
-
     else if (propertyType.equals("FORM_VIEW_ID")) {
-//      presenter = new FormViewIdPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi FORM_VIEW_ID presenter
     }
-
     else if (propertyType.equals("HORIZONTAL_ALIGNMENT")) {
-//      presenter = new HorizontalAglinmentPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi HORIZONTAL_ALIGNMENT presenter
     }
     else if (propertyType.equals("ICON_ID")) {
-//      presenter = new IconPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi ICON_ID presenter
     }
     else if (propertyType.equals("KEY_STROKE")) {
       // NOT in use
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
     }
     else if (propertyType.equals("LOOKUP_CALL")) {
-//      presenter = new LookupCallProposalPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi LOOKUP_CALL presenter
     }
     else if (propertyType.equals("LOOKUP_SERVICE")) {
-      // TODO
-//      presenter = new Lookupser(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi LOOKUP_SERVICE presenter
     }
     else if (propertyType.equals("MASTER_FIELD")) {
-//      presenter = new MasterFieldPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi MASTER_FIELD presenter
     }
     else if (propertyType.equals("OUTLINE_ROOT_PAGE")) {
-//      presenter = new OutlineRootPagePresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi OUTLINE_ROOT_PAGE presenter
     }
     else if (propertyType.equals("OUTLINE")) {
-      // TODO
-//      presenter = new Outline(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi OUTLINE presenter
     }
     else if (propertyType.equals("OUTLINES")) {
-//      presenter = new OutlinesPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi OUTLINES presenter
     }
     else if (propertyType.equals("FORM")) {
-      // TODO
-//      presenter = new Form(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi form presenter
     }
     else if (propertyType.equals("SEARCH_FORM")) {
-
-//      presenter = new SearchFormPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi SEARCH_FORM presenter
     }
     else if (propertyType.equals("NLS_PROVIDER")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi NLS_PROVIDER presenter
     }
     else if (propertyType.equals("SQL_STYLE")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi sql_style presenter
     }
     else if (propertyType.equals("SQL")) {
-//      presenter = new MultiLineStringPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi SQL presenter
     }
     else if (propertyType.equals("TEXT")) {
-//      presenter = new NlsTextPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi TEXT presenter
     }
     else if (propertyType.equals("VERTICAL_ALIGNMENT")) {
-//      presenter = new VerticalAglinmentPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi VERTICAL_ALIGNMENT presenter
     }
     else if (propertyType.equals("CHART_QNAME")) {
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi CHART_QNAME presenter
     }
     else if (propertyType.equals("HOUR_OF_DAY")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi HOUR_OF_DAY presenter
     }
     else if (propertyType.equals("DURATION_MINUTES")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi DURATION_MINUTES presenter
     }
     else if (propertyType.equals("MENU_CLASS")) {
-      // TODO
-//      presenter = new ABC(getFormToolkit(), parent);
-//      presenter.setMethod(method);
+      //TODO: multi MENU_CLASS presenter
     }
     else if (propertyType.equals("PRIMITIVE_TYPE")) {
-//      presenter = new PrimitiveTypePresenter(getFormToolkit(), parent);
-//      presenter.setMethod(methodSet);
+      //TODO: multi PRIMITIVE_TYPE presenter
     }
+
     // layout
     if (presenter != null) {
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
@@ -280,7 +226,7 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
       m_methodPresenters.put(methodSet.getMethodName(), presenter);
     }
     else {
-      ScoutSdkUi.logWarning("Could not find a presenter for property '" + propertyType + "'.");
+      ScoutSdkUi.logInfo("Could not find a multi presenter for property '" + propertyType + "'.");
     }
     return presenter;
   }

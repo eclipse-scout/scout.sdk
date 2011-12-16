@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -94,7 +95,7 @@ public class BeanPropertyTablePage extends AbstractPage {
   private class P_MethodChangedListener implements IJavaResourceChangedListener {
     @Override
     public void handleEvent(JdtEvent event) {
-      if (TypeUtility.hasAnnotation((IAnnotatable) event.getElement(), RuntimeClasses.FormData)) {
+      if (JdtUtility.hasAnnotation((IAnnotatable) event.getElement(), RuntimeClasses.FormData)) {
         markStructureDirty();
       }
     }

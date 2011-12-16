@@ -17,11 +17,9 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
-import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction;
-import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
@@ -100,7 +98,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
   @Override
   public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class, SearchFormNewAction.class,
-        PageNewAction.class, PageLinkAction.class, WellformScoutTypeAction.class, TableColumnWidthsPasteAction.class};
+        /*PageNewAction.class, PageLinkAction.class, */WellformScoutTypeAction.class, TableColumnWidthsPasteAction.class};
   }
 
   @Override
@@ -114,14 +112,14 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
     else if (menu instanceof SearchFormNewAction) {
       ((SearchFormNewAction) menu).init(getType(), getScoutResource());
     }
-    else if (menu instanceof PageNewAction) {
+    /*else if (menu instanceof PageNewAction) {
       PageNewAction action = (PageNewAction) menu;
       action.init(getScoutResource(), getType());
     }
     else if (menu instanceof PageLinkAction) {
       PageLinkAction action = (PageLinkAction) menu;
       action.init(getScoutResource(), getType());
-    }
+    }*/
     else if (menu instanceof WellformScoutTypeAction) {
       ((WellformScoutTypeAction) menu).setType(getType());
     }

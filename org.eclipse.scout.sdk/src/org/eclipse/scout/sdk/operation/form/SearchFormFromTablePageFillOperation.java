@@ -21,6 +21,7 @@ import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.form.field.BigdecimalFieldNewOperation;
 import org.eclipse.scout.sdk.operation.form.field.BooleanFieldNewOperation;
@@ -32,6 +33,7 @@ import org.eclipse.scout.sdk.operation.form.field.SmartFieldNewOperation;
 import org.eclipse.scout.sdk.operation.form.field.StringFieldNewOperation;
 import org.eclipse.scout.sdk.operation.form.field.TabBoxNewOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.template.sequencebox.DateFromToTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.DateTimeFromToTemplate;
 import org.eclipse.scout.sdk.operation.template.sequencebox.DoubleFromToTemplate;
@@ -103,26 +105,6 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     workingCopyManager.register(getSearchFormType().getCompilationUnit(), monitor);
 
     INlsProject nlsProvider = ScoutTypeUtility.findNlsProject(getTablePageType());
-
-    // // first, add needed methods for the table page
-    // if (getConfSearchMethodFromTablePage() != null) {
-    // opDel = new BCMethodDeleteOperation(getConfSearchMethodFromTablePage());
-    // opDel.run(m_monitor, m_workingCopyManager);
-    // }
-    // if (getSearchGetterMethodFromTablePage() != null) {
-    // opDel = new BCMethodDeleteOperation(getSearchGetterMethodFromTablePage());
-    // opDel.run(m_monitor, m_workingCopyManager);
-    // }
-    //
-    // m_parentType.createMethod("@Override\npublic Class< ? extends ISearchForm> getConfiguredSearchForm(){\n"+TAB+"return "+searchFormName+".class;\n}", null, true, m_monitor);
-    // m_parentType.createMethod("public "+searchFormName+" getSearchForm(){\n"+TAB+"return ("+searchFormName+") getSearchFormInternal();\n}", null, true, m_monitor);
-    // m_parentType.createImport(getImplementationPackageName()+"."+searchFormName, m_monitor);
-    // m_parentType.createImport(RuntimeClasses.ISearchForm, m_monitor);
-
-    // create constructor & textimport of searchform
-    // getSearchFormType().createImport(RuntimeClasses.ProcessingException, m_monitor);
-    // getSearchFormType().createImport(m_group.getSharedProject().getRootPackageName()+".Texts", m_monitor);
-    // getSearchFormType().createMethod("public " + m_model.getTypeName() + "() throws ProcessingException{\n"+TAB+"super();\n}", null, true, m_monitor);
     if (getFormDataType() != null) {
       CompilationUnitImportValidator icuvalidator = new CompilationUnitImportValidator(getSearchFormType().getCompilationUnit());
       StringBuilder content = new StringBuilder();
@@ -162,13 +144,6 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     searchButtonOp.setTypeName("Search" + SdkProperties.SUFFIX_BUTTON);
     searchButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSearchButton, true));
     searchButtonOp.run(monitor, workingCopyManager);
-    // // criteria box
-    // GroupBoxNewOperation criteriaBoxOp=new GroupBoxNewOperation(tabBox);
-    // criteriaBoxOp.setTypeName("Criteria" + ScoutIdeProperties.SUFFIX_GROUP_BOX);
-    // criteriaBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
-    // criteriaBoxOp.run(monitor, workingCopyManager);
-    // IScoutType criteriaBox=criteriaBoxOp.getCreatedField();
-    // getConfiguredLabel
     // field box
     GroupBoxNewOperation fieldBoxOp = new GroupBoxNewOperation(tabBox);
     fieldBoxOp.setTypeName("Field" + SdkProperties.SUFFIX_GROUP_BOX);
@@ -185,16 +160,17 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
         searchCriteriaEntry = entry;
       }
     }
-    StringBuilder getConfiguredLabelBuilder = new StringBuilder();
-    getConfiguredLabelBuilder.append("@Override\npublic String getConfiguredLabel(){\n");
-    getConfiguredLabelBuilder.append(SdkProperties.TAB + " return ");
     if (searchCriteriaEntry == null) {
-      getConfiguredLabelBuilder.append("\"Search Criteria\";\n}");
+      ConfigPropertyMethodUpdateOperation getConfiguredLabel = new ConfigPropertyMethodUpdateOperation(fieldBox, NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL, SdkProperties.TAB + "return \"Search Criteria\";", false);
+      getConfiguredLabel.validate();
+      getConfiguredLabel.run(monitor, workingCopyManager);
     }
     else {
-      getConfiguredLabelBuilder.append("Texts.get(\"" + searchCriteriaEntry.getKey() + "\");\n}");
+      NlsTextMethodUpdateOperation getConfiguredLabel = new NlsTextMethodUpdateOperation(fieldBox, NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL, false);
+      getConfiguredLabel.setNlsEntry(searchCriteriaEntry);
+      getConfiguredLabel.validate();
+      getConfiguredLabel.run(monitor, workingCopyManager);
     }
-    fieldBox.createMethod(getConfiguredLabelBuilder.toString(), null, true, monitor);
 
     ITypeHierarchy tablePageHierarchy = TypeUtility.getLocalTypeHierarchy(getTablePageType());
     IType[] tables = TypeUtility.getInnerTypes(getTablePageType(), TypeFilters.getSubtypeFilter(iTable, tablePageHierarchy));

@@ -55,6 +55,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
     // link area
     ISection linkSection = createSection(SECTION_ID_LINKS, Texts.get("Links"));
     fillLinkSection(linkSection.getSectionClient());
+    linkSection.setExpanded(wasSectionExpanded(SECTION_ID_LINKS, true));
     super.createSections();
   }
 

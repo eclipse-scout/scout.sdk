@@ -63,7 +63,7 @@ public class Section implements ISection {
     m_uiSection.addExpansionListener(new ExpansionAdapter() {
       @Override
       public void expansionStateChanged(ExpansionEvent e) {
-        m_form.reflow(true);
+        reflow();
       }
     });
     m_uiSection.setText(title);
@@ -117,7 +117,7 @@ public class Section implements ISection {
       }
       m_uiSection.setVisible(visible);
       m_form.layout(true, true);
-      m_form.reflow(true);
+      reflow();
     }
   }
 
@@ -128,7 +128,11 @@ public class Section implements ISection {
 
   @Override
   public void setExpanded(boolean expanded) {
-    m_uiSection.setExpanded(expanded);
+    if (isExpanded() != expanded) {
+      // expand forces a complete re-layout and redraw (slow).
+      // only call if a change is necessary.
+      m_uiSection.setExpanded(expanded);
+    }
   }
 
   /**
@@ -798,4 +802,8 @@ public class Section implements ISection {
     m_uiSection.update();
   }
 
+  @Override
+  public void reflow() {
+    m_form.reflow(true);
+  }
 }

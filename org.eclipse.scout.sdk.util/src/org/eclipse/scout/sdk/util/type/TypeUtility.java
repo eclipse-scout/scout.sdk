@@ -22,8 +22,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IAnnotatable;
-import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
@@ -367,31 +365,6 @@ public class TypeUtility {
       Arrays.sort(arr2, TypeComparators.getHashCodeComparator());
       return Arrays.equals(arr1, arr2);
     }
-  }
-
-  public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
-    try {
-      IAnnotation annotation = element.getAnnotation(fullyQuallifiedAnnotation);
-      // workaround since annotations are not cached properly from jdt
-      if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
-        return annotation;
-      }
-      else {
-        String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
-        annotation = element.getAnnotation(simpleName);
-        if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
-          return annotation;
-        }
-      }
-    }
-    catch (JavaModelException e) {
-      SdkUtilActivator.logError("could not get annotation '" + fullyQuallifiedAnnotation + "' of '" + element + "'", e);
-    }
-    return null;
-  }
-
-  public static boolean hasAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
-    return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
   }
 
   public static IMethod getOverwrittenMethod(IMethod method, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) {

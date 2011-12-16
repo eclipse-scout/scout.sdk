@@ -50,6 +50,7 @@ import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -227,7 +228,7 @@ public class ScoutTypeUtility extends TypeUtility {
   private static void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner) throws JavaModelException {
     IAnnotation annotation = null;
     if (element instanceof IAnnotatable) {
-      annotation = TypeUtility.getAnnotation((IAnnotatable) element, RuntimeClasses.FormData);
+      annotation = JdtUtility.getAnnotation((IAnnotatable) element, RuntimeClasses.FormData);
     }
     if (TypeUtility.exists(annotation)) {
       // context type
@@ -543,6 +544,34 @@ public class ScoutTypeUtility extends TypeUtility {
     return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IFormField), hierarchy, ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
+  public static Double getOrderAnnotationValue(IAnnotatable a) throws JavaModelException {
+    Double sortNo = null;
+    IAnnotation annotation = JdtUtility.getAnnotation(a, RuntimeClasses.Order);
+    if (TypeUtility.exists(annotation)) {
+      IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
+      for (IMemberValuePair p : memberValues) {
+        if ("value".equals(p.getMemberName())) {
+          switch (p.getValueKind()) {
+            case IMemberValuePair.K_DOUBLE:
+              sortNo = ((Double) p.getValue()).doubleValue();
+              break;
+            case IMemberValuePair.K_FLOAT:
+              sortNo = ((Float) p.getValue()).doubleValue();
+              break;
+            case IMemberValuePair.K_INT:
+              sortNo = ((Integer) p.getValue()).doubleValue();
+              break;
+            default:
+              sortNo = null;
+              break;
+          }
+          break;
+        }
+      }
+    }
+    return sortNo;
+  }
+
   public static IType[] getFormFieldsWithoutButtons(IType declaringType) {
     return getFormFieldsWithoutButtons(declaringType, TypeUtility.getLocalTypeHierarchy(declaringType));
   }
@@ -788,12 +817,12 @@ public class ScoutTypeUtility extends TypeUtility {
             newMethod.pushMethod(m);
           }
           else {
-            IAnnotation configOpAnnotation = TypeUtility.getAnnotation(m, RuntimeClasses.ConfigOperation);
+            IAnnotation configOpAnnotation = JdtUtility.getAnnotation(m, RuntimeClasses.ConfigOperation);
             if (TypeUtility.exists(configOpAnnotation)) {
               newMethod = new ConfigurationMethod(declaringType, superTypeHierarchy, methodName, ConfigurationMethod.OPERATION_METHOD);
               newMethod.pushMethod(m);
             }
-            IAnnotation configPropAnnotation = TypeUtility.getAnnotation(m, RuntimeClasses.ConfigProperty);
+            IAnnotation configPropAnnotation = JdtUtility.getAnnotation(m, RuntimeClasses.ConfigProperty);
             if (TypeUtility.exists(configPropAnnotation)) {
               String configPropertyType = null;
               for (IMemberValuePair p : configPropAnnotation.getMemberValuePairs()) {
@@ -854,7 +883,7 @@ public class ScoutTypeUtility extends TypeUtility {
         if (visitedMethodNames.contains(annotatedMethod.getElementName())) {
           continue;
         }
-        IAnnotation validationRuleAnnotation = TypeUtility.getAnnotation(annotatedMethod, RuntimeClasses.ValidationRule);
+        IAnnotation validationRuleAnnotation = JdtUtility.getAnnotation(annotatedMethod, RuntimeClasses.ValidationRule);
         if (!TypeUtility.exists(validationRuleAnnotation)) {
           continue;
         }

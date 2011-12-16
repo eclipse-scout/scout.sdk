@@ -4,16 +4,16 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type;
 
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.IPropertyBeanFilter;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * Convenience class for commonly used {@link IPropertyBeanFilter}.
@@ -33,10 +33,10 @@ public final class ScoutPropertyBeanFilters {
     return new IPropertyBeanFilter() {
       @Override
       public boolean accept(IPropertyBean property) {
-        if (property.getReadMethod() == null || TypeUtility.getAnnotation(property.getReadMethod(), RuntimeClasses.FormData) == null) {
+        if (property.getReadMethod() == null || JdtUtility.getAnnotation(property.getReadMethod(), RuntimeClasses.FormData) == null) {
           return false;
         }
-        if (property.getWriteMethod() == null || TypeUtility.getAnnotation(property.getWriteMethod(), RuntimeClasses.FormData) == null) {
+        if (property.getWriteMethod() == null || JdtUtility.getAnnotation(property.getWriteMethod(), RuntimeClasses.FormData) == null) {
           return false;
         }
         return true;
