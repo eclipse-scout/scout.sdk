@@ -43,6 +43,7 @@ public class CodeNewOperation implements IOperation {
   private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
+  private String m_genericTypeSignature;
   private IJavaElement m_sibling;
   private boolean m_formatSource;
   // out members
@@ -79,7 +80,7 @@ public class CodeNewOperation implements IOperation {
     codeOp.setSibling(getSibling());
     codeOp.setOrderDefinitionType(iCode);
     codeOp.setSuperTypeSignature(getSuperTypeSignature());
-    codeOp.setTypeModifiers(Flags.AccPublic);
+    codeOp.setTypeModifiers(Flags.AccPublic | Flags.AccStatic);
     codeOp.validate();
     codeOp.run(monitor, workingCopyManager);
     m_createdCode = codeOp.getCreatedType();
@@ -94,14 +95,11 @@ public class CodeNewOperation implements IOperation {
     IJavaElement nlsMethodSibling = null;
     String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
     if (typeArguments != null && typeArguments.length > 0) {
-      String longSignature = Signature.createTypeSignature(Long.class.getName(), true);
-      // is Long
-      if (longSignature.equals(typeArguments[0])) {
-        String codeId = getNextCodeId();
-        final String todo = (StringUtility.isNullOrEmpty(codeId)) ? (ScoutUtility.getCommentBlock("create code id.")) : ("");
-        if (StringUtility.isNullOrEmpty(codeId)) {
-          codeId = "0L";
-        }
+      String typeSig = getGenericTypeSignature();
+      if (typeSig.equals(typeArguments[0])) {
+        final boolean isCodeIdUndef = StringUtility.isNullOrEmpty(getNextCodeId());
+        final String todo = isCodeIdUndef ? ScoutUtility.getCommentBlock("Auto-generated value") : "";
+        final String codeId = isCodeIdUndef ? "null" : getNextCodeId();
         FieldCreateOperation idOp = new FieldCreateOperation(getCreatedCode(), "ID", false) {
           @Override
           public void buildSource(StringBuilder builder, IImportValidator validator) throws JavaModelException {
@@ -111,8 +109,8 @@ public class CodeNewOperation implements IOperation {
         };
 
         idOp.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
-        idOp.setSignature(Signature.SIG_LONG);
-        idOp.setSimpleInitValue("" + codeId);
+        idOp.setSignature(typeSig);
+        idOp.setSimpleInitValue(codeId);
         idOp.validate();
         idOp.run(monitor, workingCopyManager);
         MethodOverrideOperation getIdOp = new MethodOverrideOperation(getCreatedCode(), "getId", false);
@@ -197,5 +195,13 @@ public class CodeNewOperation implements IOperation {
 
   public String getSuperTypeSignature() {
     return m_superTypeSignature;
+  }
+
+  public void setGenericTypeSignature(String genericTypeSignature) {
+    m_genericTypeSignature = genericTypeSignature;
+  }
+
+  public String getGenericTypeSignature() {
+    return m_genericTypeSignature;
   }
 }

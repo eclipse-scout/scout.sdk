@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
-import java.util.HashMap;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -36,11 +34,10 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.CodeIdExtensionPoint;
+import org.eclipse.scout.sdk.ui.internal.fields.code.CodeIdField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -60,12 +57,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   final IType abstractCodeType = TypeUtility.getType(RuntimeClasses.AbstractCodeType);
 
   private String m_nextCodeId;
+  private String m_nextCodeIdSource;
   private NlsProposal m_nlsName;
   private String m_typeName;
   private ITypeProposal m_superType;
   private SignatureProposal m_genericSignature;
 
-  private StyledTextField m_nextCodeIdField;
+  private CodeIdField m_nextCodeIdField;
   private NlsProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
@@ -74,7 +72,6 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   // process members
 
   private final IScoutBundle m_sharedBundle;
-  private final HashMap<String, ICodeIdFieldValueParser> m_valueParsers;
 
   public CodeTypeNewWizardPage(IScoutBundle sharedBundle) {
     super(CodeTypeNewWizardPage.class.getName());
@@ -83,94 +80,6 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewCodeType"));
     m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractCodeType)[0];
     m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
-    m_valueParsers = new HashMap<String, CodeTypeNewWizardPage.ICodeIdFieldValueParser>();
-    initValueParsers();
-  }
-
-  private void initValueParsers() {
-    // Long
-    m_valueParsers.put(Signature.createTypeSignature(Long.class.getName(), true), new AbstractNumberCodeIdFieldValueParser('L') {
-      @Override
-      protected void parseNum(String val) throws NumberFormatException {
-        Long.parseLong(val);
-      }
-    });
-
-    // Integer
-    m_valueParsers.put(Signature.createTypeSignature(Integer.class.getName(), true), new AbstractNumberCodeIdFieldValueParser() {
-      @Override
-      protected void parseNum(String val) throws NumberFormatException {
-        Integer.parseInt(val);
-      }
-    });
-
-    // Double
-    m_valueParsers.put(Signature.createTypeSignature(Double.class.getName(), true), new AbstractNumberCodeIdFieldValueParser('D') {
-      @Override
-      protected void parseNum(String val) throws NumberFormatException {
-        Double.parseDouble(val);
-      }
-    });
-
-    // Float
-    m_valueParsers.put(Signature.createTypeSignature(Float.class.getName(), true), new AbstractNumberCodeIdFieldValueParser('F') {
-      @Override
-      protected void parseNum(String val) throws NumberFormatException {
-        Float.parseFloat(val);
-      }
-    });
-
-    // String
-    m_valueParsers.put(Signature.createTypeSignature(String.class.getName(), true), new ICodeIdFieldValueParser() {
-      @Override
-      public boolean isValid(String val) {
-        return true;
-      }
-
-      @Override
-      public String getSource(String val) {
-        if (val == null) return null;
-        return JdtUtility.toStringLiteral(val);
-      }
-    });
-
-    // Boolean
-    m_valueParsers.put(Signature.createTypeSignature(Boolean.class.getName(), true), new ICodeIdFieldValueParser() {
-      @Override
-      public boolean isValid(String val) {
-        return StringUtility.isNullOrEmpty(val) || "true".equals(val) || "false".equals(val);
-      }
-
-      @Override
-      public String getSource(String val) {
-        return val;
-      }
-    });
-  }
-
-  private void setCodeIdEnabledState(SignatureProposal sigProposal) {
-    boolean enabled = false;
-
-    // calculate if the codeId field should be enabled.
-    if (sigProposal != null) {
-      String sig = sigProposal.getSignature();
-      if (sig != null) {
-        ICodeIdFieldValueParser parser = m_valueParsers.get(sig);
-        enabled = parser != null;
-      }
-    }
-
-    // set the current code id
-    if (enabled) {
-      if (StringUtility.isNullOrEmpty(getNextCodeId())) {
-        setNextCodeId(CodeIdExtensionPoint.getNextCodeId(getSharedBundle().getScoutProject(), getGenericSignature().getSignature()));
-      }
-    }
-    else {
-      setNextCodeId(null);
-    }
-
-    m_nextCodeIdField.setEnabled(enabled);
   }
 
   @Override
@@ -180,15 +89,12 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    if (getGenericSignature() != null) {
-      setNextCodeId(CodeIdExtensionPoint.getNextCodeId(getSharedBundle().getScoutProject(), getGenericSignature().getSignature()));
-    }
-    m_nextCodeIdField = getFieldToolkit().createStyledTextField(parent, Texts.get("CodeId"));
-    m_nextCodeIdField.setText(getNextCodeId());
+    m_nextCodeIdField = new CodeIdField(parent, getSharedBundle().getScoutProject());
     m_nextCodeIdField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
-        m_nextCodeId = m_nextCodeIdField.getText();
+        m_nextCodeId = m_nextCodeIdField.getValue();
+        m_nextCodeIdSource = m_nextCodeIdField.getValueSource();
         pingStateChanging();
       }
     });
@@ -266,13 +172,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         try {
           setStateChanging(true);
           m_genericSignature = (SignatureProposal) event.proposal;
-          setCodeIdEnabledState(getGenericSignature());
         }
         finally {
           setStateChanging(false);
         }
       }
     });
+    m_nextCodeIdField.setGenericTypeField(m_genericTypeField);
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -305,15 +211,10 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
       op.setSuperTypeSignature(sig);
     }
-    if (getGenericSignature() != null && getGenericSignature().getSignature() != null && !StringUtility.isNullOrEmpty(getNextCodeId())) {
-      ICodeIdFieldValueParser parser = m_valueParsers.get(getGenericSignature().getSignature());
-      if (parser != null) {
-        op.setNextCodeId(parser.getSource(getNextCodeId()));
-      }
-    }
     if (getGenericSignature() != null) {
       op.setGenericTypeSignature(getGenericSignature().getSignature());
     }
+    op.setNextCodeId(getNextCodeIdSource());
     op.setFormatSource(true);
     op.validate();
     op.run(monitor, workingCopyManager);
@@ -323,7 +224,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void validatePage(MultiStatus multiStatus) {
     try {
-      multiStatus.add(getStatusCodeIdField());
+      multiStatus.add(getStatusNextCodeIdField());
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
       multiStatus.add(getStatusGenericType());
@@ -337,21 +238,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_sharedBundle;
   }
 
-  protected IStatus getStatusCodeIdField() throws JavaModelException {
-    if (getGenericSignature() != null && getGenericSignature().getSignature() != null && !StringUtility.isNullOrEmpty(getNextCodeId())) {
-      ICodeIdFieldValueParser parser = m_valueParsers.get(getGenericSignature().getSignature());
-
-      if (parser != null) {
-        if (!parser.isValid(getNextCodeId())) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("CodeIdNotValid"));
-        }
-      }
-      else {
-        // we have a code id but no parser that can handle it -> should not happen -> error
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("CodeIdNotValid"));
-      }
+  protected IStatus getStatusNextCodeIdField() throws JavaModelException {
+    if (isControlCreated()) {
+      return m_nextCodeIdField.getStatus();
     }
-    return Status.OK_STATUS;
+    else {
+      return Status.OK_STATUS;
+    }
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
@@ -394,7 +287,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       setStateChanging(true);
       m_nextCodeId = nextCodeId;
       if (isControlCreated()) {
-        m_nextCodeIdField.setText(nextCodeId);
+        m_nextCodeIdField.setValue(nextCodeId);
       }
     }
     finally {
@@ -404,6 +297,10 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   public String getNextCodeId() {
     return m_nextCodeId;
+  }
+
+  public String getNextCodeIdSource() {
+    return m_nextCodeIdSource;
   }
 
   public NlsProposal getNlsName() {
@@ -472,66 +369,5 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   public SignatureProposal getGenericSignature() {
     return m_genericSignature;
-  }
-
-  private static interface ICodeIdFieldValueParser {
-    boolean isValid(String val);
-
-    String getSource(String val);
-  }
-
-  private abstract static class AbstractNumberCodeIdFieldValueParser implements ICodeIdFieldValueParser {
-
-    private final String m_numTypeSuffixLo;
-    private final String m_numTypeSuffixUp;
-
-    private AbstractNumberCodeIdFieldValueParser() {
-      this(null);
-    }
-
-    private AbstractNumberCodeIdFieldValueParser(Character numTypeSuffix) {
-      if (numTypeSuffix != null) {
-        m_numTypeSuffixLo = (numTypeSuffix + "").toLowerCase();
-        m_numTypeSuffixUp = (numTypeSuffix + "").toUpperCase();
-      }
-      else {
-        m_numTypeSuffixLo = null;
-        m_numTypeSuffixUp = null;
-      }
-    }
-
-    protected abstract void parseNum(String val) throws NumberFormatException;
-
-    @Override
-    public final boolean isValid(String val) {
-      try {
-        if (m_numTypeSuffixLo != null && m_numTypeSuffixUp != null) {
-          val = val.replaceAll("[" + m_numTypeSuffixUp + m_numTypeSuffixLo + "]{0,1}$", "");
-        }
-        parseNum(val);
-        return true;
-      }
-      catch (NumberFormatException e) {
-      }
-      return false;
-    }
-
-    @Override
-    public final String getSource(String val) {
-      if (val == null) {
-        return null;
-      }
-      else if (m_numTypeSuffixLo != null && val.toLowerCase().endsWith(m_numTypeSuffixLo)) {
-        return val;
-      }
-      else {
-        if (m_numTypeSuffixLo == null) {
-          return val;
-        }
-        else {
-          return val + m_numTypeSuffixLo;
-        }
-      }
-    }
   }
 }
