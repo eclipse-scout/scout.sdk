@@ -126,8 +126,8 @@ public class BindingFileCreateOperation implements IOperation {
 //    bindingJavaTypeXml.setName("jaxb:javaType");
 //    bindingJavaTypeXml.setAttribute("name", Date.class.getName());
 //    bindingJavaTypeXml.setAttribute("xmlType", "xsd:dateTime");
-//    bindingJavaTypeXml.setAttribute("parseMethod", "org.eclipse.scout.jaxws216.adapters.DateAdapterISO8601UTC.parseDate");
-//    bindingJavaTypeXml.setAttribute("printMethod", "org.eclipse.scout.jaxws216.adapters.DateAdapterISO8601UTC.printDate");
+//    bindingJavaTypeXml.setAttribute("parseMethod", "org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC.parseDate");
+//    bindingJavaTypeXml.setAttribute("printMethod", "org.eclipse.scout.jaxws.adapters.DateAdapterISO8601UTC.printDate");
 
     ByteArrayOutputStream os = new ByteArrayOutputStream();
     try {
