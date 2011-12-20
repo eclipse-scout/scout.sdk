@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
-import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.JaxWsAliasChangeWizard;
+import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.JaxWsServletRegistrationWizard;
 import org.eclipse.swt.widgets.Shell;
 
 public class JaxWsAliasChangeWizardAction extends AbstractLinkAction {
@@ -41,9 +41,9 @@ public class JaxWsAliasChangeWizardAction extends AbstractLinkAction {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    IWizard wizard = new JaxWsAliasChangeWizard(m_bundle);
+    IWizard wizard = new JaxWsServletRegistrationWizard(m_bundle);
     ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
-    wizardDialog.setPageSize(250, 50);
+    wizardDialog.setPageSize(650, 150);
     wizardDialog.setHelpAvailable(false);
     wizardDialog.open();
     return null;

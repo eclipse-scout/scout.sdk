@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -27,10 +27,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsdlStyleEnum;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
@@ -70,6 +71,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
   private BasicPropertySupport m_propertySupport;
 
   private IScoutBundle m_bundle;
+  private String m_jaxWsServletAlias;
 
   private StyledTextField m_wsdlNameField;
   private Button m_deriveOtherNameButton;
@@ -93,12 +95,13 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
   public WsPropertiesNewWsdlWizardPage(IScoutBundle bundle) {
     super(WsPropertiesNewWsdlWizardPage.class.getName());
     setTitle(Texts.get("ConfigureWebserviceProperties"));
-    setDescription(Texts.get("ClickNextToContinue"));
+    setDescription(Texts.get("ConfigureWebserviceProperties"));
 
     m_bundle = bundle;
     m_propertySupport = new BasicPropertySupport(this);
     m_sunJaxWsXml = ResourceFactory.getSunJaxWsResource(bundle).loadXml();
     m_wsdlStyleRadioButtons = new LinkedList<Button>();
+    m_jaxWsServletAlias = JaxWsConstants.JAX_WS_ALIAS;
 
     loadIllegalValues();
     applyDefaults();
@@ -159,13 +162,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
 
     m_urlPattern = getFieldToolkit().createStyledTextField(parent, Texts.get("UrlPattern"));
     m_urlPattern.setText(getWsdlName());
-    String configuredUrlPattern = JaxWsSdkUtility.getJaxWsAlias(m_bundle);
-    if (configuredUrlPattern != null) {
-      m_urlPattern.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(configuredUrlPattern, SeparatorType.BothType));
-    }
-    else {
-      m_urlPattern.setReadOnlyPrefix("/");
-    }
+    m_urlPattern.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(m_jaxWsServletAlias, SeparatorType.BothType));
     m_urlPattern.setVisible(!isShowOnlyWsdlProperties());
     m_urlPattern.addModifyListener(new ModifyListener() {
 
@@ -364,25 +361,20 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
       return;
     }
 
-    if (m_sunJaxWsXml == null || m_sunJaxWsXml.getRoot() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XdoesNotExistDueToInexistenceOrCorruptResource", ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName())));
-      return;
-    }
-
     // WSDL name
     if (!isShowOnlyWsdlProperties()) {
       if (StringUtility.isNullOrEmpty(getWsdlName())) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_wsdlNameField.getLabelText())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_wsdlNameField.getLabelText())));
       }
       IStatus validationStatus = m_bundle.getProject().getWorkspace().validateName(getWsdlName(), IResource.FILE);
       multiStatus.add(validationStatus);
 
       // alias
       if (StringUtility.isNullOrEmpty(getAlias())) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_alias.getLabelText())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_alias.getLabelText())));
       }
       else if (m_illegalAliasNames.contains(getAlias())) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_alias.getLabelText(), getAlias())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_alias.getLabelText(), getAlias())));
       }
       else {
         IStatus status = m_bundle.getProject().getWorkspace().validateName(getAlias(), IResource.FILE);
@@ -392,18 +384,17 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
       }
 
       // URL pattern
-      String configuredUrlPattern = JaxWsSdkUtility.getJaxWsAlias(m_bundle);
-      if (StringUtility.isNullOrEmpty(getUrlPattern()) || getUrlPattern().equals(configuredUrlPattern)) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPattern.getLabelText())));
+      if (StringUtility.isNullOrEmpty(getUrlPattern()) || getUrlPattern().equals(m_jaxWsServletAlias)) {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPattern.getLabelText())));
       }
-      else if (!getUrlPattern().startsWith(configuredUrlPattern)) {
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), configuredUrlPattern)));
+      else if (!getUrlPattern().startsWith(m_jaxWsServletAlias)) {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), m_jaxWsServletAlias)));
       }
-      else if (getUrlPattern().matches(".*\\s+.*")) { // check for whitespaces
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("UrlXshouldNotContainWhitespaces", getUrlPattern())));
+      else if (!getUrlPattern().matches(".*[\\w\\-]+.*")) { // check for illegal characters
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidUrlX", getUrlPattern())));
       }
       else if (m_illegalUrlPatterns.contains(getUrlPattern())) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_urlPattern.getLabelText(), getUrlPattern())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_urlPattern.getLabelText(), getUrlPattern())));
       }
     }
 
@@ -419,7 +410,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     validateJavaField(multiStatus, m_portTypeNameField.getLabelText(), getPortTypeName());
     // service operation name
     if (StringUtility.isNullOrEmpty(getServiceOperationName())) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_serviceOperationNameField.getLabelText())));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_serviceOperationNameField.getLabelText())));
     }
     else {
       IStatus validationStatus = JavaConventionsUtil.validateMethodName(getServiceOperationName(), m_bundle.getJavaProject());
@@ -509,6 +500,13 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
 
   public String getUrlPattern() {
     return m_propertySupport.getPropertyString(PROP_URL_PATTERN);
+  }
+
+  public void setJaxWsServletAlias(String jaxWsServletAlias) {
+    m_jaxWsServletAlias = jaxWsServletAlias;
+    if (isControlCreated()) {
+      m_urlPattern.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(m_jaxWsServletAlias, SeparatorType.BothType));
+    }
   }
 
   public void setTargetNamespace(String targetNamespace) {
@@ -672,25 +670,25 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
 
   private void validateTargetNamespace(MultiStatus multiStatus) {
     if (StringUtility.isNullOrEmpty(m_targetNamespaceField.getText())) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_targetNamespaceField.getLabelText())));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_targetNamespaceField.getLabelText())));
     }
     else {
       try {
         new URL(m_targetNamespaceField.getText());
       }
       catch (MalformedURLException e) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TargetNamespaceMustBeValudUrl")));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("TargetNamespaceMustBeValudUrl")));
       }
 
       if (!m_targetNamespaceField.getText().endsWith("/")) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Target Namespace must end with a slash"));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "Target Namespace must end with a slash"));
       }
     }
   }
 
   private void validateJavaField(MultiStatus multiStatus, String label, String text) {
     if (StringUtility.isNullOrEmpty(text)) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", label)));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", label)));
       return;
     }
     IStatus validationStatus = m_bundle.getProject().getWorkspace().validateName(text, IResource.FILE);
@@ -700,7 +698,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     multiStatus.add(validationStatus);
 
     if (Character.isLowerCase(text.charAt(0))) {
-      multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("UpperCaseHint")));
+      multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("UpperCaseHint")));
     }
   }
 
@@ -725,10 +723,12 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     Set<String> illegalAliases = new HashSet<String>();
     Set<String> illegalUrlPatterns = new HashSet<String>();
 
-    for (Object xmlSunJaxWs : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-      SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) xmlSunJaxWs);
-      illegalAliases.add(sunJaxWsBean.getAlias());
-      illegalUrlPatterns.add(sunJaxWsBean.getUrlPattern());
+    if (m_sunJaxWsXml != null) {
+      for (Object xmlSunJaxWs : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) xmlSunJaxWs);
+        illegalAliases.add(sunJaxWsBean.getAlias());
+        illegalUrlPatterns.add(sunJaxWsBean.getUrlPattern());
+      }
     }
 
     m_illegalAliasNames = illegalAliases;

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -24,6 +25,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsStubGenerationOperation;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -50,6 +52,8 @@ public class StubRebuildCommand extends AbstractExecutableMarkerCommand {
     op.setProperties(m_properties);
     op.addOperationFinishedListener(new P_OperationFinishedListener());
     op.setWsdlFileName(m_wsdlResource.getFile().getName());
+    IPath wsdlFolderPath = m_wsdlResource.getFile().getProjectRelativePath().removeLastSegments(1); // get folder of WSDL file
+    op.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false));
     op.run(monitor, workingCopyManager);
   }
 

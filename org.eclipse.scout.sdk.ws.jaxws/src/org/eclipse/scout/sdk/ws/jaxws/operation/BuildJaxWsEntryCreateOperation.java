@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
+import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 
@@ -54,7 +55,13 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutXmlDocument xmlDocument = ResourceFactory.getBuildJaxWsResource(m_bundle).loadXml();
+    XmlResource buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(m_bundle);
+    if (buildJaxWsResource.getFile() == null || !buildJaxWsResource.getFile().exists()) {
+      // create build-jaxws.xml file
+      BuildJaxWsFileCreateOperation op = new BuildJaxWsFileCreateOperation(m_bundle);
+      op.run(monitor, workingCopyManager);
+    }
+    ScoutXmlDocument xmlDocument = buildJaxWsResource.loadXml();
 
     ScoutXmlElement xml;
     if (m_webserviceEnum == WebserviceEnum.Provider) {
@@ -64,7 +71,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
       xml = xmlDocument.getRoot().addChild(BuildJaxWsBean.XML_CONSUMER);
     }
 
-    BuildJaxWsBean bean = new BuildJaxWsBean(xml);
+    BuildJaxWsBean bean = new BuildJaxWsBean(xml, m_webserviceEnum);
     bean.setAlias(m_alias);
     if (m_webserviceEnum == WebserviceEnum.Consumer) {
       bean.setWsdl(m_wsdlFile); // if provider, this is stored in sun-jaxws.xml
@@ -72,7 +79,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
     bean.setProperties(m_buildProperties);
     m_createdBuildJaxWsBean = bean;
 
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_createdBuildJaxWsBean.getXml().getDocument(), m_alias, IResourceListener.EVENT_BUILDJAXWS_ENTRY_ADDED, monitor);
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_createdBuildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_ENTRY_ADDED, monitor, m_alias);
   }
 
   @Override

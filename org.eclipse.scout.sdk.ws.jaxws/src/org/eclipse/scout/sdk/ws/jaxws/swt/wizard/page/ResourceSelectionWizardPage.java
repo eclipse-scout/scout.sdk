@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -22,7 +22,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -31,10 +30,10 @@ public class ResourceSelectionWizardPage extends AbstractWorkspaceWizardPage {
   private CheckboxTableViewer m_tableViewer;
   private List<ElementBean> m_elements;
 
-  public ResourceSelectionWizardPage(String title) {
+  public ResourceSelectionWizardPage(String title, String description) {
     super(ResourceSelectionWizardPage.class.getName());
     setTitle(title);
-    setDescription(Texts.get("QuestionDeletion"));
+    setDescription(description);
   }
 
   @Override

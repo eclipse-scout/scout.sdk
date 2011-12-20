@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
+import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 
 public class SunJaxWsEntryCreateOperation implements IOperation {
@@ -50,6 +51,12 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
+    if (sunJaxWsResource.getFile() == null || !sunJaxWsResource.getFile().exists()) {
+      // create sun-jaxws.xml file
+      SunJaxWsFileCreateOperation op = new SunJaxWsFileCreateOperation(m_bundle);
+      op.run(monitor, workingCopyManager);
+    }
     ScoutXmlDocument xmlDocument = ResourceFactory.getSunJaxWsResource(m_bundle).loadXml();
     String namespacePrefix = xmlDocument.getRoot().getNamePrefix();
 
@@ -67,7 +74,7 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
     bean.setWsdl(m_wsdlFile);
     m_createdSunJaxWsBean = bean;
 
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_createdSunJaxWsBean.getXml().getDocument(), m_alias, IResourceListener.EVENT_SUNJAXWS_ENTRY_ADDED, monitor);
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_createdSunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_ENTRY_ADDED, monitor, m_alias);
   }
 
   @Override

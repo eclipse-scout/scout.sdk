@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -93,6 +93,7 @@ public class BindingFileNewAction extends AbstractLinkAction {
 
     BindingFileCreateOperation op = new BindingFileCreateOperation();
     op.setBundle(m_bundle);
+    op.setWsdlDestinationFolder(JaxWsSdkUtility.getParentFolder(m_bundle, m_wsdlResource.getFile()));
     op.setProjectRelativeFilePath(new Path(bindingFileName));
     if (schema != null) {
       op.setSchemaTargetNamespace(schemaTargetNamespace);
@@ -104,7 +105,7 @@ public class BindingFileNewAction extends AbstractLinkAction {
     new OperationJob(op).schedule();
 
     m_buildJaxWsBean.setProperties(properties);
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), m_buildJaxWsBean.getAlias(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED);
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
     return null;
   }
 

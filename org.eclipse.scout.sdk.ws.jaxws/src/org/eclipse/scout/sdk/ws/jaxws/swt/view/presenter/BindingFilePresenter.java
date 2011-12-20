@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -65,7 +65,7 @@ public class BindingFilePresenter extends FilePresenter {
     m_buildJaxWsBean.setProperties(propertiers);
 
     // store property map
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), m_buildJaxWsBean.getAlias(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED);
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
     return newFile;
   }
 
@@ -85,7 +85,7 @@ public class BindingFilePresenter extends FilePresenter {
 
     // store property map
     m_buildJaxWsBean.setProperties(propertiers);
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), m_buildJaxWsBean.getAlias(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED);
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
   }
 
   private boolean removeBindingFileEntry(Map<String, List<String>> properties, String bindingFileRaw) {

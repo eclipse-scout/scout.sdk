@@ -43,7 +43,7 @@ public class SunJaxWsFileCreateOperation implements IOperation {
     rootXml.setNamespace("jws", SunJaxWsBean.NS_ENDPOINT);
     rootXml.setName("jws:endpoints");
     rootXml.setAttribute("version", "2.0");
-    ResourceFactory.getSunJaxWsResource(m_bundle, true).storeXml(xmlDocument, IResourceListener.ELEMENT_FILE, IResourceListener.EVENT_SUNJAXWS_REPLACED, monitor);
+    ResourceFactory.getSunJaxWsResource(m_bundle, true).storeXml(xmlDocument, IResourceListener.EVENT_SUNJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
   }
 
   @Override

@@ -75,7 +75,7 @@ public class MissingPortTypeCommand extends AbstractExecutableMarkerCommand {
 
     m_sunJaxWsBean.setImplementation(m_fqnPortType);
     XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
-    sunJaxWsResource.storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED);
+    sunJaxWsResource.storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
 
     JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderNodePage.class, m_markerGroupUUID, WebServiceProviderNodePage.DATA_JDT_TYPE);
     JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderCodeFirstNodePage.class, m_markerGroupUUID, WebServiceProviderCodeFirstNodePage.DATA_JDT_TYPE);

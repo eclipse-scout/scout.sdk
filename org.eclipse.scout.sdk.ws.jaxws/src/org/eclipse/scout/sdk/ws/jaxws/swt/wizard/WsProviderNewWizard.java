@@ -22,6 +22,7 @@ import javax.wsdl.PortType;
 import javax.xml.namespace.QName;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,11 +40,13 @@ import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.BindingFileCreateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.operation.BuildJaxWsEntryCreateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.operation.ExternalFileCopyOperation;
+import org.eclipse.scout.sdk.ws.jaxws.operation.JaxWsServletRegistrationOperation;
 import org.eclipse.scout.sdk.ws.jaxws.operation.SunJaxWsEntryCreateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsProviderImplNewOperation;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsStubGenerationOperation;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsdlCreateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
+import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.JaxWsServletRegistrationWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsPropertiesExistingWsdlWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsPropertiesNewWsdlWizardPage;
@@ -54,6 +57,8 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsdlSelectionWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SchemaBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility.Registration;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
 
 public class WsProviderNewWizard extends AbstractWorkspaceWizard {
@@ -62,11 +67,13 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
 
   private WsdlSelectionWizardPage m_wsdlSelectionWizardPage;
   private WsdlLocationWizardPage m_wsdlLocationWizardPage;
+  private JaxWsServletRegistrationWizardPage m_servletRegistrationWizardPage;
   private WsPropertiesNewWsdlWizardPage m_wsPropertiesNewWsdlWizardPage;
   private WsPropertiesExistingWsdlWizardPage m_wsPropertiesExistingWsdlWizardPage;
   private WsProviderImplClassWizardPage m_wsProviderImplClassWizardPage;
   private WsStubWizardPage m_wsStubWizardPage;
 
+  private JaxWsServletRegistrationOperation m_servletRegistrationOperation;
   private ExternalFileCopyOperation[] m_copyOperations;
   private BuildJaxWsEntryCreateOperation m_buildJaxWsEntryCreateOperation;
   private SunJaxWsEntryCreateOperation m_sunJaxWsEntryCreateOperation;
@@ -88,8 +95,9 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
   @Override
   public void addPages() {
     // new or existing WSDL
-    m_wsdlSelectionWizardPage = new WsdlSelectionWizardPage();
+    m_wsdlSelectionWizardPage = new WsdlSelectionWizardPage(m_bundle);
     m_wsdlSelectionWizardPage.setTitle(Texts.get("CreateWsProvider"));
+    m_wsdlSelectionWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
     m_wsdlSelectionWizardPage.addPropertyChangeListener(new P_WsdlSelectionPropertyListener());
     addPage(m_wsdlSelectionWizardPage);
 
@@ -97,13 +105,25 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     m_wsdlLocationWizardPage = new WsdlLocationWizardPage(m_bundle);
     m_wsdlLocationWizardPage.setTitle(Texts.get("CreateWsProvider"));
     m_wsdlLocationWizardPage.setExcludePage(m_wsdlSelectionWizardPage.isNewWsdl());
-    m_wsdlLocationWizardPage.addPropertyChangeListener(new P_WsdlLocationPropertyListener());
+    m_wsdlLocationWizardPage.setWsdlFolderVisible(false);
+    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
     m_wsdlLocationWizardPage.setExcludePage(true);
+    m_wsdlLocationWizardPage.addPropertyChangeListener(new P_WsdlLocationPropertyListener());
     addPage(m_wsdlLocationWizardPage);
+
+    // Servlet registration
+    m_servletRegistrationWizardPage = new JaxWsServletRegistrationWizardPage(m_bundle, false);
+    m_servletRegistrationWizardPage.setTitle(Texts.get("CreateWsProvider"));
+    m_servletRegistrationWizardPage.addPropertyChangeListener(new P_ServletRegistrationPropertyListener());
+    m_servletRegistrationWizardPage.initializeDefaultValues(m_bundle);
+    Registration registration = ServletRegistrationUtility.getServletRegistration(m_bundle);
+    m_servletRegistrationWizardPage.setExcludePage(registration != null && !StringUtility.isNullOrEmpty(registration.getAlias()));
+    addPage(m_servletRegistrationWizardPage);
 
     // WS properties of new WSDL Wizard Page
     m_wsPropertiesNewWsdlWizardPage = new WsPropertiesNewWsdlWizardPage(m_bundle);
     m_wsPropertiesNewWsdlWizardPage.setTitle(Texts.get("CreateWsProvider"));
+    m_wsPropertiesNewWsdlWizardPage.setJaxWsServletAlias(m_servletRegistrationWizardPage.getAlias());
     m_wsPropertiesNewWsdlWizardPage.addPropertyChangeListener(new P_WsPropertiesNewWsdlPropertyListener());
     m_wsPropertiesNewWsdlWizardPage.setExcludePage(true);
     addPage(m_wsPropertiesNewWsdlWizardPage);
@@ -111,6 +131,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     // WS properties of existing WSDL Wizard Page
     m_wsPropertiesExistingWsdlWizardPage = new WsPropertiesExistingWsdlWizardPage(m_bundle, WebserviceEnum.Provider);
     m_wsPropertiesExistingWsdlWizardPage.setTitle(Texts.get("CreateWsProvider"));
+    m_wsPropertiesExistingWsdlWizardPage.setJaxWsServletAlias(m_servletRegistrationWizardPage.getAlias());
     m_wsPropertiesExistingWsdlWizardPage.addPropertyChangeListener(new P_WsPropertiesExistingWsdlPropertyListener());
     m_wsPropertiesExistingWsdlWizardPage.setExcludePage(true);
     addPage(m_wsPropertiesExistingWsdlWizardPage);
@@ -131,27 +152,28 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
+    IFolder wsdlFolder = m_wsdlLocationWizardPage.getWsdlFolder();
+
     if (!m_wsdlSelectionWizardPage.isNewWsdl()) {
       File wsdlFile = m_wsdlLocationWizardPage.getWsdlFile();
-      m_wsdlFileName = wsdlFile.getName();
 
       List<ExternalFileCopyOperation> copyOperations = new LinkedList<ExternalFileCopyOperation>();
-      if (isCopyRequired(wsdlFile)) {
+      if (isCopyRequired(m_wsdlLocationWizardPage.getWsdlFolder(), wsdlFile)) {
         ExternalFileCopyOperation op = new ExternalFileCopyOperation();
         op.setBundle(m_bundle);
         op.setOverwrite(true);
         op.setExternalFile(m_wsdlLocationWizardPage.getWsdlFile());
-        op.setWorkspacePath(new Path(JaxWsConstants.PATH_WSDL));
+        op.setWorkspacePath(wsdlFolder.getProjectRelativePath());
         copyOperations.add(op);
       }
 
       for (File file : m_wsdlLocationWizardPage.getAdditionalFiles()) {
-        if (isCopyRequired(file)) {
+        if (isCopyRequired(m_wsdlLocationWizardPage.getWsdlFolder(), file)) {
           ExternalFileCopyOperation op = new ExternalFileCopyOperation();
           op.setBundle(m_bundle);
           op.setOverwrite(true);
           op.setExternalFile(file);
-          op.setWorkspacePath(new Path(JaxWsConstants.PATH_WSDL));
+          op.setWorkspacePath(wsdlFolder.getProjectRelativePath());
           copyOperations.add(op);
         }
       }
@@ -165,6 +187,12 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     String urlPattern;
     String wsdlFileName;
     String targetNamespace;
+
+    // prepare jaxWsServletRegistrationOperation
+    m_servletRegistrationOperation = new JaxWsServletRegistrationOperation();
+    m_servletRegistrationOperation.setBundle(m_bundle);
+    m_servletRegistrationOperation.setRegistrationBundle(m_servletRegistrationWizardPage.getRegistrationBundle());
+    m_servletRegistrationOperation.setJaxWsAlias(m_servletRegistrationWizardPage.getAlias());
 
     // prepare buildJaxWs.xml operation
     m_buildJaxWsEntryCreateOperation = new BuildJaxWsEntryCreateOperation(WebserviceEnum.Provider);
@@ -213,7 +241,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
       m_wsdlCreateOperation.setAlias(m_alias);
 
       WsdlResource wsdlResource = new WsdlResource(m_bundle);
-      wsdlResource.setFile(JaxWsSdkUtility.getFile(m_bundle, new Path(JaxWsConstants.PATH_WSDL).append(m_wsPropertiesNewWsdlWizardPage.getWsdlName()).toPortableString(), false));
+      wsdlResource.setFile(JaxWsSdkUtility.getFile(m_bundle, wsdlFolder.getProjectRelativePath().append(m_wsPropertiesNewWsdlWizardPage.getWsdlName()).toPortableString(), false));
       m_wsdlCreateOperation.setWsdlResource(wsdlResource);
       m_wsdlCreateOperation.setTargetNamespace(targetNamespace);
       m_wsdlCreateOperation.setService(m_wsPropertiesNewWsdlWizardPage.getServiceName());
@@ -249,11 +277,12 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     m_sunJaxWsEntryCreateOperation.setServiceQName(serviceQName);
     m_sunJaxWsEntryCreateOperation.setPortQName(portQName);
     m_sunJaxWsEntryCreateOperation.setUrlPattern(urlPattern);
-    m_sunJaxWsEntryCreateOperation.setWsdlFile(JaxWsSdkUtility.normalizePath(JaxWsConstants.PATH_WSDL, SeparatorType.TrailingType) + wsdlFileName);
+    m_sunJaxWsEntryCreateOperation.setWsdlFile(JaxWsSdkUtility.normalizePath(wsdlFolder.getProjectRelativePath().toPortableString(), SeparatorType.TrailingType) + wsdlFileName);
 
     m_stubGenerationOperation = new WsStubGenerationOperation();
     m_stubGenerationOperation.setBundle(m_bundle);
     m_stubGenerationOperation.setAlias(m_alias);
+    m_stubGenerationOperation.setWsdlFolder(wsdlFolder);
     m_stubGenerationOperation.setProperties(buildProperties);
     m_stubGenerationOperation.setWsdlFileName(wsdlFileName);
     m_stubGenerationOperation.addOperationFinishedListener(new P_StubGenerationFinishedListener());
@@ -274,6 +303,8 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     JaxWsSdk.getDefault().getMarkerQueueManager().suspend();
     try {
+      m_servletRegistrationOperation.run(monitor, workingCopyManager);
+
       for (ExternalFileCopyOperation op : m_copyOperations) {
         op.validate();
         op.run(monitor, workingCopyManager);
@@ -294,7 +325,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
           wsdlResource = m_wsdlCreateOperation.getWsdlResource();
         }
         else {
-          IFile wsdlFile = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, m_wsdlFileName, false);
+          IFile wsdlFile = JaxWsSdkUtility.getFile(m_bundle, m_sunJaxWsEntryCreateOperation.getWsdlFileName(), false);
           wsdlResource = new WsdlResource(m_bundle);
           wsdlResource.setFile(wsdlFile);
         }
@@ -314,6 +345,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
 
           BindingFileCreateOperation op = new BindingFileCreateOperation();
           op.setBundle(m_bundle);
+          op.setWsdlDestinationFolder(m_wsdlLocationWizardPage.getWsdlFolder());
           op.setSchemaTargetNamespace(schemaTargetNamespace);
           if (!schema.isRootWsdlFile()) {
             op.setSchemaDefiningFile(schema.getWsdlFile());
@@ -392,8 +424,8 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     }
   }
 
-  private boolean isCopyRequired(File wsdlFile) {
-    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL + "/" + wsdlFile.getName(), false);
+  private boolean isCopyRequired(IFolder wsdlFolder, File wsdlFile) {
+    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, wsdlFolder.getProjectRelativePath().toPortableString(), wsdlFile.getName(), false);
 
     if (potentialSameFile != null && potentialSameFile.exists()) {
       IPath potentialSameFilePath = new Path(potentialSameFile.getLocationURI().getRawPath());
@@ -417,7 +449,9 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
         m_wsdlLocationWizardPage.setExcludePage(createNewWsdl);
         m_wsPropertiesNewWsdlWizardPage.setExcludePage(!createNewWsdl);
         m_wsPropertiesExistingWsdlWizardPage.setExcludePage(createNewWsdl);
-
+      }
+      else if (WsdlSelectionWizardPage.PROP_WSDL_FOLDER.equals(event.getPropertyName())) {
+        m_wsdlLocationWizardPage.setWsdlFolder((IFolder) event.getNewValue());
       }
     }
   }
@@ -472,6 +506,21 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
       }
       else if (WsPropertiesNewWsdlWizardPage.PROP_PORT_TYPE_NAME.equals(event.getPropertyName())) {
         m_wsProviderImplClassWizardPage.setTypeName(JaxWsSdkUtility.getPlainPortTypeName((String) event.getNewValue()));
+      }
+    }
+  }
+
+  private class P_ServletRegistrationPropertyListener implements PropertyChangeListener {
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+      if (JaxWsServletRegistrationWizardPage.PROP_ALIAS.equals(event.getPropertyName())) {
+        if (m_wsPropertiesNewWsdlWizardPage != null) {
+          m_wsPropertiesNewWsdlWizardPage.setJaxWsServletAlias(m_servletRegistrationWizardPage.getAlias());
+        }
+        if (m_wsPropertiesExistingWsdlWizardPage != null) {
+          m_wsPropertiesExistingWsdlWizardPage.setJaxWsServletAlias(m_servletRegistrationWizardPage.getAlias());
+        }
       }
     }
   }

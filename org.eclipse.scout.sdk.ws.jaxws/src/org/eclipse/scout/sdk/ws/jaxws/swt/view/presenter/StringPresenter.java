@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -87,7 +87,7 @@ public class StringPresenter extends AbstractPropertyPresenter<String> {
   public void setTooltip(String tooltip) {
     m_tooltip = tooltip;
     if (isControlCreated()) {
-      m_styledText.setToolTipText(m_tooltip);
+      m_styledText.setToolTipText(StringUtility.nvl(m_tooltip, ""));
     }
   }
 
@@ -101,7 +101,7 @@ public class StringPresenter extends AbstractPropertyPresenter<String> {
     m_styledText.addModifyListener(m_modifyListener);
     m_styledText.addVerifyListener(m_verifyListener);
     m_styledText.setEditable(false);
-    m_styledText.setToolTipText(m_tooltip);
+    m_styledText.setToolTipText(StringUtility.nvl(m_tooltip, ""));
     setEditable(m_editable);
     return m_styledText;
   }

@@ -35,6 +35,7 @@ public interface JaxWsIcons {
   public static final String Down = "arrow_down.gif";
   public static final String Filter = "filter.gif";
   public static final String Transactional = "repository-synchronize.gif";
+  public static final String UrlPattern = "url_pattern.png";
 
   public static final String CredentialValidationStrategyFolder = "credential_validation_strategy_folder.png";
   public static final String CredentialValidationStrategyBinary = "credential_validation_strategy_binary.png";

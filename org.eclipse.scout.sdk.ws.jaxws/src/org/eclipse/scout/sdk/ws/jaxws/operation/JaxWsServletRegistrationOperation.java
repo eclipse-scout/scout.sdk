@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.operation;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginElement;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
@@ -34,23 +37,30 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 
 public class JaxWsServletRegistrationOperation implements IOperation {
 
-  private static final String ELEMENT_SERVLET = "servlet";
-  private static final String ATTR_ALIAS = "alias";
-  private static final String ATTR_CLASS = "class";
-
   private IScoutBundle m_bundle;
+  private IScoutBundle m_registrationBundle;
   private String m_jaxWsAlias;
-
-  public JaxWsServletRegistrationOperation() {
-  }
+  // used for URL pattern
+  private SunJaxWsBean m_sunJaxWsBean;
+  private String m_urlPattern;
 
   @Override
   public void validate() throws IllegalArgumentException {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle must not be null");
+    }
+    if (m_bundle.getType() != IScoutBundle.BUNDLE_SERVER) {
+      throw new IllegalArgumentException("bundle must be SERVER bundle");
+    }
+    if (m_registrationBundle == null) {
+      throw new IllegalArgumentException("servlet registration bundle must not be null");
+    }
+    if (m_registrationBundle.getType() != IScoutBundle.BUNDLE_SERVER) {
+      throw new IllegalArgumentException("servlet registration bundle must be SERVER bundle");
     }
     if (!StringUtility.hasText(m_jaxWsAlias)) {
       throw new IllegalArgumentException("JAX-WS alias must not be null");
@@ -59,83 +69,120 @@ public class JaxWsServletRegistrationOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    IScoutBundle servletContributingBundle = JaxWsSdkUtility.getServletContributingBundle(m_bundle);
-    if (servletContributingBundle == null) {
-      JaxWsSdk.logError("Failed to find servlet contributing bundle");
-      return;
+    String oldServletRegBundleName = null;
+
+    // build-jaxws.xml
+    XmlResource buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(m_bundle);
+    if (!JaxWsSdkUtility.exists(buildJaxWsResource.getFile())) {
+      // create build-jaxws.xml file
+      BuildJaxWsFileCreateOperation op = new BuildJaxWsFileCreateOperation(m_bundle);
+      op.run(monitor, workingCopyManager);
+    }
+    // ensure servlet registration in build-jaxws.xml
+    ScoutXmlDocument document = buildJaxWsResource.loadXml();
+    ScoutXmlElement xml = document.getRoot().getChild(ServletRegistrationUtility.XML_SERVLET_BUNDLE);
+    if (xml == null) {
+      xml = document.getRoot().addChild(ServletRegistrationUtility.XML_SERVLET_BUNDLE);
     }
 
-    // plugin.xml of bundle
+    if (xml.hasAttribute(ServletRegistrationUtility.XML_NAME)) {
+      oldServletRegBundleName = xml.getAttribute(ServletRegistrationUtility.XML_NAME);
+      xml.removeAttribute(ServletRegistrationUtility.XML_NAME);
+    }
+    xml.setAttribute(ServletRegistrationUtility.XML_NAME, m_registrationBundle.getBundleName());
+    ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xml.getDocument(), IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
+
     String jaxWsServletClass = JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName();
-    String servletAlias = StringUtility.trim(JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType));
-    String oldServletAlias = null;
+    String alias = StringUtility.trim(JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType));
 
-    PluginModelHelper h = new PluginModelHelper(servletContributingBundle.getProject());
+    // get original alias of servlet registration bundle and remove the servlet registration to be registered anew
+    PluginModelHelper h = new PluginModelHelper(m_registrationBundle.getProject());
     HashMap<String, String> attributes = new HashMap<String, String>();
-    attributes.put(ATTR_CLASS, jaxWsServletClass);
-
-    IPluginElement e = h.PluginXml.getSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, ELEMENT_SERVLET, attributes);
-    if (e != null) {
-      oldServletAlias = null;
-      IPluginAttribute alias = e.getAttribute(ATTR_ALIAS);
-      if (alias != null) {
-        oldServletAlias = alias.getValue();
-      }
-      if (oldServletAlias == null || !oldServletAlias.equals(servletAlias)) {
-        e.setAttribute(ATTR_ALIAS, servletAlias);
-        h.save();
-        updateSunJaxWsEntries(oldServletAlias);
+    attributes.put("class", jaxWsServletClass);
+    IPluginElement ext = h.PluginXml.getSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+    String originalAlias = null;
+    if (ext != null) {
+      IPluginAttribute attribute = ext.getAttribute("alias");
+      if (attribute != null) {
+        originalAlias = attribute.getValue();
       }
     }
-    else {
-      attributes.put(ATTR_ALIAS, servletAlias);
-      h.PluginXml.addSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, ELEMENT_SERVLET, attributes);
-      h.save();
-      updateSunJaxWsEntries(oldServletAlias);
-    }
-  }
 
-  private void updateSunJaxWsEntries(String oldAlias) {
+    // remove old servlet registration if servlet defining bundle is this bundle itself
+    if (CompareUtility.equals(oldServletRegBundleName, m_bundle.getBundleName())) {
+      PluginModelHelper oldPluginHelper = new PluginModelHelper(m_bundle.getProject());
+      attributes = new HashMap<String, String>();
+      attributes.put("class", jaxWsServletClass);
+      oldPluginHelper.PluginXml.removeSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+      oldPluginHelper.save();
+    }
+
+    // remove existing registration
+    attributes = new HashMap<String, String>();
+    attributes.put("class", jaxWsServletClass);
+    h = new PluginModelHelper(m_registrationBundle.getProject());
+    h.PluginXml.removeSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+    // add new registration
+    attributes = new HashMap<String, String>();
+    attributes.put("class", jaxWsServletClass);
+    attributes.put("alias", alias);
+    h.PluginXml.addSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+    h.save();
+
+    // update sun-jaxws entries
     try {
-      IScoutBundle rootBundle = JaxWsSdkUtility.getRootBundle(m_bundle);
-      if (rootBundle == null) {
-        JaxWsSdk.logWarning("Root project bundle could not be found. URL-pattern of webservice providers could not be updated.");
-        return;
-      }
-
       // iterate through all dependent bundles to find JAX-WS dependent bundles
-      IScoutBundle[] jaxWsServerBundles = rootBundle.getDependentBundles(new IScoutBundleFilter() {
+      IScoutBundle[] candidateBundles = m_registrationBundle.getDependentBundles(new IScoutBundleFilter() {
 
         @Override
         public boolean accept(IScoutBundle bundle) {
-          return bundle.getType() == IScoutBundle.BUNDLE_SERVER &&
-                 TypeUtility.isOnClasspath(JaxWsRuntimeClasses.JaxWsActivator, bundle.getJavaProject()); // ensure JAX-WS installed on bundle
+          return bundle.getType() == IScoutBundle.BUNDLE_SERVER && TypeUtility.isOnClasspath(JaxWsRuntimeClasses.JaxWsActivator, bundle.getJavaProject()); // ensure JAX-WS installed on bundle
         }
       }, true);
-      for (IScoutBundle jaxWsServerBundle : jaxWsServerBundles) {
-        JaxWsSdk.logInfo("Update URL-pattern of JAX-registrations in bundle '" + jaxWsServerBundle.getBundleName() + "'");
-        XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(jaxWsServerBundle);
-        if (JaxWsSdkUtility.exists(sunJaxWsResource.getFile())) {
-          ScoutXmlDocument sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
 
-          for (Object sunJaxWsXmlEntry : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-            SunJaxWsBean sunJaxWsEntryBean = new SunJaxWsBean((ScoutXmlElement) sunJaxWsXmlEntry);
-            String urlPattern = sunJaxWsEntryBean.getUrlPattern();
-            if (oldAlias == null) {
-              urlPattern = sunJaxWsEntryBean.getAlias();
+      for (IScoutBundle candidateBundle : candidateBundles) {
+        XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(candidateBundle);
+        buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(candidateBundle);
+
+        if (JaxWsSdkUtility.exists(buildJaxWsResource.getFile()) &&
+            JaxWsSdkUtility.exists(sunJaxWsResource.getFile())) {
+          String bundleNameOfRegistration = ServletRegistrationUtility.getBuildJaxServletRegistrationBundleName(candidateBundle);
+          if (bundleNameOfRegistration != null && bundleNameOfRegistration.equals(m_registrationBundle.getBundleName())) {
+            ScoutXmlDocument sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
+            if (sunJaxWsXmlDocument == null) {
+              continue;
             }
-            else if (urlPattern.startsWith(JaxWsSdkUtility.normalizePath(oldAlias, SeparatorType.BothType))) {
-              urlPattern = urlPattern.substring(oldAlias.length());
+            List<String> changedEntries = new ArrayList<String>();
+            for (Object sunJaxWsXmlEntry : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+              SunJaxWsBean sunJaxWsEntryBean = new SunJaxWsBean((ScoutXmlElement) sunJaxWsXmlEntry);
+              changedEntries.add(sunJaxWsEntryBean.getAlias());
+
+              String endpointPattern = sunJaxWsEntryBean.getUrlPattern();
+              if (originalAlias != null && endpointPattern.startsWith(originalAlias)) {
+                endpointPattern = endpointPattern.substring(originalAlias.length());
+              }
+              String urlPattern = JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.BothType) + JaxWsSdkUtility.normalizePath(endpointPattern, SeparatorType.None);
+              sunJaxWsEntryBean.setUrlPattern(urlPattern);
             }
-            urlPattern = JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.BothType) + JaxWsSdkUtility.normalizePath(urlPattern, SeparatorType.None);
-            sunJaxWsEntryBean.setUrlPattern(urlPattern);
+            if (changedEntries.size() > 0) {
+              sunJaxWsResource.storeXmlAsync(sunJaxWsXmlDocument, IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, changedEntries.toArray(new String[changedEntries.size()]));
+            }
           }
-          sunJaxWsResource.storeXmlAsync(sunJaxWsXmlDocument, IResourceListener.ELEMENT_FILE, IResourceListener.EVENT_SUNJAXWS_REPLACED);
         }
       }
     }
     catch (Exception e) {
       JaxWsSdk.logError("faild to update URL-pattern", e);
+    }
+
+    // change new URL pattenr
+    if (m_sunJaxWsBean != null && m_urlPattern != null) {
+      String urlPattern = m_urlPattern;
+      if (!JaxWsSdkUtility.normalizePath(m_urlPattern, SeparatorType.LeadingType).startsWith(JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType))) {
+        urlPattern = JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType) + JaxWsSdkUtility.normalizePath(m_urlPattern, SeparatorType.LeadingType);
+      }
+      m_sunJaxWsBean.setUrlPattern(urlPattern);
+      ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
     }
   }
 
@@ -161,11 +208,35 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     m_bundle = bundle;
   }
 
+  public IScoutBundle getRegistrationBundle() {
+    return m_registrationBundle;
+  }
+
+  public void setRegistrationBundle(IScoutBundle registrationBundle) {
+    m_registrationBundle = registrationBundle;
+  }
+
   public String getJaxWsAlias() {
     return m_jaxWsAlias;
   }
 
   public void setJaxWsAlias(String jaxWsAlias) {
     m_jaxWsAlias = jaxWsAlias;
+  }
+
+  public String getUrlPattern() {
+    return m_urlPattern;
+  }
+
+  public void setUrlPattern(String urlPattern) {
+    m_urlPattern = urlPattern;
+  }
+
+  public SunJaxWsBean getSunJaxWsBean() {
+    return m_sunJaxWsBean;
+  }
+
+  public void setSunJaxWsBean(SunJaxWsBean sunJaxWsBean) {
+    m_sunJaxWsBean = sunJaxWsBean;
   }
 }

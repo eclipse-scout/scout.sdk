@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
@@ -67,11 +68,14 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.FolderPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.SeparatorPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.StringPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.TypePresenter.ISearchJavaSearchScopeFactory;
+import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.UrlPatternPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFilePresenter;
+import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFolderPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.DefinitionBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SchemaBean;
+import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPresenterValueChangedListener;
 import org.eclipse.swt.SWT;
@@ -100,9 +104,10 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
   private StringPresenter m_portPresenter;
   private StringPresenter m_bindingPresenter;
   private StringPresenter m_portTypePresenter;
-  private StringPresenter m_urlPatternPresenter;
+  private UrlPatternPresenter m_urlPatternPresenter;
   private FolderPresenter m_stubFolderPresenter;
   private FilePresenter m_stubJarFilePresenter;
+  private WsdlFolderPresenter m_wsdlFolderPresenter;
   private WsdlFilePresenter m_wsdlFilePresenter;
 
   private Composite m_bindingFilesComposite;
@@ -307,7 +312,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       applyLayoutData(m_bindingPresenter);
 
       // URL pattern
-      m_urlPatternPresenter = new StringPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
+      m_urlPatternPresenter = new UrlPatternPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
       m_urlPatternPresenter.setLabel(Texts.get("UrlPattern"));
       m_urlPatternPresenter.setBundle(m_bundle);
       m_urlPatternPresenter.setMarkerType(MarkerType.UrlPattern);
@@ -341,13 +346,19 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       m_stubJarFilePresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
       applyLayoutData(m_stubJarFilePresenter);
 
+      // wsdl folder
+      m_wsdlFolderPresenter = new WsdlFolderPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), WebserviceEnum.Provider);
+      m_wsdlFolderPresenter.setLabel(Texts.get("WsdlFolder"));
+      m_wsdlFolderPresenter.setBundle(m_bundle);
+      m_wsdlFolderPresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
+      applyLayoutData(m_wsdlFolderPresenter);
+
       // wsdl file
       m_wsdlFilePresenter = new WsdlFilePresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
       m_wsdlFilePresenter.setLabel(Texts.get("WsdlFile"));
       m_wsdlFilePresenter.setBundle(m_bundle);
       m_wsdlFilePresenter.setMarkerType(MarkerType.Wsdl);
       m_wsdlFilePresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
-      m_wsdlFilePresenter.setBuildJaxWsBean(getPage().getBuildJaxWsBean());
       applyLayoutData(m_wsdlFilePresenter);
 
       updatePresenterValues();
@@ -424,7 +435,27 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
     m_portTypePresenter.setInput(portTypeName);
     m_portTypePresenter.setTooltip(portTypeTooltip);
     m_urlPatternPresenter.setInput(urlPattern);
-    m_wsdlFilePresenter.setInput(getPage().getWsdlResource().getFile());
+    m_urlPatternPresenter.setSunJaxWsBean(sunJaxWsBean);
+    String servletRegistrationBundleName = ServletRegistrationUtility.getBuildJaxServletRegistrationBundleName(m_bundle);
+    if (servletRegistrationBundleName != null) {
+      m_urlPatternPresenter.setTooltip(Texts.get("JaxWsServletRegistrationInBundleX", servletRegistrationBundleName));
+    }
+    else {
+      m_urlPatternPresenter.setTooltip(null);
+    }
+    // WSDL folder
+    IFile wsdlFile = getPage().getWsdlResource().getFile();
+    if (wsdlFile != null) {
+      IPath wsdlFolderPath = wsdlFile.getProjectRelativePath().removeLastSegments(1);
+      m_wsdlFolderPresenter.setInput(JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false));
+    }
+    m_wsdlFolderPresenter.setBuildJaxWsBean(buildJaxWsBean);
+    m_wsdlFolderPresenter.setSunJaxWsBean(sunJaxWsBean);
+
+    // WSDL file
+    m_wsdlFilePresenter.setInput(wsdlFile);
+    m_wsdlFilePresenter.setBuildJaxWsBean(buildJaxWsBean);
+
     m_stubJarFilePresenter.setInput(stubJarFile);
     m_stubFolderPresenter.setInput(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.STUB_FOLDER, false));
 
@@ -515,9 +546,11 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient());
 
       Definition wsdlDefinition = getPage().getWsdlDefinition();
-      if (wsdlDefinition != null) {
+      WsdlResource wsdlResource = getPage().getWsdlResource();
+      if (wsdlDefinition != null && wsdlResource != null && wsdlResource.getFile() != null) {
+        IPath wsdlFolderPath = wsdlResource.getFile().getProjectRelativePath().removeLastSegments(1);
 
-        DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, wsdlDefinition);
+        DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, wsdlFolderPath, wsdlDefinition);
         for (DefinitionBean relatedWsdlDefinition : relatedWsdlDefinitions) {
           IFile file = relatedWsdlDefinition.getFile();
           FileOpenAction a = new FileOpenAction();
@@ -537,7 +570,6 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
        */
       JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_REF_SCHEMAS).getSectionClient());
 
-      WsdlResource wsdlResource = getPage().getWsdlResource();
       if (wsdlResource != null) {
         SchemaBean[] schemas = JaxWsSdkUtility.getAllSchemas(m_bundle, wsdlResource);
         for (SchemaBean schemaBean : schemas) {
@@ -799,6 +831,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
           m_portTypePresenter.updateInfo();
           m_urlPatternPresenter.updateInfo();
           m_wsdlFilePresenter.updateInfo();
+          m_wsdlFolderPresenter.updateInfo();
           m_sessionFactoryPresenter.updateInfo();
           m_authenticationHandlerPresenter.updateInfo();
           m_credentialValidationStrategyPresenter.updateInfo();

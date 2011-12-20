@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -19,6 +19,13 @@ import java.net.URLConnection;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -28,11 +35,18 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.wsdl.Definition;
+import javax.wsdl.Import;
+import javax.wsdl.extensions.schema.Schema;
+import javax.wsdl.extensions.schema.SchemaImport;
+import javax.wsdl.extensions.schema.SchemaReference;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -45,14 +59,18 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.ui.fields.TextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.AdditionalResourcesWizard;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -65,7 +83,9 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
@@ -79,6 +99,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
   public static final String PROP_WSDL_DEFINITION = "wsdlDefinition";
   public static final String PROP_REBUILD_STUB = "rebuilStub";
   public static final String PROP_ADDITIONAL_FILES = "additionalFiles";
+  public static final String PROP_WSDL_FOLDER = "wsdlFolder";
 
   private BasicPropertySupport m_propertySupport;
 
@@ -96,12 +117,18 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
   private Button m_rebuidStubButton;
 
+  // visible
   private boolean m_rebuildStubOptionVisible;
+  private boolean m_wsdlFolderVisible;
+
+  private Text m_wsdlFolderDescriptionField;
+  private TextField m_wsdlFolderField;
+  private Button m_wsdlFolderBrowseButton;
 
   public WsdlLocationWizardPage(IScoutBundle bundle) {
     super(WsdlLocationWizardPage.class.getName());
     setTitle(Texts.get("SpecifyWsdlLocation"));
-    setDescription(Texts.get("ClickNextToContinue", JaxWsConstants.PATH_WSDL));
+    setDescription(Texts.get("SpecifyWsdlLocation"));
 
     m_bundle = bundle;
     m_propertySupport = new BasicPropertySupport(this);
@@ -161,6 +188,15 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
         String path = dialog.open();
         if (path != null) {
           setPath(path);
+
+          // help the user by determing the referenced files
+          File[] referencedFiles = getReferencedFiles(new Path(path).toFile());
+          if (referencedFiles.length > 0) {
+            P_ReferencedFilesFoundWizard wizard = new P_ReferencedFilesFoundWizard(referencedFiles);
+            ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
+            wizardDialog.setPageSize(450, 350);
+            wizardDialog.open();
+          }
         }
       }
     });
@@ -184,7 +220,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_urlRadioButton = new Button(parent, SWT.RADIO);
-    m_urlRadioButton.setText(Texts.get("ChooseWsdlFromUrl", JaxWsConstants.PATH_WSDL));
+    m_urlRadioButton.setText(Texts.get("ChooseWsdlFromUrl"));
     m_urlRadioButton.setSelection(!isFileSystem());
 
     m_urlContainer = new Composite(parent, SWT.NONE);
@@ -217,6 +253,42 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
           setRebuildStubInternal(m_rebuidStubButton.getSelection());
         }
       });
+    }
+
+    // WSDL folder
+    if (isWsdlFolderVisible()) {
+      m_wsdlFolderDescriptionField = new Text(parent, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+      m_wsdlFolderDescriptionField.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+      m_wsdlFolderDescriptionField.setText(Texts.get("ChooseFolderForWsdlFileAndArtefacts"));
+
+      m_wsdlFolderField = new TextField(parent);
+      m_wsdlFolderField.setLabelText(Texts.get("WsdlFolder"));
+      m_wsdlFolderField.getTextComponent().setBackground(JaxWsSdkUtility.getColorLightGray());
+      m_wsdlFolderField.setEditable(false);
+
+      m_wsdlFolderBrowseButton = new Button(parent, SWT.PUSH);
+      m_wsdlFolderBrowseButton.setText(Texts.get("Browse"));
+      m_wsdlFolderBrowseButton.addSelectionListener(new SelectionAdapter() {
+
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
+                              m_bundle,
+                              new WsdlFolderViewerFilter(m_bundle),
+                              Texts.get("WsdlFolder"),
+                              Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
+                              JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, true), // root folder
+                              getWsdlFolder());
+          if (folder != null) {
+            setWsdlFolder(folder);
+          }
+        }
+
+      });
+      IFolder folder = getWsdlFolder();
+      if (folder != null) {
+        m_wsdlFolderField.setText(folder.getProjectRelativePath().toPortableString());
+      }
     }
 
     // layout
@@ -272,9 +344,32 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     formData.right = new FormAttachment(100, 0);
     m_urlField.setLayoutData(formData);
 
-    if (isRebuildStubOptionVisible()) {
+    Control referenceControl = m_urlContainer;
+    if (isWsdlFolderVisible()) {
       formData = new FormData();
       formData.top = new FormAttachment(m_urlContainer, 20, SWT.BOTTOM);
+      formData.left = new FormAttachment(40, 5);
+      formData.right = new FormAttachment(100, 0);
+      m_wsdlFolderDescriptionField.setLayoutData(formData);
+
+      formData = new FormData();
+      formData.top = new FormAttachment(m_wsdlFolderDescriptionField, 5, SWT.BOTTOM);
+      formData.left = new FormAttachment(0, 50);
+      formData.right = new FormAttachment(100, -75);
+      m_wsdlFolderField.setLayoutData(formData);
+
+      formData = new FormData();
+      formData.top = new FormAttachment(m_wsdlFolderField, 0, SWT.TOP);
+      formData.left = new FormAttachment(100, -70);
+      formData.right = new FormAttachment(100, 0);
+      m_wsdlFolderBrowseButton.setLayoutData(formData);
+
+      referenceControl = m_wsdlFolderField;
+    }
+
+    if (isRebuildStubOptionVisible()) {
+      formData = new FormData();
+      formData.top = new FormAttachment(referenceControl, 20, SWT.BOTTOM);
       formData.left = new FormAttachment(40, 5);
       formData.right = new FormAttachment(100, 0);
       m_rebuidStubButton.setLayoutData(formData);
@@ -293,23 +388,25 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       validateUrl(multiStatus);
     }
 
+    IFolder wsdlFolder = getWsdlFolder();
     // check whether file already exists
-    if (getWsdlFile() != null) {
-      IFile conflictingFile = m_bundle.getProject().getFile(JaxWsConstants.PATH_WSDL + "/" + getWsdlFile().getName());
+    if (getWsdlFile() != null && wsdlFolder != null) {
+      String wsdlFolderPath = JaxWsSdkUtility.normalizePath(wsdlFolder.getProjectRelativePath().toPortableString(), SeparatorType.BothType);
+
+      IFile conflictingFile = m_bundle.getProject().getFile(wsdlFolderPath + getWsdlFile().getName());
       if (conflictingFile != null && conflictingFile.exists()) {
         IPath conflictingFilePath = new Path(conflictingFile.getLocationURI().getRawPath());
         IPath wsdlFilePath = new Path(getWsdlFile().getAbsolutePath());
 
         if (!conflictingFilePath.equals(wsdlFilePath)) {
-          multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("WSDLFileAlreadyExists", conflictingFile.getName(), JaxWsConstants.PATH_WSDL)));
+          multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("WSDLFileAlreadyExists", conflictingFile.getName(), wsdlFolderPath)));
         }
       }
     }
-  }
 
-  private boolean isFileFromWsdlDirectory(File wsdlFile) {
-    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL + "/" + wsdlFile.getName(), false);
-    return !(potentialSameFile != null && potentialSameFile.exists() && potentialSameFile.getFullPath().toFile().equals(wsdlFile));
+    if (isWsdlFolderVisible() && getWsdlFolder() == null) {
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_wsdlFolderField.getText())));
+    }
   }
 
   public void setFileSystem(boolean fileSystem) {
@@ -434,6 +531,32 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     return BooleanUtility.nvl(m_propertySupport.getPropertyBool(PROP_REBUILD_STUB), false);
   }
 
+  public void setWsdlFolder(IFolder wsdlFolder) {
+    try {
+      setStateChanging(true);
+      setWsdlFolderInternal(wsdlFolder);
+      if (isControlCreated() && m_wsdlFolderField != null) {
+        if (wsdlFolder != null) {
+          m_wsdlFolderField.setText(wsdlFolder.getProjectRelativePath().toPortableString());
+        }
+        else {
+          m_wsdlFolderField.setText("");
+        }
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  private void setWsdlFolderInternal(IFolder wsdlFolder) {
+    m_propertySupport.setProperty(PROP_WSDL_FOLDER, wsdlFolder);
+  }
+
+  public IFolder getWsdlFolder() {
+    return (IFolder) m_propertySupport.getProperty(PROP_WSDL_FOLDER);
+  }
+
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.addPropertyChangeListener(listener);
@@ -551,6 +674,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       return reader.readWSDL(file.getAbsolutePath());
     }
     catch (Exception e) {
+      JaxWsSdk.logError(e);
       return null;
     }
   }
@@ -561,6 +685,118 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
   public void setRebuildStubOptionVisible(boolean rebuildStubOptionVisible) {
     m_rebuildStubOptionVisible = rebuildStubOptionVisible;
+  }
+
+  public boolean isWsdlFolderVisible() {
+    return m_wsdlFolderVisible;
+  }
+
+  public void setWsdlFolderVisible(boolean wsdlFolderVisible) {
+    m_wsdlFolderVisible = wsdlFolderVisible;
+  }
+
+  /**
+   * To get the files referenced by the given WSDL file
+   * 
+   * @param wsdlFile
+   * @return
+   */
+  private File[] getReferencedFiles(File wsdlFile) {
+    Set<File> files = new HashSet<File>();
+    try {
+      if (wsdlFile == null || !wsdlFile.exists()) {
+        return new File[0];
+      }
+
+      IPath basePath = new Path(wsdlFile.getParentFile().getPath());
+
+      Definition wsdlDefinition = loadWsdlDefinition(wsdlFile);
+      if (wsdlDefinition == null) {
+        return new File[0];
+      }
+
+      // referenced WSDL files
+      IPath[] importedFiles = getImportedFiles(basePath, wsdlDefinition);
+      for (IPath path : importedFiles) {
+        files.add(path.toFile());
+      }
+      // referenced XSD schemas
+      Schema[] schemas = getAllSchemas(basePath, wsdlDefinition);
+      for (Schema schema : schemas) {
+        // included schemas
+        @SuppressWarnings("unchecked")
+        List<SchemaReference> schemaReferences = schema.getIncludes();
+        for (SchemaReference schemaReference : schemaReferences) {
+          String location = schemaReference.getSchemaLocationURI();
+          IPath path = basePath.append(new Path(location));
+          files.add(path.toFile());
+        }
+
+        // imported schemas
+        @SuppressWarnings("unchecked")
+        Map<String, List<SchemaImport>> schemaImports = schema.getImports();
+        for (List<SchemaImport> schemaImportList : schemaImports.values()) {
+          for (SchemaImport schemaImport : schemaImportList) {
+            String location = schemaImport.getSchemaLocationURI();
+            IPath path = basePath.append(new Path(location));
+            files.add(path.toFile());
+          }
+        }
+      }
+    }
+    catch (Exception e) {
+      JaxWsSdk.logError(e);
+    }
+    return files.toArray(new File[files.size()]);
+  }
+
+  private static IPath[] getImportedFiles(IPath basePath, Definition definition) {
+    if (definition == null) {
+      return new IPath[0];
+    }
+
+    @SuppressWarnings("unchecked")
+    Map<String, List<Import>> imports = definition.getImports();
+    if (imports == null || imports.size() == 0) {
+      return new IPath[0];
+    }
+
+    Set<IPath> paths = new HashSet<IPath>();
+    for (List<Import> importDirectives : imports.values()) {
+      for (Import importDirective : importDirectives) {
+        paths.add(basePath.append(new Path(importDirective.getLocationURI())));
+        // recursively get nested definitions
+        paths.addAll(Arrays.asList(getImportedFiles(basePath, importDirective.getDefinition())));
+      }
+    }
+
+    return paths.toArray(new IPath[paths.size()]);
+  }
+
+  private Schema[] getAllSchemas(IPath basePath, Definition wsdlDefinition) {
+    if (wsdlDefinition == null) {
+      return new Schema[0];
+    }
+    List<Schema> schemas = new ArrayList<Schema>();
+
+    // schema of root WSDL file
+    Schema[] directSchemas = JaxWsSdkUtility.getDirectSchemas(wsdlDefinition);
+    for (Schema directSchema : directSchemas) {
+      schemas.add(directSchema);
+    }
+
+    // related schemas
+    IPath[] importedFiles = getImportedFiles(basePath, wsdlDefinition);
+    for (IPath relatedDefinitionPath : importedFiles) {
+      Definition relatedDefinition = loadWsdlDefinition(relatedDefinitionPath.toFile());
+
+      directSchemas = JaxWsSdkUtility.getDirectSchemas(relatedDefinition);
+      for (Schema directSchema : directSchemas) {
+        schemas.add(directSchema);
+      }
+    }
+
+    return schemas.toArray(new Schema[schemas.size()]);
   }
 
   private class P_DummyTrustManager implements X509TrustManager {
@@ -586,4 +822,47 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       return true;
     }
   }
+
+  private class P_ReferencedFilesFoundWizard extends AbstractWorkspaceWizard {
+
+    private ResourceSelectionWizardPage m_wizardPage;
+    private File[] m_candidatesFiles;
+
+    public P_ReferencedFilesFoundWizard(File[] candidatesFiles) {
+      setWindowTitle(Texts.get("ReferencedFilesFound"));
+      m_candidatesFiles = candidatesFiles;
+    }
+
+    @Override
+    public void addPages() {
+      m_wizardPage = new ResourceSelectionWizardPage(Texts.get("ReferencedFilesFound"), Texts.get("QuestionReferencedFilesFound"));
+
+      List<ElementBean> elements = new ArrayList<ElementBean>();
+      for (File candidateFile : m_candidatesFiles) {
+        ElementBean elementBean = new ElementBean(0, candidateFile.getAbsolutePath(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), false);
+        elementBean.setData(candidateFile);
+        elements.add(elementBean);
+      }
+      m_wizardPage.setElements(elements);
+      addPage(m_wizardPage);
+    }
+
+    @Override
+    protected boolean beforeFinish() throws CoreException {
+      List<File> files = new LinkedList<File>();
+      for (ElementBean element : m_wizardPage.getElements()) {
+        if (element.isChecked() || element.isMandatory()) {
+          files.add((File) element.getData());
+        }
+      }
+      setAdditionalFiles(files.toArray(new File[files.size()]));
+      return true;
+    }
+
+    @Override
+    protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+      return true;
+    }
+  }
+
 }

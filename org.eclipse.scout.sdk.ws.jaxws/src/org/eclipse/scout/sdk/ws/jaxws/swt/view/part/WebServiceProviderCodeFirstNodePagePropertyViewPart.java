@@ -41,9 +41,10 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderCodeFirst
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.ActionPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.AnnotationPropertyTypePresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.SeparatorPresenter;
-import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.StringPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.TypePresenter.ISearchJavaSearchScopeFactory;
+import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.UrlPatternPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPresenterValueChangedListener;
 import org.eclipse.swt.layout.GridData;
@@ -61,7 +62,7 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
 
   private IPresenterValueChangedListener m_presenterListener;
 
-  private StringPresenter m_urlPatternPresenter;
+  private UrlPatternPresenter m_urlPatternPresenter;
 
   private P_ScoutSeverityListener m_severityListener;
   private IPageLoadedListener m_pageLoadedListener;
@@ -177,7 +178,7 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
       getSection(SECTION_ID_PROPERTIES).setExpanded(true);
 
       // URL pattern
-      m_urlPatternPresenter = new StringPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
+      m_urlPatternPresenter = new UrlPatternPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
       m_urlPatternPresenter.setLabel(Texts.get("UrlPattern"));
       m_urlPatternPresenter.setBundle(m_bundle);
       m_urlPatternPresenter.setMarkerType(MarkerType.UrlPattern);
@@ -203,6 +204,14 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
     }
 
     m_urlPatternPresenter.setInput(urlPattern);
+    m_urlPatternPresenter.setSunJaxWsBean(sunJaxWsBean);
+    String servletRegistrationBundleName = ServletRegistrationUtility.getBuildJaxServletRegistrationBundleName(m_bundle);
+    if (servletRegistrationBundleName != null) {
+      m_urlPatternPresenter.setTooltip(Texts.get("JaxWsServletRegistrationInBundleX", servletRegistrationBundleName));
+    }
+    else {
+      m_urlPatternPresenter.setTooltip(null);
+    }
 
     IType portType = getPage().getPortType();
     if (portType != null) {

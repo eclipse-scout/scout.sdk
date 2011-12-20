@@ -47,9 +47,9 @@ public class MissingBuildJaxWsEntryCommand extends AbstractExecutableMarkerComma
     else {
       xml = xmlDocument.getRoot().addChild(BuildJaxWsBean.XML_CONSUMER);
     }
-    BuildJaxWsBean bean = new BuildJaxWsBean(xml);
+    BuildJaxWsBean bean = new BuildJaxWsBean(xml, m_webserviceEnum);
     bean.setAlias(m_alias);
 
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(bean.getXml().getDocument(), m_alias, IResourceListener.EVENT_BUILDJAXWS_ENTRY_ADDED, monitor);
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(bean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_ENTRY_ADDED, monitor, m_alias);
   }
 }

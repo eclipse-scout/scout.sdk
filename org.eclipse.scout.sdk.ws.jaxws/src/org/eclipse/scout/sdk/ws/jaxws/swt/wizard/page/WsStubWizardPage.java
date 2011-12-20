@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -25,11 +25,11 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -64,7 +64,7 @@ public class WsStubWizardPage extends AbstractWorkspaceWizardPage {
   public WsStubWizardPage(IScoutBundle bundle) {
     super(WsStubWizardPage.class.getName());
     setTitle(Texts.get("ConfigureWebServiceStub"));
-    setDescription(Texts.get("ClickNextToContinue"));
+    setDescription(Texts.get("ConfigureWebServiceStub"));
 
     m_bundle = bundle;
     m_propertySupport = new BasicPropertySupport(this);
@@ -226,17 +226,17 @@ public class WsStubWizardPage extends AbstractWorkspaceWizardPage {
   private void validatePackage(MultiStatus multiStatus) {
     if (!StringUtility.hasText(getPackageName()) && m_defaultPackageName == null) {
       //in some rare situation, package name cannot be derived from target namespace / WSDL definition
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("JaxWsCannotDerivePackageNameFromTargetNamespace")));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("JaxWsCannotDerivePackageNameFromTargetNamespace")));
     }
 
     if (!CompareUtility.equals(m_defaultPackageName, getPackageName())) {
-      multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("ConventionPackageNameEqualsToTargetNamespaceX")));
+      multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("ConventionPackageNameEqualsToTargetNamespaceX")));
 
       // validate custom package name
       multiStatus.add(JavaConventionsUtil.validatePackageName(getPackageName(), m_bundle.getJavaProject()));
 
       if (StringUtility.isNullOrEmpty(getPackageName())) {
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageDiscouraged")));
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageDiscouraged")));
       }
     }
   }

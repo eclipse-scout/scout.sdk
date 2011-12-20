@@ -47,6 +47,7 @@ import org.eclipse.scout.sdk.ws.jaxws.marker.commands.CorruptBindingFileCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.CorruptWsdlCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.InvalidPortTypeCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.InvalidServiceCommand;
+import org.eclipse.scout.sdk.ws.jaxws.marker.commands.JaxWsServletRegistrationCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.MissingBuildJaxWsEntryCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.MissingClasspathEntryForJarFileCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.MissingEndpointCodeFirstCommand;
@@ -69,6 +70,7 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.part.AnnotationProperty;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 
 @SuppressWarnings("restriction")
 public final class MarkerRebuildUtility {
@@ -236,26 +238,8 @@ public final class MarkerRebuildUtility {
       return false;
     }
 
-    // validate URL pattern
-    String configuredJaxWsAlias = JaxWsSdkUtility.getJaxWsAlias(bundle);
-    if (configuredJaxWsAlias != null) {
-      configuredJaxWsAlias = JaxWsSdkUtility.normalizePath(configuredJaxWsAlias, SeparatorType.BothType);
-      String urlPattern = sunJaxWsBean.getUrlPattern();
-      if (urlPattern == null) {
-        String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, Texts.get("MissingOrEmptyAttributeX", SunJaxWsBean.XML_URL_PATTERN));
-        JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean));
-        return false;
-      }
-      else if (JaxWsSdkUtility.normalizePath(urlPattern, SeparatorType.BothType).equals(configuredJaxWsAlias)) {
-        String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, Texts.get("XMustNotBeEmpty", SunJaxWsBean.XML_URL_PATTERN));
-        JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean));
-        return false;
-      }
-      else if (!urlPattern.startsWith(configuredJaxWsAlias)) {
-        String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, IMarker.SEVERITY_ERROR, Texts.get("UrlPatternJaxWsAliasMismatch", configuredJaxWsAlias));
-        JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean));
-        return false;
-      }
+    if (!validateJaxWsServletRegistartionAndUrlPattern(sunJaxWsBean, markerGroupUUID, bundle)) {
+      return false;
     }
 
     Definition wsdlDefinition = wsdlResource.loadWsdlDefinition();
@@ -291,6 +275,56 @@ public final class MarkerRebuildUtility {
     }
     else if (!ports.keySet().contains(sunJaxWsBean.getPortQNameSafe().getLocalPart())) {
       MarkerUtility.createMarker(markerResource, MarkerType.Port, markerGroupUUID, Texts.get("UnknownPortConfiguredInAttributeX", SunJaxWsBean.XML_PORT));
+      return false;
+    }
+    return true;
+  }
+
+  private static boolean validateJaxWsServletRegistartionAndUrlPattern(SunJaxWsBean sunJaxWsBean, String markerGroupUUID, IScoutBundle bundle) {
+    // validate JAX-WS servlet registration alais
+    String servletAlias = ServletRegistrationUtility.getAlias(bundle);
+    if (!StringUtility.hasText(servletAlias)) {
+      String markerSourceId = MarkerUtility.createMarker(bundle.getJavaProject().getResource(), MarkerType.UrlPattern, markerGroupUUID, IMarker.SEVERITY_ERROR, "No or wrong servlet plugin specified in build-jaxws.xml to host JAX-WS servlet registration.\nAdd the element 'servlet-bundle' with the attribute 'name' to build-jaxws.xml and specify the symbolic name of the plugin that contains the JAX-WS servlet registration in its plugin.xml.");
+      JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new JaxWsServletRegistrationCommand(bundle));
+      return false;
+    }
+    else if (!servletAlias.matches("[\\w\\-/]*")) { // check for illegal characters
+      String markerSourceId = MarkerUtility.createMarker(bundle.getJavaProject().getResource(), MarkerType.UrlPattern, markerGroupUUID, IMarker.SEVERITY_ERROR, "Invalid JAX-WS servlet alias '" + servletAlias + "' specified.");
+      JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new JaxWsServletRegistrationCommand(bundle));
+      return false;
+    }
+
+    IResource markerResource = ResourceFactory.getSunJaxWsResource(bundle).getFile();
+    if (!JaxWsSdkUtility.exists(markerResource)) {
+      markerResource = bundle.getJavaProject().getResource();
+    }
+
+    // condition: servlet alias is not null
+    servletAlias = JaxWsSdkUtility.normalizePath(servletAlias, SeparatorType.BothType);
+    String urlPattern = sunJaxWsBean.getUrlPattern();
+    if (urlPattern == null) {
+      String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, Texts.get("MissingOrEmptyAttributeX", SunJaxWsBean.XML_URL_PATTERN));
+      JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean, servletAlias));
+      return false;
+    }
+    else if (JaxWsSdkUtility.normalizePath(urlPattern, SeparatorType.BothType).equals(servletAlias)) {
+      String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, Texts.get("XMustNotBeEmpty", SunJaxWsBean.XML_URL_PATTERN));
+      JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean, servletAlias));
+      return false;
+    }
+    else if (!urlPattern.startsWith(servletAlias)) {
+      String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, IMarker.SEVERITY_ERROR, Texts.get("UrlPatternJaxWsAliasMismatch", servletAlias));
+      JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean, servletAlias));
+      return false;
+    }
+    else if (!urlPattern.matches("[\\w\\-/]*")) { // check for illegal characters
+      String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, IMarker.SEVERITY_ERROR, "Invalid URL pattern '" + urlPattern + "' specified.");
+      JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new JaxWsServletRegistrationCommand(bundle, sunJaxWsBean));
+      return false;
+    }
+    else if (urlPattern.endsWith("/")) {
+      String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.UrlPattern, markerGroupUUID, IMarker.SEVERITY_ERROR, "URL pattern must not end with a '/'.");
+      JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new JaxWsServletRegistrationCommand(bundle, sunJaxWsBean));
       return false;
     }
     return true;
@@ -519,8 +553,6 @@ public final class MarkerRebuildUtility {
 
   public static void rebuildCodeFirstPortTypeMarkers(IScoutBundle bundle, IType portType, SunJaxWsBean sunJaxWsBean, String markerGroupUUID) {
     try {
-      XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(bundle);
-
       // validate port type
       if (!TypeUtility.exists(portType)) {
         String markerSourceId = MarkerUtility.createMarker(ResourceFactory.getSunJaxWsResource(bundle).getFile(), MarkerType.Implementation, markerGroupUUID, Texts.get("InvalidImplementationType"));
@@ -560,23 +592,8 @@ public final class MarkerRebuildUtility {
         return;
       }
 
-      // validate URL pattern
-      String configuredJaxWsAlias = JaxWsSdkUtility.getJaxWsAlias(bundle);
-      if (configuredJaxWsAlias != null) {
-        configuredJaxWsAlias = JaxWsSdkUtility.normalizePath(configuredJaxWsAlias, SeparatorType.BothType);
-        String urlPattern = sunJaxWsBean.getUrlPattern();
-        if (urlPattern == null) {
-          String markerSourceId = MarkerUtility.createMarker(sunJaxWsResource.getFile(), MarkerType.UrlPattern, markerGroupUUID, Texts.get("MissingOrEmptyAttributeX", SunJaxWsBean.XML_URL_PATTERN));
-          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean));
-        }
-        else if (JaxWsSdkUtility.normalizePath(urlPattern, SeparatorType.BothType).equals(configuredJaxWsAlias)) {
-          String markerSourceId = MarkerUtility.createMarker(sunJaxWsResource.getFile(), MarkerType.UrlPattern, markerGroupUUID, Texts.get("XMustNotBeEmpty", SunJaxWsBean.XML_URL_PATTERN));
-          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean));
-        }
-        else if (!urlPattern.startsWith(configuredJaxWsAlias)) {
-          String markerSourceId = MarkerUtility.createMarker(sunJaxWsResource.getFile(), MarkerType.UrlPattern, markerGroupUUID, IMarker.SEVERITY_ERROR, Texts.get("UrlPatternJaxWsAliasMismatch", configuredJaxWsAlias));
-          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new UrlPatternAliasMismatchCommand(bundle, sunJaxWsBean));
-        }
+      if (!validateJaxWsServletRegistartionAndUrlPattern(sunJaxWsBean, markerGroupUUID, bundle)) {
+        return;
       }
     }
     catch (Exception e) {

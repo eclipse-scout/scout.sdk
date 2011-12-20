@@ -138,7 +138,7 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
     }
 
     // persist
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_xmlHandlerChain.getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED);
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_xmlHandlerChain.getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
     return true;
   }
 

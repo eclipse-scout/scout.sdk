@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -26,6 +26,7 @@ public class ElementBean {
   private boolean m_mandatory;
   private IResource m_resource;
   private IJavaElement m_javaElement;
+  private Object m_data;
 
   public ElementBean(int id, String name, ImageDescriptor imageDescriptor, boolean mandatory) {
     m_id = id;
@@ -99,5 +100,13 @@ public class ElementBean {
 
   public void setJavaElement(IJavaElement javaElement) {
     m_javaElement = javaElement;
+  }
+
+  public Object getData() {
+    return m_data;
+  }
+
+  public void setData(Object data) {
+    m_data = data;
   }
 }

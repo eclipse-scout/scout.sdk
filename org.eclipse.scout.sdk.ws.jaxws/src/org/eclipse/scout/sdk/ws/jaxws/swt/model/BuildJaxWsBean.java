@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
+import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 
 public class BuildJaxWsBean {
 
@@ -33,9 +34,11 @@ public class BuildJaxWsBean {
   public static final String XML_WSDL = "wsdl";
 
   private ScoutXmlElement m_xml;
+  private WebserviceEnum m_webserviceEnum;
 
-  public BuildJaxWsBean(ScoutXmlElement xml) {
+  public BuildJaxWsBean(ScoutXmlElement xml, WebserviceEnum webserviceEnum) {
     m_xml = xml;
+    m_webserviceEnum = webserviceEnum;
   }
 
   public ScoutXmlElement getXml() {
@@ -127,11 +130,18 @@ public class BuildJaxWsBean {
     }
 
     ScoutXmlElement rootXml = newDocument.getRoot();
-    if (rootXml == null || !rootXml.hasChild(BuildJaxWsBean.XML_PROVIDER)) {
+    if (rootXml == null) {
       return false;
     }
 
-    ScoutXmlElement xml = newDocument.getRoot().getChild(BuildJaxWsBean.XML_PROVIDER, BuildJaxWsBean.XML_ALIAS, getAlias());
+    String nodeName;
+    if (m_webserviceEnum == WebserviceEnum.Provider) {
+      nodeName = BuildJaxWsBean.XML_PROVIDER;
+    }
+    else {
+      nodeName = BuildJaxWsBean.XML_CONSUMER;
+    }
+    ScoutXmlElement xml = newDocument.getRoot().getChild(nodeName, BuildJaxWsBean.XML_ALIAS, getAlias());
     if (xml == null) {
       return false;
     }
@@ -140,7 +150,7 @@ public class BuildJaxWsBean {
     return true;
   }
 
-  public static BuildJaxWsBean load(IScoutBundle bundle, String alias) {
+  public static BuildJaxWsBean load(IScoutBundle bundle, String alias, WebserviceEnum webserviceEnum) {
     if (!StringUtility.hasText(alias)) {
       return null;
     }
@@ -149,16 +159,24 @@ public class BuildJaxWsBean {
       return null;
     }
 
+    String nodeName;
+    if (webserviceEnum == WebserviceEnum.Provider) {
+      nodeName = BuildJaxWsBean.XML_PROVIDER;
+    }
+    else {
+      nodeName = BuildJaxWsBean.XML_CONSUMER;
+    }
+
     ScoutXmlElement rootXml = document.getRoot();
-    if (rootXml == null || !rootXml.hasChild(BuildJaxWsBean.XML_PROVIDER)) {
+    if (rootXml == null || !rootXml.hasChild(nodeName)) {
       return null;
     }
 
-    ScoutXmlElement xml = document.getRoot().getChild(BuildJaxWsBean.XML_PROVIDER, BuildJaxWsBean.XML_ALIAS, alias);
+    ScoutXmlElement xml = document.getRoot().getChild(nodeName, BuildJaxWsBean.XML_ALIAS, alias);
     if (xml == null) {
       return null;
     }
 
-    return new BuildJaxWsBean(xml);
+    return new BuildJaxWsBean(xml, webserviceEnum);
   }
 }

@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -69,6 +70,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
   private BasicPropertySupport m_propertySupport;
 
   private IScoutBundle m_bundle;
+  private String m_jaxWsServletAlias;
 
   private ProposalTextField m_serviceField;
   private ProposalTextField m_portField;
@@ -86,12 +88,13 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
   public WsPropertiesExistingWsdlWizardPage(IScoutBundle bundle, WebserviceEnum webserviceEnum) {
     super(WsPropertiesExistingWsdlWizardPage.class.getName());
     setTitle(Texts.get("ConfigureWebserviceProperties"));
-    setDescription(Texts.get("ClickNextToContinue"));
+    setDescription(Texts.get("ConfigureWebserviceProperties"));
 
     m_bundle = bundle;
     m_webserviceEnum = webserviceEnum;
     m_propertySupport = new BasicPropertySupport(this);
     m_sunJaxWsXml = ResourceFactory.getSunJaxWsResource(bundle).loadXml();
+    m_jaxWsServletAlias = JaxWsConstants.JAX_WS_ALIAS;
 
     setDeriveOtherNames(true);
     loadIllegalValues();
@@ -161,10 +164,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
       });
 
       m_urlPattern = getFieldToolkit().createStyledTextField(parent, Texts.get("UrlPattern"));
-      String configuredUrlPattern = JaxWsSdkUtility.normalizePath(JaxWsSdkUtility.getJaxWsAlias(m_bundle), SeparatorType.BothType);
-      if (configuredUrlPattern != null) {
-        m_urlPattern.setReadOnlyPrefix(configuredUrlPattern);
-      }
+      m_urlPattern.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(m_jaxWsServletAlias, SeparatorType.BothType));
       m_urlPattern.addModifyListener(new ModifyListener() {
 
         @Override
@@ -223,10 +223,6 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
       return;
     }
 
-    if (m_sunJaxWsXml == null || m_sunJaxWsXml.getRoot() == null) {
-      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XdoesNotExistDueToInexistenceOrCorruptResource", ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName())));
-      return;
-    }
     if (getWsdlDefinition() == null) {
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("WsdlCouldNotBeParsed")));
       return;
@@ -254,12 +250,11 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
     }
     if (m_urlPattern != null) {
       // URL pattern
-      String configuredUrlPattern = JaxWsSdkUtility.getJaxWsAlias(m_bundle);
-      if (StringUtility.isNullOrEmpty(getUrlPattern()) || getUrlPattern().equals(configuredUrlPattern)) {
+      if (StringUtility.isNullOrEmpty(getUrlPattern()) || getUrlPattern().equals(m_jaxWsServletAlias)) {
         multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPattern.getLabelText())));
       }
-      else if (!getUrlPattern().startsWith(configuredUrlPattern)) {
-        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), configuredUrlPattern)));
+      else if (!getUrlPattern().startsWith(m_jaxWsServletAlias)) {
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), m_jaxWsServletAlias)));
       }
       else if (getUrlPattern().matches(".*\\s+.*")) { // check for whitespaces
         multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("UrlXshouldNotContainWhitespaces", getUrlPattern())));
@@ -359,6 +354,13 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
 
   public String getUrlPattern() {
     return m_propertySupport.getPropertyString(PROP_URL_PATTERN);
+  }
+
+  public void setJaxWsServletAlias(String jaxWsServletAlias) {
+    m_jaxWsServletAlias = jaxWsServletAlias;
+    if (isControlCreated()) {
+      m_urlPattern.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(m_jaxWsServletAlias, SeparatorType.BothType));
+    }
   }
 
   public void setService(Service service) {
@@ -506,10 +508,12 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
     Set<String> illegalAliases = new HashSet<String>();
     Set<String> illegalUrlPatterns = new HashSet<String>();
 
-    for (Object xmlSunJaxWs : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-      SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) xmlSunJaxWs);
-      illegalAliases.add(sunJaxWsBean.getAlias());
-      illegalUrlPatterns.add(sunJaxWsBean.getUrlPattern());
+    if (m_sunJaxWsXml != null) {
+      for (Object xmlSunJaxWs : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) xmlSunJaxWs);
+        illegalAliases.add(sunJaxWsBean.getAlias());
+        illegalUrlPatterns.add(sunJaxWsBean.getUrlPattern());
+      }
     }
 
     m_illegalAliasNames = illegalAliases;

@@ -46,7 +46,7 @@ public class WsProviderCodeFirstDeleteWizard extends AbstractWorkspaceWizard {
 
   @Override
   public void addPages() {
-    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("DeleteWebServiceProvider"));
+    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("DeleteWebServiceProvider"), Texts.get("QuestionDeletion"));
     m_wizardPage.setElements(getElementsToBeDeleted());
     addPage(m_wizardPage);
   }

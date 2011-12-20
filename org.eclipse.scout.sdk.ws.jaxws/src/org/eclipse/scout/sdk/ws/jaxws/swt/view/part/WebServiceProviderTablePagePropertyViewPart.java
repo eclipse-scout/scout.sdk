@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.AbstractSinglePageSectionBasedViewPart;
@@ -64,6 +63,7 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
       createSection(SECTION_ID_REPAIR, Texts.get("RepairRequired"), Texts.get("SectionRepairDescription"), false);
       createSection(SECTION_ID_LINKS, Texts.get("ConsiderLinks"));
       createSection(SECTION_ID_PROVIDER, Texts.get("WebserviceProvider"));
+      boolean sectionLinksVisible = false;
 
       // repair action
       getSection(SECTION_ID_REPAIR).setVisible(JaxWsSdk.getDefault().containsMarkerCommands(getPage().getMarkerGroupUUID()));
@@ -77,9 +77,6 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
       PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), getSection(SECTION_ID_FILTER).getSectionClient(), getPage());
       applyLayoutData(filterPresenter);
 
-      // QuickLink section
-      ScoutXmlDocument sunJaxWsBean = ResourceFactory.getSunJaxWsResource(m_bundle).loadXml();
-
       // QuickLink 'Open sun-jaxws.xml'
       IFile sunJaxWsFile = ResourceFactory.getSunJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(sunJaxWsFile)) {
@@ -88,6 +85,7 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
         b.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
         ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
         applyLayoutData(actionPresenter);
+        sectionLinksVisible = true;
       }
 
       // QuickLink 'Open build-jaxws.xml'
@@ -98,15 +96,15 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
         c.setToolTip(Texts.get("JaxWsBuildDescriptor"));
         ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), c, getFormToolkit());
         applyLayoutData(actionPresenter);
+        sectionLinksVisible = true;
       }
+      getSection(SECTION_ID_LINKS).setVisible(sectionLinksVisible);
 
       // QuickLink 'Create new Provider'
-      if (sunJaxWsBean != null && sunJaxWsBean.getRoot() != null) {
-        ProviderNewWizardAction d = new ProviderNewWizardAction();
-        d.init(m_bundle);
-        ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_PROVIDER).getSectionClient(), d, getFormToolkit());
-        applyLayoutData(actionPresenter);
-      }
+      ProviderNewWizardAction d = new ProviderNewWizardAction();
+      d.init(m_bundle);
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_PROVIDER).getSectionClient(), d, getFormToolkit());
+      applyLayoutData(actionPresenter);
     }
     finally {
       getForm().setRedraw(true);

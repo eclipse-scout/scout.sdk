@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -17,7 +17,7 @@ public final class JaxWsConstants {
   public static final String PATH_BUILD = "/WEB-INF/build";
   public static final String PATH_SUN_JAXWS = "/WEB-INF/sun-jaxws.xml";
   public static final String PATH_BUILD_JAXWS = "/WEB-INF/build/build-jaxws.xml";
-  public static final String JAX_WS_ALIAS = "/jaxws/";
+  public static final String JAX_WS_ALIAS = "/jaxws";
   public static final String SERVER_EXTENSION_POINT_SERVLETS = "org.eclipse.equinox.http.registry.servlets";
 
   public static final String SUFFIX_WS_PROVIDER = "WebService";

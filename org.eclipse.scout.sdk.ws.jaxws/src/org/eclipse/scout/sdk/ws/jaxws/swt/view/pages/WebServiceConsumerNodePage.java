@@ -26,9 +26,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -169,7 +166,12 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
   public void reloadPage(int dataMask) {
     try {
       if ((dataMask & DATA_BUILD_JAXWS_ENTRY) > 0) {
-        m_buildJaxWsBean = loadBuildJaxWsBean(getType().getElementName());
+        if (getBuildJaxWsBean() == null) {
+          m_buildJaxWsBean = BuildJaxWsBean.load(m_bundle, getType().getElementName(), WebserviceEnum.Consumer);
+        }
+        else {
+          m_buildJaxWsBean.reload(m_bundle);
+        }
         if (m_buildJaxWsBean != null) {
           m_stubJarResource.setFile(JaxWsSdkUtility.getStubJarFile(m_bundle, m_buildJaxWsBean, m_buildJaxWsBean.getWsdl()));
         }
@@ -292,33 +294,6 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     }
   }
 
-  private BuildJaxWsBean loadBuildJaxWsBean(String alias) {
-    if (!StringUtility.hasText(alias)) {
-      return null;
-    }
-    ScoutXmlDocument document = getBuildJaxWsResource().loadXml();
-    if (document == null || document.getRoot() == null) {
-      return null;
-    }
-
-    ScoutXmlElement rootXml = document.getRoot();
-    if (rootXml == null || !rootXml.hasChild(BuildJaxWsBean.XML_CONSUMER)) {
-      return null;
-    }
-
-    ScoutXmlElement xml = document.getRoot().getChild(BuildJaxWsBean.XML_CONSUMER, BuildJaxWsBean.XML_ALIAS, alias);
-    if (xml == null) {
-      return null;
-    }
-    if (getBuildJaxWsBean() == null) {
-      return new BuildJaxWsBean(xml);
-    }
-
-    BuildJaxWsBean buildJaxWsBean = getBuildJaxWsBean();
-    buildJaxWsBean.setXml(xml);
-    return buildJaxWsBean;
-  }
-
   private Definition loadWsdlDefinition() {
     if (m_buildJaxWsBean == null) {
       return null;
@@ -365,6 +340,9 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
   }
 
   public Definition getWsdlDefinition() {
+    if (m_wsdlDefinition == null) {
+      m_wsdlDefinition = loadWsdlDefinition();
+    }
     return m_wsdlDefinition;
   }
 

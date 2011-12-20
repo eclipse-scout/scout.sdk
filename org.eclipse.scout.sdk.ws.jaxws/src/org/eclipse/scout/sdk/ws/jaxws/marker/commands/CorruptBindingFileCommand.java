@@ -77,6 +77,7 @@ public class CorruptBindingFileCommand extends AbstractExecutableMarkerCommand {
     BindingFileCreateOperation op = new BindingFileCreateOperation();
     op.setBundle(m_bundle);
     op.setProjectRelativeFilePath(m_bindingFile.getProjectRelativePath());
+    op.setWsdlDestinationFolder(JaxWsSdkUtility.getParentFolder(m_bundle, m_wsdlResource.getFile()));
 
     if (m_schema != null) {
       if (m_multipleSchemas) {

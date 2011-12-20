@@ -21,6 +21,7 @@ import javax.wsdl.extensions.schema.SchemaReference;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
@@ -30,7 +31,6 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -61,7 +61,7 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
 
   @Override
   public void addPages() {
-    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("DeleteWebServiceProvider"));
+    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("DeleteWebServiceProvider"), Texts.get("QuestionDeletion"));
     m_wizardPage.setElements(getElementsToBeDeleted());
     addPage(m_wizardPage);
   }
@@ -93,9 +93,14 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
       elements.add(new ElementBean(WsProviderDeleteOperation.ID_WSDL_FILE, "WSDL file '" + wsdlFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, false));
     }
 
+    IPath wsdlFolderPath = null;
+    if (wsdlFile != null) {
+      wsdlFolderPath = wsdlFile.getProjectRelativePath().removeLastSegments(1);
+    }
+
     // referenced WSDL files
-    if (m_wsdlDefinition != null) {
-      DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, m_wsdlDefinition);
+    if (m_wsdlDefinition != null && wsdlFolderPath != null) {
+      DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, wsdlFolderPath, m_wsdlDefinition);
       for (DefinitionBean relatedWsdlDefinition : relatedWsdlDefinitions) {
         IFile file = relatedWsdlDefinition.getFile();
         if (file != null && file.exists()) {
@@ -104,7 +109,7 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
       }
     }
     // referenced XSD schemas
-    if (wsdlFile != null && wsdlFile.exists()) {
+    if (wsdlFile != null && wsdlFile.exists() && wsdlFolderPath != null) {
       WsdlResource wsdlResource = new WsdlResource(m_bundle);
       wsdlResource.setFile(wsdlFile);
 
@@ -120,7 +125,7 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
         List<SchemaReference> schemaReferences = schema.getIncludes();
         for (SchemaReference schemaReference : schemaReferences) {
           String location = schemaReference.getSchemaLocationURI();
-          IFile file = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, location, false);
+          IFile file = JaxWsSdkUtility.getFile(m_bundle, wsdlFolderPath.append(location).toPortableString(), false);
           if (file != null && file.exists()) {
             elements.add(new ElementBean(WsProviderDeleteOperation.ID_REF_XSD, "Referenced XSD schema '" + file.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), file, false));
           }
@@ -132,7 +137,7 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
         for (List<SchemaImport> schemaImportList : schemaImports.values()) {
           for (SchemaImport schemaImport : schemaImportList) {
             String location = schemaImport.getSchemaLocationURI();
-            IFile file = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, location, false);
+            IFile file = JaxWsSdkUtility.getFile(m_bundle, wsdlFolderPath.append(location).toPortableString(), false);
             if (file != null && file.exists()) {
               elements.add(new ElementBean(WsProviderDeleteOperation.ID_REF_XSD, "Referenced XSD schema '" + file.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), file, false));
             }

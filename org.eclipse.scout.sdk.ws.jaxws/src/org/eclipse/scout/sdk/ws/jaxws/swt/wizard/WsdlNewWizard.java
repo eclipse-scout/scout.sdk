@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsdlCreateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
@@ -105,13 +104,13 @@ public class WsdlNewWizard extends AbstractWorkspaceWizard {
 
     if (m_sunJaxWsBean != null) {
       // update entry in sunJaxWs.xml
-      m_sunJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(JaxWsConstants.PATH_WSDL, SeparatorType.TrailingType) + m_wsdlResource.getFile().getName());
-      ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor);
+      m_sunJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlResource.getFile().getName(), SeparatorType.None));
+      ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
     }
     else {
       // update entry in buildJaxWs.xml
-      m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(JaxWsConstants.PATH_WSDL, SeparatorType.TrailingType) + m_wsdlResource.getFile().getName());
-      ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), m_buildJaxWsBean.getAlias(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor);
+      m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlResource.getFile().getName(), SeparatorType.None));
+      ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
     }
     return true;
   }

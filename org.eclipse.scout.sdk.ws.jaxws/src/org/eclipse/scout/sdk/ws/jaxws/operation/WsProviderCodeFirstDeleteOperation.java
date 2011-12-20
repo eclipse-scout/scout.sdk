@@ -66,7 +66,7 @@ public class WsProviderCodeFirstDeleteOperation implements IOperation {
     String alias = m_sunJaxWsBean.getAlias();
     ScoutXmlDocument xmlDocument = m_sunJaxWsBean.getXml().getDocument();
     xmlDocument.getRoot().removeChild(m_sunJaxWsBean.getXml());
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(xmlDocument, alias, IResourceListener.EVENT_SUNJAXWS_ENTRY_REMOVED, monitor);
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(xmlDocument, IResourceListener.EVENT_SUNJAXWS_ENTRY_REMOVED, monitor, alias);
   }
 
   private void deleteType(IType type, IProgressMonitor monitor) throws JavaModelException {

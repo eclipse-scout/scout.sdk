@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.util.Date;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,6 +35,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
 
 public class BindingFileCreateOperation implements IOperation {
 
@@ -42,6 +44,7 @@ public class BindingFileCreateOperation implements IOperation {
   private IFile m_schemaDefiningFile;
   private String m_schemaTargetNamespace;
   private boolean m_createGlobalBindingSection;
+  private IFolder m_wsdlDestinationFolder;
 
   @Override
   public void validate() throws IllegalArgumentException {
@@ -52,10 +55,16 @@ public class BindingFileCreateOperation implements IOperation {
     if (m_projectRelativeFilePath == null) {
       throw new IllegalArgumentException("no projectRelativePath set");
     }
+
+    if (m_wsdlDestinationFolder == null) {
+      throw new IllegalArgumentException("WSDL destination path must not be null");
+    }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    IFile file = JaxWsSdkUtility.getFile(m_bundle, m_projectRelativeFilePath.toPortableString(), true);
+
     ScoutXmlDocument xmlDocument = new ScoutXmlDocument();
 
     xmlDocument.setXmlVersion("1.0");
@@ -73,7 +82,8 @@ public class BindingFileCreateOperation implements IOperation {
     rootXml.setName("jaxws:bindings");
     rootXml.setAttribute("version", "2.0");
     if (m_schemaDefiningFile != null) {
-      rootXml.setAttribute("wsdlLocation", "../wsdl/" + m_schemaDefiningFile.getName());
+      IPath relativeWsdlFolderPath = m_wsdlDestinationFolder.getProjectRelativePath().makeRelativeTo(JaxWsSdkUtility.getParentFolder(m_bundle, file).getProjectRelativePath());
+      rootXml.setAttribute("wsdlLocation", JaxWsSdkUtility.normalizePath(relativeWsdlFolderPath.toPortableString(), SeparatorType.TrailingType) + m_schemaDefiningFile.getName());
     }
     if (StringUtility.hasText(m_schemaTargetNamespace)) {
       rootXml.setAttribute("node", "wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='" + m_schemaTargetNamespace + "']");
@@ -123,8 +133,6 @@ public class BindingFileCreateOperation implements IOperation {
     try {
       xmlDocument.write(os);
       InputStream is = new ByteArrayInputStream(os.toByteArray());
-
-      IFile file = JaxWsSdkUtility.getFile(m_bundle, m_projectRelativeFilePath.toPortableString(), true);
       file.setContents(is, true, false, monitor);
     }
     catch (IOException e) {
@@ -175,6 +183,14 @@ public class BindingFileCreateOperation implements IOperation {
 
   public void setCreateGlobalBindingSection(boolean createGlobalBindingSection) {
     m_createGlobalBindingSection = createGlobalBindingSection;
+  }
+
+  public IFolder getWsdlDestinationFolder() {
+    return m_wsdlDestinationFolder;
+  }
+
+  public void setWsdlDestinationFolder(IFolder wsdlDestinationFolder) {
+    m_wsdlDestinationFolder = wsdlDestinationFolder;
   }
 
   private ScoutXmlElement createBindingsRootNode(ScoutXmlDocument xmlDocument) {

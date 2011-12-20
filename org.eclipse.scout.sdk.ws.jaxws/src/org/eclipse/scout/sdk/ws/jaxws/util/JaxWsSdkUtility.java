@@ -76,26 +76,27 @@ import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation;
 import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation.IChooseImportQuery;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
+import org.eclipse.jdt.internal.ui.wizards.buildpaths.FolderSelectionDialog;
 import org.eclipse.jdt.ui.SharedASTProvider;
-import org.eclipse.pde.core.plugin.IPluginAttribute;
-import org.eclipse.pde.core.plugin.IPluginElement;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.operation.OverrideUnimplementedMethodsOperation;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
@@ -109,13 +110,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.model.WorkbenchContentProvider;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
+import org.eclipse.ui.views.navigator.ResourceComparator;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import com.sun.xml.internal.bind.api.impl.NameConverter;
 
 @SuppressWarnings("restriction")
-public class JaxWsSdkUtility {
+public final class JaxWsSdkUtility {
 
   private JaxWsSdkUtility() {
   }
@@ -1319,7 +1323,7 @@ public class JaxWsSdkUtility {
    * @param definition
    * @return
    */
-  public static DefinitionBean[] getRelatedDefinitions(IScoutBundle bundle, Definition definition) {
+  public static DefinitionBean[] getRelatedDefinitions(IScoutBundle bundle, IPath wsdlFolderPath, Definition definition) {
     if (definition == null) {
       return new DefinitionBean[0];
     }
@@ -1336,11 +1340,11 @@ public class JaxWsSdkUtility {
         DefinitionBean bean = new DefinitionBean();
         bean.setDefinition(importDirective.getDefinition());
         bean.setNamespaceUri(importDirective.getNamespaceURI());
-        bean.setFile(JaxWsSdkUtility.getFile(bundle, JaxWsConstants.PATH_WSDL, importDirective.getLocationURI(), false));
+        bean.setFile(JaxWsSdkUtility.getFile(bundle, wsdlFolderPath.append(importDirective.getLocationURI()).toPortableString(), false));
         directives.add(bean);
 
         // recursively get nested definitions
-        directives.addAll(Arrays.asList(getRelatedDefinitions(bundle, importDirective.getDefinition())));
+        directives.addAll(Arrays.asList(getRelatedDefinitions(bundle, wsdlFolderPath, importDirective.getDefinition())));
       }
     }
 
@@ -1353,7 +1357,7 @@ public class JaxWsSdkUtility {
    * @param definition
    * @return
    */
-  private static Schema[] getDirectSchemas(Definition definition) {
+  public static Schema[] getDirectSchemas(Definition definition) {
     if (definition == null || definition.getTypes() == null) {
       return new Schema[0];
     }
@@ -1397,15 +1401,19 @@ public class JaxWsSdkUtility {
     }
 
     // related schemas
-    DefinitionBean[] definitionBeans = getRelatedDefinitions(bundle, wsdlDefinition);
-    for (DefinitionBean definitionBean : definitionBeans) {
-      directSchemas = getDirectSchemas(definitionBean.getDefinition());
-      for (Schema directSchema : directSchemas) {
-        SchemaBean schemaBean = new SchemaBean();
-        schemaBean.setRootWsdlFile(false);
-        schemaBean.setWsdlFile(definitionBean.getFile());
-        schemaBean.setSchema(directSchema);
-        schemaBeans.add(schemaBean);
+    IFile file = wsdlResource.getFile();
+    IPath wsdlFolderPath = file.getProjectRelativePath().removeLastSegments(1);
+    if (wsdlFolderPath != null) {
+      DefinitionBean[] definitionBeans = getRelatedDefinitions(bundle, wsdlFolderPath, wsdlDefinition);
+      for (DefinitionBean definitionBean : definitionBeans) {
+        directSchemas = getDirectSchemas(definitionBean.getDefinition());
+        for (Schema directSchema : directSchemas) {
+          SchemaBean schemaBean = new SchemaBean();
+          schemaBean.setRootWsdlFile(false);
+          schemaBean.setWsdlFile(definitionBean.getFile());
+          schemaBean.setSchema(directSchema);
+          schemaBeans.add(schemaBean);
+        }
       }
     }
 
@@ -1484,45 +1492,6 @@ public class JaxWsSdkUtility {
     return bundle;
   }
 
-  /**
-   * To get the root server bundle
-   * 
-   * @param serverBundle
-   * @return
-   */
-  public static IScoutBundle getServletContributingBundle(IScoutBundle serverBundle) {
-    if (serverBundle.getType() != IScoutElement.BUNDLE_SERVER) {
-      return null;
-    }
-    try {
-      IScoutBundle rootBundle = JaxWsSdkUtility.getRootBundle(serverBundle);
-      if (rootBundle == null) {
-        return null;
-      }
-
-      IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.ServiceTunnelServlet);
-
-      // iterate through all dependent bundles to find servlet contributing bundle
-      IScoutBundle[] candiates = rootBundle.getDependentBundles(ScoutBundleFilters.getServerFilter(), true);
-      for (IScoutBundle candiate : candiates) {
-        PluginModelHelper h = new PluginModelHelper(candiate.getProject());
-        IPluginElement[] exts = h.PluginXml.getSimpleExtensions(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet");
-        for (IPluginElement ext : exts) {
-          IPluginAttribute a = ext.getAttribute("class");
-          if (a != null && a.getValue() != null && a.getValue().length() > 0) {
-            if (hierarchy.contains(TypeUtility.getType(a.getValue()))) {
-              return candiate;
-            }
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError(e);
-    }
-    return null;
-  }
-
   public static boolean registerJarLib(IScoutBundle bundle, IFile jarFile, boolean remove, IProgressMonitor monitor) {
     boolean success = true;
     JaxWsSdkUtility.refreshLocal(jarFile, IResource.DEPTH_ONE);
@@ -1585,46 +1554,6 @@ public class JaxWsSdkUtility {
     return success;
   }
 
-  /**
-   * To get the configured global JAX-WS servlet alias
-   * 
-   * @param bundle
-   *          server bundle
-   * @return
-   */
-  public static String getJaxWsAlias(IScoutBundle bundle) {
-    IScoutBundle rootServerBundle = JaxWsSdkUtility.getServletContributingBundle(bundle);
-    if (rootServerBundle == null) {
-      JaxWsSdk.logError("Failed to determine root server bundle");
-      return null;
-    }
-    String servletElement = "servlet";
-
-    try {
-      // plugin.xml of root server bundle
-      String extensionPoint = JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS;
-      String jaxWsServletClass = JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName();
-
-      HashMap<String, String> attributes = new HashMap<String, String>();
-      attributes.put("class", jaxWsServletClass);
-      PluginModelHelper h = new PluginModelHelper(rootServerBundle.getProject());
-      IPluginElement ex = h.PluginXml.getSimpleExtension(extensionPoint, servletElement, attributes);
-      if (ex == null) {
-        return null;
-      }
-      else {
-        IPluginAttribute a = ex.getAttribute("alias");
-        if (a != null) {
-          return a.getValue();
-        }
-      }
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError("failed to read JAX-WS servlet alias", e);
-    }
-    return null;
-  }
-
   public static void overrideUnimplementedMethodsAsync(IType type) {
     OverrideUnimplementedMethodsOperation op = new OverrideUnimplementedMethodsOperation();
     op.setType(type);
@@ -1655,6 +1584,39 @@ public class JaxWsSdkUtility {
         return CompareUtility.compareTo(type1.getElementName(), type2.getElementName());
       }
     });
+  }
+
+  public static IFolder getParentFolder(IScoutBundle bundle, IFile file) {
+    if (file == null) {
+      return null;
+    }
+    IPath parentFolderPath = file.getProjectRelativePath().removeLastSegments(1);
+    if (parentFolderPath.segmentCount() == 0) {
+      return null;
+    }
+    return JaxWsSdkUtility.getFolder(bundle, parentFolderPath.toPortableString(), false);
+  }
+
+  public static IFolder openProjectFolderDialog(IScoutBundle bundle, ViewerFilter filter, String title, String description, IFolder rootFolder, IFolder initialFolder) {
+    ILabelProvider labelProvider = new WorkbenchLabelProvider();
+    ITreeContentProvider contentProvider = new WorkbenchContentProvider();
+    FolderSelectionDialog dialog = new FolderSelectionDialog(ScoutSdkUi.getShell(), labelProvider, contentProvider);
+    dialog.setTitle(title);
+    dialog.setMessage(description);
+    dialog.addFilter(filter);
+    dialog.setHelpAvailable(false);
+    dialog.setAllowMultiple(false);
+    if (initialFolder != null) {
+      dialog.setInitialSelection(initialFolder);
+    }
+    String parentFolderPath = rootFolder.getProjectRelativePath().removeLastSegments(1).toPortableString();
+    dialog.setInput(JaxWsSdkUtility.getFolder(bundle, parentFolderPath, true));
+    dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
+
+    if (dialog.open() == Window.OK) {
+      return (IFolder) dialog.getFirstResult();
+    }
+    return null;
   }
 
   public static enum SeparatorType {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -57,13 +57,19 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
   private String m_titleFolderDialog;
 
   public FolderPresenter(Composite parent, FormToolkit toolkit) {
-    super(parent, toolkit, false);
+    this(parent, toolkit, DEFAULT_LABEL_WIDTH, true);
+  }
+
+  public FolderPresenter(Composite parent, FormToolkit toolkit, int labelWidth, boolean initialize) {
+    super(parent, toolkit, labelWidth, false);
     setLabel(Texts.get("Folder"));
     setMessageFolderDialog(Texts.get("ChooseFolder"));
     setTitleFolderDialog(Texts.get("ChooseFolder"));
     setUseLinkAsLabel(true);
     setShowBrowseButton(true);
-    callInitializer();
+    if (initialize) {
+      callInitializer();
+    }
   }
 
   @Override
@@ -74,7 +80,7 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
     m_textField.setBackground(JaxWsSdkUtility.getColorLightGray());
 
     m_button = new Button(m_composite, SWT.PUSH);
-    m_button.setText(Texts.get("Browse") + "...");
+    m_button.setText(Texts.get("Browse"));
     m_button.addSelectionListener(new SelectionAdapter() {
 
       @Override
@@ -107,7 +113,7 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
 
     gd = new GridData();
     gd.grabExcessHorizontalSpace = false;
-    gd.widthHint = 100;
+    gd.widthHint = 50;
     gd.horizontalIndent = 5;
     gd.exclude = !isShowBrowseButton();
     m_button.setLayoutData(gd);

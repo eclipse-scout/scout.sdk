@@ -22,6 +22,7 @@ import javax.wsdl.PortType;
 import javax.xml.namespace.QName;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -86,6 +87,8 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     // WSDL selection
     m_wsdlLocationWizardPage = new WsdlLocationWizardPage(m_bundle);
     m_wsdlLocationWizardPage.setTitle(Texts.get("CreateWsConsumer"));
+    m_wsdlLocationWizardPage.setWsdlFolderVisible(true);
+    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
     m_wsdlLocationWizardPage.addPropertyChangeListener(new P_WsdlLocationPropertyListener());
     addPage(m_wsdlLocationWizardPage);
 
@@ -108,27 +111,28 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
+    IFolder wsdlFolder = m_wsdlLocationWizardPage.getWsdlFolder();
     m_alias = m_wsConsumerImplClassWizardPage.getTypeName();
     File wsdlFile = m_wsdlLocationWizardPage.getWsdlFile();
     m_wsdlFileName = wsdlFile.getName();
 
     List<ExternalFileCopyOperation> copyOperations = new LinkedList<ExternalFileCopyOperation>();
-    if (isCopyRequired(wsdlFile)) {
+    if (isCopyRequired(wsdlFolder, wsdlFile)) {
       ExternalFileCopyOperation op = new ExternalFileCopyOperation();
       op.setBundle(m_bundle);
       op.setOverwrite(true);
       op.setExternalFile(m_wsdlLocationWizardPage.getWsdlFile());
-      op.setWorkspacePath(new Path(JaxWsConstants.PATH_WSDL));
+      op.setWorkspacePath(wsdlFolder.getProjectRelativePath());
       copyOperations.add(op);
     }
 
     for (File file : m_wsdlLocationWizardPage.getAdditionalFiles()) {
-      if (isCopyRequired(file)) {
+      if (isCopyRequired(wsdlFolder, file)) {
         ExternalFileCopyOperation op = new ExternalFileCopyOperation();
         op.setBundle(m_bundle);
         op.setOverwrite(true);
         op.setExternalFile(file);
-        op.setWorkspacePath(new Path(JaxWsConstants.PATH_WSDL));
+        op.setWorkspacePath(wsdlFolder.getProjectRelativePath());
         copyOperations.add(op);
       }
     }
@@ -138,7 +142,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     m_buildJaxWsEntryCreateOperation = new BuildJaxWsEntryCreateOperation(WebserviceEnum.Consumer);
     m_buildJaxWsEntryCreateOperation.setBundle(m_bundle);
     m_buildJaxWsEntryCreateOperation.setAlias(m_alias);
-    m_buildJaxWsEntryCreateOperation.setWsdlFile(JaxWsSdkUtility.normalizePath(JaxWsConstants.PATH_WSDL, SeparatorType.TrailingType) + wsdlFile.getName());
+    m_buildJaxWsEntryCreateOperation.setWsdlFile(JaxWsSdkUtility.normalizePath(wsdlFolder.getProjectRelativePath().append(wsdlFile.getName()).toPortableString(), SeparatorType.None));
 
     m_createBindingFile = m_wsStubWizardPage.isCreateBindingFile();
 
@@ -157,6 +161,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     m_stubGenerationOperation = new WsStubGenerationOperation();
     m_stubGenerationOperation.setBundle(m_bundle);
     m_stubGenerationOperation.setAlias(m_alias);
+    m_stubGenerationOperation.setWsdlFolder(wsdlFolder);
     m_stubGenerationOperation.setProperties(buildProperties);
     m_stubGenerationOperation.setWsdlFileName(wsdlFile.getName());
     m_stubGenerationOperation.addOperationFinishedListener(new P_StubGenerationFinishedListener());
@@ -190,7 +195,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
         Map<String, List<String>> buildProperties = m_buildJaxWsEntryCreateOperation.getBuildProperties();
 
         // get WSDL resource to determine associated XML schemas
-        IFile wsdlFile = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, m_wsdlFileName, false);
+        IFile wsdlFile = JaxWsSdkUtility.getFile(m_bundle, m_buildJaxWsEntryCreateOperation.getWsdlFile(), false);
         WsdlResource wsdlResource = new WsdlResource(m_bundle);
         wsdlResource.setFile(wsdlFile);
 
@@ -209,6 +214,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
 
           BindingFileCreateOperation op = new BindingFileCreateOperation();
           op.setBundle(m_bundle);
+          op.setWsdlDestinationFolder(m_wsdlLocationWizardPage.getWsdlFolder());
           op.setSchemaTargetNamespace(schemaTargetNamespace);
           if (!schema.isRootWsdlFile()) {
             op.setSchemaDefiningFile(schema.getWsdlFile());
@@ -281,8 +287,8 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     }
   }
 
-  private boolean isCopyRequired(File wsdlFile) {
-    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL + "/" + wsdlFile.getName(), false);
+  private boolean isCopyRequired(IFolder wsdlFolder, File wsdlFile) {
+    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, wsdlFolder.getProjectRelativePath().toPortableString(), wsdlFile.getName(), false);
 
     if (potentialSameFile != null && potentialSameFile.exists()) {
       IPath potentialSameFilePath = new Path(potentialSameFile.getLocationURI().getRawPath());

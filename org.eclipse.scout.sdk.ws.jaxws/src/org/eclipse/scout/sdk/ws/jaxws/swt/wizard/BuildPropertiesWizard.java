@@ -73,7 +73,7 @@ public class BuildPropertiesWizard extends AbstractWorkspaceWizard {
 
     // store buildJaxWsBean
     ScoutXmlDocument xmlDocument = m_buildJaxWsBean.getXml().getDocument();
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(xmlDocument, m_buildJaxWsBean.getAlias(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, monitor);
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(xmlDocument, IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, monitor, m_buildJaxWsBean.getAlias());
 
     return true;
   }

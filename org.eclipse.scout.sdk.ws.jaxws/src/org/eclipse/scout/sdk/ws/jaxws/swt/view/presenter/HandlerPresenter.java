@@ -93,7 +93,7 @@ public class HandlerPresenter extends TypePresenter {
         ScoutXmlElement xmlChain = m_xmlHandlerElement.getParent();
         if (m_sunJaxWsBean.swapHandler(xmlChain, m_handlerIndex, m_handlerIndex - 1)) {
           // persist
-          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED);
+          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
         }
       }
     });
@@ -109,7 +109,7 @@ public class HandlerPresenter extends TypePresenter {
         ScoutXmlElement xmlChain = m_xmlHandlerElement.getParent();
         if (m_sunJaxWsBean.swapHandler(xmlChain, m_handlerIndex, m_handlerIndex + 1)) {
           // persist
-          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED);
+          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
         }
       }
     });
@@ -149,7 +149,7 @@ public class HandlerPresenter extends TypePresenter {
     m_xmlHandlerElement.getParent().removeChild(m_xmlHandlerElement);
 
     // persist
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED);
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
   }
 
   public SunJaxWsBean getSunJaxWsBean() {
@@ -195,7 +195,7 @@ public class HandlerPresenter extends TypePresenter {
       updateTransactionalIcon(fqn);
 
       // persist
-      ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED);
+      ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
     }
   }
 

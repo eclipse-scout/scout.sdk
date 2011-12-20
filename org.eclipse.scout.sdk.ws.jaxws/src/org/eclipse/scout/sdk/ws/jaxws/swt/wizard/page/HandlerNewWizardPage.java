@@ -35,7 +35,6 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -291,43 +290,43 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     validateType(multiStatus);
 
     if (isTransactional() && !TypeUtility.exists(getSessionFactoryType())) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", Texts.get("SessionFactory"))));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", Texts.get("SessionFactory"))));
     }
   }
 
   protected void validateType(MultiStatus multiStatus) {
     // package
     if (StringUtility.isNullOrEmpty(getPackageName())) {
-      multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageDiscouraged")));
+      multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageDiscouraged")));
     }
     else {
       multiStatus.add(JavaConventionsUtil.validatePackageName(getPackageName(), m_bundle.getJavaProject()));
 
       String recommendedPackageName = JaxWsSdkUtility.getRecommendedHandlerPackageName(m_bundle);
       if (!getPackageName().equals(recommendedPackageName)) {
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("ByConventionXShouldByY", Texts.get("Package"), recommendedPackageName)));
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("ByConventionXShouldByY", Texts.get("Package"), recommendedPackageName)));
       }
     }
 
     // name
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(JaxWsConstants.SUFFIX_HANDLER)) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", Texts.get("Name"))));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", Texts.get("Name"))));
     }
     else {
       multiStatus.add(JavaConventionsUtil.validateJavaTypeName(getTypeName(), m_bundle.getJavaProject()));
       if (Character.isLowerCase(getTypeName().charAt(0))) {
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("LowerCaseTypeName")));
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("LowerCaseTypeName")));
       }
     }
     if (multiStatus.getSeverity() < IStatus.ERROR) {
       try {
         String fqn = StringUtility.join(".", getPackageName(), getTypeName());
         if (TypeUtility.existsType(fqn)) {
-          multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TypeAlreadyExsits", fqn)));
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("TypeAlreadyExsits", fqn)));
         }
       }
       catch (Exception e) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("InvalidJavaType", getTypeName())));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidJavaType", getTypeName())));
       }
     }
   }

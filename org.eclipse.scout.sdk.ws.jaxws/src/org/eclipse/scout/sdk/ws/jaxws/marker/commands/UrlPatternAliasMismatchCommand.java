@@ -27,13 +27,11 @@ public class UrlPatternAliasMismatchCommand extends AbstractExecutableMarkerComm
   private SunJaxWsBean m_sunJaxWsBean;
   private String m_urlPattern;
 
-  public UrlPatternAliasMismatchCommand(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean) {
+  public UrlPatternAliasMismatchCommand(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, String servletAlias) {
     super("URL Pattern must start with JAX-WS servlet alias");
     m_bundle = bundle;
     m_sunJaxWsBean = sunJaxWsBean;
-    String jaxWsAlias = JaxWsSdkUtility.getJaxWsAlias(bundle);
-
-    m_urlPattern = JaxWsSdkUtility.normalizePath(jaxWsAlias, SeparatorType.BothType) + m_sunJaxWsBean.getAlias();
+    m_urlPattern = JaxWsSdkUtility.normalizePath(servletAlias, SeparatorType.BothType) + m_sunJaxWsBean.getAlias();
     setSolutionDescription("By using this task, the URL Pattern is changed to '" + m_urlPattern + "'");
   }
 
@@ -41,6 +39,6 @@ public class UrlPatternAliasMismatchCommand extends AbstractExecutableMarkerComm
   public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     m_sunJaxWsBean.setUrlPattern(m_urlPattern);
     XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
-    sunJaxWsResource.storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED);
+    sunJaxWsResource.storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
   }
 }

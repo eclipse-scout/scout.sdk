@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -15,6 +15,7 @@ import java.io.StringWriter;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -29,6 +30,7 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceConsumerNodePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderNodePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -61,6 +63,8 @@ public class StubGenerationAction extends AbstractLinkAction {
     WsStubGenerationOperation op = new WsStubGenerationOperation();
     op.setBundle(m_bundle);
     op.setAlias(m_buildJaxWsBean.getAlias());
+    IPath wsdlFolderPath = m_wsdlResource.getFile().getProjectRelativePath().removeLastSegments(1);// get folder of WSDL file
+    op.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false));
     op.setProperties(m_buildJaxWsBean.getPropertiers());
     op.addOperationFinishedListener(new P_OperationFinishedListener());
     op.setWsdlFileName(m_wsdlResource.getFile().getName());

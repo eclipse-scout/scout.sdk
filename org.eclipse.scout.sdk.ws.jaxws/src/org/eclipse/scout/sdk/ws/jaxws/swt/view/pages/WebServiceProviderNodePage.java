@@ -193,7 +193,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     if ((dataMask & DATA_BUILD_JAXWS_ENTRY) > 0) {
       BuildJaxWsBean buildJaxWsBean = getBuildJaxWsBean();
       if (buildJaxWsBean == null) {
-        m_buildJaxWsBean = BuildJaxWsBean.load(m_bundle, m_alias);
+        m_buildJaxWsBean = BuildJaxWsBean.load(m_bundle, m_alias, WebserviceEnum.Provider);
       }
       else {
         if (!buildJaxWsBean.reload(m_bundle)) {
@@ -415,6 +415,9 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
   }
 
   public Definition getWsdlDefinition() {
+    if (m_wsdlDefinition == null) {
+      m_wsdlDefinition = loadWsdlDefinition();
+    }
     return m_wsdlDefinition;
   }
 
@@ -483,7 +486,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
 
     @Override
     public void changed(String element, int event) {
-      if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_SUNJAXWS_HANDLER_CHANGED) {
+      if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_SUNJAXWS_HANDLER_CHANGED || event == EVENT_SUNJAXWS_URL_PATTERN_CHANGED) {
         reloadPage(DATA_SUN_JAXWS_ENTRY);
       }
       else {

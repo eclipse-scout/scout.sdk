@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -51,7 +51,7 @@ public class HandlerChainNewAction extends AbstractLinkAction {
     xmlHandlerChain.setName(toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAIN));
 
     // persist
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(xmlHandlerChain.getDocument(), m_sunJaxWsBean.getAlias(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED);
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(xmlHandlerChain.getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
     return null;
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.PhantomJarFilesDeleteWizard;
+import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -131,7 +132,7 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
 
     for (Object sunJaxWsXml : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
       SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) sunJaxWsXml);
-      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias());
+      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
       if (buildJaxWsBean == null) {
         // only consider by-contract providers
         continue;
@@ -152,7 +153,10 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
     IType[] wsConsumerTypes = hierarchy.getAllSubtypes(JaxWsRuntimeClasses.AbstractWebServiceClient, TypeFilters.getClassesInProject(m_bundle.getJavaProject()));
 
     for (IType consumerType : wsConsumerTypes) {
-      BuildJaxWsBean buildJaxWsBean = loadBuildJaxWsBean(consumerType);
+      if (!TypeUtility.exists(consumerType)) {
+        continue;
+      }
+      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, consumerType.getElementName(), WebserviceEnum.Consumer);
       if (buildJaxWsBean == null) {
         continue;
       }
@@ -163,29 +167,5 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
     }
 
     return jarFiles.toArray(new IFile[jarFiles.size()]);
-  }
-
-  private BuildJaxWsBean loadBuildJaxWsBean(IType type) {
-    if (!TypeUtility.exists(type)) {
-      return null;
-    }
-
-    XmlResource buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(m_bundle);
-
-    ScoutXmlDocument document = buildJaxWsResource.loadXml();
-    if (document == null || document.getRoot() == null) {
-      return null;
-    }
-
-    ScoutXmlElement rootXml = document.getRoot();
-    if (rootXml == null || !rootXml.hasChild(BuildJaxWsBean.XML_CONSUMER)) {
-      return null;
-    }
-
-    ScoutXmlElement xml = document.getRoot().getChild(BuildJaxWsBean.XML_CONSUMER, BuildJaxWsBean.XML_ALIAS, type.getElementName());
-    if (xml == null) {
-      return null;
-    }
-    return new BuildJaxWsBean(xml);
   }
 }

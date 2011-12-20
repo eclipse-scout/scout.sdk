@@ -294,7 +294,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
 
     @Override
     public void changed(String element, int event) {
-      if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_SUNJAXWS_HANDLER_CHANGED) {
+      if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_SUNJAXWS_HANDLER_CHANGED || event == EVENT_SUNJAXWS_URL_PATTERN_CHANGED) {
         reloadPage(DATA_SUN_JAXWS_ENTRY);
       }
       else {

@@ -15,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,6 +44,7 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
 
   private ExternalFileCopyOperation[] m_copyOperations;
   private WsStubGenerationOperation m_stubGenerationOperation;
+  private IFolder m_wsdlFolder;
 
   public WsdlLocationWizard(IScoutBundle bundle, BuildJaxWsBean buildJaxWsBean) {
     m_bundle = bundle;
@@ -56,31 +58,34 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
     m_wsdlLocationWizardPage = new WsdlLocationWizardPage(m_bundle);
     m_wsdlLocationWizardPage.setRebuildStubOptionVisible(true);
     m_wsdlLocationWizardPage.setRebuildStub(true);
+    m_wsdlLocationWizardPage.setWsdlFolderVisible(true);
+    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
     addPage(m_wsdlLocationWizardPage);
   }
 
   @Override
   protected boolean beforeFinish() throws CoreException {
     File wsdlFile = m_wsdlLocationWizardPage.getWsdlFile();
+    m_wsdlFolder = m_wsdlLocationWizardPage.getWsdlFolder();
     m_wsdlFileName = wsdlFile.getName();
 
     List<ExternalFileCopyOperation> copyOperations = new LinkedList<ExternalFileCopyOperation>();
-    if (isCopyRequired(wsdlFile)) {
+    if (isCopyRequired(m_wsdlFolder, wsdlFile)) {
       ExternalFileCopyOperation op = new ExternalFileCopyOperation();
       op.setBundle(m_bundle);
       op.setOverwrite(true);
       op.setExternalFile(m_wsdlLocationWizardPage.getWsdlFile());
-      op.setWorkspacePath(new Path(JaxWsConstants.PATH_WSDL));
+      op.setWorkspacePath(m_wsdlFolder.getProjectRelativePath());
       copyOperations.add(op);
     }
 
     for (File file : m_wsdlLocationWizardPage.getAdditionalFiles()) {
-      if (isCopyRequired(file)) {
+      if (isCopyRequired(m_wsdlFolder, file)) {
         ExternalFileCopyOperation op = new ExternalFileCopyOperation();
         op.setBundle(m_bundle);
         op.setOverwrite(true);
         op.setExternalFile(file);
-        op.setWorkspacePath(new Path(JaxWsConstants.PATH_WSDL));
+        op.setWorkspacePath(m_wsdlFolder.getProjectRelativePath());
         copyOperations.add(op);
       }
     }
@@ -90,6 +95,7 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
       m_stubGenerationOperation = new WsStubGenerationOperation();
       m_stubGenerationOperation.setBundle(m_bundle);
       m_stubGenerationOperation.setAlias(m_buildJaxWsBean.getAlias());
+      m_stubGenerationOperation.setWsdlFolder(m_wsdlFolder);
       m_stubGenerationOperation.setProperties(m_buildJaxWsBean.getPropertiers());
       m_stubGenerationOperation.setWsdlFileName(wsdlFile.getName());
     }
@@ -105,8 +111,8 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
     }
 
     // update entry in BuildJaxWs.xml
-    m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(JaxWsConstants.PATH_WSDL, SeparatorType.TrailingType) + m_wsdlFileName);
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), m_buildJaxWsBean.getAlias(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor);
+    m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlFolder.getProjectRelativePath().append(m_wsdlFileName).toPortableString(), SeparatorType.None));
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
 
     if (m_stubGenerationOperation != null) {
       m_stubGenerationOperation.run(monitor, workingCopyManager);
@@ -114,8 +120,8 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
     return true;
   }
 
-  private boolean isCopyRequired(File wsdlFile) {
-    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL + "/" + wsdlFile.getName(), false);
+  private boolean isCopyRequired(IFolder wsdlFolder, File wsdlFile) {
+    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, wsdlFolder.getProjectRelativePath().toPortableString(), wsdlFile.getName(), false);
 
     if (potentialSameFile != null && potentialSameFile.exists()) {
       IPath potentialSameFilePath = new Path(potentialSameFile.getLocationURI().getRawPath());

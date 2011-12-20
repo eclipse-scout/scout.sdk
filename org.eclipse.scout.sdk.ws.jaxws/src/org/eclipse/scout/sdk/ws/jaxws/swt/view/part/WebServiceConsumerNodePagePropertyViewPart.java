@@ -24,6 +24,7 @@ import javax.xml.namespace.QName;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -68,6 +69,7 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.SeparatorPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.StringPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.TypePresenter.ISearchJavaSearchScopeFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFilePresenter;
+import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFolderPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.DefinitionBean;
@@ -98,6 +100,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
   private StringPresenter m_portTypePresenter;
   private FolderPresenter m_stubFolderPresenter;
   private FilePresenter m_stubJarFilePresenter;
+  private WsdlFolderPresenter m_wsdlFolderPresenter;
   private WsdlFilePresenter m_wsdlFilePresenter;
 
   private Composite m_bindingFilesComposite;
@@ -278,13 +281,19 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       m_stubJarFilePresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
       applyLayoutData(m_stubJarFilePresenter);
 
+      // wsdl folder
+      m_wsdlFolderPresenter = new WsdlFolderPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), WebserviceEnum.Consumer);
+      m_wsdlFolderPresenter.setLabel(Texts.get("WsdlFolder"));
+      m_wsdlFolderPresenter.setBundle(m_bundle);
+      m_wsdlFolderPresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
+      applyLayoutData(m_wsdlFolderPresenter);
+
       // wsdl file
       m_wsdlFilePresenter = new WsdlFilePresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
       m_wsdlFilePresenter.setLabel(Texts.get("WsdlFile"));
       m_wsdlFilePresenter.setBundle(m_bundle);
       m_wsdlFilePresenter.setMarkerType(MarkerType.Wsdl);
       m_wsdlFilePresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
-      m_wsdlFilePresenter.setBuildJaxWsBean(getPage().getBuildJaxWsBean());
       applyLayoutData(m_wsdlFilePresenter);
 
       updatePresenterValues();
@@ -334,9 +343,20 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
     m_servicePresenter.setTooltip(serviceTooltip);
     m_portTypePresenter.setInput(portTypeName);
     m_portTypePresenter.setTooltip(portTypeTooltip);
-    m_wsdlFilePresenter.setInput(getPage().getWsdlResource().getFile());
     m_stubJarFilePresenter.setInput(stubJarFile);
     m_stubFolderPresenter.setInput(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.STUB_FOLDER, false));
+
+    // WSDL folder
+    IFile wsdlFile = getPage().getWsdlResource().getFile();
+    if (wsdlFile != null) {
+      IPath wsdlFolderPath = wsdlFile.getProjectRelativePath().removeLastSegments(1);
+      m_wsdlFolderPresenter.setInput(JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false));
+    }
+    m_wsdlFolderPresenter.setBuildJaxWsBean(buildJaxWsBean);
+
+    // WSDL file
+    m_wsdlFilePresenter.setInput(wsdlFile);
+    m_wsdlFilePresenter.setBuildJaxWsBean(buildJaxWsBean);
 
     IAnnotation scoutWebServiceClientAnnotation = JaxWsSdkUtility.getAnnotation(getPage().getType(), JaxWsRuntimeClasses.ScoutWebServiceClient.getFullyQualifiedName(), false);
     getSection(SECTION_ID_SCOUT_WEB_SERVICE_CLIENT_ANNOTATION).setVisible(TypeUtility.exists(scoutWebServiceClientAnnotation));
@@ -403,8 +423,13 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient());
 
       Definition wsdlDefinition = getPage().getWsdlDefinition();
-      if (wsdlDefinition != null) {
-        DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, wsdlDefinition);
+      WsdlResource wsdlResource = getPage().getWsdlResource();
+      IPath wsdlFolderPath = null;
+      if (wsdlResource.getFile() != null) {
+        wsdlFolderPath = wsdlResource.getFile().getProjectRelativePath().removeLastSegments(1);
+      }
+      if (wsdlDefinition != null && wsdlResource != null && wsdlFolderPath != null) {
+        DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, wsdlFolderPath, wsdlDefinition);
         for (DefinitionBean relatedWsdlDefinition : relatedWsdlDefinitions) {
           IFile file = relatedWsdlDefinition.getFile();
           FileOpenAction action = new FileOpenAction();
@@ -422,9 +447,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
        * referenced XSD schemas
        */
       JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_REF_SCHEMAS).getSectionClient());
-
-      WsdlResource wsdlResource = getPage().getWsdlResource();
-      if (wsdlResource != null) {
+      if (wsdlResource != null && wsdlFolderPath != null) {
         SchemaBean[] schemas = JaxWsSdkUtility.getAllSchemas(m_bundle, wsdlResource);
         for (SchemaBean schemaBean : schemas) {
           Schema schema = schemaBean.getSchema();
@@ -437,7 +460,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
           List<SchemaReference> schemaReferences = schema.getIncludes();
           for (SchemaReference schemaReference : schemaReferences) {
             String location = schemaReference.getSchemaLocationURI();
-            IFile file = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, location, false);
+            IFile file = JaxWsSdkUtility.getFile(m_bundle, wsdlFolderPath.append(location).toPortableString(), false);
 
             // action
             FileOpenAction action = new FileOpenAction();
@@ -460,7 +483,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
           for (List<SchemaImport> schemaImportList : schemaImports.values()) {
             for (SchemaImport schemaImport : schemaImportList) {
               String location = schemaImport.getSchemaLocationURI();
-              IFile file = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, location, false);
+              IFile file = JaxWsSdkUtility.getFile(m_bundle, wsdlFolderPath.append(location).toPortableString(), false);
 
               FileOpenAction b = new FileOpenAction();
               b.init(file, file.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
@@ -644,6 +667,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
           m_servicePresenter.updateInfo();
           m_portTypePresenter.updateInfo();
           m_wsdlFilePresenter.updateInfo();
+          m_wsdlFolderPresenter.updateInfo();
           m_authenticationHandlerPresenter.updateInfo();
           m_stubJarFilePresenter.updateInfo();
           m_stubFolderPresenter.updateInfo();

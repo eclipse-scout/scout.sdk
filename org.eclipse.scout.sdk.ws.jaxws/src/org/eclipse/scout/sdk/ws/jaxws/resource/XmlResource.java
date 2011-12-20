@@ -63,7 +63,7 @@ public class XmlResource extends ManagedResource {
     return m_xmlDocument;
   }
 
-  public void storeXmlAsync(final ScoutXmlDocument xmlDocument, final String notificationElement, final int notificationEvent) {
+  public void storeXmlAsync(final ScoutXmlDocument xmlDocument, final int notificationEvent, final String... notificationElements) {
     IOperation op = new IOperation() {
 
       @Override
@@ -77,13 +77,13 @@ public class XmlResource extends ManagedResource {
 
       @Override
       public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-        storeXml(xmlDocument, notificationElement, notificationEvent, monitor);
+        storeXml(xmlDocument, notificationEvent, monitor, notificationElements);
       }
     };
     new OperationJob(op).schedule();
   }
 
-  public void storeXml(ScoutXmlDocument xmlDocument, String notificationElement, int notificationEvent, IProgressMonitor monitor) throws CoreException {
+  public void storeXml(ScoutXmlDocument xmlDocument, int notificationEvent, IProgressMonitor monitor, String... notificationElements) throws CoreException {
     try {
       synchronized (m_fileLock) {
         if (m_file == null) {
@@ -104,7 +104,9 @@ public class XmlResource extends ManagedResource {
           m_modificationStamp = m_file.getModificationStamp();
         }
       }
-      notifyResourceListeners(notificationElement, notificationEvent);
+      for (String notificationElement : notificationElements) {
+        notifyResourceListeners(notificationElement, notificationEvent);
+      }
     }
     catch (Exception e) {
       throw new CoreException(new ScoutStatus(IStatus.ERROR, "Failed to persist XML file.", e));

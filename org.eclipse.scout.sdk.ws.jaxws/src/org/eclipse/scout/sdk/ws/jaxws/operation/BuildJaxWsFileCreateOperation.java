@@ -35,7 +35,7 @@ public class BuildJaxWsFileCreateOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutXmlDocument xmlDocument = new ScoutXmlDocument();
     xmlDocument.setRoot("webservices");
-    ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xmlDocument, IResourceListener.ELEMENT_FILE, IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor);
+    ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xmlDocument, IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
   }
 
   @Override

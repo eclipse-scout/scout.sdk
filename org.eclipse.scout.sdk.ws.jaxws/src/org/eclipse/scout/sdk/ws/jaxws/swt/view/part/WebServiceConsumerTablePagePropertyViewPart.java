@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -48,6 +48,7 @@ public class WebServiceConsumerTablePagePropertyViewPart extends AbstractSingleP
       getSection(SECTION_ID_FILTER).setExpanded(false);
       createSection(SECTION_ID_LINKS, Texts.get("ConsiderLinks"));
       createSection(SECTION_ID_CONSUMER, Texts.get("WebserviceConsumer"));
+      boolean sectionLinksVisible = false;
 
       // filter section
       PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), getSection(SECTION_ID_FILTER).getSectionClient(), getPage());
@@ -62,6 +63,7 @@ public class WebServiceConsumerTablePagePropertyViewPart extends AbstractSingleP
         b.setToolTip(Texts.get("JaxWsBuildDescriptor"));
         ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
         applyLayoutData(actionPresenter);
+        sectionLinksVisible = true;
       }
 
       // QuickLink 'Create new Webservice consumer'
@@ -69,6 +71,8 @@ public class WebServiceConsumerTablePagePropertyViewPart extends AbstractSingleP
       action.init(m_bundle);
       ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_CONSUMER).getSectionClient(), action, getFormToolkit());
       applyLayoutData(actionPresenter);
+
+      getSection(SECTION_ID_LINKS).setVisible(sectionLinksVisible);
     }
     finally {
       getForm().setRedraw(true);

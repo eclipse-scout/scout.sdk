@@ -41,7 +41,7 @@ public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
 
   @Override
   public void addPages() {
-    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("CleanupPhantomStubFiles"));
+    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("CleanupPhantomStubFiles"), Texts.get("QuestionDeletion"));
     m_wizardPage.setElements(getPhantomElements());
     addPage(m_wizardPage);
   }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -20,20 +20,18 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.marker.IMarkerRebuildListener;
 import org.eclipse.scout.sdk.ws.jaxws.marker.MarkerUtility;
-import org.eclipse.scout.sdk.ws.jaxws.marker.commands.CorruptSunJaxWsXmlFileCommand;
-import org.eclipse.scout.sdk.ws.jaxws.marker.commands.MissingJaxWsServletRegistrationCommand;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
+import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class WebServiceProviderTablePage extends AbstractPage implements IMarkerRebuildListener {
@@ -96,10 +94,7 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
-    if (m_sunJaxWsXml != null && m_sunJaxWsXml.getRoot() != null && JaxWsSdkUtility.getJaxWsAlias(m_bundle) != null) {
-      return new Class[]{ProviderNewWizardAction.class};
-    }
-    return null;
+    return new Class[]{ProviderNewWizardAction.class};
   }
 
   @Override
@@ -149,7 +144,7 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
 
       for (Object sunJaxWsXml : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
         SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) sunJaxWsXml);
-        BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias());
+        BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
 
         if (buildJaxWsBean != null) {
           new WebServiceProviderNodePage(this, sunJaxWsBean, buildJaxWsBean);
@@ -172,17 +167,6 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
 
         if (isPageUnloaded()) {
           return;
-        }
-
-        if (m_sunJaxWsXml == null || m_sunJaxWsXml.getRoot() == null) {
-          String markerSourceId = MarkerUtility.createMarker(m_bundle.getJavaProject().getResource(), m_markerGroupUUID, "Missing or corrupt file '" + JaxWsConstants.PATH_SUN_JAXWS + "'.\nThis file contains the webservices to be installed with their respective properties.");
-          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new CorruptSunJaxWsXmlFileCommand(m_bundle));
-        }
-
-        String jaxWsAlias = JaxWsSdkUtility.getJaxWsAlias(m_bundle);
-        if (jaxWsAlias == null) {
-          String markerSourceId = MarkerUtility.createMarker(m_bundle.getJavaProject().getResource(), m_markerGroupUUID, "Missing or invalid JAX-WS servlet registration in plugin.xml of root server Plug-In.");
-          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingJaxWsServletRegistrationCommand(m_bundle));
         }
       }
       finally {

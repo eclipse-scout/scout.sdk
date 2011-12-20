@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,10 +33,15 @@ import org.eclipse.debug.core.ILaunchConfigurationType;
 import org.eclipse.debug.core.ILaunchConfigurationWorkingCopy;
 import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.debug.core.model.IProcess;
+import org.eclipse.debug.internal.ui.DebugUIPlugin;
+import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
 import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -57,6 +63,7 @@ public class WsStubGenerationOperation implements IOperation {
   private String m_wsdlFileName;
   private Map<String, List<String>> m_properties;
   private String m_packageName;
+  private IFolder m_wsdlFolder;
 
   private Set<IOperationFinishedListener> m_operationFinishedListeners;
 
@@ -80,6 +87,9 @@ public class WsStubGenerationOperation implements IOperation {
     if (m_alias == null) {
       throw new IllegalArgumentException("alias not set");
     }
+    if (m_wsdlFolder == null || !m_wsdlFolder.exists()) {
+      throw new IllegalArgumentException("wsdl folder not set or does not exist");
+    }
     if (m_wsdlFileName == null) {
       throw new IllegalArgumentException("wsdlFileName not set");
     }
@@ -95,22 +105,18 @@ public class WsStubGenerationOperation implements IOperation {
       // launch JAX-WS Stub generator
       String launcherName = m_alias + " (JAX-WS stub generation)";
 
-      // delete existing jar file
       IFile jarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_properties, m_wsdlFileName);
+      // remove JAR file to ensure successful JAR generation
       if (jarFile.exists()) {
-        try {
-          jarFile.delete(true, monitor); // delete existing jar file
-        }
-        catch (Exception e) {
-          // nop
-        }
+        JaxWsSdkUtility.registerJarLib(m_bundle, jarFile, true, monitor);
+        jarFile.delete(true, monitor);
       }
 
       // assemble arguments to generate stub
       String args = null;
       String jarFilePath = JaxWsSdkUtility.normalizePath(jarFile.getProjectRelativePath().toPortableString(), SeparatorType.None);
       args = StringUtility.join("\n", args, jarFilePath);
-      args = StringUtility.join("\n", args, JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, m_wsdlFileName, false).getProjectRelativePath().toPortableString());
+      args = StringUtility.join("\n", args, getWsdlFolder().getProjectRelativePath().append(m_wsdlFileName).toPortableString());
       args = StringUtility.join("\n", args, "1"); // apply patches
 
       if (m_properties != null && m_properties.size() > 0) {
@@ -215,25 +221,41 @@ public class WsStubGenerationOperation implements IOperation {
     else {
       mode = ILaunchManager.RUN_MODE;
     }
-    ILaunch launch = lc.launch(mode, monitor, true, true);
 
-    // wait for stub generation to be finished
-    while (!launch.isTerminated()) {
-      if (monitor.isCanceled()) {
-        launch.terminate();
+    String continueWithCompileErros = DebugUIPlugin.getDefault().getPreferenceStore().getString(IInternalDebugUIConstants.PREF_CONTINUE_WITH_COMPILE_ERROR);
+    boolean changedDebugPref = false;
+    try {
+      if (!CompareUtility.equals(MessageDialogWithToggle.ALWAYS, continueWithCompileErros)) {
+        // prevent PDE dialog asking whether to continue in case of compile errors
+        DebugUIPlugin.getDefault().getPreferenceStore().setValue(IInternalDebugUIConstants.PREF_CONTINUE_WITH_COMPILE_ERROR, MessageDialogWithToggle.ALWAYS);
+        changedDebugPref = true;
       }
-      Thread.yield();
-    }
+      ILaunch launch = lc.launch(mode, monitor, true, true);
 
-    boolean keepLaunchConfiguration = JaxWsSdk.getDefault().getPreferenceStore().getBoolean(IPreferenceConstants.PREF_STUB_GENERATION_KEEP_LAUNCH_CONFIG);
-    if (!keepLaunchConfiguration) {
-      lc.delete();
-    }
+      // wait for stub generation to be finished
+      while (!launch.isTerminated()) {
+        if (monitor.isCanceled()) {
+          launch.terminate();
+          break;
+        }
+        Thread.sleep(1000);
+      }
 
-    // validate exit code of processes
-    for (IProcess process : launch.getProcesses()) {
-      if (process.getExitValue() != 0) {
-        new CoreException(new ScoutStatus("Stub generation failed"));
+      boolean keepLaunchConfiguration = JaxWsSdk.getDefault().getPreferenceStore().getBoolean(IPreferenceConstants.PREF_STUB_GENERATION_KEEP_LAUNCH_CONFIG);
+      if (!keepLaunchConfiguration) {
+        lc.delete();
+      }
+
+      // validate exit code of processes
+      for (IProcess process : launch.getProcesses()) {
+        if (process.getExitValue() != 0) {
+          new CoreException(new ScoutStatus("Stub generation failed"));
+        }
+      }
+    }
+    finally {
+      if (changedDebugPref) {
+        DebugUIPlugin.getDefault().getPreferenceStore().setValue(IInternalDebugUIConstants.PREF_CONTINUE_WITH_COMPILE_ERROR, continueWithCompileErros);
       }
     }
   }
@@ -267,7 +289,8 @@ public class WsStubGenerationOperation implements IOperation {
     }
 
     // check whether the required lib tools.jar is part of the workspace classpath (required for WsImport)
-    if (!TypeUtility.existsType(JaxWsRuntimeClasses.WsImportType)) { // first check whether tools.jar is accessible
+    IType wsImportType = TypeUtility.getType(JaxWsRuntimeClasses.WsImportType);
+    if (wsImportType == null || !wsImportType.exists() || !TypeUtility.isOnClasspath(wsImportType, m_bundle.getJavaProject())) {
       // manually add tool.jar to the classpath of the launch-configuration (from JRE).
       File toolsJarFile = locateToolsJar();
       if (toolsJarFile == null || !toolsJarFile.exists() || !toolsJarFile.isFile()) {
@@ -310,6 +333,14 @@ public class WsStubGenerationOperation implements IOperation {
 
   public String getWsdlFileName() {
     return m_wsdlFileName;
+  }
+
+  public IFolder getWsdlFolder() {
+    return m_wsdlFolder;
+  }
+
+  public void setWsdlFolder(IFolder wsdlFolder) {
+    m_wsdlFolder = wsdlFolder;
   }
 
   public void setWsdlFileName(String wsdlFileName) {

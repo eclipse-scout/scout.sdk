@@ -31,7 +31,6 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -94,7 +93,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
   public WsProviderImplClassWizardPage(IScoutBundle bundle) {
     super(WsProviderImplClassWizardPage.class.getName());
     setTitle(Texts.get("ConfigureImplementingClass"));
-    setDescription(Texts.get("ClickNextToContinue"));
+    setDescription(Texts.get("ConfigureImplementingClass"));
 
     m_propertySupport = new BasicPropertySupport(this);
     m_bundle = bundle;
@@ -410,25 +409,25 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
   protected void validateType(MultiStatus multiStatus) {
     // package
     if (StringUtility.isNullOrEmpty(getPackageName())) {
-      multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageDiscouraged")));
+      multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageDiscouraged")));
     }
     else {
       multiStatus.add(JavaConventionsUtil.validatePackageName(getPackageName(), m_bundle.getJavaProject()));
 
       String recommendedPackageName = JaxWsSdkUtility.getRecommendedProviderImplPackageName(m_bundle);
       if (!getPackageName().equals(recommendedPackageName)) {
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("ByConventionXShouldByY", Texts.get("Package"), recommendedPackageName)));
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("ByConventionXShouldByY", Texts.get("Package"), recommendedPackageName)));
       }
     }
     // name
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(JaxWsConstants.SUFFIX_WS_PROVIDER)) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("MissingNameForImplementingClass")));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("MissingNameForImplementingClass")));
     }
     else {
       multiStatus.add(JavaConventionsUtil.validateJavaTypeName(getTypeName(), m_bundle.getJavaProject()));
 
       if (Character.isLowerCase(getTypeName().charAt(0))) {
-        multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("LowerCaseTypeName")));
+        multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("LowerCaseTypeName")));
       }
     }
 
@@ -437,18 +436,18 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       String fullyQualifiedName = StringUtility.join(".", getPackageName(), getTypeName());
       try {
         if (TypeUtility.existsType(fullyQualifiedName)) {
-          multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TypeAlreadyExsits", fullyQualifiedName)));
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("TypeAlreadyExsits", fullyQualifiedName)));
         }
       }
       catch (Exception e) {
-        multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("InvalidJavaType", fullyQualifiedName)));
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidJavaType", fullyQualifiedName)));
       }
     }
   }
 
   protected void validateFactoryType(MultiStatus multiStatus, String label, String qualifiedName, IType interfaceType, String recommendedPackage) {
     if (StringUtility.isNullOrEmpty(qualifiedName)) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NoClassSpecified", label)));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("NoClassSpecified", label)));
       return;
     }
 
@@ -462,7 +461,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     }
 
     if (StringUtility.isNullOrEmpty(packageName)) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageNotAllowed")));
+      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("UsageOfDefaultPackageNotAllowed")));
       return;
     }
     else {
@@ -476,12 +475,12 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
         if (!type.newSupertypeHierarchy(new NullProgressMonitor()).contains(interfaceType)) {
           type.getJavadocRange().getOffset();
           type.getJavadocRange().getLength();
-          multiStatus.add(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("XMustBeOfTheTypeY", label, interfaceType.getFullyQualifiedName())));
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustBeOfTheTypeY", label, interfaceType.getFullyQualifiedName())));
         }
       }
       else {
         if (!packageName.equals(recommendedPackage)) {
-          multiStatus.add(new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("ByConventionXShouldByY", Texts.get("package"), recommendedPackage)));
+          multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("ByConventionXShouldByY", Texts.get("package"), recommendedPackage)));
         }
       }
     }
