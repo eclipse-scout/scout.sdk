@@ -168,7 +168,20 @@ public class ExportServerWarOperation implements IOperation {
       if (m_clientZipFile.exists()) {
         m_clientZipFile.delete(true, monitor);
       }
-      m_clientZipFile.create(new FileInputStream(tempZipFile), true, monitor);
+      FileInputStream fis = null;
+      try {
+        fis = new FileInputStream(tempZipFile);
+        m_clientZipFile.create(fis, true, monitor);
+      }
+      finally {
+        if (fis != null) {
+          try {
+            fis.close();
+          }
+          catch (Exception e) {
+          }
+        }
+      }
     }
     catch (Exception e) {
       if (e instanceof CoreException) {

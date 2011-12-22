@@ -1,5 +1,6 @@
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
+import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 
@@ -150,10 +151,23 @@ public class PropertyViewConfig {
     try {
       URL url = FileLocator.find(ScoutSdkUi.getDefault().getBundle(), new Path("resources/sdkPropertyViewConfig.xml"), null);
       ScoutXmlParser parser = new ScoutXmlParser();
-      ScoutXmlDocument xmlDoc = parser.parse(url.openStream());
-      for (Object o : xmlDoc.getRoot().getChildren(TAG_TYPE)) {
-        if (o instanceof ScoutXmlElement) {
-          loadType((ScoutXmlElement) o);
+      InputStream is = null;
+      try {
+        is = url.openStream();
+        ScoutXmlDocument xmlDoc = parser.parse(is);
+        for (Object o : xmlDoc.getRoot().getChildren(TAG_TYPE)) {
+          if (o instanceof ScoutXmlElement) {
+            loadType((ScoutXmlElement) o);
+          }
+        }
+      }
+      finally {
+        if (is != null) {
+          try {
+            is.close();
+          }
+          catch (Exception e) {
+          }
         }
       }
     }

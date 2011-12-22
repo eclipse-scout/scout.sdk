@@ -56,6 +56,7 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
 
+@SuppressWarnings("restriction")
 public class WsStubGenerationOperation implements IOperation {
 
   private IScoutBundle m_bundle;
@@ -196,7 +197,6 @@ public class WsStubGenerationOperation implements IOperation {
     return WsStubGenerationOperation.class.getName();
   }
 
-  @SuppressWarnings("restriction")
   private void launchJavaApplicationSync(String launchName, String projectName, String javaMainTypeName, String argumentList, IProgressMonitor monitor) throws Exception {
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfigurationType type = launchManager.getLaunchConfigurationType("org.eclipse.jdt.launching.localJavaApplication");

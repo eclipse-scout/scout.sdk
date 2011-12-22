@@ -130,11 +130,11 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     return (AbstractScoutTypePage) super.getPage();
   }
 
-  public ISection addSection(String sectionId, String title) {
+  ISection addSection(String sectionId, String title) {
     return super.createSection(sectionId, title);
   }
 
-  public boolean isDirty() {
+  private boolean isDirty() {
     return m_markDirtyJob.isDirty();
   }
 
@@ -272,7 +272,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     super.cleanup();
   }
 
-  public AbstractMethodPresenter createConfigMethodPresenter(Composite parent, ConfigurationMethod method) {
+  AbstractMethodPresenter createConfigMethodPresenter(Composite parent, ConfigurationMethod method) {
     AbstractMethodPresenter presenter = null;
     String propertyType = method.getConfigAnnotationType();
 
@@ -432,7 +432,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     return presenter;
   }
 
-  public AbstractMethodPresenter createOperationPresenter(Composite parent, ConfigurationMethod method) {
+  AbstractMethodPresenter createOperationPresenter(Composite parent, ConfigurationMethod method) {
     AbstractMethodPresenter presenter = null;
     if (method.getMethodName().equals("execResetSearchFilter")) {
       presenter = new ExecResetSerchFilterMethodPresenter(getFormToolkit(), parent);

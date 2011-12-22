@@ -14,6 +14,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
@@ -135,11 +136,23 @@ public class SimpleNlsProject extends AbstractNlsProject {
         while (eee.hasMoreElements()) {
           Object o = eee.nextElement();
           if (o instanceof URL) {
+            InputStream is = null;
+            URL url = (URL) o;
             try {
-              translationFiles.add(new PlatformTranslationFile(((URL) o).openStream(), NlsSdkSimple.getLanguage(((URL) o).getFile())));
+              is = url.openStream();
+              translationFiles.add(new PlatformTranslationFile(is, NlsSdkSimple.getLanguage(url.getFile())));
             }
             catch (IOException e) {
               NlsCore.logError("could not load NLS files of bundle '" + bundleId + "'", e);
+            }
+            finally {
+              if (is != null) {
+                try {
+                  is.close();
+                }
+                catch (Exception e) {
+                }
+              }
             }
           }
         }
