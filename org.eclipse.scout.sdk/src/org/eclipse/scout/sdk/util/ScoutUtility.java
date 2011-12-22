@@ -13,14 +13,11 @@ package org.eclipse.scout.sdk.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -35,13 +32,6 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.MultiEditorInput;
 
 /**
  * <h3>BcUtilities</h3> ...
@@ -261,49 +251,6 @@ public final class ScoutUtility {
     return null;
   }
 
-  public static IEditorPart[] getDirtyEditors() {
-    return instance.getDirtyEditorsImpl();
-  }
-
-  private IEditorPart[] getDirtyEditorsImpl() {
-    Set<IEditorInput> inputs = new HashSet<IEditorInput>();
-    List<IEditorPart> result = new ArrayList<IEditorPart>(0);
-    IWorkbench workbench = PlatformUI.getWorkbench();
-    IWorkbenchWindow[] windows = workbench.getWorkbenchWindows();
-    for (int i = 0; i < windows.length; i++) {
-      IWorkbenchPage[] pages = windows[i].getPages();
-      for (int x = 0; x < pages.length; x++) {
-        IEditorPart[] editors = pages[x].getDirtyEditors();
-        for (int z = 0; z < editors.length; z++) {
-          IEditorPart ep = editors[z];
-          IEditorInput input = ep.getEditorInput();
-          if (inputs.add(input)) {
-            if (isResourceEditorInput(input)) {
-              result.add(ep);
-            }
-          }
-        }
-
-      }
-    }
-
-    return result.toArray(new IEditorPart[result.size()]);
-  }
-
-  private static boolean isResourceEditorInput(IEditorInput input) {
-    if (input instanceof MultiEditorInput) {
-      IEditorInput[] inputs = ((MultiEditorInput) input).getInput();
-      for (int i = 0; i < inputs.length; i++) {
-        if (inputs[i].getAdapter(IResource.class) != null) {
-          return true;
-        }
-      }
-    }
-    else if (input.getAdapter(IResource.class) != null) {
-      return true;
-    }
-    return false;
-  }
 
   public static String sourceCodeToSql(String source) {
     StringBuffer buf = new StringBuffer();

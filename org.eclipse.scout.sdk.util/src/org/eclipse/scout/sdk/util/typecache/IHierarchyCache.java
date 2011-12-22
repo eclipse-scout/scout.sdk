@@ -21,5 +21,7 @@ public interface IHierarchyCache {
 
   TypeHierarchy getLocalHierarchy(IRegion region);
 
+  IPrimaryTypeTypeHierarchy[] getAllCachedHierarchies();
+
   void dispose();
 }

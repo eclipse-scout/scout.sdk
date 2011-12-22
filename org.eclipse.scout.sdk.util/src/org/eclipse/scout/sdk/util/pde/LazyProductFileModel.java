@@ -5,6 +5,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Hashtable;
@@ -22,6 +23,7 @@ import org.eclipse.pde.internal.core.iproduct.IConfigurationFileInfo;
 import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 
 @SuppressWarnings("restriction")
@@ -76,8 +78,10 @@ public final class LazyProductFileModel {
     if (m_configFileProperties == null) {
       m_configFileProperties = new Properties();
       IFile configIni = getConfigIniFile();
+      InputStream is = null;
       try {
-        m_configFileProperties.load(configIni.getContents());
+        is = configIni.getContents();
+        m_configFileProperties.load(is);
 
         // remember all entries at the moment of property loading.
         // this allows to check if the config file is dirty later on.
@@ -87,6 +91,16 @@ public final class LazyProductFileModel {
       catch (IOException e) {
         m_configFileProperties = null; // throw away the empty unloaded instance so that we can try again next time.
         throw new CoreException(new ScoutStatus("unable to load product configuration file: " + configIni.getFullPath().toOSString(), e));
+      }
+      finally {
+        if (is != null) {
+          try {
+            is.close();
+          }
+          catch (IOException e) {
+            SdkUtilActivator.logWarning("could not close input stream of file '" + configIni.getFullPath() + "'.", e);
+          }
+        }
       }
     }
     return m_configFileProperties;

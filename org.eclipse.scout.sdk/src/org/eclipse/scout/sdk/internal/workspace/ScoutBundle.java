@@ -199,6 +199,13 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public String getPackageName(String extension) {
+    if (extension == null) {
+      extension = "";
+    }
+    extension = extension.replaceAll("^\\.*", "");
+    if (extension.length() > 0) {
+      extension = "." + extension;
+    }
     return getRootPackageName() + extension;
   }
 

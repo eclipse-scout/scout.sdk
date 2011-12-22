@@ -76,7 +76,8 @@ public class FormStackNewOperation implements IOperation {
 
   public FormStackNewOperation(boolean formatSource) {
     m_formatSource = formatSource;
-
+    // defaults
+    m_formSuperTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractForm, true);
   }
 
   @Override

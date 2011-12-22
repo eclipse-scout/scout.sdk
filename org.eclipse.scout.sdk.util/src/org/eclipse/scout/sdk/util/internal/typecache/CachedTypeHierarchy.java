@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 
@@ -77,12 +78,20 @@ public class CachedTypeHierarchy extends TypeHierarchy implements ICachedTypeHie
   @Override
   void revalidate(IProgressMonitor monitor) {
     if (!m_created) {
+      if (!TypeUtility.exists(getType()) || !getType().getJavaProject().exists()) {
+        throw new IllegalArgumentException("type or project does not exist");
+      }
       try {
         if (getJdtHierarchy() == null) {
           setJdtHierarchy(getType().newTypeHierarchy(monitor));
         }
         else {
-          getJdtHierarchy().refresh(monitor);
+          if (TypeUtility.exists(getType()) && getType().getJavaProject().exists()) {
+            getJdtHierarchy().refresh(monitor);
+          }
+          else {
+            return;
+          }
         }
         m_created = true;
       }

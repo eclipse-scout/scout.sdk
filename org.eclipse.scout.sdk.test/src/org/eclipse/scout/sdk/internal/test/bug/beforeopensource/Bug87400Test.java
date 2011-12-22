@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,11 +44,6 @@ public class Bug87400Test extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("bugsBeforeOpensource/87400", "a", "a.client");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("a", "a.client");
   }
 
   @Test

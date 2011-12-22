@@ -25,6 +25,10 @@ public class Texts extends DynamicNls {
   public static final String RESOURCE_BUNDLE_NAME = "resources.texts.Texts";//$NON-NLS-1$
   private static Texts instance = new Texts();
 
+  protected Texts() {
+    registerResourceBundle(RESOURCE_BUNDLE_NAME, Texts.class);
+  }
+
   public static Texts getInstance() {
     return instance;
   }
@@ -37,7 +41,4 @@ public class Texts extends DynamicNls {
     return getInstance().getText(key, new String[0]);
   }
 
-  protected Texts() {
-    registerResourceBundle(RESOURCE_BUNDLE_NAME, Texts.class);
-  }
 }

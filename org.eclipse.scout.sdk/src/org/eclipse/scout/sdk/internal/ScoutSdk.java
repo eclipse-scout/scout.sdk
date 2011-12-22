@@ -107,6 +107,27 @@ public class ScoutSdk extends Plugin {
     logManager.logError(message, t);
   }
 
+  /**
+   * @see SdkLogManager#log(int, String, Throwable)
+   */
+  public static void log(int level, Throwable t) {
+    logManager.log(level, t);
+  }
+
+  /**
+   * @see SdkLogManager#log(int, String, Throwable)
+   */
+  public static void log(int level, String message) {
+    logManager.log(level, message);
+  }
+
+  /**
+   * @see SdkLogManager#log(int, String, Throwable)
+   */
+  public static void log(int level, String message, Throwable t) {
+    logManager.log(level, message, t);
+  }
+
   public void setFormDataAutoUpdate(boolean autoUpdate) {
     m_formDataUpdateSupport.setEnabled(autoUpdate);
   }

@@ -96,6 +96,7 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
       }
     }
     m_createdType = icu.createType(content, null, true, monitor);
+    // TODO verify this reconcile
     workingCopyManager.reconcile(icu, monitor);
   }
 

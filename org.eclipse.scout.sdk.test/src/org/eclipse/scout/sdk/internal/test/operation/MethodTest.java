@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -36,11 +35,6 @@ public class MethodTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("operation/method", "test.client", "test.shared");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("test.client", "test.shared");
   }
 
   @Test
@@ -96,8 +90,13 @@ public class MethodTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(implMethod));
 
     InputStream refIs = getInputStream("operation/method/formReferences/Test1FormWithExecInitForm.java");
-    IFile orig = (IFile) testForm.getCompilationUnit().getResource();
-    Assert.assertTrue(equalContents(refIs, orig.getContents()));
+    try {
+      IFile orig = (IFile) testForm.getCompilationUnit().getResource();
+      Assert.assertTrue(equalContents(refIs, orig.getContents()));
+    }
+    finally {
+      refIs.close();
+    }
   }
 
   @Test
@@ -135,8 +134,13 @@ public class MethodTest extends AbstractScoutSdkTest {
     overrideExecMethod(tableFieldTable, "execDecorateCell");
 
     InputStream refIs = getInputStream("operation/method/formReferences/Test2FormWithExecs.java");
-    IFile orig = (IFile) testForm.getCompilationUnit().getResource();
-    Assert.assertTrue(equalContents(refIs, orig.getContents()));
+    try {
+      IFile orig = (IFile) testForm.getCompilationUnit().getResource();
+      Assert.assertTrue(equalContents(refIs, orig.getContents()));
+    }
+    finally {
+      refIs.close();
+    }
   }
 
   private void overrideExecMethod(IType declaringType, String name) throws Exception {

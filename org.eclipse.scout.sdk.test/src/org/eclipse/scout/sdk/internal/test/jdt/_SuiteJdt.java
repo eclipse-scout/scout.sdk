@@ -8,26 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.internal.test;
+/**
+ *
+ */
+package org.eclipse.scout.sdk.internal.test.jdt;
 
-import org.eclipse.scout.sdk.internal.test.bug.beforeopensource._SuiteBugsBeforeOpensource;
-import org.eclipse.scout.sdk.internal.test.jdt._SuiteJdt;
-import org.eclipse.scout.sdk.internal.test.operation._SuiteOperation;
-import org.eclipse.scout.sdk.internal.test.presenter._SuitePresenter;
-import org.eclipse.scout.sdk.internal.test.types._SuiteTypes;
-import org.eclipse.scout.sdk.internal.test.util._SuiteUtil;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+/**
+ *
+ */
 @RunWith(Suite.class)
-@SuiteClasses({
-    _SuiteBugsBeforeOpensource.class,
-    _SuiteJdt.class,
-    _SuiteOperation.class,
-    _SuitePresenter.class,
-    _SuiteTypes.class,
-    _SuiteUtil.class})
-public class _SuiteInternalTest {
+@SuiteClasses({JavaProjectTests.class,})
+public class _SuiteJdt {
 
 }

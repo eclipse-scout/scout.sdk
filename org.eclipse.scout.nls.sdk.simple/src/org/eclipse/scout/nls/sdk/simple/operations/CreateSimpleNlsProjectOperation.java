@@ -11,6 +11,8 @@
 package org.eclipse.scout.nls.sdk.simple.operations;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.Properties;
 
@@ -27,6 +29,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
+import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
 import org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile.AbstractNlsFile;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -158,11 +161,23 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     IType parentType = null;
     if (desc.getParentFile() != null) {
       Properties parentProperties = new Properties();
+      InputStream io = null;
       try {
-        parentProperties.load(desc.getParentFile().getContents());
+        io = desc.getParentFile().getContents();
+        parentProperties.load(io);
       }
       catch (Exception e) {
         throw new CoreException(new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, 0, "Unable to load parent nls file. ", e));
+      }
+      finally {
+        if (io != null) {
+          try {
+            io.close();
+          }
+          catch (IOException e) {
+            NlsSdkSimple.logWarning("could not close input stream of file '" + desc.getParentFile().getFullPath() + "'.", e);
+          }
+        }
       }
       String parentClass = parentProperties.getProperty(AbstractNlsFile.MANIFEST_CLASS);
       IJavaProject jp = JavaCore.create(desc.getParentFile().getProject());

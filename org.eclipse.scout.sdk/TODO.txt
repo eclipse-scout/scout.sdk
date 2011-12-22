@@ -7,5 +7,4 @@ Plugin Dependencies issues:
 ---------------------------
 TODO:
 - remove org.eclipse.jdt.ui;bundle-version="3.6.2"
-- remove org.eclipse.debug.ui;bundle-version="3.4.2"
 - remove org.eclipse.ui.ide;bundle-version="3.6.2"

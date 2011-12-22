@@ -132,4 +132,74 @@ public class JdtEvent extends EventObject {
     }
     return m_declaringType;
   }
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder("JdtEvent <");
+    switch (getEventType()) {
+      case ADDED:
+        builder.append("ADDED ");
+        break;
+      case CHANGED:
+        builder.append("CHANGED ");
+        break;
+      case REMOVED:
+        builder.append("REMOVED ");
+        break;
+    }
+    builder.append(getElementType(getElement()) + " ");
+    if (getElement() != null) {
+      builder.append("'" + getElement().getElementName() + "' ");
+    }
+    else {
+      builder.append("'NULL ELEMENT' ");
+    }
+    if (getDeclaringType() != null) {
+      builder.append("declaringType='" + getDeclaringType().getElementName() + "' ");
+    }
+    else {
+      builder.append("declaringType='NULL' ");
+    }
+    builder.append(">");
+    return builder.toString();
+  }
+
+  private String getElementType(IJavaElement element) {
+    switch (element.getElementType()) {
+      case IJavaElement.JAVA_MODEL:
+        return "JAVA_MODEL ";
+      case IJavaElement.JAVA_PROJECT:
+        return "JAVA_PROJECT ";
+      case IJavaElement.PACKAGE_FRAGMENT_ROOT:
+        return "PACKAGE_FRAGMENT_ROOT ";
+      case IJavaElement.PACKAGE_FRAGMENT:
+        return "PACKAGE_FRAGMENT ";
+      case IJavaElement.COMPILATION_UNIT:
+        return "COMPILATION_UNIT ";
+      case IJavaElement.CLASS_FILE:
+        return "CLASS_FILE ";
+      case IJavaElement.TYPE:
+        return "TYPE ";
+      case IJavaElement.FIELD:
+        return "FIELD ";
+      case IJavaElement.METHOD:
+        return "METHOD ";
+      case IJavaElement.INITIALIZER:
+        return "INITIALIZER ";
+      case IJavaElement.PACKAGE_DECLARATION:
+        return "PACKAGE_DECLARATION ";
+      case IJavaElement.IMPORT_CONTAINER:
+        return "IMPORT_CONTAINER ";
+      case IJavaElement.IMPORT_DECLARATION:
+        return "IMPORT_DECLARATION ";
+      case IJavaElement.LOCAL_VARIABLE:
+        return "LOCAL_VARIABLE ";
+      case IJavaElement.TYPE_PARAMETER:
+        return "TYPE_PARAMETER ";
+      case IJavaElement.ANNOTATION:
+        return "ANNOTATION ";
+      default:
+        return "???";
+    }
+  }
 }

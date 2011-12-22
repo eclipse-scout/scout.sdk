@@ -27,6 +27,7 @@ import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsFolder;
 import org.eclipse.scout.nls.sdk.model.util.Language;
+import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -42,6 +43,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
 
   // The shared instance
   private static NlsSdkSimple plugin;
+  private static SdkLogManager logManager;
 
   /**
    * The constructor
@@ -52,7 +54,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
   /**
    * Returns a list of all fragments of the host plugin specified by the hostPluginId. If no plugins are found
    * an empty list is returned.
-   *
+   * 
    * @param hostPluginId
    * @return all fragments of the passed host plugin id found in the workspace
    * @throws CoreException
@@ -85,7 +87,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
 
   /**
    * finds all fragments to a cretain plugin project
-   *
+   * 
    * @param project
    * @return
    * @throws FileNotFoundException
@@ -131,6 +133,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
+    logManager = new SdkLogManager(this);
   }
 
   /*
@@ -140,12 +143,14 @@ public class NlsSdkSimple extends AbstractUIPlugin {
   @Override
   public void stop(BundleContext context) throws Exception {
     plugin = null;
+    logManager = null;
     super.stop(context);
+
   }
 
   /**
    * Returns the shared instance
-   *
+   * 
    * @return the shared instance
    */
   public static NlsSdkSimple getDefault() {
@@ -156,7 +161,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
    * finds all translations of the passed file in the toLookAt project. e.g. if a file
    * /lib/translations/messages.properties is passed all files /lib/translations/messages_[de|en|..].properties will be
    * returned.
-   *
+   * 
    * @param toLookAt
    *          the project to take a look at usually a fragment of the project the passed file is in.
    * @param file
@@ -224,4 +229,41 @@ public class NlsSdkSimple extends AbstractUIPlugin {
     fileName = fileName + "_" + locale.toString() + ".properties";
     return fileName;
   }
+
+  public static void logInfo(Throwable t) {
+    logManager.logInfo(t);
+  }
+
+  public static void logInfo(String message) {
+    logManager.logInfo(message);
+  }
+
+  public static void logInfo(String message, Throwable t) {
+    logManager.logInfo(message, t);
+  }
+
+  public static void logWarning(String message) {
+    logManager.logWarning(message);
+  }
+
+  public static void logWarning(Throwable t) {
+    logManager.logWarning(t);
+  }
+
+  public static void logWarning(String message, Throwable t) {
+    logManager.logWarning(message, t);
+  }
+
+  public static void logError(Throwable t) {
+    logManager.logError(t);
+  }
+
+  public static void logError(String message) {
+    logManager.logError(message);
+  }
+
+  public static void logError(String message, Throwable t) {
+    logManager.logError(message, t);
+  }
+
 }

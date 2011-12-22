@@ -9,5 +9,7 @@ public interface ITypeCache {
 
   IType[] getTypes(String fullyQualifiedName);
 
+  IType[] getAllCachedTypes();
+
   void dispose();
 }

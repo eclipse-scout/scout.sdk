@@ -49,6 +49,11 @@ public class FormNewOperation implements IOperation {
   private IMethod m_createdNlsLabelMethod;
   private IMethod m_createdMainBoxGetter;
 
+  public FormNewOperation() {
+    // defaults
+    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractForm, true);
+  }
+
   @Override
   public String getOperationName() {
     return "New Form...";

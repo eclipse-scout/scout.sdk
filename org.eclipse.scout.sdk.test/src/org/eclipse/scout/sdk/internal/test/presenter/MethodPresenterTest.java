@@ -81,7 +81,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
   @AfterClass
   public static void cleanUpWorkspace() throws Exception {
-    deleteProjects(SHARED_PROJECT, SERVER_PROJECT, CLIENT_PROJECT);
+    clearWorkspace();
     default_toolkit = null;
     default_parent = null;
     reference_max_durations = null;
@@ -116,12 +116,9 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
     finally {
       duration = TuningUtility.stopTimer("", false, false);
     }
-
     Assert.assertNotNull(presenter);
     Assert.assertTrue(duration > 0);
-    if (duration > testInfo.getMaxPresenterCreationDuration()) {
-      throw new Exception("Creation of presenter '" + presenter + "' took " + duration + "ns but should be faster than " + testInfo.getMaxPresenterCreationDuration() + "ns.");
-    }
+    Assert.assertTrue("Creation of presenter '" + presenter + "' took " + duration + "ns but should be faster than " + testInfo.getMaxPresenterCreationDuration() + "ns.", duration < testInfo.getMaxPresenterCreationDuration());
   }
 
   private static long getReferenceDuration(String key) {

@@ -18,7 +18,6 @@ import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -33,11 +32,6 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("util/typeCache", "test.client", "test.shared");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("test.client", "test.shared");
   }
 
   @Test

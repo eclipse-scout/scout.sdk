@@ -93,6 +93,33 @@ public class SdkLogManager {
     logImpl(createLogStatus(IStatus.ERROR, message, t));
   }
 
+  /**
+   * @see SdkLogManager#log(int, String, Throwable)
+   */
+  public void log(int logLevel, Throwable t) {
+    log(logLevel, "", t);
+  }
+
+  /**
+   * @see SdkLogManager#log(int, String, Throwable)
+   */
+  public void log(int logLevel, String message) {
+    log(logLevel, message, null);
+  }
+
+  /**
+   * @param logLevel
+   *          one of {@link IStatus#INFO}, {@link IStatus#WARNING} or {@link IStatus#ERROR}
+   * @param message
+   * @param t
+   */
+  public void log(int logLevel, String message, Throwable t) {
+    if (message == null) {
+      message = "";
+    }
+    logImpl(createLogStatus(logLevel, message, t));
+  }
+
   private static String getLogLevelProperty(Plugin p) {
     if (p != null && p.getBundle() != null) {
       return getLogLevelProperty(p.getBundle().getBundleContext());

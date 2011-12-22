@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.util;
 
 import java.util.EventListener;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
@@ -22,12 +23,14 @@ import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceStatus;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 public final class ScoutSeverityManager {
 
@@ -88,9 +91,22 @@ public final class ScoutSeverityManager {
   }
 
   /**
-   * @return {@link IMarker#SEVERITY_INFO}, {@link IMarker#SEVERITY_WARNING}, {@link IMarker#SEVERITY_ERROR}
+   * @see ScoutSeverityManager#getSeverityOf(Object, int)
    */
   public int getSeverityOf(Object obj) {
+    // delegate no log output
+    return getSeverityOf(obj, IMarker.SEVERITY_ERROR + 1);
+  }
+
+  /**
+   * @param obj
+   *          a IJavaElement or a IResource the largest scope is IWorkspaceRoot.
+   * @param logLevel
+   *          all markers with a severity >= logLevel produce a log output.
+   * @return the max severity one of {@link IMarker#SEVERITY_INFO}, {@link IMarker#SEVERITY_WARNING} or
+   *         {@link IMarker#SEVERITY_ERROR}
+   */
+  public int getSeverityOf(Object obj, int logLevel) {
     try {
       if (obj instanceof IJavaElement) {
         IJavaElement element = (IJavaElement) obj;
@@ -99,11 +115,11 @@ public final class ScoutSeverityManager {
           case IJavaElement.JAVA_MODEL:
           case IJavaElement.JAVA_PROJECT:
           case IJavaElement.PACKAGE_FRAGMENT_ROOT:
-            return getSeverityFromMarkers(element.getResource(), IResource.DEPTH_INFINITE, null);
+            return getSeverityFromMarkers(element.getResource(), IResource.DEPTH_INFINITE, logLevel, null);
           case IJavaElement.PACKAGE_FRAGMENT:
           case IJavaElement.COMPILATION_UNIT:
           case IJavaElement.CLASS_FILE:
-            return getSeverityFromMarkers(element.getResource(), IResource.DEPTH_ONE, null);
+            return getSeverityFromMarkers(element.getResource(), IResource.DEPTH_ONE, logLevel, null);
           case IJavaElement.PACKAGE_DECLARATION:
           case IJavaElement.IMPORT_DECLARATION:
           case IJavaElement.IMPORT_CONTAINER:
@@ -115,14 +131,14 @@ public final class ScoutSeverityManager {
             ICompilationUnit cu = (ICompilationUnit) element.getAncestor(IJavaElement.COMPILATION_UNIT);
             if (cu != null) {
               ISourceReference ref = (type == IJavaElement.COMPILATION_UNIT) ? null : (ISourceReference) element;
-              return getSeverityFromMarkers(cu.getResource(), IResource.DEPTH_ONE, ref);
+              return getSeverityFromMarkers(cu.getResource(), IResource.DEPTH_ONE, logLevel, ref);
             }
             break;
           default:
         }
       }
       else if (obj instanceof IResource) {
-        return getSeverityFromMarkers((IResource) obj, IResource.DEPTH_INFINITE, null);
+        return getSeverityFromMarkers((IResource) obj, IResource.DEPTH_INFINITE, logLevel, null);
       }
     }
     catch (CoreException e) {
@@ -138,13 +154,23 @@ public final class ScoutSeverityManager {
     return 0;
   }
 
-  private int getSeverityFromMarkers(IResource res, int depth, ISourceReference sourceElement) throws CoreException {
+  private int getSeverityFromMarkers(IResource res, int depth, int logLevel, ISourceReference sourceElement) throws CoreException {
     if (res == null || !res.isAccessible()) {
       return 0;
     }
     int severity = 0;
     if (sourceElement == null) {
-      severity = res.findMaxProblemSeverity(IMarker.PROBLEM, true, depth);
+      IMarker[] markers = res.findMarkers(IMarker.PROBLEM, true, depth);
+      if (markers != null) {
+        for (int i = 0; i < markers.length && (severity != IMarker.SEVERITY_ERROR); i++) {
+          IMarker m = markers[i];
+          int val = m.getAttribute(IMarker.SEVERITY, -1);
+          if (val >= logLevel) {
+            logMarker(m, val);
+          }
+          severity = Math.max(val, severity);
+        }
+      }
     }
     else {
       IMarker[] markers = res.findMarkers(IMarker.PROBLEM, true, depth);
@@ -153,9 +179,10 @@ public final class ScoutSeverityManager {
           IMarker curr = markers[i];
           if (isMarkerInRange(curr, sourceElement)) {
             int val = curr.getAttribute(IMarker.SEVERITY, -1);
-            if (val == IMarker.SEVERITY_WARNING || val == IMarker.SEVERITY_ERROR) {
-              severity = val;
+            if (val >= logLevel) {
+              logMarker(curr, val);
             }
+            severity = Math.max(val, severity);
           }
         }
       }
@@ -176,4 +203,27 @@ public final class ScoutSeverityManager {
     return false;
   }
 
+  private void logMarker(IMarker marker, int severity) {
+    int logLevel = IStatus.INFO;
+    StringBuilder builder = new StringBuilder();
+
+    switch (severity) {
+      case IMarker.SEVERITY_INFO:
+        ScoutSdk.logInfo("INFO ");
+        break;
+      case IMarker.SEVERITY_WARNING:
+        ScoutSdk.logInfo("WARNING ");
+        break;
+      case IMarker.SEVERITY_ERROR:
+        ScoutSdk.logInfo("ERROR ");
+        break;
+
+      default:
+        ScoutSdk.logInfo("UNDEFINED LEVEL ");
+        break;
+    }
+    builder.append(marker.getAttribute(IMarker.LOCATION, "")).append(" ");
+    builder.append(marker.getAttribute(IMarker.MESSAGE, "")).append(" ");
+    ScoutSdk.log(logLevel, builder.toString());
+  }
 }

@@ -317,8 +317,10 @@ public class FormDataUpdateOperation implements IOperation {
           icu.commitWorkingCopy(true, monitor);
         }
         catch (Exception e) {
-          icu.discardWorkingCopy();
           ScoutSdk.logError("could not store new form data for '" + getType().getFullyQualifiedName() + "'.", e);
+        }
+        finally {
+          icu.discardWorkingCopy();
         }
       }
 

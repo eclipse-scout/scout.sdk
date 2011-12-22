@@ -11,6 +11,8 @@
 package org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile;
 
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
@@ -18,6 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 
 public abstract class AbstractNlsFile {
 
@@ -50,11 +53,23 @@ public abstract class AbstractNlsFile {
 
   protected void parseInput(IFile file) {
     Properties props = new Properties();
+    InputStream io = null;
     try {
-      props.load(file.getContents());
+      io = file.getContents();
+      props.load(io);
     }
     catch (Exception e) {
       NlsCore.logWarning("could not open stream to read NLS file :'" + file.getFullPath() + "'", e);
+    }
+    finally {
+      if (io != null) {
+        try {
+          io.close();
+        }
+        catch (IOException e) {
+          NlsSdkSimple.logWarning("could not close input stream of '" + file.getFullPath() + "'.", e);
+        }
+      }
     }
     m_propertySupport.setPropertyString(PROP_NLS_TYPE_NAME, props.getProperty(MANIFEST_CLASS));
   }

@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -34,11 +33,6 @@ public class AnnotationTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("operation/annotations", "test.client", "test.shared");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("test.client", "test.shared");
   }
 
   @Test

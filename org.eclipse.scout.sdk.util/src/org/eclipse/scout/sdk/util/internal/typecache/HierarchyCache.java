@@ -13,11 +13,7 @@ package org.eclipse.scout.sdk.util.internal.typecache;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
@@ -42,7 +38,6 @@ public final class HierarchyCache implements IHierarchyCache {
   private static final HierarchyCache INSTANCE = new HierarchyCache();
 
   private final Object m_cacheLock;
-  private final P_AsyncLog m_asyncLog;
   private final HashMap<IType, PrimaryTypeTypeHierarchy> m_cachedPrimaryTypeHierarchies;
 
   public static HierarchyCache getInstance() {
@@ -51,7 +46,6 @@ public final class HierarchyCache implements IHierarchyCache {
 
   private HierarchyCache() {
     m_cachedPrimaryTypeHierarchies = new HashMap<IType, PrimaryTypeTypeHierarchy>();
-    m_asyncLog = new P_AsyncLog();
     m_cacheLock = new Object();
   }
 
@@ -63,9 +57,16 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   @Override
+  public IPrimaryTypeTypeHierarchy[] getAllCachedHierarchies() {
+    synchronized (m_cacheLock) {
+      return m_cachedPrimaryTypeHierarchies.values().toArray(new IPrimaryTypeTypeHierarchy[m_cachedPrimaryTypeHierarchies.size()]);
+    }
+  }
+
+  @Override
   public IPrimaryTypeTypeHierarchy getPrimaryTypeHierarchy(IType type) throws IllegalArgumentException {
-    if (!TypeUtility.exists(type)) {
-      return null;
+    if (!TypeUtility.exists(type) || !type.getJavaProject().exists()) {
+      throw new IllegalArgumentException("type does not exist!");
     }
     else if (TypeUtility.exists(type.getDeclaringType())) {
       throw new IllegalArgumentException("type '" + type.getElementName() + "' must be a primary type.");
@@ -73,6 +74,11 @@ public final class HierarchyCache implements IHierarchyCache {
     PrimaryTypeTypeHierarchy hierarchy = null;
     synchronized (m_cacheLock) {
       hierarchy = m_cachedPrimaryTypeHierarchies.get(type);
+      if (hierarchy != null && (!TypeUtility.exists(hierarchy.getType()) || !TypeUtility.exists(hierarchy.getType().getJavaProject()))) {
+        // discard old create new
+        m_cachedPrimaryTypeHierarchies.remove(type);
+        hierarchy = null;
+      }
       if (hierarchy == null) {
         hierarchy = new PrimaryTypeTypeHierarchy(type);
         m_cachedPrimaryTypeHierarchies.put(type, hierarchy);
@@ -180,30 +186,35 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
-  private void handleCompilationUnitRemoved(ICompilationUnit icu) {
-    try {
-      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
-      synchronized (m_cacheLock) {
-        hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
-      }
-      ITypeFilter compilationUnitFilter = TypeFilters.getCompilationUnitFilter(icu);
-      for (CachedTypeHierarchy h : hierarchies) {
-
-        if (h.isCreated()) {
-          IType[] allTypes = h.getJdtHierarchy().getAllTypes();
-          for (IType candidate : allTypes) {
-            if (compilationUnitFilter.accept(candidate)) {
-              // remove
-              h.handleTypeRemoving(candidate);
-              break;
+  private void handleJavaElementRemoved(IJavaElement element) {
+    if (element.getElementType() < IJavaElement.TYPE) {
+      try {
+        ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
+        synchronized (m_cacheLock) {
+          hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+        }
+        for (CachedTypeHierarchy h : hierarchies) {
+          if (TypeUtility.isAncestor(element, h.getType())) {
+            synchronized (m_cacheLock) {
+              m_cachedPrimaryTypeHierarchies.remove(h.getType());
+            }
+          }
+          else if (h.isCreated()) {
+            IType[] allTypes = h.getJdtHierarchy().getAllTypes();
+            for (IType candidate : allTypes) {
+              if (TypeUtility.isAncestor(element, candidate)) {
+                h.handleTypeRemoving(candidate);
+              }
             }
           }
         }
-
+      }
+      catch (Exception e) {
+        SdkUtilActivator.logError("could not handle element removed event ('" + element.getElementName() + "') in hierarchies.");
       }
     }
-    catch (Exception e) {
-      SdkUtilActivator.logError("could not handle icu removed ('" + icu.getElementName() + "') change in hierarchies.");
+    else if (element.getElementType() == IJavaElement.TYPE) {
+      handleTypeRemoved((IType) element);
     }
   }
 
@@ -285,7 +296,6 @@ public final class HierarchyCache implements IHierarchyCache {
   public void elementChanged(JdtEvent e) {
     switch (e.getEventType()) {
       case IJavaElementDelta.ADDED:
-//        m_asyncLog.append(e.getElement());
       case IJavaElementDelta.CHANGED: {
         if (e.getElementType() == IJavaElement.TYPE && e.getDeclaringType() == null) {
           handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
@@ -293,12 +303,8 @@ public final class HierarchyCache implements IHierarchyCache {
         break;
       }
       case IJavaElementDelta.REMOVED: {
-        if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-          handleCompilationUnitRemoved((ICompilationUnit) e.getElement());
-        }
-        else if (e.getElementType() == IJavaElement.TYPE && e.getDeclaringType() == null) {
-          handleTypeRemoved((IType) e.getElement());
-//          handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
+        if (TypeUtility.exists(e.getElement().getParent())) {
+          handleJavaElementRemoved(e.getElement());
         }
         break;
       }
@@ -307,29 +313,6 @@ public final class HierarchyCache implements IHierarchyCache {
           handleCompilationUnitChagnedExternal((ICompilationUnit) e.getElement());
         }
         break;
-    }
-  }
-
-  private class P_AsyncLog extends Job {
-    private ArrayList<IJavaElement> m_elements = new ArrayList<IJavaElement>();
-
-    public P_AsyncLog() {
-      super("");
-    }
-
-    public void append(IJavaElement e) {
-      m_elements.add(e);
-      cancel();
-      schedule(3000);
-    }
-
-    @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      synchronized (m_elements) {
-        m_elements.toArray(new IJavaElement[m_elements.size()]);
-        m_elements.clear();
-      }
-      return Status.OK_STATUS;
     }
   }
 

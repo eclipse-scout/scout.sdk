@@ -13,6 +13,7 @@ package org.eclipse.scout.nls.sdk.simple.model.ws.translationfile;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Properties;
@@ -58,12 +59,24 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
 
   @Override
   public void reload(IProgressMonitor monitor) {
+    InputStream io = null;
     try {
       m_file.refreshLocal(IResource.DEPTH_ZERO, monitor);
-      parseResource(m_file.getContents());
+      io = m_file.getContents();
+      parseResource(io);
     }
     catch (Exception e) {
       NlsCore.logError("cold not reload translation file: " + m_file.getName(), e);
+    }
+    finally {
+      if (io != null) {
+        try {
+          io.close();
+        }
+        catch (IOException e) {
+          NlsSdkSimple.logWarning("could not close input stream of file '" + m_file.getFullPath() + "'.", e);
+        }
+      }
     }
   }
 

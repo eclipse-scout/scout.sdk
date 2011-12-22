@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -26,11 +25,6 @@ public class ExternalCheckboxFieldTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("operation/formData", "formdata.shared", "formdata.client");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("formdata.client", "formdata.shared");
   }
 
   @Test
@@ -46,7 +40,7 @@ public class ExternalCheckboxFieldTest extends AbstractScoutSdkTest {
     OperationJob job = new OperationJob(op);
     job.schedule();
     job.join();
-    refreshAndBuildProject(sharedProject);
+    buildWorkspace();
     IType formData = op.getFormDataType();
     Assert.assertTrue(TypeUtility.exists(formData));
     Assert.assertTrue(TypeUtility.exists(formData));

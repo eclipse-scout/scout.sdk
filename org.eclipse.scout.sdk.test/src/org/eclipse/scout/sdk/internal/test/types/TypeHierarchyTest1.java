@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -37,7 +36,7 @@ import org.junit.Test;
  * <h1>TypeHierarchyTest</h1>
  * <p>
  */
-public class TypeHierarchyTest extends AbstractScoutSdkTest {
+public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
 
   private static String BUNDLE_NAME_CLIENT = "test.client";
   private static String BUNDLE_NAME_SHARED = "test.shared";
@@ -46,11 +45,6 @@ public class TypeHierarchyTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("util/typeCache", BUNDLE_NAME_CLIENT, BUNDLE_NAME_SHARED, BUNDLE_NAME_SERVER);
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects(BUNDLE_NAME_CLIENT, BUNDLE_NAME_SHARED, BUNDLE_NAME_SERVER);
   }
 
   @Test

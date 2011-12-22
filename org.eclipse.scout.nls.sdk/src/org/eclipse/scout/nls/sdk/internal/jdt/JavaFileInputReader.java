@@ -31,6 +31,7 @@ public class JavaFileInputReader {
   private InputStream m_inputStream;
 
   public JavaFileInputReader(IFile file) throws CoreException {
+    // TODO ensure input stream close!!!
     m_inputStream = file.getContents();
   }
 

@@ -127,21 +127,22 @@ public class JavadocTooltip extends AbstractTooltip {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         try {
-          Reader contentReader = JavadocContentAccess.getHTMLContentReader(m_member, true, true);
-          if (contentReader != null) {
-            m_javaDoc = getJavadocHtml(new IJavaElement[]{m_member});
-            if (getSourceControl() != null && !getSourceControl().isDisposed()) {
-              getSourceControl().getDisplay().asyncExec(new Runnable() {
+          if (TypeUtility.exists(m_member)) {
+            Reader contentReader = JavadocContentAccess.getHTMLContentReader(m_member, true, true);
+            if (contentReader != null) {
+              m_javaDoc = getJavadocHtml(new IJavaElement[]{m_member});
+              if (getSourceControl() != null && !getSourceControl().isDisposed()) {
+                getSourceControl().getDisplay().asyncExec(new Runnable() {
 
-                @Override
-                public void run() {
-                  if (m_browser != null && !m_browser.isDisposed()) {
-                    m_browser.setText(m_javaDoc);
+                  @Override
+                  public void run() {
+                    if (m_browser != null && !m_browser.isDisposed()) {
+                      m_browser.setText(m_javaDoc);
+                    }
                   }
-                }
-              });
+                });
+              }
             }
-
           }
         }
         catch (Exception e) {

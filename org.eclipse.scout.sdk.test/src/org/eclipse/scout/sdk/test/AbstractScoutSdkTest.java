@@ -22,29 +22,38 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URL;
 
-import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceDescription;
-import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameRequestor;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.test.Activator;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.junit.AfterClass;
 import org.junit.Assert;
 
 public abstract class AbstractScoutSdkTest {
@@ -58,14 +67,42 @@ public abstract class AbstractScoutSdkTest {
     if (projects == null || projects.length == 0) {
       projects = new String[]{null};
     }
-
     for (String project : projects) {
       IProject javaProject = createProject(project);
       copyProject(RESOURCES_FOLDER_NAME, baseFolder, project);
       javaProject.close(null);
       javaProject.open(null);
-      refreshAndBuildProject(javaProject);
     }
+    buildWorkspace();
+  }
+
+  /**
+   * deletes all workspace projects and waits for a silent workspace
+   * 
+   * @throws Exception
+   */
+  @AfterClass
+  public static void clearWorkspace() throws Exception {
+    Job delJob = new Job("") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+            p.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+            p.delete(true, true, monitor);
+          }
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+        return Status.OK_STATUS;
+      }
+    };
+    delJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
+    delJob.schedule();
+    delJob.join();
+    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+    waitForSilentWorkspace();
   }
 
   protected static void setAutoUpdateFormData(boolean autoBuild) {
@@ -80,74 +117,72 @@ public abstract class AbstractScoutSdkTest {
     }
   }
 
-  protected static void buildWorkspace() throws Exception {
-    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
-    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
-    waitForManualBuild();
-    waitForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
-  }
-
-  protected static void deleteProjects(final String... projectNames) throws Exception {
-    if (projectNames == null || projectNames.length == 0) {
-      return;
-    }
-    ResourcesPlugin.getWorkspace().run(new IWorkspaceRunnable() {
+  protected static void executeAndBuildWorkspace(IOperation... ops) throws Exception {
+    OperationJob job = new OperationJob(ops) {
       @Override
-      public void run(IProgressMonitor monitor) throws CoreException {
-        for (String project : projectNames) {
-          try {
-            deleteProject(project);
-          }
-          catch (Exception e) {
-            // nop
-          }
+      protected IStatus run(IProgressMonitor monitor) {
+        try {
+          return super.run(monitor);
+        }
+        finally {
+          System.out.println("operation job done...");
         }
       }
-    }, null);
+    };
+    job.schedule();
+    job.join();
+    buildWorkspace();
   }
 
-  protected static void deleteProject(String name) throws Exception {
-    deleteProject(ResourcesPlugin.getWorkspace().getRoot().getProject(name));
+  public static void buildWorkspace() throws Exception {
+    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+    waitForRefresh();
+    waitForNotifyJob();
+    waitForIndexesReady();
+    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
+    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
+    waitForSilentWorkspace();
   }
 
-  protected static void deleteProject(IProject project) throws Exception {
-    if (project == null) {
-      return;
-    }
-    if (project.exists() && !project.isOpen()) {
-      project.open(null);
-    }
-    deleteAndWaitUntilDeleted(project);
+  public static void waitForNotifyJob() throws Exception {
+    final IWorkspaceRunnable noop = new IWorkspaceRunnable() {
+      @Override
+      public void run(IProgressMonitor monitor) {
+        // do nothing
+      }
+    };
+    ResourcesPlugin.getWorkspace().run(noop, null, IResource.NONE, null);
+//    System.out.println("start wait " + System.currentTimeMillis());
+//    NotificationLock.waitForNotification();
+//    System.out.println("end wait " + System.currentTimeMillis());
   }
 
-  public static void refreshAndBuildProject(IProject javaProject) throws Exception {
-    refreshProject(javaProject);
-    autoBuildProject(javaProject);
+  public static void waitForSilentWorkspace() throws Exception {
+    Job worker = new Job("") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        return Status.OK_STATUS;
+      }
+    };
+    worker.setRule(ResourcesPlugin.getWorkspace().getRoot());
+    worker.schedule();
+    worker.join();
+    waitForRefresh();
+    waitForBuild();
+    waitForIndexesReady();
   }
 
-  /**
-   * @param javaProject
-   * @throws CoreException
-   */
-  private static void refreshProject(IProject javaProject) throws CoreException {
-    Assert.assertNotNull(javaProject);
-    javaProject.refreshLocal(IResource.DEPTH_INFINITE, null);
-    waitForManualRefresh();
-  }
-
-  /**
-   * @param javaProject
-   * @throws CoreException
-   */
-  public static void autoBuildProject(IProject javaProject) throws CoreException {
-    Assert.assertNotNull(javaProject);
-    javaProject.build(IncrementalProjectBuilder.FULL_BUILD, null);
-    waitForManualBuild();
+  public static void waitForBuild() {
+    waitForFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
     waitForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
-
   }
 
-  public static void waitUntilIndexesReady() {
+  public static void waitForRefresh() {
+    waitForFamily(ResourcesPlugin.FAMILY_AUTO_REFRESH);
+    waitForFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
+  }
+
+  public static void waitForIndexesReady() {
     // dummy query for waiting until the indexes are ready
     SearchEngine engine = new SearchEngine();
     IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
@@ -176,15 +211,11 @@ public abstract class AbstractScoutSdkTest {
     }
   }
 
-  public static void waitForManualBuild() {
-    waitForFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
-  }
-
   public static void waitForManualRefresh() {
     waitForFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
   }
 
-  protected static void waitForFamily(Object family) {
+  protected static void waitForFamily(final Object family) {
     boolean wasInterrupted = false;
     do {
       try {
@@ -199,78 +230,6 @@ public abstract class AbstractScoutSdkTest {
       }
     }
     while (wasInterrupted);
-  }
-
-  public static boolean isResourceDeleted(IResource resource) {
-    IContainer parent = resource.getParent();
-    if (resource.isAccessible() || parent == null || !parent.exists()) {
-      return false;
-    }
-    try {
-      IResource[] members = parent.members();
-      if (members != null) {
-        for (IResource member : members) {
-          if (resource.equals(member) || member.getFullPath().equals(resource.getFullPath())) {
-            return false;
-          }
-        }
-      }
-    }
-    catch (CoreException ce) {
-      // nop
-    }
-    return true;
-  }
-
-  public static boolean isFileDeleted(File file) {
-    File parent = file.getParentFile();
-    if (file.exists() || parent == null || !parent.exists()) {
-      return false;
-    }
-    if (parent.listFiles() != null) {
-      for (File siblingFile : parent.listFiles()) {
-        if (file.equals(siblingFile) || file.getPath().equals(siblingFile.getPath())) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  protected static void clearWorkspace() throws Exception {
-    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    for (IProject p : root.getProjects()) {
-      deleteProject(p);
-    }
-    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-    waitForManualRefresh();
-  }
-
-  public static void deleteAndWaitUntilDeleted(IResource resource) throws Exception {
-    CoreException exception = null;
-    File file = resource.getLocation().toFile();
-    int delay = 10;
-    for (int i = 1; i < 15; i++) {
-      try {
-        if (resource.isAccessible()) {
-          resource.delete(true, null);
-        }
-        if (isResourceDeleted(resource) && isFileDeleted(file)) {
-          return;
-        }
-      }
-      catch (CoreException e) {
-        exception = e;
-      }
-      if (i % 5 == 0) {
-        delay *= 10;
-      }
-      Thread.sleep(delay);
-      System.gc();
-    }
-    if (exception != null) {
-      throw exception;
-    }
   }
 
   protected static void copyProject(String... pathElements) throws IOException {
@@ -315,6 +274,9 @@ public abstract class AbstractScoutSdkTest {
       return;
     }
     if (fromFile.isDirectory()) {
+      if (".svn".equalsIgnoreCase(fromFile.getName())) {
+        return;
+      }
       File subDir = new File(toDir, fromFile.getName());
       if (!subDir.exists()) {
         subDir.mkdir();
@@ -424,5 +386,33 @@ public abstract class AbstractScoutSdkTest {
    */
   protected static IProject getProject(String projectName) {
     return ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+  }
+
+  protected void printWorkspace(String title) {
+    System.out.println("---print WS [" + title + "] ----");
+    System.out.println("Bundles:");
+    for (IScoutBundle b : ScoutSdkCore.getScoutWorkspace().getAllBundles()) {
+      if (b != null) {
+        System.out.println(" - " + b.getBundleName());
+      }
+      else {
+        System.out.println(" - Null bundle");
+      }
+    }
+    System.out.println("Hierarchies:");
+    for (IPrimaryTypeTypeHierarchy h : TypeUtility.getAllCachedPrimaryTypeHierarchies()) {
+      System.out.println(" - " + h.getType().getFullyQualifiedName());
+    }
+    System.out.println("TypeCache: (size='" + TypeUtility.getAllCachedTypes().length + "')");
+
+    System.out.println("--- END [" + title + "] ----");
+  }
+
+  protected static void assertNoWorkingCopies() throws Exception {
+    ICompilationUnit[] workingCopies = JavaCore.getWorkingCopies(null);
+    for (ICompilationUnit icu : workingCopies) {
+      System.out.println("FOUND working copy: " + icu.getElementName());
+    }
+    Assert.assertTrue(workingCopies.length == 0);
   }
 }

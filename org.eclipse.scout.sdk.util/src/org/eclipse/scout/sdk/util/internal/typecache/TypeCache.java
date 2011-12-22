@@ -79,6 +79,19 @@ public final class TypeCache implements ITypeCache {
   }
 
   @Override
+  public IType[] getAllCachedTypes() {
+    ArrayList<IType> types = new ArrayList<IType>();
+    synchronized (m_cacheLock) {
+      for (List<IType> lists : m_cache.values()) {
+        for (IType t : lists) {
+          types.add(t);
+        }
+      }
+    }
+    return types.toArray(new IType[types.size()]);
+  }
+
+  @Override
   public IType getType(String fullyQualifiedName) {
     IType[] types = getTypes(fullyQualifiedName);
     if (types.length == 1) {
@@ -172,8 +185,7 @@ public final class TypeCache implements ITypeCache {
               TypeDeclarationMatch typeMatch = (TypeDeclarationMatch) match;
 
               IType t = (IType) typeMatch.getElement();
-//              matchList.put(new CompositeLong(t.isBinary() ? 1 : 0, matchList.size()), t);
-              if (t.exists() && t.getFullyQualifiedName('.').indexOf(fqn) >= 0) {
+              if (t.exists() && t.getJavaProject().exists() && t.getFullyQualifiedName('.').indexOf(fqn) >= 0) {
                 matchList.put(new CompositeLong(t.isBinary() ? 1 : 0, matchList.size()), t);
               }
             }

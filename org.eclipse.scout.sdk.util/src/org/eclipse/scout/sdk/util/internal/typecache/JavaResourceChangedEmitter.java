@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -67,6 +68,12 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   private final HierarchyCache m_hierarchyCache;
   private IBufferChangedListener m_sourceBufferListener;
   private HashMap<String /*icu path*/, CompilationUnit /*ast*/> m_ast;
+
+  public static IResource[] getChangedResources() {
+    synchronized (INSTANCE.m_resourceLock) {
+      return INSTANCE.m_jdtEvents.keySet().toArray(new IResource[INSTANCE.m_jdtEvents.size()]);
+    }
+  }
 
   private JavaResourceChangedEmitter(HierarchyCache hierarchyCache) {
     m_hierarchyCache = hierarchyCache;
@@ -504,35 +511,46 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
           }
           switch (kind) {
             case IJavaElementDelta.ADDED:
-              add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+              if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
+                // fire straight
+                fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+              }
+              else {
+                // collect
+                add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+              }
               break;
             case IJavaElementDelta.REMOVED:
-              if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
-                JdtEvent[] jdtEvents = new JdtEvent[0];
-                synchronized (m_resourceLock) {
-                  JdtEventCollector eventSet = m_jdtEvents.remove(e.getResource());
-                  if (eventSet != null && eventSet.hasEvents()) {
-                    jdtEvents = eventSet.getEvents();
+              if (e.getElementType() <= IJavaElement.COMPILATION_UNIT) {
+                // remove all open event collectors
+                if (e.getResource() != null) {
+                  synchronized (m_resourceLock) {
+                    for (Iterator<Entry<IResource, JdtEventCollector>> it = m_jdtEvents.entrySet().iterator(); it.hasNext();) {
+                      Entry<IResource, JdtEventCollector> entry = it.next();
+                      IResource parent = entry.getKey();
+                      while (parent != null) {
+                        if (parent.equals(e.getResource())) {
+                          it.remove();
+                        }
+                        parent = parent.getParent();
+                      }
+                    }
                   }
                 }
-                for (JdtEvent e1 : jdtEvents) {
-                  fireEvent(e1);
-                }
-                fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, e));
-
+                // fire straight
+                fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
               }
               else {
                 add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
               }
+
               break;
             case IJavaElementDelta.CHANGED:
-
-              if ((flags & CHANGED_FLAG_MASK) != 0) {
-                // workaround: try to find out what really changed
-                if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                  // new ast
-
+              if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
+                fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, delta.getElement()));
+              }
+              else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+                if ((flags & CHANGED_FLAG_MASK) != 0) {
                   CompilationUnit newAst = createAst((ICompilationUnit) e);
                   CompilationUnit oldAst = m_ast.get(e.getPath().toString());
                   if (oldAst != null) {
@@ -550,15 +568,10 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
                     m_ast.put(e.getPath().toString(), newAst);
                   }
                   catch (Exception ex) {
-                    ex.printStackTrace();
+                    SdkUtilActivator.logError(ex);
                   }
                 }
-                else {
-                  add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
-                }
-              }
-              else if ((flags & IJavaElementDelta.F_PRIMARY_WORKING_COPY) != 0) {
-                if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+                else if ((flags & IJavaElementDelta.F_PRIMARY_WORKING_COPY) != 0) {
                   ICompilationUnit icu = (ICompilationUnit) e;
                   if (icu.isWorkingCopy()) {
                     CompilationUnit ast = createAst(icu);
@@ -579,11 +592,13 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
                     }
                     m_ast.remove(icu.getPath().toString());
                   }
-
                 }
               }
-              break;
+              else {
+                add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+              }
           }
+
         }
       }
     }

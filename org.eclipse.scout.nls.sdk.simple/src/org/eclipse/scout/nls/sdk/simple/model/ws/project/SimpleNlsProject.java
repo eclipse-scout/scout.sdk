@@ -45,6 +45,7 @@ import org.eclipse.scout.nls.sdk.simple.model.ws.translationfile.WorkspaceTransl
 import org.eclipse.scout.nls.sdk.simple.ui.dialog.language.TranslationFileNewDialog;
 import org.eclipse.scout.nls.sdk.simple.ui.dialog.language.TranslationFileNewModel;
 import org.eclipse.scout.nls.sdk.ui.action.INewLanguageContext;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.widgets.Shell;
 import org.osgi.framework.Bundle;
 
@@ -106,7 +107,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
   private ITranslationResource[] loadTranslationFilesWorkspace(NlsType nlsType) throws CoreException {
     // try to find all translation files
     ArrayList<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
-    if (nlsType != null && nlsType.getTranslationsFolderName() != null && nlsType.getTranslationsPrefix() != null) {
+    if (nlsType != null && TypeUtility.exists(nlsType.getType()) && nlsType.getTranslationsFolderName() != null && nlsType.getTranslationsPrefix() != null) {
       Path translationPath = new Path(nlsType.getTranslationsFolderName());
       for (IFile file : NlsSdkSimple.getAllTranslations(nlsType.getJavaProject().getProject(), translationPath, nlsType.getTranslationsPrefix())) {
         translationFiles.add(new WorkspaceTranslationFile(file));

@@ -16,7 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
@@ -30,7 +29,6 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.ui.ide.undo.DeleteResourcesOperation;
 
 /**
  * <h3> {@link JavaElementDeleteOperation}</h3> To delete any of method, type, import declaration, compilation unit.
@@ -88,13 +86,6 @@ public class JavaElementDeleteOperation implements IOperation {
     for (IJavaElement m : m_typesToDelete) {
       deleteMember(m, icuForOrganizeImports, monitor, workingCopyManager);
     }
-//    for (ICompilationUnit icu : icuForOrganizeImports) {
-//      if (TypeUtility.exists(icu)) {
-//        OrganizeImportOperation op = new OrganizeImportOperation(icu);
-//        op.run(monitor, workingCopyManager);
-//      }
-//    }
-
   }
 
   protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
@@ -119,13 +110,8 @@ public class JavaElementDeleteOperation implements IOperation {
         else {
           ICompilationUnit icu = type.getCompilationUnit();
           manager.register(icu, false, monitor);
-//          // clear imports
-//          IImportDeclaration importDeclaration = icu.getImport(((IType) member).getFullyQualifiedName());
-//          deleteMember(importDeclaration, monitor, manager);
           type.delete(true, monitor);
           icuForOrganizeImports.add(icu);
-//          OrganizeImportOperation op = new OrganizeImportOperation(icu);
-//          op.run(monitor, manager);
         }
         break;
       case IJavaElement.COMPILATION_UNIT:
@@ -152,31 +138,19 @@ public class JavaElementDeleteOperation implements IOperation {
   }
 
   private void deleteCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    manager.register(icu, false, monitor);
-    for (IType t : icu.getTypes()) {
-      t.delete(true, monitor);
-    }
-    icu.delete(true, monitor);
-    manager.unregister(icu, monitor);
     IPackageFragment packageFragment = (IPackageFragment) icu.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
-    String resourceName = icu.getElementName();
-    DeleteResourcesOperation op = new DeleteResourcesOperation(new IResource[]{icu.getResource()}, "Delete", true);
-    try {
-      op.execute(monitor, null);
-      boolean deletePackage = true;
-      for (IJavaElement e : packageFragment.getChildren()) {
-        if (TypeUtility.exists(e)) {
-          deletePackage = false;
-        }
-      }
-      if (deletePackage) {
-        PackageDeleteOperation packageOp = new PackageDeleteOperation(packageFragment);
-        packageOp.validate();
-        packageOp.run(monitor, manager);
+    manager.unregister(icu, monitor);
+    icu.delete(true, monitor);
+    boolean deletePackage = true;
+    for (IJavaElement e : packageFragment.getChildren()) {
+      if (TypeUtility.exists(e)) {
+        deletePackage = false;
       }
     }
-    catch (Exception e) {
-      ScoutSdk.logWarning("error during deleting '" + resourceName + "'.", e);
+    if (deletePackage) {
+      PackageDeleteOperation packageOp = new PackageDeleteOperation(packageFragment);
+      packageOp.validate();
+      packageOp.run(monitor, manager);
     }
   }
 }

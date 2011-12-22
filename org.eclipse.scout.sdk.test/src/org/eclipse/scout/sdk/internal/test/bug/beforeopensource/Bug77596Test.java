@@ -18,7 +18,6 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -32,11 +31,6 @@ public class Bug77596Test extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("bugsBeforeOpensource/77596", "com.bsiag.miniapp.client", "com.bsiag.miniapp.shared");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("com.bsiag.miniapp.client", "com.bsiag.miniapp.shared");
   }
 
   private IStructuredType getCompanyFormHelper() {

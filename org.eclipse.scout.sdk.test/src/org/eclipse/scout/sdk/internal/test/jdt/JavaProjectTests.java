@@ -1,0 +1,66 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.sdk.internal.test.jdt;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
+import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.junit.Test;
+
+/**
+ *
+ */
+public class JavaProjectTests extends AbstractScoutSdkTest {
+
+  /**
+   * Resource project instances are reused. Creating a project1 'aProject' deleting it and create a second project with
+   * the same name the references to the project1+2 are the same (equals).
+   */
+  @Test
+  public void testResourceProjectEquality() throws Exception {
+    String projectName = "aProject";
+    IProject project1 = createProject(projectName);
+    assertTrue(project1.exists());
+    clearWorkspace();
+    assertFalse(project1.exists());
+    IProject project2 = createProject(projectName);
+    assertTrue(project2.exists());
+    assertTrue(project1.exists());
+    assertTrue(project1.equals(project2));
+    clearWorkspace();
+  }
+
+  /**
+   * Java project instances are reused. Creating a project1 'aProject' deleting it and create a second project with
+   * the same name the references to the project1+2 are the same (equals).
+   */
+  @Test
+  public void testJavaProjectEquality() throws Exception {
+    IScoutProject module = ScoutProjectHelper.setupNewProject("a", false, true, false);
+    IJavaProject shared1 = module.getSharedBundle().getJavaProject();
+    assertTrue(shared1.exists());
+    clearWorkspace();
+    assertFalse(shared1.exists());
+
+    IScoutProject module2 = ScoutProjectHelper.setupNewProject("a", false, true, false);
+    IJavaProject shared2 = module2.getSharedBundle().getJavaProject();
+    assertTrue(shared2.exists());
+    assertTrue(shared1.exists());
+    assertTrue(shared1.equals(shared2));
+    clearWorkspace();
+  }
+
+}

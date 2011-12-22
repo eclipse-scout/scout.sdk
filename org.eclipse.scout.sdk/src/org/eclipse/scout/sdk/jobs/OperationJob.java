@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class OperationJob extends AbstractWorkspaceBlockingJob {
 
   private List<IOperation> m_operations;
+  private Exception m_outherException;
 
   public OperationJob(IOperation... operations) {
     this(Arrays.asList(operations));
@@ -64,6 +65,12 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   }
 
   @Override
+  public boolean shouldSchedule() {
+    m_outherException = new Exception();
+    return super.shouldSchedule();
+  }
+
+  @Override
   protected void validate() throws IllegalArgumentException {
     for (IOperation op : m_operations) {
       try {
@@ -84,10 +91,12 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
       }
       catch (CoreException e) {
         ScoutSdk.logError("Error occured while running Operation job.", e);
+        ScoutSdk.logError("CALLED BY:", m_outherException);
         throw e;
       }
       catch (IllegalArgumentException e) {
         ScoutSdk.logError("Error occured while running Operation job.", e);
+        ScoutSdk.logError("CALLED BY:", m_outherException);
         throw e;
       }
     }

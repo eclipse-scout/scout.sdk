@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project.template;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -68,11 +70,10 @@ public class SingleFormTemplateOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     String formName = "DesktopForm";
     IScoutBundle sharedBundle = getScoutProject().getSharedBundle();
-
     ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
     formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
     formDataOp.run(monitor, workingCopyManager);
-    final IType formData = formDataOp.getCreatedType();
+    IType formData = formDataOp.getCreatedType();
     ManifestExportPackageOperation expFormDataPackage = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD, new IPackageFragment[]{formData.getPackageFragment()}, false);
     expFormDataPackage.validate();
     expFormDataPackage.run(monitor, workingCopyManager);
@@ -165,6 +166,7 @@ public class SingleFormTemplateOperation implements IOperation {
 
     workingCopyManager.reconcile(handler.getCompilationUnit(), monitor);
 
+    final String fqnFormData = formData.getFullyQualifiedName();
     MethodOverrideOperation execLoadOp = new MethodOverrideOperation(handler, "execLoad", true) {
       @Override
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
@@ -172,7 +174,7 @@ public class SingleFormTemplateOperation implements IOperation {
         if (TypeUtility.exists(serviceInterface)) { /* service interface can be null on a client only project */
           String servicesRef = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.SERVICES, true));
           String serviceRef = validator.getSimpleTypeRef(Signature.createTypeSignature(serviceInterface.getFullyQualifiedName(), true));
-          String formDataRef = validator.getSimpleTypeRef(Signature.createTypeSignature(formData.getFullyQualifiedName(), true));
+          String formDataRef = validator.getSimpleTypeRef(Signature.createTypeSignature(fqnFormData, true));
           builder.append(serviceRef + " service = " + servicesRef + ".getService(" + serviceRef + ".class);\n");
           builder.append(formDataRef + " formData = new " + formDataRef + "();\n");
           builder.append("exportFormData(formData);\n");

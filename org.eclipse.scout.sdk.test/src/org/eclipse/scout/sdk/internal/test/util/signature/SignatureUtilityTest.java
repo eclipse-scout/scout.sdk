@@ -81,10 +81,11 @@ public class SignatureUtilityTest {
     Assert.assertTrue(imports.contains("java.util.List"));
   }
 
-  @Test(timeout = 2L)
+  @Test(timeout = 200L)
   public void testClassParameterized() throws Exception {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
     FullyQuallifiedValidator validator = new FullyQuallifiedValidator();
+
     String result = SignatureUtility.getTypeReference(signature, validator);
     Assert.assertEquals("java.lang.Class<? extends com.bsiag.scout.client.ui.desktop.outline.IOutline[]>[]", result);
   }

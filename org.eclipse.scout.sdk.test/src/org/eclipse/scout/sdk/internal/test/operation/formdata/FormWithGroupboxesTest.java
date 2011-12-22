@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -30,11 +29,6 @@ public class FormWithGroupboxesTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("operation/formData", "formdata.shared", "formdata.client");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("formdata.client", "formdata.shared");
   }
 
   @Before
@@ -51,7 +45,7 @@ public class FormWithGroupboxesTest extends AbstractScoutSdkTest {
       OperationJob job = new OperationJob(op);
       job.schedule();
       job.join();
-      refreshAndBuildProject(sharedProject);
+      buildWorkspace();
       m_formData = op.getFormDataType();
       Assert.assertTrue(TypeUtility.exists(m_formData));
       Assert.assertTrue(TypeUtility.exists(m_formData));

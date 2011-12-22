@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
@@ -54,6 +55,11 @@ public class OutlineNewOperation implements IOperation {
   private boolean m_formatSource;
   // out members
   private IType m_createdOutline;
+
+  public OutlineNewOperation() {
+    // defaults
+    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractOutline, true);
+  }
 
   @Override
   public void validate() throws IllegalArgumentException {

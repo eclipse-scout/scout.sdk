@@ -13,7 +13,6 @@ import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
@@ -21,11 +20,6 @@ public abstract class AbstractFieldNewOperationTest extends AbstractScoutSdkTest
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("operation/form/fields", "formfield.shared", "formfield.client");
-  }
-
-  @AfterClass
-  public static void cleanUpWorkspace() throws Exception {
-    deleteProjects("formfield.shared", "formfield.client");
   }
 
   public abstract IType getCreatedField();
@@ -46,9 +40,15 @@ public abstract class AbstractFieldNewOperationTest extends AbstractScoutSdkTest
     runOperationAndWait(op);
     IType createdField = getCreatedField();
 
-    String ref = getContent(getInputStream(getReferenceFilePath()));
-    String created = createdField.getSource().trim();
-    Assert.assertTrue(CompareUtility.equals(ref, created));
+    InputStream is = getInputStream(getReferenceFilePath());
+    try {
+      String ref = getContent(is);
+      String created = createdField.getSource().trim();
+      Assert.assertTrue(CompareUtility.equals(ref, created));
+    }
+    finally {
+      is.close();
+    }
   }
 
   protected void runOperationAndWait(IOperation o) throws InterruptedException {

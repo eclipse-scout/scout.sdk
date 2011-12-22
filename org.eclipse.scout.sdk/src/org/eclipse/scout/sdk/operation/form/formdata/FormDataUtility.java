@@ -103,14 +103,19 @@ public class FormDataUtility {
 
   public static ITypeSourceBuilder getPrimaryTypeFormDataSourceBuilder(String superTypeSignature, IType formField, ITypeHierarchy hierarchy) {
     ITypeSourceBuilder builder = null;
-    String typeErasure = Signature.getTypeErasure(superTypeSignature);
+    try {
+      String typeErasure = Signature.getTypeErasure(superTypeSignature);
+      if (Signature.getSignatureSimpleName(typeErasure).equals(Signature.getSimpleName(RuntimeClasses.AbstractTableFieldData))) {
+        builder = new TableFieldSourceBuilder(formField, hierarchy);
+      }
+      else {
+        builder = new CompositePrimaryTypeSourceBuilder(formField, hierarchy);
+      }
+    }
+    catch (Exception e) {
+      ScoutSdk.logError("could not create source builder for '" + superTypeSignature + "'.", e);
+    }
 
-    if (Signature.getSignatureSimpleName(typeErasure).equals(Signature.getSimpleName(RuntimeClasses.AbstractTableFieldData))) {
-      builder = new TableFieldSourceBuilder(formField, hierarchy);
-    }
-    else {
-      builder = new CompositePrimaryTypeSourceBuilder(formField, hierarchy);
-    }
     return builder;
   }
 

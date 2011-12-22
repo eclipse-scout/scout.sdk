@@ -67,6 +67,10 @@ public class TypeUtility {
     return TypeCacheAccessor.getTypeCache().existsType(fullyQualifiedName);
   }
 
+  public static IType[] getAllCachedTypes() {
+    return TypeCacheAccessor.getTypeCache().getAllCachedTypes();
+  }
+
   public static IJavaSearchScope newSearchScope(IJavaElement element) {
     return newSearchScope(new IJavaElement[]{element});
   }
@@ -168,6 +172,10 @@ public class TypeUtility {
 
   public static ITypeHierarchy getSuperTypeHierarchy(IType type) {
     return TypeCacheAccessor.getHierarchyCache().getSuperHierarchy(type);
+  }
+
+  public static IPrimaryTypeTypeHierarchy[] getAllCachedPrimaryTypeHierarchies() throws IllegalArgumentException {
+    return TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies();
   }
 
   /**
@@ -664,6 +672,28 @@ public class TypeUtility {
     }
 
     return filteredBeans.toArray(new IPropertyBean[filteredBeans.size()]);
+  }
+
+  /**
+   * To find out if the given child element is a ancestor of the given parent element.
+   * 
+   * @param parent
+   * @param chlid
+   * @return
+   */
+  public static boolean isAncestor(IJavaElement parent, IJavaElement chlid) {
+    if (parent == null || chlid == null) {
+      return false;
+    }
+    if (parent.equals(chlid)) {
+      return true;
+    }
+    else if (chlid.getParent() != null && chlid.getParent().getElementType() >= parent.getElementType()) {
+      return isAncestor(parent, chlid.getParent().getAncestor(parent.getElementType()));
+    }
+    else {
+      return false;
+    }
   }
 
   /**

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -172,12 +173,25 @@ public class ScoutProjectIcons implements IIconProvider {
       for (String ext : PREDEFINED_EXTENSIONS) {
         for (String folder : PREDEFINED_SUB_FOLDERS) {
           String imgPath = folder + desc.getIconName() + "." + ext;
-          InputStream is = ScoutFileLocator.resolve(baseUrl, imgPath);
-          if (is != null) {
-            ImageDescriptor desc1 = ImageDescriptor.createFromImageData(new ImageData(is));
-            if (desc1 != null) {
-              desc.setImgDesc(desc1);
-              return;
+          InputStream is = null;
+          try {
+            is = ScoutFileLocator.resolve(baseUrl, imgPath);
+            if (is != null) {
+              ImageDescriptor desc1 = ImageDescriptor.createFromImageData(new ImageData(is));
+              if (desc1 != null) {
+                desc.setImgDesc(desc1);
+                return;
+              }
+            }
+          }
+          finally {
+            if (is != null) {
+              try {
+                is.close();
+              }
+              catch (IOException e) {
+                ScoutSdk.logWarning("could not close input stream of file '" + baseUrl + "" + imgPath + "'.", e);
+              }
             }
           }
         }
