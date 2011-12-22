@@ -118,17 +118,7 @@ public abstract class AbstractScoutSdkTest {
   }
 
   protected static void executeAndBuildWorkspace(IOperation... ops) throws Exception {
-    OperationJob job = new OperationJob(ops) {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        try {
-          return super.run(monitor);
-        }
-        finally {
-          System.out.println("operation job done...");
-        }
-      }
-    };
+    OperationJob job = new OperationJob(ops);
     job.schedule();
     job.join();
     buildWorkspace();
