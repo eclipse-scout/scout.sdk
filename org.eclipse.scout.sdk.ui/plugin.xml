@@ -3,7 +3,7 @@
 <plugin>
    <extension-point id="formField" name="Form Field" schema="schema/formField.exsd"/>
    <extension-point id="outlineDragAndDrop" name="Drag And Drop" schema="schema/outlineDragAndDrop.exsd"/>
-   <extension-point id="scoutCodeIdProvider" name="Code ID Provider" schema="schema/scoutCodeIdProvider.exsd"/>
+   <extension-point id="codeId" name="Code ID Provider or Parser" schema="schema/codeId.exsd"/>
    <extension-point id="explorerPage" name="Scout Explorer Page" schema="schema/explorerPage.exsd"/>
    <extension-point id="propertyStructure" name="Scout Property View Structure" schema="schema/propertyStructure.exsd"/>
    <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
@@ -787,5 +787,38 @@
             id="org.eclipse.scout.sdk.ui.emptyTemplate"
             orderNumber="30">
       </template>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.codeId">
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.BooleanCodeIdParser"
+            genericType="java.lang.Boolean"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.DoubleCodeIdParser"
+            genericType="java.lang.Double"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.FloatCodeIdParser"
+            genericType="java.lang.Float"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.IntegerCodeIdParser"
+            genericType="java.lang.Integer"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.LongCodeIdParser"
+            genericType="java.lang.Long"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.StringCodeIdParser"
+            genericType="java.lang.String"
+            priority="10">
+      </codeIdParser>
    </extension>
 </plugin>
