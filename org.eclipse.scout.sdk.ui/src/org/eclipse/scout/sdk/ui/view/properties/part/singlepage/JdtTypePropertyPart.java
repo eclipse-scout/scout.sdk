@@ -44,6 +44,8 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormVi
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.HorizontalAlignmentPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IconPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IntegerPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelHorizontalAlignmentPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelPositionPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LongPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupCallProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupServiceProposalPresenter;
@@ -309,6 +311,14 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
     else if (propertyType.equals("OBJECT")) {
       // TODO: presenter for OBJECT
+    }
+    else if (propertyType.equals("LABEL_POSITION")) {
+      presenter = new LabelPositionPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if (propertyType.equals("LABEL_HORIZONTAL_ALIGNMENT")) {
+      presenter = new LabelHorizontalAlignmentPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
     }
     else if (propertyType.equals("BUTTON_DISPLAY_STYLE")) {
       presenter = new ButtonDisplayStylePresenter(getFormToolkit(), parent);

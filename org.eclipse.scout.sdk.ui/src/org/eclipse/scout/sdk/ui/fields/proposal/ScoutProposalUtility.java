@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.BundleTypeProposal;
 import org.eclipse.scout.sdk.ui.internal.fields.proposal.ConstantFieldProposal;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelHorizontalAlignmentPresenter;
 import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -271,6 +272,26 @@ public class ScoutProposalUtility {
     return m_formDisplayHintProposals;
   }
 
+  public static ConstantFieldProposal<Integer>[] getLabelPositionProposals() {
+    return instance.getLabelPositionProposalsImpl();
+  }
+
+  private ConstantFieldProposal<Integer>[] m_labelPositionProposals;
+
+  @SuppressWarnings("unchecked")
+  private ConstantFieldProposal<Integer>[] getLabelPositionProposalsImpl() {
+    if (m_labelPositionProposals == null) {
+      IType formFieldType = TypeUtility.getType(RuntimeClasses.IFormField);
+      m_labelPositionProposals = new ConstantFieldProposal[]{
+          new ConstantFieldProposal<Integer>("Default", ScoutSdkUi.getImage(ScoutSdkUi.Default), formFieldType.getField("LABEL_POSITION_DEFAULT"), 0),
+          new ConstantFieldProposal<Integer>("Left", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft), formFieldType.getField("LABEL_POSITION_LEFT"), 1),
+          new ConstantFieldProposal<Integer>("On Field", ScoutSdkUi.getImage(ScoutSdkUi.Default), formFieldType.getField("LABEL_POSITION_ON_FIELD"), 2),
+          new ConstantFieldProposal<Integer>("Right", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight), formFieldType.getField("LABEL_POSITION_RIGHT"), 3),
+          new ConstantFieldProposal<Integer>("Top", ScoutSdkUi.getImage(ScoutSdkUi.VerticalTop), formFieldType.getField("LABEL_POSITION_TOP"), 4),};
+    }
+    return m_labelPositionProposals;
+  }
+
   /**
    * @return
    */
@@ -301,7 +322,7 @@ public class ScoutProposalUtility {
   private ConstantFieldProposal<Integer>[] m_horizontalAlignmentProposals;
 
   @SuppressWarnings("unchecked")
-  private ConstantFieldProposal<Integer>[] getHorizontalAlignmentProposalsImpl() {
+  private synchronized ConstantFieldProposal<Integer>[] getHorizontalAlignmentProposalsImpl() {
     if (m_horizontalAlignmentProposals == null) {
       m_horizontalAlignmentProposals = new ConstantFieldProposal[]{
           new ConstantFieldProposal<Integer>("Left", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft), null, -1),
@@ -311,9 +332,26 @@ public class ScoutProposalUtility {
     return m_horizontalAlignmentProposals;
   }
 
+  public static ConstantFieldProposal<Integer>[] getLabelHorizontalAlignmentProposals() {
+    return instance.getLabelHorizontalAlignmentProposalsImpl();
+  }
+
+  private ConstantFieldProposal<Integer>[] m_labelHorizontalAlignmentProposals;
+
+  @SuppressWarnings("unchecked")
+  private synchronized ConstantFieldProposal<Integer>[] getLabelHorizontalAlignmentProposalsImpl() {
+    if (m_labelHorizontalAlignmentProposals == null) {
+      m_labelHorizontalAlignmentProposals = new ConstantFieldProposal[]{
+          new ConstantFieldProposal<Integer>("Default", ScoutSdkUi.getImage(ScoutSdkUi.Default), null, LabelHorizontalAlignmentPresenter.DEFAULT),
+          new ConstantFieldProposal<Integer>("Left", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft), null, LabelHorizontalAlignmentPresenter.LEFT),
+          new ConstantFieldProposal<Integer>("Center", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalCenter), null, LabelHorizontalAlignmentPresenter.CENTER),
+          new ConstantFieldProposal<Integer>("Right", ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight), null, LabelHorizontalAlignmentPresenter.RIGHT)};
+    }
+    return m_labelHorizontalAlignmentProposals;
+  }
+
   public static String getFieldName(IType field, String labelMethodName) {
     return ScoutSourceUtility.getTranslatedMethodStringValue(field, labelMethodName);
-
   }
 
   public static ITypeProposal[] getPageShortListProposals() {
