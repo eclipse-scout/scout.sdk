@@ -113,10 +113,22 @@ public class ErrorProneWsdlLocatorCommand extends AbstractExecutableMarkerComman
           .append(" *").append(" This is a fix by Eclipse Scout SDK to use bundle's classloader to locate WSDL file.\n")
           .append(" * The uncommented static initializer code originates by JAX-WS stub generation process.\n")
           .append(" */\n");
-      BufferedReader reader = new BufferedReader(new StringReader(oldCode));
-      String line = null;
-      while ((line = reader.readLine()) != null) {
-        buf.append("// ").append(line).append("\n");
+      BufferedReader reader = null;
+      try {
+        reader = new BufferedReader(new StringReader(oldCode));
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+          buf.append("// ").append(line).append("\n");
+        }
+      }
+      finally {
+        if (reader != null) {
+          try {
+            reader.close();
+          }
+          catch (Exception e) {
+          }
+        }
       }
     }
     catch (IOException e) {

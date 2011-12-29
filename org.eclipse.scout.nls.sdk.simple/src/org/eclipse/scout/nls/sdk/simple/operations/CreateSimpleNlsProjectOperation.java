@@ -13,7 +13,6 @@ package org.eclipse.scout.nls.sdk.simple.operations;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
@@ -77,7 +76,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
   }
 
   private byte[] getNlsFileContent() {
-    StringWriter writer = new StringWriter();
+    StringBuilder writer = new StringBuilder();
     writer.append(getNlsFileHeader());
     writer.append(AbstractNlsFile.MANIFEST_CLASS + "=" + getDesc().getPackage() + "." + getDesc().getClassName() + NL);
     return writer.toString().getBytes();
@@ -186,7 +185,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
 
     String resourcePathString = getResourcePathString(getDesc().getTranslationFolder(), getDesc().getFileName());
 
-    StringWriter writer = new StringWriter();
+    StringBuilder writer = new StringBuilder();
     writer.append("package " + desc.getPackage() + ";" + NL);
     writer.append(NL);
     writer.append("import java.util.Locale;" + NL);
@@ -222,7 +221,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
   }
 
   private static byte[] getDefaultMessagesFileContent() {
-    StringWriter writer = new StringWriter();
+    StringBuilder writer = new StringBuilder();
     writer.append(getTranslationFileHeader());
     return writer.toString().getBytes();
   }

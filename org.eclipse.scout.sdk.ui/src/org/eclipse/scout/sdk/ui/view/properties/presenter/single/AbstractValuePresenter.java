@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
-import java.io.BufferedReader;
-import java.io.Reader;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.ui.JavadocContentAccess;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
@@ -201,7 +198,6 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
           }
           break;
         case SWT.FocusIn:
-          getJavaDoc();
           getTextComponent().setForeground(null);
           break;
 
@@ -210,22 +206,4 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
       }
     }
   } // end class P_TextListener
-
-  @Override
-  protected String getJavaDoc() {
-    String javaDoc = null;
-    try {
-      Reader contentReader = JavadocContentAccess.getHTMLContentReader(getMethod().peekMethod(), true, false);
-      if (contentReader != null) {
-        BufferedReader bf = new BufferedReader(contentReader);
-        System.out.println(bf.readLine());
-      }
-    }
-    catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    return javaDoc;
-  }
-
 }

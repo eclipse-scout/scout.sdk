@@ -100,17 +100,7 @@ public class JavadocTooltip extends AbstractTooltip {
       @Override
       public void changing(LocationEvent event) {
         // TODO allow navigating
-//        try {
-//          IViewPart javadocView = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView(JavaUI.ID_JAVADOC_VIEW);
-//         javadocView.
-//        }
-//        catch (PartInitException e) {
-//          // TODO Auto-generated catch block
-//          e.printStackTrace();
-//        }
-        // TODO Auto-generated method stub
         event.doit = false;
-
       }
     });
   }
@@ -126,9 +116,10 @@ public class JavadocTooltip extends AbstractTooltip {
     Job j = new Job("calculating java doc of '" + m_member.getElementName() + "'") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
+        Reader contentReader = null;
         try {
           if (TypeUtility.exists(m_member)) {
-            Reader contentReader = JavadocContentAccess.getHTMLContentReader(m_member, true, true);
+            contentReader = JavadocContentAccess.getHTMLContentReader(m_member, true, true);
             if (contentReader != null) {
               m_javaDoc = getJavadocHtml(new IJavaElement[]{m_member});
               if (getSourceControl() != null && !getSourceControl().isDisposed()) {
@@ -146,9 +137,16 @@ public class JavadocTooltip extends AbstractTooltip {
           }
         }
         catch (Exception e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-
+          ScoutSdkUi.logWarning(e);
+        }
+        finally {
+          if (contentReader != null) {
+            try {
+              contentReader.close();
+            }
+            catch (Exception e) {
+            }
+          }
         }
         return Status.OK_STATUS;
       }

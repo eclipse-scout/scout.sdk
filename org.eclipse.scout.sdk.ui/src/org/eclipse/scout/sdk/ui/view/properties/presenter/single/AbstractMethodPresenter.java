@@ -10,16 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
-import java.io.Reader;
 import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.ui.JavadocContentAccess;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.text.BadLocationException;
-import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
@@ -287,20 +284,4 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     newBody = newBody.replaceAll("\t", SdkProperties.TAB);
     return newBody;
   }
-
-  protected String getJavaDoc() {
-    try {
-      Reader contentReader = JavadocContentAccess.getContentReader(getMethod().peekMethod(), true);
-      if (contentReader != null) {
-        return IOUtility.getContent(contentReader);
-      }
-    }
-    catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-
-    }
-    return null;
-  }
-
 }
