@@ -24,6 +24,14 @@ public class DesktopFormData extends AbstractFormData {
     return getFieldByClass(IconPresenter.class);
   }
 
+  public LabelHorizontalAlignmentTest getLabelHorizontalAlignmentTest() {
+    return getFieldByClass(LabelHorizontalAlignmentTest.class);
+  }
+
+  public LabelPositionPresenterTest getLabelPositionPresenterTest() {
+    return getFieldByClass(LabelPositionPresenterTest.class);
+  }
+
   public LongPresenterTest getLongPresenterTest() {
     return getFieldByClass(LongPresenterTest.class);
   }
@@ -91,6 +99,38 @@ public class DesktopFormData extends AbstractFormData {
     protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.ZERO_NULL_EQUALITY, true);
+    }
+  }
+
+  public static class LabelHorizontalAlignmentTest extends AbstractValueFieldData<String> {
+    private static final long serialVersionUID = 1L;
+
+    public LabelHorizontalAlignmentTest() {
+    }
+
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
+    }
+  }
+
+  public static class LabelPositionPresenterTest extends AbstractValueFieldData<String> {
+    private static final long serialVersionUID = 1L;
+
+    public LabelPositionPresenterTest() {
+    }
+
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 

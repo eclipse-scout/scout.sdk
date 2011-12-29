@@ -27,6 +27,8 @@ import presenter.test.client.ui.forms.DesktopForm.MainBox.FontPresenterTestBox;
 import presenter.test.client.ui.forms.DesktopForm.MainBox.HorizontalAlignmentPresenterTestBox;
 import presenter.test.client.ui.forms.DesktopForm.MainBox.IconPresenterField;
 import presenter.test.client.ui.forms.DesktopForm.MainBox.IntegerPresenterTestBox;
+import presenter.test.client.ui.forms.DesktopForm.MainBox.LabelHorizontalAlignmentTestField;
+import presenter.test.client.ui.forms.DesktopForm.MainBox.LabelPositionPresenterTestField;
 import presenter.test.client.ui.forms.DesktopForm.MainBox.LongPresenterTestField;
 import presenter.test.client.ui.forms.DesktopForm.MainBox.MasterFieldPresenterTestField;
 import presenter.test.client.ui.forms.DesktopForm.MainBox.NlsTextProposalPresenterTestField;
@@ -105,6 +107,14 @@ public class DesktopForm extends AbstractForm {
 
   public IntegerPresenterTestBox getIntegerPresenterTestBox() {
     return getFieldByClass(IntegerPresenterTestBox.class);
+  }
+
+  public LabelHorizontalAlignmentTestField getLabelHorizontalAlignmentTestField() {
+    return getFieldByClass(LabelHorizontalAlignmentTestField.class);
+  }
+
+  public LabelPositionPresenterTestField getLabelPositionPresenterTestField() {
+    return getFieldByClass(LabelPositionPresenterTestField.class);
   }
 
   public LongPresenterTestField getLongPresenterTestField() {
@@ -256,6 +266,24 @@ public class DesktopForm extends AbstractForm {
       @Override
       protected int getConfiguredSystemType() {
         return SYSTEM_TYPE_RESET;
+      }
+    }
+
+    @Order(170.0)
+    public class LabelPositionPresenterTestField extends AbstractStringField {
+
+      @Override
+      protected int getConfiguredLabelPosition() {
+        return LABEL_POSITION_ON_FIELD;
+      }
+    }
+
+    @Order(180.0)
+    public class LabelHorizontalAlignmentTestField extends AbstractStringField {
+
+      @Override
+      protected int getConfiguredLabelHorizontalAlignment() {
+        return 0;
       }
     }
   }

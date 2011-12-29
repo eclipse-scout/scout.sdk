@@ -20,6 +20,8 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormVi
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.HorizontalAlignmentPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IconPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IntegerPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelHorizontalAlignmentPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelPositionPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LongPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupCallProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupServiceProposalPresenter;
@@ -502,6 +504,42 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       @Override
       public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         NlsTextPresenter presenter = new NlsTextPresenter(toolkit, parent);
+        presenter.setMethod(m);
+        return presenter;
+      }
+    });
+  }
+
+  @Test
+  public void testLabelPositionPresenter() throws Exception {
+    doPresenterTest(new AbstractPresenterTestInfo("presenter.test.client.ui.forms.DesktopForm.MainBox.LabelPositionPresenterTestField") {
+
+      @Override
+      public long getMaxPresenterCreationDuration() {
+        return getReferenceDuration("testLabelPositionPresenter");
+      }
+
+      @Override
+      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+        LabelPositionPresenter presenter = new LabelPositionPresenter(toolkit, parent);
+        presenter.setMethod(m);
+        return presenter;
+      }
+    });
+  }
+
+  @Test
+  public void testLabelHorizontalAlignmentPresenter() throws Exception {
+    doPresenterTest(new AbstractPresenterTestInfo("presenter.test.client.ui.forms.DesktopForm.MainBox.LabelHorizontalAlignmentTestField") {
+
+      @Override
+      public long getMaxPresenterCreationDuration() {
+        return getReferenceDuration("testLabelHorizontalAlignmentPresenter");
+      }
+
+      @Override
+      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+        LabelHorizontalAlignmentPresenter presenter = new LabelHorizontalAlignmentPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
       }
