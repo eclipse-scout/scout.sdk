@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -72,6 +73,8 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IPackageFragment pck = getScoutBundle().getSpecificPackageFragment(getImplementationPackageName(), monitor, workingCopyManager);
+    // needed to ensure jdt events getting fired at this point. Otherwise some events getting lost.
+    ResourcesPlugin.getWorkspace().checkpoint(false);
     ICompilationUnit icu = pck.getCompilationUnit(getTypeName() + ".java");
     if (!TypeUtility.exists(icu)) {
       icu = pck.createCompilationUnit(getTypeName() + ".java", "", true, monitor);
@@ -84,6 +87,9 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
       }
       op.run(monitor, workingCopyManager);
     }
+    // needed to ensure jdt events getting fired at this point. Otherwise some events getting lost.
+    ResourcesPlugin.getWorkspace().checkpoint(false);
+
     workingCopyManager.register(icu, monitor);
     icu.createPackageDeclaration(pck.getElementName(), monitor);
     SimpleImportValidator validator = new SimpleImportValidator(getImplementationPackageName());

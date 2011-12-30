@@ -63,8 +63,6 @@ public class BoxDeleteOperation implements IOperation {
       }
     }
     deleteOperation.run(monitor, workingCopyManager);
-//    TypeDeleteOperation op = new TypeDeleteOperation(getBoxType());
-//    op.run(monitor, workingCopyManager);
   }
 
   protected void deleteGetterMethodsAndImportsRec(IType type, JavaElementDeleteOperation deleteOperation, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
@@ -80,15 +78,10 @@ public class BoxDeleteOperation implements IOperation {
     else {
       getter = ScoutTypeUtility.getFormFieldGetterMethod(type);
     }
-    manager.register(type.getCompilationUnit(), false, monitor);
+    manager.register(type.getCompilationUnit(), monitor);
     if (TypeUtility.exists(getter)) {
       deleteOperation.addMember(getter);
     }
-//    // import
-//    IImportDeclaration importDec = type.getCompilationUnit().getImport(type.getFullyQualifiedName().replaceAll("\\$", "."));
-//    if (importDec != null && importDec.exists()) {
-//      importDec.delete(true, monitor);
-//    }
   }
 
   public IType getBoxType() {

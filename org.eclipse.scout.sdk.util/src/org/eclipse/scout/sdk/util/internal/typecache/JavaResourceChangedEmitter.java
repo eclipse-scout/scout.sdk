@@ -14,19 +14,10 @@ import java.io.PrintStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.BufferChangedEvent;
 import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.IBufferChangedListener;
@@ -36,15 +27,10 @@ import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
-import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedAstMatcher;
 import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IJavaResourceChangedEmitter;
@@ -55,51 +41,51 @@ import org.eclipse.scout.sdk.util.typecache.IJavaResourceChangedEmitter;
 public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmitter {
   public static final int CHANGED_EXTERNAL = 229;
 
+  public static final int CHANGED_FLAG_MASK =
+      IJavaElementDelta.F_CONTENT |
+          IJavaElementDelta.F_MODIFIERS |
+          IJavaElementDelta.F_MOVED_FROM |
+          IJavaElementDelta.F_MOVED_TO |
+          IJavaElementDelta.F_REORDER |
+          IJavaElementDelta.F_SUPER_TYPES |
+          IJavaElementDelta.F_OPENED |
+          IJavaElementDelta.F_CLOSED |
+          IJavaElementDelta.F_PRIMARY_WORKING_COPY |
+          IJavaElementDelta.F_CATEGORIES |
+          IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED |
+          IJavaElementDelta.F_ANNOTATIONS;
+
   private static final JavaResourceChangedEmitter INSTANCE = new JavaResourceChangedEmitter(HierarchyCache.getInstance());
 
-  private P_ResourceListener m_resourceChangeListener;
   private P_JavaElementChangedListener m_javaElementListener;
   private Object m_resourceLock = new Object();
-  private HashMap<IResource, JdtEventCollector> m_jdtEvents;
+  private HashMap<ICompilationUnit, JdtEventCollector> m_eventCollectors;
   private EventListenerList m_eventListeners = new EventListenerList();
   private WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_innerTypeChangedListeners;
   private WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_methodChangedListeners;
   private Object m_eventListenerLock;
   private final HierarchyCache m_hierarchyCache;
   private IBufferChangedListener m_sourceBufferListener;
-  private HashMap<String /*icu path*/, CompilationUnit /*ast*/> m_ast;
 
-  public static IResource[] getChangedResources() {
+  public static ICompilationUnit[] getPendingWorkingCopies() {
     synchronized (INSTANCE.m_resourceLock) {
-      return INSTANCE.m_jdtEvents.keySet().toArray(new IResource[INSTANCE.m_jdtEvents.size()]);
+      return INSTANCE.m_eventCollectors.keySet().toArray(new ICompilationUnit[INSTANCE.m_eventCollectors.size()]);
     }
   }
 
   private JavaResourceChangedEmitter(HierarchyCache hierarchyCache) {
     m_hierarchyCache = hierarchyCache;
     m_sourceBufferListener = new P_SourceBufferListener();
-    m_jdtEvents = new HashMap<IResource, JdtEventCollector>();
+    m_eventCollectors = new HashMap<ICompilationUnit, JdtEventCollector>();
     m_eventListenerLock = new Object();
     m_innerTypeChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
     m_methodChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
 
-    m_resourceChangeListener = new P_ResourceListener();
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener);
-
     m_javaElementListener = new P_JavaElementChangedListener();
     JavaCore.addElementChangedListener(m_javaElementListener);
-
     // ast tracker
-    m_ast = new HashMap<String, CompilationUnit>();
     for (ICompilationUnit icu : JavaCore.getWorkingCopies(null)) {
-      try {
-        icu.getBuffer().addBufferChangedListener(m_sourceBufferListener);
-      }
-      catch (JavaModelException e) {
-        SdkUtilActivator.logError("could not access source buffer of '" + icu.getElementName() + "'.", e);
-      }
-      CompilationUnit ast = createAst(icu);
-      m_ast.put(icu.getPath().toString(), ast);
+      m_eventCollectors.put(icu, new JdtEventCollector(icu));
     }
   }
 
@@ -109,9 +95,8 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
 
   @Override
   public void dispose() {
-    ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_resourceChangeListener);
     JavaCore.removeElementChangedListener(m_javaElementListener);
-    m_jdtEvents.clear();
+    m_eventCollectors.clear();
     m_innerTypeChangedListeners.clear();
     m_methodChangedListeners.clear();
   }
@@ -186,35 +171,137 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     m_eventListeners.remove(IJavaResourceChangedListener.class, listener);
   }
 
-  private void add(JdtEvent event) {
-    IResource r = event.getElement().getResource();
-    if (r != null) {
-      synchronized (m_resourceLock) {
-        JdtEventCollector jdtEventCollector = m_jdtEvents.get(r);
-        if (jdtEventCollector == null) {
-          jdtEventCollector = new JdtEventCollector(r);
-          m_jdtEvents.put(r, jdtEventCollector);
-          ICompilationUnit icu = null;
-          if (event.getElement().getElementType() == IJavaElement.COMPILATION_UNIT) {
-            icu = (ICompilationUnit) event.getElement();
+  private void handleJdtDelta(IJavaElementDelta delta) {
+    IJavaElement e = delta.getElement();
+    if (e == null) {
+      return;
+    }
+    JdtEventCollector collector = null;
+    if (e.getElementType() == IJavaElement.COMPILATION_UNIT && ((delta.getFlags() & IJavaElementDelta.F_PRIMARY_WORKING_COPY) != 0)) {
+      collector = aquireEventCollector((ICompilationUnit) e);
+    }
+    int kind = delta.getKind();
+    switch (kind) {
+      case IJavaElementDelta.ADDED:
+        if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
+          // fire straight
+          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+        }
+        else {
+          if (collector != null) {
+            addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
           }
           else {
-            icu = (ICompilationUnit) event.getElement().getAncestor(IJavaElement.COMPILATION_UNIT);
+            fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
           }
-          fireEvent(new JdtEvent(this, JdtEvent.BUFFER_DIRTY, icu));
         }
-
-        jdtEventCollector.addEvent(event);
-      }
+        break;
+      case IJavaElementDelta.REMOVED:
+        if (e.getElementType() <= IJavaElement.COMPILATION_UNIT) {
+          // remove all open event collectors
+          removeEventCollectors(e);
+          // fire straight
+          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+        }
+        else {
+          if (collector != null) {
+            addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+          }
+          else {
+            // fire straight
+            fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+          }
+        }
+        break;
+      case IJavaElementDelta.CHANGED:
+        if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
+          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, delta.getElement()));
+        }
+        else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+          if (collector != null && (delta.getFlags() & CHANGED_FLAG_MASK) != 0) {
+            for (FineGrainedJavaElementDelta a : collector.updateAst()) {
+              if (TypeUtility.exists(a.getElement())) {
+                addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, a.getElement()));
+              }
+            }
+          }
+          else {
+            fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, CHANGED_EXTERNAL, e));
+            return;
+          }
+        }
+        else {
+          if (collector != null) {
+            addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
+          }
+          else {
+            fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, CHANGED_EXTERNAL, e));
+          }
+        }
+    }
+    if (e.getElementType() == IJavaElement.COMPILATION_UNIT && ((delta.getFlags() & IJavaElementDelta.F_PRIMARY_WORKING_COPY) != 0)) {
+      releaseEventCollector((ICompilationUnit) e, true);
     }
   }
 
-  private CompilationUnit createAst(ICompilationUnit icu) {
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
-    parser.setCompilerOptions(JavaCore.getOptions());
-    parser.setKind(ASTParser.K_COMPILATION_UNIT);
-    parser.setSource(icu);
-    return (CompilationUnit) parser.createAST(null);
+  private void addEvent(JdtEventCollector collector, JdtEvent event) {
+    if (collector.isEmpty()) {
+      fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_DIRTY, collector.getCompilationUnit()));
+    }
+    collector.addEvent(event);
+  }
+
+  private JdtEventCollector aquireEventCollector(ICompilationUnit icu) {
+    JdtEventCollector collector = null;
+    collector = m_eventCollectors.get(icu);
+    if (collector == null && icu.isWorkingCopy()) {
+      collector = new JdtEventCollector(icu);
+      m_eventCollectors.put(icu, collector);
+      try {
+        icu.getBuffer().addBufferChangedListener(m_sourceBufferListener);
+      }
+      catch (JavaModelException ex) {
+        SdkUtilActivator.logError("could not access source buffer of '" + icu.getElementName() + "'.", ex);
+      }
+    }
+    return collector;
+  }
+
+  private void releaseEventCollector(ICompilationUnit icu, boolean clearWorkingCopy) {
+    JdtEventCollector collector = null;
+    if (icu.isWorkingCopy()) {
+      collector = m_eventCollectors.get(icu);
+    }
+    else {
+      collector = m_eventCollectors.remove(icu);
+    }
+    if (collector != null && !icu.isWorkingCopy()) {
+      boolean fireChanges = false;
+      JdtEvent[] jdtEvents = new JdtEvent[0];
+      synchronized (m_resourceLock) {
+        if (collector != null && collector.hasEvents()) {
+          fireChanges = (icu == null) || icu.getResource().getModificationStamp() != collector.getLastModification();
+          jdtEvents = collector.removeAllEvents();
+        }
+      }
+      if (fireChanges) {
+        for (JdtEvent e : jdtEvents) {
+          fireEvent(e);
+        }
+      }
+      fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, icu));
+    }
+  }
+
+  private void removeEventCollectors(IJavaElement element) {
+    synchronized (m_resourceLock) {
+      for (Iterator<Entry<ICompilationUnit, JdtEventCollector>> it = m_eventCollectors.entrySet().iterator(); it.hasNext();) {
+        Entry<ICompilationUnit, JdtEventCollector> cur = it.next();
+        if (TypeUtility.isAncestor(element, cur.getKey())) {
+          it.remove();
+        }
+      }
+    }
   }
 
   private void fireEvent(JdtEvent e) {
@@ -277,24 +364,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         l.handleEvent(e);
       }
     }
-  }
-
-  private void releaseCompilationUnit(ICompilationUnit icu) {
-    boolean fireChanges = false;
-    JdtEvent[] jdtEvents = new JdtEvent[0];
-    synchronized (m_resourceLock) {
-      JdtEventCollector eventSet = m_jdtEvents.remove(icu.getResource());
-      if (eventSet != null && eventSet.hasEvents()) {
-        fireChanges = (icu == null) || icu.getResource().getModificationStamp() != eventSet.getLastModification();
-        jdtEvents = eventSet.getEvents();
-      }
-    }
-    if (fireChanges) {
-      for (JdtEvent e : jdtEvents) {
-        fireEvent(e);
-      }
-    }
-    fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, icu));
   }
 
   private void printEventType(int type, PrintStream out) {
@@ -419,82 +488,38 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     out.flush();
   }
 
-  private class P_ResourceListener implements IResourceChangeListener {
-    @Override
-    public void resourceChanged(final IResourceChangeEvent event) {
-      IResourceDelta delta = event.getDelta();
-      try {
-        if (delta != null) {
-          delta.accept(new IResourceDeltaVisitor() {
-            @Override
-            public boolean visit(IResourceDelta visitDelta) {
-              IResource resource = visitDelta.getResource();
-              if (resource.getType() == IResource.PROJECT && ((visitDelta.getFlags() & (IResourceDelta.OPEN | IResourceDelta.REMOVED)) != 0)) {
-                m_hierarchyCache.clearCache();
-              }
-              if (resource.getType() == IFile.FILE && resource.getFileExtension() != null) {
-                if (resource.getFileExtension().equalsIgnoreCase("java") && ((visitDelta.getFlags() & IResourceDelta.CONTENT) != 0)) {
-                  releaseCompilationUnit((ICompilationUnit) JavaCore.create(resource));
-                }
-                return false;
-              }
-              return true;
-            }
-
-          });
-        }
-        else if (event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource().getType() == IResource.PROJECT) {
-          m_hierarchyCache.clearCache();
-        }
-      }
-      catch (CoreException e) {
-        SdkUtilActivator.logWarning(e);
-      }
-    }
-  } // end class P_ResouceListener
-
   private class P_SourceBufferListener implements IBufferChangedListener {
 
     @Override
     public void bufferChanged(BufferChangedEvent event) {
       ICompilationUnit icu = (ICompilationUnit) event.getBuffer().getOwner();
       if (TypeUtility.exists(icu)) {
-        if (!event.getBuffer().hasUnsavedChanges() && TypeUtility.exists(icu) && icu.getResource().exists()) {
-          m_ast.put(icu.getPath().toString(), createAst(icu));
-          releaseCompilationUnit(icu);
+        if (event.getBuffer().isClosed()) {
+          event.getBuffer().removeBufferChangedListener(m_sourceBufferListener);
+          releaseEventCollector(icu, false);
         }
-      }
-      else {
-        // TODO
       }
     }
   }
 
   private class P_JavaElementChangedListener implements org.eclipse.jdt.core.IElementChangedListener {
-    public static final int CHANGED_FLAG_MASK =
-        IJavaElementDelta.F_CONTENT |
-            IJavaElementDelta.F_MODIFIERS |
-            IJavaElementDelta.F_MOVED_FROM |
-            IJavaElementDelta.F_MOVED_TO |
-            IJavaElementDelta.F_REORDER |
-            IJavaElementDelta.F_SUPER_TYPES |
-            IJavaElementDelta.F_OPENED |
-            IJavaElementDelta.F_CLOSED |
-            IJavaElementDelta.F_CATEGORIES |
-            IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED |
-            IJavaElementDelta.F_ANNOTATIONS;
 
     @Override
     public void elementChanged(ElementChangedEvent event) {
-      visitDelta(event.getDelta(), event.getType());
+      try {
+        visitDelta(event.getDelta(), event.getType());
+      }
+      catch (Exception e) {
+        e.printStackTrace();
+      }
     }
 
     private void visitDelta(IJavaElementDelta delta, int eventType) {
-      int flags = delta.getFlags();
-
-      int kind = delta.getKind();
-      // children
-      if ((flags & IJavaElementDelta.F_CHILDREN) != 0) {
+      // annotations
+      for (IJavaElementDelta annotationDelta : delta.getAnnotationDeltas()) {
+        visitDelta(annotationDelta, eventType);
+      }
+      if ((delta.getFlags() & IJavaElementDelta.F_CHILDREN) != 0) {
         IJavaElementDelta[] childDeltas = delta.getAffectedChildren();
         if (childDeltas != null && childDeltas.length > 0) {
           for (int i = 0; i < childDeltas.length; i++) {
@@ -503,129 +528,10 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         }
       }
       else {
-        IJavaElement e = delta.getElement();
-        if (e != null) {
-          // annotations
-          for (IJavaElementDelta annotationDelta : delta.getAnnotationDeltas()) {
-            visitDelta(annotationDelta, eventType);
-          }
-          switch (kind) {
-            case IJavaElementDelta.ADDED:
-              if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
-                // fire straight
-                fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
-              }
-              else {
-                // collect
-                add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
-              }
-              break;
-            case IJavaElementDelta.REMOVED:
-              if (e.getElementType() <= IJavaElement.COMPILATION_UNIT) {
-                // remove all open event collectors
-                if (e.getResource() != null) {
-                  synchronized (m_resourceLock) {
-                    for (Iterator<Entry<IResource, JdtEventCollector>> it = m_jdtEvents.entrySet().iterator(); it.hasNext();) {
-                      Entry<IResource, JdtEventCollector> entry = it.next();
-                      IResource parent = entry.getKey();
-                      while (parent != null) {
-                        if (parent.equals(e.getResource())) {
-                          it.remove();
-                        }
-                        parent = parent.getParent();
-                      }
-                    }
-                  }
-                }
-                // fire straight
-                fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
-              }
-              else {
-                add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
-              }
-
-              break;
-            case IJavaElementDelta.CHANGED:
-              if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
-                fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, delta.getElement()));
-              }
-              else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-                if ((flags & CHANGED_FLAG_MASK) != 0) {
-                  CompilationUnit newAst = createAst((ICompilationUnit) e);
-                  CompilationUnit oldAst = m_ast.get(e.getPath().toString());
-                  if (oldAst != null) {
-                    for (FineGrainedJavaElementDelta a : calculateDeltas(oldAst, newAst)) {
-                      if (TypeUtility.exists(a.getElement())) {
-                        add(new JdtEvent(JavaResourceChangedEmitter.this, kind, a.getElement()));
-                      }
-                    }
-                  }
-                  else {
-                    fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, CHANGED_EXTERNAL, e));
-                    return;
-                  }
-                  try {
-                    m_ast.put(e.getPath().toString(), newAst);
-                  }
-                  catch (Exception ex) {
-                    SdkUtilActivator.logError(ex);
-                  }
-                }
-                else if ((flags & IJavaElementDelta.F_PRIMARY_WORKING_COPY) != 0) {
-                  ICompilationUnit icu = (ICompilationUnit) e;
-                  if (icu.isWorkingCopy()) {
-                    CompilationUnit ast = createAst(icu);
-                    m_ast.put(icu.getPath().toString(), ast);
-                    try {
-                      icu.getBuffer().addBufferChangedListener(m_sourceBufferListener);
-                    }
-                    catch (JavaModelException ex) {
-                      SdkUtilActivator.logError("could not access source buffer of '" + icu.getElementName() + "'.", ex);
-                    }
-                  }
-                  else {
-                    try {
-                      icu.getBuffer().removeBufferChangedListener(m_sourceBufferListener);
-                    }
-                    catch (JavaModelException ex) {
-                      SdkUtilActivator.logError("could not access source buffer of '" + icu.getElementName() + "'.", ex);
-                    }
-                    m_ast.remove(icu.getPath().toString());
-                  }
-                }
-              }
-              else {
-                add(new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
-              }
-          }
-
-        }
+        handleJdtDelta(delta);
       }
     }
 
-    public FineGrainedJavaElementDelta[] calculateDeltas(CompilationUnit oldAst, final CompilationUnit newAst) {
-      final HashSet<FineGrainedJavaElementDelta> set = new HashSet<FineGrainedJavaElementDelta>();
-      FineGrainedAstMatcher matcher = new FineGrainedAstMatcher() {
-        @Override
-        protected boolean processDelta(boolean match, ASTNode node, Object other) {
-          if (!match) {
-            try {
-
-              IJavaElement e = ((ICompilationUnit) newAst.getJavaElement()).getElementAt(node.getStartPosition());
-              if (e != null) {
-                set.add(new FineGrainedJavaElementDelta(e));
-              }
-            }
-            catch (JavaModelException e1) {
-              // nop
-            }
-          }
-          return true;
-        }
-      };
-      newAst.subtreeMatch(matcher, oldAst);
-      return set.toArray(new FineGrainedJavaElementDelta[set.size()]);
-    }
   }
 
 }

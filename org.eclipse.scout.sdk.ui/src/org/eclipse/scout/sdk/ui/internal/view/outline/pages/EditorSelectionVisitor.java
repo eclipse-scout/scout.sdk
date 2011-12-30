@@ -484,7 +484,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
 
   private int visitDesktopOutlineTablePage(DesktopOutlineTablePage page) {
     ITypeHierarchy hierarchy = getCachedTypeHierarchy(getCurrentElement());
-    if (hierarchy.contains(TypeUtility.getType(RuntimeClasses.IOutline))) {
+    if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IOutline))) {
       IType desktopType = page.getDesktopType();
       IMethod outlineMethods = TypeUtility.getMethod(desktopType, "getConfiguredOutlines");
       IType[] allNewOccurences = ScoutTypeUtility.getNewTypeOccurencesInMethod(outlineMethods);

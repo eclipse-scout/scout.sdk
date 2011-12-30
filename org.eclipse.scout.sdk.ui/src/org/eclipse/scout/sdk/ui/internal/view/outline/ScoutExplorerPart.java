@@ -49,7 +49,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndP
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineProcess;
-import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeOperation;
+import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ScoutExplorerRootNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -225,7 +225,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   /**
    * This method might be called from any thread.
    * The page is added to the dirty structure pages list.
-   * A {@link RefreshOutlineSubTreeOperation} is queued after some time to reload the affected nodes
+   * A {@link RefreshOutlineSubTreeJob} is queued after some time to reload the affected nodes
    */
   public void markStructureDirty(AbstractPage newPage) {
     // if(BsiCaseCore.getDefault().getScoutWorkspace().isInitialized()){
@@ -287,23 +287,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     return b.toString();
   }
 
-//  public PageFilter getPageFilterFor(AbstractPage p) {
-//    StringBuilder b = new StringBuilder();
-//    IPage tmp = p;
-//    while (tmp != null) {
-//      b.insert(0, "/" + tmp.getName());
-//      tmp = tmp.getParent();
-//    }
-//    String path = b.toString();
-//    synchronized (m_pageFilterCacheLock) {
-//      PageFilter filter = m_pageFilterCache.get(path);
-//      if (filter == null) {
-//        filter = new PageFilter();
-//        m_pageFilterCache.put(path, filter);
-//      }
-//      return filter;
-//    }
-//  }
 
   @SuppressWarnings("restriction")
   private void createToolbar() {
@@ -512,7 +495,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
     @Override
     public void selectionChanged(SelectionChangedEvent event) {
-      if (m_viewer.getData(RefreshOutlineSubTreeOperation.SELECTION_PREVENTER) != null) {
+      if (m_viewer.getData(RefreshOutlineSubTreeJob.SELECTION_PREVENTER) != null) {
         return;
       }
       try {

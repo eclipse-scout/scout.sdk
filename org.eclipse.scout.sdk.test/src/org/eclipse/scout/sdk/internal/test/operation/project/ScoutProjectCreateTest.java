@@ -11,9 +11,11 @@
 package org.eclipse.scout.sdk.internal.test.operation.project;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
@@ -29,7 +31,6 @@ import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -64,12 +65,14 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
   }
 
   @Test
-  @Ignore
   public void testLoop() throws Exception {
     // create 5 times a project with the same name and remove it again
     for (int i = 0; i < 5; i++) {
       System.out.println("-------------- start " + i + "--------------");
       testTemplateDesktopForm("org.eclipse.testapp");
+      for (ICompilationUnit icu : JavaResourceChangedEmitter.getPendingWorkingCopies()) {
+        System.out.println("still available resource: " + icu.getElementName());
+      }
       System.out.println("-------------- end " + i + "--------------");
     }
   }
@@ -77,9 +80,22 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
   private void testTemplateDesktopForm(String projectName) throws Exception {
     try {
       IScoutProject project = ScoutProjectHelper.setupNewProject(projectName, true, true, true);
+
       final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+      ITypeHierarchy hierarchy = iForm.newTypeHierarchy(new NullProgressMonitor());
+      for (IType tx : hierarchy.getAllSubtypes(iForm)) {
+        if (tx.getElementName().equals("DesktopForm")) {
+          System.out.println("EEKEKEKKEKEKEKKEKEKKEKEKEKKEKEKKEKE ");
+        }
+      }
       final IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       IType[] subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getInWorkspaceFilter());
+      if (subtypes.length > 0) {
+        System.out.println("Should not come up:");
+        for (IType t : subtypes) {
+          System.out.println(" - " + t.getFullyQualifiedName() + " exists " + TypeUtility.exists(t) + "  " + t.getResource().exists());
+        }
+      }
       Assert.assertEquals(0, subtypes.length);
       SingleFormTemplateOperation op = new SingleFormTemplateOperation(project);
       executeAndBuildWorkspace(op);
@@ -93,8 +109,8 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
       subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getInWorkspaceFilter());
       if (subtypes.length != 1) {
         System.out.println("NOT FIRED RESOURCES -------");
-        for (IResource r : JavaResourceChangedEmitter.getChangedResources()) {
-          System.out.println(" - '" + r.getName() + "'");
+        for (ICompilationUnit icu : JavaResourceChangedEmitter.getPendingWorkingCopies()) {
+          System.out.println(" - '" + icu.getElementName() + "'");
         }
         System.out.println("EEEEEEEEEEEEEEEEEEEEEERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOORRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR");
         Thread.sleep(10000);
@@ -102,7 +118,6 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
       Assert.assertEquals(1, subtypes.length);
     }
     finally {
-      assertNoWorkingCopies();
       clearWorkspace();
       Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getRootProjects().length);
     }

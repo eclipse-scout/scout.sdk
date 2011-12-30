@@ -50,7 +50,7 @@ public class FormFieldDeleteOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    workingCopyManager.register(getFormFieldType().getCompilationUnit(), true, monitor);
+    workingCopyManager.register(getFormFieldType().getCompilationUnit(), monitor);
     IType declaringType = getFormFieldType().getDeclaringType();
 
     JavaElementDeleteOperation op = new JavaElementDeleteOperation();

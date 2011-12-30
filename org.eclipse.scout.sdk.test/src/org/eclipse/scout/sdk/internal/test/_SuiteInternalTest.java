@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.internal.test.operation._SuiteOperation;
 import org.eclipse.scout.sdk.internal.test.presenter._SuitePresenter;
 import org.eclipse.scout.sdk.internal.test.types._SuiteTypes;
 import org.eclipse.scout.sdk.internal.test.util._SuiteUtil;
+import org.eclipse.scout.sdk.internal.test.workspace._SuiteWorkspaceTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -27,7 +28,8 @@ import org.junit.runners.Suite.SuiteClasses;
     _SuiteOperation.class,
     _SuitePresenter.class,
     _SuiteTypes.class,
-    _SuiteUtil.class})
+    _SuiteUtil.class,
+    _SuiteWorkspaceTest.class})
 public class _SuiteInternalTest {
 
 }

@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.internal.test.jdt;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.resources.IProject;
@@ -40,6 +42,7 @@ public class JavaProjectTests extends AbstractScoutSdkTest {
     assertTrue(project2.exists());
     assertTrue(project1.exists());
     assertTrue(project1.equals(project2));
+    assertSame(project1, project2);
     clearWorkspace();
   }
 
@@ -59,6 +62,7 @@ public class JavaProjectTests extends AbstractScoutSdkTest {
     IJavaProject shared2 = module2.getSharedBundle().getJavaProject();
     assertTrue(shared2.exists());
     assertTrue(shared1.exists());
+    assertNotSame(shared1, shared2);
     assertTrue(shared1.equals(shared2));
     clearWorkspace();
   }

@@ -120,11 +120,11 @@ public class ServiceNewOperation implements IOperation {
       newOp.setSuperTypeSignature(getServiceSuperTypeSignature());
       newOp.addInterfaceSignature(intSig);
       newOp.run(monitor, workingCopyManager);
-      workingCopyManager.register(newOp.getCreatedType().getCompilationUnit(), monitor);
-      // add to exported packages
-      ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{newOp.getCreatedType().getPackageFragment()}, true);
-      manifestOp.run(monitor, workingCopyManager);
       m_createdServiceImplementation = newOp.getCreatedType();
+      workingCopyManager.register(m_createdServiceImplementation.getCompilationUnit(), monitor);
+      // add to exported packages
+      ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{m_createdServiceImplementation.getPackageFragment()}, true);
+      manifestOp.run(monitor, workingCopyManager);
       // register
       for (IScoutBundle sb : getServiceRegistrationBundles()) {
         IType sessionType = null;

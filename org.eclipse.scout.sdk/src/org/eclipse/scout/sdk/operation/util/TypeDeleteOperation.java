@@ -49,7 +49,7 @@ public class TypeDeleteOperation implements IDeleteOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit icu = getType().getCompilationUnit();
     if (getType().getDeclaringType() != null) {
-      workingCopyManager.register(icu, false, monitor);
+      workingCopyManager.register(icu, monitor);
       // handle inner type
       // delete import in compilation unit
       String fullyQuallifiedImport = getType().getFullyQualifiedName();

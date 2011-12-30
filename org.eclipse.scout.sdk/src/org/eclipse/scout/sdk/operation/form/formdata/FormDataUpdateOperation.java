@@ -310,8 +310,8 @@ public class FormDataUpdateOperation implements IOperation {
 
       ICompilationUnit icu = m_formDataType.getCompilationUnit();
       if (icu != null) {
-        icu.becomeWorkingCopy(monitor);
         try {
+          icu.becomeWorkingCopy(monitor);
           icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(m_icuSource, icu));
           icu.getBuffer().save(monitor, true);
           icu.commitWorkingCopy(true, monitor);

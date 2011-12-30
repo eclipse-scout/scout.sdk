@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineLabelsJob;
-import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeOperation;
+import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
@@ -34,6 +34,7 @@ public class DirtyUpdateManager {
 
   public DirtyUpdateManager(ScoutExplorerPart view) {
     m_view = view;
+    m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeJob(m_view, Texts.get("Refreshing"));
     // add quality listener
     ScoutSeverityManager.getInstance().addQualityManagerListener(
         new IScoutSeverityListener() {
@@ -72,12 +73,8 @@ public class DirtyUpdateManager {
   }
 
   private synchronized void enqueueStructureJob() {
-    if (m_currentRefreshSubTreeProcess != null) {
-      m_currentRefreshSubTreeProcess.cancel();
-      m_currentRefreshSubTreeProcess = null;
-    }
-    m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeOperation(m_view, Texts.get("Refreshing"));
-    m_currentRefreshSubTreeProcess.schedule();
+    m_currentRefreshSubTreeProcess.cancel();
+    m_currentRefreshSubTreeProcess.schedule(200);
   }
 
   private synchronized void enqueueLabelsJob() {
@@ -86,7 +83,7 @@ public class DirtyUpdateManager {
       m_currentRefreshLabelsProcess = null;
     }
     m_currentRefreshLabelsProcess = new RefreshOutlineLabelsJob(m_view, Texts.get("Refreshing"));
-    m_currentRefreshLabelsProcess.schedule();
+    m_currentRefreshLabelsProcess.schedule(200);
   }
 
   public IPage[] fetchDirtyStructurePages() {

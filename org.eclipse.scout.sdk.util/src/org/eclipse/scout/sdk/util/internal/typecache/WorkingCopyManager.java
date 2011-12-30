@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.util.internal.typecache;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
@@ -38,79 +38,60 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class WorkingCopyManager implements IWorkingCopyManager {
 
   private Object LOCK = new Object();
-  private HashSet<ICompilationUnit> m_workingCopies = new HashSet<ICompilationUnit>();
-  private HashSet<ICompilationUnit> m_wellformWorkingCopies = new HashSet<ICompilationUnit>();
+  private List<ICompilationUnit> m_workingCopies = new ArrayList<ICompilationUnit>();
 
   public WorkingCopyManager() {
   }
 
-  private List<ICompilationUnit> getWorkingCopies() {
+  @Override
+  public void register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
+    if (icu.isReadOnly()) {
+      throw new IllegalArgumentException("try to get a working copy of the read only icu '" + icu.getElementName() + "'.");
+    }
     synchronized (LOCK) {
-      return new ArrayList<ICompilationUnit>(m_workingCopies);
+      if (!m_workingCopies.contains(icu)) {
+        icu.becomeWorkingCopy(monitor);
+        m_workingCopies.add(icu);
+      }
     }
   }
 
   @Override
-  public void register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
-    register(icu, true, monitor);
-  }
-
-  @Override
-  public void register(ICompilationUnit icu, boolean wellform, IProgressMonitor monitor) throws JavaModelException {
+  public void unregisterAll(IProgressMonitor monitor) {
     synchronized (LOCK) {
-      boolean added = m_workingCopies.add(icu);
-      if (added) {
-        SdkUtilActivator.logInfo("#REGISTER working copy " + icu.getElementName());
-        icu.becomeWorkingCopy(monitor);
+      for (Iterator<ICompilationUnit> it = m_workingCopies.iterator(); it.hasNext();) {
+        releaseCompilationUnit(it.next(), monitor);
       }
-      if (wellform) {
-        m_wellformWorkingCopies.add(icu);
-      }
+      m_workingCopies.clear();
     }
   }
 
   @Override
   public void unregister(ICompilationUnit icu, IProgressMonitor monitor) {
-    try {
-      synchronized (LOCK) {
-        if (!m_workingCopies.contains(icu)) {
-          return;
-        }
-      }
-      //
-      synchronized (LOCK) {
-        /*wellform = */m_wellformWorkingCopies.remove(icu);
-      }
-      if (!icu.exists()) {
-        return;
-      }
-      synchronized (LOCK) {
-        m_workingCopies.remove(icu);
-      }
-      try {
-        if (!monitor.isCanceled()) {
-          icu.commitWorkingCopy(true, monitor);
-          indexCompilationUnitSync(icu);
-        }
-        else {
-          icu.discardWorkingCopy();
-          icu.becomeWorkingCopy(monitor);
-          icu.commitWorkingCopy(true, monitor);
-        }
-      }
-      catch (JavaModelException e) {
-        SdkUtilActivator.logError("could not commit working copy '" + icu.getElementName() + "'", e);
-      }
-      finally {
-        try {
-          icu.discardWorkingCopy();
-        }
-        catch (JavaModelException e) {
-          SdkUtilActivator.logError("could not discard working copy '" + icu.getElementName() + "'", e);
-        }
+    synchronized (LOCK) {
+      if (m_workingCopies.remove(icu)) {
+        releaseCompilationUnit(icu, monitor);
       }
     }
+  }
+
+  private void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor) {
+    try {
+      if (!monitor.isCanceled()) {
+        icu.commitWorkingCopy(true, monitor);
+        indexCompilationUnitSync(icu);
+      }
+    }
+    catch (JavaModelException e) {
+      SdkUtilActivator.logError("could not commit working copy '" + icu.getElementName() + "'", e);
+    }
     finally {
+      try {
+        icu.discardWorkingCopy();
+      }
+      catch (JavaModelException e) {
+        SdkUtilActivator.logError("could not discard working copy '" + icu.getElementName() + "'", e);
+      }
     }
   }
 
@@ -143,32 +124,13 @@ public class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   @Override
-  public void unregisterAll(IProgressMonitor monitor) {
-    for (ICompilationUnit icu : getWorkingCopies()) {
-      unregister(icu, monitor);
-    }
-    m_workingCopies.clear();
-    m_wellformWorkingCopies.clear();
-  }
-
-  private void checkRegistered(ICompilationUnit icu) throws CoreException {
+  public CompilationUnit reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
     synchronized (LOCK) {
       if (!m_workingCopies.contains(icu)) {
         throw new CoreException(new ScoutStatus("compilation unit " + icu.getElementName() + " has not been registered"));
       }
+      return icu.reconcile(AST.JLS3, true, icu.getOwner(), monitor);
     }
-  }
-
-  @Override
-  public CompilationUnit reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
-    CompilationUnit ast = null;
-    try {
-      checkRegistered(icu);
-      ast = icu.reconcile(AST.JLS3, true, icu.getOwner(), monitor);
-    }
-    finally {
-    }
-    return ast;
   }
 
 }

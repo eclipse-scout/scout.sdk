@@ -78,6 +78,7 @@ public class CachedTypeHierarchy extends TypeHierarchy implements ICachedTypeHie
   @Override
   void revalidate(IProgressMonitor monitor) {
     if (!m_created) {
+      // TODO aho verify type and project exitstance
       if (!TypeUtility.exists(getType()) || !getType().getJavaProject().exists()) {
         throw new IllegalArgumentException("type or project does not exist");
       }

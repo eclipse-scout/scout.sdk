@@ -62,7 +62,6 @@ public class JdtEventLoggerView extends ViewPart {
   private Button m_startButton;
   private Button m_stopButton;
   private Button m_resetButton;
-//  private Text m_eventLogField;
   private Object writeLock = new Object();
   private ArrayList<String> m_events = new ArrayList<String>();
   private IElementChangedListener m_elementChangedListener;
@@ -189,9 +188,7 @@ public class JdtEventLoggerView extends ViewPart {
     synchronized (writeLock) {
       m_invisibleRoot = new Event();
       m_treeViewer.setInput(m_invisibleRoot);
-//      m_events.clear();
     }
-//    updateView();
   }
 
   private Job m_updateViewJob;
@@ -220,13 +217,15 @@ public class JdtEventLoggerView extends ViewPart {
     protected IStatus run(IProgressMonitor monitor) {
       synchronized (m_updateViewLock) {
         if (m_updateViewJob == this) {
-          getViewSite().getShell().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-              m_treeViewer.refresh();
-              m_treeViewer.expandAll();
-            }
-          });
+          if (getViewSite().getShell() != null && !getViewSite().getShell().isDisposed()) {
+            getViewSite().getShell().getDisplay().asyncExec(new Runnable() {
+              @Override
+              public void run() {
+                m_treeViewer.refresh();
+                m_treeViewer.expandAll();
+              }
+            });
+          }
         }
       }
       return Status.OK_STATUS;
@@ -358,7 +357,14 @@ public class JdtEventLoggerView extends ViewPart {
     }
 
     private void visitDelta(IResourceDelta delta, Event parentEvent) {
-      String resourceName = delta.getResource().getName() + " [" + delta.getResource().exists() + "]";
+      if (delta == null) {
+        return;
+      }
+      IResource resource = delta.getResource();
+      String resourceName = "NULL RESOURCE";
+      if (resource != null) {
+        resourceName = resource.getName() + " [" + resource.exists() + "]";
+      }
 
       Event newLogEvent = new Event(getEventType(delta), getResourceType(delta), resourceName);
       newLogEvent.setEventGroup(EventGroup.RESOURCE_EVENT);

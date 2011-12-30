@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.job;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITreeSelection;
@@ -31,20 +32,24 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-public class RefreshOutlineSubTreeOperation extends AbstractWorkspaceBlockingJob {
+public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
   public static final String SELECTION_PREVENTER = "selectionPreventer";
   private ScoutExplorerPart m_view;
   private P_BackupNode[] m_backupTree;
   private String m_selectedNodeName;
   private ITreeSelection m_backupedSelection;
 
-  public RefreshOutlineSubTreeOperation(ScoutExplorerPart view, String name) {
+  public RefreshOutlineSubTreeJob(ScoutExplorerPart view, String name) {
     super(name);
     m_view = view;
+    setRule(ResourcesPlugin.getWorkspace().getRoot());
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    if (monitor.isCanceled()) {
+      return;
+    }
     final IPage[] dirtyStructureRoots = m_view.fetchDirtyStructurePages();
     if (dirtyStructureRoots.length == 0) {
       return;
@@ -97,21 +102,21 @@ public class RefreshOutlineSubTreeOperation extends AbstractWorkspaceBlockingJob
             return;
           }
           if (dirtyStructureRoots.length > 0) {
-//            try {
-//              m_treeViewer.setData(SELECTION_PREVENTER, this);
+            try {
+              m_treeViewer.setData(SELECTION_PREVENTER, this);
 
-            for (IPage p : dirtyStructureRoots) {
-              m_treeViewer.refresh(p, true);
+              for (IPage p : dirtyStructureRoots) {
+                m_treeViewer.refresh(p, true);
+              }
+              for (int i = 0; i < m_backupTree.length; i++) {
+                m_backupTree[i].restoreGui(dirtyStructureRoots[i]);
+              }
             }
-            for (int i = 0; i < m_backupTree.length; i++) {
-              m_backupTree[i].restoreGui(dirtyStructureRoots[i]);
+            finally {
+              m_treeViewer.setData(SELECTION_PREVENTER, null);
             }
             // restore selection
             restoreSelectionInUiThread();
-//            }
-//            finally {
-//              m_treeViewer.setData(SELECTION_PREVENTER, null);
-//            }
           }
           m_view.getViewContentProvider().setAutoLoadChildren(true);
           m_treeControl.setCursor(null);

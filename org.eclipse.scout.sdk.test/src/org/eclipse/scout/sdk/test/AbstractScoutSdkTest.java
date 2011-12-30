@@ -38,8 +38,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -398,11 +396,4 @@ public abstract class AbstractScoutSdkTest {
     System.out.println("--- END [" + title + "] ----");
   }
 
-  protected static void assertNoWorkingCopies() throws Exception {
-    ICompilationUnit[] workingCopies = JavaCore.getWorkingCopies(null);
-    for (ICompilationUnit icu : workingCopies) {
-      System.out.println("FOUND working copy: " + icu.getElementName());
-    }
-    Assert.assertTrue(workingCopies.length == 0);
-  }
 }

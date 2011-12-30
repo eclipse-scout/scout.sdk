@@ -109,7 +109,7 @@ public class JavaElementDeleteOperation implements IOperation {
         }
         else {
           ICompilationUnit icu = type.getCompilationUnit();
-          manager.register(icu, false, monitor);
+          manager.register(icu, monitor);
           type.delete(true, monitor);
           icuForOrganizeImports.add(icu);
         }

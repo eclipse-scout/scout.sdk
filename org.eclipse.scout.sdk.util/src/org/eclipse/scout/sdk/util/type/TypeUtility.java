@@ -675,7 +675,8 @@ public class TypeUtility {
   }
 
   /**
-   * To find out if the given child element is a ancestor of the given parent element.
+   * To find out if the given child element is a ancestor of the given parent element. If parent and child is the same
+   * element true is returned.
    * 
    * @param parent
    * @param chlid

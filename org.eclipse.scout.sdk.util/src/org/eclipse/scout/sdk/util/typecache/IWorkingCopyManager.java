@@ -16,9 +16,16 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.WorkingCopyOwner;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public interface IWorkingCopyManager {
+
+  /**
+   * The working copy owner for all scout operations
+   */
+  public static final WorkingCopyOwner ScoutWorkingCopyOwner = new WorkingCopyOwner() {
+  };
 
   /**
    * Register compilation unit BEFORE doing changes on it.
@@ -28,17 +35,6 @@ public interface IWorkingCopyManager {
    * @param icu
    */
   void register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException;
-
-  /**
-   * Register compilation unit BEFORE doing changes on it.
-   * Creates a working copy on the first registration.
-   * Compilation unit may be registered multiple times
-   * 
-   * @param icu
-   * @param wellform
-   *          to ensure the icu will be wellformed after the process ended.
-   */
-  void register(ICompilationUnit icu, boolean wellform, IProgressMonitor monitor) throws JavaModelException;
 
   /**
    * Unregister compilation unit AFTER doing changes on it.
