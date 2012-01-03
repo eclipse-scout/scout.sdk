@@ -43,9 +43,9 @@ import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.javadoc.JavaDoc;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -253,7 +253,7 @@ public class CreateTemplateOperation implements IOperation {
     try {
       IMethod getterMethod = ScoutTypeUtility.getFormFieldGetterMethod(formField, hierarchy);
       if (TypeUtility.exists(getterMethod)) {
-        String NL = JdtUtility.getLineSeparator(getterMethod.getCompilationUnit());
+        String NL = ResourcesUtility.getLineSeparator(getterMethod.getCompilationUnit());
         P_FormField templateFormField = templateFormFields.get(formField.getElementName());
         // find import
         IImportDeclaration formFieldImport = formField.getCompilationUnit().getImport(fqFormFieldName);

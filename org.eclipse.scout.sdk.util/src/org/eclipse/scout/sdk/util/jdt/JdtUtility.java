@@ -34,10 +34,6 @@ public final class JdtUtility {
     return javaElement;
   }
 
-  public static String getLineSeparator(ICompilationUnit icu) {
-    return System.getProperty("line.separator");
-  }
-
   public static boolean hasAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
     return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
   }

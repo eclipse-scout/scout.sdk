@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -34,8 +33,10 @@ public class MethodSourceBuilder implements ISourceBuilder {
   private String m_elementName;
   private int m_flags;
   private String m_simpleBody;
+  protected final String NL;
 
-  public MethodSourceBuilder() {
+  public MethodSourceBuilder(String nl) {
+    NL = nl;
     m_parameters = new ArrayList<MethodParameter>();
     m_exceptionSignatures = new ArrayList<String>();
     m_annotations = new ArrayList<AnnotationSourceBuilder>();
@@ -54,10 +55,10 @@ public class MethodSourceBuilder implements ISourceBuilder {
     StringBuilder builder = new StringBuilder();
     String javaDoc = createJavaDoc(validator);
     if (!StringUtility.isNullOrEmpty(javaDoc)) {
-      builder.append(javaDoc + ScoutUtility.NL);
+      builder.append(javaDoc + NL);
     }
     for (AnnotationSourceBuilder annotation : getAnnotations()) {
-      builder.append(annotation.createSource(validator) + ScoutUtility.NL);
+      builder.append(annotation.createSource(validator) + NL);
     }
     if (Flags.isPublic(getFlags())) {
       builder.append("public ");
@@ -96,10 +97,10 @@ public class MethodSourceBuilder implements ISourceBuilder {
       }
       builder.append(" ");
     }
-    builder.append("{" + ScoutUtility.NL);
+    builder.append("{" + NL);
     String value = createMethodBody(validator);
     if (!StringUtility.isNullOrEmpty(value)) {
-      builder.append(value + ScoutUtility.NL);
+      builder.append(value + NL);
     }
     builder.append("}");
     return builder.toString();

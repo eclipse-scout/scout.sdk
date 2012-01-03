@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
@@ -45,6 +45,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
   private static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
 
   public SourceBuilderWithProperties(final IType type) {
+    super(ResourcesUtility.getLineSeparator(type.getOpenable()));
     visitProperties(type);
     addValidationRules(type);
   }
@@ -65,7 +66,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
               String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
               String unboxedSignature = FormDataUtility.unboxPrimitiveSignature(resolvedSignature);
               // property class
-              TypeSourceBuilder propertyBuilder = new TypeSourceBuilder();
+              TypeSourceBuilder propertyBuilder = new TypeSourceBuilder(NL);
               propertyBuilder.setElementName(propName);
 
               String superTypeSig = Signature.createTypeSignature(RuntimeClasses.AbstractPropertyData, true);
@@ -73,23 +74,23 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
               propertyBuilder.setSuperTypeSignature(superTypeSig);
               addBuilder(propertyBuilder, CATEGORY_TYPE_PROPERTY);
               // getter
-              MethodSourceBuilder getterBuilder = new MethodSourceBuilder();
+              MethodSourceBuilder getterBuilder = new MethodSourceBuilder(NL);
               getterBuilder.setElementName("get" + propName);
               getterBuilder.setReturnSignature(Signature.createTypeSignature(propName, false));
               getterBuilder.setSimpleBody("return getPropertyByClass(" + propName + ".class);");
               addBuilder(getterBuilder, new CompositeObject(CATEGORY_METHOD_PROPERTY, lowerCaseBeanName, 1, getterBuilder));
 
               // legacy getter
-              MethodSourceBuilder legacyGetter = new MethodSourceBuilder();
-              legacyGetter.setJavaDoc(" /** " + ScoutUtility.NL + "   * access method for property " + upperCaseBeanName + "." + ScoutUtility.NL + "*/");
+              MethodSourceBuilder legacyGetter = new MethodSourceBuilder(NL);
+              legacyGetter.setJavaDoc(" /** " + NL + "   * access method for property " + upperCaseBeanName + "." + NL + "*/");
               legacyGetter.setElementName((Signature.SIG_BOOLEAN.equals(resolvedSignature) ? "is" : "get") + upperCaseBeanName);
               legacyGetter.setReturnSignature(resolvedSignature);
               legacyGetter.setSimpleBody(getLegacyGetterMethodBody(resolvedSignature, propName));
               addBuilder(legacyGetter, new CompositeObject(CATEGORY_METHOD_PROPERTY, lowerCaseBeanName, 2, legacyGetter));
 
               // legacy setter
-              MethodSourceBuilder legacySetter = new MethodSourceBuilder();
-              legacySetter.setJavaDoc(" /** " + ScoutUtility.NL + "   * access method for property " + upperCaseBeanName + "." + ScoutUtility.NL + "*/");
+              MethodSourceBuilder legacySetter = new MethodSourceBuilder(NL);
+              legacySetter.setJavaDoc(" /** " + NL + "   * access method for property " + upperCaseBeanName + "." + NL + "*/");
               legacySetter.setElementName("set" + upperCaseBeanName);
               legacySetter.addParameter(new MethodParameter(resolvedSignature, lowerCaseBeanName));
               legacySetter.setSimpleBody("get" + propName + "().setValue(" + lowerCaseBeanName + ");");
@@ -159,8 +160,8 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           }
         }
         if (list.size() > 0) {
-          ValidationRuleMethodOverrideBuilder builder = new ValidationRuleMethodOverrideBuilder(list);
-          builder.setJavaDoc(" /** " + ScoutUtility.NL + "   * list of derived validation rules." + ScoutUtility.NL + "*/");
+          ValidationRuleMethodOverrideBuilder builder = new ValidationRuleMethodOverrideBuilder(list, NL);
+          builder.setJavaDoc(" /** " + NL + "   * list of derived validation rules." + NL + "*/");
           builder.addAnnotation(new AnnotationSourceBuilder("Ljava.lang.Override;"));
           builder.setFlags(Flags.AccProtected);
           builder.setElementName("initValidationRules");
@@ -182,7 +183,8 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
   private static class ValidationRuleMethodOverrideBuilder extends MethodSourceBuilder {
     private final List<ValidationRuleMethod> m_methods;
 
-    public ValidationRuleMethodOverrideBuilder(List<ValidationRuleMethod> methods) {
+    public ValidationRuleMethodOverrideBuilder(List<ValidationRuleMethod> methods, String nl) {
+      super(nl);
       m_methods = methods;
     }
 
@@ -200,14 +202,14 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
             //add javadoc warning
             String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
             buf.append("/**");
-            buf.append(ScoutUtility.NL);
+            buf.append(NL);
             buf.append(" * XXX not processed ValidationRule(" + vm.getRuleName() + ")");
-            buf.append(ScoutUtility.NL);
+            buf.append(NL);
             buf.append(" * generatedSourceCode: ");
             buf.append(generatedSourceCode);
-            buf.append(ScoutUtility.NL);
+            buf.append(NL);
             buf.append(" * at " + fqn);
-            buf.append(ScoutUtility.NL);
+            buf.append(NL);
             buf.append("*/");
             continue;
           }
@@ -221,7 +223,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
             ruleDecl = "\"" + vm.getRuleName() + "\"";
           }
           //
-          buf.append(ScoutUtility.NL);
+          buf.append(NL);
           buf.append("ruleMap.put(");
           buf.append(ruleDecl);
           buf.append(", ");
@@ -259,5 +261,4 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
       return sourceSnippet;
     }
   }
-
 }

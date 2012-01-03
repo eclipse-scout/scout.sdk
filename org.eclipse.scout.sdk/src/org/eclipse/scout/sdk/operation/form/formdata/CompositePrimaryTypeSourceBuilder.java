@@ -81,7 +81,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
         builder.setSuperTypeSignature(superTypeSignature);
         builder.setFlags(Flags.AccPublic | Flags.AccStatic);
         addBuilder(builder, CATEGORY_TYPE_FIELD);
-        MethodSourceBuilder getterBuilder = new MethodSourceBuilder();
+        MethodSourceBuilder getterBuilder = new MethodSourceBuilder(NL);
         getterBuilder.setElementName("get" + formDataElementName);
         getterBuilder.setReturnSignature(Signature.createTypeSignature(formDataElementName, false));
         getterBuilder.setSimpleBody("return getFieldByClass(" + formDataElementName + ".class);");

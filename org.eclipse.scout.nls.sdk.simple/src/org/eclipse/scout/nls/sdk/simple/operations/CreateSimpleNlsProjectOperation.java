@@ -31,6 +31,7 @@ import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
 import org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile.AbstractNlsFile;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 
 public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOperation {
@@ -77,7 +78,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
 
   private byte[] getNlsFileContent() {
     StringBuilder writer = new StringBuilder();
-    writer.append(getNlsFileHeader());
+    writer.append(getNlsFileHeader(NL));
     writer.append(AbstractNlsFile.MANIFEST_CLASS + "=" + getDesc().getPackage() + "." + getDesc().getClassName() + NL);
     return writer.toString().getBytes();
   }
@@ -87,31 +88,31 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     createLanguageFile(null, folder, getDesc().getFileName(), monitor);
   }
 
-  private static final String getNlsClassFileHeader(String translationFileName) {
+  private static final String getNlsClassFileHeader(String translationFileName, String nl) {
     StringBuilder builder = new StringBuilder();
-    builder.append("/**" + NL);
-    builder.append(" * This class provides the NLS support." + NL);
-    builder.append(" */" + NL);
+    builder.append("/**" + nl);
+    builder.append(" * This class provides the NLS support." + nl);
+    builder.append(" */" + nl);
     return builder.toString();
   }
 
-  private static final String getNlsFileHeader() {
+  private static final String getNlsFileHeader(String nl) {
     StringBuilder builder = new StringBuilder();
-    builder.append("################################################" + NL);
-    builder.append("# This file is maintained by the nls editor.   #" + NL);
-    builder.append("# To ensure a properly working nls support     #" + NL);
-    builder.append("# keep this file untouched.                    #" + NL);
-    builder.append("################################################" + NL);
+    builder.append("################################################" + nl);
+    builder.append("# This file is maintained by the nls editor.   #" + nl);
+    builder.append("# To ensure a properly working nls support     #" + nl);
+    builder.append("# keep this file untouched.                    #" + nl);
+    builder.append("################################################" + nl);
     return builder.toString();
   }
 
-  private static final String getTranslationFileHeader() {
+  private static final String getTranslationFileHeader(String nl) {
     StringBuilder builder = new StringBuilder();
-    builder.append("##############################################################" + NL);
-    builder.append("# This file is maintained by the NLS project and should not  #" + NL);
-    builder.append("# be modified directly. Use the NLS Editor to add, remove or #" + NL);
-    builder.append("# change translations.                                       #" + NL);
-    builder.append("##############################################################" + NL);
+    builder.append("##############################################################" + nl);
+    builder.append("# This file is maintained by the NLS project and should not  #" + nl);
+    builder.append("# be modified directly. Use the NLS Editor to add, remove or #" + nl);
+    builder.append("# change translations.                                       #" + nl);
+    builder.append("##############################################################" + nl);
     return builder.toString();
   }
 
@@ -122,7 +123,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     String filename = filePrefix + lang + ".properties";
     IFile file = folder.getFile(filename);
     if (!file.exists()) {
-      file.create(new ByteArrayInputStream(getDefaultMessagesFileContent()), true, monitor);
+      file.create(new ByteArrayInputStream(getDefaultMessagesFileContent(ResourcesUtility.getLineSeparator(folder))), true, monitor);
     }
   }
 
@@ -190,7 +191,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     writer.append(NL);
     writer.append("import java.util.Locale;" + NL);
     writer.append(NL);
-    writer.append(getNlsClassFileHeader(desc.getFileName() + ".nls"));
+    writer.append(getNlsClassFileHeader(desc.getFileName() + ".nls", NL));
     writer.append("public class " + className + " extends ");
     if (parentType != null) {
       writer.append(parentType.getFullyQualifiedName() + " {" + NL);
@@ -220,9 +221,9 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return writer.toString().getBytes();
   }
 
-  private static byte[] getDefaultMessagesFileContent() {
+  private static byte[] getDefaultMessagesFileContent(String nl) {
     StringBuilder writer = new StringBuilder();
-    writer.append(getTranslationFileHeader());
+    writer.append(getTranslationFileHeader(nl));
     return writer.toString().getBytes();
   }
 }

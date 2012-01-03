@@ -95,7 +95,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         final String colSignature = getColumnSignature(column, hierarchy);
         colunmSignatures[i] = colSignature;
         // setter
-        MethodSourceBuilder columnSetter = new MethodSourceBuilder();
+        MethodSourceBuilder columnSetter = new MethodSourceBuilder(NL);
         columnSetter.setElementName("set" + upperColName);
         columnSetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
         columnSetter.addParameter(new MethodParameter(colSignature, methodParameterName));
@@ -103,7 +103,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         addBuilder(columnSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, i, 1, columnSetter));
         // getter
         final String finalColumnName = getColumnConstantName(i, columnIdMap);
-        MethodSourceBuilder columnGetter = new MethodSourceBuilder() {
+        MethodSourceBuilder columnGetter = new MethodSourceBuilder(NL) {
           @Override
           protected String createMethodBody(IImportValidator validator) throws JavaModelException {
             StringBuilder getterBody = new StringBuilder();
@@ -128,7 +128,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
     }
     if (columns.length > 0) {
       // gobal getter
-      MethodSourceBuilder globalGetter = new MethodSourceBuilder() {
+      MethodSourceBuilder globalGetter = new MethodSourceBuilder(NL) {
         @Override
         protected String createMethodBody(IImportValidator validator) {
           StringBuilder builder = new StringBuilder();
@@ -151,7 +151,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       addBuilder(globalGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, globalGetter.getElementName(), globalGetter));
 
       // gobal setter
-      MethodSourceBuilder globalSetter = new MethodSourceBuilder() {
+      MethodSourceBuilder globalSetter = new MethodSourceBuilder(NL) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder builder = new StringBuilder();
@@ -178,7 +178,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       addBuilder(globalSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, globalSetter.getElementName(), globalSetter));
 
       // column count
-      MethodSourceBuilder columnCount = new MethodSourceBuilder();
+      MethodSourceBuilder columnCount = new MethodSourceBuilder(NL);
       columnCount.setElementName("getColumnCount");
       columnCount.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
       columnCount.setReturnSignature(Signature.SIG_INT);

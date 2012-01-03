@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -43,7 +42,10 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
   private boolean m_createDefaultSerialVersionUid;
   private ArrayList<AnnotationSourceBuilder> m_annotations;
 
-  public TypeSourceBuilder() {
+  protected final String NL;
+
+  public TypeSourceBuilder(String nl) {
+    NL = nl;
     m_children = new TreeMap<CompositeObject, ISourceBuilder>();
     m_annotations = new ArrayList<AnnotationSourceBuilder>();
     // default
@@ -61,7 +63,7 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
   public String createSource(IImportValidator validator) throws JavaModelException {
     StringBuilder builder = new StringBuilder();
     for (AnnotationSourceBuilder as : getAnnotations()) {
-      builder.append(as.createSource(validator) + ScoutUtility.NL);
+      builder.append(as.createSource(validator) + NL);
     }
     if (Flags.isPublic(getFlags())) {
       builder.append("public ");
@@ -86,20 +88,20 @@ public class TypeSourceBuilder implements ITypeSourceBuilder {
     if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
       builder.append("extends " + SignatureUtility.getTypeReference(getSuperTypeSignature(), validator) + " ");
     }
-    builder.append("{" + ScoutUtility.NL);
+    builder.append("{" + NL);
     if (isCreateDefaultSerialVersionUid()) {
-      builder.append("private static final long serialVersionUID=1L;" + ScoutUtility.NL + ScoutUtility.NL);
+      builder.append("private static final long serialVersionUID=1L;" + NL + NL);
     }
     if (isCreateDefaultConstructor()) {
-      builder.append("public " + getElementName() + "() {" + ScoutUtility.NL + "}" + ScoutUtility.NL);
+      builder.append("public " + getElementName() + "() {" + NL + "}" + NL);
     }
     ISourceBuilder[] childBuilders = m_children.values().toArray(new ISourceBuilder[m_children.size()]);
     if (childBuilders.length > 0) {
-      builder.append(ScoutUtility.NL);
+      builder.append(NL);
       for (int i = 0; i < childBuilders.length; i++) {
         builder.append(childBuilders[i].createSource(validator));
         if (i < childBuilders.length - 1) {
-          builder.append(ScoutUtility.NL);
+          builder.append(NL);
         }
       }
     }
