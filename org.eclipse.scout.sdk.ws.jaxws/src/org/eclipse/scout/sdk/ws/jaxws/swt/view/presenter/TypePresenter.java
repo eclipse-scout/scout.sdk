@@ -390,6 +390,14 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
   public void setEnabled(boolean enabled) {
     m_button.setEnabled(enabled);
     m_textField.setEnabled(enabled);
+
+    if (enabled) {
+      m_textField.setBackground(null);
+    }
+    else {
+      m_textField.setBackground(JaxWsSdkUtility.getColorLightGray());
+    }
+
     super.setEnabled(enabled);
   }
 

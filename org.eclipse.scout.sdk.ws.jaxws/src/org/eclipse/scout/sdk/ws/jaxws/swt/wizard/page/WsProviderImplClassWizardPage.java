@@ -599,6 +599,12 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       setAuthenticationHandlerInternal(authenticationHandler);
       if (isControlCreated()) {
         m_authenticationHandlerField.setText(authenticationHandler);
+
+        if (isAnnotateImplClass()) {
+          boolean authenticationSet = JaxWsSdkUtility.isProviderAuthenticationSet(authenticationHandler);
+          m_credentialValidationStrategyField.setEnabled(authenticationSet);
+          m_credentialValidationStrategyButton.setEnabled(authenticationSet);
+        }
       }
     }
     finally {

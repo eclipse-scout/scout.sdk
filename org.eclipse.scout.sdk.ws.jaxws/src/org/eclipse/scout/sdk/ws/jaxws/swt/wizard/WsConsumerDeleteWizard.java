@@ -12,16 +12,9 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.wizard;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import javax.wsdl.Definition;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
-import javax.wsdl.extensions.schema.SchemaReference;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
@@ -34,13 +27,16 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsConsumerDeleteOperation;
-import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ResourceSelectionWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.DefinitionBean;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SchemaBean;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 
 public class WsConsumerDeleteWizard extends AbstractWorkspaceWizard {
 
@@ -49,7 +45,6 @@ public class WsConsumerDeleteWizard extends AbstractWorkspaceWizard {
   private IScoutBundle m_bundle;
   private IType m_type;
   private BuildJaxWsBean m_buildJaxWsBean;
-  private Definition m_wsdlDefinition;
 
   private WsConsumerDeleteOperation m_operation;
 
@@ -95,54 +90,34 @@ public class WsConsumerDeleteWizard extends AbstractWorkspaceWizard {
       elements.add(new ElementBean(WsConsumerDeleteOperation.ID_WSDL_FILE, "WSDL file '" + wsdlFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, false));
     }
 
-    IPath wsdlFolderPath = null;
     if (wsdlFile != null) {
-      wsdlFolderPath = wsdlFile.getProjectRelativePath().removeLastSegments(1);
-    }
-
-    // referenced WSDL files
-    if (m_wsdlDefinition != null && wsdlFolderPath != null) {
-      DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, wsdlFolderPath, m_wsdlDefinition);
-      for (DefinitionBean relatedWsdlDefinition : relatedWsdlDefinitions) {
-        IFile file = relatedWsdlDefinition.getFile();
-        if (file != null && file.exists()) {
-          elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_WSDL, "Referenced WSDL file '" + file.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), file, false));
+      Artefact[] artefacts = SchemaUtility.getArtefacts(wsdlFile, false);
+      for (Artefact artefact : artefacts) {
+        // referenced WSDL definitions
+        if (artefact instanceof WsdlArtefact) {
+          WsdlArtefact wsdlArtefact = (WsdlArtefact) artefact;
+          if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+            IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, wsdlArtefact.getFile());
+            if (referencedWsdlFile != null && referencedWsdlFile.exists()) {
+              elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_WSDL, "Referenced WSDL file '" + referencedWsdlFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), referencedWsdlFile, false));
+            }
+          }
         }
-      }
-    }
-    // referenced XSD schemas
-    if (wsdlFile != null && wsdlFile.exists() && wsdlFolderPath != null) {
-      WsdlResource wsdlResource = new WsdlResource(m_bundle);
-      wsdlResource.setFile(wsdlFile);
-
-      SchemaBean[] schemas = JaxWsSdkUtility.getAllSchemas(m_bundle, wsdlResource);
-      for (SchemaBean schemaBean : schemas) {
-        Schema schema = schemaBean.getSchema();
-
-        if (schema == null) {
-          continue;
-        }
-        // included schemas
-        @SuppressWarnings("unchecked")
-        List<SchemaReference> schemaReferences = schema.getIncludes();
-        for (SchemaReference schemaReference : schemaReferences) {
-          String location = schemaReference.getSchemaLocationURI();
-          IFile file = JaxWsSdkUtility.getFile(m_bundle, wsdlFolderPath.append(location).toPortableString(), false);
-          if (file != null && file.exists()) {
-            elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, "Referenced XSD schema '" + file.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), file, false));
+        // imported XSD schemas
+        if (artefact instanceof SchemaImportArtefact) {
+          SchemaImportArtefact schemaArtefact = (SchemaImportArtefact) artefact;
+          IFile importedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
+          if (importedSchemaFile != null && importedSchemaFile.exists()) {
+            elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, "Imported XSD schema '" + importedSchemaFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), importedSchemaFile, false));
           }
         }
 
-        // imported schemas
-        @SuppressWarnings("unchecked")
-        Map<String, List<SchemaImport>> schemaImports = schema.getImports();
-        for (List<SchemaImport> schemaImportList : schemaImports.values()) {
-          for (SchemaImport schemaImport : schemaImportList) {
-            String location = schemaImport.getSchemaLocationURI();
-            IFile file = JaxWsSdkUtility.getFile(m_bundle, wsdlFolderPath.append(location).toPortableString(), false);
-            if (file != null && file.exists()) {
-              elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, "Referenced XSD schema '" + file.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), file, false));
-            }
+        // included XSD schemas
+        if (artefact instanceof SchemaIncludeArtefact) {
+          SchemaIncludeArtefact schemaArtefact = (SchemaIncludeArtefact) artefact;
+          IFile includedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
+          if (includedSchemaFile != null && includedSchemaFile.exists()) {
+            elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, "Included XSD schema '" + includedSchemaFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), includedSchemaFile, false));
           }
         }
       }
@@ -206,13 +181,5 @@ public class WsConsumerDeleteWizard extends AbstractWorkspaceWizard {
 
   public void setBuildJaxWsBean(BuildJaxWsBean buildJaxWsBean) {
     m_buildJaxWsBean = buildJaxWsBean;
-  }
-
-  public Definition getWsdlDefinition() {
-    return m_wsdlDefinition;
-  }
-
-  public void setWsdlDefinition(Definition wsdlDefinition) {
-    m_wsdlDefinition = wsdlDefinition;
   }
 }

@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.ws.jaxws.util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,12 +28,10 @@ import java.util.Set;
 import javax.jws.WebService;
 import javax.wsdl.Binding;
 import javax.wsdl.Definition;
-import javax.wsdl.Import;
 import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
-import javax.wsdl.extensions.schema.Schema;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceClient;
 
@@ -97,9 +95,9 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.operation.OverrideUnimplementedMethodsOperation;
-import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.part.AnnotationProperty;
@@ -160,6 +158,22 @@ public final class JaxWsSdkUtility {
     catch (CoreException e) {
       JaxWsSdk.logWarning("The 'resource '" + resource.getFullPath().toPortableString() + "' could not be synchronized with the filesystem.");
     }
+  }
+
+  public static IFile toFile(IScoutBundle bundle, File file) {
+    if (bundle == null || file == null) {
+      return null;
+    }
+
+    IPath path = new Path(file.getAbsolutePath()).makeRelativeTo(bundle.getProject().getLocation());
+    return JaxWsSdkUtility.getFile(bundle, path.toPortableString(), false);
+  }
+
+  public static File toFile(IFile file) {
+    if (file == null) {
+      return null;
+    }
+    return new File(file.getLocationURI());
   }
 
   public static IFile getFile(IScoutBundle scoutBundle, String path, boolean autoCreate) {
@@ -654,6 +668,15 @@ public final class JaxWsSdkUtility {
       JaxWsSdk.logError("Failed to resolve portType interface type", e);
     }
     return types.toArray(new IType[types.size()]);
+  }
+
+  public static boolean isProviderAuthenticationSet(String fqn) {
+    if (!StringUtility.hasText(fqn)) {
+      return false;
+    }
+    fqn = fqn.replaceAll("\\$", "\\.");
+    String noneAuthFqn = JaxWsRuntimeClasses.NullAuthenticationHandlerProvider.getFullyQualifiedName().replaceAll("\\$", "\\.");
+    return TypeUtility.existsType(fqn) && !fqn.equals(noneAuthFqn);
   }
 
   private static class TypeEntry {
@@ -1316,110 +1339,6 @@ public final class JaxWsSdkUtility {
     return false;
   }
 
-  /**
-   * To get recursively all related WSDL definitions
-   * 
-   * @param bundle
-   * @param definition
-   * @return
-   */
-  public static DefinitionBean[] getRelatedDefinitions(IScoutBundle bundle, IPath wsdlFolderPath, Definition definition) {
-    if (definition == null) {
-      return new DefinitionBean[0];
-    }
-
-    @SuppressWarnings("unchecked")
-    Map<String, List<Import>> imports = definition.getImports();
-    if (imports == null || imports.size() == 0) {
-      return new DefinitionBean[0];
-    }
-
-    List<DefinitionBean> directives = new ArrayList<JaxWsSdkUtility.DefinitionBean>();
-    for (List<Import> importDirectives : imports.values()) {
-      for (Import importDirective : importDirectives) {
-        DefinitionBean bean = new DefinitionBean();
-        bean.setDefinition(importDirective.getDefinition());
-        bean.setNamespaceUri(importDirective.getNamespaceURI());
-        bean.setFile(JaxWsSdkUtility.getFile(bundle, wsdlFolderPath.append(importDirective.getLocationURI()).toPortableString(), false));
-        directives.add(bean);
-
-        // recursively get nested definitions
-        directives.addAll(Arrays.asList(getRelatedDefinitions(bundle, wsdlFolderPath, importDirective.getDefinition())));
-      }
-    }
-
-    return directives.toArray(new DefinitionBean[directives.size()]);
-  }
-
-  /**
-   * Do get the direct schemas of the WSDL file
-   * 
-   * @param definition
-   * @return
-   */
-  public static Schema[] getDirectSchemas(Definition definition) {
-    if (definition == null || definition.getTypes() == null) {
-      return new Schema[0];
-    }
-
-    List<Schema> schemas = new ArrayList<Schema>();
-    for (Object type : definition.getTypes().getExtensibilityElements()) {
-      if (type instanceof Schema) {
-        schemas.add((Schema) type);
-      }
-    }
-    return schemas.toArray(new Schema[schemas.size()]);
-  }
-
-  /**
-   * To get recursively all related schemas
-   * 
-   * @param bundle
-   * @param wsdlResource
-   *          the root WSDL resource
-   * @return
-   */
-  public static SchemaBean[] getAllSchemas(IScoutBundle bundle, WsdlResource wsdlResource) {
-    if (wsdlResource == null) {
-      return new SchemaBean[0];
-    }
-    Definition wsdlDefinition = wsdlResource.loadWsdlDefinition();
-    if (wsdlDefinition == null) {
-      return new SchemaBean[0];
-    }
-
-    List<SchemaBean> schemaBeans = new ArrayList<SchemaBean>();
-
-    // schema of root WSDL file
-    Schema[] directSchemas = getDirectSchemas(wsdlDefinition);
-    for (Schema directSchema : directSchemas) {
-      SchemaBean schemaBean = new SchemaBean();
-      schemaBean.setWsdlFile(wsdlResource.getFile());
-      schemaBean.setRootWsdlFile(true);
-      schemaBean.setSchema(directSchema);
-      schemaBeans.add(schemaBean);
-    }
-
-    // related schemas
-    IFile file = wsdlResource.getFile();
-    IPath wsdlFolderPath = file.getProjectRelativePath().removeLastSegments(1);
-    if (wsdlFolderPath != null) {
-      DefinitionBean[] definitionBeans = getRelatedDefinitions(bundle, wsdlFolderPath, wsdlDefinition);
-      for (DefinitionBean definitionBean : definitionBeans) {
-        directSchemas = getDirectSchemas(definitionBean.getDefinition());
-        for (Schema directSchema : directSchemas) {
-          SchemaBean schemaBean = new SchemaBean();
-          schemaBean.setRootWsdlFile(false);
-          schemaBean.setWsdlFile(definitionBean.getFile());
-          schemaBean.setSchema(directSchema);
-          schemaBeans.add(schemaBean);
-        }
-      }
-    }
-
-    return schemaBeans.toArray(new SchemaBean[schemaBeans.size()]);
-  }
-
   private static String getStubJarFilePath(String jarFileName) {
     if (jarFileName == null) {
       return null;
@@ -1621,76 +1540,6 @@ public final class JaxWsSdkUtility {
 
   public static enum SeparatorType {
     LeadingType, TrailingType, BothType, None;
-  }
-
-  public static class SchemaBean {
-    private IFile m_wsdlFile;
-    private Schema m_schema;
-    private boolean m_rootWsdlFile;
-
-    public IFile getWsdlFile() {
-      return m_wsdlFile;
-    }
-
-    public void setWsdlFile(IFile wsdlFile) {
-      m_wsdlFile = wsdlFile;
-    }
-
-    public Schema getSchema() {
-      return m_schema;
-    }
-
-    public void setSchema(Schema schema) {
-      m_schema = schema;
-    }
-
-    public boolean isRootWsdlFile() {
-      return m_rootWsdlFile;
-    }
-
-    public void setRootWsdlFile(boolean rootWsdlFile) {
-      m_rootWsdlFile = rootWsdlFile;
-    }
-
-    public String getTargetNamespace() {
-      if (m_schema == null) {
-        return null;
-      }
-      if (m_schema.getElement().hasAttribute("targetNamespace")) {
-        return m_schema.getElement().getAttribute("targetNamespace");
-      }
-      return null;
-    }
-  }
-
-  public static class DefinitionBean {
-    private Definition m_definition;
-    private IFile m_file;
-    private String m_namespaceUri;
-
-    public Definition getDefinition() {
-      return m_definition;
-    }
-
-    public void setDefinition(Definition definition) {
-      m_definition = definition;
-    }
-
-    public IFile getFile() {
-      return m_file;
-    }
-
-    public void setFile(IFile file) {
-      m_file = file;
-    }
-
-    public String getNamespaceUri() {
-      return m_namespaceUri;
-    }
-
-    public void setNamespaceUri(String namespaceUri) {
-      m_namespaceUri = namespaceUri;
-    }
   }
 
   private static class JarFileSearchScope implements IJavaSearchScope {

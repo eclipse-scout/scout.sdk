@@ -48,9 +48,12 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsConsumerImplClassWizardP
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsPropertiesExistingWsdlWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsStubWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsdlLocationWizardPage;
+import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper;
+import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper.SchemaCandidate;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SchemaBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
 
 public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
@@ -200,24 +203,24 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
         wsdlResource.setFile(wsdlFile);
 
         // iterate through schemas to create respective binding files
-        SchemaBean[] schemas = JaxWsSdkUtility.getAllSchemas(m_bundle, wsdlResource);
-        for (int i = 0; i < schemas.length; i++) {
-          SchemaBean schema = schemas[i];
+        SchemaCandidate[] schemaCandidates = GlobalBindingRegistrationHelper.getSchemaCandidates(wsdlResource.getFile());
+        for (int i = 0; i < schemaCandidates.length; i++) {
+          SchemaCandidate candidate = schemaCandidates[i];
 
           // schema targetNamespace must only be specified if multiple schemas exist
           String schemaTargetNamespace = null;
-          if (schemas.length > 1) {
-            schemaTargetNamespace = schema.getTargetNamespace();
+          if (schemaCandidates.length > 1) {
+            schemaTargetNamespace = SchemaUtility.getSchemaTargetNamespace(candidate.getSchema());
           }
 
           String bindingFileName = JaxWsSdkUtility.createUniqueBindingFileNamePath(m_bundle, m_alias, schemaTargetNamespace);
-
           BindingFileCreateOperation op = new BindingFileCreateOperation();
           op.setBundle(m_bundle);
           op.setWsdlDestinationFolder(m_wsdlLocationWizardPage.getWsdlFolder());
           op.setSchemaTargetNamespace(schemaTargetNamespace);
-          if (!schema.isRootWsdlFile()) {
-            op.setSchemaDefiningFile(schema.getWsdlFile());
+          if (candidate.getWsdlArtefact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
+            IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, candidate.getWsdlArtefact().getFile());
+            op.setWsdlLocation(referencedWsdlFile);
           }
           op.setProjectRelativeFilePath(new Path(bindingFileName));
           JaxWsSdkUtility.addBuildProperty(buildProperties, JaxWsConstants.OPTION_BINDING_FILE, bindingFileName);

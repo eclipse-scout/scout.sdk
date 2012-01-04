@@ -48,7 +48,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.RefreshAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubGenerationAction;
+import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderDeleteAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
@@ -154,10 +154,10 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
   @Override
   public void prepareMenuAction(AbstractScoutHandler menu) {
     if (menu instanceof WsProviderDeleteAction) {
-      ((WsProviderDeleteAction) menu).init(m_bundle, getSunJaxWsBean(), getBuildJaxWsBean(), getWsdlDefinition());
+      ((WsProviderDeleteAction) menu).init(m_bundle, getSunJaxWsBean(), getBuildJaxWsBean());
     }
-    else if (menu instanceof StubGenerationAction) {
-      ((StubGenerationAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.Provider);
+    else if (menu instanceof StubRebuildAction) {
+      ((StubRebuildAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.Provider);
     }
   }
 
@@ -171,7 +171,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
         getSunJaxWsBean() != null &&
         !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR) &&
         !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)) {
-      actions.add(StubGenerationAction.class);
+      actions.add(StubRebuildAction.class);
     }
 
     return actions.toArray(new Class[actions.size()]);
@@ -486,8 +486,11 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
 
     @Override
     public void changed(String element, int event) {
-      if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_SUNJAXWS_HANDLER_CHANGED || event == EVENT_SUNJAXWS_URL_PATTERN_CHANGED) {
+      if (event == EVENT_SUNJAXWS_HANDLER_CHANGED || event == EVENT_SUNJAXWS_URL_PATTERN_CHANGED) {
         reloadPage(DATA_SUN_JAXWS_ENTRY);
+      }
+      else if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_WSDL_REPLACED) {
+        reloadPage(DATA_SUN_JAXWS_ENTRY | DATA_WSDL_FILE);
       }
       else {
         JaxWsSdk.getDefault().getMarkerQueueManager().queueRequest(WebServiceProviderNodePage.this);

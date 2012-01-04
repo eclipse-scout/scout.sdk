@@ -41,7 +41,7 @@ public class BindingFileCreateOperation implements IOperation {
 
   private IScoutBundle m_bundle;
   private IPath m_projectRelativeFilePath;
-  private IFile m_schemaDefiningFile;
+  private IFile m_wsdlLocation;
   private String m_schemaTargetNamespace;
   private boolean m_createGlobalBindingSection;
   private IFolder m_wsdlDestinationFolder;
@@ -63,7 +63,7 @@ public class BindingFileCreateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IFile file = JaxWsSdkUtility.getFile(m_bundle, m_projectRelativeFilePath.toPortableString(), true);
+    IFile bindingFile = JaxWsSdkUtility.getFile(m_bundle, m_projectRelativeFilePath.toPortableString(), true);
 
     ScoutXmlDocument xmlDocument = new ScoutXmlDocument();
 
@@ -81,9 +81,9 @@ public class BindingFileCreateOperation implements IOperation {
     rootXml.setNamespace("xjc", "http://java.sun.com/xml/ns/jaxb/xjc");
     rootXml.setName("jaxws:bindings");
     rootXml.setAttribute("version", "2.0");
-    if (m_schemaDefiningFile != null) {
-      IPath relativeWsdlFolderPath = m_wsdlDestinationFolder.getProjectRelativePath().makeRelativeTo(JaxWsSdkUtility.getParentFolder(m_bundle, file).getProjectRelativePath());
-      rootXml.setAttribute("wsdlLocation", JaxWsSdkUtility.normalizePath(relativeWsdlFolderPath.toPortableString(), SeparatorType.TrailingType) + m_schemaDefiningFile.getName());
+    if (m_wsdlLocation != null) {
+      IPath relativeWsdlFolderPath = m_wsdlDestinationFolder.getProjectRelativePath().makeRelativeTo(JaxWsSdkUtility.getParentFolder(m_bundle, bindingFile).getProjectRelativePath());
+      rootXml.setAttribute("wsdlLocation", JaxWsSdkUtility.normalizePath(relativeWsdlFolderPath.toPortableString(), SeparatorType.TrailingType) + m_wsdlLocation.getName());
     }
     if (StringUtility.hasText(m_schemaTargetNamespace)) {
       rootXml.setAttribute("node", "wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='" + m_schemaTargetNamespace + "']");
@@ -133,7 +133,7 @@ public class BindingFileCreateOperation implements IOperation {
     try {
       xmlDocument.write(os);
       InputStream is = new ByteArrayInputStream(os.toByteArray());
-      file.setContents(is, true, false, monitor);
+      bindingFile.setContents(is, true, false, monitor);
     }
     catch (IOException e) {
       throw new CoreException(new ScoutStatus(IStatus.ERROR, "could not create binding file.", e));
@@ -161,12 +161,12 @@ public class BindingFileCreateOperation implements IOperation {
     m_projectRelativeFilePath = projectRelativeFilePath;
   }
 
-  public IFile getSchemaDefiningFile() {
-    return m_schemaDefiningFile;
+  public IFile getWsdlLocation() {
+    return m_wsdlLocation;
   }
 
-  public void setSchemaDefiningFile(IFile schemaDefiningFile) {
-    m_schemaDefiningFile = schemaDefiningFile;
+  public void setWsdlLocation(IFile wsdlLocation) {
+    m_wsdlLocation = wsdlLocation;
   }
 
   public String getSchemaTargetNamespace() {

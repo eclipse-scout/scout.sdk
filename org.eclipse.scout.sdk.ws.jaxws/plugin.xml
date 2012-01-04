@@ -162,7 +162,7 @@
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.RefreshAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.StubGenerationAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.TypeOpenAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsConsumerDeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderDeleteAction"></contextMenu>

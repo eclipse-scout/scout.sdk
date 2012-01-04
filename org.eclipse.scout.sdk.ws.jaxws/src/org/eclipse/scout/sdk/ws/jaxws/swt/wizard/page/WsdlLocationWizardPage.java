@@ -20,12 +20,8 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -35,10 +31,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.wsdl.Definition;
-import javax.wsdl.Import;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
-import javax.wsdl.extensions.schema.SchemaReference;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
@@ -51,6 +43,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.IOUtility;
@@ -71,6 +64,11 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.AdditionalResourcesWizard;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -190,9 +188,9 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
           setPath(path);
 
           // help the user by determing the referenced files
-          File[] referencedFiles = getReferencedFiles(new Path(path).toFile());
-          if (referencedFiles.length > 0) {
-            P_ReferencedFilesFoundWizard wizard = new P_ReferencedFilesFoundWizard(referencedFiles);
+          Artefact[] artefacts = SchemaUtility.getArtefacts(new Path(path).toFile(), false);
+          if (artefacts.length > 0) {
+            P_ReferencedFilesFoundWizard wizard = new P_ReferencedFilesFoundWizard(artefacts);
             ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
             wizardDialog.setPageSize(450, 350);
             wizardDialog.open();
@@ -695,110 +693,6 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     m_wsdlFolderVisible = wsdlFolderVisible;
   }
 
-  /**
-   * To get the files referenced by the given WSDL file
-   * 
-   * @param wsdlFile
-   * @return
-   */
-  private File[] getReferencedFiles(File wsdlFile) {
-    Set<File> files = new HashSet<File>();
-    try {
-      if (wsdlFile == null || !wsdlFile.exists()) {
-        return new File[0];
-      }
-
-      IPath basePath = new Path(wsdlFile.getParentFile().getPath());
-
-      Definition wsdlDefinition = loadWsdlDefinition(wsdlFile);
-      if (wsdlDefinition == null) {
-        return new File[0];
-      }
-
-      // referenced WSDL files
-      IPath[] importedFiles = getImportedFiles(basePath, wsdlDefinition);
-      for (IPath path : importedFiles) {
-        files.add(path.toFile());
-      }
-      // referenced XSD schemas
-      Schema[] schemas = getAllSchemas(basePath, wsdlDefinition);
-      for (Schema schema : schemas) {
-        // included schemas
-        @SuppressWarnings("unchecked")
-        List<SchemaReference> schemaReferences = schema.getIncludes();
-        for (SchemaReference schemaReference : schemaReferences) {
-          String location = schemaReference.getSchemaLocationURI();
-          IPath path = basePath.append(new Path(location));
-          files.add(path.toFile());
-        }
-
-        // imported schemas
-        @SuppressWarnings("unchecked")
-        Map<String, List<SchemaImport>> schemaImports = schema.getImports();
-        for (List<SchemaImport> schemaImportList : schemaImports.values()) {
-          for (SchemaImport schemaImport : schemaImportList) {
-            String location = schemaImport.getSchemaLocationURI();
-            IPath path = basePath.append(new Path(location));
-            files.add(path.toFile());
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError(e);
-    }
-    return files.toArray(new File[files.size()]);
-  }
-
-  private static IPath[] getImportedFiles(IPath basePath, Definition definition) {
-    if (definition == null) {
-      return new IPath[0];
-    }
-
-    @SuppressWarnings("unchecked")
-    Map<String, List<Import>> imports = definition.getImports();
-    if (imports == null || imports.size() == 0) {
-      return new IPath[0];
-    }
-
-    Set<IPath> paths = new HashSet<IPath>();
-    for (List<Import> importDirectives : imports.values()) {
-      for (Import importDirective : importDirectives) {
-        paths.add(basePath.append(new Path(importDirective.getLocationURI())));
-        // recursively get nested definitions
-        paths.addAll(Arrays.asList(getImportedFiles(basePath, importDirective.getDefinition())));
-      }
-    }
-
-    return paths.toArray(new IPath[paths.size()]);
-  }
-
-  private Schema[] getAllSchemas(IPath basePath, Definition wsdlDefinition) {
-    if (wsdlDefinition == null) {
-      return new Schema[0];
-    }
-    List<Schema> schemas = new ArrayList<Schema>();
-
-    // schema of root WSDL file
-    Schema[] directSchemas = JaxWsSdkUtility.getDirectSchemas(wsdlDefinition);
-    for (Schema directSchema : directSchemas) {
-      schemas.add(directSchema);
-    }
-
-    // related schemas
-    IPath[] importedFiles = getImportedFiles(basePath, wsdlDefinition);
-    for (IPath relatedDefinitionPath : importedFiles) {
-      Definition relatedDefinition = loadWsdlDefinition(relatedDefinitionPath.toFile());
-
-      directSchemas = JaxWsSdkUtility.getDirectSchemas(relatedDefinition);
-      for (Schema directSchema : directSchemas) {
-        schemas.add(directSchema);
-      }
-    }
-
-    return schemas.toArray(new Schema[schemas.size()]);
-  }
-
   private class P_DummyTrustManager implements X509TrustManager {
 
     @Override
@@ -826,11 +720,11 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
   private class P_ReferencedFilesFoundWizard extends AbstractWorkspaceWizard {
 
     private ResourceSelectionWizardPage m_wizardPage;
-    private File[] m_candidatesFiles;
+    private Artefact[] m_artefacts;
 
-    public P_ReferencedFilesFoundWizard(File[] candidatesFiles) {
+    public P_ReferencedFilesFoundWizard(Artefact[] artefacts) {
       setWindowTitle(Texts.get("ReferencedFilesFound"));
-      m_candidatesFiles = candidatesFiles;
+      m_artefacts = artefacts;
     }
 
     @Override
@@ -838,9 +732,25 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       m_wizardPage = new ResourceSelectionWizardPage(Texts.get("ReferencedFilesFound"), Texts.get("QuestionReferencedFilesFound"));
 
       List<ElementBean> elements = new ArrayList<ElementBean>();
-      for (File candidateFile : m_candidatesFiles) {
-        ElementBean elementBean = new ElementBean(0, candidateFile.getAbsolutePath(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), false);
-        elementBean.setData(candidateFile);
+      for (Artefact artefact : m_artefacts) {
+        String suffix = null;
+        ImageDescriptor imageDescriptor = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.File);
+        if (artefact instanceof WsdlArtefact) {
+          suffix = " (referenced WSDL file)";
+          imageDescriptor = JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile);
+        }
+        else if (artefact instanceof SchemaIncludeArtefact) {
+          suffix = " (included XSD schema)";
+          imageDescriptor = JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema);
+
+        }
+        else if (artefact instanceof SchemaImportArtefact) {
+          suffix = " (imported XSD schema)";
+          imageDescriptor = JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema);
+        }
+
+        ElementBean elementBean = new ElementBean(0, artefact.getFile().getAbsoluteFile().getAbsolutePath() + suffix, imageDescriptor, false);
+        elementBean.setData(artefact.getFile());
         elements.add(elementBean);
       }
       m_wizardPage.setElements(elements);

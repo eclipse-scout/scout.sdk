@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -30,6 +31,7 @@ import org.eclipse.scout.sdk.ws.jaxws.operation.WsStubGenerationOperation;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
+import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsdlLocationWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
@@ -38,6 +40,7 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
 
   private IScoutBundle m_bundle;
   private BuildJaxWsBean m_buildJaxWsBean;
+  private SunJaxWsBean m_sunJaxWsBean;
   private String m_wsdlFileName;
 
   private WsdlLocationWizardPage m_wsdlLocationWizardPage;
@@ -46,20 +49,41 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
   private WsStubGenerationOperation m_stubGenerationOperation;
   private IFolder m_wsdlFolder;
 
-  public WsdlLocationWizard(IScoutBundle bundle, BuildJaxWsBean buildJaxWsBean) {
+  /**
+   * @param bundle
+   * @param buildJaxWsBean
+   * @param sunJaxWsBean
+   *          is only used by webservice providers
+   * @param oldWsdlFolder
+   */
+  public WsdlLocationWizard(IScoutBundle bundle, BuildJaxWsBean buildJaxWsBean, SunJaxWsBean sunJaxWsBean) {
     m_bundle = bundle;
     m_copyOperations = new ExternalFileCopyOperation[0];
     m_buildJaxWsBean = buildJaxWsBean;
+    m_sunJaxWsBean = sunJaxWsBean;
     setWindowTitle(Texts.get("BrowseForWsdlFile"));
   }
 
   @Override
   public void addPages() {
+    IFolder oldWsdlFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false);
+    String wsdlLocation = null;
+    if (m_sunJaxWsBean != null) {
+      wsdlLocation = m_sunJaxWsBean.getWsdl();
+    }
+    else {
+      wsdlLocation = m_buildJaxWsBean.getWsdl();
+    }
+
+    if (StringUtility.hasText(wsdlLocation)) {
+      oldWsdlFolder = JaxWsSdkUtility.getParentFolder(m_bundle, JaxWsSdkUtility.getFile(m_bundle, wsdlLocation, false));
+    }
+
     m_wsdlLocationWizardPage = new WsdlLocationWizardPage(m_bundle);
     m_wsdlLocationWizardPage.setRebuildStubOptionVisible(true);
     m_wsdlLocationWizardPage.setRebuildStub(true);
     m_wsdlLocationWizardPage.setWsdlFolderVisible(true);
-    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
+    m_wsdlLocationWizardPage.setWsdlFolder(oldWsdlFolder); // initial value
     addPage(m_wsdlLocationWizardPage);
   }
 
@@ -110,9 +134,16 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
       op.run(monitor, workingCopyManager);
     }
 
-    // update entry in BuildJaxWs.xml
-    m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlFolder.getProjectRelativePath().append(m_wsdlFileName).toPortableString(), SeparatorType.None));
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
+    if (m_sunJaxWsBean != null) { // webservice provider
+      // update entry in sunJaxWs.xml
+      m_sunJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlFolder.getProjectRelativePath().append(m_wsdlFileName).toPortableString(), SeparatorType.None));
+      ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
+    }
+    else { // webservice consumer
+      // update entry in buildJaxWs.xml
+      m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlFolder.getProjectRelativePath().append(m_wsdlFileName).toPortableString(), SeparatorType.None));
+      ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
+    }
 
     if (m_stubGenerationOperation != null) {
       m_stubGenerationOperation.run(monitor, workingCopyManager);

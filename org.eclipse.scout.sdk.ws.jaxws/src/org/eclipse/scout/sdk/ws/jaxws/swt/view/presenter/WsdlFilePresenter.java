@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
+import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.WsdlLocationWizard;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -22,6 +23,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class WsdlFilePresenter extends FilePresenter {
 
   private BuildJaxWsBean m_buildJaxWsBean;
+  private SunJaxWsBean m_sunJaxWsBean;
 
   public WsdlFilePresenter(Composite parent, FormToolkit toolkit) {
     super(parent, toolkit);
@@ -34,7 +36,7 @@ public class WsdlFilePresenter extends FilePresenter {
   @Override
   protected IFile execBrowseAction() {
     // browse for WSDL file or create new one
-    WsdlLocationWizard wizard = new WsdlLocationWizard(m_bundle, m_buildJaxWsBean);
+    WsdlLocationWizard wizard = new WsdlLocationWizard(m_bundle, m_buildJaxWsBean, m_sunJaxWsBean);
     ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
     wizardDialog.setPageSize(650, 350);
     wizardDialog.open();
@@ -48,5 +50,18 @@ public class WsdlFilePresenter extends FilePresenter {
 
   public void setBuildJaxWsBean(BuildJaxWsBean buildJaxWsBean) {
     m_buildJaxWsBean = buildJaxWsBean;
+  }
+
+  public SunJaxWsBean getSunJaxWsBean() {
+    return m_sunJaxWsBean;
+  }
+
+  /**
+   * Used by providers
+   * 
+   * @param sunJaxWsBean
+   */
+  public void setSunJaxWsBean(SunJaxWsBean sunJaxWsBean) {
+    m_sunJaxWsBean = sunJaxWsBean;
   }
 }

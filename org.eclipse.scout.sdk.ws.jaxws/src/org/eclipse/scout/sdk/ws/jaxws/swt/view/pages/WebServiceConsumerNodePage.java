@@ -44,7 +44,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.RefreshAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubGenerationAction;
+import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.WsConsumerDeleteAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
@@ -144,7 +144,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     if (getBuildJaxWsBean() != null &&
         !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR) &&
         !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)) {
-      list.add(StubGenerationAction.class);
+      list.add(StubRebuildAction.class);
     }
     list.add(RefreshAction.class);
     list.add(WsConsumerDeleteAction.class);
@@ -155,10 +155,10 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
   public void prepareMenuAction(AbstractScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof WsConsumerDeleteAction) {
-      ((WsConsumerDeleteAction) menu).init(m_bundle, getType(), getBuildJaxWsBean(), getWsdlDefinition());
+      ((WsConsumerDeleteAction) menu).init(m_bundle, getType(), getBuildJaxWsBean());
     }
-    else if (menu instanceof StubGenerationAction) {
-      ((StubGenerationAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.Consumer);
+    else if (menu instanceof StubRebuildAction) {
+      ((StubRebuildAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.Consumer);
     }
   }
 

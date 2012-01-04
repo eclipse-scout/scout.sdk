@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -19,7 +19,11 @@ public abstract class AbstractLinkAction extends AbstractScoutHandler implements
   private String m_linkText;
 
   public AbstractLinkAction(String menuText, ImageDescriptor icon) {
-    super(menuText, icon, null, false, Category.WS);
+    this(menuText, icon, null);
+  }
+
+  public AbstractLinkAction(String menuText, ImageDescriptor icon, String keyStroke) {
+    super(menuText, icon, keyStroke, false, Category.WS);
   }
 
   @Override

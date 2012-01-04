@@ -12,14 +12,10 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import javax.wsdl.Binding;
 import javax.wsdl.Definition;
 import javax.wsdl.PortType;
-import javax.wsdl.extensions.schema.Schema;
-import javax.wsdl.extensions.schema.SchemaImport;
-import javax.wsdl.extensions.schema.SchemaReference;
 import javax.xml.namespace.QName;
 
 import org.eclipse.core.resources.IFile;
@@ -55,7 +51,7 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.action.BuildPropertiesEditAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction.FileExtensionType;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubGenerationAction;
+import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.TypeOpenAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
@@ -73,8 +69,12 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFilePresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFolderPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.DefinitionBean;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SchemaBean;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPresenterValueChangedListener;
@@ -90,7 +90,8 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
   public static final String SECTION_ID_STUB_PROPERTIES = "section.jaxws.build";
   public static final String SECTION_ID_LINKS = "section.jaxws.links";
   public static final String SECTION_ID_LINKS_REF_WSDLS = "section.jaxws.links.ref.wsdl";
-  public static final String SECTION_ID_LINKS_REF_SCHEMAS = "section.jaxws.links.ref.schema";
+  public static final String SECTION_ID_LINKS_INCLUDED_SCHEMAS = "section.jaxws.links.included.schema";
+  public static final String SECTION_ID_LINKS_IMPORTED_SCHEMAS = "section.jaxws.links.imported.schema";
   public static final String SECTION_ID_SCOUT_WEB_SERVICE_ANNOTATION = "section.scoutWebServiceAnnotation";
 
   public static final int PRESENTER_ID_SESSION_FACTORY = 1 << 1;
@@ -172,10 +173,17 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       getSection(SECTION_ID_LINKS_REF_WSDLS).setExpanded(false);
 
       /*
-       * link section (imported / included XSD schemas)
+       * link section (imported XSD schemas)
        */
-      createSection(SECTION_ID_LINKS_REF_SCHEMAS, Texts.get("ImportedIncludedXsdSchemas"));
-      getSection(SECTION_ID_LINKS_REF_SCHEMAS).setExpanded(false);
+      createSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS, Texts.get("ImportedXsdSchemas"));
+      getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).setExpanded(false);
+
+      /*
+       * link section (included XSD schemas)
+       */
+      createSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS, Texts.get("IncludedXsdSchemas"));
+      getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).setExpanded(false);
+
       createQuickLinkPresentersForReferencedFiles();
 
       if (getPage().getBuildJaxWsBean() == null) {
@@ -187,7 +195,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
        */
       createSection(SECTION_ID_STUB_PROPERTIES, Texts.get("StubProperties"));
 
-      StubGenerationAction b = new StubGenerationAction();
+      StubRebuildAction b = new StubRebuildAction();
       b.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.Provider);
       m_rebuildStubPresenter = new ActionPresenter(getSection(SECTION_ID_STUB_PROPERTIES).getSectionClient(), b, getFormToolkit());
       applyLayoutData(m_rebuildStubPresenter);
@@ -455,6 +463,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
     // WSDL file
     m_wsdlFilePresenter.setInput(wsdlFile);
     m_wsdlFilePresenter.setBuildJaxWsBean(buildJaxWsBean);
+    m_wsdlFilePresenter.setSunJaxWsBean(sunJaxWsBean);
 
     m_stubJarFilePresenter.setInput(stubJarFile);
     m_stubFolderPresenter.setInput(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.STUB_FOLDER, false));
@@ -488,6 +497,8 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
     validateRebuildStubPresenter();
 
     getSection(SECTION_ID_REPAIR).setVisible(JaxWsSdk.getDefault().containsMarkerCommands(getPage().getMarkerGroupUUID()));
+
+    controlView();
   }
 
   private void createQuickLinkPresenters() {
@@ -540,82 +551,50 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
   private void createQuickLinkPresentersForReferencedFiles() {
     getForm().setRedraw(false);
     try {
-      /*
-       * referenced WSDL definitions
-       */
       JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient());
+      JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient());
+      JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient());
 
-      Definition wsdlDefinition = getPage().getWsdlDefinition();
       WsdlResource wsdlResource = getPage().getWsdlResource();
-      if (wsdlDefinition != null && wsdlResource != null && wsdlResource.getFile() != null) {
-        IPath wsdlFolderPath = wsdlResource.getFile().getProjectRelativePath().removeLastSegments(1);
+      Artefact[] artefacts = SchemaUtility.getArtefacts(wsdlResource.getFile(), false);
 
-        DefinitionBean[] relatedWsdlDefinitions = JaxWsSdkUtility.getRelatedDefinitions(m_bundle, wsdlFolderPath, wsdlDefinition);
-        for (DefinitionBean relatedWsdlDefinition : relatedWsdlDefinitions) {
-          IFile file = relatedWsdlDefinition.getFile();
-          FileOpenAction a = new FileOpenAction();
-          a.init(file, file.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
+      for (Artefact artefact : artefacts) {
+        // referenced WSDL definitions
+        if (artefact instanceof WsdlArtefact) {
+          WsdlArtefact wsdlArtefact = (WsdlArtefact) artefact;
+          if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+            IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, wsdlArtefact.getFile());
+            FileOpenAction action = new FileOpenAction();
+            action.init(referencedWsdlFile, referencedWsdlFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
 
-          String namespace = StringUtility.nvl(relatedWsdlDefinition.getNamespaceUri(), "?");
-          a.setToolTip("namespace: " + namespace);
-
-          ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient(), a, getFormToolkit());
-          actionPresenter.setEnabled(file.exists());
-          applyLayoutData(actionPresenter);
-        }
-      }
-
-      /*
-       * referenced XSD schemas
-       */
-      JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_REF_SCHEMAS).getSectionClient());
-
-      if (wsdlResource != null) {
-        SchemaBean[] schemas = JaxWsSdkUtility.getAllSchemas(m_bundle, wsdlResource);
-        for (SchemaBean schemaBean : schemas) {
-          Schema schema = schemaBean.getSchema();
-
-          if (schema == null) {
-            continue;
-          }
-          // add included schemas
-          @SuppressWarnings("unchecked")
-          List<SchemaReference> schemaReferences = schema.getIncludes();
-          for (SchemaReference schemaReference : schemaReferences) {
-            String location = schemaReference.getSchemaLocationURI();
-            IFile file = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, location, false);
-
-            // action
-            FileOpenAction b = new FileOpenAction();
-            b.init(file, file.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
-            String targetNamespace = null;
-            if (schema.getElement().hasAttribute("targetNamespace")) {
-              targetNamespace = schema.getElement().getAttribute("targetNamespace");
-            }
-            b.setToolTip("targetNamespace: " + StringUtility.nvl(targetNamespace, "?") + " (included schema)");
-
-            // presenter
-            ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_SCHEMAS).getSectionClient(), b, getFormToolkit());
-            actionPresenter.setEnabled(file.exists());
+            ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient(), action, getFormToolkit());
+            actionPresenter.setEnabled(referencedWsdlFile.exists());
             applyLayoutData(actionPresenter);
           }
+        }
+        // imported XSD schemas
+        if (artefact instanceof SchemaImportArtefact) {
+          SchemaImportArtefact schemaArtefact = (SchemaImportArtefact) artefact;
+          IFile importedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
 
-          // add imported schemas
-          @SuppressWarnings("unchecked")
-          Map<String, List<SchemaImport>> schemaImports = schema.getImports();
-          for (List<SchemaImport> schemaImportList : schemaImports.values()) {
-            for (SchemaImport schemaImport : schemaImportList) {
-              String location = schemaImport.getSchemaLocationURI();
-              IFile file = JaxWsSdkUtility.getFile(m_bundle, JaxWsConstants.PATH_WSDL, location, false);
+          FileOpenAction b = new FileOpenAction();
+          b.init(importedSchemaFile, importedSchemaFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          b.setToolTip("namespace: " + StringUtility.nvl(schemaArtefact.getNamespaceUri(), "?"));
+          ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient(), b, getFormToolkit());
+          actionPresenter.setEnabled(importedSchemaFile.exists());
+          applyLayoutData(actionPresenter);
+        }
 
-              FileOpenAction c = new FileOpenAction();
-              c.init(file, file.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
-              c.setToolTip("namespace: " + StringUtility.nvl(schemaImport.getNamespaceURI(), "?") + " (imported schema)");
-              ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_SCHEMAS).getSectionClient(), c, getFormToolkit());
-              actionPresenter.setEnabled(file.exists());
-              applyLayoutData(actionPresenter);
-            }
-          }
+        // included XSD schemas
+        if (artefact instanceof SchemaIncludeArtefact) {
+          SchemaIncludeArtefact schemaArtefact = (SchemaIncludeArtefact) artefact;
+          IFile includedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
+
+          FileOpenAction b = new FileOpenAction();
+          b.init(includedSchemaFile, includedSchemaFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient(), b, getFormToolkit());
+          actionPresenter.setEnabled(includedSchemaFile.exists());
+          applyLayoutData(actionPresenter);
         }
       }
     }
@@ -628,8 +607,11 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       getSection(SECTION_ID_LINKS_REF_WSDLS).setVisible(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient().getChildren().length > 0);
       JaxWsSdkUtility.doLayoutSection(getSection(SECTION_ID_LINKS_REF_WSDLS));
 
-      getSection(SECTION_ID_LINKS_REF_SCHEMAS).setVisible(getSection(SECTION_ID_LINKS_REF_SCHEMAS).getSectionClient().getChildren().length > 0);
-      JaxWsSdkUtility.doLayoutSection(getSection(SECTION_ID_LINKS_REF_SCHEMAS));
+      getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).setVisible(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient().getChildren().length > 0);
+      JaxWsSdkUtility.doLayoutSection(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS));
+
+      getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).setVisible(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient().getChildren().length > 0);
+      JaxWsSdkUtility.doLayoutSection(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS));
     }
   }
 
@@ -739,10 +721,15 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
     m_rebuildStubPresenter.setEnabled(valid);
 
     if (valid) {
-      StubGenerationAction action = new StubGenerationAction();
+      StubRebuildAction action = new StubRebuildAction();
       action.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.Provider);
       m_rebuildStubPresenter.setAction(action);
     }
+  }
+
+  private void controlView() {
+    // enable / disable credential validation strategy presenter
+    m_credentialValidationStrategyPresenter.setEnabled(JaxWsSdkUtility.isProviderAuthenticationSet(m_authenticationHandlerPresenter.getValue()));
   }
 
   private final class P_PresenterListener implements IPresenterValueChangedListener {
@@ -769,6 +756,9 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
                 break;
               case PRESENTER_ID_AUTHENTICATION_HANDLER:
                 op.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, factoryType);
+                if (!JaxWsSdkUtility.isProviderAuthenticationSet(factoryFullyQualifiedName)) {
+                  op.removeProperty(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY);
+                }
                 break;
               case PRESENTER_ID_CREDENTIAL_VALIDATION_STRATEGY:
                 op.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY, factoryType);
@@ -843,6 +833,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
           }
 
           validateRebuildStubPresenter();
+          controlView();
         }
       });
     }

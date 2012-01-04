@@ -16,6 +16,7 @@ import java.io.StringWriter;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -36,7 +37,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-public class StubGenerationAction extends AbstractLinkAction {
+public class StubRebuildAction extends AbstractLinkAction {
 
   private IScoutBundle m_bundle;
   private WsdlResource m_wsdlResource;
@@ -44,7 +45,7 @@ public class StubGenerationAction extends AbstractLinkAction {
   private WebserviceEnum m_webserviceEnum;
   private BuildJaxWsBean m_buildJaxWsBean;
 
-  public StubGenerationAction() {
+  public StubRebuildAction() {
     super(Texts.get("RebuildWebserviceStub"), JaxWsSdk.getImageDescriptor(JaxWsIcons.RebuildWsStub));
     setLinkText(Texts.get("RebuildWebserviceStub"));
     setToolTip(Texts.get("ClickToGenerateWsStub"));
@@ -68,7 +69,11 @@ public class StubGenerationAction extends AbstractLinkAction {
     op.setProperties(m_buildJaxWsBean.getPropertiers());
     op.addOperationFinishedListener(new P_OperationFinishedListener());
     op.setWsdlFileName(m_wsdlResource.getFile().getName());
-    new OperationJob(op).schedule();
+    OperationJob job = new OperationJob(op);
+    job.setSystem(false);
+    job.setUser(false);
+    job.setPriority(Job.INTERACTIVE);
+    job.schedule();
     return null;
   }
 

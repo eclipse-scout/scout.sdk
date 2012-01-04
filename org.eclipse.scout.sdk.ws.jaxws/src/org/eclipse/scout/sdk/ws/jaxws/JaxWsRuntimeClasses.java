@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -37,6 +37,7 @@ public final class JaxWsRuntimeClasses {
   public static final IType BasicAuthenticationHandlerProvider = TypeUtility.getType("org.eclipse.scout.jaxws.security.provider.BasicAuthenticationHandler");
   public static final IType BasicAuthenticationHandlerConsumer = TypeUtility.getType("org.eclipse.scout.jaxws.security.consumer.BasicAuthenticationHandler");
   public static final IType NullAuthenticationHandlerConsumer = TypeUtility.getType("org.eclipse.scout.jaxws.security.consumer.IAuthenticationHandler$NONE");
+  public static final IType NullAuthenticationHandlerProvider = TypeUtility.getType("org.eclipse.scout.jaxws.security.provider.IAuthenticationHandler$NONE");
   public static final IType ConfigIniCredentialValidationStrategy = TypeUtility.getType("org.eclipse.scout.jaxws.security.provider.ConfigIniCredentialValidationStrategy");
 
   public static final IType JaxWsStubGenerator = TypeUtility.getType("org.eclipse.scout.jaxws.tool.JaxWsStubGenerator");
