@@ -109,10 +109,8 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
   @Override
   public void commitChanges(IProgressMonitor monitor) {
     synchronized (m_file) {
-
       if (!m_file.exists()) {
         NlsCore.logError("File: " + m_file.getName() + " not found!");
-        // return new Status(IStatus.WARNING, NlsCore.PLUGIN_ID, IStatus.OK, "File: " + m_file.getName() + " not found!", null);
       }
 
       Properties prop = new Properties();
@@ -132,22 +130,22 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
 
         Arrays.sort(lines);
 
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder builder = new StringBuilder();
         for (; i < lines.length; i++) {
-          buffer.append(lines[i] + NL);
+          // remove all newline characters because java.lang.Properties class uses OS dependent line delimiters.
+          // but we would like to use project dependent line delimiters -> remove all first, add project dependent delimiter afterwards.
+          builder.append(lines[i].replace("\n", "").replace("\r", ""));
+          builder.append(NL);
         }
 
-        m_file.setContents(new ByteArrayInputStream(buffer.toString().getBytes()), IFile.KEEP_HISTORY, monitor);
+        m_file.setContents(new ByteArrayInputStream(builder.toString().getBytes()), IFile.KEEP_HISTORY, monitor);
         m_file.refreshLocal(IResource.DEPTH_ONE, monitor);
-        // return Status.OK_STATUS;
       }
       catch (IOException e1) {
         NlsCore.logError("could not refresh file: " + m_file.getName());
-        // return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, IStatus.OK, "could not refresh file: " + m_file.getName(), null);
       }
       catch (CoreException e1) {
         NlsCore.logError("could not refresh file: " + m_file.getName());
-        // return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, IStatus.OK, "could not refresh file: " + m_file.getName(), null);
       }
     }
   }
