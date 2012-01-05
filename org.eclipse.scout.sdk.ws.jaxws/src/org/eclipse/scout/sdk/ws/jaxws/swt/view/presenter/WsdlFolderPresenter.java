@@ -37,13 +37,26 @@ public class WsdlFolderPresenter extends FolderPresenter {
   }
 
   @Override
+  protected String getConfiguredBrowseButtonLabel() {
+    return Texts.get("Change");
+  }
+
+  @Override
   protected IFolder execBrowseAction() {
+    IFolder rootFolder = null;
+    if (m_webserviceEnum == WebserviceEnum.Provider) {
+      rootFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, true);
+    }
+    else {
+      rootFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_CONSUMER, true);
+    }
+
     IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
         m_bundle,
-        new WsdlFolderViewerFilter(m_bundle),
+        new WsdlFolderViewerFilter(m_bundle, rootFolder),
         Texts.get("MovingFiles"),
         Texts.get("MoveWsdlFileAndArtefacts"),
-        JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, true), // root folder
+        rootFolder,
         getValue());
     if (folder != null && (getValue() == null || !folder.getProjectRelativePath().equals(getValue().getProjectRelativePath()))) {
       WsFileMoveWizard wizard = new WsFileMoveWizard();

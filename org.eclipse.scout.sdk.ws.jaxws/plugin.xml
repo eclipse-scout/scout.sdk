@@ -81,6 +81,12 @@
       <super type="org.eclipse.scout.sdk.ws.jaxws.jaxws" />
    </extension>
    <extension
+      id="wsdlFolder"
+      name="wsdlFolder"
+      point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.scout.sdk.ws.jaxws.jaxws" />
+   </extension>
+   <extension
       id="bindingFile"
       name="bindingFile"
       point="org.eclipse.core.resources.markers">

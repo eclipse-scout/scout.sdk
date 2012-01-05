@@ -117,9 +117,9 @@ public class WebServiceConsumerTablePage extends AbstractPage {
     @Override
     public void handleEvent(int eventType, IType type) {
       switch (eventType) {
+        // important: ignore CHANGE events to exclude marker updates
         case POST_TYPE_REMOVING:
         case POST_TYPE_ADDING:
-        case POST_TYPE_CHANGED:
           IScoutBundle bundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
           if (bundle.getScoutProject() == getScoutResource().getScoutProject()) {
             markStructureDirty();

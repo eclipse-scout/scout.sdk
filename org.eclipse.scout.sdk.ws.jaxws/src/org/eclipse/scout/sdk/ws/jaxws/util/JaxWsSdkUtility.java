@@ -231,6 +231,9 @@ public final class JaxWsSdkUtility {
   }
 
   public static IFolder getFolder(IScoutBundle scoutBundle, String projectRelativePath, boolean autoCreate) {
+    if (StringUtility.isNullOrEmpty(projectRelativePath)) {
+      return null;
+    }
     // ensure that the path begins and ends with a slash
     IPath path = new Path(normalizePath(projectRelativePath, SeparatorType.BothType));
 
@@ -1517,6 +1520,9 @@ public final class JaxWsSdkUtility {
   }
 
   public static IFolder openProjectFolderDialog(IScoutBundle bundle, ViewerFilter filter, String title, String description, IFolder rootFolder, IFolder initialFolder) {
+    if (!JaxWsSdkUtility.exists(rootFolder)) {
+      rootFolder = JaxWsSdkUtility.getFolder(bundle, rootFolder.getProjectRelativePath().toPortableString(), true);
+    }
     ILabelProvider labelProvider = new WorkbenchLabelProvider();
     ITreeContentProvider contentProvider = new WorkbenchContentProvider();
     FolderSelectionDialog dialog = new FolderSelectionDialog(ScoutSdkUi.getShell(), labelProvider, contentProvider);

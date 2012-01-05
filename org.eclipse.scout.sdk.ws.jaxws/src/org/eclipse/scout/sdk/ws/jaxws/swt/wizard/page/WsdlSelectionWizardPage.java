@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.ui.fields.TextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -50,6 +49,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
   private Text m_descriptionField;
   private TextField m_wsdlFolderField;
   private Button m_browseButton;
+  private IFolder m_rootWsdlFolder;
 
   public WsdlSelectionWizardPage(IScoutBundle bundle) {
     super(WsdlSelectionWizardPage.class.getName());
@@ -99,10 +99,10 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
       public void widgetSelected(SelectionEvent e) {
         IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
                             m_bundle,
-                            new WsdlFolderViewerFilter(m_bundle),
+                            new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
                             Texts.get("WsdlFolder"),
                             Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
-                            JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, true), // root folder
+                            m_rootWsdlFolder, // root folder
                             getWsdlFolder());
         if (folder != null) {
           setWsdlFolder(folder);
@@ -223,5 +223,13 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     m_propertySupport.removePropertyChangeListener(listener);
     super.removePropertyChangeListener(listener);
+  }
+
+  public IFolder getRootWsdlFolder() {
+    return m_rootWsdlFolder;
+  }
+
+  public void setRootWsdlFolder(IFolder rootWsdlFolder) {
+    m_rootWsdlFolder = rootWsdlFolder;
   }
 }

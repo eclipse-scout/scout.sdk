@@ -80,7 +80,7 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
     m_textField.setBackground(JaxWsSdkUtility.getColorLightGray());
 
     m_button = new Button(m_composite, SWT.PUSH);
-    m_button.setText(Texts.get("Browse"));
+    m_button.setText(getConfiguredBrowseButtonLabel());
     m_button.addSelectionListener(new SelectionAdapter() {
 
       @Override
@@ -187,6 +187,10 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
 
   protected ViewerFilter createFilter() {
     return new FolderFilter(m_bundle);
+  }
+
+  protected String getConfiguredBrowseButtonLabel() {
+    return Texts.get("Browse");
   }
 
   public String getMessageFolderDialog() {

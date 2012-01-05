@@ -13,7 +13,8 @@ package org.eclipse.scout.sdk.ws.jaxws;
 public final class JaxWsConstants {
 
   public static final String PATH_WEB_INF = "/WEB-INF";
-  public static final String PATH_WSDL = "/WEB-INF/wsdl";
+  public static final String PATH_WSDL_PROVIDER = "/WEB-INF/wsdl/provider";
+  public static final String PATH_WSDL_CONSUMER = "/WEB-INF/wsdl/consumer";
   public static final String PATH_BUILD = "/WEB-INF/build";
   public static final String PATH_SUN_JAXWS = "/WEB-INF/sun-jaxws.xml";
   public static final String PATH_BUILD_JAXWS = "/WEB-INF/build/build-jaxws.xml";
@@ -49,6 +50,7 @@ public final class JaxWsConstants {
     Implementation(JaxWsSdk.PLUGIN_ID + ".implementation"),
     Package(JaxWsSdk.PLUGIN_ID + ".package"),
     Wsdl(JaxWsSdk.PLUGIN_ID + ".wsdl"),
+    WsdlFolder(JaxWsSdk.PLUGIN_ID + ".wsdlFolder"),
     BindingFile(JaxWsSdk.PLUGIN_ID + ".bindingFile"),
     MissingBuildJaxWsEntry(JaxWsSdk.PLUGIN_ID + ".missingBuildJaxWsEntry"),
     HandlerClass(JaxWsSdk.PLUGIN_ID + ".handlerClazz");

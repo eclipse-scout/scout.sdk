@@ -66,13 +66,18 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
 
   @Override
   public void addPages() {
-    IFolder oldWsdlFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false);
+    IFolder oldWsdlFolder = null;
+    IFolder wsdlRootFolder = null;
     String wsdlLocation = null;
     if (m_sunJaxWsBean != null) {
       wsdlLocation = m_sunJaxWsBean.getWsdl();
+      oldWsdlFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false);
+      wsdlRootFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false);
     }
     else {
       wsdlLocation = m_buildJaxWsBean.getWsdl();
+      oldWsdlFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_CONSUMER, false);
+      wsdlRootFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_CONSUMER, false);
     }
 
     if (StringUtility.hasText(wsdlLocation)) {
@@ -84,6 +89,7 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
     m_wsdlLocationWizardPage.setRebuildStub(true);
     m_wsdlLocationWizardPage.setWsdlFolderVisible(true);
     m_wsdlLocationWizardPage.setWsdlFolder(oldWsdlFolder); // initial value
+    m_wsdlLocationWizardPage.setRootWsdlFolder(wsdlRootFolder);
     addPage(m_wsdlLocationWizardPage);
   }
 

@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
@@ -45,6 +46,7 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.CorruptBindingFileCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.CorruptWsdlCommand;
+import org.eclipse.scout.sdk.ws.jaxws.marker.commands.DiscouragedWsdlFolderCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.InvalidPortTypeCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.InvalidServiceCommand;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.JaxWsServletRegistrationCommand;
@@ -373,15 +375,13 @@ public final class MarkerRebuildUtility {
       MarkerUtility.createMarker(markerResource, MarkerType.Wsdl, markerGroupUUID, Texts.get("NoWSDLFileConfigured"));
       return false;
     }
-
+    boolean provider = (sunJaxWsBean != null);
     if (!wsdlResource.existsFile()) {
       String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.Wsdl, markerGroupUUID, Texts.get("WSDLFileXCouldNotBeFound", wsdlFile.getProjectRelativePath().toPortableString()));
-      if (sunJaxWsBean != null) {
-        // provider
+      if (provider) {
         JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingWsdlCommand(bundle, wsdlResource, sunJaxWsBean));
       }
       else {
-        // consumer
         JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingWsdlCommand(bundle, wsdlResource, buildJaxWsBean));
       }
       return false;
@@ -390,12 +390,10 @@ public final class MarkerRebuildUtility {
     Definition wsdlDefinition = wsdlResource.loadWsdlDefinition();
     if (wsdlDefinition == null) {
       String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.Wsdl, markerGroupUUID, Texts.get("CorruptWSDLFileAtLocationX", wsdlFile.getProjectRelativePath().toPortableString()));
-      if (sunJaxWsBean != null) {
-        // provider
+      if (provider) {
         JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new CorruptWsdlCommand(bundle, wsdlResource, sunJaxWsBean));
       }
       else {
-        // consumer
         JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new CorruptWsdlCommand(bundle, wsdlResource, buildJaxWsBean));
       }
       return false;
@@ -407,6 +405,28 @@ public final class MarkerRebuildUtility {
       String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.Service, markerGroupUUID, IMarker.SEVERITY_ERROR, Texts.get("NoServiceFoundInWSDLFileX", wsdlResource.getFile().getProjectRelativePath().toPortableString()));
       JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingServiceCommand(wsdlResource.getFile().getName()));
       return false;
+    }
+
+    // validate WSDL folder > only accept subfolders of root folder
+    IFolder rootFolder;
+    if (provider) {
+      rootFolder = JaxWsSdkUtility.getFolder(bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false);
+    }
+    else {
+      rootFolder = JaxWsSdkUtility.getFolder(bundle, JaxWsConstants.PATH_WSDL_CONSUMER, false);
+    }
+    IFolder folder = JaxWsSdkUtility.getParentFolder(bundle, wsdlFile);
+    IPath wsdlRootPath = rootFolder.getProjectRelativePath();
+    IPath candidatePath = folder.getProjectRelativePath();
+    candidatePath = candidatePath.makeRelativeTo(wsdlRootPath);
+    if (candidatePath.toPortableString().startsWith("..")) {
+      String markerSourceId = MarkerUtility.createMarker(markerResource, MarkerType.WsdlFolder, markerGroupUUID, IMarker.SEVERITY_WARNING, Texts.get("WarningWsdlFolder", rootFolder.getProjectRelativePath().toPortableString()));
+      if (provider) {
+        JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new DiscouragedWsdlFolderCommand(bundle, markerGroupUUID, buildJaxWsBean, sunJaxWsBean));
+      }
+      else {
+        JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new DiscouragedWsdlFolderCommand(bundle, markerGroupUUID, buildJaxWsBean));
+      }
     }
     return true;
   }
@@ -460,7 +480,7 @@ public final class MarkerRebuildUtility {
     Definition wsdlDefinition = wsdlResource.loadWsdlDefinition();
     // check that service exists in WSDL
     if (wsdlDefinition == null) {
-      return false;
+      return true;
     }
 
     if (wsdlDefinition.getService(serviceQName) == null) {

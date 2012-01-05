@@ -316,7 +316,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
         if (!MarkerRebuildUtility.rebuildBindingFileMarkers(getBuildJaxWsResource().getFile(), m_bindingFileResources, m_wsdlResource, m_markerGroupUUID, m_bundle)) {
           return;
         }
-        if (!MarkerRebuildUtility.rebuildWsdlMarkers(m_wsdlResource, null, m_sunJaxWsBean, m_markerGroupUUID, m_bundle)) {
+        if (!MarkerRebuildUtility.rebuildWsdlMarkers(m_wsdlResource, m_buildJaxWsBean, m_sunJaxWsBean, m_markerGroupUUID, m_bundle)) {
           return;
         }
 

@@ -30,7 +30,12 @@ public class WsdlFilePresenter extends FilePresenter {
     setLabel(Texts.get("WsdlFile"));
     setUseLinkAsLabel(true);
     setFileExtension("wsdl");
-    setFileDirectory(JaxWsConstants.PATH_WSDL);
+    if (m_sunJaxWsBean != null) {
+      setFileDirectory(JaxWsConstants.PATH_WSDL_PROVIDER);
+    }
+    else {
+      setFileDirectory(JaxWsConstants.PATH_WSDL_CONSUMER);
+    }
   }
 
   @Override
@@ -42,6 +47,11 @@ public class WsdlFilePresenter extends FilePresenter {
     wizardDialog.open();
     // as wizard operation is asynchronously, the presenter's value is updated by setting a new value with {@link AbstractPropertyPresenter#setInput(Object)}
     return null;
+  }
+
+  @Override
+  protected String getConfiguredBrowseButtonLabel() {
+    return Texts.get("Change");
   }
 
   public BuildJaxWsBean getBuildJaxWsBean() {

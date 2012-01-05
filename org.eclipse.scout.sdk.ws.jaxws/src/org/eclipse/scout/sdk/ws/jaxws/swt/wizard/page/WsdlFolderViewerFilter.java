@@ -15,15 +15,15 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class WsdlFolderViewerFilter extends ViewerFilter {
 
   private IScoutBundle m_bundle;
+  private IFolder m_rootFolder;
 
-  public WsdlFolderViewerFilter(IScoutBundle bundle) {
+  public WsdlFolderViewerFilter(IScoutBundle bundle, IFolder rootFolder) {
     m_bundle = bundle;
+    m_rootFolder = rootFolder;
   }
 
   @Override
@@ -37,18 +37,17 @@ public class WsdlFolderViewerFilter extends ViewerFilter {
       return false;
     }
 
-    IFolder wsdlRootFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false); // root folder
-    if (wsdlRootFolder == null || !wsdlRootFolder.exists()) {
+    if (m_rootFolder == null || !m_rootFolder.exists()) {
       return false;
     }
 
     // only accept subfolders of WSDL root folder
-    IPath wsdlRootPath = wsdlRootFolder.getProjectRelativePath();
+    IPath wsdlRootPath = m_rootFolder.getProjectRelativePath();
     IPath candidatePath = candidateFolder.getProjectRelativePath();
     candidatePath = candidatePath.makeRelativeTo(wsdlRootPath);
     if (candidatePath.toPortableString().startsWith("..")) {
       return false;
     }
-    return wsdlRootFolder.exists(candidatePath);
+    return m_rootFolder.exists(candidatePath);
   }
 }

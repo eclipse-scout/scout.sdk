@@ -19,6 +19,7 @@ import javax.wsdl.PortType;
 import javax.xml.namespace.QName;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
@@ -358,6 +359,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       m_wsdlFolderPresenter = new WsdlFolderPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), WebserviceEnum.Provider);
       m_wsdlFolderPresenter.setLabel(Texts.get("WsdlFolder"));
       m_wsdlFolderPresenter.setBundle(m_bundle);
+      m_wsdlFolderPresenter.setMarkerType(MarkerType.WsdlFolder);
       m_wsdlFolderPresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
       applyLayoutData(m_wsdlFolderPresenter);
 
@@ -455,7 +457,12 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
     IFile wsdlFile = getPage().getWsdlResource().getFile();
     if (wsdlFile != null) {
       IPath wsdlFolderPath = wsdlFile.getProjectRelativePath().removeLastSegments(1);
-      m_wsdlFolderPresenter.setInput(JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false));
+      IFolder folder = JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false);
+      if (folder == null) {
+        folder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false);
+      }
+      m_wsdlFolderPresenter.setInput(folder);
+      m_wsdlFilePresenter.setFileDirectory(folder.getProjectRelativePath().toPortableString());
     }
     m_wsdlFolderPresenter.setBuildJaxWsBean(buildJaxWsBean);
     m_wsdlFolderPresenter.setSunJaxWsBean(sunJaxWsBean);

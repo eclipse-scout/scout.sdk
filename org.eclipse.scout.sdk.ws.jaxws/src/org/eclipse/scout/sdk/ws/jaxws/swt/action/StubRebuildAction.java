@@ -17,7 +17,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -27,6 +26,7 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.WsStubGenerationOperation;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
+import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ErrorDialog;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceConsumerNodePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderNodePage;
@@ -98,9 +98,9 @@ public class StubRebuildAction extends AbstractLinkAction {
             messageBox.open();
           }
           else {
-            MessageBox messageBox = new MessageBox(ScoutSdkUi.getShell(), SWT.ICON_ERROR | SWT.OK);
-            messageBox.setMessage(StringUtility.join("\n\n", Texts.get("WsStubGenerationFailed"), getStacktrace(e)));
-            messageBox.open();
+            ErrorDialog dialog = new ErrorDialog(Texts.get("StubGenerationFailed"));
+            dialog.setError(Texts.get("WsStubGenerationFailed"), e);
+            dialog.open();
           }
         }
       });

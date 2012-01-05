@@ -91,7 +91,8 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     m_wsdlLocationWizardPage = new WsdlLocationWizardPage(m_bundle);
     m_wsdlLocationWizardPage.setTitle(Texts.get("CreateWsConsumer"));
     m_wsdlLocationWizardPage.setWsdlFolderVisible(true);
-    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
+    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_CONSUMER, false)); // initial value
+    m_wsdlLocationWizardPage.setRootWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_CONSUMER, false));
     m_wsdlLocationWizardPage.addPropertyChangeListener(new P_WsdlLocationPropertyListener());
     addPage(m_wsdlLocationWizardPage);
 

@@ -16,12 +16,14 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
+import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ErrorDialog;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ResourceSelectionWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -69,13 +71,22 @@ public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    for (IFile jarFile : m_phantomJarFilesToBeDeleted) {
+    for (final IFile jarFile : m_phantomJarFilesToBeDeleted) {
       try {
         jarFile.delete(true, true, monitor);
         JaxWsSdkUtility.registerJarLib(m_bundle, jarFile, true, monitor);
       }
-      catch (Exception e) {
-        JaxWsSdk.logError(e);
+      catch (final Exception e) {
+        ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
+
+          @Override
+          public void run() {
+            ErrorDialog dialog = new ErrorDialog(Texts.get("FailedToDeleteFile"));
+            dialog.setError(Texts.get("FailedToDeleteFileX", jarFile.getProjectRelativePath().toPortableString()), e);
+            dialog.open();
+          }
+        });
+        return false;
       }
     }
     return true;

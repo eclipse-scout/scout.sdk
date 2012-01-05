@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -64,7 +64,7 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
     m_textField.setBackground(JaxWsSdkUtility.getColorLightGray());
 
     m_button = new Button(m_composite, SWT.PUSH);
-    m_button.setText(Texts.get("Browse"));
+    m_button.setText(getConfiguredBrowseButtonLabel());
     m_button.addSelectionListener(new SelectionAdapter() {
 
       @Override
@@ -103,6 +103,10 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
     m_button.setLayoutData(gd);
 
     return m_composite;
+  }
+
+  protected String getConfiguredBrowseButtonLabel() {
+    return Texts.get("Browse");
   }
 
   @Override

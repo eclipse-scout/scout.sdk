@@ -100,7 +100,8 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     // new or existing WSDL
     m_wsdlSelectionWizardPage = new WsdlSelectionWizardPage(m_bundle);
     m_wsdlSelectionWizardPage.setTitle(Texts.get("CreateWsProvider"));
-    m_wsdlSelectionWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
+    m_wsdlSelectionWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false)); // initial value
+    m_wsdlSelectionWizardPage.setRootWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false));
     m_wsdlSelectionWizardPage.addPropertyChangeListener(new P_WsdlSelectionPropertyListener());
     addPage(m_wsdlSelectionWizardPage);
 
@@ -109,7 +110,8 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     m_wsdlLocationWizardPage.setTitle(Texts.get("CreateWsProvider"));
     m_wsdlLocationWizardPage.setExcludePage(m_wsdlSelectionWizardPage.isNewWsdl());
     m_wsdlLocationWizardPage.setWsdlFolderVisible(false);
-    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, false)); // initial value
+    m_wsdlLocationWizardPage.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false)); // initial value
+    m_wsdlLocationWizardPage.setRootWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false));
     m_wsdlLocationWizardPage.setExcludePage(true);
     m_wsdlLocationWizardPage.addPropertyChangeListener(new P_WsdlLocationPropertyListener());
     addPage(m_wsdlLocationWizardPage);

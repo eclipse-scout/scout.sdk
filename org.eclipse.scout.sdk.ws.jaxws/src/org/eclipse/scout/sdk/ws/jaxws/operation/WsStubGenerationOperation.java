@@ -109,8 +109,15 @@ public class WsStubGenerationOperation implements IOperation {
       IFile jarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_properties, m_wsdlFileName);
       // remove JAR file to ensure successful JAR generation
       if (jarFile.exists()) {
-        JaxWsSdkUtility.registerJarLib(m_bundle, jarFile, true, monitor);
-        jarFile.delete(true, monitor);
+        try {
+          jarFile.delete(true, monitor);
+          JaxWsSdkUtility.registerJarLib(m_bundle, jarFile, true, monitor);
+        }
+        catch (Exception e) {
+          JaxWsSdk.logError("failed to delete jar file", e);
+          notifyListeners(false, new Exception("Failed to delete stub JAR-file '" + jarFile.getProjectRelativePath().toPortableString() + "'. The file might be locked because the server is running.", e));
+          return;
+        }
       }
 
       // assemble arguments to generate stub

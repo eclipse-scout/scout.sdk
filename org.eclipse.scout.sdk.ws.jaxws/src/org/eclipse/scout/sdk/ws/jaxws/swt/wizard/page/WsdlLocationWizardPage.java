@@ -56,7 +56,6 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -122,6 +121,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
   private Text m_wsdlFolderDescriptionField;
   private TextField m_wsdlFolderField;
   private Button m_wsdlFolderBrowseButton;
+  private IFolder m_rootWsdlFolder;
 
   public WsdlLocationWizardPage(IScoutBundle bundle) {
     super(WsdlLocationWizardPage.class.getName());
@@ -272,10 +272,10 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
         public void widgetSelected(SelectionEvent e) {
           IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
                               m_bundle,
-                              new WsdlFolderViewerFilter(m_bundle),
+                              new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
                               Texts.get("WsdlFolder"),
                               Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
-                              JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL, true), // root folder
+                              getRootWsdlFolder(),
                               getWsdlFolder());
           if (folder != null) {
             setWsdlFolder(folder);
@@ -691,6 +691,14 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
   public void setWsdlFolderVisible(boolean wsdlFolderVisible) {
     m_wsdlFolderVisible = wsdlFolderVisible;
+  }
+
+  public IFolder getRootWsdlFolder() {
+    return m_rootWsdlFolder;
+  }
+
+  public void setRootWsdlFolder(IFolder rootWsdlFolder) {
+    m_rootWsdlFolder = rootWsdlFolder;
   }
 
   private class P_DummyTrustManager implements X509TrustManager {
