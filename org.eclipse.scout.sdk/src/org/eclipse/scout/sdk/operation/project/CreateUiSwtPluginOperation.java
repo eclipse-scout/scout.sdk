@@ -20,6 +20,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
+import org.eclipse.scout.sdk.operation.template.InstallSwtPluginXmlFileOperation;
+import org.eclipse.scout.sdk.operation.template.InstallSwtProductFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -51,8 +53,8 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
     TemplateVariableSet bindings = TemplateVariableSet.createNew(project, m_templateBindings);
     try {
       new InstallTextFileOperation("templates/ui.swt/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, bindings).run(monitor, workingCopyManager);
-      new InstallTextFileOperation("templates/ui.swt/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
       new InstallTextFileOperation("templates/ui.swt/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
+      new InstallSwtPluginXmlFileOperation("templates/ui.swt/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/splash.bmp", project, "splash.bmp").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipseScout16x16.gif", project, "resources/icons/eclipseScout16x16.gif").run(monitor, workingCopyManager);
@@ -65,9 +67,9 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
 
     // products
     String projectAlias = bindings.getVariable(ITemplateVariableSet.VAR_PROJECT_ALIAS);
-    new InstallTextFileOperation("templates/ui.swt/products/development/app-client-dev.product", "products/development/" + projectAlias + "-swt-client-dev.product", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/ui.swt/products/development/config.ini", "products/development/config.ini", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/ui.swt/products/production/app-client.product", "products/production/" + projectAlias + "-swt-client.product", project, bindings).run(monitor, workingCopyManager);
+    new InstallSwtProductFileOperation("templates/ui.swt/products/development/app-client-dev.product", "products/development/" + projectAlias + "-swt-client-dev.product", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/ui.swt/products/production/config.ini", "products/production/config.ini", project, bindings).run(monitor, workingCopyManager);
+    new InstallSwtProductFileOperation("templates/ui.swt/products/production/app-client.product", "products/production/" + projectAlias + "-swt-client.product", project, bindings).run(monitor, workingCopyManager);
   }
 }

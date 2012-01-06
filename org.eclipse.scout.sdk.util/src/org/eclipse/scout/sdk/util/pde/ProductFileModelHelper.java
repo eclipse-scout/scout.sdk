@@ -234,6 +234,17 @@ public final class ProductFileModelHelper {
     }
 
     /**
+     * Sets the value of the "osgi.bundles" entry of the config file.
+     * 
+     * @param value
+     *          The new value of the entry.
+     * @throws CoreException
+     */
+    public void setOsgiBundlesEntry(String value) throws CoreException {
+      setEntry(EclipseStarter.PROP_BUNDLES, value);
+    }
+
+    /**
      * Gets the configuration file of this product.
      * 
      * @return The config file.

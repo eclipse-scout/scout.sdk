@@ -120,12 +120,12 @@ public final class LazyProductFileModel {
     IFile configIni = getConfigIniFile();
     OutputStream stream = null;
     try {
-      stream = new BufferedOutputStream(new FileOutputStream(configIni.getFullPath().toFile()));
+      stream = new BufferedOutputStream(new FileOutputStream(configIni.getRawLocation().toFile()));
       m_configFileProperties.store(stream, null);
       stream.flush();
     }
     catch (IOException e) {
-      throw new CoreException(new ScoutStatus("unable to save product configuration file: " + configIni.getFullPath().toOSString(), e));
+      throw new CoreException(new ScoutStatus("unable to save product configuration file: " + configIni.getRawLocation().toOSString(), e));
     }
     finally {
       if (stream != null) {
