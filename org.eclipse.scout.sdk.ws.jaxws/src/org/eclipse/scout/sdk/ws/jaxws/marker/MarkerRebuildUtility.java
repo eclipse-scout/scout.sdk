@@ -246,7 +246,7 @@ public final class MarkerRebuildUtility {
 
     Definition wsdlDefinition = wsdlResource.loadWsdlDefinition();
     if (wsdlDefinition == null) {
-      return false;
+      return true;
     }
 
     // validate service
