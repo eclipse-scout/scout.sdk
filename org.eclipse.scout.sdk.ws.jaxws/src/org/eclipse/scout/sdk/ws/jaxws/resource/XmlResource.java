@@ -15,9 +15,7 @@ package org.eclipse.scout.sdk.ws.jaxws.resource;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -92,13 +90,12 @@ public class XmlResource extends ManagedResource {
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         xmlDocument.write(os);
-        InputStream is = new ByteArrayInputStream(os.toByteArray());
-        JaxWsSdkUtility.refreshLocal(m_file, IResource.DEPTH_ZERO);
 
         m_modificationStamp = ManagedResource.API_MODIFICATION_STAMP;
         try {
+          JaxWsSdkUtility.prepareFileAccess(m_file, true);
+          m_file.setContents(new ByteArrayInputStream(os.toByteArray()), true, true, monitor);
           m_xmlDocument = xmlDocument;
-          m_file.setContents(is, true, false, monitor);
         }
         finally {
           m_modificationStamp = m_file.getModificationStamp();

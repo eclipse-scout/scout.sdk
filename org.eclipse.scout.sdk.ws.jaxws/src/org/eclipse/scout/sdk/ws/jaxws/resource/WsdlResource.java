@@ -21,15 +21,11 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.wsdl.xml.WSDLWriter;
 
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -97,27 +93,15 @@ public class WsdlResource extends ManagedResource {
         }
 
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-
         WSDLFactory factory = WSDLFactory.newInstance();
         WSDLWriter writer = factory.newWSDLWriter();
         writer.writeWSDL(definition, os);
 
-        JaxWsSdkUtility.refreshLocal(getFile(), IResource.DEPTH_ZERO);
         m_modificationStamp = ManagedResource.API_MODIFICATION_STAMP;
         try {
-          ByteArrayInputStream bis = new ByteArrayInputStream(os.toByteArray());
-          if (!getFile().exists()) {
-            // create the folders if they do not exist yet
-            if (getFile().getParent() instanceof IFolder) {
-              ResourcesUtility.createFolder(getFile().getParent());
-            }
-            // the file does not already exist. Therefore create an empty file
-            getFile().create(bis, true, new NullProgressMonitor());
-          }
-          else {
-            m_wsdlDefinition = definition;
-            m_file.setContents(bis, true, true, monitor);
-          }
+          JaxWsSdkUtility.prepareFileAccess(m_file, true);
+          m_file.setContents(new ByteArrayInputStream(os.toByteArray()), true, true, monitor);
+          m_wsdlDefinition = definition;
         }
         finally {
           m_modificationStamp = m_file.getModificationStamp();

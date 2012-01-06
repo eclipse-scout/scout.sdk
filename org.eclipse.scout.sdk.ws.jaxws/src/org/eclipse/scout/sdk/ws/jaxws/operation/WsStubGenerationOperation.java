@@ -89,7 +89,7 @@ public class WsStubGenerationOperation implements IOperation {
       throw new IllegalArgumentException("alias not set");
     }
     if (m_wsdlFolder == null || !m_wsdlFolder.exists()) {
-      throw new IllegalArgumentException("wsdl folder not set or does not exist");
+      throw new IllegalArgumentException("wsdl folder not set");
     }
     if (m_wsdlFileName == null) {
       throw new IllegalArgumentException("wsdlFileName not set");
@@ -105,6 +105,9 @@ public class WsStubGenerationOperation implements IOperation {
 
       // launch JAX-WS Stub generator
       String launcherName = m_alias + " (JAX-WS stub generation)";
+
+      // ensure WSDL folder to be registered in build.xml
+      JaxWsSdkUtility.prepareFolderAccess(getWsdlFolder(), true);
 
       IFile jarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_properties, m_wsdlFileName);
       // remove JAR file to ensure successful JAR generation

@@ -195,6 +195,11 @@ public final class JaxWsSdkUtility {
     }
 
     IFile file = scoutBundle.getProject().getFile(path);
+    prepareFileAccess(file, autoCreate);
+    return file;
+  }
+
+  public static void prepareFileAccess(IFile file, boolean autoCreate) {
     refreshLocal(file, IResource.DEPTH_ZERO);
 
     if (!exists(file) && autoCreate) {
@@ -217,8 +222,8 @@ public final class JaxWsSdkUtility {
       IFolder folder = (IFolder) file.getParent();
       if (!folder.getProjectRelativePath().toPortableString().contains("build")) {
         try {
-          PluginModelHelper h = new PluginModelHelper(scoutBundle.getProject());
-          h.BuildProperties.addBinaryBuildEntry(folder.getProjectRelativePath().toPortableString());
+          PluginModelHelper h = new PluginModelHelper(file.getProject());
+          h.BuildProperties.addBinaryBuildEntry(folder);
           h.save();
         }
         catch (CoreException e) {
@@ -226,8 +231,6 @@ public final class JaxWsSdkUtility {
         }
       }
     }
-
-    return file;
   }
 
   public static IFolder getFolder(IScoutBundle scoutBundle, String projectRelativePath, boolean autoCreate) {
@@ -236,8 +239,12 @@ public final class JaxWsSdkUtility {
     }
     // ensure that the path begins and ends with a slash
     IPath path = new Path(normalizePath(projectRelativePath, SeparatorType.BothType));
-
     IFolder folder = scoutBundle.getProject().getFolder(path);
+    prepareFolderAccess(folder, autoCreate);
+    return folder;
+  }
+
+  public static void prepareFolderAccess(IFolder folder, boolean autoCreate) {
     refreshLocal(folder, IResource.DEPTH_INFINITE);
 
     if (!folder.exists() && autoCreate) {
@@ -253,16 +260,14 @@ public final class JaxWsSdkUtility {
     // register folder in build properties
     if (autoCreate && !folder.getProjectRelativePath().toPortableString().contains("build")) {
       try {
-        PluginModelHelper h = new PluginModelHelper(scoutBundle.getProject());
-        h.BuildProperties.addBinaryBuildEntry(folder.getProjectRelativePath().toPortableString());
+        PluginModelHelper h = new PluginModelHelper(folder.getProject());
+        h.BuildProperties.addBinaryBuildEntry(folder);
         h.save();
       }
       catch (CoreException e) {
         JaxWsSdk.logError("failed to register folder in build.properties", e);
       }
     }
-
-    return folder;
   }
 
   /**
@@ -1448,10 +1453,10 @@ public final class JaxWsSdkUtility {
     PluginModelHelper h = new PluginModelHelper(project);
     try {
       if (remove) {
-        h.Manifest.removeClasspathEntry(jarFilePath);
+        h.Manifest.removeClasspathEntry(jarFile);
       }
       else {
-        h.Manifest.addClasspathEntry(jarFilePath);
+        h.Manifest.addClasspathEntry(jarFile);
       }
       h.Manifest.addClasspathDefaultEntry();
     }
@@ -1462,9 +1467,11 @@ public final class JaxWsSdkUtility {
 
     // update bin.includes in build.properties
     try {
-      h.BuildProperties.removeBinaryBuildEntry(jarFilePath);
+      // remove JAR file registration as folder is registered anyway
+      h.BuildProperties.removeBinaryBuildEntry(jarFile);
       if (!remove) {
-        h.BuildProperties.addBinaryBuildEntry(jarFilePath);
+        // register folder, not file
+        h.BuildProperties.addBinaryBuildEntry(JaxWsSdkUtility.getParentFolder(bundle, jarFile));
       }
     }
     catch (Exception e) {
