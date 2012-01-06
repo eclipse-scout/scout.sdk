@@ -130,6 +130,9 @@ public class WsFilesMoveOperation implements IOperation {
       return;
     }
     try {
+      // ensure folder to be created
+      JaxWsSdkUtility.getFolder(m_bundle, JaxWsSdkUtility.getParentFolder(m_bundle, file).getProjectRelativePath().toPortableString(), true);
+      // move file
       file.move(destinationFolderPath.getFullPath().append(file.getName()), true, true, monitor);
     }
     catch (Exception e) {
