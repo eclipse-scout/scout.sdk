@@ -45,6 +45,7 @@ public class Event {
   private String m_elementType;
   private String m_element;
   private long m_eventTime;
+  private String m_eventDump;
   private List<Event> m_children;
 
   public Event() {
@@ -90,6 +91,14 @@ public class Event {
     m_eventTime = eventTime;
   }
 
+  public String getEventDump() {
+    return m_eventDump;
+  }
+
+  public void setEventDump(String eventDump) {
+    m_eventDump = eventDump;
+  }
+
   public EventGroup getEventGroup() {
     return m_eventGroup;
   }
@@ -109,4 +118,5 @@ public class Event {
   public synchronized Event[] getChildren() {
     return m_children.toArray(new Event[m_children.size()]);
   }
+
 }

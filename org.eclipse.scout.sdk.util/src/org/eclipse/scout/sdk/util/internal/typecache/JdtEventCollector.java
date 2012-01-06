@@ -92,9 +92,10 @@ public class JdtEventCollector {
     return m_events.values().toArray(new JdtEvent[m_events.size()]);
   }
 
-  public JdtEvent[] removeAllEvents() {
+  public JdtEvent[] removeAllEvents(long resourceTimestamp) {
     JdtEvent[] events = m_events.values().toArray(new JdtEvent[m_events.size()]);
     m_events.clear();
+    m_lastModification = resourceTimestamp;
     return events;
   }
 
@@ -113,4 +114,5 @@ public class JdtEventCollector {
   public CompilationUnit getAst() {
     return m_ast;
   }
+
 }

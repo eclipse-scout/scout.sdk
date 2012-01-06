@@ -68,6 +68,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
 
   @Override
   protected void loadChildrenImpl() {
+    System.out.println("reload children!!!");
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormField);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);

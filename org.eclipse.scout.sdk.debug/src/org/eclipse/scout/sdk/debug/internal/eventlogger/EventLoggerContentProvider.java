@@ -95,6 +95,8 @@ public class EventLoggerContentProvider implements ITreeContentProvider, ITableL
         return (e.getElementType() == null) ? ("") : (e.getElementType());
       case 2:
         return (e.getElement() == null) ? ("") : (e.getElement());
+      case 3:
+        return (e.getEventDump() == null) ? "" : e.getEventDump();
     }
     return "";
   }

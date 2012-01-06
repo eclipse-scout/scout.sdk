@@ -23,10 +23,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ElementChangedEvent;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.scout.sdk.debug.internal.eventlogger.Event;
 import org.eclipse.scout.sdk.debug.internal.eventlogger.Event.EventGroup;
@@ -101,6 +103,9 @@ public class JdtEventLoggerView extends ViewPart {
     TreeColumn elementColumn = new TreeColumn(m_treeViewer.getTree(), SWT.LEFT);
     elementColumn.setText("Element");
     elementColumn.setWidth(200);
+    TreeColumn eventDumpColumn = new TreeColumn(m_treeViewer.getTree(), SWT.LEFT);
+    eventDumpColumn.setText("Dump");
+    eventDumpColumn.setWidth(600);
 
     filter.setViewer(m_treeViewer);
     EventLoggerContentProvider viewerProvider = new EventLoggerContentProvider();
@@ -258,8 +263,9 @@ public class JdtEventLoggerView extends ViewPart {
     }
 
     private void visitDelta(IJavaElementDelta delta, int eventType, Event parentEvent) {
-      Event newLogEvent = new Event(getEventType(delta), getElementType(delta), delta.getElement().getElementName());
+      Event newLogEvent = new Event(getEventType(delta), getElementType(delta), delta.getElement().getElementName() + " [hasChildren='" + ((delta.getFlags() & IJavaElementDelta.F_CHILDREN) != 0) + "']");
       newLogEvent.setEventGroup(EventGroup.JDT_EVENT);
+      newLogEvent.setEventDump(eventDump(delta));
       parentEvent.addChildEvent(newLogEvent);
       if ((delta.getFlags() & IJavaElementDelta.F_CHILDREN) != 0) {
         IJavaElementDelta[] childDeltas = delta.getAffectedChildren();
@@ -272,6 +278,50 @@ public class JdtEventLoggerView extends ViewPart {
       for (IJavaElementDelta annotationDelta : delta.getAnnotationDeltas()) {
         visitDelta(annotationDelta, eventType, newLogEvent);
       }
+    }
+
+    private String eventDump(IJavaElementDelta delta) {
+      StringBuilder b = new StringBuilder();
+      if (delta.getElement() != null) {
+        ICompilationUnit icu = (ICompilationUnit) delta.getElement().getAncestor(IJavaElement.COMPILATION_UNIT);
+        if (icu != null) {
+          b.append("[isWorkingCopy=").append(icu.isWorkingCopy()).append("] ");
+          try {
+            b.append("[changed=").append(icu.hasUnsavedChanges()).append("] ");
+          }
+          catch (JavaModelException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          }
+        }
+
+      }
+      int flags = delta.getFlags();
+      b.append("[F_CONTENT=").append((flags & IJavaElementDelta.F_CONTENT) != 0).append("] ");
+//      b.append("[F_MODIFIERS=").append((flags & IJavaElementDelta.F_MODIFIERS) != 0).append("] ");
+      b.append("[F_CHILDREN=").append((flags & IJavaElementDelta.F_CHILDREN) != 0).append("] ");
+//      b.append("[F_MOVED_FROM=").append((flags & IJavaElementDelta.F_MOVED_FROM) != 0).append("] ");
+//      b.append("[F_MOVED_TO=").append((flags & IJavaElementDelta.F_MOVED_TO) != 0).append("] ");
+//      b.append("[F_ADDED_TO_CLASSPATH=").append((flags & IJavaElementDelta.F_ADDED_TO_CLASSPATH) != 0).append("] ");
+//      b.append("[F_REMOVED_FROM_CLASSPATH=").append((flags & IJavaElementDelta.F_REMOVED_FROM_CLASSPATH) != 0).append("] ");
+//      b.append("[F_CLASSPATH_REORDER=").append((flags & IJavaElementDelta.F_CLASSPATH_REORDER) != 0).append("] ");
+//      b.append("[F_REORDER=").append((flags & IJavaElementDelta.F_REORDER) != 0).append("] ");
+      b.append("[F_OPENED=").append((flags & IJavaElementDelta.F_OPENED) != 0).append("] ");
+      b.append("[F_CLOSED=").append((flags & IJavaElementDelta.F_CLOSED) != 0).append("] ");
+//      b.append("[F_SUPER_TYPES=").append((flags & IJavaElementDelta.F_SUPER_TYPES) != 0).append("] ");
+//      b.append("[F_SOURCEATTACHED=").append((flags & IJavaElementDelta.F_SOURCEATTACHED) != 0).append("] ");
+//      b.append("[F_SOURCEDETACHED=").append((flags & IJavaElementDelta.F_SOURCEDETACHED) != 0).append("] ");
+//      b.append("[F_FINE_GRAINED=").append((flags & IJavaElementDelta.F_FINE_GRAINED) != 0).append("] ");
+//      b.append("[F_ARCHIVE_CONTENT_CHANGED=").append((flags & IJavaElementDelta.F_ARCHIVE_CONTENT_CHANGED) != 0).append("] ");
+      b.append("[F_PRIMARY_WORKING_COPY=").append((flags & IJavaElementDelta.F_PRIMARY_WORKING_COPY) != 0).append("] ");
+//      b.append("[F_CLASSPATH_CHANGED=").append((flags & IJavaElementDelta.F_CLASSPATH_CHANGED) != 0).append("] ");
+      b.append("[F_PRIMARY_RESOURCE=").append((flags & IJavaElementDelta.F_PRIMARY_RESOURCE) != 0).append("] ");
+//      b.append("[F_AST_AFFECTED=").append((flags & IJavaElementDelta.F_AST_AFFECTED) != 0).append("] ");
+//      b.append("[F_CATEGORIES=").append((flags & IJavaElementDelta.F_CATEGORIES) != 0).append("] ");
+//      b.append("[F_RESOLVED_CLASSPATH_CHANGED=").append((flags & IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED) != 0).append("] ");
+//      b.append("[F_ANNOTATIONS=").append((flags & IJavaElementDelta.F_ANNOTATIONS) != 0).append("]");
+
+      return b.toString();
     }
 
     @SuppressWarnings("deprecation")
