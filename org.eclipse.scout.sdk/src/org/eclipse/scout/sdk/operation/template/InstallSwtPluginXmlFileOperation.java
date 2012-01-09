@@ -10,7 +10,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 public class InstallSwtPluginXmlFileOperation extends InstallTextFileOperation {
   public InstallSwtPluginXmlFileOperation(String srcPath, String dstPath, IProject dstProject) {
@@ -29,8 +28,7 @@ public class InstallSwtPluginXmlFileOperation extends InstallTextFileOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
 
-    Version frameworkVersion = JdtUtility.getFrameworkVersion();
-    if (frameworkVersion.getMajor() == 4 || (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() > 7)) {
+    if (JdtUtility.isPlatformE4()) {
       final String[][] additionalE4Properties = new String[][]{
           {"applicationXMI", "org.eclipse.platform/LegacyIDE.e4xmi"},
           {"cssTheme", "org.eclipse.e4.ui.css.theme.e4_default"},

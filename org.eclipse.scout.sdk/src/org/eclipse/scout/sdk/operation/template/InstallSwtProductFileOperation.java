@@ -7,7 +7,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 public class InstallSwtProductFileOperation extends InstallTextFileOperation {
   public InstallSwtProductFileOperation(String srcPath, String dstPath, IProject dstProject) {
@@ -26,9 +25,7 @@ public class InstallSwtProductFileOperation extends InstallTextFileOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
 
-    Version frameworkVersion = JdtUtility.getFrameworkVersion();
-    if (frameworkVersion.getMajor() == 4 || (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() > 7)) {
-
+    if (JdtUtility.isPlatformE4()) {
       final String[] additionalE4Plugins = new String[]{
           "org.eclipse.e4.core.commands",
           "org.eclipse.e4.core.contexts",

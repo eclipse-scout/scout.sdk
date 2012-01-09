@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.util.jdt;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -21,12 +22,10 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.ITextSelection;
-import org.eclipse.osgi.framework.internal.core.Constants;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Version;
 
-@SuppressWarnings("restriction")
 public final class JdtUtility {
   private JdtUtility() {
   }
@@ -41,8 +40,12 @@ public final class JdtUtility {
     return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
   }
 
-  public static Version getFrameworkVersion() {
-    return new Version(SdkUtilActivator.getDefault().getBundle().getBundleContext().getProperty(Constants.OSGI_IMPL_VERSION_KEY));
+  public static boolean isPlatformE4() {
+    return JdtUtility.getPlatformVersion().getMajor() == 4;
+  }
+
+  public static Version getPlatformVersion() {
+    return Platform.getProduct().getDefiningBundle().getVersion();
   }
 
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {

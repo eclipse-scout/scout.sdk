@@ -26,9 +26,12 @@ public class InstallServerProductFileOperation extends InstallTextFileOperation 
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
 
-    Version frameworkVersion = JdtUtility.getFrameworkVersion();
-    if (frameworkVersion.getMajor() == 4 || (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() > 7)) {
-      // change from Jetti 6 to Jetty 7 when eclipse >= 3.8
+    Version frameworkVersion = JdtUtility.getPlatformVersion();
+    if ((frameworkVersion.getMajor() == 4 && frameworkVersion.getMinor() > 1) ||
+        (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() > 7)) {
+      // jetty plugins have been renamed: jetty <= 6 is named "org.mortbay..." while jetty > 6 is called "org.eclipse.jetty..."
+      // see http://wiki.eclipse.org/Jetty/Getting_Started/Porting_to_Jetty_7/Refactoring
+      // eclipse 3.8 and 4.2 uses jetty >= 7 -> rename jetty plugins
       final String[] oldPluginsToRemove = new String[]{
           "org.mortbay.jetty.server",
           "org.mortbay.jetty.util"

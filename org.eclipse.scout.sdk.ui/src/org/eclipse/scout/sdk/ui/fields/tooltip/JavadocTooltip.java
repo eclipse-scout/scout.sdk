@@ -283,7 +283,7 @@ public class JavadocTooltip extends AbstractTooltip {
   private String addImageAndLabel(IJavaElement member, String imageName, String label) {
     // workaround to make internal 3.X code accessible with API changes.
     StringBuffer buffer = new StringBuffer();
-    Version frameworkVersion = JdtUtility.getFrameworkVersion();
+    Version frameworkVersion = JdtUtility.getPlatformVersion();
     if (frameworkVersion.getMajor() == 3) {
       if (frameworkVersion.getMinor() <= 5) {
         try {
