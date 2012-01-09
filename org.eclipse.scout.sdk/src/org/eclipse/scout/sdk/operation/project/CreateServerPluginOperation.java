@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
+import org.eclipse.scout.sdk.operation.template.InstallServerProductFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -53,11 +54,14 @@ public class CreateServerPluginOperation extends AbstractCreateScoutBundleOperat
     new InstallTextFileOperation("templates/server/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/server/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/server/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
+
     // products
-    new InstallTextFileOperation("templates/server/products/development/app-server-dev.product", "products/development/" + projectAlias + "-server-dev.product", project, bindings).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/server/products/development/config.ini", "products/development/config.ini", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/server/products/production/app-server.product", "products/production/" + projectAlias + "-server.product", project, bindings).run(monitor, workingCopyManager);
+    new InstallServerProductFileOperation("templates/server/products/development/app-server-dev.product", "products/development/" + projectAlias + "-server-dev.product", project, bindings).run(monitor, workingCopyManager);
+
     new InstallTextFileOperation("templates/server/products/production/config.ini", "products/production/config.ini", project, bindings).run(monitor, workingCopyManager);
+    new InstallServerProductFileOperation("templates/server/products/production/app-server.product", "products/production/" + projectAlias + "-server.product", project, bindings).run(monitor, workingCopyManager);
+
     // resources
     new InstallTextFileOperation("templates/server/resources/html/index.html", "resources/html/index.html", project, bindings).run(monitor, workingCopyManager);
     try {
