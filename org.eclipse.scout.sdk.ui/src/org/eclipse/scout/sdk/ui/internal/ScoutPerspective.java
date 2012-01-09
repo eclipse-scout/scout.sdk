@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal;
 
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
 import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
@@ -51,11 +52,13 @@ public class ScoutPerspective implements IPerspectiveFactory {
     bottomLeft.addView(IScoutConstants.SCOUT_PROPERTY_VIEW);
     bottomLeft.addView(IPageLayout.ID_OUTLINE);
 
-    // Bottom: Problems, Console, Tasks, Log
+    // Bottom: Problems, Progress, Tasks, Console, Javadoc, Error Log
     IFolderLayout bottom = layout.createFolder(id_bottom, IPageLayout.BOTTOM, 0.8f, editorArea);
     bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
-    bottom.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+    bottom.addView(IPageLayout.ID_PROGRESS_VIEW);
     bottom.addView(IPageLayout.ID_TASK_LIST);
+    bottom.addView(IConsoleConstants.ID_CONSOLE_VIEW);
+    bottom.addView(JavaUI.ID_JAVADOC_VIEW);
     bottom.addView("org.eclipse.pde.runtime.LogView");
   }
 }
