@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK UI
 Bundle-SymbolicName: org.eclipse.scout.sdk.ui;singleton:=true
-Bundle-Version: 3.7.1.qualifier
+Bundle-Version: 3.7.2.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.ui.ScoutSdkUi
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.scout.commons;bundle-version="1.1.2";visibility:=reexport,
+ org.eclipse.scout.commons;bundle-version="3.7.1";visibility:=reexport,
  org.eclipse.help;bundle-version="3.3.100",
  org.eclipse.help.ui;bundle-version="3.3.100",
- org.eclipse.scout.sdk;bundle-version="1.2.4",
+ org.eclipse.scout.sdk;bundle-version="3.7.2",
  org.eclipse.ui,
  org.eclipse.pde.ui;bundle-version="3.5.1",
  org.eclipse.debug.core;bundle-version="3.5.1",
