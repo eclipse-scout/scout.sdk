@@ -813,6 +813,8 @@
 		<config name="getConfiguredGridH" type="Normal" category="Layout" />
 		<config name="getConfiguredGridW" type="Normal" category="Layout" />
 		<config name="getConfiguredLabelVisible" type="Normal" category="Layout" />
+		<config name="getConfiguredLabel" type="Advanced" category="Appearance" />
+		<config name="getConfiguredMandatory" type="Advanced" category="Behavior" />
 		<config name="execClicked" type="Normal" category="BusinessLogic" />
 		<config name="execHyperlink" type="Advanced" category="BusinessLogic" />
 	</type>
