@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Simple Scout Multilanguage Support
+Bundle-Name: Scout Simple Multilanguage Support
 Bundle-SymbolicName: org.eclipse.scout.nls.sdk.simple;singleton:=true
 Bundle-Version: 3.7.1.qualifier
 Bundle-Activator: org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple
