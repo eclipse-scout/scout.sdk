@@ -22,7 +22,7 @@ import org.eclipse.pde.internal.core.project.PDEProject;
  * This class is thread safe.
  * 
  * @author mvi
- * @since 3.7.1
+ * @since 3.8.0
  */
 @SuppressWarnings("restriction")
 public final class LazyPluginModel {

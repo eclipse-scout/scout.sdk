@@ -22,7 +22,7 @@ import org.w3c.dom.Node;
  * Helper class for basic product file operations.
  * 
  * @author mvi
- * @since 3.7.1
+ * @since 3.8.0
  */
 @SuppressWarnings("restriction")
 public final class ProductFileModelHelper {
