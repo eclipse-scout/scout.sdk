@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -55,12 +56,18 @@ public class CreateUiSwingPluginOperation extends AbstractCreateScoutBundleOpera
       new InstallTextFileOperation("templates/ui.swing/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
       new InstallTextFileOperation("templates/ui.swing/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swing/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
-      //
+
+      // product files
       String projectAlias = bindings.getVariable(ITemplateVariableSet.VAR_PROJECT_ALIAS);
-      new InstallTextFileOperation("templates/ui.swing/products/development/app-client-dev.product", "products/development/" + projectAlias + "-swing-client-dev.product", project, bindings).run(monitor, workingCopyManager);
       new InstallTextFileOperation("templates/ui.swing/products/development/config.ini", "products/development/config.ini", project, bindings).run(monitor, workingCopyManager);
-      new InstallTextFileOperation("templates/ui.swing/products/production/app-client.product", "products/production/" + projectAlias + "-swing-client.product", project, bindings).run(monitor, workingCopyManager);
+      InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/ui.swing/products/development/app-client-dev.product", "products/development/" + projectAlias + "-swing-client-dev.product", project, bindings);
+      devProdInstallOp.run(monitor, workingCopyManager);
+
       new InstallTextFileOperation("templates/ui.swing/products/production/config.ini", "products/production/config.ini", project, bindings).run(monitor, workingCopyManager);
+      new InstallTextFileOperation("templates/ui.swing/products/production/app-client.product", "products/production/" + projectAlias + "-swing-client.product", project, bindings).run(monitor, workingCopyManager);
+
+      // register development product as project launcher in project-property-part
+      SdkProperties.addProjectProductLauncher(m_templateBindings.getVariable(ITemplateVariableSet.VAR_PROJECT_NAME), devProdInstallOp.getCreatedFile());
     }
     catch (MalformedURLException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));

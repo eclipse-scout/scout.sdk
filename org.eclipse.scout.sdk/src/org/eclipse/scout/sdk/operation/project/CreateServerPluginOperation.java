@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallServerProductFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -57,10 +58,14 @@ public class CreateServerPluginOperation extends AbstractCreateScoutBundleOperat
 
     // products
     new InstallTextFileOperation("templates/server/products/development/config.ini", "products/development/config.ini", project, bindings).run(monitor, workingCopyManager);
-    new InstallServerProductFileOperation("templates/server/products/development/app-server-dev.product", "products/development/" + projectAlias + "-server-dev.product", project, bindings).run(monitor, workingCopyManager);
+    InstallServerProductFileOperation devProdInstallOp = new InstallServerProductFileOperation("templates/server/products/development/app-server-dev.product", "products/development/" + projectAlias + "-server-dev.product", project, bindings);
+    devProdInstallOp.run(monitor, workingCopyManager);
 
     new InstallTextFileOperation("templates/server/products/production/config.ini", "products/production/config.ini", project, bindings).run(monitor, workingCopyManager);
     new InstallServerProductFileOperation("templates/server/products/production/app-server.product", "products/production/" + projectAlias + "-server.product", project, bindings).run(monitor, workingCopyManager);
+
+    // register development product as project launcher in project-property-part
+    SdkProperties.addProjectProductLauncher(m_templateBinding.getVariable(ITemplateVariableSet.VAR_PROJECT_NAME), devProdInstallOp.getCreatedFile());
 
     // resources
     new InstallTextFileOperation("templates/server/resources/html/index.html", "resources/html/index.html", project, bindings).run(monitor, workingCopyManager);

@@ -15,15 +15,10 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.dialog.ProductSelectionDialog;
@@ -33,6 +28,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Projec
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.Section;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.SWT;
@@ -91,7 +87,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
         ProductSelectionDialog dialog = new ProductSelectionDialog(getForm().getShell(), getScoutProject());
         dialog.setCheckedProductFiles(productFiles.toArray(new IFile[productFiles.size()]));
         if (dialog.open() == Dialog.OK) {
-          updateProducts(dialog.getCheckedProductFiles());
+          refreshProductLaunchPresenters(dialog.getCheckedProductFiles());
         }
       }
     };
@@ -107,7 +103,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     return (IScoutProject) getPage().getScoutResource();
   }
 
-  private void updateProducts(IFile[] products) {
+  private void refreshProductLaunchPresenters(IFile[] productFiles) {
     ISection section = getSection(SECTION_ID_PRODUCT_LAUNCHER);
     for (ProductLaunchPresenter p : m_launchPresenters) {
       p.dispose();
@@ -115,7 +111,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     m_launchPresenters.clear();
     Composite sectionClient = section.getSectionClient();
     TreeMap<CompositeObject, P_ProductFile> orderedProducts = new TreeMap<CompositeObject, P_ProductFile>();
-    for (IFile productFile : products) {
+    for (IFile productFile : productFiles) {
       if (productFile != null && productFile.exists()) {
         IScoutBundle scoutBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(productFile.getProject());
         int productType = -1;
@@ -139,24 +135,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   @Override
   public void init(IMemento memento) {
-    ArrayList<IFile> products = new ArrayList<IFile>();
-    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
-    String mementoProducts = node.get(SECTION_ID_PRODUCT_LAUNCHER + "_" + getScoutProject().getProjectName(), "");
-    if (!StringUtility.isNullOrEmpty(mementoProducts)) {
-      String[] productLocations = mementoProducts.split(",\\s*");
-      if (productLocations != null) {
-        for (String productPath : productLocations) {
-          if (!StringUtility.isNullOrEmpty(productPath)) {
-            IFile productFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(productPath));
-            if (productFile != null && productFile.exists()) {
-              products.add(productFile);
-            }
-          }
-        }
-      }
-    }
-    updateProducts(products.toArray(new IFile[products.size()]));
-
+    refreshProductLaunchPresenters(SdkProperties.getProjectProductLaunchers(getScoutProject().getProjectName()));
   }
 
   @Override
@@ -165,19 +144,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     for (int i = 0; i < files.length; i++) {
       files[i] = m_launchPresenters.get(i).getProductFile();
     }
-    saveProductLaunchers(getScoutProject(), files);
-  }
-
-  public static void saveProductLaunchers(IScoutProject scoutProject, IFile[] files) {
-    StringBuilder mementoString = new StringBuilder();
-    for (int i = 0; i < files.length; i++) {
-      mementoString.append(files[i].getFullPath());
-      if (i < files.length - 1) {
-        mementoString.append(",");
-      }
-    }
-    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
-    node.put(SECTION_ID_PRODUCT_LAUNCHER + "_" + scoutProject.getProjectName(), mementoString.toString());
+    SdkProperties.saveProjectProductLaunchers(getScoutProject().getProjectName(), files);
   }
 
   private class P_ProductFile {

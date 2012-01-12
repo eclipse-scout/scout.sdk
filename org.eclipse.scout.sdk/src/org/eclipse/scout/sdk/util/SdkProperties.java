@@ -10,11 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util;
 
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
  * <h3>{@link SdkProperties}</h3> ...
@@ -22,16 +30,14 @@ import org.eclipse.scout.sdk.RuntimeClasses;
  * @author Andreas Hoegger
  * @since 1.0.8 24.10.2008
  */
-public class SdkProperties {
+public final class SdkProperties {
 
   public static final int UI_STRATEGY_SWT = 1 << 0;
   public static final int UI_STRATEGY_SWING = 1 << 1;
-  public static final int UI_STRATEGY_DEMO = 1 << 2;
 
   public static final String PRODUCT_FOLDER = "products";
   public static final String PRODUCT_PRODUCTION_FOLDER = "products/production";
   public static final String PRODUCT_FOLDER_DEVELOPMENT = "products/development";
-  public static final String PRODUCT_FOLDER_TEST = "products/test";
 
   public static final String DEFAULT_SOURCE_FOLDER_NAME = "src";
 
@@ -43,7 +49,6 @@ public class SdkProperties {
   public static final int BUNDLE_TYPE_SERVER_APPLICATION = 1 << 4;
   public static final int BUNDLE_TYPE_UI_SWT = 1 << 5;
   public static final int BUNDLE_TYPE_UI_SWT_APPLICATION = 1 << 6;
-
   public static final int BUNDLE_TYPE_UI_SWING = 1 << 7;
   public static final int BUNDLE_TYPE_TEST_CLIENT = 1 << 8;
 
@@ -56,7 +61,6 @@ public class SdkProperties {
 
   public static final String SUFFIX_BOX = "Box";
   public static final String SUFFIX_BOOKMARK_STORAGE_SERVICE = "BookmarkStorageService";
-
   public static final String SUFFIX_ID = "Nr";
   public static final String SUFFIX_BUTTON = "Button";
   public static final String SUFFIX_CALENDAR_ITEM = "Item";
@@ -95,7 +99,6 @@ public class SdkProperties {
   public static final String SUFFIX_WIZARD_FORM = "Wizardform";
   public static final String SUFFIX_WIZARD = "Wizard";
   public static final String SUFFIX_WIZARD_STEP = "Step";
-  private static final String SUFFIX_WORKFLOW_TABLE_PAGE = "WorkflowPage";
   public static final String SUFFIX_FORM_HANDLER = "Handler";
   // non field suffixes
   public static final String SUFFIX_FROM = "From";
@@ -130,49 +133,6 @@ public class SdkProperties {
   public static final String TYPE_NAME_BUTTON_WIZARD_FINISH = "FinishButton";
   public static final String TYPE_NAME_BUTTON_WIZARD_CANCEL = "CancelButton";
 
-  private static HashMap<String, String> suffixMapping = new HashMap<String, String>();
-  static {
-    suffixMapping.put(RuntimeClasses.AbstractCalendarItem, SUFFIX_CALENDAR_ITEM);
-    suffixMapping.put(RuntimeClasses.AbstractCodeType, SUFFIX_CODE_TYPE);
-    suffixMapping.put(RuntimeClasses.AbstractBooleanField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractButton, SUFFIX_BUTTON);
-    suffixMapping.put(RuntimeClasses.AbstractCancelButton, SUFFIX_BUTTON);
-    suffixMapping.put(RuntimeClasses.AbstractCloseButton, SUFFIX_BUTTON);
-    suffixMapping.put(RuntimeClasses.AbstractOkButton, SUFFIX_BUTTON);
-    suffixMapping.put(RuntimeClasses.AbstractResetButton, SUFFIX_BUTTON);
-    suffixMapping.put(RuntimeClasses.AbstractSaveButton, SUFFIX_BUTTON);
-    suffixMapping.put(RuntimeClasses.AbstractSearchButton, SUFFIX_BUTTON);
-    suffixMapping.put(RuntimeClasses.AbstractCalendarField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractChartBox, SUFFIX_BOX);
-    suffixMapping.put(RuntimeClasses.AbstractCheckBox, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractComposerField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractCustomField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractDateField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractDoubleField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractFileChooserField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractForm, SUFFIX_FORM);
-    suffixMapping.put(RuntimeClasses.AbstractGroupBox, SUFFIX_BOX);
-    suffixMapping.put(RuntimeClasses.AbstractHtmlField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractImageField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractLabelField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractListBox, SUFFIX_BOX);
-    suffixMapping.put(RuntimeClasses.AbstractLongField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractMatrixField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractPageWithNodes, SUFFIX_OUTLINE_NODE_PAGE);
-    suffixMapping.put(RuntimeClasses.AbstractPageWithTable, SUFFIX_OUTLINE_TABLE_PAGE);
-    suffixMapping.put(RuntimeClasses.AbstractPlannerField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractRadioButtonGroup, SUFFIX_BUTTON_GROUP);
-    suffixMapping.put(RuntimeClasses.AbstractSequenceBox, SUFFIX_BOX);
-    suffixMapping.put(RuntimeClasses.AbstractSmartField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractStringField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractTabBox, SUFFIX_BOX);
-    suffixMapping.put(RuntimeClasses.AbstractTableField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractTimeField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.AbstractTreeBox, SUFFIX_BOX);
-    suffixMapping.put(RuntimeClasses.AbstractTreeField, SUFFIX_FORM_FIELD);
-    suffixMapping.put(RuntimeClasses.ExampleWorkflowTablePage, SUFFIX_WORKFLOW_TABLE_PAGE);
-  }
-
   public static final String PREFIX_INITIAL_MENU_SUPER_TYPE = "Abstract";
   public static final String PREFIX_INITIAL_FIELD_SUPER_TYPE = "Abstract";
   public static final String NUMBER_MAX = "inf";
@@ -180,41 +140,58 @@ public class SdkProperties {
   public static final String NULL = "None";
   public static final String INPUT_MULTI_UNDEFINED = "###";
 
+  private static final String PROJECT_PROD_LAUNCHERS = "pref_scout_project_prod_launcher";
+
+  private static final Pattern REGEX_METHOD_PRESENTER_NAME = Pattern.compile("([A-Z])");
+
   private SdkProperties() {
   }
 
-  // public static String getClientApplicationSuffix() {
-  // return "client.app.core";
-  // }
-  // public static String getClientSuffix(){
-  // return "client.core";
-  // }
-  // public static String getSharedSuffix(){
-  // return "shared.core";
-  // }
-  // public static String getServerSuffix(){
-  // return "server.core";
-  // }
+  public static void saveProjectProductLaunchers(String projectName, IFile[] productFiles) {
+    StringBuilder mementoString = new StringBuilder();
+    for (int i = 0; i < productFiles.length; i++) {
+      mementoString.append(productFiles[i].getFullPath());
+      if (i < productFiles.length - 1) {
+        mementoString.append(",");
+      }
+    }
+    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
+    node.put(PROJECT_PROD_LAUNCHERS + "_" + projectName, mementoString.toString());
+  }
 
-  //
-  // public static String getManifestGroupId(){
-  // return "BsiCase-ProjectGroupId";
-  // }
-  //
-  // public static String getManifestAlias(){
-  // return "BsiCase-Alias";
-  // }
-  //
-  // public static String getManifestIdenifier(){
-  // return "BsiCase-BundleType";
-  // }
-  //
-  // public static String getScoutPluginPrefix(){
-  // return "org.eclipse.scout.rt";
-  // }
+  public static void addProjectProductLauncher(String projectName, IFile productFile) {
+    IFile[] existingLaunchers = getProjectProductLaunchers(projectName);
+    IPath path = productFile.getFullPath();
+    for (IFile existing : existingLaunchers) {
+      if (existing.getFullPath().equals(path)) {
+        return; /* this entry already exists */
+      }
+    }
 
-  public static String getMappedSuffix(String fullyQualifiedBcType) {
-    return suffixMapping.get(fullyQualifiedBcType);
+    IFile[] newProdFiles = new IFile[existingLaunchers.length + 1];
+    System.arraycopy(existingLaunchers, 0, newProdFiles, 0, existingLaunchers.length);
+    newProdFiles[existingLaunchers.length] = productFile;
+    saveProjectProductLaunchers(projectName, newProdFiles);
+  }
+
+  public static IFile[] getProjectProductLaunchers(String projectName) {
+    ArrayList<IFile> products = new ArrayList<IFile>();
+    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
+    String mementoProducts = node.get(PROJECT_PROD_LAUNCHERS + "_" + projectName, "");
+    if (!StringUtility.isNullOrEmpty(mementoProducts)) {
+      String[] productLocations = mementoProducts.split(",\\s*");
+      if (productLocations != null && productLocations.length > 0) {
+        for (String productPath : productLocations) {
+          if (!StringUtility.isNullOrEmpty(productPath)) {
+            IFile productFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(productPath));
+            if (productFile != null && productFile.exists()) {
+              products.add(productFile);
+            }
+          }
+        }
+      }
+    }
+    return products.toArray(new IFile[products.size()]);
   }
 
   public static String getMethodPresenterName(IMethod method) {
@@ -223,9 +200,8 @@ public class SdkProperties {
     if (m.find()) {
       name = m.group(1);
     }
-    name = name.replaceAll("([A-Z])", " $1").trim();
+    name = REGEX_METHOD_PRESENTER_NAME.matcher(name).replaceAll(" $1").trim();
     name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
     return name;
   }
-
 }

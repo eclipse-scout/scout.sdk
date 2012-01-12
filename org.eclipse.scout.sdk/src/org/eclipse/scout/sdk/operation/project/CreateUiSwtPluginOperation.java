@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.operation.template.InstallSwtPluginXmlFileOperation
 import org.eclipse.scout.sdk.operation.template.InstallSwtProductFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -68,8 +69,13 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
     // products
     String projectAlias = bindings.getVariable(ITemplateVariableSet.VAR_PROJECT_ALIAS);
     new InstallTextFileOperation("templates/ui.swt/products/development/config.ini", "products/development/config.ini", project, bindings).run(monitor, workingCopyManager);
-    new InstallSwtProductFileOperation("templates/ui.swt/products/development/app-client-dev.product", "products/development/" + projectAlias + "-swt-client-dev.product", project, bindings).run(monitor, workingCopyManager);
+    InstallSwtProductFileOperation devProdInstallOp = new InstallSwtProductFileOperation("templates/ui.swt/products/development/app-client-dev.product", "products/development/" + projectAlias + "-swt-client-dev.product", project, bindings);
+    devProdInstallOp.run(monitor, workingCopyManager);
+
     new InstallTextFileOperation("templates/ui.swt/products/production/config.ini", "products/production/config.ini", project, bindings).run(monitor, workingCopyManager);
     new InstallSwtProductFileOperation("templates/ui.swt/products/production/app-client.product", "products/production/" + projectAlias + "-swt-client.product", project, bindings).run(monitor, workingCopyManager);
+
+    // register development product as project launcher in project-property-part
+    SdkProperties.addProjectProductLauncher(m_templateBindings.getVariable(ITemplateVariableSet.VAR_PROJECT_NAME), devProdInstallOp.getCreatedFile());
   }
 }
