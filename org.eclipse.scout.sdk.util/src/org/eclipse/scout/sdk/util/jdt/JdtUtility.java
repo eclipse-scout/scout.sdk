@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.util.jdt;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -24,7 +23,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.osgi.framework.Version;
 
 public final class JdtUtility {
   private JdtUtility() {
@@ -38,14 +36,6 @@ public final class JdtUtility {
 
   public static boolean hasAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
     return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
-  }
-
-  public static boolean isPlatformE4() {
-    return JdtUtility.getPlatformVersion().getMajor() == 4;
-  }
-
-  public static Version getPlatformVersion() {
-    return Platform.getProduct().getDefiningBundle().getVersion();
   }
 
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {

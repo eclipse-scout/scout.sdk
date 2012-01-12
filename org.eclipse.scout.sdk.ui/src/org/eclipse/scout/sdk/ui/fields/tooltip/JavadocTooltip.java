@@ -42,7 +42,7 @@ import org.eclipse.jface.internal.text.html.HTMLPrinter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.PlatformUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -283,7 +283,7 @@ public class JavadocTooltip extends AbstractTooltip {
   private String addImageAndLabel(IJavaElement member, String imageName, String label) {
     // workaround to make internal 3.X code accessible with API changes.
     StringBuffer buffer = new StringBuffer();
-    Version frameworkVersion = JdtUtility.getPlatformVersion();
+    Version frameworkVersion = PlatformUtility.getPlatformVersion();
     if (frameworkVersion.getMajor() == 3) {
       if (frameworkVersion.getMinor() <= 5) {
         try {

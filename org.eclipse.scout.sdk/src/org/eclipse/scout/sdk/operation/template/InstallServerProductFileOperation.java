@@ -3,11 +3,10 @@ package org.eclipse.scout.sdk.operation.template;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.PlatformUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
-import org.osgi.framework.Version;
 
 public class InstallServerProductFileOperation extends InstallTextFileOperation {
   public InstallServerProductFileOperation(String srcPath, String dstPath, IProject dstProject) {
@@ -26,9 +25,7 @@ public class InstallServerProductFileOperation extends InstallTextFileOperation 
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
 
-    Version frameworkVersion = JdtUtility.getPlatformVersion();
-    if ((frameworkVersion.getMajor() == 4 && frameworkVersion.getMinor() > 1) ||
-        (frameworkVersion.getMajor() == 3 && frameworkVersion.getMinor() > 7)) {
+    if (PlatformUtility.isPlatformJuno()) {
       // jetty plugins have been renamed: jetty <= 6 is named "org.mortbay..." while jetty > 6 is called "org.eclipse.jetty..."
       // see http://wiki.eclipse.org/Jetty/Getting_Started/Porting_to_Jetty_7/Refactoring
       // eclipse 3.8 and 4.2 uses jetty >= 7 -> rename jetty plugins

@@ -3,7 +3,7 @@ package org.eclipse.scout.sdk.operation.template;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.PlatformUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
@@ -25,7 +25,7 @@ public class InstallSwtProductFileOperation extends InstallTextFileOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
 
-    if (JdtUtility.isPlatformE4()) {
+    if (PlatformUtility.isPlatformE4()) {
       final String[] additionalE4Plugins = new String[]{
           "org.eclipse.e4.core.commands",
           "org.eclipse.e4.core.contexts",

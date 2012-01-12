@@ -6,7 +6,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.pde.core.plugin.IExtensionsModelFactory;
 import org.eclipse.pde.core.plugin.IPluginElement;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.PlatformUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
@@ -28,7 +28,7 @@ public class InstallSwtPluginXmlFileOperation extends InstallTextFileOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
 
-    if (JdtUtility.isPlatformE4()) {
+    if (PlatformUtility.isPlatformE4()) {
       final String[][] additionalE4Properties = new String[][]{
           {"applicationXMI", "org.eclipse.platform/LegacyIDE.e4xmi"},
           {"cssTheme", "org.eclipse.e4.ui.css.theme.e4_default"},
