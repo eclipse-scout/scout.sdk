@@ -6,7 +6,7 @@
       <bundleNode
             bundleName="ui.rap"
             bundleType="GUI_Bundle"
-            class="org.eclipse.scout.sdk.ui.rap.internal.extensions.bundle.RapScoutBundleExtension"
+            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle.RapScoutBundleExtension"
             icon="resources/icons/uiBundle.png"
             id="org.eclipse.scout.sdk.ui.UiRapBundle"
             orderNumber="30">
@@ -15,27 +15,27 @@
    <extension
          point="org.eclipse.scout.sdk.ui.contextMenuContributor">
       <contributor
-            class="org.eclipse.scout.sdk.ui.rap.DebugContextMenuContributor"
+            class="org.eclipse.scout.sdk.rap.ui.DebugContextMenuContributor"
             page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage">
       </contributor>
    </extension>
    <extension
          point="org.eclipse.scout.sdk.ui.contextMenu">
       <contextMenu
-            class="org.eclipse.scout.sdk.ui.rap.internal.ModifyXmlAction">
+            class="org.eclipse.scout.sdk.rap.ui.internal.ModifyXmlAction">
       </contextMenu>
    </extension>
    <extension
          point="org.eclipse.scout.sdk.ui.explorerPage">
       <pageFactory
-            factory="org.eclipse.scout.sdk.ui.rap.internal.extensions.UiRapBundleNodeFactory"
+            factory="org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory"
             parentPageId="org.eclipse.scout.sdk.page.ProjectNodePage">
       </pageFactory>
    </extension>
    <extension
          point="org.eclipse.scout.sdk.ui.propertyViewPart">
       <part
-            page="org.eclipse.scout.sdk.ui.rap.internal.view.outline.pages.project.UiRapNodePage"
+            page="org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project.UiRapNodePage"
             ranking="-1">
          <singlePart
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">

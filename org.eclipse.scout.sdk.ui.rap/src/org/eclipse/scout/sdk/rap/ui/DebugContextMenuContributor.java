@@ -8,11 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.rap;
+package org.eclipse.scout.sdk.rap.ui;
 
+import org.eclipse.scout.sdk.rap.ui.internal.ModifyXmlAction;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
-import org.eclipse.scout.sdk.ui.rap.internal.ModifyXmlAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;

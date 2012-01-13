@@ -8,9 +8,9 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.rap.internal.view.outline.pages.project;
+package org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project;
 
-import org.eclipse.scout.sdk.ui.rap.ScoutSdkRapUI;
+import org.eclipse.scout.sdk.rap.ui.ScoutSdkRapUI;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;

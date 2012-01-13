@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.rap;
+package org.eclipse.scout.sdk.rap.ui;
 
 /**
  *

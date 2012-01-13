@@ -8,7 +8,7 @@
  *  Contributors:
  *      BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.rap.internal.wizard.project;
+package org.eclipse.scout.sdk.rap.ui.internal.wizard.project;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateAjaxServletOperation;
 import org.eclipse.scout.sdk.rap.operations.project.InstallTargetPlatformFileOperation;
+import org.eclipse.scout.sdk.rap.ui.ScoutSdkRapUI;
 import org.eclipse.scout.sdk.ui.fields.FileSelectionField;
 import org.eclipse.scout.sdk.ui.fields.IFileSelectionListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -39,7 +40,6 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizard;
-import org.eclipse.scout.sdk.ui.rap.ScoutSdkRapUI;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.PlatformUtility;

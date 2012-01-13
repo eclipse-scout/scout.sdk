@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.rap.internal.extensions.bundle;
+package org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,10 +18,10 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.rap.operations.project.UiRapBundleNewOperation;
+import org.eclipse.scout.sdk.rap.ui.internal.wizard.project.RapTargetPlatformWizardPage;
 import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.rap.internal.wizard.project.RapTargetPlatformWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
