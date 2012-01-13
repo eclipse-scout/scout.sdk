@@ -25,7 +25,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
-  public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ui.rap";
+  public static final String PLUGIN_ID = "org.eclipse.scout.sdk.rap.ui";
 
   private static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
   private static final String IMAGE_PATH = "resources/icons/";

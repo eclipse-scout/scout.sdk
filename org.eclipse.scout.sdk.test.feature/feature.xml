@@ -36,8 +36,8 @@ BSI Business Systems Integration AG - initial API and implementation
          optional="true"/>
 
    <requires>
-      <import feature="org.eclipse.scout.sdk.feature" version="3.5.0" match="compatible"/>
-      <import feature="org.eclipse.scout.sdk.feature.source" version="3.5.0" match="compatible"/>
+      <import feature="org.eclipse.scout.sdk.feature" version="3.8.0" match="compatible"/>
+      <import feature="org.eclipse.scout.sdk.feature.source" version="3.8.0" match="compatible"/>
    </requires>
 
    <plugin

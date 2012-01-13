@@ -6,7 +6,7 @@
       provider-name="%providerName">
 
    <description url="http://www.example.com/description">
-      RAP (Rich Ajax Platform support for Eclipse Scout.
+      RAP (Rich Ajax Platform) support for Eclipse Scout.
    </description>
 
    <copyright>
@@ -36,11 +36,8 @@ BSI Business Systems Integration AG - initial API and implementation
          optional="true"/>
 
    <requires>
-      <import feature="org.eclipse.pde" version="3.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.platform" version="3.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.scout.rt.rap.feature" version="3.5.5" match="greaterOrEqual"/>
-      <import feature="org.eclipse.scout.rt.rap.feature.source" version="3.5.5" match="greaterOrEqual"/>
+      <import feature="org.eclipse.scout.sdk.feature" version="3.8.0.qualifier"/>
+      <import feature="org.eclipse.scout.sdk.feature.source" version="3.8.0.qualifier"/>
    </requires>
 
    <plugin
