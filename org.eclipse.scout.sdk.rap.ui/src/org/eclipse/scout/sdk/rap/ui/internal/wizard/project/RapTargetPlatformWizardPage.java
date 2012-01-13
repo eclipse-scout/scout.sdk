@@ -4,7 +4,7 @@
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
  *  http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  *  Contributors:
  *      BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -87,7 +87,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   public RapTargetPlatformWizardPage() {
     super(RapTargetPlatformWizardPage.class.getName());
     // init proposals
-    remoteUrlProposalV_1_4 = new DefaultProposal("Version 1.4 (recomanded)", ScoutSdkUi.getImage(ScoutSdkUi.Default));
+    remoteUrlProposalV_1_4 = new DefaultProposal("Version 1.4 (recommended)", ScoutSdkUi.getImage(ScoutSdkUi.Default));
     remoteUrlProposalV_1_4.setData(PROP_REMOTE_TARGET_URL, "http://download.eclipse.org/rt/rap/1.4/runtime");
     remoteUrlProposalVLatest = new DefaultProposal("Latest release (experimental)", ScoutSdkUi.getImage(ScoutSdkUi.Default));
     remoteUrlProposalVLatest.setData(PROP_REMOTE_TARGET_URL, "http://download.eclipse.org/rt/rap/latest-release/runtime");
