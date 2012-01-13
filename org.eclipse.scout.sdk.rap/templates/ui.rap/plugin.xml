@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+  <extension id="product" point="org.eclipse.core.runtime.products">
+    <product
+      application="@@BUNDLE_RAP_NAME@@.app"
+      name="@@ALIAS@@">
+      <property
+        name="appName"
+        value="@@ALIAS@@">
+      </property>
+    </product>
+  </extension>
+  <extension id="app" name="@@ALIAS@@" point="org.eclipse.core.runtime.applications">
+   <application>
+     <run class="org.eclipse.scout.rt.ui.rap.RwtApplication"/>
+   </application>
+  </extension>
+  <extension
+    point="org.eclipse.scout.rt.ui.rap.lookAndFeel">
+    <decorations
+      scope="global">
+      <mandatory>
+        <starMarker
+          placement="afterLabel">
+        </starMarker>
+      </mandatory>
+    </decorations>
+    <properties
+      scope="global">
+      <property
+        name="formMainBoxBorder.visible"
+        value="false">
+      </property>
+    </properties>
+  </extension>
+  <extension
+    point="org.eclipse.rap.ui.entrypoint">
+    <entrypoint
+      class="@@BUNDLE_RAP_NAME@@.StandaloneRwtEnvironment"
+      id="default"
+      parameter="default"/>
+  </extension>
+
+  <extension point="org.eclipse.rap.ui.branding">
+    <branding body="web-resources/startup-body.html" favicon="web-resources/eclipseScout.gif" id="@@BUNDLE_RAP_NAME@@.branding" servletName="rap" themeId="org.eclipse.scout.rt.ui.rap.theme" title="@@ALIAS@@">
+      <additionalHeaders>
+        <link href="res/html-styles.css" rel="stylesheet"/>
+      </additionalHeaders>
+    </branding>
+    <branding body="web-resources/startup-body.html" favicon="web-resources/eclipseScout.gif" id="@@BUNDLE_RAP_NAME@@.branding" servletName="extern.rap" themeId="org.eclipse.scout.rt.ui.rap.theme" title="@@ALIAS@@">
+      <additionalHeaders>
+        <link href="res/html-styles.css" rel="stylesheet"/>
+      </additionalHeaders>
+    </branding>
+  </extension>
+  <extension point="org.eclipse.rap.ui.themes">
+    <themeContribution file="theme/application.css" themeId="org.eclipse.scout.rt.ui.rap.theme"/>
+  </extension>
+  <extension point="org.eclipse.equinox.http.registry.resources">
+    <resource alias="/res" base-name="/web-resources"/>
+  </extension>
+  <extension
+    point="org.eclipse.scout.http.servletfilter.filters">
+    <filter
+      aliases="/rap"
+      class="org.eclipse.scout.http.servletfilter.security.AnonymousSecurityFilter"
+      ranking="10">
+    </filter>
+  </extension>
+</plugin>
