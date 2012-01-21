@@ -10,93 +10,73 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.helper;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 
 import junit.framework.Assert;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.project.CreateClientBundleOperation;
+import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateUiSwingPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateUiSwtPluginOperation;
-import org.eclipse.scout.sdk.operation.project.FillClientPluginOperation;
-import org.eclipse.scout.sdk.operation.project.FillServerPluginOperation;
-import org.eclipse.scout.sdk.operation.project.FillSharedPluginOperation;
-import org.eclipse.scout.sdk.operation.project.FillUiSwingPluginOperation;
-import org.eclipse.scout.sdk.operation.project.FillUiSwtPluginOperation;
-import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
+import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
+import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
  *
  */
 public final class ScoutProjectHelper {
+  public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server, PropertyMap properties) throws Exception {
+    return setupNewProject(projectName, client, shared, server, false, false, properties);
+  }
+
   public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server) throws Exception {
     return setupNewProject(projectName, client, shared, server, false, false);
-
   }
 
   public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing) throws Exception {
-    TemplateVariableSet vars = TemplateVariableSet.createNew(projectName, "", "alias");
-    List<IOperation> createOps = new ArrayList<IOperation>();
-    CreateClientBundleOperation clientOp = null;
-    CreateSharedPluginOperation sharedOp = null;
-    CreateServerPluginOperation serverOp = null;
-    CreateUiSwtPluginOperation swtOp = null;
-    CreateUiSwingPluginOperation swingOp = null;
+    return setupNewProject(projectName, client, shared, server, uiSwt, uiSwing, new PropertyMap());
+  }
+
+  public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing, PropertyMap properties) throws Exception {
+    // define settings what to create
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, projectName);
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, "");
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, "alias");
+    HashSet<String> nodesToCreate = new HashSet<String>();
     if (client) {
-      clientOp = new CreateClientBundleOperation(vars);
-      createOps.add(clientOp);
+      nodesToCreate.add(CreateClientPluginOperation.BUNDLE_ID);
     }
     if (shared) {
-      sharedOp = new CreateSharedPluginOperation(vars);
-      createOps.add(sharedOp);
+      nodesToCreate.add(CreateSharedPluginOperation.BUNDLE_ID);
     }
     if (server) {
-      serverOp = new CreateServerPluginOperation(vars);
-      createOps.add(serverOp);
+      nodesToCreate.add(CreateServerPluginOperation.BUNDLE_ID);
     }
     if (uiSwt) {
-      swtOp = new CreateUiSwtPluginOperation(vars);
-      createOps.add(swtOp);
+      nodesToCreate.add(CreateUiSwtPluginOperation.BUNDLE_ID);
     }
     if (uiSwing) {
-      swingOp = new CreateUiSwingPluginOperation(vars);
-      createOps.add(swingOp);
+      nodesToCreate.add(CreateUiSwingPluginOperation.BUNDLE_ID);
     }
-    OperationJob createJob = new OperationJob(createOps);
-    createJob.schedule();
-    createJob.join();
-    List<IOperation> fillOps = new ArrayList<IOperation>();
-    if (clientOp != null) {
-      FillClientPluginOperation fillClientOp = new FillClientPluginOperation(clientOp.getCreatedProject(), vars);
-      fillOps.add(fillClientOp);
-    }
-    if (sharedOp != null) {
-      FillSharedPluginOperation fillSharedOp = new FillSharedPluginOperation(sharedOp.getCreatedProject(), vars);
-      fillOps.add(fillSharedOp);
-    }
-    if (serverOp != null) {
-      FillServerPluginOperation fillServerOp = new FillServerPluginOperation(serverOp.getCreatedProject(), vars);
-      fillOps.add(fillServerOp);
-    }
-    if (swtOp != null) {
-      FillUiSwtPluginOperation fillSwtOp = new FillUiSwtPluginOperation(swtOp.getCreatedProject(), vars);
-      fillOps.add(fillSwtOp);
-    }
-    if (swingOp != null) {
-      FillUiSwingPluginOperation fillSwingOp = new FillUiSwingPluginOperation(swingOp.getCreatedProject(), vars);
-      fillOps.add(fillSwingOp);
-    }
-    OperationJob fillJob = new OperationJob(fillOps);
-    fillJob.schedule();
-    fillJob.join();
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_CHECKED_NODES, nodesToCreate);
+
+    // execute scout project creation according to the properties defined
+    ScoutProjectNewOperation mainOperation = new ScoutProjectNewOperation();
+    mainOperation.setProperties(properties);
+    OperationJob job = new OperationJob(mainOperation);
+    job.schedule();
+    job.join();
+
+    // build and wait for silent workspace
     AbstractScoutSdkTest.buildWorkspace();
+
+    // get scout workspace
     IScoutProject[] rootProjects = ScoutSdkCore.getScoutWorkspace().getRootProjects();
     Assert.assertEquals(1, rootProjects.length);
     IScoutProject scoutProject = rootProjects[0];

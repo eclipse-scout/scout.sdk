@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.internal.test.bug.beforeopensource;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -37,13 +36,13 @@ public class Bug77596Test extends AbstractScoutSdkTest {
     IType form = TypeUtility.getType("com.bsiag.miniapp.client.ui.forms.CompanyForm");
     Assert.assertTrue(TypeUtility.exists(form));
     IStructuredType helper = null;
-    try {
-      TuningUtility.startTimer();
-      helper = ScoutTypeUtility.createStructuredForm(form);
-    }
+    /*try {
+      TuningUtility.startTimer();*/
+    helper = ScoutTypeUtility.createStructuredForm(form);
+    /*}
     finally {
       TuningUtility.stopTimer("time to build structure helper.");
-    }
+    }*/
     return helper;
   }
 

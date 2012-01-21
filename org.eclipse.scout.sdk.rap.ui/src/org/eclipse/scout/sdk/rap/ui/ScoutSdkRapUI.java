@@ -10,12 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.ui;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
-import org.eclipse.scout.sdk.util.log.LogStatus;
+import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Image;
@@ -29,97 +27,62 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
 
   private static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
   private static final String IMAGE_PATH = "resources/icons/";
+
   private static ScoutSdkRapUI plugin;
-  private int m_loglevel;
+  private static SdkLogManager logManager;
 
   @Override
   public void start(BundleContext bundleContext) throws Exception {
     super.start(bundleContext);
-    m_loglevel = parseLogLevel(bundleContext.getProperty(LOG_LEVEL));
     plugin = this;
+    logManager = new SdkLogManager(this);
   }
 
   @Override
   public void stop(BundleContext bundleContext) throws Exception {
     super.stop(bundleContext);
     plugin = null;
+    logManager = null;
   }
 
   public static ScoutSdkRapUI getDefault() {
     return plugin;
   }
 
-  private int parseLogLevel(String loglevel) {
-    int level = IStatus.INFO | IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
-    if (!StringUtility.isNullOrEmpty(loglevel)) {
-      String lowerLoglevel = loglevel.toLowerCase();
-      if (lowerLoglevel.equals("warning")) {
-        level = IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
-      }
-      else if (lowerLoglevel.equals("error")) {
-        level = IStatus.ERROR | IStatus.CANCEL;
-      }
-      else if (lowerLoglevel.equals("cancel")) {
-        level = IStatus.CANCEL;
-      }
-    }
-    return level;
-  }
-
-  public static void log(IStatus log) {
-    if (log instanceof LogStatus) {
-      getDefault().logImpl((LogStatus) log);
-    }
-    else {
-      getDefault().logImpl(new LogStatus(ScoutSdkRapUI.class, log.getSeverity(), log.getPlugin(), log.getMessage(), log.getException()));
-    }
-  }
-
-  private void logImpl(LogStatus log) {
-    if ((log.getSeverity() & m_loglevel) != 0) {
-      getLog().log(log);
-    }
+  public static void logInfo(Throwable t) {
+    logManager.logInfo(t);
   }
 
   public static void logInfo(String message) {
-    logInfo(message, null);
+    logManager.logInfo(message);
   }
 
   public static void logInfo(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    getDefault().logImpl(new LogStatus(ScoutSdkRapUI.class, IStatus.INFO, PLUGIN_ID, message, t));
+    logManager.logInfo(message, t);
   }
 
   public static void logWarning(String message) {
-    logWarning(message, null);
+    logManager.logWarning(message);
   }
 
   public static void logWarning(Throwable t) {
-    logWarning(null, t);
+    logManager.logWarning(t);
   }
 
   public static void logWarning(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    getDefault().logImpl(new LogStatus(ScoutSdkRapUI.class, IStatus.WARNING, PLUGIN_ID, message, t));
+    logManager.logWarning(message, t);
   }
 
   public static void logError(Throwable t) {
-    logError("", t);
+    logManager.logError(t);
   }
 
   public static void logError(String message) {
-    logError(message, null);
+    logManager.logError(message);
   }
 
   public static void logError(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    getDefault().logImpl(new LogStatus(ScoutSdkRapUI.class, IStatus.ERROR, PLUGIN_ID, message, t));
+    logManager.logError(message, t);
   }
 
   @Override

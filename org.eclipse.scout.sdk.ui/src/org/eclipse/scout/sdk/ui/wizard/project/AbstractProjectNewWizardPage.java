@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.project;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.PropertyMap;
 
 /**
  * <h3>AbstractProjectNewWizardPage</h3> ...
@@ -31,8 +31,5 @@ public abstract class AbstractProjectNewWizardPage extends AbstractWorkspaceWiza
 
   }
 
-  public boolean performFinish(IProgressMonitor monitor) {
-    return true;
-  }
-
+  public abstract void putProperties(PropertyMap properties);
 }

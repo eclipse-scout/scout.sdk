@@ -10,24 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
+import java.util.Map;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
-import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-public class FillServerPluginOperation implements IOperation {
-  private final IProject m_project;
-  private final ITemplateVariableSet m_templateBindings;
-
-  public FillServerPluginOperation(IProject project, ITemplateVariableSet templageBindings) {
-    m_project = project;
-    m_templateBindings = templageBindings;
-  }
+public class FillServerPluginOperation extends AbstractScoutProjectNewOperation {
+  private IProject m_project;
 
   @Override
   public String getOperationName() {
@@ -35,25 +28,33 @@ public class FillServerPluginOperation implements IOperation {
   }
 
   @Override
+  public boolean isRelevant() {
+    return isNodeChecked(CreateServerPluginOperation.BUNDLE_ID);
+  }
+
+  @Override
+  public void init() {
+    String serverPluginName = getProperties().getProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, String.class);
+    m_project = getCreatedBundle(serverPluginName).getProject();
+  }
+
+  @Override
   public void validate() throws IllegalArgumentException {
-    if (getProject() == null) {
+    super.validate();
+    if (m_project == null) {
       throw new IllegalArgumentException("project can not be null.");
     }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    TemplateVariableSet bindings = TemplateVariableSet.createNew(getProject(), m_templateBindings);
-    String destPathPref = "src/" + (getProject().getName().replace('.', '/')) + "/";
-    new InstallJavaFileOperation("templates/server/src/Activator.java", destPathPref + "Activator.java", getProject(), bindings).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/server/src/ServerApplication.java", destPathPref + "ServerApplication.java", getProject(), bindings).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/server/src/ServerSession.java", destPathPref + "ServerSession.java", getProject(), bindings).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/server/src/AccessControlService.java", destPathPref + "services/custom/security/AccessControlService.java", getProject(), bindings).run(monitor, workingCopyManager);
-    getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+    String destPathPref = "src/" + (m_project.getName().replace('.', '/')) + "/";
+    Map<String, String> props = getStringProperties();
+    new InstallJavaFileOperation("templates/server/src/Activator.java", destPathPref + "Activator.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/server/src/ServerApplication.java", destPathPref + "ServerApplication.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/server/src/ServerSession.java", destPathPref + "ServerSession.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/server/src/AccessControlService.java",
+        destPathPref + "services/custom/security/AccessControlService.java", m_project, props).run(monitor, workingCopyManager);
+    m_project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
-
-  public IProject getProject() {
-    return m_project;
-  }
-
 }

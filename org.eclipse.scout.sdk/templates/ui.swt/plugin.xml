@@ -61,14 +61,4 @@
           value="resources/icons/eclipseScout16x16.gif,resources/icons/eclipseScout32x32.gif"/>
     </product>
   </extension>
-  <extension
-      point="org.eclipse.ui.views">
-   <view
-         class="org.eclipse.ui.internal.progress.ProgressView"
-         icon="resources/icons/progress_none.gif"
-         id="org.eclipse.ui.views.ProgressView"
-         name="Progress View">
-   </view>
-  </extension>
-
 </plugin>

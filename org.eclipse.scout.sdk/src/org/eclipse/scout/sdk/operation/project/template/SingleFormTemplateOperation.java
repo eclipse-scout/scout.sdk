@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.FormHandlerNewOperation;
@@ -28,6 +27,7 @@ import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
@@ -44,22 +44,31 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
-public class SingleFormTemplateOperation implements IOperation {
+public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperation {
 
-  IScoutProject m_scoutProject;
+  public final static String TEMPLATE_ID = "ID_SINGLE_FORM_TEMPLATE";
 
-  public SingleFormTemplateOperation(IScoutProject scoutProject) {
-    m_scoutProject = scoutProject;
-  }
+  private IScoutProject m_scoutProject;
 
   @Override
   public String getOperationName() {
-    return "Applay single form tempalte...";
+    return "Apply single form template...";
+  }
+
+  @Override
+  public boolean isRelevant() {
+    return TEMPLATE_ID.equals(getTemplateName());
+  }
+
+  @Override
+  public void init() {
+    m_scoutProject = getScoutProject();
   }
 
   @Override
   public void validate() throws IllegalArgumentException {
-    if (getScoutProject() == null) {
+    super.validate();
+    if (m_scoutProject == null) {
       throw new IllegalArgumentException("scout project must not be null.");
     }
   }
@@ -67,7 +76,7 @@ public class SingleFormTemplateOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     String formName = "DesktopForm";
-    IScoutBundle sharedBundle = getScoutProject().getSharedBundle();
+    IScoutBundle sharedBundle = m_scoutProject.getSharedBundle();
     ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
     formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
     formDataOp.run(monitor, workingCopyManager);
@@ -79,7 +88,7 @@ public class SingleFormTemplateOperation implements IOperation {
     // form
     FormNewOperation formOp = new FormNewOperation();
     formOp.setFormDataSignature(formDataSignature);
-    formOp.setClientBundle(getScoutProject().getClientBundle());
+    formOp.setClientBundle(m_scoutProject.getClientBundle());
     formOp.setCreateButtonCancel(false);
     formOp.setCreateButtonOk(false);
     formOp.setSuperType(Signature.createTypeSignature(RuntimeClasses.AbstractForm, true));
@@ -88,7 +97,7 @@ public class SingleFormTemplateOperation implements IOperation {
     final IType form = formOp.getCreatedFormType();
     workingCopyManager.reconcile(form.getCompilationUnit(), monitor);
 
-    final ScoutIconDesc icon = getScoutProject().getIconProvider().getIcon("eclipse_scout");
+    final ScoutIconDesc icon = m_scoutProject.getIconProvider().getIcon("eclipse_scout");
     if (icon != null) {
       MethodOverrideOperation iconIdOverrideOp = new MethodOverrideOperation(form, "getConfiguredIconId", true) {
         @Override
@@ -117,9 +126,9 @@ public class SingleFormTemplateOperation implements IOperation {
 
     // process service
     ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation();
-    serviceOp.setClientServiceRegistryBundles(new IScoutBundle[]{getScoutProject().getClientBundle()});
-    serviceOp.setServerServiceRegistryBundles(new IScoutBundle[]{getScoutProject().getServerBundle()});
-    serviceOp.setServiceImplementationBundle(getScoutProject().getServerBundle());
+    serviceOp.setClientServiceRegistryBundles(new IScoutBundle[]{m_scoutProject.getClientBundle()});
+    serviceOp.setServerServiceRegistryBundles(new IScoutBundle[]{m_scoutProject.getServerBundle()});
+    serviceOp.setServiceImplementationBundle(m_scoutProject.getServerBundle());
     serviceOp.setServiceImplementationName("DesktopProcessService");
     serviceOp.setServiceInterfaceBundle(sharedBundle);
     serviceOp.setServiceInterfaceName("IDesktopProcessService");
@@ -190,7 +199,7 @@ public class SingleFormTemplateOperation implements IOperation {
     formDataUpdateOp.run(monitor, workingCopyManager);
 
     // desktop
-    IType desktopType = TypeUtility.getType(getScoutProject().getClientBundle().getBundleName() + IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP + ".Desktop");
+    IType desktopType = TypeUtility.getType(m_scoutProject.getClientBundle().getBundleName() + IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP + ".Desktop");
     if (TypeUtility.exists(desktopType)) {
       MethodOverrideOperation execOpenOp = new MethodOverrideOperation(desktopType, "execOpened") {
         @Override
@@ -199,7 +208,7 @@ public class SingleFormTemplateOperation implements IOperation {
           sourceBuilder.append("// dektop form\n");
           String treeFormRef = validator.getSimpleTypeRef(Signature.createTypeSignature(form.getFullyQualifiedName(), true));
           sourceBuilder.append(treeFormRef + " desktopForm = new " + treeFormRef + "();\n");
-          ScoutIconDesc icn = getScoutProject().getIconProvider().getIcon("eclipse_scout");
+          ScoutIconDesc icn = m_scoutProject.getIconProvider().getIcon("eclipse_scout");
           if (icn != null) {
             String iconsRef = validator.getSimpleTypeRef(Signature.createTypeSignature(icn.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
             sourceBuilder.append("desktopForm.setIconId(" + iconsRef + "." + icn.getConstantField().getElementName() + ");\n");
@@ -214,12 +223,4 @@ public class SingleFormTemplateOperation implements IOperation {
       execOpenOp.run(monitor, workingCopyManager);
     }
   }
-
-  /**
-   * @return the scoutProject
-   */
-  public IScoutProject getScoutProject() {
-    return m_scoutProject;
-  }
-
 }

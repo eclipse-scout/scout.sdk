@@ -10,23 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.project.template;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
 import org.eclipse.scout.sdk.ui.extensions.project.template.IProjectTemplate;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ClientScoutBundleExtension;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 
-/**
- *
- */
 public class DesktopFormTemplate implements IProjectTemplate {
-  public static final String ID = "org.eclipse.scout.sdk.ui.dektopFormTemplate";
-
   @Override
   public String getText() {
     return Texts.get("ApplicationWithASingleForm");
@@ -39,19 +29,11 @@ public class DesktopFormTemplate implements IProjectTemplate {
 
   @Override
   public boolean isApplicable(IScoutProjectWizard wizard) {
-    return wizard.getProjectWizardPage().isBundleNodesSelected(ClientScoutBundleExtension.BUNDLE_ID);
+    return wizard.getProjectWizardPage().isBundleNodesSelected(CreateClientPluginOperation.BUNDLE_ID);
   }
 
   @Override
-  public void apply(IScoutProject project, IProgressMonitor monitor, IWorkingCopyManager manager) {
-    try {
-      SingleFormTemplateOperation op = new SingleFormTemplateOperation(project);
-      op.validate();
-      op.run(monitor, manager);
-    }
-    catch (CoreException e) {
-      ScoutSdkUi.logError("could not apply DesktopFormTemplate.", e);
-    }
+  public String getId() {
+    return SingleFormTemplateOperation.TEMPLATE_ID;
   }
-
 }

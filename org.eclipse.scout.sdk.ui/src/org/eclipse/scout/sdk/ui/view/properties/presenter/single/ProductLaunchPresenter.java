@@ -194,13 +194,15 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     model.addGlobalLink(new FileOpenLink(getProductFile(), 10, IPDEUIConstants.PRODUCT_EDITOR_ID));
     // find config.ini
     IConfigurationFileInfo info = m_productModel.getProduct().getConfigurationFileInfo();
-    String path = info.getPath(Platform.getOS());
-    if (path == null) {
-      path = info.getPath(null);
-    }
-    if (!StringUtility.isNullOrEmpty(path)) {
-      IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
-      model.addGlobalLink(new FileOpenLink(configIniFile, 20, EditorsUI.DEFAULT_TEXT_EDITOR_ID));
+    if (info != null) {
+      String path = info.getPath(Platform.getOS());
+      if (path == null) {
+        path = info.getPath(null);
+      }
+      if (!StringUtility.isNullOrEmpty(path)) {
+        IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
+        model.addGlobalLink(new FileOpenLink(configIniFile, 20, EditorsUI.DEFAULT_TEXT_EDITOR_ID));
+      }
     }
 
     LinksPresenter presenter = new LinksPresenter(getToolkit(), parent, model);

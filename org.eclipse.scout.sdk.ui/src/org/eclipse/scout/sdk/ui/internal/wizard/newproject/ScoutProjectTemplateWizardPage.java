@@ -14,8 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -25,15 +23,14 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.project.template.ProjectTemplateExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.project.template.ProjectTemplateExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -97,17 +94,11 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor) {
-    OperationJob performFinishJob = new OperationJob(new P_PerformFinishOperation());
-    performFinishJob.schedule();
-    try {
-      performFinishJob.join();
+  public void putProperties(PropertyMap properties) {
+    if (m_selectedTemplate != null) {
+      // set which template has been selected
+      properties.setProperty(IScoutProjectNewOperation.PROP_SELECTED_TEMPLATE_NAME, m_selectedTemplate.getTemplate().getId());
     }
-    catch (InterruptedException e) {
-      ScoutSdkUi.logWarning("perform finish job of Project Template step get canceled.", e);
-      return false;
-    }
-    return true;
   }
 
   @Override
@@ -200,43 +191,20 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
     public void addListener(ILabelProviderListener listener) {
-      // TODO Auto-generated method stub
 
     }
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
-      // TODO Auto-generated method stub
       return false;
     }
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
-      // TODO Auto-generated method stub
     }
   } // end class P_ContentProvider
-
-  private class P_PerformFinishOperation implements IOperation {
-    @Override
-    public String getOperationName() {
-      return "apply template...";
-    }
-
-    @Override
-    public void validate() throws IllegalArgumentException {
-    }
-
-    @Override
-    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-      if (m_selectedTemplate != null) {
-        m_selectedTemplate.getTemplate().apply(getWizard().getCreatedProject(), monitor, workingCopyManager);
-      }
-    }
-  }
 }

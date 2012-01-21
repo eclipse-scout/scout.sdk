@@ -13,20 +13,13 @@ package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 import java.beans.PropertyChangeListener;
 import java.util.HashSet;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -41,9 +34,8 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
-import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -60,6 +52,7 @@ import org.eclipse.swt.widgets.Label;
  * @author Andreas Hoegger
  * @since 1.0.8 06.03.2010
  */
+
 public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage implements IScoutProjectWizardPage {
   static final int TYPE_BUNDLE = 99;
 
@@ -148,11 +141,6 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     for (ScoutBundleExtension e : ScoutBundleExtensionPoint.getExtensions()) {
       TreeUtility.createNode(rootNode, TYPE_BUNDLE, e.getBundleName(), ScoutSdkUi.getImageDescriptor(e.getIconPath()), e.getOrderNumber(), e);
     }
-//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWING, "ui.swing", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwingBundle), TYPE_BUNDLE_SWING);
-//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SWT, "ui.swt", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwtBundle), TYPE_BUNDLE_SWT);
-//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_CLIENT, "client", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientBundle), TYPE_BUNDLE_CLIENT);
-//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SHARED, "shared", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundle), TYPE_BUNDLE_SHARED);
-//    TreeUtility.createNode(rootNode, TYPE_BUNDLE_SERVER, "server", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle), TYPE_BUNDLE_SERVER);
     return rootNode;
   }
 
@@ -213,61 +201,32 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   @Override
-  public boolean performFinish(IProgressMonitor monitor) {
-    OperationJob job = new OperationJob(new P_PerformFinishOperation(getWizard()));
-    job.schedule();
-    try {
-      job.join();
+  public void putProperties(PropertyMap properties) {
+    // put properties of the textfields of this page (project name, etc)
+    String postfix = getProjectNamePostfix();
+    if (postfix != null) {
+      postfix = postfix.trim();
+      if (postfix.length() == 0) {
+        postfix = null;
+      }
     }
-    catch (InterruptedException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    try {
-      Job.getJobManager().join(ResourcesPlugin.FAMILY_MANUAL_REFRESH, monitor);
-      Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor);
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logError("error during waiting for auto build and refresh");
-    }
-    getWizard().setCreatedProject(ScoutSdkCore.getScoutWorkspace().findScoutProject(getWizard().getProjectWizardPage().getProjectName()));
-    return true;
-  }
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, getProjectName().trim());
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, postfix);
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, getProjectAlias().trim());
 
-//  @Override
-//  public void performFinish(IProgressMonitor monitor, IScoutWorkingCopyManager workingCopyManager) throws IllegalArgumentException, CoreException {
-//    TemplateVariableSet variables = TemplateVariableSet.createNew(getProjectName(), getProjectNamePostfix(), getProjectAlias());
-//    for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
-//      if (m_bundleTree.isChecked(node)) {
-//        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
-//        if (ext != null) {
-//          try {
-//            ext.getBundleExtention().createBundle(variables, monitor, workingCopyManager);
-//          }
-//          catch (Exception e) {
-//            ScoutSdkUi.logError("could not create bundle of extension '" + ext.getBundleID() + "'.", e);
-//          }
-//        }
-//      }
-//    }
-//
-//    NewBsiCaseGroupStep1Operation op1 = new NewBsiCaseGroupStep1Operation(variables);
-//    op1.setCreateUiSwing(isCreateUiSwing());
-//    op1.setCreateUiSwt(isCreateUiSwt());
-//    op1.setCreateClient(isCreateClient());
-//    op1.setCreateShared(isCreateShared());
-//    op1.setCreateServer(isCreateServer());
-//    op1.setProjectName(getProjectName());
-//    op1.setProjectNamePostfix(getPostFix());
-//    op1.setProjectAlias(getProjectAlias());
-//    op1.validate();
-//    op1.run(monitor, workingCopyManager);
-//
-//    NewScoutProjectStep2Operation op2 = new NewScoutProjectStep2Operation(op1, variables);
-//    op2.validate();
-//    op2.run(monitor, workingCopyManager);
-//
-//  }
+    // go through all node extensions and put properties which node has been checked
+    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
+    HashSet<String> checkedNodeExtensionIds = new HashSet<String>(nodes.length);
+    for (ITreeNode node : nodes) {
+      if (m_bundleTree.isChecked(node)) {
+        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+        if (ext != null) {
+          checkedNodeExtensionIds.add(ext.getBundleID());
+        }
+      }
+    }
+    properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_CHECKED_NODES, checkedNodeExtensionIds);
+  }
 
   @Override
   public ScoutProjectNewWizard getWizard() {
@@ -277,6 +236,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   @Override
   protected void validatePage(MultiStatus multiStatus) {
     multiStatus.add(getStatusProjectName());
+    multiStatus.add(getStatusProjectPostfix());
     multiStatus.add(getStatusProjectAlias());
     for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
       if (m_bundleTree.isChecked(node)) {
@@ -288,12 +248,24 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     }
   }
 
+  protected IStatus getStatusProjectPostfix() {
+    if (StringUtility.isNullOrEmpty(getProjectNamePostfix())) {
+      return Status.OK_STATUS;
+    }
+    else if (getProjectNamePostfix().matches("[a-zA-Z]{1}[a-zA-Z0-9]*[a-zA-Z]{1}")) {
+      return Status.OK_STATUS;
+    }
+    else {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project postfix is not valid.");
+    }
+  }
+
   protected IStatus getStatusProjectName() {
     if (StringUtility.isNullOrEmpty(getProjectName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectNameMissing"));
     }
     if (getProjectName().contains("..")) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid prject names are similar to 'org.eclipse.testapp'.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid project names are similar to 'org.eclipse.testapp'.");
     }
     if (getProjectName().matches("[a-zA-Z]{1}[a-zA-Z0-9\\.]*[a-zA-Z]{1}")) {
       if (getProjectName().matches(".*[A-Z].*")) {
@@ -301,7 +273,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid prject names are similar to 'org.eclipse.testapp'.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid project names are similar to 'org.eclipse.testapp'.");
     }
     return Status.OK_STATUS;
   }
@@ -310,7 +282,12 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     if (StringUtility.isNullOrEmpty(getProjectAlias())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectAliasMissing"));
     }
-    return Status.OK_STATUS;
+    if (getProjectAlias().matches("[a-zA-Z]{1}[a-zA-Z0-9]*[a-zA-Z]{1}")) {
+      return Status.OK_STATUS;
+    }
+    else {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project alias is not valid.");
+    }
   }
 
   @Override
@@ -411,45 +388,6 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     m_propertySupport.setPropertyString(PROP_PROJECT_ALIAS, alias);
   }
 
-  private class P_PerformFinishOperation implements IOperation {
-
-    private final IScoutProjectWizard m_wizard;
-
-    public P_PerformFinishOperation(IScoutProjectWizard wizard) {
-      m_wizard = wizard;
-
-    }
-
-    @Override
-    public String getOperationName() {
-      return "create bundles...";
-    }
-
-    @Override
-    public void validate() throws IllegalArgumentException {
-    }
-
-    @Override
-    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-
-      for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
-        if (m_bundleTree.isChecked(node)) {
-          ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
-          if (ext != null) {
-            try {
-              IJavaProject javaProject = ext.getBundleExtention().createBundle(m_wizard, monitor, workingCopyManager);
-              getWizard().addCreatedBundle(javaProject);
-            }
-            catch (Exception e) {
-              ScoutSdkUi.logError("could not create bundle of extension '" + ext.getBundleID() + "'.", e);
-            }
-          }
-        }
-      }
-
-    }
-  }
-
   private class P_InitialCheckNodesFilter implements ITreeNodeFilter {
 
     @Override
@@ -505,5 +443,4 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       return false;
     }
   }
-
 }

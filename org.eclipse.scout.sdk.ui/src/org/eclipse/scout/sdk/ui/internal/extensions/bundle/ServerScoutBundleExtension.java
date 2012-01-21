@@ -10,26 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.bundle;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
-import org.eclipse.scout.sdk.operation.project.FillServerPluginOperation;
-import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-/**
- *
- */
 public class ServerScoutBundleExtension implements IScoutBundleProvider {
-  public static final String BUNDLE_ID = "org.eclipse.scout.sdk.ui.ServerBundle";
-
   @Override
   public IStatus getStatus(IScoutProjectWizard wizard) {
     if (!wizard.getProjectWizardPage().hasSelectedBundle(BundleTypes.Shared_Bundle)) {
@@ -41,20 +29,4 @@ public class ServerScoutBundleExtension implements IScoutBundleProvider {
   @Override
   public void bundleSelectionChanged(IScoutProjectWizard wizard, boolean selected) {
   }
-
-  @Override
-  public IJavaProject createBundle(IScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    TemplateVariableSet variables = TemplateVariableSet.createNew(wizard.getProjectWizardPage().getProjectName(), wizard.getProjectWizardPage().getProjectNamePostfix(), wizard.getProjectWizardPage().getProjectAlias());
-    try {
-      CreateServerPluginOperation op = new CreateServerPluginOperation(variables);
-      op.run(monitor, workingCopyManager);
-      new FillServerPluginOperation(op.getCreatedProject(), variables).run(monitor, workingCopyManager);
-      return op.getJavaProject();
-    }
-    catch (CoreException e) {
-      ScoutSdkUi.logError("could not create server bundle", e);
-      return null;
-    }
-  }
-
 }

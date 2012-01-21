@@ -10,18 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions.bundle;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-/**
- *
- */
 public interface IScoutBundleProvider {
-
-  IJavaProject createBundle(IScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager);
 
   void bundleSelectionChanged(IScoutProjectWizard wizard, boolean selected);
 

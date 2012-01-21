@@ -10,26 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
+import java.util.Map;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
-import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-/**
- * creates plugins like for example
- * com.google.rcp.client
- */
 public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperation {
+  public final static String PROP_BUNDLE_SHARED_NAME = "BUNDLE_SHARED_NAME";
 
-  private final ITemplateVariableSet m_templateBindings;
-
-  public CreateSharedPluginOperation(ITemplateVariableSet templateBindings) {
-    setSymbolicName(templateBindings.getVariable(ITemplateVariableSet.VAR_BUNDLE_SHARED_NAME));
-    m_templateBindings = templateBindings;
-  }
+  public final static String SHARED_PROJECT_NAME_SUFFIX = ".shared";
+  public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.SharedBundle";
 
   @Override
   public String getOperationName() {
@@ -37,16 +30,27 @@ public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperat
   }
 
   @Override
+  public boolean isRelevant() {
+    return isNodeChecked(CreateSharedPluginOperation.BUNDLE_ID);
+  }
+
+  @Override
+  public void init() {
+    setSymbolicName(getPluginName(SHARED_PROJECT_NAME_SUFFIX));
+  }
+
+  @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
     IProject project = getCreatedProject();
-    TemplateVariableSet bindings = TemplateVariableSet.createNew(project, m_templateBindings);
-    new InstallTextFileOperation("templates/shared/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/build.properties", "build.properties", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/plugin.xml", "plugin.xml", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/resources/texts/Texts.properties", "resources/texts/Texts.properties", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/resources/texts/Texts_de.properties", "resources/texts/Texts_de.properties", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/resources/texts/Texts_fr.properties", "resources/texts/Texts_fr.properties", project, bindings).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/resources/texts/Texts_it.properties", "resources/texts/Texts_it.properties", project, bindings).run(monitor, workingCopyManager);
+    getProperties().setProperty(PROP_BUNDLE_SHARED_NAME, getSymbolicName());
+    Map<String, String> props = getStringProperties();
+    new InstallTextFileOperation("templates/shared/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, props).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/build.properties", "build.properties", project, props).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/plugin.xml", "plugin.xml", project, props).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/resources/texts/Texts.properties", "resources/texts/Texts.properties", project, props).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/resources/texts/Texts_de.properties", "resources/texts/Texts_de.properties", project, props).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/resources/texts/Texts_fr.properties", "resources/texts/Texts_fr.properties", project, props).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/resources/texts/Texts_it.properties", "resources/texts/Texts_it.properties", project, props).run(monitor, workingCopyManager);
   }
 }

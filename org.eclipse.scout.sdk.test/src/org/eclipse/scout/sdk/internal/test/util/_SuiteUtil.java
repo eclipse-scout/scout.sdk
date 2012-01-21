@@ -28,7 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({
     RegexTest.class,
-    PlatformUtilityTest.class,
+    CompatibilityTest.class,
     FormDataUtilityTest.class,
     // suites
     _SuiteSignature.class})

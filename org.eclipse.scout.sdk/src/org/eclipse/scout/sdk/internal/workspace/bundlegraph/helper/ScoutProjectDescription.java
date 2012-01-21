@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -44,14 +44,14 @@ public class ScoutProjectDescription {
   }
 
   public String determProjectName() {
-    String regex = "^(.*)\\.(ui\\.swt|ui\\.swing|client|shared|server)(\\.(.*))?$";
+    String regex = "^(.*)\\.(ui\\.|client|shared|server)(\\.(.*))?$";
     String prefix = null;
     String postfix = null;
     for (BundleGraphNode node : m_nodes) {
       Matcher m = Pattern.compile(regex).matcher(node.getIdentifier());
       if (m.find()) {
         if (prefix != null && !prefix.equals(m.group(1))) {
-          ScoutSdk.logWarning("bundlenames not consistent. Expected scout project do have the same prefix like 'com.bsiag.'");
+          ScoutSdk.logWarning("bundlenames not consistent. Expected scout project do have the same prefix like 'org.eclipse.'");
         }
         else {
           prefix = m.group(1);

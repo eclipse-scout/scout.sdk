@@ -6,6 +6,7 @@ import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.core.build.IBuildModel;
 import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
+import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.PDEState;
 import org.eclipse.pde.internal.core.build.WorkspaceBuildModel;
@@ -14,7 +15,6 @@ import org.eclipse.pde.internal.core.bundle.BundlePluginModelBase;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundleModel;
 import org.eclipse.pde.internal.core.ibundle.IBundle;
 import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
-import org.eclipse.pde.internal.core.project.PDEProject;
 
 /**
  * Base class for PDE model access of workspace plugins.<br>
@@ -43,9 +43,9 @@ public final class LazyPluginModel {
   public LazyPluginModel(IProject project) {
     if (project == null) throw new IllegalArgumentException("null project not allowed.");
     m_project = project;
-    m_manifestFile = PDEProject.getManifest(getProject());
-    m_pluginXmlFile = PDEProject.getPluginXml(getProject());
-    m_buildPropertiesFile = PDEProject.getBuildProperties(getProject());
+    m_manifestFile = getProject().getFile(ICoreConstants.BUNDLE_FILENAME_DESCRIPTOR);
+    m_pluginXmlFile = getProject().getFile(ICoreConstants.PLUGIN_FILENAME_DESCRIPTOR);
+    m_buildPropertiesFile = getProject().getFile(ICoreConstants.BUILD_FILENAME_DESCRIPTOR);
 
     if (!isInteresting()) throw new IllegalArgumentException("the passed project is not a valid plugin.");
   }

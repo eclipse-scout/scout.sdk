@@ -82,6 +82,7 @@
       <plugin id="org.eclipse.rap.jface" fragment=""/>
       <plugin id="org.eclipse.rap.jface.databinding" fragment=""/>
       <plugin id="org.eclipse.rap.rwt" fragment=""/>
+      <plugin id="org.eclipse.rap.rwt.osgi" fragment=""/>
       <plugin id="org.eclipse.rap.rwt.supplemental.filedialog" fragment=""/>
       <plugin id="org.eclipse.rap.rwt.supplemental.fileupload" fragment=""/>
       <plugin id="org.eclipse.rap.ui" fragment=""/>

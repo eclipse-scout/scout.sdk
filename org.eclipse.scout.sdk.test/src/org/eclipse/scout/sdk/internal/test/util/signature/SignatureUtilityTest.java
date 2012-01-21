@@ -90,7 +90,7 @@ public class SignatureUtilityTest {
     Assert.assertEquals("java.lang.Class<? extends com.bsiag.scout.client.ui.desktop.outline.IOutline[]>[]", result);
   }
 
-  @Test(timeout = 2L)
+  @Test(timeout = 4L)
   public void testComplexNestedArrayListHashMapArray() throws Exception {
     String signature = "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;";
     FullyQuallifiedValidator validator = new FullyQuallifiedValidator();

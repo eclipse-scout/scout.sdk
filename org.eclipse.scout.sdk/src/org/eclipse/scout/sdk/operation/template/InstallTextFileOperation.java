@@ -36,24 +36,24 @@ public class InstallTextFileOperation implements IOperation {
   protected final String m_srcPath;
   protected final String m_dstPath;
   protected final IProject m_dstProject;
-  private final ITemplateVariableSet m_templateBinding;
   private final Bundle m_sourceBoundle;
+  private final Map<String, String> m_properties;
   private IFile m_createdFile;
 
   public InstallTextFileOperation(String srcPath, String dstPath, IProject dstProject) {
-    this(srcPath, dstPath, dstProject, TemplateVariableSet.createNew(dstProject));
+    this(srcPath, dstPath, dstProject, null);
   }
 
-  public InstallTextFileOperation(String srcPath, String dstPath, IProject dstProject, ITemplateVariableSet templateBinding) {
-    this(srcPath, dstPath, Platform.getBundle(ScoutSdk.PLUGIN_ID), dstProject, templateBinding);
+  public InstallTextFileOperation(String srcPath, String dstPath, IProject dstProject, Map<String, String> properties) {
+    this(srcPath, dstPath, Platform.getBundle(ScoutSdk.PLUGIN_ID), dstProject, properties);
   }
 
-  public InstallTextFileOperation(String srcPath, String dstPath, Bundle sourceBoundle, IProject dstProject, ITemplateVariableSet templateBinding) {
+  public InstallTextFileOperation(String srcPath, String dstPath, Bundle sourceBoundle, IProject dstProject, Map<String, String> properties) {
     m_srcPath = srcPath;
     m_dstPath = dstPath;
     m_sourceBoundle = sourceBoundle;
     m_dstProject = dstProject;
-    m_templateBinding = templateBinding;
+    m_properties = properties;
   }
 
   @Override
@@ -79,13 +79,19 @@ public class InstallTextFileOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       String s = new String(IOUtility.getContent(FileLocator.openStream(m_sourceBoundle, new Path(getSrcPath()), false)), "UTF-8");
-      for (Map.Entry<String, String> e : getTemplateBinding().entrySet()) {
-        s = s.replace("@@" + e.getKey() + "@@", e.getValue());
+      if (getProperties() != null) {
+        for (Map.Entry<String, String> e : getProperties().entrySet()) {
+          s = s.replace("@@" + e.getKey() + "@@", e.getValue());
+        }
       }
+
+      // check that all variables have been substituted
       Matcher m = Pattern.compile("@@([^@]+)@@").matcher(s);
       if (m.find()) {
         throw new CoreException(new ScoutStatus("Missing tag replacement for tag " + m.group(1) + " in template " + getSrcPath()));
       }
+
+      // write file
       File f = new File(new File(m_dstProject.getLocation().toOSString()), m_dstPath);
       f.getParentFile().mkdirs();
       IOUtility.writeContent(new FileWriter(f), s);
@@ -109,11 +115,11 @@ public class InstallTextFileOperation implements IOperation {
     return m_dstProject;
   }
 
-  public ITemplateVariableSet getTemplateBinding() {
-    return m_templateBinding;
-  }
-
   public IFile getCreatedFile() {
     return m_createdFile;
+  }
+
+  protected Map<String, String> getProperties() {
+    return m_properties;
   }
 }

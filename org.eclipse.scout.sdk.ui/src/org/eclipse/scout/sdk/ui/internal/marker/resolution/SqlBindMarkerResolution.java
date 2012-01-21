@@ -77,7 +77,7 @@ public class SqlBindMarkerResolution implements IMarkerResolution {
       }
     }
     catch (Exception e) {
-      ScoutSdkUi.logError("could not applay annotation resolution for bindvar '" + bindVar + "' in  '" + icuName + "'.");
+      ScoutSdkUi.logError("could not apply annotation resolution for bindvar '" + bindVar + "' in  '" + icuName + "'.");
     }
   }
 

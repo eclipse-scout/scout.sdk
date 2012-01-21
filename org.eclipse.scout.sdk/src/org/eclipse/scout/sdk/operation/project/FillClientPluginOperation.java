@@ -10,26 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
+import java.util.Map;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.template.ITemplateVariableSet;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
-import org.eclipse.scout.sdk.operation.template.TemplateVariableSet;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-public class FillClientPluginOperation implements IOperation {
+public class FillClientPluginOperation extends AbstractScoutProjectNewOperation {
 
-  private final IProject m_clientProject;
-
-  private final ITemplateVariableSet m_templateBindings;
-
-  public FillClientPluginOperation(IProject clientProject, ITemplateVariableSet templateBindings) {
-    m_clientProject = clientProject;
-    m_templateBindings = templateBindings;
-  }
+  private IProject m_clientProject;
 
   @Override
   public String getOperationName() {
@@ -37,24 +29,31 @@ public class FillClientPluginOperation implements IOperation {
   }
 
   @Override
+  public boolean isRelevant() {
+    return isNodeChecked(CreateClientPluginOperation.BUNDLE_ID);
+  }
+
+  @Override
+  public void init() {
+    String clientPluginName = getProperties().getProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, String.class);
+    m_clientProject = getCreatedBundle(clientPluginName).getProject();
+  }
+
+  @Override
   public void validate() throws IllegalArgumentException {
-    if (getClientProject() == null) {
+    super.validate();
+    if (m_clientProject == null) {
       throw new IllegalArgumentException("project can not be null.");
     }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    TemplateVariableSet bindings = TemplateVariableSet.createNew(getClientProject(), m_templateBindings);
-    String destPathPref = "src/" + (getClientProject().getName().replace('.', '/')) + "/";
-    new InstallJavaFileOperation("templates/client/src/Activator.java", destPathPref + "Activator.java", getClientProject(), bindings).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/client/src/ClientSession.java", destPathPref + "ClientSession.java", getClientProject(), bindings).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/client/src/ui/desktop/Desktop.java", destPathPref + "ui/desktop/Desktop.java", getClientProject(), bindings).run(monitor, workingCopyManager);
-    getClientProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+    String destPathPref = "src/" + (m_clientProject.getName().replace('.', '/')) + "/";
+    Map<String, String> props = getStringProperties();
+    new InstallJavaFileOperation("templates/client/src/Activator.java", destPathPref + "Activator.java", m_clientProject, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/client/src/ClientSession.java", destPathPref + "ClientSession.java", m_clientProject, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/client/src/ui/desktop/Desktop.java", destPathPref + "ui/desktop/Desktop.java", m_clientProject, props).run(monitor, workingCopyManager);
+    m_clientProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
-
-  public IProject getClientProject() {
-    return m_clientProject;
-  }
-
 }

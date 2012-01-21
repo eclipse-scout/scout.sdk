@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.util.internal.typecache.JavaResourceChangedEmitter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -36,7 +37,6 @@ import org.junit.Test;
 /**
  * TODO work in progress
  */
-
 public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
 
   @BeforeClass
@@ -79,7 +79,8 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
 
   private void testTemplateDesktopForm(String projectName) throws Exception {
     try {
-      IScoutProject project = ScoutProjectHelper.setupNewProject(projectName, true, true, true);
+      PropertyMap properties = new PropertyMap();
+      ScoutProjectHelper.setupNewProject(projectName, true, true, true, properties);
 
       final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
       ITypeHierarchy hierarchy = iForm.newTypeHierarchy(new NullProgressMonitor());
@@ -97,7 +98,9 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
         }
       }
       Assert.assertEquals(0, subtypes.length);
-      SingleFormTemplateOperation op = new SingleFormTemplateOperation(project);
+      SingleFormTemplateOperation op = new SingleFormTemplateOperation();
+      op.setProperties(properties);
+      op.init();
       executeAndBuildWorkspace(op);
       int severity = ScoutSeverityManager.getInstance().getSeverityOf(ResourcesPlugin.getWorkspace().getRoot(), IMarker.SEVERITY_WARNING);
       if (severity >= IMarker.SEVERITY_ERROR) {
@@ -127,16 +130,23 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
   @Test
   public void testTemplateOutlineTreeTable() throws Exception {
     try {
-      IScoutProject project = ScoutProjectHelper.setupNewProject("org.eclipse.testapp1", true, true, true);
+      PropertyMap properties = new PropertyMap();
+      ScoutProjectHelper.setupNewProject("org.eclipse.testapp1", true, true, true, properties);
+
       final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
       final IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       IType[] subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getInWorkspaceFilter());
       Assert.assertEquals(0, subtypes.length);
-      OutlineTemplateOperation op = new OutlineTemplateOperation(project);
+
+      OutlineTemplateOperation op = new OutlineTemplateOperation();
+      op.setProperties(properties);
+      op.init();
       OperationJob job = new OperationJob(op);
       job.schedule();
       job.join();
+
       buildWorkspace();
+
       int severity = ScoutSeverityManager.getInstance().getSeverityOf(ResourcesPlugin.getWorkspace().getRoot());
       Assert.assertTrue(severity < IMarker.SEVERITY_ERROR);
     }
