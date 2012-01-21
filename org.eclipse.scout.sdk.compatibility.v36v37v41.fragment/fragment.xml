@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<fragment>
+   <extension
+         point="org.eclipse.scout.sdk.compatibility.activator">
+      <activator
+            class="org.eclipse.scout.sdk.compatibility.v36v37v41.internal.CompatibilityActivator"
+            platformVersion="3.6,3.7,4.1">
+      </activator>
+   </extension>
+</fragment>
