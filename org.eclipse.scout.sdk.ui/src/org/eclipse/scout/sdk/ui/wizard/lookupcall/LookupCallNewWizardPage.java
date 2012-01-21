@@ -143,7 +143,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("LookupSerivice"));
+    m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("LookupService"));
     m_lookupServiceTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
