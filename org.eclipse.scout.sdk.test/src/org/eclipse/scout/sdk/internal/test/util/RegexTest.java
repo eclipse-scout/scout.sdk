@@ -44,12 +44,14 @@ public class RegexTest {
   @Test
   public void testMethodPresenterValue() {
     checkMethodPresenter("{ int a=0; return abcdefg.aaa; } ", "abcdefg.aaa");
-    checkMethodPresenter("{ return \"abcdefg;aaa\"; } ", "\"abcdefg;aaa\"");
-    checkMethodPresenter("{ return \"abcdefg.aaa\"; } ", "\"abcdefg.aaa\"");
-    checkMethodPresenter("{ return \"abcdefg.aaa; } ", null);
-    checkMethodPresenter("{ return abcdefg.aaa\"; } ", null);
-    checkMethodPresenter("{ return \"abcde\\\"fg.aaa\"; } ", "\"abcde\\\"fg.aaa\"");
-    checkMethodPresenter("{ return \"abcde\\\"jk\\\".aaa\"; } ", "\"abcde\\\"jk\\\".aaa\"");
+    checkMethodPresenter("{ int a=0; return \"abcdefg;aaa\"; } ", "\"abcdefg;aaa\"");
+    checkMethodPresenter("{ int a=0; return \"abcdefg.aaa\"; } ", "\"abcdefg.aaa\"");
+    checkMethodPresenter("{ int a=0; return \"abcdefg.aaa; } ", null);
+    checkMethodPresenter("{ int a=0; return abcdefg.aaa\"; } ", null);
+    checkMethodPresenter("{ int a=0; return \"abcde\\\"fg.aaa\"; } ", "\"abcde\\\"fg.aaa\"");
+    checkMethodPresenter("{ int a=0; return \"abcde\\\"jk\\\".aaa\"; } ", "\"abcde\\\"jk\\\".aaa\"");
+    checkMethodPresenter("{ int a=0; return TEXTS.get(\"InvalidPhoneNumberMessageX\"); } ", "TEXTS.get(\"InvalidPhoneNumberMessageX\")");
+    checkMethodPresenter("{ int a=0; return TEXTS.get(\"InvalidPhoneNumber;MessageX\"); } ", "TEXTS.get(\"InvalidPhoneNumber;MessageX\")");
   }
 
   private void checkMethodPresenter(String valToCheck, String expectedVal) {

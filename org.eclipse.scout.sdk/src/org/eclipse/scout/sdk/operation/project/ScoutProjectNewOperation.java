@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -138,6 +139,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
         o.run(monitor, workingCopyManager);
       }
     }
+    ResourcesPlugin.getWorkspace().checkpoint(false);
   }
 
   private static String getHostName() {

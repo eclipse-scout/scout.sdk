@@ -30,7 +30,7 @@ public class Regex {
   public static final Pattern REGEX_METHOD_NEW_TYPE_OCCURRENCES = Pattern.compile("\\s*new\\s*([^\\(]*)\\([^\\)]*\\)\\s*", Pattern.DOTALL);
   public static final Pattern REGEX_METHOD_DEFINITION = Pattern.compile("[ \\t]*(public|protected|private)?\\s*(static)?\\s*(void|[^\\s]*)\\s*[^\\s\\(]*\\s*\\([^\\)]*\\)\\s*\\{", Pattern.DOTALL);
 
-  public static final Pattern REGEX_PROPERTY_METHOD_REPRESENTER_VALUE = Pattern.compile("\\{.*return\\s*((\\\".*\\\")|([^\\\"]*))\\s*\\;.*\\}", Pattern.DOTALL);
+  public static final Pattern REGEX_PROPERTY_METHOD_REPRESENTER_VALUE = Pattern.compile("\\{.*return\\s*((.*\\\".*\\\".*)|([^\\\"]*))\\s*\\;.*\\}", Pattern.DOTALL);
   public static final Pattern REGEX_PROPERTY_METHOD_REPRESENTER_BOOLEAN = Pattern.compile("\\{\\s*return\\s*(true|false)\\s*\\;\\s*\\}", Pattern.DOTALL);
 
   public static final Pattern REGEX_ICON_NAME = Pattern.compile("(\\\")?(([^\\\\/]*(/|\\\\))*)([^.\\\"]*)(\\.)?([^\"]*)(\\\")?");
