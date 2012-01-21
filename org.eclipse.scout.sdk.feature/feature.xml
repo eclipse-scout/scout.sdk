@@ -108,7 +108,7 @@ BSI Business Systems Integration AG - initial API and implementation
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.sdk.compatibility.v36v37.fragment"
+         id="org.eclipse.scout.sdk.compatibility.v36v37v41.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"
