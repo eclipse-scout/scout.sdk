@@ -88,8 +88,19 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     super.init(method);
-    m_defaultValue = parseSourceInput(getMethod().computeDefaultValue());
-    setCurrentSourceValue(parseSourceInput(getMethod().computeValue()));
+    String defValue = getMethod().computeDefaultValue();
+    String value = getMethod().computeValue();
+    m_defaultValue = parseSourceInput(defValue);
+
+    if (CompareUtility.equals(defValue, value)) {
+      // if the default value and the value are the same: directly use the already parsed default value.
+      setCurrentSourceValue(m_defaultValue);
+    }
+    else {
+      // only parse, if the value is different than the default value.
+      setCurrentSourceValue(parseSourceInput(value));
+    }
+
     String initialText = formatDisplayValue(getCurrentSourceValue());
     m_textComponent.setText(initialText);
     m_textComponent.setEnabled(true);

@@ -194,7 +194,6 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
       }
       catch (CoreException e) {
-        // ScoutSdkUi.logWarning("could not parse method.", e);
         m_errorContent.setMethod(configurationMethod);
         m_body.setVisible(false);
         m_errorContent.setVisible(true);

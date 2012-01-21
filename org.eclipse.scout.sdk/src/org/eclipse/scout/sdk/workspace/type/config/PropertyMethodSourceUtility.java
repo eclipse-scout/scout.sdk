@@ -61,8 +61,6 @@ public final class PropertyMethodSourceUtility {
   private final static Pattern REGEX_CLASS_REFERENCE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?(class)\\b");
   private final static Pattern REGEX_NULL = Pattern.compile("\\bnull\\b");
 
-  //private final static String REGEX_NLS_DEFAULT_SCOUT = "\\s*ScoutTexts.get\\(\\s*null\\s*\\)\\s*";
-
   private final static Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\s*\"(.*)\"\\s*");
   private final static Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("[A-Za-z0-9_-]*\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*");
 

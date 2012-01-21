@@ -41,6 +41,26 @@ public class RegexTest {
     checkVariableDeclarationRightHandSide("private int i j = 5;", "5");
   }
 
+  @Test
+  public void testMethodPresenterValue() {
+    checkMethodPresenter("{ int a=0; return abcdefg.aaa; } ", "abcdefg.aaa");
+    checkMethodPresenter("{ return \"abcdefg;aaa\"; } ", "\"abcdefg;aaa\"");
+    checkMethodPresenter("{ return \"abcdefg.aaa\"; } ", "\"abcdefg.aaa\"");
+    checkMethodPresenter("{ return \"abcdefg.aaa; } ", null);
+    checkMethodPresenter("{ return abcdefg.aaa\"; } ", null);
+    checkMethodPresenter("{ return \"abcde\\\"fg.aaa\"; } ", "\"abcde\\\"fg.aaa\"");
+    checkMethodPresenter("{ return \"abcde\\\"jk\\\".aaa\"; } ", "\"abcde\\\"jk\\\".aaa\"");
+  }
+
+  private void checkMethodPresenter(String valToCheck, String expectedVal) {
+    Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(valToCheck);
+    boolean found = m.find();
+    Assert.assertTrue(found || expectedVal == null);
+    if (found) {
+      Assert.assertEquals(expectedVal, m.group(1).trim());
+    }
+  }
+
   private void checkVariableDeclarationRightHandSide(String fieldDeclaration, String expectedRightHandSide) {
     Assert.assertEquals(expectedRightHandSide, Regex.getFieldDeclarationRightHandSide(fieldDeclaration));
   }
