@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.ScoutSdk;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jdt.signature.IImportValidator;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
+import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.FormHandlerNewOperation;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
@@ -143,6 +144,7 @@ public class SingleFormTemplateOperation implements IScoutProjectTemplateOperati
 
       workingCopyManager.reconcile(serviceOp.getCreatedServiceImplementation().getCompilationUnit(), monitor);
       MethodCreateOperation loadMethodOp = new MethodCreateOperation(serviceOp.getCreatedServiceImplementation(), "load");
+      loadMethodOp.addAnnotation(new AnnotationCreateOperation(null, Signature.createTypeSignature(Override.class.getName(), true)));
       loadMethodOp.setMethodFlags(Flags.AccPublic);
       loadMethodOp.setReturnTypeSignature(Signature.createTypeSignature(formData.getFullyQualifiedName(), true));
       loadMethodOp.setParameterNames(new String[]{"formData"});
