@@ -821,4 +821,10 @@
             priority="10">
       </codeIdParser>
    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.scout.sdk.ui.menu.ScoutSdkStartupExtension">
+      </startup>
+   </extension>
 </plugin>
