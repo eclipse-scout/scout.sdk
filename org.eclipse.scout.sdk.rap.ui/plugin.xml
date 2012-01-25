@@ -13,13 +13,6 @@
       </bundleNode>
    </extension>
    <extension
-         point="org.eclipse.scout.sdk.ui.contextMenuContributor">
-      <contributor
-            class="org.eclipse.scout.sdk.rap.ui.DebugContextMenuContributor"
-            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage">
-      </contributor>
-   </extension>
-   <extension
          point="org.eclipse.scout.sdk.ui.contextMenu">
       <contextMenu
             class="org.eclipse.scout.sdk.rap.ui.internal.ModifyXmlAction">
@@ -42,5 +35,4 @@
          </singlePart>
       </part>
    </extension>
-
 </plugin>

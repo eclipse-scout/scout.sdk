@@ -10,12 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages;
 
-import java.util.List;
-
-import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ImportPluginAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction;
@@ -85,16 +81,6 @@ public class ScoutExplorerRootNodePage extends AbstractPage {
   @Override
   public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{ScoutProjectNewAction.class, ImportPluginAction.class};
-  }
-
-  @Override
-  public void addDebugMenus(List<Action> debugActions) {
-    debugActions.add(new Action("print bundle tree") {
-      @Override
-      public void run() {
-        ((ScoutWorkspace) ScoutSdkCore.getScoutWorkspace()).printBundleGraph();
-      }
-    });
   }
 
   @Override
