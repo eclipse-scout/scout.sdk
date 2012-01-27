@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: RAP Bundle
+Bundle-SymbolicName: @@BUNDLE_RAP_NAME@@;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: @@BUNDLE_RAP_NAME@@.Activator
+Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.core.runtime,
+ @@BUNDLE_CLIENT_NAME@@,
+ @@BUNDLE_SHARED_NAME@@,
+ org.eclipse.scout.rt.ui.rap,
+ org.eclipse.scout.net,
+ org.eclipse.equinox.http.registry,
+ org.eclipse.scout.http.servletfilter
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Scout-Project: org.eclipse.scout.rt

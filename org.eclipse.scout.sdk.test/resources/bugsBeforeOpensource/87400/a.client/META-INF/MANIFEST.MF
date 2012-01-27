@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Test Client Plug-in
+Bundle-SymbolicName: a.client
+Bundle-Version: 1.0.0
+Bundle-Activator: a.client.Activator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.shared;bundle-version="3.2.2",
+ org.eclipse.scout.rt.client;bundle-version="3.5.5"
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Scout-Project: a.client
+Scout-Project-Alias: a
+Scout-Bundle-Type: client

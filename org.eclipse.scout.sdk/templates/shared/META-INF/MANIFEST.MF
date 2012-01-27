@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: @@BUNDLE_SHARED_NAME@@
+Bundle-SymbolicName: @@BUNDLE_SHARED_NAME@@;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: @@BUNDLE_SHARED_NAME@@.Activator
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.shared;visibility:=reexport
+Export-Package: @@BUNDLE_SHARED_NAME@@

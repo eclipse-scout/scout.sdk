@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="@@BUNDLE_SWT_NAME@@.perspective.Perspective"
+            fixed="true"
+            id="@@BUNDLE_SWT_NAME@@.perspective.Perspective"
+            name="@@ALIAS@@"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="@@BUNDLE_SWT_NAME@@.views.CenterView"
+            icon="resources/icons/eclipse_scout.gif"
+            id="@@BUNDLE_SWT_NAME@@.views.CenterView"
+            name="CenterView">
+      </view>
+      <view
+            class="@@BUNDLE_SWT_NAME@@.views.OutlinePageView"
+            icon="resources/icons/eclipse_scout.gif"
+            id="@@BUNDLE_SWT_NAME@@.views.OutlinePageView"
+            name="Outline"
+            restorable="true">
+      </view>
+      <view
+            class="@@BUNDLE_SWT_NAME@@.views.TablePageView"
+            icon="resources/icons/eclipse_scout.gif"
+            id="@@BUNDLE_SWT_NAME@@.views.TablePageView"
+            name="Table Page"
+            restorable="true">
+      </view>
+      <view
+            class="@@BUNDLE_SWT_NAME@@.views.SearchView"
+            icon="resources/icons/eclipse_scout.gif"
+            id="@@BUNDLE_SWT_NAME@@.views.SearchView"
+            name="Search"
+            restorable="true">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="@@BUNDLE_SWT_NAME@@.SwtStartup">
+      </startup>
+   </extension>
+     <extension id="application" name="Application" point="org.eclipse.core.runtime.applications">
+    <application>
+      <run class="@@BUNDLE_SWT_NAME@@.application.Application"/>
+    </application>
+  </extension>
+  <extension id="product" point="org.eclipse.core.runtime.products">
+    <product
+          application="@@BUNDLE_SWT_NAME@@.application"
+          name="@@ALIAS@@">
+       <property
+             name="appName"
+             value="@@ALIAS@@"/>
+       <property
+          name="windowImages"
+          value="resources/icons/eclipseScout16x16.gif,resources/icons/eclipseScout32x32.gif"/>
+    </product>
+  </extension>
+</plugin>

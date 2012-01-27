@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: presenter.test.client
+Bundle-SymbolicName: presenter.test.client;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: presenter.test.client.Activator
+Export-Package: presenter.test.client,
+ presenter.test.client.ui.desktop,
+ presenter.test.client.ui.desktop.outlines,
+ presenter.test.client.ui.desktop.outlines.pages,
+ presenter.test.client.ui.forms,
+ presenter.test.client.ui.searchforms
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.client;visibility:=reexport,
+ presenter.test.shared
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.scout.sdk.ui.scoutBundle">
+      <bundleNode
+            bundleName="ui.rap"
+            bundleType="GUI_Bundle"
+            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle.RapScoutBundleExtension"
+            icon="resources/icons/uiBundle.png"
+            id="org.eclipse.scout.sdk.ui.UiRapBundle"
+            orderNumber="30">
+      </bundleNode>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.contextMenu">
+      <contextMenu
+            class="org.eclipse.scout.sdk.rap.ui.internal.ModifyXmlAction">
+      </contextMenu>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.explorerPage">
+      <pageFactory
+            factory="org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory"
+            parentPageId="org.eclipse.scout.sdk.page.ProjectNodePage">
+      </pageFactory>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.propertyViewPart">
+      <part
+            page="org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project.UiRapNodePage"
+            ranking="-1">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
+         </singlePart>
+      </part>
+   </extension>
+</plugin>

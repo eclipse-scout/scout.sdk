@@ -1,0 +1,830 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="formField" name="Form Field" schema="schema/formField.exsd"/>
+   <extension-point id="outlineDragAndDrop" name="Drag And Drop" schema="schema/outlineDragAndDrop.exsd"/>
+   <extension-point id="codeId" name="Code ID Provider or Parser" schema="schema/codeId.exsd"/>
+   <extension-point id="explorerPage" name="Scout Explorer Page" schema="schema/explorerPage.exsd"/>
+   <extension-point id="propertyStructure" name="Scout Property View Structure" schema="schema/propertyStructure.exsd"/>
+   <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
+   <extension-point id="outlineCopyAndPaste" name="Copy And Paste" schema="schema/outlineCopyAndPaste.exsd"/>
+      <extension-point id="contextMenu" name="contextMenu" schema="schema/contextMenu.exsd"/>
+   <extension-point id="contextMenuContributor" name="contextMenuContributor" schema="schema/contextMenuContributor.exsd"/>
+   <extension-point id="scoutBundle" name="Scout Bundle" schema="schema/scoutBundle.exsd"/>
+   <extension-point id="scoutProjectTemplate" name="Scout Project Template" schema="schema/scoutProjectTemplate.exsd"/>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+         <perspectiveExtension
+            targetID="org.eclipse.scout.sdk.ui.internal.ScoutPerspective">
+         <actionSet
+               id="org.eclipse.jdt.ui.JavaActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.debug.ui.launchActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.jdt.debug.ui.JDTDebugActionSet">
+         </actionSet>
+         <viewShortcut
+               id="org.eclipse.scout.sdk.ui.internal.view.properties.ScoutPropertyView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.scout.sdk.designer.internal.view.DesignerView">
+         </viewShortcut>
+         <perspectiveShortcut
+               id="org.eclipse.debug.ui.DebugPerspective">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="org.eclipse.jdt.ui.JavaPerspective">
+         </perspectiveShortcut>
+         <perspectiveShortcut
+               id="org.eclipse.pde.ui.PDEPerspective">
+         </perspectiveShortcut>
+      </perspectiveExtension>
+   </extension>
+      <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.eclipse.scout.sdk.ui.internal.ScoutPerspective"
+            icon="resources/icons/eclipse_scout.gif"
+            id="org.eclipse.scout.sdk.ui.internal.ScoutPerspective"
+            name="Scout">
+      </perspective>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            allowMultiple="false"
+            category="org.eclipse.scout.sdk.viewcategory"
+            class="org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart"
+            icon="resources/icons/presentation.gif"
+            id="org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart"
+            name="Scout Explorer"/>
+      <view
+            allowMultiple="false"
+            category="org.eclipse.scout.sdk.viewcategory"
+            class="org.eclipse.scout.sdk.ui.internal.view.properties.ScoutPropertyView"
+            icon="resources/icons/propertiesedit.gif"
+            id="org.eclipse.scout.sdk.ui.internal.view.properties.ScoutPropertyView"
+            name="Scout Object Properties"/>
+      <category
+            id="org.eclipse.scout.sdk.viewcategory"
+            name="Scout (SDK)"/>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.scout.sdk.ui.internal.view.icons.IconsEditor"
+            extensions="icons"
+            icon="resources/icons/icons.png"
+            id="org.eclipse.scout.sdk.ui.internal.view.icons.IconsEditor"
+            name="Icons">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.scout.sdk"
+            name="Scout"/>
+      <wizard
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizard"
+            finalPerspective="org.eclipse.pde.ui.PDEPerspective"
+            hasPages="true"
+            icon="resources/icons/projectGroup_add.png"
+            id="bsicase.development.newProjectWizard"
+            name="Scout Project"
+            project="true"/>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="org.eclipse.scout.sdk.ui.extensions.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkPreferencePage"
+            id="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkPreferencePage"
+            name="Scout SDK">
+      </page>
+   </extension>
+   <extension
+            point="org.eclipse.scout.sdk.ui.outlineDragAndDrop">
+      <dragSupport
+            dragSourceDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.dnd.FormFieldDragSourceDelegator">
+      </dragSupport>
+      <dropSupport
+            dropTargetDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.dnd.FormFieldDropTargetDelegator">
+      </dropSupport>
+      <dragSupport
+            dragSourceDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.dnd.TableColumnDragSourceDelegator">
+      </dragSupport>
+      <dropSupport
+            dropTargetDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.dnd.TableColumnDropTargetDelegator">
+      </dropSupport>
+   </extension>
+   <extension point="org.eclipse.scout.sdk.ui.formField">
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField"
+            name="Bigdecimal Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.bigdecimalfield.BigdecimalFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.BigDecimalFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"
+            name="Boolean Field">
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.BooleanFieldNodePage">
+         </nodePage>
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.booleanfield.BooleanFieldNewWizard">
+         </newWizard>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.button.IButton"
+            name="Button Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.buttonfield.ButtonFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.ButtonNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField"
+            name="Calendar Field">
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.CalendarFieldNodePage">
+         </nodePage>
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.calendarfield.CalendarFieldNewWizard">
+         </newWizard>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox"
+            name="Checkbox Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.checkbox.CheckboxFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.CheckBoxNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField"
+            name="Composer Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.composerfield.ComposerFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.ComposerFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"
+            name="Date Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.datefield.DateFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.DateFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField"
+            name="Double Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.doublefield.DoubleFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.DoubleFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField"
+            name="FileChooser Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.filechooserfield.FileChooserFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FileChooserFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox"
+            name="Group Box">
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.GroupBoxNodePage">
+         </nodePage>
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.groupbox.GroupBoxNewWizard">
+         </newWizard>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField"
+            name="Html Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.htmlfield.HtmlFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.HtmlFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField"
+            name="Integer Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.integerfield.IntegerFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.IntegerFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField"
+            name="Image Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.imagefield.ImageFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.ImageFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField"
+            name="Label Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.labelfield.LabelFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.LabelFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox"
+            name="List Box">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.listbox.ListBoxFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.ListBoxNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField"
+            name="Long Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.longfield.LongFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.LongFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.matrixfield.IMatrixField"
+            name="Matrix Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.matrixfield.MatrixFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.MatrixFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="false"
+            model="org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField"
+            name="Mail Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.mailfield.MailFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.MailFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField"
+            name="Planner Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.plannerfield.PlannerFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.PlannerFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup"
+            name="Radio Button Group">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.radiobuttongroup.RadioButtonGroupFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.RadioButtonGroupNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox"
+            name="Sequence Box">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.sequencebox.SequenceBoxNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.SequenceBoxFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"
+            name="Smart Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.smartfield.SmartFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.SmartFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField"
+            name="String Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.stringfield.StringFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.StringFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox"
+            name="Tab Box">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.tabbox.TabBoxNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TabBoxNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField"
+            name="Table Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.tablefield.TableFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TableFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"
+            name="Tree Box">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.treebox.TreeBoxNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TreeBoxNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField"
+            name="Tree Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.treefield.TreeFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TreeFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton"
+            name="OK Button">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.buttonfield.OkButtonNewWizard">
+         </newWizard>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.IFormField"
+            name="Default Form Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.formfield.DefaultFormFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.UnknownFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton"
+            name="Cancel Button">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.buttonfield.CancelButtonNewWizard">
+         </newWizard>
+      </FormField>
+      <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox"
+            name="Split Box">
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.SplitBoxNodePage">
+         </nodePage>
+      </FormField>
+   </extension>
+   <extension point="org.eclipse.scout.sdk.ui.contextMenu">
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.ExportServerWarAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.FormDataUpdateAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.ImportPluginAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.InstallClientSessionAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.PageLinkAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.WellformAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.AttributeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.BeanPropertyNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.BookmarkStorageServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CalendarItemProviderNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CalendarServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ClientServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CodeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CustomServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CustomServiceNewPackageAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.DesktopMenuNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.EntityNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.FormHandlerNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.FormNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.GroupBoxNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.KeyStrokeNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.LocalLookupCallNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.LookupCallNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.MenuNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.OutlineNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.OutlineServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.PageNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.PermissionNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.RadioButtonNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SharedContextBeanPropertyNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SmtpServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.SqlServiceNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ToolbuttonNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.WizardNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.DeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.LookupCallDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.PropertyBeanDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.TableColumnDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.WizardStepDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.TableColumnRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.WizardStepRenameAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction"></contextMenu>
+  <contextMenu
+        class="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction">
+  </contextMenu>
+   </extension>
+   <extension
+         id="sqlBindCompletionProposalComputer"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.scout.sdk.ui.sqlBindProposalCategory"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.sql.SqlBindFromFormDataCompletionComputer">
+         <partition
+               type="__java_string">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         id="sqlBindProposalCategory"
+         name="SQL Bind Proposals"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <proposalCategory
+            icon="resources/icons/default.gif">
+      </proposalCategory>
+   </extension>
+   <extension
+         id="product"
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="org.eclipse.ui.ide.workbench" name="Scout SDK">
+         <property
+               name="appName" value="Scout SDK">
+         </property>
+         <property
+               name="preferenceCustomization"
+               value="plugin_customization.ini">
+         </property>
+      </product>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.propertyStructure">
+      <propertyDefinition
+            file="resources/sdkEditorStructure.xml">
+      </propertyDefinition>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.propertyViewPart">
+      <part
+            page="org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.JdtTypePropertyPart">
+         </singlePart>
+         <multiPart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.multipage.JdtTypeMultiPropertyPart">
+         </multiPart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.view.outline.pages.IPage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.UnknownSinglePagePropertyViewPart">
+         </singlePart>
+         <multiPart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.multipage.UnknownMultiPagePropertyViewPart">
+         </multiPart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ServicePropertyPart">
+         </singlePart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.FormPropertyPart">
+         </singlePart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwtNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
+         </singlePart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwingNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
+         </singlePart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
+         </singlePart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.IconNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.IconsPropertyViewPart">
+         </singlePart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ScoutProjectPropertyPart">
+         </singlePart>
+      </part>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.outlineCopyAndPaste">
+      <pasteSupport
+            pasteTargetDelegator="org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.TableColumnWidthsPasteTargetDelegator">
+      </pasteSupport>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu
+               id="org.eclipse.scout.sdk.menu"
+               label="Scout">
+            <dynamic
+                  class="org.eclipse.scout.sdk.ui.menu.FormDataUpdateContributionItem"
+                  id="org.eclipse.scout.sdk.ui.menu.updateFormdataAutomatically">
+            </dynamic>
+         </menu>
+      </menuContribution>
+      <menuContribution
+            allPopups="false"
+            class="org.eclipse.scout.sdk.ui.menu.ScoutMenuContributionItemFactory"
+            locationURI="popup:org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart">
+      </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.eclipse.scout.sdk.ui.internal.marker.resolution.SqlBindMarkerResolutionGenerator"
+            markerType="org.eclipse.scout.sdk.formdata.sql.binding.single">
+      </markerResolutionGenerator>
+      <markerResolutionGenerator
+            class="org.eclipse.scout.sdk.ui.internal.marker.resolution.SqlBindMarkerResolutionGenerator"
+            markerType="org.eclipse.scout.sdk.formdata.sql.binding.multi">
+      </markerResolutionGenerator>
+   </extension>
+      <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="org.eclipse.scout.sdk.ui.menu.MenuVisibilityTester"
+            id="org.eclipse.scout.sdk.ui.menu.menuVisibilityTester"
+            namespace="org.eclipse.scout.sdk.ui.menu"
+            properties="menuVisibilityTester"
+            type="java.lang.Object">
+      </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="org.eclipse.scout.sdk.explorer.context"
+            name="Scout Explorer Context">
+      </context>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.contextMenuContributor">
+      <contributor
+            class="org.eclipse.scout.sdk.ui.internal.extensions.DefaultMenuContributorExtension">
+      </contributor>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.scoutBundle">
+      <bundleNode
+            bundleName="ui.swing"
+            bundleType="GUI_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwingScoutBundleExtension"
+            icon="resources/icons/uiBundle.png"
+            id="org.eclipse.scout.sdk.ui.UiSwingBundle"
+            orderNumber="10">
+      </bundleNode>
+      <bundleNode
+            bundleName="ui.swt"
+            bundleType="GUI_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwtScoutBundleExtension"
+            icon="resources/icons/uiBundle.png"
+            id="org.eclipse.scout.sdk.ui.UiSwtBundle"
+            orderNumber="20">
+      </bundleNode>
+      <bundleNode
+            bundleName="client"
+            bundleType="Client_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ClientScoutBundleExtension"
+            icon="resources/icons/clientBundle.png"
+            id="org.eclipse.scout.sdk.ui.ClientBundle"
+            orderNumber="150">
+      </bundleNode>
+      <bundleNode
+            bundleName="shared"
+            bundleType="Shared_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SharedScoutBundleExtension"
+            icon="resources/icons/sharedBundle.png"
+            id="org.eclipse.scout.sdk.ui.SharedBundle"
+            orderNumber="250">
+      </bundleNode>
+      <bundleNode
+            bundleName="server"
+            bundleType="Server_Bundle"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ServerScoutBundleExtension"
+            icon="resources/icons/serverBundle.png"
+            id="org.eclipse.scout.sdk.ui.ServerBundle"
+            orderNumber="350">
+      </bundleNode>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.scoutProjectTemplate">
+      <template
+            class="org.eclipse.scout.sdk.ui.internal.extensions.project.template.DesktopFormTemplate"
+            icon="resources/icons/default.gif"
+            id="org.eclipse.scout.sdk.ui.dektopFormTemplate"
+            orderNumber="10">
+      </template>
+      <template
+            class="org.eclipse.scout.sdk.ui.internal.extensions.project.template.OutlineTemplate"
+            icon="resources/icons/default.gif"
+            id="org.eclipse.scout.sdk.ui.outlineTemplate"
+            orderNumber="20">
+      </template>
+      <template
+            class="org.eclipse.scout.sdk.ui.internal.extensions.project.template.EmptyApplicationTemplate"
+            icon="resources/icons/default.gif"
+            id="org.eclipse.scout.sdk.ui.emptyTemplate"
+            orderNumber="30">
+      </template>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.codeId">
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.BooleanCodeIdParser"
+            genericType="java.lang.Boolean"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.DoubleCodeIdParser"
+            genericType="java.lang.Double"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.FloatCodeIdParser"
+            genericType="java.lang.Float"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.IntegerCodeIdParser"
+            genericType="java.lang.Integer"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.LongCodeIdParser"
+            genericType="java.lang.Long"
+            priority="10">
+      </codeIdParser>
+      <codeIdParser
+            class="org.eclipse.scout.sdk.ui.internal.fields.code.parsers.StringCodeIdParser"
+            genericType="java.lang.String"
+            priority="10">
+      </codeIdParser>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.scout.sdk.ui.menu.ScoutSdkStartupExtension">
+      </startup>
+   </extension>
+</plugin>

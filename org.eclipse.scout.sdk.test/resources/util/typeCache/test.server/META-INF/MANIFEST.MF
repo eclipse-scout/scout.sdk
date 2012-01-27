@@ -1,0 +1,27 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: test.server
+Bundle-SymbolicName: test.server;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: test.server.Activator
+Bundle-Vendor: Eclipse Scout Project
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.core.runtime,
+ test.shared,
+ org.eclipse.scout.rt.server,
+ org.eclipse.scout.http.servletfilter,
+ org.eclipse.equinox.http.registry,
+ org.eclipse.scout.rt.jdbc.derby
+Export-Package: test.server,
+ test.server.services.process
+Bundle-ClassPath: .
+Import-Package: javax.servlet;version="2.4.0",
+ javax.servlet.http;version="2.4.0",
+ javax.activation;resolution:=optional,
+ javax.jms;resolution:=optional,
+ javax.mail;resolution:=optional,
+ javax.mail.event;resolution:=optional,
+ javax.mail.internet;resolution:=optional,
+ javax.mail.search;resolution:=optional,
+ javax.mail.util;resolution:=optional
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

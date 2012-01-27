@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.scout.nls.sdk.nlsProvider">
+      <provider
+            class="org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider">
+      </provider>
+   </extension>
+   <extension point="org.eclipse.scout.sdk.ui.explorerPage">
+      <page
+            page="org.eclipse.scout.nls.sdk.services.ui.page.TextServiceTablePage"
+            parentPageId="org.eclipse.scout.sdk.page.SharedNodePage">
+      </page>
+   </extension>
+	<extension point="org.eclipse.scout.sdk.ui.propertyViewPart">
+		<part
+            page="org.eclipse.scout.nls.sdk.services.ui.page.TextServiceNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.nls.sdk.services.ui.part.NlsPropertyViewPart">
+         </singlePart>
+      </part>
+   </extension>
+ <extension
+       point="org.eclipse.scout.sdk.ui.contextMenu">
+    <contextMenu
+          class="org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceNewAction">
+    </contextMenu>
+    <contextMenu
+          class="org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceDeleteAction">
+    </contextMenu>
+ </extension>
+</plugin>
