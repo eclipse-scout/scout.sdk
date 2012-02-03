@@ -37,7 +37,7 @@ public class ServerApplication implements IApplication{
   public Object start(IApplicationContext context) throws Exception {
     //start the scheduler
     /*
-    ScoutScheduler scheduler=new ScoutScheduler(Activator.getDefault().getBackendSubject(),ServerSession.class);
+    Scheduler scheduler=new Scheduler(Activator.getDefault().getBackendSubject(),ServerSession.class);
     scheduler.addJob(new LoadJobs());
     scheduler.start();
     Activator.getDefault().setScheduler(scheduler);
