@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.IPageChangedListener;
 import org.eclipse.jface.dialogs.PageChangedEvent;
@@ -18,20 +19,12 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 public class ScoutWizardDialog extends WizardDialog implements IWizardPageContainer {
 
   public ScoutWizardDialog(IWizard newWizard) {
     this(ScoutSdkUi.getDefault().getWorkbench().getActiveWorkbenchWindow().getShell(), newWizard);
-  }
-
-  @Override
-  protected Control createContents(Composite parent) {
-    // settings
-    return super.createContents(parent);
   }
 
   public ScoutWizardDialog(Shell parentShell, IWizard newWizard) {
@@ -47,6 +40,12 @@ public class ScoutWizardDialog extends WizardDialog implements IWizardPageContai
       }
     });
   }
+
+  @Override
+  protected IDialogSettings getDialogBoundsSettings() {
+    return ScoutSdkUi.getDefault().getDialogSettingsSection(getWizard().getClass().getName());
+  }
+
 
   @Override
   public void showPage(IWizardPage page) {

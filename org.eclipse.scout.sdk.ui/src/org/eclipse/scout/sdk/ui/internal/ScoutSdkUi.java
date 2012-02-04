@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.FontRegistry;
@@ -113,6 +114,15 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
       m_formDataServiceRegistration.unregister();
       m_formDataServiceRegistration = null;
     }
+  }
+
+  public IDialogSettings getDialogSettingsSection(String name) {
+    IDialogSettings dialogSettings = getDialogSettings();
+    IDialogSettings section = dialogSettings.getSection(name);
+    if (section == null) {
+      section = dialogSettings.addNewSection(name);
+    }
+    return section;
   }
 
   public static void logInfo(Throwable t) {
