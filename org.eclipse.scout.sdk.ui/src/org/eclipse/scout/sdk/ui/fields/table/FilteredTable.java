@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.table;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
@@ -27,7 +31,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -57,18 +60,33 @@ public class FilteredTable extends Composite {
     createContent(this);
   }
 
-  @Override
-  public Point computeSize(int wHint, int hHint, boolean changed) {
-    Point computeSize = super.computeSize(wHint, hHint, changed);
-    return computeSize;
-  }
-
   protected void createContent(Composite parent) {
 
     Control filterControl = createFilterControl(parent);
     m_table = new AutoResizeColumnTable(parent, m_style);
 
-    m_tableViewer = new TableViewer(m_table);
+    m_tableViewer = new TableViewer(m_table) {
+
+      @Override
+      protected Object[] getSortedChildren(Object parentNode) {
+        // ensure no separator at beginning/end or siblings
+        ArrayList<Object> cleanedElements = new ArrayList<Object>(Arrays.asList(super.getSortedChildren(parentNode)));
+        boolean removeNextSeperator = true;
+        for (Iterator<Object> it = cleanedElements.iterator(); it.hasNext();) {
+          Object cur = it.next();
+          if (cur instanceof ISeparator) {
+            if (removeNextSeperator || !it.hasNext()) {
+              it.remove();
+            }
+            removeNextSeperator = true;
+          }
+          else {
+            removeNextSeperator = false;
+          }
+        }
+        return cleanedElements.toArray(new Object[cleanedElements.size()]);
+      }
+    };
     m_tableViewer.setFilters(new ViewerFilter[]{m_tableFilter});
     m_tableViewer.setSorter(new P_TableSorter());
     // layout
@@ -175,23 +193,33 @@ public class FilteredTable extends Composite {
 
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-      ITableLabelProvider labelProvider = (ITableLabelProvider) ((TableViewer) viewer).getLabelProvider();
+      TableViewer tableViewer = (TableViewer) viewer;
+      if (element instanceof ISeparator) {
+        return true;
+      }
+      ITableLabelProvider labelProvider = (ITableLabelProvider) tableViewer.getLabelProvider();
       String columnText = labelProvider.getColumnText(element, 0);
       return (!StringUtility.isNullOrEmpty(columnText)) && CharOperation.match(m_filterString.toCharArray(), columnText.toCharArray(), false);
     }
 
     public void setFilterText(String filterText) {
-      if (StringUtility.isNullOrEmpty(filterText)) {
-        filterText = "*";
+      if (filterText == null) {
+        filterText = "";
       }
-      if (!filterText.endsWith("*")) {
-        filterText = filterText + "*";
-      }
-      m_filterString = filterText.toLowerCase();
+      filterText.replaceAll("^\\**", "*");
+      filterText.replaceAll("\\**$", "*");
+      m_filterString = "*" + filterText.toLowerCase() + "*";
     }
 
   } // end class P_TableFilter
 
+  /**
+   * <h3>{@link P_TableSorter}</h3> ...
+   * The default table sorter. Can be replaced by setting any other sorter or null afterwards.
+   * 
+   * @author Andreas Hoegger
+   * @since 3.8.0 27.01.2012
+   */
   private class P_TableSorter extends ViewerSorter {
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
@@ -203,4 +231,5 @@ public class FilteredTable extends Composite {
       return -1;
     }
   }
+
 }

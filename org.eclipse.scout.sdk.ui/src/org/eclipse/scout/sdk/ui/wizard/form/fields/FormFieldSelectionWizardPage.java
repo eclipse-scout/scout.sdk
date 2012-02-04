@@ -12,11 +12,13 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -25,16 +27,18 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.fields.table.ISeparator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
@@ -42,14 +46,10 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -64,13 +64,11 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
   private final IType m_declaringType;
   private AbstractScoutWizardPage m_nextPage;
+  private Object m_currentSelection;
+  private HashSet<IType> m_modelTypeShortList;
 
-  private HashSet<IFormFieldExtension> m_byExtensionEntries = new HashSet<IFormFieldExtension>();
-  private HashSet<IType> m_byClassEntries = new HashSet<IType>();
   // ui fields
   private FilteredTable m_table;
-  private Button m_allFieldsButton;
-  private P_TableFilter m_tableFilter;
 
   /**
    * @param pageName
@@ -85,30 +83,34 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
+    m_modelTypeShortList = new HashSet<IType>();
+    ArrayList<Object> elements = new ArrayList<Object>();
+    elements.add(new ISeparator() {
+    });
     // entries
-    for (IFormFieldExtension ext : FormFieldExtensionPoint.getAllFormFieldExtensions()) {
-      if (ext.isInShortList() && !StringUtility.isNullOrEmpty(ext.getName())) {
-        m_byExtensionEntries.add(ext);
-      }
-    }
     IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IFormField));
-    IType[] abstractFormFields = formFieldHierarchy.getAllSubtypes(iFormField, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), ScoutTypeComparators.getOrderAnnotationComparator());
+    IType[] abstractFormFields = formFieldHierarchy.getAllSubtypes(iFormField, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()));
     for (IType formField : abstractFormFields) {
-      m_byClassEntries.add(formField);
+      IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1);
+      if (formFieldExtension != null && formFieldExtension.isInShortList()) {
+        m_modelTypeShortList.add(formField);
+      }
+      elements.add(formField);
     }
-    m_tableFilter = new P_TableFilter();
     // ui
     m_table = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
-    m_table.getViewer().addFilter(m_tableFilter);
     m_table.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        Object selectedItem = null;
-        if (!event.getSelection().isEmpty()) {
-          StructuredSelection selection = (StructuredSelection) event.getSelection();
-          selectedItem = selection.getFirstElement();
+        if (m_currentSelection != null) {
+          m_table.getViewer().refresh(m_currentSelection);
         }
-        handleSelection(selectedItem);
+        m_currentSelection = null;
+        if (!event.getSelection().isEmpty()) {
+          m_currentSelection = ((StructuredSelection) event.getSelection()).getFirstElement();
+        }
+        m_table.getViewer().refresh(m_currentSelection);
+        handleSelection(m_currentSelection);
       }
     });
 
@@ -131,47 +133,30 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
         IWizardContainer container = getWizard().getContainer();
         if (container != null) {
           container.showPage(page);
-
         }
-
       }
     });
-    ArrayList<Object> elements = new ArrayList<Object>();
-    elements.addAll(m_byClassEntries);
-    elements.addAll(m_byExtensionEntries);
     P_ContentProvider provider = new P_ContentProvider(elements.toArray());
     m_table.getViewer().setLabelProvider(provider);
     m_table.getViewer().setContentProvider(provider);
     m_table.getViewer().setInput(provider);
-    m_allFieldsButton = new Button(parent, SWT.CHECK);
-    m_allFieldsButton.setText(Texts.get("ShowAllFields"));
-    m_allFieldsButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        showAllFields(((Button) e.widget).getSelection());
-      }
-    });
-    showAllFields(false);
+    m_table.getViewer().setSorter(new P_TableSorter());
 
     // layout
     parent.setLayout(new GridLayout(1, true));
-    m_table.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH | GridData.GRAB_VERTICAL));
+    GridData tableData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH | GridData.GRAB_VERTICAL);
+    tableData.heightHint = 150;
+    m_table.setLayoutData(tableData);
   }
 
   private void handleSelection(Object selectedItem) {
 
     AbstractFormFieldWizard wizard = null;
     if (selectedItem instanceof IType) {
-      IType selectedType = (IType) selectedItem;
-
-      wizard = (AbstractFormFieldWizard) FormFieldExtensionPoint.createNewWizard(selectedType);
+      IType formField = (IType) selectedItem;
+      wizard = (AbstractFormFieldWizard) FormFieldExtensionPoint.createNewWizard(formField);
       wizard.initWizard(m_declaringType);
-      wizard.setSuperType(selectedType);
-    }
-    else if (selectedItem instanceof IFormFieldExtension) {
-      IFormFieldExtension ext = (IFormFieldExtension) selectedItem;
-      wizard = (AbstractFormFieldWizard) ext.createNewWizard();
-      wizard.initWizard(m_declaringType);
+      wizard.setSuperType(formField);
     }
     if (wizard != null) {
       m_nextPage = (AbstractScoutWizardPage) wizard.getPages()[0];
@@ -180,14 +165,6 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       m_nextPage = null;
     }
     revalidate();
-  }
-
-  /**
-   * @param selection
-   */
-  protected void showAllFields(boolean selection) {
-    m_tableFilter.setByClass(selection);
-    m_table.refresh(true);
   }
 
   @Override
@@ -207,35 +184,23 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     return m_nextPage;
   }
 
-  private class P_TableFilter extends ViewerFilter {
-    private boolean m_byClass = false;
-
-    @Override
-    public boolean select(Viewer viewer, Object parentElement, Object element) {
-      if (m_byClass) {
-        return element instanceof IType;
-      }
-      else {
-        return element instanceof IFormFieldExtension;
-      }
-    }
-
-    /**
-     * @param byClass
-     *          the byClass to set
-     */
-    public void setByClass(boolean byClass) {
-      m_byClass = byClass;
-    }
-
-  } // end class P_TableFilter
-
-  private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
+  private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider, IStyledLabelProvider {
 
     private Object[] m_elements;
+    private Pattern m_typeNamePattern = Pattern.compile("^(Abstract|Abstract)?(.*)$");
 
     public P_ContentProvider(Object[] elements) {
       m_elements = elements;
+    }
+
+    @Override
+    public StyledString getStyledText(Object element) {
+      return null;
+    }
+
+    @Override
+    public Image getImage(Object element) {
+      return null;
     }
 
     @Override
@@ -246,6 +211,9 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
+        if (element instanceof ISeparator) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.Separator);
+        }
         return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
       }
       return null;
@@ -254,19 +222,22 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     @Override
     public String getColumnText(Object element, int columnIndex) {
       if (columnIndex == 0) {
-        String label = "";
-        if (element instanceof IType) {
-          IType t = (IType) element;
-          label = t.getElementName();
-          StructuredSelection selection = (StructuredSelection) m_table.getViewer().getSelection();
-          if (selection.toList().contains(element)) {
-            label = label + "  (" + t.getPackageFragment().getElementName() + ")";
-          }
+        StringBuilder label = new StringBuilder();
+        if (element instanceof ISeparator) {
+          return "-------------- more fields ------------------";
         }
-        else if (element instanceof IFormFieldExtension) {
-          label = ((IFormFieldExtension) element).getName();
+        StructuredSelection selection = (StructuredSelection) m_table.getViewer().getSelection();
+
+        IType t = (IType) element;
+        String typeName = t.getElementName();
+        if (typeName.toLowerCase().startsWith("abstract")) {
+          typeName = typeName.substring("abstract".length());
         }
-        return label;
+        label.append(typeName);
+        if (selection.toList().contains(element)) {
+          label.append("  (").append(t.getFullyQualifiedName()).append(")");
+        }
+        return label.toString();
       }
       return null;
     }
@@ -293,5 +264,42 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     public void removeListener(ILabelProviderListener listener) {
     }
   } // end class P_ByClassProvider
+
+  private class P_TableSorter extends ViewerSorter {
+
+    @Override
+    public int compare(Viewer viewer, Object e1, Object e2) {
+
+      CompositeObject comp1;
+      if (e1 instanceof ISeparator) {
+        comp1 = new CompositeObject(2);
+      }
+      else {
+        IType modelType = (IType) e1;
+        if (m_modelTypeShortList.contains(modelType)) {
+          comp1 = new CompositeObject(1, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
+        else {
+          comp1 = new CompositeObject(3, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
+      }
+
+      CompositeObject comp2;
+      if (e2 instanceof ISeparator) {
+        comp2 = new CompositeObject(2);
+      }
+      else {
+        IType modelType = (IType) e2;
+        if (m_modelTypeShortList.contains(modelType)) {
+          comp2 = new CompositeObject(1, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
+        else {
+          comp2 = new CompositeObject(3, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
+      }
+
+      return comp1.compareTo(comp2);
+    }
+  }
 
 }
