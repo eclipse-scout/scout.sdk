@@ -292,7 +292,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   }
 
   private void releaseEventCollector(ICompilationUnit icu, boolean clearWorkingCopy) {
-//    System.out.println("RELEASE '" + icu.getElementName() + "'");
     JdtEventCollector collector = null;
     if (icu.isWorkingCopy()) {
       collector = m_eventCollectors.get(icu);
@@ -530,12 +529,12 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
             public boolean visit(IResourceDelta visitDelta) {
               IResource resource = visitDelta.getResource();
               if (resource.getType() == IFile.FILE && StringUtility.equalsIgnoreCase("java", resource.getFileExtension())) {
-                int flags = visitDelta.getFlags();
-                if (((flags & IResourceDelta.CONTENT) != 0)) {
+//                int flags = visitDelta.getFlags();
+//                if (((flags & IResourceDelta.CONTENT) != 0)) {
 //                  ICompilationUnit icu = (ICompilationUnit) JavaCore.create(resource);
 //                  System.out.println("release from resource listener '" + icu.getElementName() + "' ");
 //                  releaseEventCollector(icu, false);
-                }
+//                }
                 return false;
               }
               return true;
