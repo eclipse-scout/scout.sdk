@@ -26,8 +26,8 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -161,12 +161,12 @@ public class ClientNodePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{WellformAction.class, FormDataUpdateAction.class, InstallClientSessionAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       ((WellformAction) menu).setOperation(new WellformClientBundleOperation(getScoutResource()));
     }

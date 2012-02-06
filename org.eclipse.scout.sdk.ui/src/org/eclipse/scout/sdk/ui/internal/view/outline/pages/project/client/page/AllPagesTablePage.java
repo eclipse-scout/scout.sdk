@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformPagesOperation;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -87,12 +87,12 @@ public class AllPagesTablePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{WellformAction.class, PageNewAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformPagesOperation(getScoutResource()));

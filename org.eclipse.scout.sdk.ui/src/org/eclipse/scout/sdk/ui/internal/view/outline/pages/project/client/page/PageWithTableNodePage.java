@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction;
@@ -96,13 +96,13 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class, SearchFormNewAction.class,
         /*PageNewAction.class, PageLinkAction.class, */WellformScoutTypeAction.class, TableColumnWidthsPasteAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof DeleteAction) {
       DeleteAction action = (DeleteAction) menu;

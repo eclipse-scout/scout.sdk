@@ -15,7 +15,7 @@ import java.util.UUID;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
@@ -85,7 +85,7 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof ProviderNewWizardAction) {
       ((ProviderNewWizardAction) menu).init(getScoutResource());
     }
@@ -93,7 +93,7 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{ProviderNewWizardAction.class};
   }
 

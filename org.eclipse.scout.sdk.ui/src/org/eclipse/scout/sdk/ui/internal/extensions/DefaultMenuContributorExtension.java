@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions;
 
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
 import org.eclipse.scout.sdk.ui.menu.IContextMenuProvider;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 public class DefaultMenuContributorExtension implements IContextMenuContributor {
 
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActionsFor(IPage p) {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActionsFor(IPage p) {
     if (p instanceof IContextMenuProvider) {
       return ((IContextMenuProvider) p).getSupportedMenuActions();
     }
@@ -26,7 +26,7 @@ public class DefaultMenuContributorExtension implements IContextMenuContributor 
   }
 
   @Override
-  public void prepareMenuAction(IPage p, AbstractScoutHandler menu) {
+  public void prepareMenuAction(IPage p, IScoutHandler menu) {
     if (p instanceof IContextMenuProvider) {
       ((IContextMenuProvider) p).prepareMenuAction(menu);
     }

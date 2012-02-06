@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
@@ -73,7 +73,7 @@ public class SessionFactoryNodePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     if (!m_type.isBinary()) {
       return new Class[]{DeleteAction.class, TypeRenameAction.class, ShowJavaReferencesAction.class};
     }
@@ -81,7 +81,7 @@ public class SessionFactoryNodePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof TypeRenameAction) {
       TypeRenameAction action = (TypeRenameAction) menu;
       action.setOldName(getType().getElementName());

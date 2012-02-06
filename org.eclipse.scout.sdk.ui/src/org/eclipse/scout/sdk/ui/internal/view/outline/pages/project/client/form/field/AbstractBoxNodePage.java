@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction;
@@ -91,7 +91,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof FormFieldRenameAction) {
       FormFieldRenameAction a = (FormFieldRenameAction) menu;
@@ -117,7 +117,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, FormFieldNewAction.class,
         BoxDeleteAction.class, CreateTemplateAction.class, FormDataUpdateAction.class};
   }

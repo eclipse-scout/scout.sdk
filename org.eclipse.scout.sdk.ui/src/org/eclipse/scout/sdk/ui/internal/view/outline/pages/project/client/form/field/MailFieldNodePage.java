@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -28,7 +28,7 @@ public class MailFieldNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof FormFieldDeleteAction) {
       menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MailFieldRemove));

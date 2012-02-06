@@ -26,8 +26,8 @@ import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperation;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ExportServerWarAction;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
@@ -157,12 +157,12 @@ public class ServerNodePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class, ExportServerWarAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       ((WellformAction) menu).setOperation(new WellformServerBundleOperation(getScoutResource()));
     }

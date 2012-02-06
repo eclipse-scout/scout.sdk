@@ -9,7 +9,7 @@ import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceNewAction;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -83,7 +83,7 @@ public class TextServiceTablePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TextProviderServiceNewAction.class};
   }
 }

@@ -6,11 +6,13 @@ import java.util.HashMap;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.expressions.PropertyTester;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.ContextMenuContributorExtensionPoint;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.ui.services.IServiceLocator;
 
 public class MenuVisibilityTester extends PropertyTester {
 
@@ -22,15 +24,15 @@ public class MenuVisibilityTester extends PropertyTester {
     return false;
   }
 
-  private static IContextMenuContributor getMenuContributor(Class<? extends AbstractScoutHandler> menu, IPage p) {
+  private static IContextMenuContributor getMenuContributor(Class<? extends IScoutHandler> menu, IPage p) {
     for (IContextMenuContributor c : ContextMenuContributorExtensionPoint.getContextMenuContributors(p)) {
-      Class<? extends AbstractScoutHandler>[] menus = c.getSupportedMenuActionsFor(p);
+      Class<? extends IScoutHandler>[] menus = c.getSupportedMenuActionsFor(p);
       if (contains(menus, menu)) return c;
     }
     return null;
   }
 
-  private static HashMap<IPage, IContextMenuContributor> getMenuContributorsForAllPages(Class<? extends AbstractScoutHandler> menu, IPage[] pages) {
+  private static HashMap<IPage, IContextMenuContributor> getMenuContributorsForAllPages(Class<? extends IScoutHandler> menu, IPage[] pages) {
     HashMap<IPage, IContextMenuContributor> mapping = new HashMap<IPage, IContextMenuContributor>();
     for (IPage p : pages) {
       IContextMenuContributor c = getMenuContributor(menu, p);
@@ -39,7 +41,7 @@ public class MenuVisibilityTester extends PropertyTester {
     return mapping;
   }
 
-  private static void prepareMenu(AbstractScoutHandler menu, HashMap<IPage, IContextMenuContributor> contributors) {
+  private static void prepareMenu(IScoutHandler menu, HashMap<IPage, IContextMenuContributor> contributors) {
     for (IPage p : contributors.keySet()) {
       contributors.get(p).prepareMenuAction(p, menu);
     }
@@ -52,7 +54,7 @@ public class MenuVisibilityTester extends PropertyTester {
     return true;
   }
 
-  private static IPage[] getFilteredSelection(Collection c) {
+  private static IPage[] getFilteredSelection(Collection<?> c) {
     ArrayList<IPage> ret = new ArrayList<IPage>(c.size());
     for (Object o : c) {
       if (o instanceof IPage) {
@@ -65,16 +67,19 @@ public class MenuVisibilityTester extends PropertyTester {
   @SuppressWarnings("unchecked")
   @Override
   public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
-    if (receiver instanceof Collection && args != null && args.length == 2 && args[0] instanceof Class && args[1] instanceof Command) {
-      if (AbstractScoutHandler.class.isAssignableFrom((Class<?>) args[0])) {
-        IPage[] selectedNodes = getFilteredSelection((Collection) receiver);
+    if (receiver instanceof StructuredSelection) {
+      receiver = ((StructuredSelection) receiver).toList();
+    }
+    if (receiver instanceof Collection && args != null && args.length == 3 && args[0] instanceof Class && args[1] instanceof Command && args[2] instanceof IServiceLocator) {
+      if (IScoutHandler.class.isAssignableFrom((Class<?>) args[0])) {
+        IPage[] selectedNodes = getFilteredSelection((Collection<?>) receiver);
         if (selectedNodes.length == 0) {
           return false;
         }
         else {
           try {
             // get class of current menu
-            Class<? extends AbstractScoutHandler> currentMenuClass = (Class<? extends AbstractScoutHandler>) args[0];
+            Class<? extends IScoutHandler> currentMenuClass = (Class<? extends IScoutHandler>) args[0];
             Command cmd = (Command) args[1];
 
             // for each page in the selection: get a contributor that supports the menu
@@ -83,7 +88,7 @@ public class MenuVisibilityTester extends PropertyTester {
             // check if a contributor is available for each selected page (if not: the menu is not supported by each selected node)
             if (!isMenuAvailableInAllPages(contributors)) return false;
 
-            AbstractScoutHandler currentMenu = ScoutMenuContributionItemFactory.getMenuInstance(currentMenuClass);
+            IScoutHandler currentMenu = ScoutMenuContributionItemFactory.getMenuInstance(currentMenuClass);
             if (currentMenu == null) return false; // no instance could be created -> do not show the menu
 
             // check for multi select
@@ -95,9 +100,11 @@ public class MenuVisibilityTester extends PropertyTester {
             // check if menu is visible
             if (!currentMenu.isVisible()) return false;
 
-            // if we come here all selected rows support the current menu and the menu is visible and prepared.
-            cmd.setHandler(currentMenu);
+            // if we come here, all selected rows support the current menu and the menu is visible and prepared: enable the handler
+            IServiceLocator serviceLocator = (IServiceLocator) args[2];
+            ScoutMenuContributionItemFactory.activateHandler(serviceLocator, currentMenu);
 
+            // register the key stroke
             ScoutMenuContributionItemFactory.registerKeyStroke(currentMenu.getKeyStroke(), cmd);
 
             return true;

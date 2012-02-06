@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
@@ -50,12 +50,12 @@ public class PermissionNodePage extends AbstractScoutTypePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof DeleteAction) {
       DeleteAction action = (DeleteAction) menu;
       action.addType(getType());

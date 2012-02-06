@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions;
 
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 public interface IContextMenuContributor {
@@ -22,7 +22,7 @@ public interface IContextMenuContributor {
    *          The page for which the available menus should be returned.
    * @return The list of supported menu classes.
    */
-  Class<? extends AbstractScoutHandler>[] getSupportedMenuActionsFor(IPage page);
+  Class<? extends IScoutHandler>[] getSupportedMenuActionsFor(IPage page);
 
   /**
    * Prepares the given context menu instance called on the given page.<br>
@@ -35,5 +35,5 @@ public interface IContextMenuContributor {
    * @param menu
    *          The menu instance (unprepared) that can be filled with parameters.
    */
-  void prepareMenuAction(IPage page, AbstractScoutHandler menu);
+  void prepareMenuAction(IPage page, IScoutHandler menu);
 }

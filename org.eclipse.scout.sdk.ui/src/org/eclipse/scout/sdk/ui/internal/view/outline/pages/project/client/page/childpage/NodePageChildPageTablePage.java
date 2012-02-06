@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -103,12 +103,12 @@ public class NodePageChildPageTablePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{PageLinkAction.class, PageNewAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof PageLinkAction) {
       ((PageLinkAction) menu).init(getScoutResource(), getNodePageType());
     }

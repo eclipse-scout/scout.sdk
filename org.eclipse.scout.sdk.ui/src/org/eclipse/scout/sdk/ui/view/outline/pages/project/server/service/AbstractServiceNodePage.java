@@ -15,7 +15,7 @@ import java.util.TreeMap;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
 import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
@@ -91,12 +91,12 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class, ServiceOperationNewAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof ServiceRenameAction) {
       ServiceRenameAction sra = (ServiceRenameAction) menu;

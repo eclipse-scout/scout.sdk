@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table;
 
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.TableColumnDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TableColumnRenameAction;
@@ -46,12 +46,12 @@ public class ColumnNodePage extends AbstractScoutTypePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TableColumnRenameAction.class, TableColumnDeleteAction.class, ShowJavaReferencesAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof TableColumnRenameAction) {
       TableColumnRenameAction action = (TableColumnRenameAction) menu;

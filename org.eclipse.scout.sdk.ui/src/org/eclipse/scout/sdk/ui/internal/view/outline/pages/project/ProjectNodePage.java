@@ -16,8 +16,8 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.operation.form.formdata.ScoutProjectUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutProjectOperation;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ImportPluginAction;
 import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
@@ -149,12 +149,12 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{ImportPluginAction.class, OrganizeAllImportsAction.class, WellformAction.class, FormDataUpdateAction.class, FormDataSqlBindingValidateAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof ImportPluginAction) {
       ((ImportPluginAction) menu).setScoutProject(getScoutResource());
     }

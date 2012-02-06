@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceDeleteAction;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.EditorSelectionVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -76,7 +76,7 @@ public class TextServiceNodePage extends AbstractServiceNodePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TextProviderServiceDeleteAction.class};
   }
 }

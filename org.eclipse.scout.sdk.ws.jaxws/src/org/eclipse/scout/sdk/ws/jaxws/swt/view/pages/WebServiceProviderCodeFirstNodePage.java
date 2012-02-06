@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
@@ -99,7 +100,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WsProviderCodeFirstDeleteAction) {
       ((WsProviderCodeFirstDeleteAction) menu).init(m_bundle, getSunJaxWsBean());
     }
@@ -107,7 +108,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     List<Class<? extends AbstractScoutHandler>> actions = new ArrayList<Class<? extends AbstractScoutHandler>>();
     actions.add(WsProviderCodeFirstDeleteAction.class);
     return actions.toArray(new Class[actions.size()]);

@@ -125,6 +125,11 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
     m_category = category;
   }
 
+  @Override
+  public final String getId() {
+    return this.getClass().getName();
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public final Object execute(ExecutionEvent event) throws ExecutionException {

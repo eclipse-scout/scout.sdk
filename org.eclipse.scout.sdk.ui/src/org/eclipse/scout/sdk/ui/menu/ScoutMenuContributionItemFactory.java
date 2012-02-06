@@ -15,12 +15,12 @@ import org.eclipse.jface.bindings.Binding;
 import org.eclipse.jface.bindings.keys.KeyBinding;
 import org.eclipse.jface.bindings.keys.KeySequence;
 import org.eclipse.jface.bindings.keys.ParseException;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.ContextMenuContributorExtensionPoint;
 import org.eclipse.swt.SWT;
 import org.eclipse.ui.commands.ICommandService;
+import org.eclipse.ui.handlers.IHandlerActivation;
 import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.internal.Workbench;
 import org.eclipse.ui.internal.keys.BindingService;
@@ -35,12 +35,13 @@ import org.eclipse.ui.services.IServiceLocator;
 public class ScoutMenuContributionItemFactory extends ExtensionContributionFactory {
 
   private static HashMap<String, KeyBinding> m_usedBindings = new HashMap<String, KeyBinding>();
+  private static HashMap<String, IHandlerActivation> m_usedActivations = new HashMap<String, IHandlerActivation>();
 
   @Override
   public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
 
-    TreeMap<IScoutHandler.Category, ArrayList<AbstractScoutHandler>> sorted =
-        new TreeMap<IScoutHandler.Category, ArrayList<AbstractScoutHandler>>(new Comparator<IScoutHandler.Category>() {
+    TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>> sorted =
+        new TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>>(new Comparator<IScoutHandler.Category>() {
           @Override
           public int compare(IScoutHandler.Category o1, IScoutHandler.Category o2) {
             return new Integer(o1.getOrder()).compareTo(o2.getOrder());
@@ -48,17 +49,17 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
         });
 
     // group and sort all actions by category
-    for (AbstractScoutHandler a : ContextMenuContributorExtensionPoint.getAllRegisteredContextMenus()) {
-      ArrayList<AbstractScoutHandler> listOfCurCat = sorted.get(a.getCategory());
+    for (IScoutHandler a : ContextMenuContributorExtensionPoint.getAllRegisteredContextMenus()) {
+      ArrayList<IScoutHandler> listOfCurCat = sorted.get(a.getCategory());
       if (listOfCurCat == null) {
-        listOfCurCat = new ArrayList<AbstractScoutHandler>();
+        listOfCurCat = new ArrayList<IScoutHandler>();
         sorted.put(a.getCategory(), listOfCurCat);
       }
       listOfCurCat.add(a);
     }
 
-    for (AbstractScoutHandler.Category c : sorted.keySet()) {
-      for (AbstractScoutHandler a : sorted.get(c)) {
+    for (IScoutHandler.Category c : sorted.keySet()) {
+      for (IScoutHandler a : sorted.get(c)) {
         Command cmd = getCommand(serviceLocator, a);
 
         CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, cmd.getId(), cmd.getId(), SWT.PUSH);
@@ -68,7 +69,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
 
         CommandContributionItem item = new CommandContributionItem(p);
 
-        Object[] args = new Object[]{a.getClass(), cmd};
+        Object[] args = new Object[]{a.getClass(), cmd, serviceLocator};
         TestExpression e = new TestExpression("org.eclipse.scout.sdk.ui.menu", "menuVisibilityTester", args, Boolean.TRUE);
         additions.addContributionItem(item, e);
       }
@@ -76,10 +77,10 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
     }
   }
 
-  public static AbstractScoutHandler getMenuInstance(Class<? extends AbstractScoutHandler> type) {
+  public static IScoutHandler getMenuInstance(Class<? extends IScoutHandler> type) {
     try {
-      Constructor<? extends AbstractScoutHandler> c = type.getConstructor(new Class[]{});
-      AbstractScoutHandler ret = c.newInstance();
+      Constructor<? extends IScoutHandler> c = type.getConstructor(new Class[]{});
+      IScoutHandler ret = c.newInstance();
       return ret;
     }
     catch (Exception e) {
@@ -97,12 +98,12 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
     return cat;
   }
 
-  public static void registerKeyStroke(String keyStroke, Command cmd) {
+  public synchronized static void registerKeyStroke(String keyStroke, Command cmd) {
     if (keyStroke != null) {
       try {
         BindingService bs = (BindingService) Workbench.getInstance().getService(IBindingService.class);
 
-        KeyBinding oldBinding = m_usedBindings.get(keyStroke);
+        KeyBinding oldBinding = m_usedBindings.remove(keyStroke);
         if (oldBinding != null) {
           bs.removeBinding(oldBinding);
         }
@@ -111,8 +112,8 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
         KeyBinding kb = new KeyBinding(KeySequence.getInstance(keyStroke), paramCmd,
             "org.eclipse.ui.defaultAcceleratorConfiguration",
             "org.eclipse.scout.sdk.explorer.context", null, null, null, Binding.USER);
-        m_usedBindings.put(keyStroke, kb);
         bs.addBinding(kb);
+        m_usedBindings.put(keyStroke, kb);
       }
       catch (ParseException e) {
         ScoutSdkUi.logError(e);
@@ -120,13 +121,23 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
     }
   }
 
-  private Command getCommand(IServiceLocator serviceLocator, AbstractScoutHandler action) {
-    ICommandService cs = (ICommandService) serviceLocator.getService(ICommandService.class);
-    String actionId = action.getClass().getName();
-    Command cmd = cs.getCommand(actionId);
-    if (!cmd.isDefined()) {
+  public synchronized static void activateHandler(IServiceLocator serviceLocator, IScoutHandler h) {
+    if (h != null) {
       IHandlerService hs = (IHandlerService) serviceLocator.getService(IHandlerService.class);
-      hs.activateHandler(actionId, action);
+      IHandlerActivation existingActivation = m_usedActivations.remove(h.getId());
+      if (existingActivation != null) {
+        hs.deactivateHandler(existingActivation);
+      }
+      IHandlerActivation ha = hs.activateHandler(h.getId(), h);
+      m_usedActivations.put(h.getId(), ha);
+    }
+  }
+
+  private Command getCommand(IServiceLocator serviceLocator, IScoutHandler action) {
+    ICommandService cs = (ICommandService) serviceLocator.getService(ICommandService.class);
+    Command cmd = cs.getCommand(action.getId());
+    if (!cmd.isDefined()) {
+      activateHandler(serviceLocator, action);
 
       Category cat = null;
       if (action.getCategory() == null) {
@@ -135,7 +146,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
       else {
         cat = getCategory(serviceLocator, action.getCategory().getId());
       }
-      cmd.define(actionId, null, cat);
+      cmd.define(action.getId(), null, cat);
     }
     return cmd;
   }

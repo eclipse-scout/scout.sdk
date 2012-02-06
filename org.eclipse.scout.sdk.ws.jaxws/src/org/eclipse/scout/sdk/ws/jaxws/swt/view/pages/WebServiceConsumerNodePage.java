@@ -26,7 +26,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
@@ -135,9 +135,9 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
-    List<Class<? extends AbstractScoutHandler>> list = new ArrayList<Class<? extends AbstractScoutHandler>>();
-    for (Class<? extends AbstractScoutHandler> c : super.getSupportedMenuActions()) {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+    List<Class<? extends IScoutHandler>> list = new ArrayList<Class<? extends IScoutHandler>>();
+    for (Class<? extends IScoutHandler> c : super.getSupportedMenuActions()) {
       list.add(c);
     }
 
@@ -152,7 +152,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof WsConsumerDeleteAction) {
       ((WsConsumerDeleteAction) menu).init(m_bundle, getType(), getBuildJaxWsBean());

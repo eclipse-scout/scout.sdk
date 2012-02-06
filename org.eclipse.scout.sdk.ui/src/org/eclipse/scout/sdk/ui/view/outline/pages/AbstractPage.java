@@ -23,7 +23,7 @@ import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint;
@@ -354,12 +354,12 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return null;
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
   }
 
   /**

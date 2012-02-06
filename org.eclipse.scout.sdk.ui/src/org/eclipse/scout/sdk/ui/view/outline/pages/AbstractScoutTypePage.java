@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -70,12 +70,12 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof TypeRenameAction) {
       TypeRenameAction action = (TypeRenameAction) menu;
       action.setOldName(getType().getElementName());

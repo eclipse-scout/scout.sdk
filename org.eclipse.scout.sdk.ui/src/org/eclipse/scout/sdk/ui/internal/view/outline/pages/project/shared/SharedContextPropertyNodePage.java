@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -47,12 +47,12 @@ public class SharedContextPropertyNodePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{PropertyBeansRenameAction.class, MemberListDeleteAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof MemberListDeleteAction) {
       MemberListDeleteAction action = (MemberListDeleteAction) menu;

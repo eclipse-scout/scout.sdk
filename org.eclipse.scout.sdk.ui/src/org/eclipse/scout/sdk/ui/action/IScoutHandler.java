@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.action;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.commands.IHandler2;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.widgets.Shell;
@@ -20,7 +21,7 @@ import org.eclipse.ui.menus.CommandContributionItemParameter;
 /**
  *
  */
-public interface IScoutHandler {
+public interface IScoutHandler extends IHandler2 {
   public enum Category {
     OPEN("org.eclipse.scout.sdk.ui.menu.category.new", 5),
     NEW("org.eclipse.scout.sdk.ui.menu.category.new", 10),
@@ -93,6 +94,8 @@ public interface IScoutHandler {
   public Category getCategory();
 
   public void setCategory(Category category);
+
+  public String getId();
 
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException;
 }

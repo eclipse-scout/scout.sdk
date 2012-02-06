@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.menu;
 
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 
 public interface IContextMenuProvider {
 
@@ -19,12 +19,12 @@ public interface IContextMenuProvider {
    * 
    * @return
    */
-  Class<? extends AbstractScoutHandler>[] getSupportedMenuActions();
+  Class<? extends IScoutHandler>[] getSupportedMenuActions();
 
   /**
    * is called for each menu that is supported by this provider and supports the current selection count.
    * 
    * @param menu
    */
-  void prepareMenuAction(AbstractScoutHandler menu);
+  void prepareMenuAction(IScoutHandler menu);
 }

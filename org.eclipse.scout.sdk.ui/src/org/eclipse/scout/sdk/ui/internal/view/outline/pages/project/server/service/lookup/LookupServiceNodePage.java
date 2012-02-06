@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction;
@@ -44,13 +44,13 @@ public class LookupServiceNodePage extends AbstractServiceNodePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class,
         ServiceOperationNewAction.class, ServiceDeleteAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof ServiceDeleteAction) {
       ServiceDeleteAction action = (ServiceDeleteAction) menu;

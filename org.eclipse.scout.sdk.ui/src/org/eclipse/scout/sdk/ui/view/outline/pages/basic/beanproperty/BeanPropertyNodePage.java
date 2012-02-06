@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.PropertyBeanDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -75,12 +75,12 @@ public class BeanPropertyNodePage extends AbstractPage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{PropertyBeansRenameAction.class, PropertyBeanDeleteAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof PropertyBeansRenameAction) {
       ((PropertyBeansRenameAction) menu).setPropertyBeanDescriptors(new IPropertyBean[]{getPropertyDescriptor()});
     }

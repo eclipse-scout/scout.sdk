@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction;
@@ -85,12 +85,12 @@ public class FormNodePage extends AbstractScoutTypePage {
 
   @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends AbstractScoutHandler>[] getSupportedMenuActions() {
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, FormDeleteAction.class, WellformAction.class, FormDataUpdateAction.class};
   }
 
   @Override
-  public void prepareMenuAction(AbstractScoutHandler menu) {
+  public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof FormDeleteAction) {
       ((FormDeleteAction) menu).setFormType(getType());
