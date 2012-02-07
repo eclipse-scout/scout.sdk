@@ -2,9 +2,8 @@ package org.eclipse.scout.sdk.ui.menu;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.Map;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
@@ -40,23 +39,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
   @Override
   public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
 
-    TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>> sorted =
-        new TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>>(new Comparator<IScoutHandler.Category>() {
-          @Override
-          public int compare(IScoutHandler.Category o1, IScoutHandler.Category o2) {
-            return new Integer(o1.getOrder()).compareTo(o2.getOrder());
-          }
-        });
-
-    // group and sort all actions by category
-    for (IScoutHandler a : ContextMenuContributorExtensionPoint.getAllRegisteredContextMenus()) {
-      ArrayList<IScoutHandler> listOfCurCat = sorted.get(a.getCategory());
-      if (listOfCurCat == null) {
-        listOfCurCat = new ArrayList<IScoutHandler>();
-        sorted.put(a.getCategory(), listOfCurCat);
-      }
-      listOfCurCat.add(a);
-    }
+    Map<IScoutHandler.Category, ArrayList<IScoutHandler>> sorted = ContextMenuContributorExtensionPoint.getAllRegisteredContextMenusByCategory();
 
     for (IScoutHandler.Category c : sorted.keySet()) {
       for (IScoutHandler a : sorted.get(c)) {

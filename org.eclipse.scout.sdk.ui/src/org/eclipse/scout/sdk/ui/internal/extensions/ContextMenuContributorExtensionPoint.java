@@ -1,24 +1,30 @@
 package org.eclipse.scout.sdk.ui.internal.extensions;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 public class ContextMenuContributorExtensionPoint {
 
-  private static Object contextMenuExtensionsCacheLock = new Object();
-  private static AbstractScoutHandler[] contextMenuExtensions;
+  private final static Object contextMenuExtensionsCacheLock = new Object();
+  private static IScoutHandler[] contextMenuExtensions;
 
-  private static Object contextMenuContributorExtensionsCacheLock = new Object();
+  private final static Object contextMenuContributorExtensionsCacheLock = new Object();
   private static MenuContributionInfo[] contextMenuContributorExtensions;
+
+  private final static Object contextMenuByCatLock = new Object();
+  private static Map<IScoutHandler.Category, ArrayList<IScoutHandler>> contextMenuByCat;
 
   private static class MenuContributionInfo {
     private IContextMenuContributor contributor;
@@ -93,16 +99,16 @@ public class ContextMenuContributorExtensionPoint {
     }
   }
 
-  public static AbstractScoutHandler[] getAllRegisteredContextMenus() {
+  public static IScoutHandler[] getAllRegisteredContextMenus() {
     if (contextMenuExtensions == null) {
       synchronized (contextMenuExtensionsCacheLock) {
         if (contextMenuExtensions == null) {
-          final ArrayList<AbstractScoutHandler> list = new ArrayList<AbstractScoutHandler>();
+          final ArrayList<IScoutHandler> list = new ArrayList<IScoutHandler>();
           visitExtensions("contextMenu", "contextMenu", new IExtensionVisitor() {
             @Override
             public boolean visit(IConfigurationElement element) {
               try {
-                AbstractScoutHandler ext = (AbstractScoutHandler) element.createExecutableExtension("class");
+                IScoutHandler ext = (IScoutHandler) element.createExecutableExtension("class");
                 list.add(ext);
               }
               catch (Throwable t) {
@@ -111,10 +117,40 @@ public class ContextMenuContributorExtensionPoint {
               return true;
             }
           });
-          contextMenuExtensions = list.toArray(new AbstractScoutHandler[list.size()]);
+          contextMenuExtensions = list.toArray(new IScoutHandler[list.size()]);
         }
       }
     }
     return contextMenuExtensions;
+  }
+
+  public static Map<IScoutHandler.Category, ArrayList<IScoutHandler>> getAllRegisteredContextMenusByCategory() {
+    if (contextMenuByCat == null) {
+      synchronized (contextMenuExtensionsCacheLock) {
+        if (contextMenuByCat == null) {
+          TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>> sorted =
+              new TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>>(new Comparator<IScoutHandler.Category>() {
+                @Override
+                public int compare(IScoutHandler.Category o1, IScoutHandler.Category o2) {
+                  return new Integer(o1.getOrder()).compareTo(o2.getOrder());
+                }
+              });
+
+          // group and sort all actions by category
+          for (IScoutHandler a : getAllRegisteredContextMenus()) {
+            ArrayList<IScoutHandler> listOfCurCat = sorted.get(a.getCategory());
+            if (listOfCurCat == null) {
+              listOfCurCat = new ArrayList<IScoutHandler>();
+              sorted.put(a.getCategory(), listOfCurCat);
+            }
+            listOfCurCat.add(a);
+          }
+
+          contextMenuByCat = sorted;
+        }
+      }
+    }
+
+    return contextMenuByCat;
   }
 }
