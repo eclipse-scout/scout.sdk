@@ -21,7 +21,9 @@ public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
 
   @Override
   public void init() {
-    ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
+    ArrayList<IFile> productFiles = new ArrayList<IFile>(1);
+
+    // only add dev-product as prod product has no jetty.
     IFile dev = getProperties().getProperty(CreateUiRapPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
     if (dev != null) productFiles.add(dev);
 

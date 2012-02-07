@@ -8,10 +8,11 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.rap.ui;
+package org.eclipse.scout.sdk.rap.ui.internal;
 
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.sdk.rap.ui.SdkRapIcons;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.swt.SWT;

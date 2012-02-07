@@ -20,12 +20,11 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
 
   @Override
   public void init() {
-    ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
+    ArrayList<IFile> productFiles = new ArrayList<IFile>(1);
+
+    // only add dev-product as prod product has no jetty.
     IFile dev = getProperties().getProperty(CreateServerPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
     if (dev != null) productFiles.add(dev);
-
-    IFile prod = getProperties().getProperty(CreateServerPluginOperation.PROP_PRODUCT_FILE_PROD, IFile.class);
-    if (prod != null) productFiles.add(prod);
 
     m_serverProdFiles = productFiles.toArray(new IFile[productFiles.size()]);
   }

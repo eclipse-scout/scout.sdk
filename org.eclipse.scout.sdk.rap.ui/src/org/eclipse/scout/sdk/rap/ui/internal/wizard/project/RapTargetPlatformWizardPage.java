@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation.TARGET_STRATEGY;
-import org.eclipse.scout.sdk.rap.ui.ScoutSdkRapUI;
+import org.eclipse.scout.sdk.rap.ui.internal.ScoutSdkRapUI;
 import org.eclipse.scout.sdk.ui.fields.FileSelectionField;
 import org.eclipse.scout.sdk.ui.fields.IFileSelectionListener;
 import org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizard;

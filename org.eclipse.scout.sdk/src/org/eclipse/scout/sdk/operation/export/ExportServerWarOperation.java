@@ -123,7 +123,7 @@ public class ExportServerWarOperation implements IOperation {
         IOUtility.deleteDirectory(m_tempBuildDir);
       }
       catch (Exception e) {
-        // viod
+        // nop
       }
     }
 

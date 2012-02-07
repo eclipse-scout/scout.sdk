@@ -35,4 +35,10 @@
          </singlePart>
       </part>
    </extension>
+   <extension
+       point="org.eclipse.scout.sdk.ui.contextMenu">
+    <contextMenu
+          class="org.eclipse.scout.sdk.rap.ui.internal.action.ExportRapWarAction">
+    </contextMenu>
+ </extension>
 </plugin>

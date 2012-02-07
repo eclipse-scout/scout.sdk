@@ -48,7 +48,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -68,7 +67,6 @@ import org.eclipse.swt.widgets.Label;
  */
 public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
   private final static String SETTINGS_WAR_FILE = "warFile";
-  private final static String SETTINGS_WAR_FILE_NAME = "warFileName";
   private final static String SETTINGS_OVERWRITE_WAR = "warOverwrite";
   private final static String SETTINGS_INCLUDE_CLIENT = "includeClientExport";
   private final static String SETTINGS_CLIENT_PRODUCT = "clientProduct";
@@ -79,9 +77,6 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
   private final static String PROP_OVERWRITE_EXISTING_WAR = "overwriteExistingWar";
   private final static String PROP_INCLUDE_CLIENT_APPLICATION = "includeClientApplication";
   private final static String PROP_CLIENT_EXPORT_FOLDER = "clientExportFolder";
-
-  private final static String BUNDLE_ID_HTTP_REGISTRY = "org.eclipse.equinox.http.registry";
-  private final static String BUNDLE_ID_HTTP_SERVLETBRIDGE = "org.eclipse.equinox.http.servletbridge";
 
   private final IScoutProject m_scoutProject;
 
@@ -105,7 +100,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    ITreeNode serverProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new P_ServerProductFilter(), false);
+    ITreeNode serverProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new DeployableProductFileNodeFilter(IScoutBundle.BUNDLE_SERVER), false);
     m_serverProductField = new ProductSelectionField(parent, serverProductTreeRoot);
     m_serverProductField.setLabelText(Texts.get("ProductFile"));
     m_serverProductField.addProductSelectionListener(new IProductSelectionListener() {
@@ -123,7 +118,9 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
       m_serverProductField.setProductFile(pf);
     }
     else if (serverProductNodes.length == 0) {
-      m_serverProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WarExportNoServerFound", BUNDLE_ID_HTTP_SERVLETBRIDGE, BUNDLE_ID_HTTP_REGISTRY));
+      m_serverProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WarExportNoServerFound",
+          DeployableProductFileNodeFilter.BUNDLE_ID_HTTP_SERVLETBRIDGE,
+          DeployableProductFileNodeFilter.BUNDLE_ID_HTTP_REGISTRY));
     }
 
     m_warFileField = new FileSelectionField(parent);
@@ -578,66 +575,6 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
      */
     public String getName() {
       return m_name;
-    }
-  }
-
-  private class P_ServerProductFilter implements ITreeNodeFilter {
-
-    @Override
-    public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case IScoutBundle.BUNDLE_SERVER:
-          return true;
-        case TreeUtility.TYPE_PRODUCT_NODE:
-          return getServletBridgeProductStatus((IFile) node.getData()).isOK();
-        default:
-          return false;
-      }
-    }
-
-    /**
-     * @param productFile
-     * @return {@link Status#OK_STATUS} if the given product is valid to deploy on a app server using the servlet bridge
-     */
-    private IStatus getServletBridgeProductStatus(IFile productFile) {
-      if (productFile == null) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "product file is null.");
-      }
-      ProductFileModelHelper h = null;
-      try {
-        h = new ProductFileModelHelper(productFile);
-
-        if (!h.ProductFile.isValid()) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "product file is not valid.");
-        }
-
-        // check required plugins
-        if (!h.ProductFile.existsDependency(BUNDLE_ID_HTTP_REGISTRY)) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "product must contain '" + BUNDLE_ID_HTTP_REGISTRY + "' as required bundle.");
-        }
-        if (!h.ProductFile.existsDependency(BUNDLE_ID_HTTP_SERVLETBRIDGE)) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "product must contain '" + BUNDLE_ID_HTTP_SERVLETBRIDGE + "' as required bundle.");
-        }
-
-        // check osgi.bundles entries
-        String osgiBundleEntry = h.ConfigurationFile.getOsgiBundlesEntry();
-        if (osgiBundleEntry == null) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "osgi.bundles entry in config.ini is missing.");
-        }
-        else {
-          // org.eclipse.equinox.common@2:start, org.eclipse.update.configurator@start, org.eclipse.equinox.http.servletbridge@start, org.eclipse.equinox.http.registry@start, org.eclipse.core.runtime@start
-          if (!osgiBundleEntry.contains(BUNDLE_ID_HTTP_SERVLETBRIDGE)) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "osgi.bundles entry in config.ini file must conatin '" + BUNDLE_ID_HTTP_SERVLETBRIDGE + "' bundle.");
-          }
-          if (!osgiBundleEntry.contains(BUNDLE_ID_HTTP_REGISTRY)) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "osgi.bundles entry in config.ini file must conatin '" + BUNDLE_ID_HTTP_REGISTRY + "' bundle.");
-          }
-        }
-      }
-      catch (CoreException e) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "could not parse product file.");
-      }
-      return Status.OK_STATUS;
     }
   }
 

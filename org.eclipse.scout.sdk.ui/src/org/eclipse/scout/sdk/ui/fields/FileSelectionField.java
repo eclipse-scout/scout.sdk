@@ -262,7 +262,7 @@ public class FileSelectionField extends TextField {
     }
   }
 
-  public void setFileInternal(File file) {
+  private void setFileInternal(File file) {
     if (!CompareUtility.equals(getFile(), file)) {
       setFile(file);
       fireFileSelected(file);

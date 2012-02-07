@@ -30,6 +30,7 @@ import org.osgi.framework.Bundle;
 public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperation {
   public final static String PROP_BUNDLE_RAP_NAME = "BUNDLE_RAP_NAME";
   public final static String PROP_PRODUCT_FILE_DEV = "RAP_PROD_FILE_DEV";
+  public final static String PROP_PRODUCT_FILE_PROD = "RAP_PROD_FILE_PROD";
 
   public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.UiRapBundle";
   public final static String RAP_UI_PROJECT_NAME_SUFFIX = ".ui.rap";
@@ -71,14 +72,22 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
       new InstallJavaFileOperation("templates/ui.rap/src/Activator.java", destPathPref + "Activator.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
       new InstallJavaFileOperation("templates/ui.rap/src/StandaloneRwtEnvironment.java", destPathPref + "StandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
 
-      // PRODUCT
+      // dev product
       new InstallTextFileOperation("templates/ui.rap/products/development/config.ini", "products/development/config.ini", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
-      InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/ui.rap/products/development/app-rap-dev.product", "products/development/app-rap-dev.product", uiRapBundle, project, getStringProperties());
+      InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/ui.rap/products/development/app-rap-dev.product",
+          "products/development/" + getProjectAlias() + "-rap-dev.product", uiRapBundle, project, getStringProperties());
       devProdInstallOp.run(monitor, workingCopyManager);
       getProperties().setProperty(PROP_PRODUCT_FILE_DEV, devProdInstallOp.getCreatedFile());
 
       // register development product as project launcher in project-property-part
       SdkProperties.addProjectProductLauncher(getScoutProjectName(), devProdInstallOp.getCreatedFile());
+
+      // prod product
+      new InstallTextFileOperation("templates/ui.rap/products/production/config.ini", "products/production/config.ini", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
+      InstallTextFileOperation prodProdInstallOp = new InstallTextFileOperation("templates/ui.rap/products/production/app-rap.product",
+          "products/production/" + getProjectAlias() + "-rap.product", uiRapBundle, project, getStringProperties());
+      prodProdInstallOp.run(monitor, workingCopyManager);
+      getProperties().setProperty(PROP_PRODUCT_FILE_PROD, prodProdInstallOp.getCreatedFile());
     }
     catch (MalformedURLException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdkRap.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));

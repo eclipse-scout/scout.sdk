@@ -16,9 +16,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWarWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
-/**
- *
- */
 public class ExportServerWarAction extends AbstractWizardAction {
 
   private IScoutBundle m_res;

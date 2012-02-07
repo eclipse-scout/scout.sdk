@@ -4,8 +4,8 @@
 <product name="@@ALIAS@@ Server" id="@@BUNDLE_SERVER_NAME@@.product" application="@@BUNDLE_SERVER_NAME@@.app" useFeatures="false" includeLaunchers="true">
 
    <configIni use="default">
-      <linux>/@@BUNDLE_SERVER_NAME@@/products/development/config.ini</linux>
-      <macosx>/@@BUNDLE_SERVER_NAME@@/products/development/config.ini</macosx>
+      <linux>/@@BUNDLE_SERVER_NAME@@/products/production/config.ini</linux>
+      <macosx>/@@BUNDLE_SERVER_NAME@@/products/production/config.ini</macosx>
       <win32>/@@BUNDLE_SERVER_NAME@@/products/production/config.ini</win32>
    </configIni>
 
