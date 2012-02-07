@@ -32,8 +32,8 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
   @Override
   public void validate() throws IllegalArgumentException {
     super.validate();
-    if (m_serverProdFiles == null || m_serverProdFiles.length != 2) {
-      throw new IllegalArgumentException("dev or prod server product file not found.");
+    if (m_serverProdFiles == null || m_serverProdFiles.length != 1) {
+      throw new IllegalArgumentException("server development product file not found.");
     }
   }
 
