@@ -493,7 +493,8 @@
       </FormField>
    </extension>
    <extension point="org.eclipse.scout.sdk.ui.contextMenu">
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.ExportServerWarAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.export.ExportServerWarAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.export.ExportEarAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.FormDataUpdateAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.ImportPluginAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.InstallClientSessionAction"></contextMenu>

@@ -1,5 +1,12 @@
 package org.eclipse.scout.sdk.util;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -14,6 +21,8 @@ import org.eclipse.jface.text.Document;
 
 @SuppressWarnings("restriction")
 public final class ResourcesUtility {
+
+  private final static int BUF_SIZE = 8192;
 
   private ResourcesUtility() {
   }
@@ -79,6 +88,65 @@ public final class ResourcesUtility {
     catch (JavaModelException e) {
       return getLineSeparator();
     }
+  }
+
+  /**
+   * copies all data from the given file to the output stream
+   * 
+   * @param from
+   *          source file
+   * @param to
+   *          data target
+   * @throws IOException
+   */
+  public static void copy(File from, OutputStream to) throws IOException {
+    InputStream input = null;
+    try {
+      input = new BufferedInputStream(new FileInputStream(from), BUF_SIZE);
+      copy(input, to);
+    }
+    finally {
+      if (input != null) {
+        try {
+          input.close();
+        }
+        catch (IOException e) {
+        }
+      }
+    }
+  }
+
+  /**
+   * copies all data from the input stream to the output stream.
+   * 
+   * @param from
+   *          data source
+   * @param to
+   *          data target
+   * @throws IOException
+   */
+  public static void copy(InputStream from, OutputStream to) throws IOException {
+    copy(from, to, BUF_SIZE);
+  }
+
+  /**
+   * copies all data from the input stream to the output stream.
+   * 
+   * @param from
+   *          data source
+   * @param to
+   *          data target
+   * @param bufferSize
+   *          buffer size to use
+   * @throws IOException
+   */
+  public static void copy(InputStream from, OutputStream to, int bufferSize) throws IOException {
+    byte[] b = new byte[bufferSize];
+    int len;
+    while ((len = from.read(b, 0, b.length)) != -1) {
+      to.write(b, 0, len);
+    }
+    to.flush();
   }
 
   /**

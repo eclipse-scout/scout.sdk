@@ -42,12 +42,12 @@ import org.eclipse.pde.internal.core.exports.ProductExportOperation;
 import org.eclipse.pde.internal.core.iproduct.IProductModel;
 import org.eclipse.pde.internal.core.iproduct.IProductPlugin;
 import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
-import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Version;
 
@@ -260,9 +260,9 @@ public class ExportServerWarOperation implements IOperation {
           }
           name = name.substring(prefix.length() + 1);
           name = name.replace('\\', '/');
-          byte[] data = FileUtility.readFile(f);
+
           zOut.putNextEntry(new ZipEntry(name));
-          zOut.write(data);
+          ResourcesUtility.copy(f, zOut);
           zOut.closeEntry();
         }
       }

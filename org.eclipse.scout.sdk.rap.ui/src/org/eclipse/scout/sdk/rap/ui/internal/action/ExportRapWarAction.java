@@ -12,7 +12,7 @@ public class ExportRapWarAction extends AbstractWizardAction {
   private IScoutBundle m_res;
 
   public ExportRapWarAction() {
-    super(Texts.get("ExportRapAsWarFile"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundleExport), null, false, Category.IMPORT);
+    super(Texts.get("ExportRapAsWarFile"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.UiBundleExport), null, false, Category.IMPORT);
   }
 
   public void setScoutBundle(IScoutBundle res) {

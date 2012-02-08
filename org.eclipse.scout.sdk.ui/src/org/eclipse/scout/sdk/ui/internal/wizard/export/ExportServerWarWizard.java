@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.export;
 
-import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -18,7 +17,6 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class ExportServerWarWizard extends AbstractWorkspaceWizard {
 
   private ExportServerWarWizardPage m_page1;
-  private IType m_declaringType;
 
   public ExportServerWarWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("ExportToWAR"));

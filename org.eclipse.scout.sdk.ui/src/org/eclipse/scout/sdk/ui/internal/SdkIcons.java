@@ -49,9 +49,7 @@ public interface SdkIcons {
   String LauncherSwing = "swingLauncher.gif";
 
   String File = "file.gif";
-  String FolderAdd = "folder_add.gif";
-  String FolderClosed = "folder_close.gif";
-  String FolderOpen = "folder_open.gif";
+  String FolderOpen = "folder_open.png";
   String Class = "class_obj.gif";
   String Interface = "innerinterface_obj.gif";
   String FieldPrivate = "field_private_obj.gif";
@@ -76,7 +74,7 @@ public interface SdkIcons {
   String Button = "button.png";
   String ButtonAdd = "button_add.gif";
   String ButtonRemove = "button_remove.gif";
-  String Buttons = "buttons.gif";
+  String Buttons = "buttons.png";
   String ClientBundle = "clientBundle.png";
   String ClientBundleAdd = "clientBundle_add.png";
   String ClientBundleRemove = "clientBundle_remove.png";
@@ -139,6 +137,7 @@ public interface SdkIcons {
   String PermissionAdd = "permission_add.png";
   String PermissionRemove = "permission_remove.png";
   String ScoutProject = "projectGroup.png";
+  String ScoutProjectExport = "projectGroup_export.png";
   String ScoutProjectAdd = "projectGroup_add.png";
   String ScoutProjectRemove = "projectGroup_remove.png";
   String SearchForm = "searchForm.png";
@@ -170,6 +169,7 @@ public interface SdkIcons {
   String SqlServiceAdd = "sqlService_add.png";
   String SqlServiceRemove = "sqlService_remove.png";
   String SwtBundle = "uiBundle.png";
+  String UiBundleExport = "uiBundle_export.png";
   String SwtBundleAdd = "uiBundle_add.png";
   String SwtBundleRemove = "uiBundle_remove.png";
   String SwingBundle = "uiBundle.png";
