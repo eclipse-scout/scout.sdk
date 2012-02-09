@@ -13,6 +13,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.ear.IScoutEarExportWizard;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -81,6 +82,11 @@ public abstract class AbstractExportEarProductWizardPage extends AbstractWorkspa
     m_productField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_warFileName.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     parent.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
+  }
+
+  @Override
+  public IScoutEarExportWizard getWizard() {
+    return (IScoutEarExportWizard) super.getWizard();
   }
 
   @Override
