@@ -64,6 +64,12 @@ public class ResourceServletFolderSelectionField extends TextField {
   }
 
   @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    m_popupButton.setEnabled(enabled);
+  }
+
+  @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
 
@@ -134,8 +140,12 @@ public class ResourceServletFolderSelectionField extends TextField {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
         if (CheckableTreeSelectionDialog.PROP_SELECTED_NODE.equals(evt.getPropertyName())) {
-          ITreeNode selNode = (ITreeNode) evt.getNewValue();
-          ((CheckableTreeSelectionDialog) evt.getSource()).setComplete(selNode.getType() == ResourceServletFolderTree.NODE_TYPE_FOLDER);
+          boolean complete = false;
+          if (evt.getNewValue() instanceof ITreeNode) {
+            ITreeNode selNode = (ITreeNode) evt.getNewValue();
+            complete = selNode.getType() == ResourceServletFolderTree.NODE_TYPE_FOLDER;
+          }
+          ((CheckableTreeSelectionDialog) evt.getSource()).setComplete(complete);
         }
       }
     });

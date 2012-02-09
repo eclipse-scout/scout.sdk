@@ -12,15 +12,15 @@ package org.eclipse.scout.sdk.ui.internal.wizard.export;
 
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class ExportServerWarWizard extends AbstractWorkspaceWizard {
 
   private ExportServerWarWizardPage m_page1;
 
-  public ExportServerWarWizard(IScoutBundle serverBundle) {
+  public ExportServerWarWizard(IScoutProject scoutProject) {
     setWindowTitle(Texts.get("ExportToWAR"));
-    m_page1 = new ExportServerWarWizardPage(serverBundle.getScoutProject());
+    m_page1 = new ExportServerWarWizardPage(scoutProject);
     addPage(m_page1);
   }
 }

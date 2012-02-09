@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.core.resources.IFile;
@@ -60,15 +59,16 @@ import org.osgi.framework.Version;
 @SuppressWarnings("restriction")
 public class ExportServerWarOperation implements IOperation {
   public static final String BUNDLE_NAME_SERVLETBRIDGE = "org.eclipse.equinox.servletbridge";
-
   public static final String WEB_INF = "WEB-INF";
+
   private IFile m_serverProduct;
   private IFile m_clientProduct;
   private File m_tempBuildDir;
-  private String m_warFileName = "D:/Temp/max24h/warBuild/export.war";
+  private String m_warFileName;
   private IFolder m_htmlFolder;
 
   private IFile m_clientZipFile;
+  private File m_resultingWarFile;
 
   public ExportServerWarOperation(IFile serverProduct) {
     m_serverProduct = serverProduct;
@@ -104,7 +104,7 @@ public class ExportServerWarOperation implements IOperation {
       installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/servletbridge.jar"), WEB_INF + "/lib/servletbridge.jar");
       installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/web.xml"), WEB_INF + "/web.xml");
       installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/eclipse/launch.ini"), WEB_INF + "/eclipse/launch.ini");
-      packWar();
+      m_resultingWarFile = packWar();
     }
     catch (Exception e) {
 
@@ -160,7 +160,7 @@ public class ExportServerWarOperation implements IOperation {
         tempZipFile.getParentFile().mkdirs();
       }
       ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(tempZipFile));
-      addFolderToZip(new File(m_tempBuildDir.getAbsolutePath() + File.separator + "client/buildDir/"), new File(m_tempBuildDir.getAbsolutePath() + File.separator + "client/buildDir/"), zipOut);
+      ResourcesUtility.addFolderToZip(new File(m_tempBuildDir.getAbsolutePath() + File.separator + "client/buildDir/"), zipOut);
       zipOut.flush();
       zipOut.close();
       // copy to server bundle
@@ -237,36 +237,10 @@ public class ExportServerWarOperation implements IOperation {
       destinationFile.getParentFile().mkdirs();
     }
     ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(destinationFile));
-    addFolderToZip(m_tempBuildDir, m_tempBuildDir, zipOut);
+    ResourcesUtility.addFolderToZip(m_tempBuildDir, zipOut);
     zipOut.flush();
     zipOut.close();
     return destinationFile;
-  }
-
-  private void addFolderToZip(File baseDir, File file, ZipOutputStream zOut) throws IOException {
-    if ((!file.exists()) || (!file.isDirectory())) {
-      throw new IOException("source directory " + file + " does not exist or is not a folder");
-    }
-    for (File f : file.listFiles()) {
-      if (f.exists() && (!f.isHidden())) {
-        if (f.isDirectory()) {
-          addFolderToZip(baseDir, f, zOut);
-        }
-        else {
-          String name = f.getAbsolutePath();
-          String prefix = baseDir.getAbsolutePath();
-          if (prefix.endsWith("/") || prefix.endsWith("\\")) {
-            prefix = prefix.substring(0, prefix.length() - 1);
-          }
-          name = name.substring(prefix.length() + 1);
-          name = name.replace('\\', '/');
-
-          zOut.putNextEntry(new ZipEntry(name));
-          ResourcesUtility.copy(f, zOut);
-          zOut.closeEntry();
-        }
-      }
-    }
   }
 
   private File installFile(URL platformUrl, String filePath) throws IOException, ProcessingException {
@@ -423,5 +397,9 @@ public class ExportServerWarOperation implements IOperation {
       if (bundle != null) list.add(bundle);
     }
     return list.toArray(new BundleDescription[list.size()]);
+  }
+
+  public File getResultingWarFile() {
+    return m_resultingWarFile;
   }
 }

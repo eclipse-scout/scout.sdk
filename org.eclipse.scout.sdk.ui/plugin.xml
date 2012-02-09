@@ -12,6 +12,7 @@
    <extension-point id="contextMenuContributor" name="contextMenuContributor" schema="schema/contextMenuContributor.exsd"/>
    <extension-point id="scoutBundle" name="Scout Bundle" schema="schema/scoutBundle.exsd"/>
    <extension-point id="scoutProjectTemplate" name="Scout Project Template" schema="schema/scoutProjectTemplate.exsd"/>
+   <extension-point id="earEntry" name="EAR Entry" schema="schema/earEntry.exsd"/>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
          <perspectiveExtension
@@ -827,5 +828,22 @@
       <startup
             class="org.eclipse.scout.sdk.ui.menu.ScoutSdkStartupExtension">
       </startup>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.earEntry">
+      <entry
+            class="org.eclipse.scout.sdk.ui.internal.extensions.ear.ServerEarEntryHandler"
+            icon="resources/icons/serverBundle.png"
+            id="server"
+            name="Server Web Application"
+            order="100">
+      </entry>
+      <entry
+            class="org.eclipse.scout.sdk.ui.internal.extensions.ear.ClientEarEntryHandler"
+            icon="resources/icons/clientBundle.png"
+            id="ui.client"
+            name="Include Client Application"
+            order="200">
+      </entry>
    </extension>
 </plugin>

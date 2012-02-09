@@ -152,7 +152,7 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{ImportPluginAction.class, OrganizeAllImportsAction.class, WellformAction.class,
-        FormDataUpdateAction.class, FormDataSqlBindingValidateAction.class/*, ExportEarAction.class*/};
+        FormDataUpdateAction.class, FormDataSqlBindingValidateAction.class, ExportEarAction.class};
   }
 
   @Override

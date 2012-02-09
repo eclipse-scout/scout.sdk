@@ -175,7 +175,7 @@ public class ServerNodePage extends AbstractPage {
       });
     }
     else if (menu instanceof ExportServerWarAction) {
-      ((ExportServerWarAction) menu).setScoutBundle(getScoutResource());
+      ((ExportServerWarAction) menu).setScoutProject(getScoutResource().getScoutProject());
     }
   }
 

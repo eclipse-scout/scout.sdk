@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
@@ -43,6 +45,45 @@ public final class ResourcesUtility {
       }
     }
     return getLineSeparator();
+  }
+
+  /**
+   * Adds all files below the given baseDir into the zip stream.
+   * 
+   * @param baseDir
+   *          The base dir. All files (recursively) in this folder will be added to the zip.
+   * @param zOut
+   *          The zip where the files will be added.
+   * @throws IOException
+   */
+  public static void addFolderToZip(File baseDir, ZipOutputStream zOut) throws IOException {
+    addFolderToZipRec(baseDir, baseDir, zOut);
+  }
+
+  private static void addFolderToZipRec(File baseDir, File file, ZipOutputStream zOut) throws IOException {
+    if ((!file.exists()) || (!file.isDirectory())) {
+      throw new IOException("source directory " + file + " does not exist or is not a folder");
+    }
+    for (File f : file.listFiles()) {
+      if (f.exists() && (!f.isHidden())) {
+        if (f.isDirectory()) {
+          addFolderToZipRec(baseDir, f, zOut);
+        }
+        else {
+          String name = f.getAbsolutePath();
+          String prefix = baseDir.getAbsolutePath();
+          if (prefix.endsWith("/") || prefix.endsWith("\\")) {
+            prefix = prefix.substring(0, prefix.length() - 1);
+          }
+          name = name.substring(prefix.length() + 1);
+          name = name.replace('\\', '/');
+
+          zOut.putNextEntry(new ZipEntry(name));
+          copy(f, zOut);
+          zOut.closeEntry();
+        }
+      }
+    }
   }
 
   /**

@@ -59,8 +59,6 @@ public class ExportRapWarWizardPage extends AbstractWorkspaceWizardPage {
   private final static String PROP_WAR_FILE = "warFile";
   private final static String PROP_OVERWRITE_EXISTING_WAR = "overwriteExistingWar";
 
-  private final static String WAR_NAME = "rap.war";
-
   private ProductSelectionField m_serverProductField;
   private FileSelectionField m_warFileField;
   private Button m_overwriteButton;

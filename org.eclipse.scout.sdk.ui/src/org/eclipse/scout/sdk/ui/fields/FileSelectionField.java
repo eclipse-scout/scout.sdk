@@ -56,6 +56,12 @@ public class FileSelectionField extends TextField {
   }
 
   @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    m_popupButton.setEnabled(enabled);
+  }
+
+  @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
 

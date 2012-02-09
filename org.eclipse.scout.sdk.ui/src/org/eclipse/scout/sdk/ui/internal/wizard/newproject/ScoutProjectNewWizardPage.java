@@ -64,19 +64,15 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   private ITreeNode m_invisibleRootNode;
   private StyledTextField m_projectAliasNameField;
 
-  private ScoutBundleExtension[] m_scoutBundleExtensions;
-
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
     m_propertySupport = new BasicPropertySupport(this);
     setTitle(Texts.get("CreateAScoutProject"));
     setDescription(Texts.get("CreateScoutProjectHelpMsg"));
-    m_scoutBundleExtensions = ScoutBundleExtensionPoint.getExtensions();
   }
 
   @Override
   protected void createContent(Composite parent) {
-    ScoutBundleExtensionPoint.getExtensions();
     m_projectNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("ProjectName"));
     m_projectNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -160,11 +156,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
         node.setText(prefix + ext.getBundleName() + postfix);
       }
     }
-//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_CLIENT)).setText(getProjectName() + ".client" + postfix);
-//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SHARED)).setText(getProjectName() + ".shared" + postfix);
-//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SERVER)).setText(getProjectName() + ".server" + postfix);
-//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SWING)).setText(getProjectName() + ".ui.swing" + postfix);
-//    TreeUtility.findNode(m_invisibleRootNode, NodeFilters.getByType(TYPE_BUNDLE_SWT)).setText(getProjectName() + ".ui.swt" + postfix);
+
     m_bundleTree.getTreeViewer().refresh();
     String alias = "";
     int dotIndex = getProjectName().lastIndexOf('.');
@@ -174,7 +166,6 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     if (pf != null && pf.length() > 1) {
       alias = alias + Character.toUpperCase(pf.charAt(0)) + pf.substring(1);
     }
-    // setProjectAlias(alias);
     m_projectAliasNameField.setText(alias);
   }
 

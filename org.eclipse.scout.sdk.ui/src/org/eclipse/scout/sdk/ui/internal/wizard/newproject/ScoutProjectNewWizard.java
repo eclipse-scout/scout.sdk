@@ -43,7 +43,6 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
 
   private ScoutProjectNewWizardPage m_page1;
   private ScoutProjectTemplateWizardPage m_page2;
-  private IWizardPage m_page;
 
   public ScoutProjectNewWizard() {
     setWindowTitle(Texts.get("NewScoutProjectNoPopup"));

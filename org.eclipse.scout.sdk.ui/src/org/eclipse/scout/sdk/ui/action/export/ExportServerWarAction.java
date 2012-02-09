@@ -15,17 +15,17 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWarWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class ExportServerWarAction extends AbstractWizardAction {
 
-  private IScoutBundle m_res;
+  private IScoutProject m_res;
 
   public ExportServerWarAction() {
     super(Texts.get("ExportAsWarFile"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundleExport), null, false, Category.IMPORT);
   }
 
-  public void setScoutBundle(IScoutBundle res) {
+  public void setScoutProject(IScoutProject res) {
     m_res = res;
   }
 

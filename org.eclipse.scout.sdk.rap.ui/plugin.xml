@@ -41,4 +41,14 @@
           class="org.eclipse.scout.sdk.rap.ui.internal.action.ExportRapWarAction">
     </contextMenu>
  </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.earEntry">
+      <entry
+            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.ear.RapEarEntryHandler"
+            icon="resources/icons/uiBundle.png"
+            id="ui.rap"
+            name="RAP Web Application"
+            order="300">
+      </entry>
+   </extension>
 </plugin>

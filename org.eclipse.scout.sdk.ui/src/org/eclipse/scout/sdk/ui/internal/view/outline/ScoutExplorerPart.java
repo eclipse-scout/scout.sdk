@@ -287,7 +287,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     return b.toString();
   }
 
-
   @SuppressWarnings("restriction")
   private void createToolbar() {
     IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
@@ -300,6 +299,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
   private void hookContextMenu() {
     MenuManager menuMgr = new MenuManager("#PopupMenu");
+    menuMgr.setRemoveAllWhenShown(true);
     Menu menu = menuMgr.createContextMenu(m_viewer.getControl());
     m_viewer.getControl().setMenu(menu);
     getSite().registerContextMenu(menuMgr, m_viewer);

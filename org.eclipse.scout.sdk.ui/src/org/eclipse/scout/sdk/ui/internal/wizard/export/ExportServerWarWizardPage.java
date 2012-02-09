@@ -186,6 +186,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
         getDialogSettings().put(SETTINGS_INCLUDE_CLIENT, m_includeClientButton.getSelection());
         setIncludingClientInternal(m_includeClientButton.getSelection());
         m_clientProductField.setEnabled(m_includeClientButton.getSelection());
+        m_resourceFolderField.setEnabled(m_includeClientButton.getSelection());
         pingStateChanging();
       }
     });
