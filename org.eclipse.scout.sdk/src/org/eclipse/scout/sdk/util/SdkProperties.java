@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * <h3>{@link SdkProperties}</h3> ...
@@ -157,6 +158,12 @@ public final class SdkProperties {
     }
     IEclipsePreferences node = new InstanceScope().getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
     node.put(PROJECT_PROD_LAUNCHERS + "_" + projectName, mementoString.toString());
+    try {
+      node.flush();
+    }
+    catch (BackingStoreException e) {
+      ScoutSdk.logError("unable to persist project product launcher settings.", e);
+    }
   }
 
   public static void addProjectProductLauncher(String projectName, IFile productFile) {
