@@ -5,9 +5,11 @@ import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -65,22 +67,25 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
       }
     }
 
-    // build tree based on the references and remember root nodes and invalid nodes
-    ArrayList<P_OperationElement> roots = new ArrayList<P_OperationElement>();
+    // build graph based on the references and remember invalid nodes
     ArrayList<P_OperationElement> invalidNodes = new ArrayList<P_OperationElement>();
+    ArrayList<P_OperationElement> validNodes = new ArrayList<P_OperationElement>(ops.size());
     for (P_OperationElement op : ops.values()) {
       if (op.referenceId == null) {
-        roots.add(op);
+        validNodes.add(op);
       }
       else {
         P_OperationElement refElement = ops.get(op.referenceId);
         if (refElement != null) {
           if (op.execAfterReference) {
             refElement.children.add(op);
+            op.parent = refElement;
           }
           else {
             op.children.add(refElement);
+            refElement.parent = op;
           }
+          validNodes.add(op);
         }
         else {
           invalidNodes.add(op); // the reference of this item could not be found -> execute at the end
@@ -89,33 +94,48 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
       }
     }
 
+    // find root nodes and check that at least one root exists
+    Collection<P_OperationElement> roots = getRootOperations(validNodes);
     if (roots.size() == 0) {
-      throw new IllegalArgumentException("not operation root node could be found! Check for cycles in the reference graph.");
+      throw new IllegalArgumentException("not operation root node could be found! Check the new project operation references.");
     }
 
     // traverse the tree collecting all items in a level-order-traversal into a flat list
     // if several root nodes have been found (independent trees), the trees are executed in serial order (complete first tree, complete second tree, ...)
-    ArrayList<P_OperationElement> nodes = new ArrayList<P_OperationElement>();
-    breadthFirstTraverse(roots, nodes);
+    LinkedHashSet<P_OperationElement> collector = new LinkedHashSet<P_OperationElement>(ops.size());
+    for (P_OperationElement root : roots) {
+      breadthFirstTraverse(root, collector);
+    }
 
-    // add all invalid nodes to the end assuming that no-one depends on them but they may depend on others (which are not present)
-    nodes.addAll(invalidNodes);
+    // add all invalid nodes to the end assuming that no one depends on them but they may depend on others (which are not present)
+    collector.addAll(invalidNodes);
 
     // execute the operations
-    execOperations(monitor, workingCopyManager, nodes.toArray(new P_OperationElement[nodes.size()]));
+    execOperations(monitor, workingCopyManager, collector.toArray(new P_OperationElement[collector.size()]));
   }
 
-  private void breadthFirstTraverse(ArrayList<P_OperationElement> nodes, ArrayList<P_OperationElement> collector) {
-    for (P_OperationElement node : nodes) {
-      Deque<P_OperationElement> deck = new ArrayDeque<P_OperationElement>();
-      deck.addLast(node);
-      while (!deck.isEmpty()) {
-        P_OperationElement el = deck.removeFirst();
-        for (P_OperationElement child : el.children) {
-          deck.addLast(child);
-        }
-        collector.add(el);
+  private Collection<P_OperationElement> getRootOperations(Collection<P_OperationElement> nodes) {
+    ArrayList<P_OperationElement> roots = new ArrayList<ScoutProjectNewOperation.P_OperationElement>();
+    for (P_OperationElement el : nodes) {
+      if (el.parent == null) {
+        roots.add(el);
       }
+    }
+    return roots;
+  }
+
+  private void breadthFirstTraverse(P_OperationElement root, Collection<P_OperationElement> collector) {
+    Deque<P_OperationElement> deck = new ArrayDeque<P_OperationElement>();
+    deck.addLast(root);
+    while (!deck.isEmpty()) {
+      P_OperationElement el = deck.removeFirst();
+      for (P_OperationElement child : el.children) {
+        if (collector.contains(child)) {
+          throw new IllegalArgumentException("Cycle detected in new scout project operation tree.");
+        }
+        deck.addLast(child);
+      }
+      collector.add(el);
     }
   }
 
@@ -157,6 +177,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     private final String referenceId;
     private final boolean execAfterReference;
     private final ArrayList<P_OperationElement> children;
+    private P_OperationElement parent;
 
     private P_OperationElement(IConfigurationElement element) throws CoreException {
       op = (IScoutProjectNewOperation) element.createExecutableExtension(EXT_ATTR_CLASS_NAME);
