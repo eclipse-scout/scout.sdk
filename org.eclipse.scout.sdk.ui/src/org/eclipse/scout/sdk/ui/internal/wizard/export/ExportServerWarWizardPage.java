@@ -193,6 +193,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
 
     ITreeNode clientProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new P_ClientProductFilter(), false);
     m_clientProductField = new ProductSelectionField(group, clientProductTreeRoot);
+    m_clientProductField.setEnabled(m_includeClientButton.getSelection());
     m_clientProductField.setLabelText(Texts.get("ClientProductToInclude"));
 
     String clientProductFileName = getDialogSettings().get(SETTINGS_CLIENT_PRODUCT);
@@ -233,6 +234,7 @@ public class ExportServerWarWizardPage extends AbstractWorkspaceWizardPage {
 
     m_resourceFolderField = new ResourceServletFolderSelectionField(group, getScoutProject());
     m_resourceFolderField.setLabelText(Texts.get("ClientDownloadLocation"));
+    m_resourceFolderField.setEnabled(m_includeClientButton.getSelection());
     m_resourceFolderField.addProductSelectionListener(new IFolderSelectedListener() {
       @Override
       public void handleFolderSelection(IFolder folder) {
