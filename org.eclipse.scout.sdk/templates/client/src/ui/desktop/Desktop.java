@@ -31,17 +31,15 @@ public class Desktop extends AbstractDesktop implements IDesktop{
   }
 
   @Override
-  public String getConfiguredTitle(){
+  protected String getConfiguredTitle(){
     return TEXTS.get("ApplicationTitle");
   }
-
-
 
   @Order(10.0)
   public class FileMenu extends AbstractMenu{
 
     @Override
-    public String getConfiguredText(){
+    protected String getConfiguredText(){
       return TEXTS.get("FileMenu");
     }
 
@@ -49,7 +47,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
     public class ExitMenu extends AbstractMenu{
 
       @Override
-      public String getConfiguredText(){
+      protected String getConfiguredText(){
         return TEXTS.get("ExitMenu");
       }
 
@@ -64,7 +62,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
   public class ToolsMenu extends AbstractMenu{
 
     @Override
-    public String getConfiguredText(){
+    protected String getConfiguredText(){
       return TEXTS.get("ToolsMenu");
     }
   }
@@ -80,7 +78,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
   public class HelpMenu extends AbstractMenu{
 
     @Override
-    public String getConfiguredText(){
+    protected String getConfiguredText(){
       return TEXTS.get("HelpMenu");
     }
 
@@ -88,7 +86,7 @@ public class Desktop extends AbstractDesktop implements IDesktop{
     public class AboutMenu extends AbstractMenu{
 
       @Override
-      public String getConfiguredText(){
+      protected String getConfiguredText(){
         return TEXTS.get("AboutMenu");
       }
 

@@ -61,7 +61,7 @@ public final class NodeFilters {
     return new ITreeNodeFilter() {
       @Override
       public boolean accept(ITreeNode node) {
-        return node.isVisible();
+        return node != null && node.isVisible();
       }
     };
   }

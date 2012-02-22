@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -32,11 +32,6 @@ import org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment;
  *  </pre>
 */
 public class SwtEnvironment extends AbstractSwtEnvironment{
-
-
-  public static final String DEFAULT_STACK_VIEW_ID = "com.bsiag.crm.ui.swt.views.defaultStackView";
-
-
   public SwtEnvironment(Bundle bundle,String perspectiveId,Class<? extends AbstractClientSession> clientSessionClazz) {
     super(bundle, perspectiveId, clientSessionClazz);
     registerPart(IForm.VIEW_ID_CENTER, Activator.CENTER_VIEW_ID);
@@ -44,6 +39,4 @@ public class SwtEnvironment extends AbstractSwtEnvironment{
     registerPart(IForm.VIEW_ID_PAGE_TABLE, Activator.TABLE_PAGE_VIEW_ID);
     registerPart(IForm.VIEW_ID_PAGE_SEARCH, Activator.SEAECH_VIEW_ID);
   }
-
-
 }

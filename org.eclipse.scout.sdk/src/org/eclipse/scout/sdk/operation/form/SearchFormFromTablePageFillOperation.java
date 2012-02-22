@@ -191,69 +191,6 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
         }
       }
     }
-    // composer box
-    // GroupBoxNewOperation composerBoxOp=new GroupBoxNewOperation(tabBox);
-    // composerBoxOp.setTypeName("Composer" + ScoutIdeProperties.SUFFIX_GROUP_BOX);
-    // composerBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
-    // composerBoxOp.run(monitor, workingCopyManager);
-    // IScoutType composerBox=composerBoxOp.getCreatedField();
-
-    // ComposerFieldNewOperation composerFieldOp=new ComposerFieldNewOperation(composerBox);
-    // composerFieldOp.setTypeName("ComposerField");
-    // composerFieldOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractComposerField, true));
-    // composerFieldOp.run(monitor, workingCopyManager);
-    //IType composerField = null;// composerFieldOp.getCreatedField();
-    // composerField.createMethod("@Override\npublic boolean getConfiguredLabelVisible(){\n" + ScoutIdeProperties.TAB + "return false;\n}\n", null, true, monitor);
-    // composerField.createMethod("@Override\npublic int getConfiguredGridW(){\n" + ScoutIdeProperties.TAB + "return FULL_WIDTH;\n}\n", null, true, monitor);
-    // composerField.createMethod("@Override\npublic int getConfiguredGridH(){\n" + ScoutIdeProperties.TAB + "return 8;\n}\n", null, true, monitor);
-
-    // sql columns
-//    List<String> sqlColumns = new ArrayList<String>();
-//
-//    IMethod execLoadTableDataMethod = TypeUtility.getMethod(getTablePageType(), "execLoadTableData");
-//    if (TypeUtility.exists(execLoadTableDataMethod)) {
-//      // get outline statement
-//      Matcher matcher = Pattern.compile("(SERVICES.getService)( +)?(\\()([A-Za-z0-9]+)(\\.class\\)\\.)(get[A-Za-z0-9]+TableData)").matcher(execLoadTableDataMethod.getSource());
-//      if (matcher.find()) {
-//        IType serviceInterface = ScoutUtility.getReferencedType(execLoadTableDataMethod.getDeclaringType(), matcher.group(4));
-//        if (serviceInterface != null) {
-//          // find implementation
-//          IType[] foundServiceImpls = SdkTypeUtility.getServiceImplementations(serviceInterface);
-//          IType serviceImpl = null;
-//          if (foundServiceImpls.length > 0) {
-//            if (foundServiceImpls.length > 1) {
-//              ScoutSdk.logInfo("found more than one implemenation of the service '" + serviceInterface.getFullyQualifiedName() + "'.");
-//            }
-//            serviceImpl = foundServiceImpls[0];
-//            String methodName = matcher.group(6);
-//            IMethod theSelect = TypeUtility.getMethod(serviceImpl, methodName);
-//            if (TypeUtility.exists(theSelect)) {
-//              String sql = theSelect.getSource().substring(theSelect.getSource().indexOf("\""));
-//              sql = ScoutUtility.removeComments(sql);
-//              sql = ScoutUtility.removeSourceCodeIndent(sql, ScoutUtility.getSourceCodeIndent(sql, false));
-//              sql = ScoutUtility.sourceCodeToSql(sql);
-//              sqlColumns = ScoutUtility.extractSqlColumns(sql);
-//            }
-//          }
-//          else {
-//            ScoutSdk.logWarning("could not find a implemenation of the service '" + serviceInterface.getFullyQualifiedName() + "'.");
-//          }
-//        }
-//      }
-//    }
-//
-//    // go through all columns
-//    IType[] columns = SdkTypeUtility.getColumns(getTablePageType().getType(ScoutIdeProperties.TYPE_NAME_TABLEFIELD_TABLE));
-//    Iterator<String> sqlColumnIter = sqlColumns.iterator();
-//    for (IType column : columns) {
-//
-//      IMethod confDisplay = TypeUtility.findMethodInHierarchy(column, MethodFilters.getNameFilter("getConfiguredDisplayable"));
-//      String sqlColumn = sqlColumnIter.hasNext() ? sqlColumnIter.next() : "";
-//      if (TypeUtility.exists(confDisplay) && confDisplay.getSource().contains("return true")) {
-//        // create only for the "real" columns a search field, not for id's, fonts and such
-//        createField(fieldBox, composerField, column, sqlColumn, monitor, workingCopyManager);
-//      }
-//    }
 
     /* search handler */
     FormHandlerNewOperation formHandlerOp = new FormHandlerNewOperation(getSearchFormType());

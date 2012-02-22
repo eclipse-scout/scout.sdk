@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 public class CheckableTreeSelectionDialog extends TitleAreaDialog {
 
   public static final String PROP_CHECKED_NODES = "checkedNodes"; /*ITreeNode[] */
-  public static final String PROP_SELECTED_NODE = "checkedNodes"; /*ITreeNode */
+  public static final String PROP_SELECTED_NODE = "selectedNodes"; /*ITreeNode */
 
   private BasicPropertySupport m_propertySupport;
 
@@ -49,6 +49,8 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
   private OptimisticLock m_uiLock = new OptimisticLock();
   private boolean m_complete;
 
+  private String m_message, m_title;
+
   public CheckableTreeSelectionDialog(Shell parentShell, ITreeNode rootNode) {
     this(parentShell, rootNode, null, null);
   }
@@ -56,15 +58,20 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
   public CheckableTreeSelectionDialog(Shell parentShell, ITreeNode rootNode, String dialogTitle, String message) {
     super(parentShell);
     m_rootNode = rootNode;
-    if (dialogTitle != null) {
-      setTitle(dialogTitle);
-    }
-    if (message != null) {
-      setMessage(message);
-    }
+    m_title = dialogTitle;
+    m_message = message;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     m_propertySupport = new BasicPropertySupport(this);
+  }
+
+  @Override
+  protected Control createContents(Composite parent) {
+    Control c = super.createContents(parent);
+    setMessage(m_message);
+    setTitle(m_title);
+    m_tree.setChecked(getCheckedNodes());
+    return c;
   }
 
   @Override
@@ -116,7 +123,6 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
       }
     });
 
-    m_tree.setChecked(getCheckedNodes());
     if (parent.getLayout() instanceof GridLayout) {
       rootPane.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL | GridData.GRAB_VERTICAL));
     }

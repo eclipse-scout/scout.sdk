@@ -15,9 +15,14 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -25,6 +30,7 @@ import org.eclipse.scout.sdk.ui.dialog.ProductSelectionDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ProjectVersionPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.TechnologyPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.Section;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
@@ -50,6 +56,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
   private static final String SECTION_ID_FILTER = "section.filter";
   private static final String SECTION_ID_PRODUCT_LAUNCHER = "section.productLauncher";
   private static final String SECTION_ID_VERSION = "section.version";
+  private static final String SECTION_ID_TECHNOLOGY = "section.technology";
 
   private ArrayList<ProductLaunchPresenter> m_launchPresenters = new ArrayList<ProductLaunchPresenter>();
 
@@ -61,7 +68,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     layoutData.widthHint = 200;
     filterPresenter.getContainer().setLayoutData(layoutData);
-    getSection(SECTION_ID_FILTER).setExpanded(false);
+    filterSection.setExpanded(wasSectionExpanded(SECTION_ID_FILTER, false));
 
     // version
     ISection versionSection = createSection(SECTION_ID_VERSION, Texts.get("ProjectVersion"));
@@ -69,7 +76,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     GridData versionLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     versionLayoutData.widthHint = 200;
     versionPresenter.getContainer().setLayoutData(versionLayoutData);
-    getSection(SECTION_ID_VERSION).setExpanded(true);
+    versionSection.setExpanded(wasSectionExpanded(SECTION_ID_VERSION, true));
 
     // product launchers
     Section linkSection = (Section) createSection(SECTION_ID_PRODUCT_LAUNCHER, Texts.get("ProductLauncher"));
@@ -95,8 +102,53 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     action.setToolTipText(Texts.get("EditContent"));
     toolBarManager.add(action);
     toolBarManager.update(true);
-
     linkSection.getUiSection().setTextClient(toolbar);
+    linkSection.setExpanded(wasSectionExpanded(SECTION_ID_PRODUCT_LAUNCHER, true));
+
+    // technologies
+    Section techSection = (Section) createSection(SECTION_ID_TECHNOLOGY, Texts.get("Technologies"));
+    final TechnologyPresenter techPresenter = new TechnologyPresenter(getFormToolkit(), techSection.getSectionClient(), getScoutProject());
+    GridData techLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    techLayoutData.widthHint = 200;
+    techPresenter.getContainer().setLayoutData(techLayoutData);
+
+    // load technologies lazy
+    final ProgressIndicator indicator = new ProgressIndicator(techPresenter.getContainer(), SWT.INDETERMINATE | SWT.SMOOTH);
+    indicator.beginAnimatedTask();
+    GridData indicatorData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    indicatorData.horizontalSpan = 2;
+    indicatorData.heightHint = 5;
+    indicator.setLayoutData(indicatorData);
+    Job j = new Job("load technologies...") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        if (techPresenter != null && !techPresenter.isDisposed()) {
+          try {
+            techPresenter.loadModel();
+          }
+          finally {
+            if (techPresenter.getContainer() != null && !techPresenter.getContainer().isDisposed()) {
+              techPresenter.getContainer().getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                  if (techPresenter != null && !techPresenter.isDisposed()) {
+                    techPresenter.createContent();
+                    indicator.dispose();
+                    getForm().layout(true, true);
+                    getForm().updateToolBar();
+                    getForm().reflow(true);
+                  }
+                }
+              });
+            }
+          }
+        }
+        return Status.OK_STATUS;
+      }
+    };
+    j.setSystem(true);
+    j.schedule();
+    techSection.setExpanded(wasSectionExpanded(SECTION_ID_TECHNOLOGY, true));
   }
 
   protected IScoutProject getScoutProject() {

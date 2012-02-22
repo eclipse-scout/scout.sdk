@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.util.internal.typecache.JavaResourceChangedEmitter;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
@@ -107,7 +108,7 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
         System.out.println();
       }
       Assert.assertTrue(severity < IMarker.SEVERITY_ERROR);
-      waitForIndexesReady();
+      JdtUtility.waitForIndexesReady();
       System.out.println("iForm exists " + iForm.exists() + "  " + iForm.getJavaProject().exists());
       subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getInWorkspaceFilter());
       if (subtypes.length != 1) {

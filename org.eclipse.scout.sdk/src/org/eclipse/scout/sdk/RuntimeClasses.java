@@ -26,6 +26,7 @@ public final class RuntimeClasses {
   public static final String ScoutServerBundleId = "org.eclipse.scout.rt.server"; // NO_UCD
   public static final String ScoutUiSwtBundleId = "org.eclipse.scout.rt.ui.swt"; // NO_UCD
   public static final String ScoutUiSwingBundleId = "org.eclipse.scout.rt.ui.swing"; // NO_UCD
+  public static final String ScoutClientSvgBundleId = "org.eclipse.scout.svg.client"; // NO_UCD
 
   public static final String AbstractActivityMap = "org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap"; // NO_UCD
   public static final String AbstractBigDecimalField = "org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField"; // NO_UCD
@@ -54,6 +55,7 @@ public final class RuntimeClasses {
   public static final String AbstractObjectColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractObjectColumn"; // NO_UCD
   public static final String AbstractSmartColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn"; // NO_UCD
   public static final String AbstractStringColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn"; // NO_UCD
+  public static final String AbstractSwingEnvironment = "org.eclipse.scout.rt.ui.swing.AbstractSwingEnvironment"; // NO_UCD
   public static final String AbstractComposerAttribute = "org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute"; // NO_UCD
   public static final String AbstractComposerEntity = "org.eclipse.scout.rt.client.ui.form.fields.composer.entity.AbstractComposerEntity"; // NO_UCD
   public static final String AbstractComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField"; // NO_UCD
@@ -126,10 +128,6 @@ public final class RuntimeClasses {
   public static final String BasicPermission = "java.security.BasicPermission"; // NO_UCD
   public static final String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
   public static final String FormData_UpdateOperation = "org.eclipse.scout.commons.annotations.FormData.UpdateOperation"; // NO_UCD
-  public static final String BsiCaseLocalBeanProperty = "org.eclipse.scout.rt.shared.bsicase.BsiCaseLocalBeanProperty"; // NO_UCD
-  public static final String BsiCaseOperation = "org.eclipse.scout.commons.annotations.ConfigOperation"; // NO_UCD
-  public static final String BsiCaseOrder = "org.eclipse.scout.commons.annotations.Order"; // NO_UCD
-  public static final String BsiCaseProperty = "org.eclipse.scout.commons.annotations.ConfigProperty"; // NO_UCD
   public static final String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
   public static final String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD
   public static final String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty"; // NO_UCD

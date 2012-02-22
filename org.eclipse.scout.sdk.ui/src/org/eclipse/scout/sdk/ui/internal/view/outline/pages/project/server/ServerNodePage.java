@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
-import org.eclipse.scout.sdk.ui.action.export.ExportServerWarAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -158,7 +157,7 @@ public class ServerNodePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class, ExportServerWarAction.class};
+    return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class};
   }
 
   @Override
@@ -173,9 +172,6 @@ public class ServerNodePage extends AbstractPage {
           return resolveServices();
         }
       });
-    }
-    else if (menu instanceof ExportServerWarAction) {
-      ((ExportServerWarAction) menu).setScoutProject(getScoutResource().getScoutProject());
     }
   }
 

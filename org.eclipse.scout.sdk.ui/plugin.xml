@@ -8,11 +8,12 @@
    <extension-point id="propertyStructure" name="Scout Property View Structure" schema="schema/propertyStructure.exsd"/>
    <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
    <extension-point id="outlineCopyAndPaste" name="Copy And Paste" schema="schema/outlineCopyAndPaste.exsd"/>
-      <extension-point id="contextMenu" name="contextMenu" schema="schema/contextMenu.exsd"/>
+   <extension-point id="contextMenu" name="contextMenu" schema="schema/contextMenu.exsd"/>
    <extension-point id="contextMenuContributor" name="contextMenuContributor" schema="schema/contextMenuContributor.exsd"/>
    <extension-point id="scoutBundle" name="Scout Bundle" schema="schema/scoutBundle.exsd"/>
    <extension-point id="scoutProjectTemplate" name="Scout Project Template" schema="schema/scoutProjectTemplate.exsd"/>
-   <extension-point id="earEntry" name="EAR Entry" schema="schema/earEntry.exsd"/>
+   <extension-point id="exportScoutProjectEntry" name="Export Scout Project Entry" schema="schema/exportScoutProjectEntry.exsd"/>
+   <extension-point id="technology" name="Technology" schema="schema/technology.exsd"/>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
          <perspectiveExtension
@@ -96,15 +97,9 @@
             finalPerspective="org.eclipse.pde.ui.PDEPerspective"
             hasPages="true"
             icon="resources/icons/projectGroup_add.png"
-            id="bsicase.development.newProjectWizard"
+            id="org.eclipse.scout.newProjectWizard"
             name="Scout Project"
             project="true"/>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.preferences">
-      <initializer
-            class="org.eclipse.scout.sdk.ui.extensions.preferences.PreferenceInitializer">
-      </initializer>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">
@@ -494,8 +489,7 @@
       </FormField>
    </extension>
    <extension point="org.eclipse.scout.sdk.ui.contextMenu">
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.export.ExportServerWarAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.export.ExportEarAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.export.ExportScoutProjectAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.FormDataUpdateAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.ImportPluginAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.InstallClientSessionAction"></contextMenu>
@@ -830,20 +824,109 @@
       </startup>
    </extension>
    <extension
-         point="org.eclipse.scout.sdk.ui.earEntry">
+         point="org.eclipse.scout.sdk.ui.exportScoutProjectEntry">
       <entry
-            class="org.eclipse.scout.sdk.ui.internal.extensions.ear.ServerEarEntryHandler"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.export.ServerExportEntryHandler"
             icon="resources/icons/serverBundle.png"
             id="server"
             name="Server Web Application"
             order="100">
       </entry>
       <entry
-            class="org.eclipse.scout.sdk.ui.internal.extensions.ear.ClientEarEntryHandler"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.export.ClientExportEntryHandler"
             icon="resources/icons/clientBundle.png"
             id="ui.client"
             name="Include Client Application"
             order="200">
       </entry>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.technology">
+      <technology
+            category="UI Features"
+            id="scout.technology.svg"
+            name="Scalable Vector Graphics (SVG)">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.svg.SvgClientTechnologyHandler"
+            technology="scout.technology.svg">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.svg.SvgUiSwingTechnologyHandler"
+            technology="scout.technology.svg">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.svg.SvgUiSwtTechnologyHandler"
+            technology="scout.technology.svg">
+      </handler>
+      <technology
+            category="Database Drivers"
+            id="scout.technology.jdbc.mysql"
+            name="MySQL JDBC Driver for Eclipse Scout">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.MySqlJdbcManifestTechnologyHandler"
+            technology="scout.technology.jdbc.mysql">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.MySqlJdbcProdTechnologyHandler"
+            technology="scout.technology.jdbc.mysql">
+      </handler>
+      <technology
+            category="Database Drivers"
+            id="scout.technology.jdbc.oracle11g2"
+            name="Oracle 11g2 JDBC Driver for Eclipse Scout">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Oracle11g2JdbcManifestTechnologyHandler"
+            technology="scout.technology.jdbc.oracle11g2">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Oracle11g2JdbcProdTechnologyHandler"
+            technology="scout.technology.jdbc.oracle11g2">
+      </handler>
+      <technology
+            category="Database Drivers"
+            id="scout.technology.jdbc.postgres9"
+            name="Postgres 9 JDBC Driver for Eclipse Scout">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Postgres9JdbcManifestTechnologyHandler"
+            technology="scout.technology.jdbc.postgres9">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Postgres9JdbcProdTechnologyHandler"
+            technology="scout.technology.jdbc.postgres9">
+      </handler>
+      <technology
+            category="Database Drivers"
+            id="scout.technology.jdbc.derby"
+            name="Derby JDBC Driver for Eclipse Scout">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.DerbyJdbcManifestTechnologyHandler"
+            technology="scout.technology.jdbc.derby">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.DerbyJdbcProdTechnologyHandler"
+            technology="scout.technology.jdbc.derby">
+      </handler>
+      <technology
+            category="Look and Feel"
+            id="scout.technology.laf.rayo"
+            name="Rayo Swing Look and Feel for Eclipse Scout">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.laf.RayoUiSwingManifestTechnologyHandler"
+            technology="scout.technology.laf.rayo">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.laf.RayoUiSwingProdTechnologyHandler"
+            technology="scout.technology.laf.rayo">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.laf.RayoUiSwingEnvTechnologyHandler"
+            technology="scout.technology.laf.rayo">
+      </handler>
    </extension>
 </plugin>

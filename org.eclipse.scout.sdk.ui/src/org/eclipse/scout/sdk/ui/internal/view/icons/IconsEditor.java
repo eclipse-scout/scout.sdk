@@ -136,8 +136,6 @@ public class IconsEditor extends EditorPart {
       if (scoutProject.getType() == IScoutElement.BUNDLE_SHARED) {
         setScoutSharedBundle(scoutProject);
       }
-      // TODO parse file
-      // setScoutSharedBundle(BsiCaseCore.getDefault().getScoutWorkspace().getProjectGroup(file.getProject()));
     }
     setSite(site);
     setInput(input);

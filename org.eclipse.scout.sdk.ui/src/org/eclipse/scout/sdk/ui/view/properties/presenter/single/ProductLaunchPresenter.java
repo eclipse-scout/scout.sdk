@@ -91,16 +91,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     m_bundle = bundle;
     String prodName = null;
     String productFileContent = "";
-    /*WorkspaceProductModel productModel = null;
-    try {
-      productModel = ScoutSdkUtility.getProductModel(productFile, true);
-
-      productFileContent = IOUtility.getContent(new InputStreamReader(productFile.getContents()));
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logError("could not read product file '" + productFile.getFullPath() + "'.", e);
-
-    }*/
     Matcher m = PATTERN.matcher(productFileContent);
     if (m.find()) {
       prodName = m.group(2);
@@ -240,23 +230,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       }
     });
 
-//    // export war
-//    if (getBundle().getType() == IScoutBundle.BUNDLE_SERVER) {
-//      ImageHyperlink exportWar = getToolkit().createImageHyperlink(container, SWT.NONE);
-//      exportWar.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ServerBundleExport));
-//      exportWar.setToolTipText("Export war file...");
-//      exportWar.addHyperlinkListener(new HyperlinkAdapter() {
-//        @Override
-//        public void linkActivated(HyperlinkEvent e) {
-//          OperationJob job = new OperationJob(new ExportServerWarOperation(m_productModel));
-//          job.schedule();
-//        }
-//      });
-//      GridData layoutData = new GridData(GridData.FILL_BOTH);
-//      layoutData.heightHint = 16;
-//      exportWar.setLayoutData(layoutData);
-//    }
-
     //layout
     GridLayout layout = new GridLayout(1, false);
     layout.horizontalSpacing = 0;
@@ -364,32 +337,34 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   }
 
   private void recomputeLaunchState() {
-    getContainer().getDisplay().asyncExec(new Runnable() {
-      @Override
-      public void run() {
-        ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
-        for (ILaunch l : launches) {
-          if (l.getLaunchConfiguration().getName().equals(getProductFile().getName())) {
-            if (l.isTerminated()) {
-              m_stopLink.setEnabled(false);
-              m_mainGroup.setText(getProductFile().getParent().getName());
-            }
-            else {
-              m_stopLink.setEnabled(true);
-              if (l.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-                m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
-              }
-              else if (l.getLaunchMode().equals(ILaunchManager.RUN_MODE)) {
-                m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+    if (getContainer() != null && !getContainer().isDisposed()) {
+      getContainer().getDisplay().asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
+          for (ILaunch l : launches) {
+            if (l.getLaunchConfiguration().getName().equals(getProductFile().getName())) {
+              if (l.isTerminated()) {
+                m_stopLink.setEnabled(false);
+                m_mainGroup.setText(getProductFile().getParent().getName());
               }
               else {
-                m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("UndefinedState") + "...");
+                m_stopLink.setEnabled(true);
+                if (l.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
+                  m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
+                }
+                else if (l.getLaunchMode().equals(ILaunchManager.RUN_MODE)) {
+                  m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+                }
+                else {
+                  m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("UndefinedState") + "...");
+                }
               }
             }
           }
         }
-      }
-    });
+      });
+    }
   }
 
   private class P_LaunchListener implements ILaunchListener {

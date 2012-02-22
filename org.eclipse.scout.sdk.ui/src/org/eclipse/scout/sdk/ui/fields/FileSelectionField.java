@@ -130,7 +130,9 @@ public class FileSelectionField extends TextField {
     String fileName = null;
     if (isFolderMode()) {
       DirectoryDialog dialog = new DirectoryDialog(getShell());
-      dialog.setFilterPath(getFile().getAbsolutePath());
+      if (getFile() != null) {
+        dialog.setFilterPath(getFile().getAbsolutePath());
+      }
       fileName = dialog.open();
     }
     else {

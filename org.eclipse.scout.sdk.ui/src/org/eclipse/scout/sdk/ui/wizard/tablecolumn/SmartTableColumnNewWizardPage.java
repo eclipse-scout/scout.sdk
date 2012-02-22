@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.SmartTableColumnNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
-import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroupListener;
+import org.eclipse.scout.sdk.ui.fields.buttongroup.IButtonGroupListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -230,7 +230,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     ButtonGroup<CONTINUE_OPERATION> nextStepOptions = new ButtonGroup<CONTINUE_OPERATION>(g, SWT.RADIO);
     nextStepOptions.createButton(Texts.get("CreateMoreColumn"), CONTINUE_OPERATION.ADD_MORE_COLUMNS);
     nextStepOptions.createButton(Texts.get("FinishWizard"), CONTINUE_OPERATION.FINISH);
-    nextStepOptions.addButtonGroupListener(new ButtonGroupListener<CONTINUE_OPERATION>() {
+    nextStepOptions.addButtonGroupListener(new IButtonGroupListener<CONTINUE_OPERATION>() {
 
       @Override
       public void handleSelectionChanged(List<CONTINUE_OPERATION> newSelection) {

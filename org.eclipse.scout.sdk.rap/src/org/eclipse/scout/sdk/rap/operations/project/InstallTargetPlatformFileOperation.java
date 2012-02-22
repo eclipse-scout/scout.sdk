@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.rap.operations.project;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -28,19 +27,20 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
   private static final String TARGET_FILE_NAME = "ScoutRAP.target";
   private static final String VARIABLE_RAP_LOCATION = "RAP_LOCATION";
 
-  private static final String SCOUT_RT_RAP_FEATURE_URL = "http://download.eclipse.org/scout/nightly/update"; //TODO: change to juno download page
+  private static final String SCOUT_RT_RAP_FEATURE_URL = "http://download.eclipse.org/scout/nightly/update";
+  //TODO: enable juno update site
+  //private static final String SCOUT_RT_RAP_FEATURE_URL = "http://download.eclipse.org/releases/juno";
   private static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.feature.feature.group";
 
-  // requirement as defined by Scout RT RAP
+  // RAP runtime
   private static final String ECLIPSE_RT_RAP_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/runtime";
   private static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.runtime.feature.group";
-  //private static final String ECLIPSE_RT_RAP_REQ_FEATURE = "org.eclipse.rap.runtime.requirements.feature.group";
 
+  // RAP Incubator
   private static final String ECLIPSE_RT_RAP_INCUB_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/incubator";
-  private static final String ECLIPSE_RT_RAP_INCUB_FEATURE = "org.eclipse.rap.incubator.feature.feature.group";
+  private static final String ECLIPSE_RT_RAP_INCUB_FEATURE = "org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group";
 
   private String m_rapTargetLocalFolder;
-  private Map<String, String> m_properties;
 
   public InstallTargetPlatformFileOperation(IProject dstProject) {
     super("templates/ui.rap/ScoutRAP.target", TARGET_FILE_NAME, ScoutSdkRap.getDefault().getBundle(), dstProject, new HashMap<String, String>());

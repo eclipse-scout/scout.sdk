@@ -33,21 +33,16 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.core.search.SearchPattern;
-import org.eclipse.jdt.core.search.TypeNameRequestor;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.test.Activator;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -100,7 +95,7 @@ public abstract class AbstractScoutSdkTest {
     delJob.schedule();
     delJob.join();
     ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-    waitForSilentWorkspace();
+    JdtUtility.waitForSilentWorkspace();
   }
 
   protected static void setAutoUpdateFormData(boolean autoBuild) {
@@ -124,12 +119,12 @@ public abstract class AbstractScoutSdkTest {
 
   public static void buildWorkspace() throws Exception {
     ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-    waitForRefresh();
+    JdtUtility.waitForRefresh();
     waitForNotifyJob();
-    waitForIndexesReady();
+    JdtUtility.waitForIndexesReady();
     ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
     ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
-    waitForSilentWorkspace();
+    JdtUtility.waitForSilentWorkspace();
   }
 
   public static void waitForNotifyJob() throws Exception {
@@ -143,81 +138,6 @@ public abstract class AbstractScoutSdkTest {
 //    System.out.println("start wait " + System.currentTimeMillis());
 //    NotificationLock.waitForNotification();
 //    System.out.println("end wait " + System.currentTimeMillis());
-  }
-
-  public static void waitForSilentWorkspace() throws Exception {
-    Job worker = new Job("") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        return Status.OK_STATUS;
-      }
-    };
-    worker.setRule(ResourcesPlugin.getWorkspace().getRoot());
-    worker.schedule();
-    worker.join();
-    waitForRefresh();
-    waitForBuild();
-    waitForIndexesReady();
-  }
-
-  public static void waitForBuild() {
-    waitForFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
-    waitForFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
-  }
-
-  public static void waitForRefresh() {
-    waitForFamily(ResourcesPlugin.FAMILY_AUTO_REFRESH);
-    waitForFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
-  }
-
-  public static void waitForIndexesReady() {
-    // dummy query for waiting until the indexes are ready
-    SearchEngine engine = new SearchEngine();
-    IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
-    try {
-      engine.searchAllTypeNames(
-          null,
-          SearchPattern.R_EXACT_MATCH,
-          "!@$#!@".toCharArray(),
-          SearchPattern.R_PATTERN_MATCH | SearchPattern.R_CASE_SENSITIVE,
-          IJavaSearchConstants.CLASS,
-          scope,
-          new TypeNameRequestor() {
-            @Override
-            public void acceptType(
-                int modifiers,
-                char[] packageName,
-                char[] simpleTypeName,
-                char[][] enclosingTypeNames,
-                String path) {
-            }
-          },
-          IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
-          null);
-    }
-    catch (CoreException e) {
-    }
-  }
-
-  public static void waitForManualRefresh() {
-    waitForFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
-  }
-
-  protected static void waitForFamily(final Object family) {
-    boolean wasInterrupted = false;
-    do {
-      try {
-        Job.getJobManager().join(family, null);
-        wasInterrupted = false;
-      }
-      catch (OperationCanceledException e) {
-        e.printStackTrace();
-      }
-      catch (InterruptedException e) {
-        wasInterrupted = true;
-      }
-    }
-    while (wasInterrupted);
   }
 
   protected static void copyProject(String... pathElements) throws IOException {

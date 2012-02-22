@@ -160,6 +160,7 @@ public class ScoutProject implements IScoutProject {
     return null;
   }
 
+  @Override
   public IScoutBundle[] getBundles(IScoutBundleFilter filter) {
     ArrayList<IScoutBundle> result = new ArrayList<IScoutBundle>();
     synchronized (bundleMapLock) {

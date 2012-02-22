@@ -114,7 +114,7 @@
                   
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn="com.bsiag.bsicase.swt.views.outline.pages.AbstractBCTypeNodePage:"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage:"/>
                </appinfo>
             </annotation>
          </attribute>

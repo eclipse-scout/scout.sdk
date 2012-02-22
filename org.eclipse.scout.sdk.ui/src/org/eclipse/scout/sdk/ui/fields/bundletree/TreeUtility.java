@@ -31,27 +31,19 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * @since 1.0.8 04.02.2010
  */
 public class TreeUtility {
-  private static TreeUtility instance = new TreeUtility();
+
   public static final int TYPE_PRODUCT_NODE = 2999;
 
   private TreeUtility() {
   }
 
   public static ITreeNode[] findNodes(ITreeNode startNode, ITreeNodeFilter filter) {
-    return instance.findNodesImpl(startNode, filter);
-  }
-
-  private ITreeNode[] findNodesImpl(ITreeNode startNode, ITreeNodeFilter filter) {
     ArrayList<ITreeNode> collector = new ArrayList<ITreeNode>(3);
     collectNodes(startNode, filter, collector);
     return collector.toArray(new ITreeNode[collector.size()]);
   }
 
   public static ITreeNode findNode(ITreeNode startNode, ITreeNodeFilter filter) {
-    return instance.findNodeImpl(startNode, filter);
-  }
-
-  private ITreeNode findNodeImpl(ITreeNode startNode, ITreeNodeFilter filter) {
     ArrayList<ITreeNode> collector = new ArrayList<ITreeNode>(3);
     collectNodes(startNode, filter, collector);
     if (collector.size() > 0) {
@@ -63,7 +55,7 @@ public class TreeUtility {
     return null;
   }
 
-  private void collectNodes(ITreeNode node, ITreeNodeFilter filter, List<ITreeNode> collector) {
+  private static void collectNodes(ITreeNode node, ITreeNodeFilter filter, List<ITreeNode> collector) {
     if (filter.accept(node)) {
       collector.add(node);
     }
@@ -133,10 +125,6 @@ public class TreeUtility {
   }
 
   public static ITreeNode createProductTree(IScoutProject project, ITreeNodeFilter visibleFilter, boolean checkMode) {
-    return instance.createProductTreeImpl(project, visibleFilter, checkMode);
-  }
-
-  private ITreeNode createProductTreeImpl(IScoutProject project, ITreeNodeFilter visibleFilter, boolean checkMode) {
     if (project == null) {
       return null;
     }
@@ -198,7 +186,11 @@ public class TreeUtility {
 
   public static IFile[] getAllProductFiles(IScoutProject project) {
     ArrayList<P_ProductFile> productFiles = new ArrayList<P_ProductFile>();
-    instance.visitScoutProject(productFiles, project);
+    visitScoutProject(productFiles, project);
+    return getFiles(productFiles);
+  }
+
+  private static IFile[] getFiles(List<P_ProductFile> productFiles) {
     IFile[] ret = new IFile[productFiles.size()];
     for (int i = 0; i < ret.length; i++) {
       ret[i] = productFiles.get(i).getProductFile();
@@ -206,21 +198,31 @@ public class TreeUtility {
     return ret;
   }
 
-  private void visitScoutProject(List<P_ProductFile> productFileCollector, IScoutProject project) {
+  public static IFile[] getAllProductFiles(IScoutBundle bundle) {
+    ArrayList<P_ProductFile> productFiles = new ArrayList<P_ProductFile>();
+    visitScoutBundle(productFiles, bundle);
+    return getFiles(productFiles);
+  }
+
+  private static void visitScoutBundle(List<P_ProductFile> productFileCollector, IScoutBundle b) {
+    try {
+      b.getProject().accept(new P_ProductResourceVisitor(b, productFileCollector));
+    }
+    catch (CoreException e) {
+      ScoutSdkUi.logWarning("error during searching *.product in '" + b.getProject().getName() + "'.", e);
+    }
+  }
+
+  private static void visitScoutProject(List<P_ProductFile> productFileCollector, IScoutProject project) {
     for (IScoutBundle b : project.getAllScoutBundles()) {
-      try {
-        b.getProject().accept(new P_ProductResourceVisitor(b, productFileCollector));
-      }
-      catch (CoreException e) {
-        ScoutSdkUi.logWarning("error during searching *.product in '" + b.getProject().getName() + "'.", e);
-      }
+      visitScoutBundle(productFileCollector, b);
     }
     for (IScoutProject childProject : project.getSubProjects()) {
       visitScoutProject(productFileCollector, childProject);
     }
   }
 
-  private class P_ProductResourceVisitor implements IResourceVisitor {
+  private static class P_ProductResourceVisitor implements IResourceVisitor {
     private final List<P_ProductFile> m_productFileCollector;
     private final IScoutBundle m_bundle;
 
@@ -242,7 +244,7 @@ public class TreeUtility {
     }
   }
 
-  private class P_ProductFile {
+  private static class P_ProductFile {
     private IScoutBundle m_scoutBundle;
     private IFile m_productFile;
 

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.outline;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPageVisitor;
 
 /**
  * <h3>IScoutExplorerPart</h3> ...
@@ -28,4 +29,9 @@ public interface IScoutExplorerPart {
   void setSelection(IStructuredSelection selection);
 
   void expandAndSelectProjectLevel();
+
+  /**
+   * @param visitor
+   */
+  void visitPages(IPageVisitor visitor);
 }

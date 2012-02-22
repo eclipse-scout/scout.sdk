@@ -55,6 +55,7 @@ import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPageVisitor;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 import org.eclipse.swt.SWT;
@@ -183,6 +184,18 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
   }
 
+  @Override
+  public void visitPages(IPageVisitor visitor) {
+    visitPagesRec(visitor, m_invisibleRoot);
+  }
+
+  private void visitPagesRec(IPageVisitor visitor, IPage p) {
+    visitor.visit(p);
+    for (IPage c : p.getChildren()) {
+      visitPagesRec(visitor, c);
+    }
+  }
+
   public ScoutExplorerRootNodePage getRoot() {
     return m_invisibleRoot;
   }
@@ -228,18 +241,11 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
    * A {@link RefreshOutlineSubTreeJob} is queued after some time to reload the affected nodes
    */
   public void markStructureDirty(AbstractPage newPage) {
-    // if(BsiCaseCore.getDefault().getScoutWorkspace().isInitialized()){
     m_dirtyManager.notifyStructureDirty(newPage);
-    // }
   }
 
   public IPage[] fetchDirtyStructurePages() {
-    // if(BsiCaseCore.getDefault().getScoutWorkspace().isInitialized()){
     return m_dirtyManager.fetchDirtyStructurePages();
-    // }
-    // else{
-    // return new AbstractPage[0];
-    // }
   }
 
   public void markFilterChanged(AbstractPage page) {

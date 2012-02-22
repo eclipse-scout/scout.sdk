@@ -43,7 +43,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
     if (superTypeHierarchy.contains(abstractSqlLookupService)) {
       StringBuilder methodBuilder = new StringBuilder();
       methodBuilder.append("@Override\n");
-      methodBuilder.append("public String getConfiguredSqlSelect(){\n");
+      methodBuilder.append("protected String getConfiguredSqlSelect(){\n");
       methodBuilder.append(SdkProperties.TAB + "return \"\"; " + ScoutUtility.getCommentBlock("write select statement here.") + "\n}");
       serviceImplementation.createMethod(methodBuilder.toString(), null, true, monitor);
     }

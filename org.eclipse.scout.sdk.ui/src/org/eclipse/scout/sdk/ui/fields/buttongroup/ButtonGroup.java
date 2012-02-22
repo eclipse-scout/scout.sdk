@@ -71,12 +71,12 @@ public class ButtonGroup<T> extends Composite {
     setLayout(new FormLayout());
   }
 
-  public void addButtonGroupListener(ButtonGroupListener<T> listener) {
-    m_eventListeners.add(ButtonGroupListener.class, listener);
+  public void addButtonGroupListener(IButtonGroupListener<T> listener) {
+    m_eventListeners.add(IButtonGroupListener.class, listener);
   }
 
-  public void removeButtonGroupListener(ButtonGroupListener<T> listener) {
-    m_eventListeners.remove(ButtonGroupListener.class, listener);
+  public void removeButtonGroupListener(IButtonGroupListener<T> listener) {
+    m_eventListeners.remove(IButtonGroupListener.class, listener);
   }
 
   public int getType() {
@@ -191,7 +191,7 @@ public class ButtonGroup<T> extends Composite {
    */
   private void fireSelectionChanged() {
     List<T> selection = getValues();
-    for (ButtonGroupListener<T> l : m_eventListeners.getListeners(ButtonGroupListener.class)) {
+    for (IButtonGroupListener<T> l : m_eventListeners.getListeners(IButtonGroupListener.class)) {
       try {
         l.handleSelectionChanged(selection);
       }

@@ -76,4 +76,10 @@ public interface IScoutProject extends IScoutContainer {
    */
   IScoutBundle[] getAllBundles(int type);
 
+  /**
+   * @param filter
+   * @return
+   */
+  IScoutBundle[] getBundles(IScoutBundleFilter filter);
+
 }
