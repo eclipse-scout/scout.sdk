@@ -23,6 +23,7 @@ import org.eclipse.pde.core.plugin.IPluginObject;
 import org.eclipse.pde.internal.core.ibundle.IManifestHeader;
 import org.eclipse.pde.internal.core.text.bundle.BundleClasspathHeader;
 import org.eclipse.pde.internal.core.text.bundle.ExportPackageHeader;
+import org.eclipse.pde.internal.core.text.bundle.RequireBundleHeader;
 import org.eclipse.scout.commons.CompareUtility;
 import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
@@ -179,6 +180,31 @@ public class PluginModelHelper {
     }
 
     /**
+     * Removes the given plugin from the dependency list of the project associated with this helper.<br>
+     * 
+     * @param pluginId
+     *          The plugin id to remove.
+     * @throws CoreException
+     */
+    public void removeDependency(String pluginId) throws CoreException {
+      synchronized (m_model.getProject()) {
+        IPluginImport existing = getDependency(pluginId);
+        if (existing != null) {
+          m_model.getPluginBase().remove(existing);
+
+          RequireBundleHeader reqHeader = getRequireBundleHeader();
+          reqHeader.removeBundle(pluginId);
+          setEntryValue(Constants.REQUIRE_BUNDLE, reqHeader.getValue());
+        }
+      }
+    }
+
+    private RequireBundleHeader getRequireBundleHeader() {
+      IManifestHeader header = m_model.getBundle().getManifestHeader(Constants.REQUIRE_BUNDLE);
+      return (RequireBundleHeader) m_model.getBundleModel().getFactory().createHeader(Constants.REQUIRE_BUNDLE, header.getValue() == null ? "" : header.getValue());
+    }
+
+    /**
      * Checks whether the given plugin id is already in the dependency list of the project associated with this helper.
      * 
      * @param pluginId
@@ -186,13 +212,18 @@ public class PluginModelHelper {
      * @return true if the given plugin is already in the dependency list, false otherwise.
      */
     public boolean existsDependency(String pluginId) {
-      if (pluginId == null || pluginId.length() < 1) return false;
+      IPluginImport existing = getDependency(pluginId);
+      return existing != null;
+    }
+
+    private IPluginImport getDependency(String pluginId) {
+      if (pluginId == null || pluginId.length() < 1) return null;
       for (IPluginImport existing : m_model.getPluginBase().getImports()) {
         if (existing.getId().equals(pluginId)) {
-          return true; // exists already
+          return existing;
         }
       }
-      return false;
+      return null;
     }
 
     /**

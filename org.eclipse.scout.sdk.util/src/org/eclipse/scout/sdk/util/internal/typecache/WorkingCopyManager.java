@@ -18,7 +18,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
@@ -28,6 +27,7 @@ import org.eclipse.jdt.internal.compiler.SourceElementParser;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -102,25 +102,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
     SourceElementParser parser = im.getSourceElementParser(jp, null/*requestor will be set by indexer*/);
     im.addSource((IFile) icu.getResource(), containerPath, parser);
-    waitForJob(containerPath.toString());
-  }
-
-  private void waitForJob(String family) {
-    try {
-      boolean wasInterrupted = false;
-      do {
-        try {
-          Job.getJobManager().join(family, null);
-          wasInterrupted = false;
-        }
-        catch (InterruptedException e) {
-          wasInterrupted = true;
-        }
-      }
-      while (wasInterrupted);
-    }
-    catch (Throwable t) {
-    }
+    JdtUtility.waitForJobFamily(containerPath.toString());
   }
 
   @Override

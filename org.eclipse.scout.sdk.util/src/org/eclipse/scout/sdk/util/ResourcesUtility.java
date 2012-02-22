@@ -20,6 +20,8 @@ import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.FileUtility;
+import org.eclipse.scout.commons.IOUtility;
 
 @SuppressWarnings("restriction")
 public final class ResourcesUtility {
@@ -154,6 +156,22 @@ public final class ResourcesUtility {
         catch (IOException e) {
         }
       }
+    }
+  }
+
+  public static void moveFile(File from, File destFolder) throws IOException {
+    if (from == null || !from.isFile()) {
+      throw new IOException("source file is not valid");
+    }
+    if (destFolder == null) {
+      throw new IOException("destination folder is not valid");
+    }
+    destFolder.mkdirs();
+    boolean success = from.renameTo(destFolder);
+    if (!success) {
+      // fallback: copy file
+      FileUtility.copyFile(from, new File(destFolder, from.getName()));
+      IOUtility.deleteFile(from.getAbsolutePath());
     }
   }
 

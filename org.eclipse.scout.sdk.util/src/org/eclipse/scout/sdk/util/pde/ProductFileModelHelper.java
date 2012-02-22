@@ -224,6 +224,17 @@ public final class ProductFileModelHelper {
     }
 
     /**
+     * Removes the given key from the configuration file.
+     * 
+     * @param key
+     *          The key to remove
+     * @throws CoreException
+     */
+    public void removeEntry(String key) throws CoreException {
+      m_model.getConfigFileProperties().remove(key);
+    }
+
+    /**
      * Gets the value of the "osgi.bundles" entry of the config file.
      * 
      * @return The value of the "osgi.bundles" entry.
@@ -247,7 +258,7 @@ public final class ProductFileModelHelper {
     /**
      * Gets the configuration file of this product.
      * 
-     * @return The config file.
+     * @return The config file or null if this product has no config file specified.
      * @throws CoreException
      */
     public IFile getFile() throws CoreException {

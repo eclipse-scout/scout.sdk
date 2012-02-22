@@ -11,6 +11,14 @@
 package org.eclipse.scout.sdk.util.jdt;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -20,9 +28,15 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.core.search.TypeNameRequestor;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.osgi.framework.Bundle;
 
 public final class JdtUtility {
   private JdtUtility() {
@@ -126,5 +140,101 @@ public final class JdtUtility {
       return (IType) element;
     }
     return findDeclaringType(element.getParent());
+  }
+
+  public static void waitForSilentWorkspace() {
+    Job worker = new Job("") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        return Status.OK_STATUS;
+      }
+    };
+    worker.setRule(ResourcesPlugin.getWorkspace().getRoot());
+    worker.schedule();
+    try {
+      worker.join();
+    }
+    catch (InterruptedException e) {
+    }
+    waitForRefresh();
+    waitForBuild();
+    waitForIndexesReady();
+  }
+
+  public static void waitForBuild() {
+    waitForJobFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
+    waitForJobFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
+  }
+
+  public static void waitForRefresh() {
+    waitForJobFamily(ResourcesPlugin.FAMILY_AUTO_REFRESH);
+    waitForJobFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
+  }
+
+  public static void waitForIndexesReady() {
+    // dummy query for waiting until the indexes are ready
+    SearchEngine engine = new SearchEngine();
+    IJavaSearchScope scope = SearchEngine.createWorkspaceScope();
+    try {
+      engine.searchAllTypeNames(
+          null,
+          SearchPattern.R_EXACT_MATCH,
+          "!@$#!@".toCharArray(),
+          SearchPattern.R_PATTERN_MATCH | SearchPattern.R_CASE_SENSITIVE,
+          IJavaSearchConstants.CLASS,
+          scope,
+          new TypeNameRequestor() {
+            @Override
+            public void acceptType(
+                int modifiers,
+                char[] packageName,
+                char[] simpleTypeName,
+                char[][] enclosingTypeNames,
+                String path) {
+            }
+          },
+          IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
+          null);
+    }
+    catch (CoreException e) {
+    }
+  }
+
+  public static void waitForManualRefresh() {
+    waitForJobFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
+  }
+
+  public static void waitForJobFamily(final Object family) {
+    boolean wasInterrupted = false;
+    do {
+      try {
+        Job.getJobManager().join(family, null);
+        wasInterrupted = false;
+      }
+      catch (OperationCanceledException e) {
+        e.printStackTrace();
+      }
+      catch (InterruptedException e) {
+        wasInterrupted = true;
+      }
+    }
+    while (wasInterrupted);
+  }
+
+  /**
+   * checks whether all of the given plugins are installed in the current platform
+   * 
+   * @param pluginIds
+   *          the plugin Ids to search
+   * @return true if every plugin passed exists in the given platform, false otherwise.
+   */
+  public static boolean areAllPluginsInstalled(String... pluginIds) {
+    for (String pluginId : pluginIds) {
+      Bundle b = Platform.getBundle(pluginId);
+      if (b == null) {
+        return false;
+      }
+    }
+    return true;
   }
 }

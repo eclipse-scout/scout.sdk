@@ -61,13 +61,22 @@ public final class LazyProductFileModel {
     return m_configFileInfo;
   }
 
+  /**
+   * gets the config.ini file specified in the product.
+   * 
+   * @return the config file or null if no file is specified.
+   * @throws CoreException
+   */
   public synchronized IFile getConfigIniFile() throws CoreException {
     if (m_configIniFile == null) {
-      IPath path = new Path(getConfigurationFileInfo().getPath(Platform.getOS())).removeFirstSegments(1);
-      m_configIniFile = m_productFile.getProject().getFile(path);
-      if (m_configIniFile == null || !m_configIniFile.exists()) {
-        m_configIniFile = null;
-        throw new CoreException(new ScoutStatus("could not find product configuration file: " + path.toOSString()));
+      String osPath = getConfigurationFileInfo().getPath(Platform.getOS());
+      if (osPath != null) {
+        IPath path = new Path(osPath).removeFirstSegments(1);
+        m_configIniFile = m_productFile.getProject().getFile(path);
+        if (m_configIniFile == null || !m_configIniFile.exists()) {
+          m_configIniFile = null;
+          throw new CoreException(new ScoutStatus("could not find product configuration file: " + path.toOSString()));
+        }
       }
     }
     return m_configIniFile;
@@ -78,6 +87,10 @@ public final class LazyProductFileModel {
     if (m_configFileProperties == null) {
       m_configFileProperties = new Properties();
       IFile configIni = getConfigIniFile();
+      if (configIni == null) {
+        return new Properties(); // no config.ini, no properties
+      }
+
       InputStream is = null;
       try {
         is = configIni.getContents();
@@ -118,6 +131,10 @@ public final class LazyProductFileModel {
 
   private void saveConfigIni() throws CoreException {
     IFile configIni = getConfigIniFile();
+    if (configIni == null) {
+      return;
+    }
+
     OutputStream stream = null;
     try {
       stream = new BufferedOutputStream(new FileOutputStream(configIni.getRawLocation().toFile()));
