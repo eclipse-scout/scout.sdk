@@ -11,8 +11,6 @@
 package org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project;
 
 import org.eclipse.scout.sdk.rap.ui.internal.ScoutSdkRapUI;
-import org.eclipse.scout.sdk.rap.ui.internal.action.ExportRapWarAction;
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -57,19 +55,5 @@ public class UiRapNodePage extends AbstractPage {
   @Override
   public IScoutBundle getScoutResource() {
     return m_scoutBundle;
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof ExportRapWarAction) {
-      ((ExportRapWarAction) menu).setScoutBundle(getScoutResource());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ExportRapWarAction.class};
   }
 }
