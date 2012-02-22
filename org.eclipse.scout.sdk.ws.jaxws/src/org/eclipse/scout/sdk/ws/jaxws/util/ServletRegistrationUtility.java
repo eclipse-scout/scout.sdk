@@ -91,7 +91,7 @@ public final class ServletRegistrationUtility {
           return false;
         }
         // check whether JAX-WS dependency is installed on bundle
-        if (!TypeUtility.exists(JaxWsRuntimeClasses.JaxWsActivator) || !TypeUtility.isOnClasspath(JaxWsRuntimeClasses.JaxWsActivator, candidate.getJavaProject())) {
+        if (!TypeUtility.exists(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator)) || !TypeUtility.isOnClasspath(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator), candidate.getJavaProject())) {
           return false;
         }
         return true;
@@ -111,7 +111,7 @@ public final class ServletRegistrationUtility {
     for (IScoutBundle candidate : getJaxWsBundlesOnClasspath(bundle)) {
       String extensionPoint = JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS;
       HashMap<String, String> attributes = new HashMap<String, String>();
-      attributes.put("class", JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName());
+      attributes.put("class", TypeUtility.getType(JaxWsRuntimeClasses.JaxWsServlet).getFullyQualifiedName());
       PluginModelHelper h = new PluginModelHelper(candidate.getProject());
       IPluginElement ex = h.PluginXml.getSimpleExtension(extensionPoint, "servlet", attributes);
       if (ex == null) {

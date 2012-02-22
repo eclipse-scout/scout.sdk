@@ -101,7 +101,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
   private void applyDefaults() {
     setAnnotateImplClass(true);
-    setAuthenticationHandler(JaxWsRuntimeClasses.NullAuthenticationHandlerConsumer.getFullyQualifiedName());
+    setAuthenticationHandler(TypeUtility.getType(JaxWsRuntimeClasses.NullAuthenticationHandlerConsumer).getFullyQualifiedName());
     setPackageName(JaxWsSdkUtility.getRecommendedConsumerImplPackageName(m_bundle));
   }
 
@@ -149,7 +149,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_annotateImplButton = new Button(parent, SWT.CHECK);
-    m_annotateImplButton.setText(Texts.get("AnnotateImplClass", JaxWsRuntimeClasses.ScoutWebServiceClient.getElementName()));
+    m_annotateImplButton.setText(Texts.get("AnnotateImplClass", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient).getElementName()));
     m_annotateImplButton.setSelection(isAnnotateImplClass());
     m_annotateImplButton.addSelectionListener(new SelectionAdapter() {
 
@@ -163,7 +163,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
     m_descriptionScoutAnnotation = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
     m_descriptionScoutAnnotation.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
-    m_descriptionScoutAnnotation.setText(Texts.get("DescriptionScoutWebServiceClientAnnotation", JaxWsRuntimeClasses.ScoutWebServiceClient.getElementName()));
+    m_descriptionScoutAnnotation.setText(Texts.get("DescriptionScoutWebServiceClientAnnotation", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient).getElementName()));
 
     m_authenticationHandlerField = getFieldToolkit().createStyledTextField(m_containerAnnotation, Texts.get("AuthenticationMechanism"));
     m_authenticationHandlerField.setText(getAuthenticationHandler());
@@ -184,7 +184,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         try {
-          IJavaSearchScope searchScope = createSubClassesSearchScope(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer);
+          IJavaSearchScope searchScope = createSubClassesSearchScope(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer));
 
           SelectionDialog dialog = JavaUI.createTypeDialog(ScoutSdkUi.getShell(), null, searchScope, IJavaElementSearchConstants.CONSIDER_CLASSES, false, "*.*");
           dialog.setTitle(Texts.get("AuthenticationMechanism"));
@@ -266,7 +266,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     validateType(multiStatus);
 
     if (isAnnotateImplClass()) {
-      validateFactoryType(multiStatus, Texts.get("AuthenticationFactory"), getAuthenticationHandler(), JaxWsRuntimeClasses.IAuthenticationHandlerConsumer);
+      validateFactoryType(multiStatus, Texts.get("AuthenticationFactory"), getAuthenticationHandler(), TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer));
     }
   }
 
@@ -444,7 +444,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(authenticationHandler)) {
         IType type = TypeUtility.getType(authenticationHandler);
         try {
-          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer)) {
+          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer))) {
             m_tooltipAuthenticationFactory.setMember(type);
           }
         }

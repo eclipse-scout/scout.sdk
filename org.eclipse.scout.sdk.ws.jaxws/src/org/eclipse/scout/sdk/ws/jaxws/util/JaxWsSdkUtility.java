@@ -683,7 +683,7 @@ public final class JaxWsSdkUtility {
       return false;
     }
     fqn = fqn.replaceAll("\\$", "\\.");
-    String noneAuthFqn = JaxWsRuntimeClasses.NullAuthenticationHandlerProvider.getFullyQualifiedName().replaceAll("\\$", "\\.");
+    String noneAuthFqn = TypeUtility.getType(JaxWsRuntimeClasses.NullAuthenticationHandlerProvider).getFullyQualifiedName().replaceAll("\\$", "\\.");
     return TypeUtility.existsType(fqn) && !fqn.equals(noneAuthFqn);
   }
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -62,11 +62,11 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
     wizard.setSuperTypeSearchScopeFactory(new P_JavaSearchScopeFactory(m_webserviceEnum, m_bundle, false));
 
     if (m_webserviceEnum == WebserviceEnum.Provider) {
-      wizard.setInterfaceType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider);
+      wizard.setInterfaceType(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider));
       wizard.setRecommendedPackageFragment(JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
     }
     else {
-      wizard.setInterfaceType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer);
+      wizard.setInterfaceType(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer));
       wizard.setRecommendedPackageFragment(JaxWsSdkUtility.getRecommendedConsumerSecurityPackageName(m_bundle));
     }
 
@@ -97,10 +97,10 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
     public IJavaSearchScope create() {
       IType type;
       if (m_webserviceEnum == WebserviceEnum.Provider) {
-        type = JaxWsRuntimeClasses.IAuthenticationHandlerProvider;
+        type = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider);
       }
       else {
-        type = JaxWsRuntimeClasses.IAuthenticationHandlerConsumer;
+        type = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer);
       }
       IType[] subTypes;
       if (m_onlyInterfaceTypes) {

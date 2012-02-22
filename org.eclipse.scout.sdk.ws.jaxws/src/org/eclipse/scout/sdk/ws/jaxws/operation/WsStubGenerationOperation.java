@@ -164,7 +164,7 @@ public class WsStubGenerationOperation implements IOperation {
       try {
         launchJavaApplicationSync(launcherName,
             m_bundle.getProject().getName(),
-            JaxWsRuntimeClasses.JaxWsStubGenerator.getFullyQualifiedName(),
+            TypeUtility.getType(JaxWsRuntimeClasses.JaxWsStubGenerator).getFullyQualifiedName(),
             args,
             monitor);
       }

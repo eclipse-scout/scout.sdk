@@ -204,7 +204,7 @@ public class HandlerPresenter extends TypePresenter {
     ImageDescriptor icon = null;
     String tooltip = null;
     if (TypeUtility.exists(type)) {
-      IAnnotation annotation = JaxWsSdkUtility.getAnnotation(type, JaxWsRuntimeClasses.ScoutTransaction.getFullyQualifiedName(), false);
+      IAnnotation annotation = JaxWsSdkUtility.getAnnotation(type, TypeUtility.getType(JaxWsRuntimeClasses.ScoutTransaction).getFullyQualifiedName(), false);
       if (annotation != null) {
         icon = JaxWsSdk.getImageDescriptor(JaxWsIcons.Transactional);
         AnnotationProperty prop = JaxWsSdkUtility.parseAnnotationTypeValue(type, annotation, JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY);

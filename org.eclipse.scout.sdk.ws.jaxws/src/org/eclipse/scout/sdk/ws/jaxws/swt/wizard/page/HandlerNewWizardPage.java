@@ -96,7 +96,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     setTransactional(true);
 
     try {
-      String defaultSessionFactory = (String) JaxWsRuntimeClasses.ScoutWebService.getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
+      String defaultSessionFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
       setSessionFactoryType(TypeUtility.getType(defaultSessionFactory));
     }
     catch (JavaModelException e) {
@@ -208,7 +208,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         try {
-          IJavaSearchScope searchScope = createSubClassesSearchScope(JaxWsRuntimeClasses.IServerSessionFactory);
+          IJavaSearchScope searchScope = createSubClassesSearchScope(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory));
 
           SelectionDialog dialog = JavaUI.createTypeDialog(ScoutSdkUi.getShell(), null, searchScope, IJavaElementSearchConstants.CONSIDER_CLASSES, false, "*.*");
           dialog.setTitle(Texts.get("SessionFactory"));
@@ -479,15 +479,18 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     types.addAll(Arrays.asList(JaxWsSdkUtility.getJdtSubTypes(m_bundle, LogicalHandler.class.getName(), true, true, false, false)));
     types.addAll(Arrays.asList(JaxWsSdkUtility.getJdtSubTypes(m_bundle, SOAPHandler.class.getName(), true, true, false, false)));
 
+    IType authHandlerProv = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider);
+    IType authHandlerCons = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer);
+
     // remove authentication handlers (provider)
-    IType[] providerAuthHandlers = JaxWsSdkUtility.getJdtSubTypes(m_bundle, JaxWsRuntimeClasses.IAuthenticationHandlerProvider.getFullyQualifiedName(), true, true, false, false);
+    IType[] providerAuthHandlers = JaxWsSdkUtility.getJdtSubTypes(m_bundle, authHandlerProv.getFullyQualifiedName(), true, true, false, false);
     types.removeAll(Arrays.asList(providerAuthHandlers));
-    types.remove(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider.getFullyQualifiedName()));
+    types.remove(TypeUtility.getType(authHandlerProv.getFullyQualifiedName()));
 
     // remove authentication handlers (consumer)
-    IType[] consumerAuthHandlers = JaxWsSdkUtility.getJdtSubTypes(m_bundle, JaxWsRuntimeClasses.IAuthenticationHandlerConsumer.getFullyQualifiedName(), true, true, false, false);
+    IType[] consumerAuthHandlers = JaxWsSdkUtility.getJdtSubTypes(m_bundle, authHandlerCons.getFullyQualifiedName(), true, true, false, false);
     types.removeAll(Arrays.asList(consumerAuthHandlers));
-    types.remove(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer.getFullyQualifiedName()));
+    types.remove(TypeUtility.getType(authHandlerCons.getFullyQualifiedName()));
 
     // remove internal classes
     Iterator<IType> iterator = types.iterator();

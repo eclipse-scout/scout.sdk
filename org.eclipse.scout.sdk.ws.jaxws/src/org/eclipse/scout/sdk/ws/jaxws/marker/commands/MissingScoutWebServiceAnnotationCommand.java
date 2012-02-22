@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.operation.AnnotationUpdateOperation;
@@ -24,16 +25,16 @@ public class MissingScoutWebServiceAnnotationCommand extends AbstractExecutableM
   private IType m_interfacePortType;
 
   public MissingScoutWebServiceAnnotationCommand(IType declaringType) {
-    super("Missing annotation '" + JaxWsRuntimeClasses.ScoutWebService.getElementName() + "'");
+    super("Missing annotation '" + TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName() + "'");
     m_declaringType = declaringType;
-    setSolutionDescription("By using this task, the port type '" + m_declaringType.getElementName() + "' is annotated with '" + JaxWsRuntimeClasses.ScoutWebService.getElementName() + "'.");
+    setSolutionDescription("By using this task, the port type '" + m_declaringType.getElementName() + "' is annotated with '" + TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName() + "'.");
   }
 
   @Override
   public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     AnnotationUpdateOperation op = new AnnotationUpdateOperation();
     op.setDeclaringType(m_declaringType);
-    op.setAnnotationType(JaxWsRuntimeClasses.ScoutWebService);
+    op.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService));
     new OperationJob(op).schedule();
   }
 }

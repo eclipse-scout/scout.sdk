@@ -90,7 +90,7 @@ public class HandlerNodePagePropertyViewPart extends AbstractSinglePageSectionBa
       ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit());
       applyLayoutData(actionPresenter);
 
-      m_transactionalPresenter = new AnnotationPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), getPage().getType(), JaxWsRuntimeClasses.ScoutTransaction);
+      m_transactionalPresenter = new AnnotationPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), getPage().getType(), TypeUtility.getType(JaxWsRuntimeClasses.ScoutTransaction));
       m_transactionalPresenter.setLabel(Texts.get("Transactional"));
       applyLayoutData(m_transactionalPresenter);
 
@@ -101,12 +101,12 @@ public class HandlerNodePagePropertyViewPart extends AbstractSinglePageSectionBa
       m_sessionFactoryPresenter.setLabel(Texts.get("SessionFactory"));
       m_sessionFactoryPresenter.setAcceptNullValue(true);
       m_sessionFactoryPresenter.setBundle(m_bundle);
-      m_sessionFactoryPresenter.setAnnotationType(JaxWsRuntimeClasses.ScoutTransaction);
+      m_sessionFactoryPresenter.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutTransaction));
       m_sessionFactoryPresenter.setProperty(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY);
       m_sessionFactoryPresenter.setDefaultPackageNameNewType(JaxWsSdkUtility.getRecommendedSessionPackageName(m_bundle));
-      m_sessionFactoryPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(JaxWsRuntimeClasses.IServerSessionFactory));
+      m_sessionFactoryPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory)));
       m_sessionFactoryPresenter.setAllowChangeOfInterfaceType(true);
-      m_sessionFactoryPresenter.setInterfaceTypes(new IType[]{JaxWsRuntimeClasses.IServerSessionFactory});
+      m_sessionFactoryPresenter.setInterfaceTypes(new IType[]{TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory)});
       m_sessionFactoryPresenter.addValueChangedListener(m_presenterListener);
       applyLayoutData(m_sessionFactoryPresenter);
 
@@ -178,7 +178,7 @@ public class HandlerNodePagePropertyViewPart extends AbstractSinglePageSectionBa
           IType factoryType = TypeUtility.getType(factoryFullyQualifiedName);
           AnnotationUpdateOperation op = new AnnotationUpdateOperation();
           op.setDeclaringType(type);
-          op.setAnnotationType(JaxWsRuntimeClasses.ScoutTransaction);
+          op.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutTransaction));
           op.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, factoryType);
           new OperationJob(op).schedule();
           break;

@@ -183,4 +183,20 @@
     <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.AuthenticationHandlerNewWizardAction"></contextMenu>
     <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.CleanupPhantomJarFileAction"></contextMenu>
    </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.technology">
+      <technology
+            category="Backend Features"
+            id="scout.technology.ws.jaxws"
+            name="Webservices with JAX-WS 2.1.6">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ws.jaxws.technology.JaxWsServerProdTechnologyHandler"
+            technology="scout.technology.ws.jaxws">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ws.jaxws.technology.JaxWsServerManifestTechnologyHandler"
+            technology="scout.technology.ws.jaxws">
+      </handler>
+   </extension>
 </plugin>

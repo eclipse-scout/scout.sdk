@@ -108,7 +108,7 @@ public abstract class TypeNewAction extends AbstractLinkAction {
         level.register(m_createdType.getCompilationUnit(), new NullProgressMonitor());
         TypeUtility.getType(m_createdType.getFullyQualifiedName());
         level.reconcile(m_createdType.getCompilationUnit(), new NullProgressMonitor());
-        TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.IServerSessionFactory).invalidate();
+        TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory)).invalidate();
       }
       catch (JavaModelException e) {
         // TODO Auto-generated catch block

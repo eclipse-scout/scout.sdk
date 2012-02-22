@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.ext;
 
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -38,6 +39,7 @@ public class WebServicePageFactory implements IPageFactory {
   }
 
   private boolean isJaxWsDependencyInstalled(IScoutBundle bundle) {
-    return TypeUtility.exists(JaxWsRuntimeClasses.JaxWsActivator) && TypeUtility.isOnClasspath(JaxWsRuntimeClasses.JaxWsActivator, bundle.getJavaProject());
+    IType activator = TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator);
+    return TypeUtility.exists(activator) && TypeUtility.isOnClasspath(activator, bundle.getJavaProject());
   }
 }

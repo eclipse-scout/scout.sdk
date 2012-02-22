@@ -236,13 +236,13 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       m_authenticationHandlerPresenter.setLabel(Texts.get("Authentication"));
       m_authenticationHandlerPresenter.setAcceptNullValue(true);
       m_authenticationHandlerPresenter.setBundle(m_bundle);
-      m_authenticationHandlerPresenter.setAnnotationType(JaxWsRuntimeClasses.ScoutWebService);
+      m_authenticationHandlerPresenter.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService));
       m_authenticationHandlerPresenter.setProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER);
       m_authenticationHandlerPresenter.setDefaultPackageNameNewType(JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
       m_authenticationHandlerPresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
-      m_authenticationHandlerPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(JaxWsRuntimeClasses.IAuthenticationHandlerProvider));
+      m_authenticationHandlerPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider)));
       m_authenticationHandlerPresenter.setAllowChangeOfInterfaceType(true);
-      m_authenticationHandlerPresenter.setInterfaceTypes(new IType[]{JaxWsRuntimeClasses.IAuthenticationHandlerProvider});
+      m_authenticationHandlerPresenter.setInterfaceTypes(new IType[]{TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider)});
       m_authenticationHandlerPresenter.addValueChangedListener(m_presenterListener);
       m_authenticationHandlerPresenter.getContainer().setLayoutData(new GridData());
       applyLayoutData(m_authenticationHandlerPresenter);
@@ -253,13 +253,13 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       m_credentialValidationStrategyPresenter.setLabel(Texts.get("CredentialValidation"));
       m_credentialValidationStrategyPresenter.setAcceptNullValue(true);
       m_credentialValidationStrategyPresenter.setBundle(m_bundle);
-      m_credentialValidationStrategyPresenter.setAnnotationType(JaxWsRuntimeClasses.ScoutWebService);
+      m_credentialValidationStrategyPresenter.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService));
       m_credentialValidationStrategyPresenter.setProperty(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY);
       m_credentialValidationStrategyPresenter.setDefaultPackageNameNewType(JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
       m_credentialValidationStrategyPresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
-      m_credentialValidationStrategyPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(JaxWsRuntimeClasses.ICredentialValidationStrategy));
+      m_credentialValidationStrategyPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy)));
       m_credentialValidationStrategyPresenter.setAllowChangeOfInterfaceType(true);
-      m_credentialValidationStrategyPresenter.setInterfaceTypes(new IType[]{JaxWsRuntimeClasses.ICredentialValidationStrategy});
+      m_credentialValidationStrategyPresenter.setInterfaceTypes(new IType[]{TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy)});
       m_credentialValidationStrategyPresenter.addValueChangedListener(m_presenterListener);
       m_credentialValidationStrategyPresenter.getContainer().setLayoutData(new GridData());
       applyLayoutData(m_credentialValidationStrategyPresenter);
@@ -270,13 +270,13 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       m_sessionFactoryPresenter.setLabel(Texts.get("Session"));
       m_sessionFactoryPresenter.setAcceptNullValue(true);
       m_sessionFactoryPresenter.setBundle(m_bundle);
-      m_sessionFactoryPresenter.setAnnotationType(JaxWsRuntimeClasses.ScoutWebService);
+      m_sessionFactoryPresenter.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService));
       m_sessionFactoryPresenter.setProperty(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY);
       m_sessionFactoryPresenter.setDefaultPackageNameNewType(JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
       m_sessionFactoryPresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
-      m_sessionFactoryPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(JaxWsRuntimeClasses.IServerSessionFactory));
+      m_sessionFactoryPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory)));
       m_sessionFactoryPresenter.setAllowChangeOfInterfaceType(true);
-      m_sessionFactoryPresenter.setInterfaceTypes(new IType[]{JaxWsRuntimeClasses.IServerSessionFactory});
+      m_sessionFactoryPresenter.setInterfaceTypes(new IType[]{TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory)});
       m_sessionFactoryPresenter.addValueChangedListener(m_presenterListener);
       m_sessionFactoryPresenter.getContainer().setLayoutData(new GridData());
       applyLayoutData(m_sessionFactoryPresenter);
@@ -477,7 +477,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
 
     IType portType = getPage().getPortType();
     if (portType != null) {
-      IAnnotation scoutWebServiceAnnotation = JaxWsSdkUtility.getAnnotation(portType, JaxWsRuntimeClasses.ScoutWebService.getFullyQualifiedName(), false);
+      IAnnotation scoutWebServiceAnnotation = JaxWsSdkUtility.getAnnotation(portType, TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getFullyQualifiedName(), false);
       getSection(SECTION_ID_SCOUT_WEB_SERVICE_ANNOTATION).setVisible(TypeUtility.exists(scoutWebServiceAnnotation));
       if (TypeUtility.exists(scoutWebServiceAnnotation)) {
         AnnotationProperty propertyValue = JaxWsSdkUtility.parseAnnotationTypeValue(portType, scoutWebServiceAnnotation, JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY);
@@ -756,7 +756,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
             IType factoryType = TypeUtility.getType(factoryFullyQualifiedName);
             AnnotationUpdateOperation op = new AnnotationUpdateOperation();
             op.setDeclaringType(portType);
-            op.setAnnotationType(JaxWsRuntimeClasses.ScoutWebService);
+            op.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService));
             switch (presenterId) {
               case PRESENTER_ID_SESSION_FACTORY:
                 op.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, factoryType);

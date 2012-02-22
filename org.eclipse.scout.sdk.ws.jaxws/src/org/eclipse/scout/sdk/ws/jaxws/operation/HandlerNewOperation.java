@@ -88,9 +88,9 @@ public class HandlerNewOperation implements IOperation {
     if (m_transactional) {
       AnnotationUpdateOperation opAnnotation = new AnnotationUpdateOperation();
       opAnnotation.setDeclaringType(m_createdType);
-      opAnnotation.setAnnotationType(JaxWsRuntimeClasses.ScoutTransaction);
+      opAnnotation.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutTransaction));
 
-      String defaultSessionFactory = (String) JaxWsRuntimeClasses.ScoutWebService.getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
+      String defaultSessionFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
 
       if (!isSameType(m_sessionFactoryType.getFullyQualifiedName(), defaultSessionFactory)) {
         opAnnotation.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, m_sessionFactoryType);

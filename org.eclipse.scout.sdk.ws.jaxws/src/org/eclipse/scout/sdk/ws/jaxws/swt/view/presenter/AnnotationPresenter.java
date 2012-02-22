@@ -19,6 +19,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -125,7 +126,7 @@ public class AnnotationPresenter extends AbstractPropertyPresenter<IAnnotation> 
         new OperationJob(op).schedule();
       }
       else {
-        IAnnotation annotation = JaxWsSdkUtility.getAnnotation(m_type, JaxWsRuntimeClasses.ScoutTransaction.getFullyQualifiedName(), false);
+        IAnnotation annotation = JaxWsSdkUtility.getAnnotation(m_type, TypeUtility.getType(JaxWsRuntimeClasses.ScoutTransaction).getFullyQualifiedName(), false);
         if (annotation != null) {
           SourceRangeRemoveOperation op = new SourceRangeRemoveOperation();
           op.setAnnotation(annotation);

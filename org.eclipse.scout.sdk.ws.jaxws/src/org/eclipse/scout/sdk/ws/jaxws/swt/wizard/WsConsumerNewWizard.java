@@ -239,7 +239,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
 
       m_stubGenerationOperation.validate();
       m_stubGenerationOperation.run(monitor, workingCopyManager);
-      TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.AbstractWebServiceClient).invalidate();
+      TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient)).invalidate();
 
       IFile stubJarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_buildJaxWsEntryCreateOperation.getBuildProperties(), m_wsdlFileName);
       IType portTypeInterfaceType = JaxWsSdkUtility.resolvePortTypeInterfaceType(m_portTypeQName, stubJarFile);

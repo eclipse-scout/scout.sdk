@@ -143,8 +143,8 @@ public class HandlerTablePage extends AbstractPage {
       // skip internal classes
       if (!Signature.getQualifier(handlerType.getFullyQualifiedName()).contains("internal")) {
         // skipt authentication handlers
-        if (!JaxWsSdkUtility.isJdtSubType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer.getFullyQualifiedName(), handlerType) &&
-            !JaxWsSdkUtility.isJdtSubType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider.getFullyQualifiedName(), handlerType)) {
+        if (!JaxWsSdkUtility.isJdtSubType(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer).getFullyQualifiedName(), handlerType) &&
+            !JaxWsSdkUtility.isJdtSubType(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider).getFullyQualifiedName(), handlerType)) {
           new HandlerNodePage(this, handlerType);
         }
       }
