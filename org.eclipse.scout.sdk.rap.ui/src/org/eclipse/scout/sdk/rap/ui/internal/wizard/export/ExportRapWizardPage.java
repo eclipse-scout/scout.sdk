@@ -8,6 +8,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.extensions.export.ServerExportEntryHandler;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.AbstractExportProductWizardPage;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -38,9 +39,11 @@ public class ExportRapWizardPage extends AbstractExportProductWizardPage {
   @Override
   protected void validatePage(MultiStatus multiStatus) {
     super.validatePage(multiStatus);
-    ExportServerWizardPage server = (ExportServerWizardPage) getWizard().getPage(ExportServerWizardPage.class.getName());
-    if (server != null && CompareUtility.equals(server.getWarName(), getWarName())) {
-      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WarFileNameUsed")));
+    if (getWizard().getExportWizardPage().isNodesSelected(ServerExportEntryHandler.ID)) {
+      ExportServerWizardPage server = (ExportServerWizardPage) getWizard().getPage(ExportServerWizardPage.class.getName());
+      if (server != null && CompareUtility.equals(server.getWarName(), getWarName())) {
+        multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WarFileNameUsed")));
+      }
     }
   }
 }

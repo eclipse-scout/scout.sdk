@@ -32,11 +32,7 @@ public class ExportServerWizardPage extends AbstractExportProductWizardPage {
   @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
-    String lastVal = getDialogSettings().get(SETTINGS_WAR_FILE_NAME);
-    if (StringUtility.hasText(lastVal)) {
-      m_warFileName.setText(lastVal);
-    }
-    else {
+    if (!StringUtility.hasText(m_warFileName.getModifiableText())) {
       String warName = findServerWarName();
       if (warName == null) {
         warName = getWizard().getProjectAlias();

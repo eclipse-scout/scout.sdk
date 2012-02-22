@@ -77,9 +77,7 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
     if (defaultSelection == null) {
       ITreeNode[] productNodes = TreeUtility.findNodes(productTreeRoot, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
       if (productNodes.length == 1) {
-        IFile pf = (IFile) productNodes[0].getData();
-        setProductFileInternal(pf);
-        m_productField.setProductFile(pf);
+        defaultSelection = (IFile) productNodes[0].getData();
       }
       else if (productNodes.length == 0) {
         m_productStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WarExportNoServerFound",
@@ -87,11 +85,8 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
             DeployableProductFileNodeFilter.BUNDLE_ID_HTTP_REGISTRY));
       }
     }
-    else {
-      m_productField.setProductFile(defaultSelection);
-      setProductFileInternal(defaultSelection);
-      pingStateChanging();
-    }
+    m_productField.setProductFile(defaultSelection);
+    setProductFileInternal(defaultSelection);
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -137,7 +132,7 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
   }
 
   protected IStatus getStatusWarName() {
-    if (getWarName() == null) {
+    if (!StringUtility.hasText(m_warFileName.getModifiableText())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoWARFileSpecified"));
     }
     return Status.OK_STATUS;

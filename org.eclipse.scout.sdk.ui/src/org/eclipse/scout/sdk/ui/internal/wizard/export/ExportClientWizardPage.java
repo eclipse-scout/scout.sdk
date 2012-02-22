@@ -61,28 +61,21 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    IFile lastSelection = getProductFileSetting();
-    if (lastSelection == null) {
+    IFile defaultSelection = getProductFileSetting();
+    if (defaultSelection == null) {
       ITreeNode[] clientProductNodes = TreeUtility.findNodes(clientProductTreeRoot, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
       if (clientProductNodes.length == 1) {
-        IFile pf = (IFile) clientProductNodes[0].getData();
-        m_clientProductField.setProductFile(pf);
-        setClientProductFileInternal(pf);
+        defaultSelection = (IFile) clientProductNodes[0].getData();
       }
       else if (clientProductNodes.length == 0) {
         m_clientProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientToAddAvail"));
       }
       else {
-        IFile pf = getDefaultSelectionProductFile(clientProductNodes);
-        m_clientProductField.setProductFile(pf);
-        setClientProductFileInternal(pf);
+        defaultSelection = getDefaultSelectionProductFile(clientProductNodes);
       }
     }
-    else {
-      m_clientProductField.setProductFile(lastSelection);
-      setClientProductFileInternal(lastSelection);
-      pingStateChanging();
-    }
+    m_clientProductField.setProductFile(defaultSelection);
+    setClientProductFileInternal(defaultSelection);
 
     m_resourceFolderField = new ResourceServletFolderSelectionField(parent, getScoutProject());
     m_resourceFolderField.setLabelText(Texts.get("ClientDownloadLocation"));
@@ -93,23 +86,18 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    IFolder lastFolder = getResourceFolderSetting();
-    if (lastFolder == null) {
+    IFolder defaultFolder = getResourceFolderSetting();
+    if (defaultFolder == null) {
       ITreeNode[] folderNodes = TreeUtility.findNodes(m_resourceFolderField.getRootNode(), NodeFilters.getByType(ResourceServletFolderTree.NODE_TYPE_FOLDER));
       if (folderNodes.length == 1) {
-        IFolder folder = (IFolder) folderNodes[0].getData();
-        setClientExportFolderInternal(folder);
-        m_resourceFolderField.setFolder(folder);
+        defaultFolder = (IFolder) folderNodes[0].getData();
       }
       else if (folderNodes.length == 0) {
         m_clientExportFolderStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoResourceServletFound"));
       }
     }
-    else {
-      m_resourceFolderField.setFolder(lastFolder);
-      setClientExportFolderInternal(lastFolder);
-      pingStateChanging();
-    }
+    m_resourceFolderField.setFolder(defaultFolder);
+    setClientExportFolderInternal(defaultFolder);
 
     parent.setLayout(new GridLayout(1, true));
     m_clientProductField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));

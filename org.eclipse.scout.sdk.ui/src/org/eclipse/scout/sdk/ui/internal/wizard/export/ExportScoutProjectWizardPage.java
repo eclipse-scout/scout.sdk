@@ -148,6 +148,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
       }
     });
     m_exportAsEarButton.setSelection(getDialogSettings().getBoolean(SETTINGS_EXPORT_EAR));
+    setExportEarInternal(m_exportAsEarButton.getSelection());
 
     m_earFileName = getFieldToolkit().createStyledTextField(group, Texts.get("EarFileName"));
     m_earFileName.setReadOnlySuffix(".ear");
@@ -224,7 +225,11 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
 
   private void setTargetDirectoryInternal(File f) {
     setProperty(PROP_TARGET_DIR, f);
-    getDialogSettings().put(SETTINGS_TARGET_DIR, f.getAbsolutePath());
+    String path = null;
+    if (f != null) {
+      path = f.getAbsolutePath();
+    }
+    getDialogSettings().put(SETTINGS_TARGET_DIR, path);
   }
 
   public boolean isExportEar() {
@@ -280,7 +285,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
 
   protected IStatus getStatusEarFileName() {
     if (isExportEar()) {
-      if (!StringUtility.hasText(getEarName())) {
+      if (!StringUtility.hasText(m_earFileName.getModifiableText())) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("SelectEarFileName"));
       }
     }
