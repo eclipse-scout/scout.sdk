@@ -36,19 +36,20 @@
       </part>
    </extension>
    <extension
-       point="org.eclipse.scout.sdk.ui.contextMenu">
-    <contextMenu
-          class="org.eclipse.scout.sdk.rap.ui.internal.action.ExportRapWarAction">
-    </contextMenu>
- </extension>
-   <extension
-         point="org.eclipse.scout.sdk.ui.earEntry">
+         point="org.eclipse.scout.sdk.ui.exportScoutProjectEntry">
       <entry
-            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.ear.RapEarEntryHandler"
+            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.export.RapExportEntryHandler"
             icon="resources/icons/uiBundle.png"
             id="ui.rap"
             name="RAP Web Application"
             order="300">
       </entry>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.technology">
+      <handler
+            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.SvgUiRapTechnologyHandler"
+            technology="scout.technology.svg">
+      </handler>
    </extension>
 </plugin>
