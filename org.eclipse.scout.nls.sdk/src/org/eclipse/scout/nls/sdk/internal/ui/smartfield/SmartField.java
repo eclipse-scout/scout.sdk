@@ -94,7 +94,7 @@ public class SmartField extends Composite {
         }
       }
     });
-    m_smartButton = new Button(parent, SWT.PUSH);
+    m_smartButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_smartButton.setImage(m_smartImage);
     m_smartButton.addSelectionListener(new SelectionAdapter() {
       @Override

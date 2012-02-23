@@ -91,7 +91,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
     m_wsdlFolderField.getTextComponent().setBackground(JaxWsSdkUtility.getColorLightGray());
     m_wsdlFolderField.setEditable(false);
 
-    m_browseButton = new Button(parent, SWT.PUSH);
+    m_browseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_browseButton.setText(Texts.get("Browse"));
     m_browseButton.addSelectionListener(new SelectionAdapter() {
 

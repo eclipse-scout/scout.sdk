@@ -172,7 +172,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_browseButton = new Button(m_fileSystemContainer, SWT.PUSH);
+    m_browseButton = new Button(m_fileSystemContainer, SWT.PUSH | SWT.FLAT);
     m_browseButton.setText(Texts.get("Browse"));
     m_browseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -264,7 +264,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       m_wsdlFolderField.getTextComponent().setBackground(JaxWsSdkUtility.getColorLightGray());
       m_wsdlFolderField.setEditable(false);
 
-      m_wsdlFolderBrowseButton = new Button(parent, SWT.PUSH);
+      m_wsdlFolderBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
       m_wsdlFolderBrowseButton.setText(Texts.get("Browse"));
       m_wsdlFolderBrowseButton.addSelectionListener(new SelectionAdapter() {
 

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -83,7 +83,7 @@ public class PackagePresenter extends AbstractPropertyPresenter<String> {
       }
     });
 
-    m_button = new Button(composite, SWT.PUSH);
+    m_button = new Button(composite, SWT.PUSH | SWT.FLAT);
     m_button.setText(Texts.get("Browse") + "...");
     m_button.addSelectionListener(new SelectionAdapter() {
 

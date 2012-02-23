@@ -66,7 +66,7 @@ public class ProductSelectionField extends TextField {
 
     Label label = getLabelComponent();
     StyledText text = getTextComponent();
-    m_popupButton = new Button(parent, SWT.PUSH);
+    m_popupButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_popupButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDropdown));
     m_popupButton.addSelectionListener(new SelectionAdapter() {
       @Override

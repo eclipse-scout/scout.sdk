@@ -66,7 +66,7 @@ public class FileChooserField extends Composite {
         }
       }
     });
-    m_button = new Button(parent, SWT.PUSH);
+    m_button = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_button.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

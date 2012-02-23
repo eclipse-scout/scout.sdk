@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -102,7 +102,7 @@ public class TypeBrowseDialog extends TitleAreaDialog {
     m_tooltipType = new JavadocTooltip(m_typeField.getTextComponent());
     updateJavaDoc(m_tooltipType, getType());
 
-    m_typeBrowseButton = new Button(composite, SWT.PUSH);
+    m_typeBrowseButton = new Button(composite, SWT.PUSH | SWT.FLAT);
     m_typeBrowseButton.setText(Texts.get("Browse"));
     m_typeBrowseButton.addSelectionListener(new SelectionAdapter() {
 

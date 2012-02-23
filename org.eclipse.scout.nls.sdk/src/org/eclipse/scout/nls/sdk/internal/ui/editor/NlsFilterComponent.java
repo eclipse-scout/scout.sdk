@@ -48,7 +48,7 @@ public class NlsFilterComponent extends Composite {
     super(parent, SWT.DOUBLE_BUFFERED);
     m_filterFields = new HashMap<Language, Text>();
     setBackground(parent.getBackground());
-    m_resetButton = new Button(this, SWT.PUSH);
+    m_resetButton = new Button(this, SWT.PUSH | SWT.FLAT);
     m_resetButton.setText("Reset");
     m_resetButton.addSelectionListener(new SelectionAdapter() {
       @Override

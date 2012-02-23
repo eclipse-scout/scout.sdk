@@ -135,7 +135,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_packageBrowseButton = new Button(parent, SWT.PUSH);
+    m_packageBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_packageBrowseButton.setText(Texts.get("Browse"));
     m_packageBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -177,7 +177,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_tooltipAuthenticationFactory = new JavadocTooltip(m_authenticationHandlerField.getTextComponent());
 
-    m_authenticationFactoryBrowseButton = new Button(m_containerAnnotation, SWT.PUSH);
+    m_authenticationFactoryBrowseButton = new Button(m_containerAnnotation, SWT.PUSH | SWT.FLAT);
     m_authenticationFactoryBrowseButton.setText(Texts.get("Browse"));
     m_authenticationFactoryBrowseButton.addSelectionListener(new SelectionAdapter() {
 

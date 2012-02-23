@@ -122,7 +122,7 @@ public class FilteredTable extends Composite {
         }
       }
     });
-    m_clearFilter = new Button(filterComposite, SWT.PUSH | SWT.NO_FOCUS);
+    m_clearFilter = new Button(filterComposite, SWT.PUSH | SWT.NO_FOCUS | SWT.FLAT);
     m_clearFilter.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDelete));
     m_clearFilter.setEnabled(false);
     m_clearFilter.addSelectionListener(new SelectionAdapter() {

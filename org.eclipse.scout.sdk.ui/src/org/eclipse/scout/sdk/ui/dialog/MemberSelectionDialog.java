@@ -135,7 +135,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
 
   protected Control createButtons(Composite parent) {
     Composite buttonArea = new Composite(parent, SWT.NONE);
-    Button selectAll = new Button(buttonArea, SWT.PUSH);
+    Button selectAll = new Button(buttonArea, SWT.PUSH | SWT.FLAT);
     selectAll.setText("select All");
     selectAll.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -143,7 +143,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
         setSelectedMembers(getMembers());
       }
     });
-    Button deselectAll = new Button(buttonArea, SWT.PUSH);
+    Button deselectAll = new Button(buttonArea, SWT.PUSH | SWT.FLAT);
     deselectAll.setText("deselect All");
     deselectAll.addSelectionListener(new SelectionAdapter() {
       @Override

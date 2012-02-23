@@ -86,7 +86,7 @@ public class ErrorDialog extends Dialog {
     stackTraceText.setText(m_stackTrace);
     stackTraceText.setBackground(content.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-    Button button = new Button(container, SWT.PUSH);
+    Button button = new Button(container, SWT.PUSH | SWT.FLAT);
     button.setText("OK");
     button.addSelectionListener(new CloseSelectionListener());
     getShell().setDefaultButton(button);

@@ -60,7 +60,7 @@ public class ColumnViewerFilter extends Composite {
   public ColumnViewerFilter(Composite parent) {
     super(parent, SWT.DOUBLE_BUFFERED);
     setBackground(parent.getBackground());
-    m_resetButton = new Button(this, SWT.PUSH);
+    m_resetButton = new Button(this, SWT.PUSH | SWT.FLAT);
     m_resetButton.setText("Reset");
     m_resetButton.addSelectionListener(new SelectionAdapter() {
       @Override

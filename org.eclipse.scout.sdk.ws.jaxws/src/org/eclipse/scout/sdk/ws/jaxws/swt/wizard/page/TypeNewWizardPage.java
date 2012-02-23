@@ -116,7 +116,7 @@ public class TypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_packageField.setEnabled(isAllowModifyPackage());
     m_packageField.setText(StringUtility.nvl(getRecommendedPackageFragment(), ""));
 
-    m_packageBrowseButton = new Button(parent, SWT.PUSH);
+    m_packageBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_packageBrowseButton.setText(Texts.get("Browse"));
     m_packageBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -139,7 +139,7 @@ public class TypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_tooltipInterfaceType = new JavadocTooltip(m_interfaceTypeField.getTextComponent());
     updateJavaDoc(m_tooltipInterfaceType, getInterfaceType());
 
-    m_interfaceTypeBrowseButton = new Button(parent, SWT.PUSH);
+    m_interfaceTypeBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_interfaceTypeBrowseButton.setText(Texts.get("Browse"));
     m_interfaceTypeBrowseButton.setEnabled(isAllowModifyInterfaceType());
     m_interfaceTypeBrowseButton.addSelectionListener(new SelectionAdapter() {
@@ -175,7 +175,7 @@ public class TypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_tooltipSuperType = new JavadocTooltip(m_superTypeField.getTextComponent());
     updateJavaDoc(m_tooltipSuperType, getSuperType());
 
-    m_superTypeBrowseButton = new Button(parent, SWT.PUSH);
+    m_superTypeBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_superTypeBrowseButton.setText(Texts.get("Browse"));
     m_superTypeBrowseButton.setEnabled(isAllowModifySuperType());
     m_superTypeBrowseButton.addSelectionListener(new SelectionAdapter() {

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -37,7 +37,7 @@ public class TextButtonField extends Composite {
     m_label = new Label(parent, SWT.INHERIT_DEFAULT | SWT.RIGHT);
     m_text = new Text(parent, SWT.INHERIT_DEFAULT | SWT.BORDER);
 
-    m_smartButton = new Button(parent, SWT.PUSH);
+    m_smartButton = new Button(parent, SWT.PUSH | SWT.FLAT);
 
     parent.setTabList(new Control[]{m_text, m_smartButton});
 

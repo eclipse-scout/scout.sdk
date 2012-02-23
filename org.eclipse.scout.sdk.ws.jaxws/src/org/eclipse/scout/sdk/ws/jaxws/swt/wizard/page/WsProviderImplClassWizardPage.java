@@ -141,7 +141,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_packageBrowseButton = new Button(parent, SWT.PUSH);
+    m_packageBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_packageBrowseButton.setText(Texts.get("Browse"));
     m_packageBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -186,7 +186,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_tooltipSessionFactory = new JavadocTooltip(m_sessionFactoryField.getTextComponent());
 
-    m_sessionFactoryBrowseButton = new Button(m_containerAnnotation, SWT.PUSH);
+    m_sessionFactoryBrowseButton = new Button(m_containerAnnotation, SWT.PUSH | SWT.FLAT);
     m_sessionFactoryBrowseButton.setText(Texts.get("Browse"));
     m_sessionFactoryBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -228,7 +228,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_tooltipAuthenticationHandler = new JavadocTooltip(m_authenticationHandlerField.getTextComponent());
 
-    m_authenticationHandlerBrowseButton = new Button(m_containerAnnotation, SWT.PUSH);
+    m_authenticationHandlerBrowseButton = new Button(m_containerAnnotation, SWT.PUSH | SWT.FLAT);
     m_authenticationHandlerBrowseButton.setText(Texts.get("Browse"));
     m_authenticationHandlerBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -270,7 +270,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_tooltipCredentialValidationStrategy = new JavadocTooltip(m_credentialValidationStrategyField.getTextComponent());
 
-    m_credentialValidationStrategyButton = new Button(m_containerAnnotation, SWT.PUSH);
+    m_credentialValidationStrategyButton = new Button(m_containerAnnotation, SWT.PUSH | SWT.FLAT);
     m_credentialValidationStrategyButton.setText(Texts.get("Browse"));
     m_credentialValidationStrategyButton.addSelectionListener(new SelectionAdapter() {
 

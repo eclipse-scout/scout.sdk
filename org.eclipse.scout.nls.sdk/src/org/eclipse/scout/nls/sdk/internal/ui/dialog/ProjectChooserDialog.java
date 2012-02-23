@@ -107,7 +107,7 @@ public class ProjectChooserDialog extends TitleAreaDialog {
 
   private Control createControlArea(Composite parent) {
     Composite rootArea = new Composite(parent, SWT.NONE);
-    Button selectAll = new Button(rootArea, SWT.PUSH);
+    Button selectAll = new Button(rootArea, SWT.PUSH | SWT.FLAT);
     selectAll.setText("Select all");
     selectAll.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -119,7 +119,7 @@ public class ProjectChooserDialog extends TitleAreaDialog {
         revalidate();
       }
     });
-    Button deselectAll = new Button(rootArea, SWT.PUSH);
+    Button deselectAll = new Button(rootArea, SWT.PUSH | SWT.FLAT);
     deselectAll.setText("Deselect all");
     deselectAll.addSelectionListener(new SelectionAdapter() {
       @Override

@@ -49,7 +49,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
@@ -136,20 +135,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
    */
   protected void create(Composite parent, IFile productFile) {
     m_mainGroup = new Group(parent, SWT.SHADOW_ETCHED_OUT);
-    m_mainGroup.setText(productFile.getParent().getName());
-
-    Label l = getToolkit().createLabel(m_mainGroup, "");
-    switch (getBundle().getType()) {
-      case IScoutBundle.BUNDLE_SERVER:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherServer));
-        break;
-      case IScoutBundle.BUNDLE_UI_SWING:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwing));
-        break;
-      case IScoutBundle.BUNDLE_UI_SWT:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwt));
-        break;
-    }
+    m_mainGroup.setText(getBundle().getBundleName());
     m_productModel = null;
     try {
       m_productModel = new WorkspaceProductModel(getProductFile(), false);
@@ -170,11 +156,9 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     layout.verticalSpacing = 0;
     layout.horizontalSpacing = 0;
     m_mainGroup.setLayout(layout);
-    l.setLayoutData(new GridData(GridData.FILL_VERTICAL));
     linkPart.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     GridData actionPartData = new GridData(GridData.FILL_VERTICAL | GridData.FILL_HORIZONTAL);
     actionPartData.minimumWidth = actionPart.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
-//    actionPartData.minimumWidth = 50;
     actionPartData.horizontalAlignment = SWT.RIGHT;
     actionPart.setLayoutData(actionPartData);
   }

@@ -126,7 +126,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     m_tooltipSuperType = new JavadocTooltip(m_superTypeField.getTextComponent());
     updateJavaDoc(m_tooltipSuperType, getSuperType());
 
-    m_superTypeBrowseButton = new Button(parent, SWT.PUSH);
+    m_superTypeBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_superTypeBrowseButton.setText(Texts.get("Browse"));
     m_superTypeBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -163,7 +163,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_packageBrowseButton = new Button(parent, SWT.PUSH);
+    m_packageBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_packageBrowseButton.setText(Texts.get("Browse"));
     m_packageBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -201,7 +201,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     m_tooltipSessionFactory = new JavadocTooltip(m_sessionFactoryField.getTextComponent());
     updateJavaDoc(m_tooltipSessionFactory, getSessionFactoryType());
 
-    m_sessionFactoryBrowseButton = new Button(parent, SWT.PUSH);
+    m_sessionFactoryBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_sessionFactoryBrowseButton.setText(Texts.get("Browse"));
     m_sessionFactoryBrowseButton.addSelectionListener(new SelectionAdapter() {
 
