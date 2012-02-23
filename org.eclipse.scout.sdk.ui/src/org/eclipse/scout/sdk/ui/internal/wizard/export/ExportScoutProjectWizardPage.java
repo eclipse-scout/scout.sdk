@@ -183,11 +183,11 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
   public boolean isNodesSelected(String... entryIds) {
     ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByIdFilter(entryIds));
     for (ITreeNode n : nodes) {
-      if (!m_entryTree.isChecked(n)) {
-        return false;
+      if (m_entryTree.isChecked(n)) {
+        return true;
       }
     }
-    return true;
+    return false;
   }
 
   @Override

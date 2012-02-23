@@ -125,7 +125,7 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
   }
 
   protected IStatus getStatusProductField() {
-    if (getProductFile() == null) {
+    if (getProductFile() == null || !getProductFile().exists()) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoProductFileSpecified"));
     }
     return m_productStatus;

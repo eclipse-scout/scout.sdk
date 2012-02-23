@@ -129,7 +129,7 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusClientProductField() {
     if (m_clientProductStatus.isOK()) {
-      if (getClientProductFile() == null) {
+      if (getClientProductFile() == null || !getClientProductFile().exists()) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientProductFileSpecified"));
       }
     }
@@ -138,7 +138,7 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusClientExportFolder() {
     if (m_clientExportFolderStatus.isOK()) {
-      if (getClientExportFolder() == null) {
+      if (getClientExportFolder() == null || !getClientExportFolder().exists()) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientExportLocationSpecified"));
       }
     }
