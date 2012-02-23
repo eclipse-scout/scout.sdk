@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
  */
 public class StaticContentProvider extends ContentProposalProvider {
 
-  private final Object[] m_elements;
+  private Object[] m_elements;
   private final ILabelProvider m_labelProvider;
 
   public StaticContentProvider(Object[] elements, ILabelProvider labelProvider) {
@@ -66,6 +66,10 @@ public class StaticContentProvider extends ContentProposalProvider {
       searchRangeLabelProvider.endRecordMatchRegions();
     }
     return props.toArray(new Object[props.size()]);
+  }
+
+  public void setElements(Object[] elements) {
+    m_elements = elements;
   }
 
   public Object[] getElements() {

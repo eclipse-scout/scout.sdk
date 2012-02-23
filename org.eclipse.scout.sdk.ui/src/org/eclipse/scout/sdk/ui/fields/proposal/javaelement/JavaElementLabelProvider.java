@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal.javaelement;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
@@ -23,7 +23,7 @@ import org.eclipse.swt.graphics.Image;
  * @author aho
  * @since 3.8.0 09.02.2012
  */
-public class JavaElementLabelProvider extends SelectionStateLabelProvider {
+public class JavaElementLabelProvider extends SearchRangeStyledLabelProvider {
 
   @Override
   public String getText(Object element) {

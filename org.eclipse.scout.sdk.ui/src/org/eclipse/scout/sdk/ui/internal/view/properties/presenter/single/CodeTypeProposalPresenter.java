@@ -10,17 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
@@ -68,50 +65,30 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
    * @author aho
    * @since 3.8.0 15.02.2012
    */
-  private class P_ContentProvider extends ContentProposalProvider {
-
-    private IType[] m_proposals;
-    private final ILabelProvider m_labelProvider;
+  private class P_ContentProvider extends StaticContentProvider {
 
     private P_ContentProvider(ILabelProvider labelProvider) {
-      m_labelProvider = labelProvider;
-
+      super(null, labelProvider);
     }
 
     @Override
     public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
       ensureCache();
-      if (searchPattern == null) {
-        searchPattern = "*";
-      }
-      else {
-        searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
-      }
-
-      char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
-      ArrayList<Object> collector = new ArrayList<Object>();
-      for (Object proposal : m_proposals) {
-        if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
-          collector.add(proposal);
-        }
-      }
-      return collector.toArray(new Object[collector.size()]);
+      return super.getProposals(searchPattern, monitor);
     }
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      if (m_proposals != null) {
-        m_proposals = null;
-      }
+      setElements(null);
     }
 
     private void ensureCache() {
-      if (m_proposals == null) {
+      if (getElements() == null) {
         if (getMethod() != null) {
-          m_proposals = TypeUtility.getPrimaryTypeHierarchy(iCodeType).getAllSubtypes(iCodeType, TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator());
+          setElements(TypeUtility.getPrimaryTypeHierarchy(iCodeType).getAllSubtypes(iCodeType, TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator()));
         }
         else {
-          m_proposals = new IType[0];
+          setElements(new IType[0]);
         }
       }
     }
