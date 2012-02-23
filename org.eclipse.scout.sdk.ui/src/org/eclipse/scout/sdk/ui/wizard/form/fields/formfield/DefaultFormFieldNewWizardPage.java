@@ -25,15 +25,10 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.DefaultFormFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -58,13 +53,13 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   final IType abstractFormField = TypeUtility.getType(RuntimeClasses.AbstractFormField);
   final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
-  private ITypeProposal m_superType;
-  private SignatureProposal m_genericSignature;
+  private IType m_superType;
+  private String m_genericSignature;
   private SiblingProposal m_sibling;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private ProposalTextField m_genericTypeField;
@@ -77,7 +72,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public DefaultFormFieldNewWizardPage(IType declaringType) {
     super(Texts.get("NewDefaultField"));
     m_declaringType = declaringType;
-    m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractFormField)[0];
+    m_superType = abstractFormField;
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -93,14 +88,11 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -121,20 +113,17 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(RuntimeClasses.AbstractFormField));
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(
-         ScoutTypeUtility.getAbstractTypesOnClasspath(iFormField, m_declaringType.getJavaProject()));
-
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(abstractFormField),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(iFormField, m_declaringType.getJavaProject(), abstractFormField));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          m_superType = (ITypeProposal) event.proposal;
+          m_superType = (IType) event.proposal;
 
-          if (getSuperType() != null && TypeUtility.isGenericType(getSuperType().getType())) {
+          if (getSuperType() != null && TypeUtility.isGenericType(getSuperType())) {
             m_genericTypeField.setEnabled(true);
           }
         }
@@ -144,13 +133,13 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, ScoutTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType), SignatureProposalProvider.DEFAULT_MOST_USED);
     m_genericTypeField.acceptProposal(getGenericSignature());
-    m_genericTypeField.setEnabled(getSuperType() != null && TypeUtility.isGenericType(getSuperType().getType()));
+    m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_genericSignature = (SignatureProposal) event.proposal;
+        m_genericSignature = (String) event.proposal;
         pingStateChanging();
       }
     });
@@ -181,16 +170,16 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setFormatSource(true);
     // write back members
     if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName().getNlsEntry());
+      operation.setNlsEntry(getNlsName());
     }
     operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(getSuperType().getType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature().getSignature()) + ">", true);
+        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
       }
       else {
-        sig = Signature.createTypeSignature(getSuperType().getType().getFullyQualifiedName(), true);
+        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true);
       }
       operation.setSuperTypeSignature(sig);
     }
@@ -199,7 +188,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
     operation.run(monitor, workingCopyManager);
     m_createdField = operation.getCreatedField();
@@ -245,7 +234,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusGenericType() throws JavaModelException {
-    if (getSuperType() != null && TypeUtility.isGenericType(getSuperType().getType())) {
+    if (getSuperType() != null && TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
       }
@@ -260,11 +249,11 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_createdField;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -294,11 +283,11 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;
@@ -311,7 +300,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public void setGenericSignature(SignatureProposal genericSignature) {
+  public void setGenericSignature(String genericSignature) {
     try {
       setStateChanging(true);
       m_genericSignature = genericSignature;
@@ -324,7 +313,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public SignatureProposal getGenericSignature() {
+  public String getGenericSignature() {
     return m_genericSignature;
   }
 

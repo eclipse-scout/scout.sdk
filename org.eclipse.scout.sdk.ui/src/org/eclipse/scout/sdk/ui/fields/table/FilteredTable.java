@@ -14,12 +14,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 
-import org.eclipse.jdt.core.compiler.CharOperation;
+import org.eclipse.jdt.core.search.SearchPattern;
+import org.eclipse.jdt.ui.JavaElementLabels;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.StyledString;
+import org.eclipse.jface.viewers.StyledString.Styler;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.scout.commons.StringUtility;
@@ -31,6 +39,10 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.TextStyle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -65,28 +77,7 @@ public class FilteredTable extends Composite {
     Control filterControl = createFilterControl(parent);
     m_table = new AutoResizeColumnTable(parent, m_style);
 
-    m_tableViewer = new TableViewer(m_table) {
-
-      @Override
-      protected Object[] getSortedChildren(Object parentNode) {
-        // ensure no separator at beginning/end or siblings
-        ArrayList<Object> cleanedElements = new ArrayList<Object>(Arrays.asList(super.getSortedChildren(parentNode)));
-        boolean removeNextSeperator = true;
-        for (Iterator<Object> it = cleanedElements.iterator(); it.hasNext();) {
-          Object cur = it.next();
-          if (cur instanceof ISeparator) {
-            if (removeNextSeperator || !it.hasNext()) {
-              it.remove();
-            }
-            removeNextSeperator = true;
-          }
-          else {
-            removeNextSeperator = false;
-          }
-        }
-        return cleanedElements.toArray(new Object[cleanedElements.size()]);
-      }
-    };
+    m_tableViewer = new P_TableViewer(m_table);
     m_tableViewer.setFilters(new ViewerFilter[]{m_tableFilter});
     m_tableViewer.setSorter(new P_TableSorter());
     // layout
@@ -189,29 +180,123 @@ public class FilteredTable extends Composite {
   }
 
   private class P_TableFilter extends ViewerFilter {
-    private String m_filterString = "*";
+    private static final char END_SYMBOL = '<';
+    private static final char ANY_STRING = '*';
+    private static final char BLANK = ' ';
+    private static final String DATA_FILTER_RESULT_PREFIX = "filterResult";
+    private int m_matchKind;
+    private String m_pattern;
+
+    private P_TableFilter() {
+      setFilterText("*");
+    }
 
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
-      TableViewer tableViewer = (TableViewer) viewer;
       if (element instanceof ISeparator) {
         return true;
       }
-      ITableLabelProvider labelProvider = (ITableLabelProvider) tableViewer.getLabelProvider();
-      String columnText = labelProvider.getColumnText(element, 0);
-      return (!StringUtility.isNullOrEmpty(columnText)) && CharOperation.match(m_filterString.toCharArray(), columnText.toCharArray(), false);
+      String text = ((P_StyledLabelProvider) getViewer().getLabelProvider()).getText(element, 0);
+      String filterText = text;
+      if (!StringUtility.isNullOrEmpty(filterText)) {
+        int index = text.indexOf(JavaElementLabels.CONCAT_STRING);
+        if (index > -1) {
+          filterText = filterText.substring(0, index);
+        }
+      }
+      int[] matchingRegions = SearchPattern.getMatchingRegions(m_pattern, filterText, m_matchKind);
+      viewer.setData(DATA_FILTER_RESULT_PREFIX + Integer.toString(element.hashCode()), new P_FilterResult(m_pattern, text, matchingRegions));
+      return matchingRegions != null;
     }
 
     public void setFilterText(String filterText) {
-      if (filterText == null) {
-        filterText = "";
+      if (StringUtility.isNullOrEmpty(filterText)) {
+        filterText = "*";
       }
-      filterText.replaceAll("^\\**", "*");
-      filterText.replaceAll("\\**$", "*");
-      m_filterString = "*" + filterText.toLowerCase() + "*";
+      initializePatternAndMatchKind(filterText);
+
+    }
+
+    private void initializePatternAndMatchKind(String pattern) {
+      int length = pattern.length();
+      if (length == 0) {
+        m_matchKind = SearchPattern.R_EXACT_MATCH;
+        m_pattern = pattern;
+        return;
+      }
+      char last = pattern.charAt(length - 1);
+
+      if (pattern.indexOf('*') != -1 || pattern.indexOf('?') != -1) {
+        m_matchKind = SearchPattern.R_PATTERN_MATCH;
+        switch (last) {
+          case END_SYMBOL:
+          case BLANK:
+            m_pattern = pattern.substring(0, length - 1);
+            break;
+          case ANY_STRING:
+            m_pattern = pattern;
+            break;
+          default:
+            m_pattern = pattern + ANY_STRING;
+        }
+        return;
+      }
+
+      if (last == END_SYMBOL || last == BLANK) {
+        m_pattern = pattern.substring(0, length - 1);
+        if (SearchPattern.validateMatchRule(m_pattern, SearchPattern.R_CAMELCASE_SAME_PART_COUNT_MATCH) == SearchPattern.R_CAMELCASE_SAME_PART_COUNT_MATCH) {
+          m_matchKind = SearchPattern.R_CAMELCASE_SAME_PART_COUNT_MATCH;
+        }
+        else {
+          m_matchKind = SearchPattern.R_EXACT_MATCH;
+        }
+        return;
+      }
+
+      if (SearchPattern.validateMatchRule(pattern, SearchPattern.R_CAMELCASE_MATCH) == SearchPattern.R_CAMELCASE_MATCH) {
+        m_matchKind = SearchPattern.R_CAMELCASE_MATCH;
+        m_pattern = pattern;
+        return;
+      }
+
+      m_matchKind = SearchPattern.R_PREFIX_MATCH;
+      m_pattern = pattern;
+    }
+
+    private String getUniqueKey(Object element) {
+      return Integer.toHexString(element.hashCode());
+    }
+
+    public P_FilterResult getFilterResult(Viewer viewer, Object element) {
+      String key = DATA_FILTER_RESULT_PREFIX + Integer.toString(element.hashCode());
+      return (P_FilterResult) viewer.getData(key);
     }
 
   } // end class P_TableFilter
+
+  private class P_FilterResult {
+    private final String m_text;
+    private final int[] m_matchingRegions;
+    private final String m_pattern;
+
+    private P_FilterResult(String pattern, String text, int[] matchingRegions) {
+      m_pattern = pattern;
+      m_text = text;
+      m_matchingRegions = matchingRegions;
+    }
+
+    public String getPattern() {
+      return m_pattern;
+    }
+
+    public String getText() {
+      return m_text;
+    }
+
+    public int[] getMatchingRegions() {
+      return m_matchingRegions;
+    }
+  }
 
   /**
    * <h3>{@link P_TableSorter}</h3> ...
@@ -222,6 +307,12 @@ public class FilteredTable extends Composite {
    */
   private class P_TableSorter extends ViewerSorter {
     @Override
+    public void sort(Viewer viewer, Object[] elements) {
+      super.sort(viewer, elements);
+
+    }
+
+    @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
       IBaseLabelProvider provider = getViewer().getLabelProvider();
       if (provider instanceof ITableLabelProvider) {
@@ -231,5 +322,141 @@ public class FilteredTable extends Composite {
       return -1;
     }
   }
+
+  /**
+   * <h3>{@link P_TableViewer}</h3> ...
+   * 
+   * @author aho
+   * @since 3.8.0 17.02.2012
+   */
+  private class P_TableViewer extends TableViewer {
+    /**
+     * @param table
+     */
+    public P_TableViewer(Table table) {
+      super(table);
+    }
+
+    @Override
+    public void setLabelProvider(IBaseLabelProvider labelProvider) {
+      if (labelProvider instanceof ITableLabelProvider || labelProvider instanceof ILabelProvider) {
+        super.setLabelProvider(new P_StyledLabelProvider(labelProvider));
+      }
+      else {
+        throw new IllegalArgumentException("only allows ITableLabelProvider and ILabelProvider subtypes.");
+      }
+    }
+
+    @Override
+    protected Object[] getSortedChildren(Object parentNode) {
+      // ensure no separator at beginning/end or siblings
+      ArrayList<Object> cleanedElements = new ArrayList<Object>(Arrays.asList(super.getSortedChildren(parentNode)));
+      boolean removeNextSeperator = true;
+      for (Iterator<Object> it = cleanedElements.iterator(); it.hasNext();) {
+        Object cur = it.next();
+        if (cur instanceof ISeparator) {
+          if (removeNextSeperator || !it.hasNext()) {
+            it.remove();
+          }
+          removeNextSeperator = true;
+        }
+        else {
+          removeNextSeperator = false;
+        }
+      }
+      return cleanedElements.toArray(new Object[cleanedElements.size()]);
+    }
+  } // end class P_TableViewer
+
+  private class P_StyledLabelProvider extends StyledCellLabelProvider {
+    private final IBaseLabelProvider m_wrappedLabelProvider;
+    private Font m_boldFont;
+    private Styler m_boldStyler;
+
+    private P_StyledLabelProvider(IBaseLabelProvider labelProvider) {
+      m_wrappedLabelProvider = labelProvider;
+    }
+
+    @Override
+    public boolean isLabelProperty(Object element, String property) {
+      return m_wrappedLabelProvider.isLabelProperty(element, property);
+    }
+
+    @Override
+    public void initialize(ColumnViewer viewer, ViewerColumn column) {
+      super.initialize(viewer, column);
+      Font defaultFont = viewer.getControl().getFont();
+      FontData[] defaultFontData = defaultFont.getFontData();
+      FontData[] boldFontData = new FontData[defaultFontData.length];
+      for (int i = 0; i < defaultFontData.length; i++) {
+        boldFontData[i] = new FontData(defaultFontData[i].getName(), defaultFontData[i].getHeight(), defaultFontData[i].getStyle() | SWT.BOLD);
+      }
+      m_boldFont = new Font(viewer.getControl().getDisplay(), boldFontData);
+      m_boldStyler = new Styler() {
+        @Override
+        public void applyStyles(TextStyle textStyle) {
+          textStyle.font = m_boldFont;
+        }
+      };
+    }
+
+    @Override
+    public void dispose() {
+      super.dispose();
+      m_wrappedLabelProvider.dispose();
+      m_boldFont.dispose();
+      m_boldFont = null;
+    }
+
+    @Override
+    public void update(ViewerCell cell) {
+      Object element = cell.getElement();
+      StyledString text = new StyledString(getText(element, cell.getColumnIndex()));
+      if (cell.getColumnIndex() == 0) {
+        P_FilterResult filterResult = m_tableFilter.getFilterResult(getViewer(), element);
+        if (filterResult != null && !"*".equals(filterResult.getPattern())) {
+          int[] matchingRegions = filterResult.getMatchingRegions();
+          if (matchingRegions != null && matchingRegions.length > 0) {
+
+            for (int i = 0; i < matchingRegions.length - 1; i += 2) {
+              text.setStyle(matchingRegions[i], matchingRegions[i + 1], m_boldStyler);
+            }
+          }
+          // package information
+          if (!StringUtility.isNullOrEmpty(filterResult.getText())) {
+            int index = filterResult.getText().indexOf(JavaElementLabels.CONCAT_STRING);
+            if (index > 0) {
+              text.setStyle(index, text.length() - index, StyledString.QUALIFIER_STYLER);
+            }
+          }
+        }
+      }
+      cell.setText(text.getString());
+      cell.setStyleRanges(text.getStyleRanges());
+      cell.setImage(getImage(element, cell.getColumnIndex()));
+      super.update(cell);
+    }
+
+    private String getText(Object element, int columnIndex) {
+      if (m_wrappedLabelProvider instanceof ITableLabelProvider) {
+        return ((ITableLabelProvider) m_wrappedLabelProvider).getColumnText(element, columnIndex);
+      }
+      else if (m_wrappedLabelProvider instanceof ILabelProvider) {
+        return ((ILabelProvider) m_wrappedLabelProvider).getText(element);
+      }
+      return null;
+    }
+
+    private Image getImage(Object element, int columnIndex) {
+      if (m_wrappedLabelProvider instanceof ITableLabelProvider) {
+        return ((ITableLabelProvider) m_wrappedLabelProvider).getColumnImage(element, columnIndex);
+      }
+      else if (m_wrappedLabelProvider instanceof ILabelProvider) {
+        return ((ILabelProvider) m_wrappedLabelProvider).getImage(element);
+      }
+      return null;
+    }
+
+  } // end class P_StyledLabelProvider
 
 }

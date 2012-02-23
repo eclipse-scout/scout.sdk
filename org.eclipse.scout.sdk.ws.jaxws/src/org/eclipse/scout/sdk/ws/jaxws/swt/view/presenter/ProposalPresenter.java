@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -14,57 +14,72 @@ import java.util.Arrays;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class ProposalPresenter<T extends IContentProposalEx> extends AbstractPropertyPresenter<T> {
+public class ProposalPresenter<T extends SimpleProposal> extends AbstractPropertyPresenter<T> {
 
   protected ProposalTextField m_proposalField;
-  protected IContentProposalEx[] m_proposals;
+  protected SimpleProposal[] m_proposals;
 
   private IProposalAdapterListener m_proposalListener;
 
-  public ProposalPresenter(Composite parent, FormToolkit toolkit) {
+  public ProposalPresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit, true);
   }
 
-  public ProposalPresenter(Composite parent, FormToolkit toolkit, boolean initialize) {
+  public ProposalPresenter(Composite parent, PropertyViewFormToolkit toolkit, boolean initialize) {
     super(parent, toolkit, initialize);
-  }
-
-  public void setProposals(IContentProposalEx[] proposals) {
-    setStateChanging(true);
-    m_proposals = proposals;
-    if (isControlCreated()) {
-      try {
-        DefaultProposalProvider provider = new DefaultProposalProvider();
-        provider.setShortList(m_proposals);
-        m_proposalField.setContentProposalProvider(provider);
-      }
-      finally {
-        setStateChanging(false);
-      }
-      if (!isStateChanging()) {
-        setInput(getValue());
-      }
-    }
   }
 
   @Override
   protected Control createContent(Composite parent) {
-    DefaultProposalProvider provider = new DefaultProposalProvider();
-    provider.setShortList(m_proposals);
-
-    m_proposalField = new ProposalTextField(parent, provider, ProposalTextField.TYPE_NO_LABEL);
+    m_proposalField = getToolkit().createProposalField(parent, "", ProposalTextField.STYLE_NO_LABEL);
+    initializeProposalField(getProposals());
     m_proposalListener = new P_ProposalListener();
     m_proposalField.addProposalAdapterListener(m_proposalListener);
     return m_proposalField;
+  }
+
+  public void setProposals(SimpleProposal[] proposals) {
+    setStateChanging(true);
+    m_proposals = proposals;
+    initializeProposalField(proposals);
+  }
+
+  private void initializeProposalField(SimpleProposal[] proposals) {
+    setStateChanging(true);
+    try {
+      if (isControlCreated()) {
+        try {
+          StaticContentProvider provider = new StaticContentProvider(m_proposals, new SimpleLabelProvider());
+          m_proposalField.setContentProvider(provider);
+        }
+        finally {
+          setStateChanging(false);
+        }
+        if (!isStateChanging()) {
+          setInput(getValue());
+        }
+      }
+
+    }
+    finally {
+      setStateChanging(false);
+
+    }
+
+  }
+
+  public SimpleProposal[] getProposals() {
+    return m_proposals;
   }
 
   @Override

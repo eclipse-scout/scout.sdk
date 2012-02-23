@@ -4,21 +4,27 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.IJavaElement;
 
 public interface ITypeSibling {
 
-  public static final int TYPE_BEGINNING = 1;
-  public static final int TYPE_SIBLING = 2;
-  public static final int TYPE_END = 3;
+  public static enum SiblingType {
+    Beginning,
+    Sibling,
+    End
+  }
 
-  int getSiblingType();
+  SiblingType getSiblingType();
 
-  IType getScoutType();
+  /**
+   * @return
+   */
+  IJavaElement getElement();
+
 }

@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.extensions.view.property.IPropertyViewPart;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.TableWrapLayoutEx;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
@@ -29,7 +30,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
@@ -40,7 +40,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
  */
 public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
 
-  private FormToolkit m_formToolkit;
+  private PropertyViewFormToolkit m_formToolkit;
   private ScrolledForm m_form;
   private HashMap<String, Section> m_sections;
   private Composite m_sectionContainer;
@@ -56,7 +56,7 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
   @Override
   public final void createPart(Composite parent) {
     init();
-    m_formToolkit = new FormToolkit(parent.getDisplay());
+    m_formToolkit = new PropertyViewFormToolkit(parent.getDisplay());
     m_form = m_formToolkit.createScrolledForm(parent);
     try {
       m_form.setRedraw(false);
@@ -303,7 +303,7 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
     return m_form;
   }
 
-  protected FormToolkit getFormToolkit() {
+  protected PropertyViewFormToolkit getFormToolkit() {
     return m_formToolkit;
   }
 

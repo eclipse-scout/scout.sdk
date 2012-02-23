@@ -24,15 +24,13 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.lookupcall.LocalLookupCallNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -53,7 +51,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private static final IType localLookupCall = TypeUtility.getType(RuntimeClasses.LocalLookupCall);
+  protected final IType localLookupCall = TypeUtility.getType(RuntimeClasses.LocalLookupCall);
 
   /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
@@ -72,7 +70,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_clientBundle = client;
     setTitle(Texts.get("NewLocalLookupCallNoPopup"));
     setDescription(Texts.get("CreateANewLocalLookupCall"));
-    setLookupCallSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(localLookupCall)[0]);
+    setLookupCallSuperTypeInternal(localLookupCall);
   }
 
   @Override
@@ -89,18 +87,16 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("LookupCallSuperType"));
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(localLookupCall);
     ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
-    IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractLookupServices);
-    m_superTypeField.setContentProposalProvider(new DefaultProposalProvider(shotList, proposals));
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeFilters.getNotInTypes(localLookupCall));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCallSuperType"), TypeUtility.toArray(localLookupCall),
+        lookupServiceHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator()));
     m_superTypeField.acceptProposal(getLookupCallSuperType());
 
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setLookupCallSuperTypeInternal((ITypeProposal) event.proposal);
+        setLookupCallSuperTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -134,9 +130,9 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     op.setBundle(getClientBundle());
     op.setLookupCallName(getTypeName());
     op.setFormatSource(true);
-    ITypeProposal superTypeProp = getLookupCallSuperType();
+    IType superTypeProp = getLookupCallSuperType();
     if (superTypeProp != null) {
-      op.setLookupCallSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+      op.setLookupCallSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
     }
     op.validate();
     op.run(monitor, manager);
@@ -195,11 +191,11 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     setPropertyString(PROP_TYPE_NAME, typeName);
   }
 
-  public ITypeProposal getLookupCallSuperType() {
-    return (ITypeProposal) getProperty(PROP_SUPER_TYPE);
+  public IType getLookupCallSuperType() {
+    return (IType) getProperty(PROP_SUPER_TYPE);
   }
 
-  public void setLookupCallSuperType(ITypeProposal superType) {
+  public void setLookupCallSuperType(IType superType) {
     try {
       setStateChanging(true);
       setLookupCallSuperTypeInternal(superType);
@@ -212,7 +208,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setLookupCallSuperTypeInternal(ITypeProposal superType) {
+  private void setLookupCallSuperTypeInternal(IType superType) {
     setProperty(PROP_SUPER_TYPE, superType);
   }
 }

@@ -28,17 +28,18 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.ui.dialog.JavaElementSelectionDialog;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractJavaElementListPresenter;
 import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>OutlinesPresenter</h3> ...
@@ -46,7 +47,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class OutlinesPresenter extends AbstractJavaElementListPresenter {
   final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
-  public OutlinesPresenter(FormToolkit toolkit, Composite parent) {
+  public OutlinesPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
@@ -71,7 +72,8 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
     HashSet<IJavaElement> sourceProposals = new HashSet<IJavaElement>(Arrays.asList(getSourceProps()));
     ArrayList<IJavaElement> candidates = new ArrayList<IJavaElement>();
     ICachedTypeHierarchy outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
-    for (IType t : outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator())) {
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeFilters.getClassFilter());
+    for (IType t : outlineHierarchy.getAllSubtypes(iOutline, filter, TypeComparators.getTypeNameComparator())) {
       if (!sourceProposals.contains(t)) {
         candidates.add(t);
       }

@@ -12,14 +12,13 @@ package org.eclipse.scout.sdk.ui.wizard.page;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class PageNewWizard extends AbstractWorkspaceWizard {
 
   // members
-  private IScoutBundle m_clientBundle;
+  private final IScoutBundle m_clientBundle;
   private IType m_holderType;
   private IType m_superType;
   // pages
@@ -29,20 +28,21 @@ public class PageNewWizard extends AbstractWorkspaceWizard {
   // private ClientBundleLocationWizardPage m_clientLocationPage;
 
   public PageNewWizard(IScoutBundle clientBundle) {
+    m_clientBundle = clientBundle;
     setWindowTitle(Texts.get("NewPage"));
-    // m_clientLocationPage=new ClientBundleLocationWizardPage("Choose the client bundle", "The new created table page will be located within the selected bundle.");
-    // m_clientLocationPage.addPropertyChangeListener(new P_LocationPropChangeListener());
-    // addPage(m_clientLocationPage);
     m_templatePage = new PageNewTemplatesWizardPage(clientBundle);
     addPage(m_templatePage);
-    m_pageAttributePage = new PageNewAttributesWizardPage();
-    m_pageAttributePage.setClientBundle(clientBundle);
+    m_pageAttributePage = new PageNewAttributesWizardPage(clientBundle);
     addPage(m_pageAttributePage);
+  }
+
+  public IScoutBundle getClientBundle() {
+    return m_clientBundle;
   }
 
   public void setHolderType(IType holderType) {
     m_holderType = holderType;
-    m_pageAttributePage.setHolderType(ScoutProposalUtility.getScoutTypeProposalsFor(holderType)[0]);
+    m_pageAttributePage.setHolderType(holderType);
   }
 
   public IType getHolderType() {

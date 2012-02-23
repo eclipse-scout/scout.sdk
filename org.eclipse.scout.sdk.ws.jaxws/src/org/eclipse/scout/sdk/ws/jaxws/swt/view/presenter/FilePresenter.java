@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.ExternalFileCopyOperation;
@@ -36,7 +37,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.ide.IDE;
 
 public class FilePresenter extends AbstractPropertyPresenter<IFile> {
@@ -48,7 +48,7 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
   private String m_fileDirectory;
   private boolean m_showBrowseButton;
 
-  public FilePresenter(Composite parent, FormToolkit toolkit) {
+  public FilePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit, false);
     setLabel(Texts.get("File"));
     setUseLinkAsLabel(true);

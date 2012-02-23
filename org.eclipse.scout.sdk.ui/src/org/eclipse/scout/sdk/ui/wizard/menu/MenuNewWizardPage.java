@@ -10,18 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.menu;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.ui.JavaElementLabelProvider;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -29,14 +27,10 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -45,12 +39,10 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -70,15 +62,15 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   static final String PROP_FORM_TO_OPEN = "formToOpen";
   static final String PROP_FORM_HANDLER = "formHandler";
 
-  static IType abstractMenuType = TypeUtility.getType(RuntimeClasses.AbstractMenu);
-  static IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
-  static IType iformType = TypeUtility.getType(RuntimeClasses.IForm);
+  protected final IType abstractMenuType = TypeUtility.getType(RuntimeClasses.AbstractMenu);
+  protected final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
+  protected final IType iformType = TypeUtility.getType(RuntimeClasses.IForm);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
-  private ITypeProposal m_superType;
+  private IType m_superType;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private ProposalTextField m_siblingField;
@@ -94,7 +86,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewMenu"));
     setDescription(Texts.get("CreateANewMenu"));
     m_declaringType = declaringType;
-    m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractMenuType)[0];
+    m_superType = abstractMenuType;
     setSiblingInternal(SiblingProposal.SIBLING_END);
 
   }
@@ -109,13 +101,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
         try {
           setStateChanging(true);
           INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -135,37 +125,20 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(abstractMenuType);
-    IPrimaryTypeTypeHierarchy menuHierarchy = TypeUtility.getPrimaryTypeHierarchy(iMenuType);
-    IType[] abstractMenus = menuHierarchy.getAllSubtypes(iMenuType, TypeFilters.getAbstractOnClasspath(getDeclaringType().getJavaProject()));
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractMenus);
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), new IType[]{abstractMenuType},
+        ScoutTypeUtility.getAbstractTypesOnClasspath(iMenuType, getDeclaringType().getJavaProject(), abstractMenuType));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_superType = (ITypeProposal) event.proposal;
+        m_superType = (IType) event.proposal;
         pingStateChanging();
       }
     });
 
-    ArrayList<SiblingProposal> availableSiblings = new ArrayList<SiblingProposal>();
-
-    IRegion region = JavaCore.newRegion();
-    region.add(getDeclaringType());
-    ITypeHierarchy combinedTypeHierarchy = menuHierarchy.combinedTypeHierarchy(region);
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(iMenuType, combinedTypeHierarchy));
-    IType[] innerTypes = TypeUtility.getInnerTypes(getDeclaringType(), filter, ScoutTypeComparators.getOrderAnnotationComparator());
-    for (IType menu : innerTypes) {
-      availableSiblings.add(new SiblingProposal(menu));
-    }
-    if (availableSiblings.size() > 0) {
-      availableSiblings.add(SiblingProposal.SIBLING_END);
-    }
-    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings.toArray(new SiblingProposal[availableSiblings.size()])), "Sibling");
+    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, getDeclaringType(), iMenuType);
     m_siblingField.acceptProposal(getSibling());
-    m_siblingField.setEnabled(availableSiblings.size() > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -193,37 +166,34 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
         TypeFilters.getTypesOnClasspath(getDeclaringType().getJavaProject()),
         TypeFilters.getClassFilter());
     IType[] formCandidates = cachedFormHierarchy.getAllSubtypes(iformType, formsFilter, TypeComparators.getTypeNameComparator());
-    ITypeProposal[] formProposals = ScoutProposalUtility.getScoutTypeProposalsFor(formCandidates);
 
-    m_formToOpenField = getFieldToolkit().createProposalField(groupBox, new DefaultProposalProvider(formProposals), Texts.get("FormToStart"));
+    m_formToOpenField = getFieldToolkit().createJavaElementProposalField(groupBox, Texts.get("FormToStart"), formCandidates);
     m_formToOpenField.acceptProposal(getFormToOpen());
     m_formToOpenField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          ITypeProposal formProposal = (ITypeProposal) event.proposal;
-          setFormToOpenInternal(formProposal);
-          DefaultProposalProvider formHandlerProvider = new DefaultProposalProvider();
-          IType form = null;
-          ITypeProposal formHandlerSelection = (ITypeProposal) m_formHandlerField.getSelectedProposal();
-          if (formProposal != null) {
-            m_formHandlerField.setEnabled(true);
-            form = formProposal.getType();
-            IType[] formHandlers = ScoutTypeUtility.getFormHandlers(form);
+          setFormToOpenInternal((IType) event.proposal);
+
+          JavaElementContentProvider formHandlerProvider = null;
+          IType formHandlerSelection = (IType) m_formHandlerField.getSelectedProposal();
+          if (getFormToOpen() != null) {
+            IType[] formHandlers = ScoutTypeUtility.getFormHandlers(getFormToOpen());
             if (formHandlers != null) {
-              formHandlerProvider = new DefaultProposalProvider(ScoutProposalUtility.getScoutTypeProposalsFor(formHandlers));
+              formHandlerProvider = new JavaElementContentProvider((ILabelProvider) m_formHandlerField.getLabelProvider(), formHandlers);
             }
             // assign null selection if the current selected form is not the declaring type of the form hanlder selection.
-            if (formHandlerSelection != null && !form.equals(formHandlerSelection.getType().getDeclaringType())) {
+            if (formHandlerSelection != null && !getFormToOpen().equals(formHandlerSelection.getDeclaringType())) {
               formHandlerSelection = null;
             }
+            m_formHandlerField.setEnabled(true);
           }
           else {
             m_formHandlerField.setEnabled(false);
           }
           // backup
-          m_formHandlerField.setContentProposalProvider(formHandlerProvider);
+          m_formHandlerField.setContentProvider(formHandlerProvider);
           m_formHandlerField.acceptProposal(formHandlerSelection);
         }
         finally {
@@ -232,13 +202,14 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_formHandlerField = getFieldToolkit().createProposalField(groupBox, new DefaultProposalProvider(), Texts.get("FormHandler"));
+    m_formHandlerField = getFieldToolkit().createProposalField(groupBox, Texts.get("FormHandler"));
+    m_formHandlerField.setLabelProvider(new JavaElementLabelProvider());
     m_formHandlerField.setEnabled(false);
     m_formHandlerField.acceptProposal(getFormToOpen());
     m_formHandlerField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setFormHandlerInternal((ITypeProposal) event.proposal);
+        setFormHandlerInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -256,13 +227,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     // create menu
     MenuNewOperation operation = new MenuNewOperation(getDeclaringType(), true);
     // write back members
-    if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName().getNlsEntry());
-    }
+    operation.setNlsEntry(getNlsName());
     operation.setTypeName(getTypeName());
-    ITypeProposal superTypeProp = getSuperType();
-    if (superTypeProp != null) {
-      String signature = Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true);
+    IType superType = getSuperType();
+    if (superType != null) {
+      String signature = Signature.createTypeSignature(superType.getFullyQualifiedName(), true);
       operation.setSuperTypeSignature(signature);
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {
@@ -270,14 +239,10 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_MENU));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
-    if (getFormToOpen() != null) {
-      operation.setFormToOpen(getFormToOpen().getType());
-    }
-    if (getHandler() != null) {
-      operation.setFormHandler(getHandler().getType());
-    }
+    operation.setFormToOpen(getFormToOpen());
+    operation.setFormHandler(getHandler());
     operation.run(monitor, manager);
     m_createdMenu = operation.getCreatedMenu();
     return true;
@@ -331,11 +296,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_createdMenu;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -365,11 +330,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;
@@ -403,11 +368,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     setProperty(PROP_SIBLING, sibling);
   }
 
-  public ITypeProposal getFormToOpen() {
-    return (ITypeProposal) getProperty(PROP_FORM_TO_OPEN);
+  public IType getFormToOpen() {
+    return (IType) getProperty(PROP_FORM_TO_OPEN);
   }
 
-  public void setFormToOpen(ITypeProposal formToOpen) {
+  public void setFormToOpen(IType formToOpen) {
     try {
       setStateChanging(true);
       setFormToOpenInternal(formToOpen);
@@ -420,15 +385,15 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setFormToOpenInternal(ITypeProposal formToOpen) {
+  private void setFormToOpenInternal(IType formToOpen) {
     setProperty(PROP_FORM_TO_OPEN, formToOpen);
   }
 
-  public ITypeProposal getHandler() {
-    return (ITypeProposal) getProperty(PROP_FORM_HANDLER);
+  public IType getHandler() {
+    return (IType) getProperty(PROP_FORM_HANDLER);
   }
 
-  public void setFormHandler(ITypeProposal formHandler) {
+  public void setFormHandler(IType formHandler) {
     try {
       setStateChanging(true);
       setFormHandlerInternal(formHandler);
@@ -441,7 +406,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setFormHandlerInternal(ITypeProposal formHandler) {
+  private void setFormHandlerInternal(IType formHandler) {
     setProperty(PROP_FORM_HANDLER, formHandler);
   }
 

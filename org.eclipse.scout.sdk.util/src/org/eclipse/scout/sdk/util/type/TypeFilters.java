@@ -256,10 +256,21 @@ public class TypeFilters {
     };
   }
 
+  public static ITypeFilter getNotInTypes(IType... excludedTypes) {
+    HashSet<IType> excludedSet = new HashSet<IType>();
+    if (excludedTypes != null) {
+      excludedSet.addAll(Arrays.asList(excludedTypes));
+    }
+    return getNotInTypes(excludedSet);
+  }
+
   public static ITypeFilter getNotInTypes(final Set<IType> excludedTypes) {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
+        if (excludedTypes == null) {
+          return true;
+        }
         return !excludedTypes.contains(type);
       }
     };

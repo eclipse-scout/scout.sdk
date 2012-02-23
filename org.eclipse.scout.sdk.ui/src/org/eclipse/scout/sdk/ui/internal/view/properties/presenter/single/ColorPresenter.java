@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -37,7 +38,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>StringPresenter</h3> Representing a plain text property method. References like 'm_value' or
@@ -49,7 +49,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
   private Color m_currentColor;
   private Button m_chooserButton;
 
-  public ColorPresenter(FormToolkit toolkit, Composite parent) {
+  public ColorPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, ".*");
   }
 

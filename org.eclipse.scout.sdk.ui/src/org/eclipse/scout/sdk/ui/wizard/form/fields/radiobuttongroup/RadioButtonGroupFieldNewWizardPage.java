@@ -26,11 +26,9 @@ import org.eclipse.scout.sdk.operation.form.field.RadioButtonGroupFieldNewOperat
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -55,13 +53,13 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
   final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
   final IType abstractRadioButtonGroup = TypeUtility.getType(RuntimeClasses.AbstractRadioButtonGroup);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
-  private SignatureProposal m_genericSignature;
+  private String m_genericSignature;
   private SiblingProposal m_sibling;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_genericTypeField;
   private ProposalTextField m_siblingField;
@@ -77,7 +75,7 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     m_declaringType = declaringType;
     // default
     setSuperType(abstractRadioButtonGroup);
-    m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
+    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -91,14 +89,11 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -119,13 +114,13 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, ScoutTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType), SignatureProposalProvider.DEFAULT_MOST_USED);
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_genericSignature = (SignatureProposal) event.proposal;
+        m_genericSignature = (String) event.proposal;
         pingStateChanging();
       }
     });
@@ -155,14 +150,14 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     operation.setFormatSource(true);
     // write back members
     if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName().getNlsEntry());
+      operation.setNlsEntry(getNlsName());
     }
     operation.setTypeName(getTypeName());
     operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature().getSignature()) + ">", true);
+        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
       }
       else {
         sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true);
@@ -174,7 +169,7 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
     operation.run(monitor, workingCopyManager);
     m_createdField = operation.getCreatedField();
@@ -230,11 +225,11 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     return m_createdField;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -273,7 +268,7 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     pingStateChanging();
   }
 
-  public void setGenericSignature(SignatureProposal genericSignature) {
+  public void setGenericSignature(String genericSignature) {
     try {
       setStateChanging(true);
       m_genericSignature = genericSignature;
@@ -286,7 +281,7 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     }
   }
 
-  public SignatureProposal getGenericSignature() {
+  public String getGenericSignature() {
     return m_genericSignature;
   }
 

@@ -61,4 +61,19 @@ public class FieldFilters {
       }
     };
   }
+
+  public static IFieldFilter getCompositeFilter(final IFieldFilter... filters) {
+    return new IFieldFilter() {
+
+      @Override
+      public boolean accept(IField field) {
+        for (IFieldFilter f : filters) {
+          if (!f.accept(field)) {
+            return false;
+          }
+        }
+        return true;
+      }
+    };
+  }
 }

@@ -16,11 +16,11 @@ import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>StringPresenter</h3> Representing a plain text property method.
@@ -28,7 +28,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
  */
 public class StringPresenter extends AbstractValuePresenter<String> {
 
-  public StringPresenter(FormToolkit toolkit, Composite parent) {
+  public StringPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, null);
   }
 

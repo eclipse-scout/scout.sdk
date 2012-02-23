@@ -42,14 +42,8 @@ import org.eclipse.scout.nls.sdk.simple.ui.wizard.ResourceProposalModel;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
-import org.eclipse.scout.sdk.ui.fields.proposal.TypeProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -89,7 +83,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
   private final IScoutBundle m_bundle;
   private final HashSet<String> m_languagesToCreate;
   private final NlsServiceType[] m_existingServicesInPlugin;
-  private final TypeProposal m_defaultProposal;
+  private final IType m_defaultProposal;
 
   public NewTextProviderServiceWizardPage(IScoutBundle bundle) {
     super(NewTextProviderServiceWizardPage.class.getName());
@@ -98,7 +92,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_bundle = bundle;
     m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
-    m_defaultProposal = new TypeProposal(TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
+    m_defaultProposal = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
   }
 
   private NlsServiceType[] getTextProviderServicesInSamePlugin() {
@@ -145,16 +139,15 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     Group group = new Group(parent, SWT.NONE);
     group.setText("Text Provider Service Class");
 
-    IContentProposalProvider proposalProvider = null;
+    IType[] proposals = null;
     if (m_bundle != null) {
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(iTextProviderService, m_bundle.getJavaProject()));
-      proposalProvider = new DefaultProposalProvider(new IContentProposalEx[]{m_defaultProposal}, proposals);
+      proposals = ScoutTypeUtility.getAbstractTypesOnClasspath(iTextProviderService, m_bundle.getJavaProject());
     }
-    m_superTypeField = getFieldToolkit().createProposalField(group, proposalProvider, "Super Class");
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, "Super Class", proposals);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setSuperTypeInternal(((ITypeProposal) event.proposal).getType());
+        setSuperTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -401,7 +394,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       setStateChanging(true);
       setSuperTypeInternal(superType);
       if (isControlCreated()) {
-        m_superTypeField.acceptProposal(new TypeProposal(superType));
+        m_superTypeField.acceptProposal(superType);
       }
     }
     finally {

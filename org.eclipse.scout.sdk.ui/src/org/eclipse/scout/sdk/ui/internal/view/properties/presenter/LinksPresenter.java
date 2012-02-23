@@ -15,6 +15,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.ILink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -24,18 +25,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 public class LinksPresenter extends AbstractPresenter {
 
   private LinksPresenterModel m_linksProperty;
 
-  public LinksPresenter(FormToolkit toolkit, Composite parent) {
+  public LinksPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     this(toolkit, parent, null);
   }
 
-  public LinksPresenter(FormToolkit toolkit, Composite parent, LinksPresenterModel linksProperty) {
+  public LinksPresenter(PropertyViewFormToolkit toolkit, Composite parent, LinksPresenterModel linksProperty) {
     super(toolkit, parent);
     GridLayout layout = new GridLayout(2, true);
     layout.marginHeight = 0;

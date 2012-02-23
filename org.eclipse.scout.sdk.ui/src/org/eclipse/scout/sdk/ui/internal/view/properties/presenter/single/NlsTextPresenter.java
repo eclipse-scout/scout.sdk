@@ -10,28 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.nls.sdk.ui.action.NlsEntryNewAction;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
+import org.eclipse.scout.sdk.ui.fields.proposal.ILazyProposalContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.fields.proposal.nls.NlsNewProposal;
-import org.eclipse.scout.sdk.ui.internal.fields.proposal.nls.NlsNullProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.IProposalSelectionHandler;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsProposalDescriptionProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextSelectionHandler;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -39,26 +38,25 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>NlsTextPresenter</h3> ...
  */
 public class NlsTextPresenter extends AbstractMethodPresenter {
 
-  protected NlsProposalTextField m_proposalField;
+  private ProposalTextField m_proposalField;
   private INlsEntry m_currentSourceTuple;
   private INlsEntry m_defaultTuple;
   private INlsProject m_nlsProject;
   private OptimisticLock storeValueLock = new OptimisticLock();
 
-  public NlsTextPresenter(FormToolkit toolkit, Composite parent) {
+  public NlsTextPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
   @Override
   protected Control createContent(Composite container) {
-    m_proposalField = new NlsProposalTextField(container, null, NlsProposalTextField.TYPE_NO_LABEL);
+    m_proposalField = new ProposalTextField(container, ProposalTextField.STYLE_NO_LABEL);
     toolkitAdapt(m_proposalField);
     m_proposalField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -67,6 +65,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
       }
     });
     m_proposalField.setEnabled(false);
+    m_proposalField.setProposalDescriptionProvider(new NlsProposalDescriptionProvider());
     return m_proposalField;
   }
 
@@ -86,19 +85,17 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
     return false;
   }
 
-  protected INlsProject getNlsProject(ConfigurationMethod method) {
-    return ScoutTypeUtility.findNlsProject(method.getType());
-  }
-
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     if (method == null) return;
     super.init(method);
-    m_nlsProject = getNlsProject(method);
-    m_proposalField.setNlsProject(getNlsProject());
-    if (getNlsProject() == null) {
-      m_proposalField.setEnabled(false);
-      return;
+    INlsProject newNlsProject = ScoutTypeUtility.findNlsProject(method.getType());
+    if (!CompareUtility.equals(newNlsProject, m_nlsProject)) {
+      m_nlsProject = newNlsProject;
+      m_proposalField.setLabelProvider(createLabelProvider(getNlsProject()));
+      m_proposalField.setContentProvider(createContentProvider(getNlsProject()));
+      m_proposalField.setSelectionHandler(createSelectionHandler(getNlsProject()));
+      m_proposalField.setEnabled(getNlsProject() != null);
     }
 
     String defaultKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
@@ -114,7 +111,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
           throw new CoreException(new ScoutStatus("could not parse nls presenter of : " + getMethod().getMethodName()));
         }
         else {
-          m_proposalField.acceptProposal(new NlsProposal(m_currentSourceTuple, getNlsProject().getDevelopmentLanguage()));
+          m_proposalField.acceptProposal(m_currentSourceTuple);
         }
       }
       else {
@@ -128,69 +125,77 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   }
 
   /**
+   * might be overridden to provide an other nls project
+   * 
+   * @param method
+   *          not null
+   * @return an nls project
+   */
+  protected INlsProject resolveNlsProject(ConfigurationMethod method) {
+    return ScoutTypeUtility.findNlsProject(method.getType());
+  }
+
+  /**
+   * might be overridden to provide an own implementation of a content provider
+   * 
+   * @param project
+   *          might be null
+   * @return a content provider or null
+   */
+  protected ILazyProposalContentProvider createContentProvider(INlsProject nlsProject) {
+    if (nlsProject != null) {
+      return new NlsTextContentProvider((NlsTextLabelProvider) getProposalField().getLabelProvider());
+    }
+    return null;
+  }
+
+  /**
+   * might be overridden to provide an own implementation of a label provider
+   * 
+   * @param project
+   *          might be null
+   * @return a label provider or null
+   */
+  protected ILabelProvider createLabelProvider(INlsProject project) {
+    if (project != null) {
+      return new NlsTextLabelProvider(project);
+    }
+    return null;
+  }
+
+  /**
+   * might be overridden to provide an own implementation of a selection handler
+   * 
+   * @param project
+   *          might be null
+   * @return a selection handler or null
+   */
+  protected IProposalSelectionHandler createSelectionHandler(INlsProject project) {
+    if (project != null) {
+      return new NlsTextSelectionHandler(getNlsProject());
+    }
+    return null;
+  }
+
+  protected ProposalTextField getProposalField() {
+    return m_proposalField;
+  }
+
+  /**
    * @param event
    */
   protected void handleProposalAccepted(ContentProposalEvent event) {
-    IContentProposalEx proposal = event.proposal;
+    Object proposal = event.proposal;
     if (proposal == null) {
       m_proposalField.setText("");
       storeNlsText(null);
     }
     else {
-      if (proposal instanceof NlsNewProposal) {
-        String proposalFieldText = event.text.substring(0, event.cursorPosition);
-        String key = getNewKey(proposalFieldText);
-        NlsEntry row = new NlsEntry(key, getNlsProject());
-        row.addTranslation(getNlsProject().getDevelopmentLanguage(), proposalFieldText);
-        NlsEntryNewAction action = new NlsEntryNewAction(row, getNlsProject());
-        action.run();
-        try {
-          action.join();
-        }
-        catch (InterruptedException e) {
-          ScoutSdkUi.logWarning(e);
-        }
-        row = action.getEntry();
-        if (row != null) {
-          NlsProposal newProposal = new NlsProposal(row, getNlsProject().getDevelopmentLanguage());
-          m_proposalField.acceptProposal(newProposal);
-          storeNlsText(newProposal);
-        }
-        else {
-          storeNlsText(null);
-          m_proposalField.setText("");
-        }
-      }
-      else if (proposal instanceof NlsNullProposal) {
-        storeNlsText(null);
-      }
-      else if (proposal instanceof NlsProposal) {
-        storeNlsText((NlsProposal) proposal);
-      }
+      storeNlsText((INlsEntry) proposal);
     }
   }
 
-  protected String getNewKey(String value) {
-    List<String> existingKeys = Arrays.asList(getNlsProject().getAllKeys());
-    if (value == null || value.length() == 0) {
-      return null;
-    }
-    else {
-      String[] split = value.split(" ");
-      value = "";
-      for (String splitValue : split) {
-        value = value + Character.toUpperCase(splitValue.charAt(0)) + ((splitValue.length() > 1) ? (splitValue.substring(1)) : (""));
-      }
-      String newKey = value;
-      int i = 0;
-      while (existingKeys.contains(newKey)) {
-        newKey = value + i++;
-      }
-      return newKey;
-    }
-  }
-
-  protected synchronized void storeNlsText(final NlsProposal proposal) {
+  protected synchronized void storeNlsText(final INlsEntry proposal) {
     try {
       if (storeValueLock.acquire()) {
         IOperation op = null;
@@ -202,7 +207,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
         else {
           if (proposal != null) {
             op = new NlsTextMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), false);
-            ((NlsTextMethodUpdateOperation) op).setNlsEntry(proposal.getNlsEntry());
+            ((NlsTextMethodUpdateOperation) op).setNlsEntry(proposal);
           }
         }
         if (op != null) {

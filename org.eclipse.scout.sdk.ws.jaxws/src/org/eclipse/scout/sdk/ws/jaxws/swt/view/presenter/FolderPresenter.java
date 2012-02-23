@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -41,7 +42,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.model.WorkbenchContentProvider;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
@@ -56,11 +56,11 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
   private String m_messageFolderDialog;
   private String m_titleFolderDialog;
 
-  public FolderPresenter(Composite parent, FormToolkit toolkit) {
+  public FolderPresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     this(parent, toolkit, DEFAULT_LABEL_WIDTH, true);
   }
 
-  public FolderPresenter(Composite parent, FormToolkit toolkit, int labelWidth, boolean initialize) {
+  public FolderPresenter(Composite parent, PropertyViewFormToolkit toolkit, int labelWidth, boolean initialize) {
     super(parent, toolkit, labelWidth, false);
     setLabel(Texts.get("Folder"));
     setMessageFolderDialog(Texts.get("ChooseFolder"));

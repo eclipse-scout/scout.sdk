@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.table.AutoResizeColumnTable;
 import org.eclipse.scout.sdk.ui.fields.table.JavaElementTableContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
@@ -36,7 +37,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public abstract class AbstractJavaElementListPresenter extends AbstractMethodPresenter {
 
@@ -48,7 +48,7 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
   private Button m_removeButton;
   private Button m_addButton;
 
-  public AbstractJavaElementListPresenter(FormToolkit toolkit, Composite parent) {
+  public AbstractJavaElementListPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 

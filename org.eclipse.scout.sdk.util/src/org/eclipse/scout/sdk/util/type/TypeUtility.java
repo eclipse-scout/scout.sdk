@@ -104,6 +104,13 @@ public class TypeUtility {
     return allSubtypes.contains(potentialSubtype);
   }
 
+  public static IType[] toArray(IType... types) {
+    if (types == null) {
+      return new IType[0];
+    }
+    return types;
+  }
+
   public static IType[] getInnerTypes(IType type) {
     return getInnerTypes(type, null);
   }

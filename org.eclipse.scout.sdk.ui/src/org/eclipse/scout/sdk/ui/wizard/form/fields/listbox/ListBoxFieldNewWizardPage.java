@@ -25,15 +25,10 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.ListBoxFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -61,14 +56,14 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
   final IType abstractCodeType = TypeUtility.getType(RuntimeClasses.AbstractCodeType);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
-  private SignatureProposal m_genericSignature;
-  private ITypeProposal m_codeType;
+  private String m_genericSignature;
+  private IType m_codeType;
   private SiblingProposal m_sibling;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_genericTypeField;
   private ProposalTextField m_codeTypeField;
@@ -85,7 +80,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
     // default
     m_superType = abstractListBox;
-    m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
+    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -99,14 +94,11 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -127,24 +119,23 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, ScoutTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType), SignatureProposalProvider.DEFAULT_MOST_USED);
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_genericSignature = (SignatureProposal) event.proposal;
+        m_genericSignature = (String) event.proposal;
         pingStateChanging();
       }
     });
 
-    ITypeProposal[] codeTypeProposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getClassesOnClasspath(iCodeType, m_declaringType.getJavaProject()));
-    m_codeTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(codeTypeProposals), Texts.get("CodeType"));
+    m_codeTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("CodeType"), ScoutTypeUtility.getClassesOnClasspath(iCodeType, m_declaringType.getJavaProject()));
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_codeType = (ITypeProposal) event.proposal;
+        m_codeType = (IType) event.proposal;
         pingStateChanging();
       }
     });
@@ -175,13 +166,13 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setFormatSource(true);
     // write back members
     if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName().getNlsEntry());
+      operation.setNlsEntry(getNlsName());
     }
     operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature().getSignature()) + ">", true);
+        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
       }
       else {
         sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true);
@@ -189,16 +180,13 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setSuperTypeSignature(sig);
     }
 
-    ITypeProposal codeTypeProposal = getCodeType();
-    if (codeTypeProposal != null) {
-      operation.setCodeType(codeTypeProposal.getType());
-    }
+    operation.setCodeType(getCodeType());
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
     operation.run(monitor, workingCopyManager);
     m_createdField = operation.getCreatedField();
@@ -254,11 +242,11 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_createdField;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -297,7 +285,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     pingStateChanging();
   }
 
-  public void setGenericSignature(SignatureProposal genericSignature) {
+  public void setGenericSignature(String genericSignature) {
     try {
       setStateChanging(true);
       m_genericSignature = genericSignature;
@@ -310,11 +298,11 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public SignatureProposal getGenericSignature() {
+  public String getGenericSignature() {
     return m_genericSignature;
   }
 
-  public void setCodeType(ITypeProposal codeType) {
+  public void setCodeType(IType codeType) {
     try {
       setStateChanging(true);
       m_codeType = codeType;
@@ -327,7 +315,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getCodeType() {
+  public IType getCodeType() {
     return m_codeType;
   }
 

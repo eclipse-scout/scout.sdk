@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -20,6 +20,9 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.window.Window;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.resources.ResourcesContentProvider;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.SourceFolderCreateOrUpdateOperation;
@@ -27,11 +30,14 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.proposal.PathProposal;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.SourceFolderNewWizard;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
+/**
+ * @deprecated use {@link ProposalTextField} with {@link ResourcesContentProvider}
+ */
+@Deprecated
 public class SourceFolderPresenter extends ProposalPresenter<PathProposal> {
 
-  public SourceFolderPresenter(Composite parent, FormToolkit toolkit) {
+  public SourceFolderPresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit, false);
     setLabel(Texts.get("SourceFolder"));
     setTooltip(Texts.get("ClickToCreateNewSourceFolder"));

@@ -25,12 +25,8 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.ButtonFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -55,12 +51,12 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private final IType iButton = TypeUtility.getType(RuntimeClasses.IButton);
   private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
   private SiblingProposal m_sibling;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_siblingField;
 
@@ -97,14 +93,11 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -125,10 +118,8 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(ScoutTypeUtility.getFormFields(m_declaringType));
-    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
+    m_siblingField = getFieldToolkit().createFormFieldSiblingProposalField(parent, m_declaringType);
     m_siblingField.acceptProposal(m_sibling);
-    m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -149,9 +140,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     getOperation().setFormatSource(true);
     // write back members
-    if (getNlsName() != null) {
-      getOperation().setNlsEntry(getNlsName().getNlsEntry());
-    }
+    getOperation().setNlsEntry(getNlsName());
     getOperation().setTypeName(getTypeName());
     if (getSuperType() != null) {
       getOperation().setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true));
@@ -161,7 +150,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       getOperation().setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
-      getOperation().setSibling(getSibling().getScoutType());
+      getOperation().setSibling(getSibling().getElement());
     }
     getOperation().run(monitor, workingCopyManager);
     m_createdField = getOperation().getCreatedButton();
@@ -220,11 +209,11 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_createdField;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;

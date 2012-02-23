@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiValuePresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -28,14 +29,13 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>MultiLongPresenter</h3> ...
  */
 public class MultiIntegerPresenter extends AbstractMultiValuePresenter<Integer> {
 
-  public MultiIntegerPresenter(FormToolkit toolkit, Composite parent) {
+  public MultiIntegerPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, "[-+0-9\\'eEinf]*");
   }
 

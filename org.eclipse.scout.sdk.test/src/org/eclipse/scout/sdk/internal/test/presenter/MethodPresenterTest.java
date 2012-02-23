@@ -31,13 +31,13 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Outlin
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.SearchFormPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.StringPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.VerticalAglinmentPresenter;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -49,7 +49,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
   private final static String SERVER_PROJECT = "presenter.test.server";
   private final static String CLIENT_PROJECT = "presenter.test.client";
 
-  private static FormToolkit default_toolkit;
+  private static PropertyViewFormToolkit default_toolkit;
   private static Composite default_parent;
   private static Properties reference_max_durations;
 
@@ -57,7 +57,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("presenter", SHARED_PROJECT, SERVER_PROJECT, CLIENT_PROJECT);
 
-    default_toolkit = new FormToolkit(Display.getDefault());
+    default_toolkit = new PropertyViewFormToolkit(Display.getDefault());
     default_parent = Display.getDefault().getActiveShell();
 
     String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
@@ -142,7 +142,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         BooleanPresenter presenter = new BooleanPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -160,7 +160,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         OutlinesPresenter presenter = new OutlinesPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -178,7 +178,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         CodeTypeProposalPresenter presenter = new CodeTypeProposalPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -196,7 +196,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         LookupCallProposalPresenter presenter = new LookupCallProposalPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -214,7 +214,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         LookupServiceProposalPresenter presenter = new LookupServiceProposalPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -232,7 +232,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         MasterFieldPresenter presenter = new MasterFieldPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -250,7 +250,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         SearchFormPresenter presenter = new SearchFormPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -268,7 +268,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         ButtonDisplayStylePresenter presenter = new ButtonDisplayStylePresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -286,7 +286,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         ButtonSystemTypePresenter presenter = new ButtonSystemTypePresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -304,7 +304,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         FormDisplayHintPresenter presenter = new FormDisplayHintPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -322,7 +322,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         FormViewIdPresenter presenter = new FormViewIdPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -340,7 +340,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         HorizontalAlignmentPresenter presenter = new HorizontalAlignmentPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -358,7 +358,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         IconPresenter presenter = new IconPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -376,7 +376,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         VerticalAglinmentPresenter presenter = new VerticalAglinmentPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -394,7 +394,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         ColorPresenter presenter = new ColorPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -412,7 +412,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         DoublePresenter presenter = new DoublePresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -430,7 +430,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         FontPresenter presenter = new FontPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -448,7 +448,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         IntegerPresenter presenter = new IntegerPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -466,7 +466,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         LongPresenter presenter = new LongPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -484,7 +484,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         StringPresenter presenter = new StringPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -502,7 +502,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         NlsTextPresenter presenter = new NlsTextPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -520,7 +520,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         LabelPositionPresenter presenter = new LabelPositionPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;
@@ -538,7 +538,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
       }
 
       @Override
-      public AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m) {
+      public AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m) {
         LabelHorizontalAlignmentPresenter presenter = new LabelHorizontalAlignmentPresenter(toolkit, parent);
         presenter.setMethod(m);
         return presenter;

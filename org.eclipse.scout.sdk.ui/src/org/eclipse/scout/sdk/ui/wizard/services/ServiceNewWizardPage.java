@@ -19,13 +19,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
@@ -78,16 +76,13 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("SuperType"));
-    if (getLocationBundle() != null) {
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(m_definitionType, getLocationBundle().getJavaProject()));
-      m_superTypeField.setContentProposalProvider(new DefaultProposalProvider(proposals));
-    }
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(getSuperType()),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(m_definitionType, getLocationBundle().getJavaProject(), getSuperType()));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setSuperTypeInternal((ITypeProposal) event.proposal);
+        setSuperTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -164,11 +159,11 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     setPropertyString(PROP_TYPE_NAME, typeName);
   }
 
-  public ITypeProposal getSuperType() {
-    return (ITypeProposal) getProperty(PROP_SUPER_TYPE);
+  public IType getSuperType() {
+    return (IType) getProperty(PROP_SUPER_TYPE);
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       setSuperTypeInternal(superType);
@@ -181,7 +176,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  protected void setSuperTypeInternal(ITypeProposal superType) {
+  protected void setSuperTypeInternal(IType superType) {
     setProperty(PROP_SUPER_TYPE, superType);
   }
 

@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.internal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.dialogs.IDialogSettings;
@@ -117,6 +119,10 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   }
 
   public IDialogSettings getDialogSettingsSection(String name) {
+    return getDialogSettingsSection(name, true);
+  }
+
+  public IDialogSettings getDialogSettingsSection(String name, boolean createIfNotExist) {
     IDialogSettings dialogSettings = getDialogSettings();
     IDialogSettings section = dialogSettings.getSection(name);
     if (section == null) {
@@ -386,6 +392,35 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     else {
       getImageRegistry().put(name, desc);
     }
+  }
+
+  public static Image getImage(IJavaElement element) {
+    Image img = null;
+    try {
+      switch (((IJavaElement) element).getElementType()) {
+        case IJavaElement.TYPE:
+          if (((IType) element).isInterface()) {
+            img = getImage(Interface);
+          }
+          else {
+            img = getImage(Class);
+          }
+          break;
+        case IJavaElement.METHOD:
+          img = getImage(Public);
+          break;
+        case IJavaElement.FIELD:
+          img = getImage(FieldPrivate);
+          break;
+        default:
+          img = getImage(Default);
+          break;
+      }
+    }
+    catch (JavaModelException e) {
+      logWarning(e);
+    }
+    return img;
   }
 
   public static void showJavaElementInEditor(IJavaElement e, boolean createNew) {

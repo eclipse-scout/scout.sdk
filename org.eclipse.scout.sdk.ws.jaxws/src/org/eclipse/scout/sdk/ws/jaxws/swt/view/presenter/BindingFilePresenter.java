@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -29,13 +30,12 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class BindingFilePresenter extends FilePresenter {
 
   private BuildJaxWsBean m_buildJaxWsBean;
 
-  public BindingFilePresenter(Composite parent, FormToolkit toolkit) {
+  public BindingFilePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit);
     setResetLinkVisible(true);
     setFileDirectory(JaxWsConstants.PATH_BUILD);

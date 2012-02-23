@@ -16,22 +16,22 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.scout.sdk.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
-import org.eclipse.scout.sdk.ui.wizard.WizardPageFieldToolkit;
 import org.eclipse.swt.widgets.Shell;
 
 public abstract class AbstractStatusDialog extends TitleAreaDialog {
 
   private IStatus m_status = Status.OK_STATUS;
   private IStatus m_defaultOkStatus = new Status(IStatus.OK, ScoutSdkUi.PLUGIN_ID, "");
-  private final WizardPageFieldToolkit m_fieldToolkit;
+  private final FieldToolkit m_fieldToolkit;
   private int m_stateChangingCounter = 0;
   private String m_title;
 
   public AbstractStatusDialog(Shell parentShell) {
     super(parentShell);
-    m_fieldToolkit = new WizardPageFieldToolkit();
+    m_fieldToolkit = new FieldToolkit();
     setHelpAvailable(false);
   }
 
@@ -142,7 +142,7 @@ public abstract class AbstractStatusDialog extends TitleAreaDialog {
     }
   }
 
-  public WizardPageFieldToolkit getFieldToolkit() {
+  public FieldToolkit getFieldToolkit() {
     return m_fieldToolkit;
   }
 

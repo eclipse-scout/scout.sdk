@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
@@ -41,7 +42,6 @@ import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 public class HandlerPresenter extends TypePresenter {
@@ -52,7 +52,7 @@ public class HandlerPresenter extends TypePresenter {
   private int m_handlerIndex;
   private int m_handlerCount;
 
-  public HandlerPresenter(IScoutBundle bundle, Composite parent, int handlerIndex, int handlerCount, FormToolkit toolkit) {
+  public HandlerPresenter(IScoutBundle bundle, Composite parent, int handlerIndex, int handlerCount, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit, 70, false);
     m_handlerIndex = handlerIndex;
     m_handlerCount = handlerCount;

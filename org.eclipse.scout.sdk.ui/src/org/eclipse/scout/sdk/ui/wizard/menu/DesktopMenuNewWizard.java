@@ -16,8 +16,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
@@ -50,7 +48,7 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
   }
 
   public void setSuperType(IType superType) {
-    m_page1.setSuperType(ScoutProposalUtility.getScoutTypeProposalsFor(superType)[0]);
+    m_page1.setSuperType(superType);
   }
 
   /**
@@ -65,13 +63,11 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
     // create menu
     m_operation = new MenuNewOperation(getDeclaringType(), true);
     // write back members
-    if (m_page1.getNlsName() != null) {
-      m_operation.setNlsEntry(m_page1.getNlsName().getNlsEntry());
-    }
+    m_operation.setNlsEntry(m_page1.getNlsName());
     m_operation.setTypeName(m_page1.getTypeName());
-    ITypeProposal superTypeProp = m_page1.getSuperType();
+    IType superTypeProp = m_page1.getSuperType();
     if (superTypeProp != null) {
-      String signature = Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true);
+      String signature = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true);
       m_operation.setSuperTypeSignature(signature);
     }
     if (m_page1.getSibling() == SiblingProposal.SIBLING_END) {
@@ -79,11 +75,9 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
       m_operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_MENU));
     }
     else {
-      m_operation.setSibling(m_page1.getSibling().getScoutType());
+      m_operation.setSibling(m_page1.getSibling().getElement());
     }
-    if (m_page1.getFormToOpen() != null) {
-      m_operation.setFormToOpen(m_page1.getFormToOpen().getType());
-    }
+    m_operation.setFormToOpen(m_page1.getFormToOpen());
     m_operation.run(monitor, workingCopyManager);
     return true;
   }

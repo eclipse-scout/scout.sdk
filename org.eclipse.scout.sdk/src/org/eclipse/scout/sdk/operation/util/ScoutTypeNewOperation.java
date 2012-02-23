@@ -25,7 +25,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>BCTypeNewOperation</h3> To create a new BCType. Can be used to create a class or an interface. To create an
+ * <h3> {@link ScoutTypeNewOperation}</h3> To create a new {@link IType}. Can be used to create a class or an interface.
+ * To
+ * create an
  * interface add the {@link Flags#AccInterface} to the typeModifiers.
  * <p>
  * <b>Note:</b> the parameter will not be validated before when run is called.

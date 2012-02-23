@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.scout.sdk.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -34,14 +35,14 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
 
   private IStatus m_status = Status.OK_STATUS;
   private Composite m_content;
-  private final WizardPageFieldToolkit m_fieldToolkit;
+  private final FieldToolkit m_fieldToolkit;
   private int m_stateChangingCounter = 0;
   private boolean m_excludePage;
   private ArrayList<IStatusProvider> m_statusProvider;
 
   public AbstractScoutWizardPage(String pageName, String title, ImageDescriptor titleImage) {
     super(pageName, title, titleImage);
-    m_fieldToolkit = new WizardPageFieldToolkit();
+    m_fieldToolkit = new FieldToolkit();
     m_statusProvider = new ArrayList<IStatusProvider>();
   }
 
@@ -50,7 +51,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
 
   }
 
-  public WizardPageFieldToolkit getFieldToolkit() {
+  public FieldToolkit getFieldToolkit() {
     return m_fieldToolkit;
   }
 

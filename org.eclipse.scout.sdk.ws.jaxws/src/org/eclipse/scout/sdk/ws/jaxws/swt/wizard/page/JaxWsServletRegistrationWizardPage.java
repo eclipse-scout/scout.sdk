@@ -11,9 +11,7 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
@@ -24,10 +22,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -42,7 +41,6 @@ import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility.Registrati
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -88,19 +86,17 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
   @Override
   protected void createContent(Composite parent) {
     // registration bundle
-    m_registrationBundleField = new ProposalTextField(parent);
-    m_registrationBundleField.setLabelText(Texts.get("ServletRegistrationBundle"));
-    DefaultProposalProvider provider = new DefaultProposalProvider();
-    List<P_BundleProposal> proposals = new ArrayList<P_BundleProposal>();
-    for (IScoutBundle candidateBundle : m_candidateBundles) {
-      proposals.add(new P_BundleProposal(candidateBundle));
+    m_registrationBundleField = getFieldToolkit().createProposalField(parent, Texts.get("ServletRegistrationBundle"));
+    m_registrationBundleField.setLabelProvider(new SimpleLabelProvider());
+    SimpleProposal[] proposals = new SimpleProposal[m_candidateBundles.length];
+    for (int i = 0; i < proposals.length; i++) {
+      proposals[i] = new P_BundleProposal(m_candidateBundles[i]);
     }
-    provider.setShortList(proposals.toArray(new P_BundleProposal[proposals.size()]));
-    m_registrationBundleField.setContentProposalProvider(provider);
+    m_registrationBundleField.setContentProvider(new SimpleProposalProvider(proposals));
     m_registrationBundleField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        IContentProposalEx proposal = event.proposal;
+        Object proposal = event.proposal;
         if (proposal != null) {
           IScoutBundle registrationBundle = ((P_BundleProposal) proposal).getBundle();
           setRegistrationBundleInternal(registrationBundle);
@@ -354,31 +350,17 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     return m_propertySupport.getPropertyString(PROP_URL_PATTERN);
   }
 
-  private class P_BundleProposal implements IContentProposalEx {
+  private class P_BundleProposal extends SimpleProposal {
 
-    private IScoutBundle m_bundle;
+    private static final String DATA_BUNDLE = "dataBundle";
 
     private P_BundleProposal(IScoutBundle bundle) {
-      m_bundle = bundle;
-    }
-
-    @Override
-    public int getCursorPosition(boolean selected, boolean expertMode) {
-      return 0;
-    }
-
-    @Override
-    public Image getImage(boolean selected, boolean expertMode) {
-      return ScoutSdkUi.getImage(SdkIcons.ServerBundle);
-    }
-
-    @Override
-    public String getLabel(boolean selected, boolean expertMode) {
-      return m_bundle.getBundleName();
+      super(bundle.getBundleName(), ScoutSdkUi.getImage(SdkIcons.ServerBundle));
+      setData(DATA_BUNDLE, bundle);
     }
 
     public IScoutBundle getBundle() {
-      return m_bundle;
+      return (IScoutBundle) getData(DATA_BUNDLE);
     }
   }
 }

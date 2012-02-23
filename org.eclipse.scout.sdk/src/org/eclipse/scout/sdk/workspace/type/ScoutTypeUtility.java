@@ -67,9 +67,6 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
 public class ScoutTypeUtility extends TypeUtility {
-  private static final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
-  private static final IType iValueField = TypeUtility.getType(RuntimeClasses.IValueField);
-  private static final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
 
   private static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
   private static final Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
@@ -485,7 +482,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   private static void collectPotentialMasterFields(IType type, Set<IType> collector, ITypeHierarchy formFieldHierarchy) {
     if (TypeUtility.exists(type)) {
-      if (formFieldHierarchy.isSubtype(iValueField, type)) {
+      if (formFieldHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IValueField), type)) {
         collector.add(type);
       }
       for (IType subType : TypeUtility.getInnerTypes(type)) {
@@ -685,6 +682,13 @@ public class ScoutTypeUtility extends TypeUtility {
   public static IType[] getAbstractTypesOnClasspath(IType superType, IJavaProject project) {
     ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(superType);
     IType[] abstractTypes = typeHierarchy.getAllSubtypes(superType, TypeFilters.getAbstractOnClasspath(project), TypeComparators.getTypeNameComparator());
+    return abstractTypes;
+  }
+
+  public static IType[] getAbstractTypesOnClasspath(IType superType, IJavaProject project, IType... excludedTypes) {
+    ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(superType);
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNotInTypes(excludedTypes), TypeFilters.getAbstractOnClasspath(project));
+    IType[] abstractTypes = typeHierarchy.getAllSubtypes(superType, filter, TypeComparators.getTypeNameComparator());
     return abstractTypes;
   }
 

@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
@@ -34,6 +35,13 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
+/**
+ * <h3>{@link FormNewOperation}</h3>
+ * To create a new form. A form is either a view, editor or a dialog.
+ *
+ * @author aho
+ * @since 1.0.0 2008
+ */
 public class FormNewOperation implements IOperation {
 
   private String m_typeName;
@@ -66,6 +74,9 @@ public class FormNewOperation implements IOperation {
     }
     if (getClientBundle() == null) {
       throw new IllegalArgumentException("client boundle missing.");
+    }
+    if (StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
+      ScoutSdk.logWarning("Create a form '" + getTypeName() + "' without a super type.");
     }
   }
 

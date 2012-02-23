@@ -25,14 +25,9 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.CodeTypeNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.code.CodeIdField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -58,13 +53,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   private String m_nextCodeId;
   private String m_nextCodeIdSource;
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
-  private ITypeProposal m_superType;
-  private SignatureProposal m_genericSignature;
+  private IType m_superType;
+  private String m_genericSignature;
 
   private CodeIdField m_nextCodeIdField;
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private ProposalTextField m_genericTypeField;
@@ -78,8 +73,8 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewCodeType"));
     setDescription(Texts.get("CreateANewCodeType"));
-    m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractCodeType)[0];
-    m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
+    m_superType = abstractCodeType;
+    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
   }
 
   @Override
@@ -106,14 +101,11 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -134,23 +126,20 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(RuntimeClasses.AbstractCodeType));
-
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(iCodeType, getSharedBundle().getJavaProject()));
-
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
+        TypeUtility.toArray(abstractCodeType), ScoutTypeUtility.getAbstractTypesOnClasspath(iCodeType, getSharedBundle().getJavaProject(), abstractCodeType));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          m_superType = (ITypeProposal) event.proposal;
+          m_superType = (IType) event.proposal;
 
-          if (getSuperType() != null && TypeUtility.isGenericType(getSuperType().getType())) {
+          if (TypeUtility.isGenericType(getSuperType())) {
             m_genericTypeField.setEnabled(true);
             if (getGenericSignature() == null) {
-              m_genericTypeField.acceptProposal(ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(Long.class.getName()))[0]);
+              m_genericTypeField.acceptProposal(TypeUtility.getType(Long.class.getName()));
             }
           }
           else {
@@ -163,15 +152,15 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, getSharedBundle(), Texts.get("GenericType"));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), getSharedBundle(), SignatureProposalProvider.DEFAULT_MOST_USED);
     m_genericTypeField.acceptProposal(getGenericSignature());
-    m_genericTypeField.setEnabled(getSuperType() != null && TypeUtility.isGenericType(getSuperType().getType()));
+    m_genericTypeField.setEnabled(getSuperType() != null && TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          m_genericSignature = (SignatureProposal) event.proposal;
+          m_genericSignature = (String) event.proposal;
         }
         finally {
           setStateChanging(false);
@@ -196,23 +185,21 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     // write back members
     op.setSharedBundle(getSharedBundle());
     op.setTypeName(getTypeName());
-    if (getNlsName() != null) {
-      op.setNlsEntry(getNlsName().getNlsEntry());
-    }
+    op.setNlsEntry(getNlsName());
 
-    ITypeProposal superTypeProp = getSuperType();
+    IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature().getSignature()) + ">", true);
+        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
       }
       else {
-        sig = Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true);
+        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true);
       }
       op.setSuperTypeSignature(sig);
     }
     if (getGenericSignature() != null) {
-      op.setGenericTypeSignature(getGenericSignature().getSignature());
+      op.setGenericTypeSignature(getGenericSignature());
     }
     op.setNextCodeId(getNextCodeIdSource());
     op.setFormatSource(true);
@@ -274,7 +261,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusGenericType() throws JavaModelException {
-    if (getSuperType() != null && TypeUtility.isGenericType(getSuperType().getType())) {
+    if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
       }
@@ -303,11 +290,11 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_nextCodeIdSource;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -337,11 +324,11 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;
@@ -354,7 +341,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public void setGenericSignature(SignatureProposal genericSignature) {
+  public void setGenericSignature(String genericSignature) {
     try {
       setStateChanging(true);
       m_genericSignature = genericSignature;
@@ -367,7 +354,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public SignatureProposal getGenericSignature() {
+  public String getGenericSignature() {
     return m_genericSignature;
   }
 }

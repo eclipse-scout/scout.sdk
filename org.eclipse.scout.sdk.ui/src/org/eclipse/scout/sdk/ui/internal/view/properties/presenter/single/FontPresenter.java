@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.FontDialog;
 import org.eclipse.scout.sdk.ui.internal.dialog.FontSpec;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -35,7 +36,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>StringPresenter</h3> Representing a plain text property method. References like 'm_value' or
@@ -47,7 +47,7 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
   private Font m_defaultFont;
   private Button m_chooserButton;
 
-  public FontPresenter(FormToolkit toolkit, Composite parent) {
+  public FontPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, ".*");
   }
 

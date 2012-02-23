@@ -1,9 +1,9 @@
 package org.eclipse.scout.sdk.internal.test.presenter;
 
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public abstract class AbstractPresenterTestInfo {
 
@@ -24,7 +24,7 @@ public abstract class AbstractPresenterTestInfo {
    *          the method for which the presenter should be created.
    * @return The created and initialized presenter.
    */
-  public abstract AbstractMethodPresenter createPresenter(FormToolkit toolkit, Composite parent, ConfigurationMethod m);
+  public abstract AbstractMethodPresenter createPresenter(PropertyViewFormToolkit toolkit, Composite parent, ConfigurationMethod m);
 
   /**
    * Specifies the maximum allowed duration in nanoseconds to create and initialize this presenter (call of the

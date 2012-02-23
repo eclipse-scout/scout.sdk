@@ -1,46 +1,83 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
-import org.eclipse.scout.sdk.ui.internal.fields.proposal.ConstantFieldProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelHorizontalAlignmentPresenter.HorizontalAlignment;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
-public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter<ConstantFieldProposal<Integer>> {
-  public static final int LEFT = -1;
-  public static final int CENTER = 0;
-  public static final int RIGHT = 1;
-  public static final int DEFAULT = 1000;
+public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter<HorizontalAlignment> {
 
-  public LabelHorizontalAlignmentPresenter(FormToolkit toolkit, Composite parent) {
+  protected static enum HorizontalAlignment {
+    Left,
+    Center,
+    Right,
+    Default
+  }
+
+  public LabelHorizontalAlignmentPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
   @Override
-  protected void init(ConfigurationMethod method) throws CoreException {
-    setProposals(ScoutProposalUtility.getLabelHorizontalAlignmentProposals());
-    super.init(method);
+  protected void createProposalFieldProviders(ProposalTextField proposalField) {
+    ILabelProvider labelProvider = new LabelProvider() {
+      @Override
+      public String getText(Object element) {
+        return element.toString();
+      }
+
+      @Override
+      public Image getImage(Object element) {
+        HorizontalAlignment value = (HorizontalAlignment) element;
+        switch (value) {
+          case Left:
+            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft);
+          case Center:
+            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalCenter);
+          case Right:
+            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight);
+        }
+        return ScoutSdkUi.getImage(ScoutSdkUi.Default);
+      }
+
+    };
+    getProposalField().setLabelProvider(labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(HorizontalAlignment.values(), labelProvider);
+    getProposalField().setContentProvider(provider);
   }
 
   @Override
-  protected ConstantFieldProposal<Integer> parseInput(String input) throws CoreException {
+  protected HorizontalAlignment parseInput(String input) throws CoreException {
     int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    return findProposal(parsedInt);
+    switch (parsedInt) {
+      case -1:
+        return HorizontalAlignment.Left;
+      case 0:
+        return HorizontalAlignment.Center;
+      case 1:
+        return HorizontalAlignment.Right;
+    }
+    return HorizontalAlignment.Default;
   }
 
   @Override
-  protected void storeValue(ConstantFieldProposal<Integer> value) {
+  protected void storeValue(HorizontalAlignment value) {
     if (value == null) {
       // set to default
-      getProposalComponent().acceptProposal(getDefaultValue());
+      getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
     IOperation op = null;
@@ -50,7 +87,17 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
       }
     }
     else {
-      String sourceValue = "" + value.getConstantValue();
+      String sourceValue;
+      switch (value) {
+        case Left:
+          sourceValue = "-1";
+        case Center:
+          sourceValue = "0";
+        case Right:
+          sourceValue = "1";
+        default:
+          sourceValue = "1000";
+      }
       op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
     }
 
@@ -60,24 +107,4 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
     }
   }
 
-  private ConstantFieldProposal<Integer> findProposal(int id) {
-    if (id == DEFAULT) {
-      id = DEFAULT;
-    }
-    else if (id > 0) {
-      id = RIGHT;
-    }
-    else if (id == 0) {
-      id = CENTER;
-    }
-    else {
-      id = LEFT;
-    }
-    for (ConstantFieldProposal<Integer> prop : getProposals()) {
-      if (prop.getConstantValue() == id) {
-        return prop;
-      }
-    }
-    return null;
-  }
 }

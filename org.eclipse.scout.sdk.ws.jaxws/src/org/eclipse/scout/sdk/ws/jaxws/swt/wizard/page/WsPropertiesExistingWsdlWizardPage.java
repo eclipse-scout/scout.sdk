@@ -11,8 +11,9 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -31,10 +32,11 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposalProvider;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
@@ -50,7 +52,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -102,12 +103,12 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
 
   @Override
   protected void createContent(Composite parent) {
-    m_serviceField = new ProposalTextField(parent);
-    m_serviceField.setLabelText(Texts.get("Service"));
+    m_serviceField = getFieldToolkit().createProposalField(parent, Texts.get("Service"));
+    m_serviceField.setLabelProvider(new SimpleLabelProvider());
     m_serviceField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        IContentProposalEx proposal = event.proposal;
+        Object proposal = event.proposal;
         if (proposal != null) {
           setServiceInternal(((P_ServiceProposal) proposal).getService());
         }
@@ -118,12 +119,12 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
       }
     });
 
-    m_portField = new ProposalTextField(parent);
-    m_portField.setLabelText(Texts.get("Port"));
+    m_portField = getFieldToolkit().createProposalField(parent, Texts.get("Port"));
+    m_portField.setLabelProvider(new SimpleLabelProvider());
     m_portField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        IContentProposalEx proposal = event.proposal;
+        Object proposal = event.proposal;
         if (proposal != null) {
           setPortInternal(((P_PortProposal) proposal).getPort());
         }
@@ -295,9 +296,8 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
 
       // reload proposals of service
       P_ServiceProposal[] serviceProposals = getServiceProposals();
-      DefaultProposalProvider provider = new DefaultProposalProvider();
-      provider.setShortList(serviceProposals);
-      m_serviceField.setContentProposalProvider(provider);
+      SimpleProposalProvider serviceProvider = new SimpleProposalProvider(serviceProposals);
+      m_serviceField.setContentProvider(serviceProvider);
 
       // default proposal for service --> ports are reloaded by setting the service
       if (serviceProposals.length > 0) {
@@ -387,11 +387,10 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
 
     // reload proposals of port
     P_PortProposal[] portProposals = getPortProposals();
-    DefaultProposalProvider provider = new DefaultProposalProvider();
-    provider.setShortList(portProposals);
+    SimpleProposalProvider portProvider = new SimpleProposalProvider(portProposals);
     if (isControlCreated()) {
       m_portField.setEnabled(service != null);
-      m_portField.setContentProposalProvider(provider);
+      m_portField.setContentProvider(portProvider);
     }
 
     // default proposal
@@ -540,92 +539,65 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
   }
 
   private P_ServiceProposal[] getServiceProposals() {
-    List<P_ServiceProposal> proposals = new LinkedList<P_ServiceProposal>();
-
     if (getWsdlDefinition() != null) {
-      for (Object service : getWsdlDefinition().getServices().values()) {
+      Collection services = getWsdlDefinition().getServices().values();
+      List<P_ServiceProposal> proposals = new ArrayList<P_ServiceProposal>(services.size());
+      for (Object service : services) {
         proposals.add(new P_ServiceProposal((Service) service));
       }
+      return proposals.toArray(new P_ServiceProposal[proposals.size()]);
     }
-
-    return proposals.toArray(new P_ServiceProposal[proposals.size()]);
+    return new P_ServiceProposal[0];
   }
 
   private P_PortProposal[] getPortProposals() {
-    List<P_PortProposal> proposals = new LinkedList<P_PortProposal>();
-
     if (getService() != null) {
-      for (Object port : getService().getPorts().values()) {
+      Collection ports = getService().getPorts().values();
+      List<P_PortProposal> proposals = new ArrayList<P_PortProposal>(ports.size());
+      for (Object port : ports) {
         proposals.add(new P_PortProposal((Port) port));
       }
+      return proposals.toArray(new P_PortProposal[proposals.size()]);
     }
-
-    return proposals.toArray(new P_PortProposal[proposals.size()]);
+    return new P_PortProposal[0];
   }
 
-  private class P_ServiceProposal implements IContentProposalEx {
+  private class P_ServiceProposal extends SimpleProposal {
 
-    private Service m_service;
+    private static final String DATA_SERVICE = "dataService";
 
     private P_ServiceProposal(Service service) {
-      m_service = service;
+      super(service.getQName().getLocalPart(), JaxWsSdk.getImage(JaxWsIcons.Service));
+      setData(DATA_SERVICE, service);
     }
 
     @Override
-    public int getCursorPosition(boolean selected, boolean expertMode) {
-      return 0;
-    }
-
-    @Override
-    public Image getImage(boolean selected, boolean expertMode) {
-      return JaxWsSdk.getImage(JaxWsIcons.Service);
-    }
-
-    @Override
-    public String getLabel(boolean selected, boolean expertMode) {
-      if (selected) {
-        return m_service.getQName().toString();
-      }
-      else {
-        return m_service.getQName().getLocalPart();
-      }
+    public String getTextSelected() {
+      return getService().getQName().toString();
     }
 
     public Service getService() {
-      return m_service;
+      return (Service) getData(DATA_SERVICE);
     }
   }
 
-  private class P_PortProposal implements IContentProposalEx {
+  private class P_PortProposal extends SimpleProposal {
 
-    private Port m_port;
+    private static final String DATA_PORT = "dataPort";
 
     private P_PortProposal(Port port) {
-      m_port = port;
+      super(port.getName(), JaxWsSdk.getImage(JaxWsIcons.Port));
+      setData(DATA_PORT, port);
     }
 
     @Override
-    public int getCursorPosition(boolean selected, boolean expertMode) {
-      return 0;
-    }
-
-    @Override
-    public Image getImage(boolean selected, boolean expertMode) {
-      return JaxWsSdk.getImage(JaxWsIcons.Port);
-    }
-
-    @Override
-    public String getLabel(boolean selected, boolean expertMode) {
-      if (selected) {
-        return "{" + m_port.getBinding().getPortType().getQName().getNamespaceURI() + "}" + m_port.getName();
-      }
-      else {
-        return m_port.getName();
-      }
+    public String getTextSelected() {
+      Port port = getPort();
+      return "{" + port.getBinding().getPortType().getQName().getNamespaceURI() + "}" + port.getName();
     }
 
     public Port getPort() {
-      return m_port;
+      return (Port) getData(DATA_PORT);
     }
   }
 }

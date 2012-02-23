@@ -27,6 +27,6 @@ public interface IProposalDescriptionProvider {
    *          the selected proposal or null
    * @return the content to display or null if no description is available.
    */
-  public Control createDescriptionContent(Composite parent, IContentProposalEx proposal);
+  public Control createDescriptionContent(Composite parent, Object proposal);
 
 }

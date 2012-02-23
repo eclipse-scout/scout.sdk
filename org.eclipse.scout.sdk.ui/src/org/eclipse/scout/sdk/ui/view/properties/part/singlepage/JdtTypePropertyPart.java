@@ -403,7 +403,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
     else if (propertyType.equals("DOC")) {
       presenter = new NlsDocsTextPresenter(getFormToolkit(), parent);
-      ((NlsDocsTextPresenter) presenter).setType(getPage().getType());
+//      ((NlsDocsTextPresenter) presenter).setType(getPage().getType());
       presenter.setMethod(method);
     }
     else if (propertyType.equals("VERTICAL_ALIGNMENT")) {

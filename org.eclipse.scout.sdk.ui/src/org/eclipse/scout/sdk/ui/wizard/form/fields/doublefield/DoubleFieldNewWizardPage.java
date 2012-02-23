@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.nls.sdk.internal.ui.action.NlsProposal;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -26,8 +27,6 @@ import org.eclipse.scout.sdk.operation.form.field.DoubleFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -51,12 +50,12 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
   private SiblingProposal m_sibling;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_siblingField;
 
@@ -85,14 +84,11 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -137,7 +133,7 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setFormatSource(true);
     // write back members
     if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName().getNlsEntry());
+      operation.setNlsEntry(getNlsName());
     }
     operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
@@ -148,7 +144,7 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
     operation.run(monitor, workingCopyManager);
     m_createdField = operation.getCreatedField();
@@ -191,11 +187,11 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_createdField;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;

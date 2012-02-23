@@ -6,14 +6,13 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.ICodeIdParser;
+import org.eclipse.scout.sdk.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.CodeIdExtensionPoint;
-import org.eclipse.scout.sdk.ui.wizard.WizardPageFieldToolkit;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
@@ -43,7 +42,7 @@ public class CodeIdField extends Composite {
   }
 
   private void createContent() {
-    m_nextCodeIdField = new WizardPageFieldToolkit().createStyledTextField(this, Texts.get("CodeId"));
+    m_nextCodeIdField = new FieldToolkit().createStyledTextField(this, Texts.get("CodeId"));
 
     setLayout(new GridLayout(1, false));
     m_nextCodeIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
@@ -73,8 +72,10 @@ public class CodeIdField extends Composite {
   }
 
   private String getGenericSignature() {
-    if (getGenericTypeField() == null || getGenericTypeField().getSelectedProposal() == null) return null;
-    return ((SignatureProposal) getGenericTypeField().getSelectedProposal()).getSignature();
+    if (getGenericTypeField() != null && getGenericTypeField().getSelectedProposal() != null) {
+      return (String) getGenericTypeField().getSelectedProposal();
+    }
+    return null;
   }
 
   public void addModifyListener(ModifyListener listener) {

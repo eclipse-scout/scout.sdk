@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.IPresenterAction;
@@ -27,7 +28,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 public class ActionPresenter extends AbstractPresenter {
@@ -38,7 +38,7 @@ public class ActionPresenter extends AbstractPresenter {
   private Text m_text;
   private ImageHyperlink m_link;
 
-  public ActionPresenter(Composite parent, IPresenterAction presenterAction, FormToolkit toolkit) {
+  public ActionPresenter(Composite parent, IPresenterAction presenterAction, PropertyViewFormToolkit toolkit) {
     super(toolkit, parent);
     m_presenterAction = presenterAction;
     createPresenter();

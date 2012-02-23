@@ -25,14 +25,10 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.OutlineToolbuttonNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.fields.proposal.ScoutTypeProposalProvider;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -55,7 +51,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
   final IType iToolButton = TypeUtility.getType(RuntimeClasses.IToolButton);
   final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
-  private ITypeProposal m_outline;
+  private IType m_outline;
   private String m_typeName;
   private SiblingProposal m_sibling;
 
@@ -78,24 +74,21 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
   @Override
   protected void createContent(Composite parent) {
 
-    ITypeProposal[] outlineProposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getClassesOnClasspath(iOutline, m_declaringType.getJavaProject()));
-    m_outlineField = getFieldToolkit().createProposalField(parent, new ScoutTypeProposalProvider(outlineProposals), Texts.get("Outline"));
+    m_outlineField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Outline"), ScoutTypeUtility.getClassesOnClasspath(iOutline, m_declaringType.getJavaProject()));
     m_outlineField.acceptProposal(getOutline());
     m_outlineField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          m_outline = (ITypeProposal) event.proposal;
+          m_outline = (IType) event.proposal;
           if (getOutline() != null && StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-            m_typeNameField.setText(getOutline().getType().getElementName());
+            m_typeNameField.setText(getOutline().getElementName());
           }
         }
         finally {
           setStateChanging(false);
         }
-        setOutline((ITypeProposal) event.proposal);
-        pingStateChanging();
       }
     });
 
@@ -110,10 +103,8 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(ScoutTypeUtility.getToolbuttons(m_declaringType));
-    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
+    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, TypeUtility.getType(RuntimeClasses.IToolButton));
     m_siblingField.acceptProposal(m_sibling);
-    m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -142,14 +133,14 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
       operation.setSuperTypeSignature(Signature.createTypeSignature(previousPage.getSuperType().getFullyQualifiedName(), true));
     }
     if (getOutline() != null) {
-      operation.setOutlineType(getOutline().getType());
+      operation.setOutlineType(getOutline());
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredOutline(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_TOOL_BUTTON));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
     operation.run(monitor, workingCopyManager);
     return true;
@@ -197,7 +188,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
     return null;
   }
 
-  public void setOutline(ITypeProposal outline) {
+  public void setOutline(IType outline) {
     try {
       setStateChanging(true);
       m_outline = outline;
@@ -210,7 +201,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
     }
   }
 
-  public ITypeProposal getOutline() {
+  public IType getOutline() {
     return m_outline;
   }
 

@@ -30,10 +30,10 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public class TextServiceNodePage extends AbstractServiceNodePage {
 
-  private final static IType ifType = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+  protected static IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
 
   public TextServiceNodePage(AbstractPage parentPage, IType type) {
-    super(parentPage, type, ifType, SdkProperties.SUFFIX_TEXT_SERVICE);
+    super(parentPage, type, abstractDynamicNlsTextProviderService, SdkProperties.SUFFIX_TEXT_SERVICE);
     setName(type.getElementName());
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Text));
   }

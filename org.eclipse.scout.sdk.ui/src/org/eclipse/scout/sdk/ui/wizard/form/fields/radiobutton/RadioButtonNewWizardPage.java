@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields.radiobutton;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,13 +25,8 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.RadioButtonNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -59,12 +51,12 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
   final IType abstractRadioButton = TypeUtility.getType(RuntimeClasses.AbstractRadioButton);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
-  private ITypeProposal m_superType;
+  private IType m_superType;
   private SiblingProposal m_sibling;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private ProposalTextField m_siblingField;
@@ -80,9 +72,9 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    ITypeProposal superType = getSuperType();
+    IType superType = getSuperType();
     if (superType == null) {
-      superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractRadioButton)[0];
+      superType = abstractRadioButton;
     }
     m_superType = superType;
     m_sibling = SiblingProposal.SIBLING_END;
@@ -98,14 +90,11 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -126,16 +115,13 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ArrayList<IType> abstractRadioButtons = new ArrayList<IType>(Arrays.asList(ScoutTypeUtility.getAbstractTypesOnClasspath(abstractRadioButton, m_declaringType.getJavaProject())));
-    abstractRadioButtons.add(abstractRadioButton);
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractRadioButtons.toArray(new IType[abstractRadioButtons.size()]));
-
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(abstractRadioButton),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(abstractRadioButton, m_declaringType.getJavaProject(), abstractRadioButton));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_superType = (ITypeProposal) event.proposal;
+        m_superType = (IType) event.proposal;
         pingStateChanging();
       }
     });
@@ -164,11 +150,11 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     RadioButtonNewOperation op = new RadioButtonNewOperation(getDeclaringType());
     op.setTypeName(getTypeName());
     if (getNlsName() != null) {
-      op.setNlsEntry(getNlsName().getNlsEntry());
+      op.setNlsEntry(getNlsName());
     }
-    ITypeProposal superTypeProp = getSuperType();
+    IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      op.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+      op.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
     }
     SiblingProposal siblingProposal = getSibling();
     if (siblingProposal == SiblingProposal.SIBLING_END) {
@@ -176,7 +162,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       op.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else if (siblingProposal != null) {
-      op.setSibling(siblingProposal.getScoutType());
+      op.setSibling(siblingProposal.getElement());
     }
 
     op.setFormatSource(true);
@@ -237,11 +223,11 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_createdRadioButton;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -271,11 +257,11 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;

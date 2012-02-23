@@ -23,20 +23,13 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.page.PageNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -67,13 +60,13 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   private IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
   private IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
-  private ITypeProposal m_holderType;
+  private IType m_holderType;
   private String m_nameSuffix;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_holderTypeField;
 
@@ -82,10 +75,11 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   private boolean m_hoderTypeEnabled = true;
 
-  private IScoutBundle m_clientBundle;
+  private final IScoutBundle m_clientBundle;
 
-  public PageNewAttributesWizardPage() {
+  public PageNewAttributesWizardPage(IScoutBundle clientBundle) {
     super(PageNewAttributesWizardPage.class.getName());
+    m_clientBundle = clientBundle;
     setTitle(Texts.get("NewPage"));
     setDescription(Texts.get("CreateANewPage"));
     m_nameSuffix = "";
@@ -95,21 +89,18 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, null, Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -131,7 +122,6 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     Control parentPageControl = createParentPageGroup(parent);
-    updateUiField(getClientBundle());
     // layout
     parent.setLayout(new GridLayout(1, true));
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
@@ -143,13 +133,22 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_OUT);
     group.setText(Texts.get("AddTo"));
 
-    m_holderTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("PageOutline"));
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+        ScoutTypeFilters.getInScoutBundles(getClientBundle()),
+        TypeFilters.getClassFilter());
 
+    IType[] pages = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithNodes, filter);
+    IType[] outlines = TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter);
+    IType[] propTypes = new IType[pages.length + outlines.length];
+    System.arraycopy(pages, 0, propTypes, 0, pages.length);
+    System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
+    Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
+    m_holderTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("PageOutline"), propTypes);
     m_holderTypeField.acceptProposal(getHolderType());
     m_holderTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_holderType = (ITypeProposal) event.proposal;
+        m_holderType = (IType) event.proposal;
         pingStateChanging();
       }
     });
@@ -160,45 +159,17 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     return group;
   }
 
-  private void updateUiField(IScoutBundle clientBundle) {
-    INlsProject nlsProject = null;
-    DefaultProposalProvider holderTypePropProvider = null;
-    if (clientBundle != null) {
-      nlsProject = clientBundle.findBestMatchNlsProject();
-      ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-          ScoutTypeFilters.getInScoutBundles(getClientBundle()),
-          TypeFilters.getClassFilter());
-
-      IType[] pages = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithNodes, filter);
-      IType[] outlines = TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter);
-      IType[] propTypes = new IType[pages.length + outlines.length];
-      System.arraycopy(pages, 0, propTypes, 0, pages.length);
-      System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
-      Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(propTypes);
-      holderTypePropProvider = new DefaultProposalProvider(proposals);
-    }
-    m_nlsNameField.setNlsProject(nlsProject);
-    IContentProposalEx selectedProposal = m_holderTypeField.getSelectedProposal();
-    m_holderTypeField.setContentProposalProvider(holderTypePropProvider);
-    m_holderTypeField.acceptProposal(selectedProposal);
-  }
-
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // write back members
     getOperation().setClientBundle(getClientBundle());
-    if (getNlsName() != null) {
-      getOperation().setNlsEntry(getNlsName().getNlsEntry());
-    }
+    getOperation().setNlsEntry(getNlsName());
     getOperation().setTypeName(getTypeName());
     IType superType = getSuperType();
     if (superType != null) {
       getOperation().setSuperTypeSignature(Signature.createTypeSignature(superType.getFullyQualifiedName(), true));
     }
-    if (getHolderType() != null) {
-      getOperation().setHolderType(getHolderType().getType());
-    }
+    getOperation().setHolderType(getHolderType());
 
     getOperation().run(monitor, workingCopyManager);
     return true;
@@ -251,28 +222,15 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     return m_operation;
   }
 
-  public void setClientBundle(IScoutBundle clientBundle) {
-    try {
-      setStateChanging(true);
-      m_clientBundle = clientBundle;
-      if (isControlCreated()) {
-        updateUiField(clientBundle);
-      }
-    }
-    finally {
-      setStateChanging(false);
-    }
-  }
-
   public IScoutBundle getClientBundle() {
     return m_clientBundle;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -337,7 +295,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public void setHolderType(ITypeProposal holderPage) {
+  public void setHolderType(IType holderPage) {
     try {
       setStateChanging(true);
       m_holderType = holderPage;
@@ -350,7 +308,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getHolderType() {
+  public IType getHolderType() {
     return m_holderType;
   }
 

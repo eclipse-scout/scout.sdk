@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -23,7 +24,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 public abstract class AbstractStringActionPresenter extends AbstractPropertyPresenter<String> {
@@ -34,7 +34,7 @@ public abstract class AbstractStringActionPresenter extends AbstractPropertyPres
   private String m_actionLinkTooltip;
   private boolean m_actionLinkEnabled;
 
-  public AbstractStringActionPresenter(Composite parent, FormToolkit toolkit) {
+  public AbstractStringActionPresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit, false);
     setAcceptNullValue(true);
     setUseLinkAsLabel(false);

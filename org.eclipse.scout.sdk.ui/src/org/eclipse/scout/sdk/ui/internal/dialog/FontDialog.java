@@ -134,7 +134,7 @@ public class FontDialog extends TitleAreaDialog {
         updateFontSpec();
       }
     });
-    m_fontNameTable = new FilteredTable(nameGroup, SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+    m_fontNameTable = new FilteredTable(nameGroup, SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
     m_fontNameTable.setEnabled(fontName != null);
     P_FontNameProvider provider = new P_FontNameProvider(m_fontNameTable.getDisplay());
     m_fontNameTable.getViewer().setLabelProvider(provider);
@@ -171,7 +171,7 @@ public class FontDialog extends TitleAreaDialog {
         updateFontSpec();
       }
     });
-    m_fontStyleTable = new FilteredTable(styleGroup, SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL);
+    m_fontStyleTable = new FilteredTable(styleGroup, SWT.SINGLE | SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
     m_fontStyleTable.setEnabled(m_fontSpec.getStyle() != null);
     P_FontSizeProvider provider = new P_FontSizeProvider();
     m_fontStyleTable.getViewer().setLabelProvider(provider);

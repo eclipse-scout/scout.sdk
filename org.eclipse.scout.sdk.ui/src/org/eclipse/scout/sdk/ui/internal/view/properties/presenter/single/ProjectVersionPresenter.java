@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -31,7 +32,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.osgi.framework.Version;
 
@@ -43,7 +43,7 @@ public class ProjectVersionPresenter extends AbstractPresenter {
   private ImageHyperlink m_applyVersionLink;
   private final HashMap<IProject, PluginModelHelper> m_bundles;
 
-  public ProjectVersionPresenter(FormToolkit toolkit, Composite parent, IScoutProject scoutProject) {
+  public ProjectVersionPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutProject scoutProject) {
     super(toolkit, parent);
     IScoutBundle[] scoutBundles = scoutProject.getAllScoutBundles(); // do not include sub projects: they might have different versions
     m_bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.length);

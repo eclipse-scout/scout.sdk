@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -32,7 +33,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>BooleanPresenter</h3> ...
@@ -42,7 +42,7 @@ public class BooleanPresenter extends AbstractMethodPresenter {
   private Button m_checkbox;
   private boolean m_defaultValue;
 
-  public BooleanPresenter(FormToolkit toolkit, Composite parent) {
+  public BooleanPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
@@ -125,16 +125,7 @@ public class BooleanPresenter extends AbstractMethodPresenter {
       OperationJob job = new OperationJob(op);
       job.setDebug(true);
       job.schedule();
-//      try {
-//        job.join();
-//        if (op instanceof ConfigPropertyMethodUpdateOperation) {
-//          showJavaElementInEditor(((ConfigPropertyMethodUpdateOperation) op).getUpdatedMethod(), false);
-//
-//        }
-//      }
-//      catch (InterruptedException e) {
-//        ScoutSdkUi.logWarning("job interrupted.", e);
-//      }
+
     }
   }
 

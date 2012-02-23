@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.EnableRegExProperty;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -21,7 +22,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class PageFilterRegExPresenter extends AbstractPresenter {
 
@@ -29,7 +29,7 @@ public class PageFilterRegExPresenter extends AbstractPresenter {
   private Button m_field;
   private Label m_label;
 
-  public PageFilterRegExPresenter(FormToolkit toolkit, Composite parent, EnableRegExProperty prop) {
+  public PageFilterRegExPresenter(PropertyViewFormToolkit toolkit, Composite parent, EnableRegExProperty prop) {
     super(toolkit, parent);
     m_prop = prop;
     createContent(parent);

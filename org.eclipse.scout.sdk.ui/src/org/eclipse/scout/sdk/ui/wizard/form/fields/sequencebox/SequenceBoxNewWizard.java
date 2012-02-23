@@ -54,7 +54,7 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
     m_operation = new SequenceBoxNewOperation(getDeclaringType(), true);
     // write back members
     if (m_page1.getNlsName() != null) {
-      m_operation.setNlsEntry(m_page1.getNlsName().getNlsEntry());
+      m_operation.setNlsEntry(m_page1.getNlsName());
     }
     m_operation.setTypeName(m_page1.getTypeName());
     if (m_page1.getSuperType() != null) {
@@ -65,7 +65,7 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
       m_operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
-      m_operation.setSibling(m_page1.getSibling().getScoutType());
+      m_operation.setSibling(m_page1.getSibling().getElement());
     }
 
     m_operation.setContentTemplate(m_templatePage.getSelectedTemplate());

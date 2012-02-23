@@ -32,6 +32,7 @@ import org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment;
  *  </pre>
 */
 public class SwtEnvironment extends AbstractSwtEnvironment{
+	
   public SwtEnvironment(Bundle bundle,String perspectiveId,Class<? extends AbstractClientSession> clientSessionClazz) {
     super(bundle, perspectiveId, clientSessionClazz);
     registerPart(IForm.VIEW_ID_CENTER, Activator.CENTER_VIEW_ID);

@@ -38,6 +38,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
@@ -49,10 +50,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 /**
@@ -84,7 +85,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
    * @param toolkit
    * @param parent
    */
-  public ProductLaunchPresenter(FormToolkit toolkit, Composite parent, IFile productFile, IScoutBundle bundle) {
+  public ProductLaunchPresenter(PropertyViewFormToolkit toolkit, Composite parent, IFile productFile, IScoutBundle bundle) {
     super(toolkit, parent);
     m_productFile = productFile;
     m_bundle = bundle;

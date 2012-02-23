@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class MenuNodePage extends AbstractScoutTypePage {
-  static final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
+  final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
 
   private InnerTypePageDirtyListener m_menuChangedListener;
 

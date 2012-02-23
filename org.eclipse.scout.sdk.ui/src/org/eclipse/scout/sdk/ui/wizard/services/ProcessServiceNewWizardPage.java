@@ -21,21 +21,18 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -57,6 +54,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   /** {@link ITypeProposal} **/
   public static final String PROP_FORM_DATA_TYPE = "formDataType";
 
+  final IType abstractService = TypeUtility.getType(RuntimeClasses.AbstractService);
   final IType iService = TypeUtility.getType(RuntimeClasses.IService);
   final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
 
@@ -87,36 +85,27 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("SuperType"));
-    if (getServerBundle() != null) {
-      ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-      ITypeFilter filter = TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject());
-      IType[] abstractServices = serviceHierarchy.getAllSubtypes(iService, filter, TypeComparators.getTypeNameComparator());
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractServices);
-      m_superTypeField.setContentProposalProvider(new DefaultProposalProvider(proposals));
-    }
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(TypeUtility.getTypes(RuntimeClasses.AbstractService)),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(iService, getServerBundle().getJavaProject(), abstractService));
+
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setSuperTypeInternal((ITypeProposal) event.proposal);
+        setSuperTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
 
-    m_formDataTypeField = getFieldToolkit().createProposalField(parent, null, Texts.get("FormData"));
-    if (getServerBundle() != null) {
-      ICachedTypeHierarchy formDataHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractFormData);
-      ITypeFilter filter = TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject());
-      IType[] abstractFormDatas = formDataHierarchy.getAllSubtypes(abstractFormData, filter, TypeComparators.getTypeNameComparator());
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractFormDatas);
-      m_formDataTypeField.setContentProposalProvider(new DefaultProposalProvider(proposals));
-    }
+    ICachedTypeHierarchy formDataHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractFormData);
+
+    IType[] formDataTypes = formDataHierarchy.getAllSubtypes(abstractFormData, TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+    m_formDataTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("FormData"), formDataTypes);
     m_formDataTypeField.acceptProposal(getFormDataType());
     m_formDataTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setFormDataTypeInternal((ITypeProposal) event.proposal);
+        setFormDataTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -133,9 +122,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   void fillProcessServiceNewOperation(ProcessServiceNewOperation op) {
     op.setServiceImplementationName(getTypeName());
     op.setServiceInterfaceName("I" + getTypeName());
-    if (getFormDataType() != null) {
-      op.setFormData(getFormDataType().getType());
-    }
+    op.setFormData(getFormDataType());
   }
 
   @Override
@@ -200,11 +187,11 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     setPropertyString(PROP_TYPE_NAME, typeName);
   }
 
-  public ITypeProposal getSuperType() {
-    return (ITypeProposal) getProperty(PROP_SUPER_TYPE);
+  public IType getSuperType() {
+    return (IType) getProperty(PROP_SUPER_TYPE);
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       setSuperTypeInternal(superType);
@@ -217,11 +204,11 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  protected void setSuperTypeInternal(ITypeProposal superType) {
+  protected void setSuperTypeInternal(IType superType) {
     setProperty(PROP_SUPER_TYPE, superType);
   }
 
-  public void setFormDataType(ITypeProposal formDataType) {
+  public void setFormDataType(IType formDataType) {
     try {
       setStateChanging(true);
       setFormDataTypeInternal(formDataType);
@@ -234,12 +221,12 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  protected void setFormDataTypeInternal(ITypeProposal formDatatype) {
+  protected void setFormDataTypeInternal(IType formDatatype) {
     setProperty(PROP_FORM_DATA_TYPE, formDatatype);
   }
 
-  public ITypeProposal getFormDataType() {
-    return (ITypeProposal) getProperty(PROP_FORM_DATA_TYPE);
+  public IType getFormDataType() {
+    return (IType) getProperty(PROP_FORM_DATA_TYPE);
   }
 
 }

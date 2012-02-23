@@ -24,11 +24,8 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.KeyStrokeNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -52,7 +49,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   final IType abstractKeyStroke = TypeUtility.getType(RuntimeClasses.AbstractKeyStroke);
 
   private String m_typeName;
-  private ITypeProposal m_superType;
+  private IType m_superType;
   private String m_keyStroke;
 
   private StyledTextField m_typeNameField;
@@ -70,7 +67,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewKeyStroke"));
     // default
     m_declaringType = declaringType;
-    m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractKeyStroke)[0];
+    m_superType = abstractKeyStroke;
     setOperation(new KeyStrokeNewOperation(m_declaringType));
   }
 
@@ -88,16 +85,13 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(abstractKeyStroke);
-
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(iKeyStroke, m_declaringType.getJavaProject()));
-
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(abstractKeyStroke),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(iKeyStroke, m_declaringType.getJavaProject(), abstractKeyStroke));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_superType = (ITypeProposal) event.proposal;
+        m_superType = (IType) event.proposal;
         pingStateChanging();
       }
     });
@@ -124,9 +118,9 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // write back members
     m_operation.setTypeName(getTypeName());
-    ITypeProposal superTypeProp = getSuperType();
+    IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      m_operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+      m_operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
     }
     m_operation.setKeyStroke(getKeyStroke());
     // sibling
@@ -206,11 +200,11 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;

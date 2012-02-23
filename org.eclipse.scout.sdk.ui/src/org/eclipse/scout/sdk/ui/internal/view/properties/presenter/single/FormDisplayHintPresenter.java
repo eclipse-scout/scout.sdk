@@ -11,49 +11,73 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IField;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
-import org.eclipse.scout.sdk.ui.internal.fields.proposal.ConstantFieldProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormDisplayHintPresenter.DisplayHint;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>FormDisplayHintPresenter</h3> ...
  */
-public class FormDisplayHintPresenter extends AbstractProposalPresenter<ConstantFieldProposal<Integer>> {
+public class FormDisplayHintPresenter extends AbstractProposalPresenter<DisplayHint> {
 
-  public FormDisplayHintPresenter(FormToolkit toolkit, Composite parent) {
+  protected static enum DisplayHint {
+    Dialog,
+    View
+  }
+
+  public FormDisplayHintPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
 
   }
 
   @Override
-  protected ConstantFieldProposal<Integer> parseInput(String input) throws CoreException {
+  protected void createProposalFieldProviders(ProposalTextField proposalField) {
+    ILabelProvider labelProvider = new LabelProvider() {
+      @Override
+      public String getText(Object element) {
+        return element.toString();
+      }
+
+      @Override
+      public Image getImage(Object element) {
+        return ScoutSdkUi.getImage(ScoutSdkUi.Default);
+      }
+
+    };
+    getProposalField().setLabelProvider(labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(DisplayHint.values(), labelProvider);
+    getProposalField().setContentProvider(provider);
+  }
+
+  @Override
+  protected DisplayHint parseInput(String input) throws CoreException {
     int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    return findProposal(parsedInt);
+    switch (parsedInt) {
+      case 0:
+        return DisplayHint.Dialog;
+      case 20:
+        return DisplayHint.View;
+    }
+    return null;
   }
 
   @Override
-  protected void init(ConfigurationMethod method) throws CoreException {
-    setProposals(ScoutProposalUtility.getFormDisplayHintProposals());
-    super.init(method);
-  }
-
-  @Override
-  protected synchronized void storeValue(ConstantFieldProposal<Integer> value) {
+  protected synchronized void storeValue(DisplayHint value) {
     if (value == null) {
-      getProposalComponent().acceptProposal(getDefaultValue());
+      getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
     IOperation op = null;
@@ -63,27 +87,21 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<Constant
       }
     }
     else {
-      final IField finalField = value.getField();
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName()) {
-        @Override
-        protected String createMethodBody(IMethod methodToOverride, IImportValidator validator) throws JavaModelException {
-          return "  return " + finalField.getElementName() + ";";
-        }
-
-      };
+      StringBuilder source = new StringBuilder("return ");
+      switch (value) {
+        case Dialog:
+          source.append("DISPLAY_HINT_DIALOG");
+          break;
+        case View:
+          source.append("DISPLAY_HINT_VIEW");
+          break;
+      }
+      source.append(";");
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString());
     }
     if (op != null) {
       new OperationJob(op).schedule();
     }
-  }
-
-  private ConstantFieldProposal<Integer> findProposal(int id) {
-    for (ConstantFieldProposal<Integer> prop : getProposals()) {
-      if (prop.getConstantValue() == id) {
-        return prop;
-      }
-    }
-    return null;
   }
 
 }

@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.SWT;
@@ -35,7 +36,6 @@ import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class StringPresenter extends AbstractPropertyPresenter<String> {
 
@@ -47,7 +47,7 @@ public class StringPresenter extends AbstractPropertyPresenter<String> {
   private boolean m_editable;
   private String m_tooltip;
 
-  public StringPresenter(Composite parent, FormToolkit toolkit) {
+  public StringPresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit, false);
     m_verifyListener = new P_VerifyListener();
     m_modifyListener = new P_ModifyListener();

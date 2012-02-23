@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.wizard.menu;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -33,7 +32,7 @@ public class MenuNewWizard extends AbstractWorkspaceWizard {
   }
 
   public void setSuperType(IType superType) {
-    m_page1.setSuperType(ScoutProposalUtility.getScoutTypeProposalsFor(superType)[0]);
+    m_page1.setSuperType(superType);
   }
 
   /**

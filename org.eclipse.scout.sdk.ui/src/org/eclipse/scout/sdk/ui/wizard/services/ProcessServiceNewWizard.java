@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
@@ -72,7 +71,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
     addPage(m_locationWizardPage);
     // init
-    m_serviceNewWizardPage.setSuperType(ScoutProposalUtility.getScoutTypeProposalsFor(abstractService)[0]);
+    m_serviceNewWizardPage.setSuperType(abstractService);
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {

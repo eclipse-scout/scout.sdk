@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class MenuTablePage extends AbstractPage {
 
-  static final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
+  final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
   private final IType m_declaringType;
   private InnerTypePageDirtyListener m_menuChangedListener;
 

@@ -19,37 +19,36 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.LegacyOperationAction;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.IContentProposalEx;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>AbstractProposalPresenter</h3> ...
  */
 @SuppressWarnings("deprecation")
-public abstract class AbstractProposalPresenter<T extends IContentProposalEx> extends AbstractMethodPresenter {
+public abstract class AbstractProposalPresenter<T extends Object> extends AbstractMethodPresenter {
 
   private ProposalTextField m_proposalField;
   private T m_currentSourceValue;
   private T m_defaultValue;
-  private DefaultProposalProvider m_proposalProvider;
+  private SimpleProposalProvider m_proposalProvider;
   private OptimisticLock storeValueLock = new OptimisticLock();
 
-  public AbstractProposalPresenter(FormToolkit toolkit, Composite parent) {
+  public AbstractProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
   @Override
   protected Control createContent(Composite container) {
-    m_proposalProvider = new DefaultProposalProvider();
-    m_proposalField = new ProposalTextField(container, m_proposalProvider, ProposalTextField.TYPE_NO_LABEL);
+    m_proposalField = getToolkit().createProposalField(container, "", ProposalTextField.STYLE_NO_LABEL);
+    createProposalFieldProviders(m_proposalField);
     m_proposalField.setEnabled(false);
     P_ProposalFieldListener listener = new P_ProposalFieldListener();
     m_proposalField.addProposalAdapterListener(listener);
@@ -65,6 +64,11 @@ public abstract class AbstractProposalPresenter<T extends IContentProposalEx> ex
     m_proposalField.setMenu(menu);
     return m_proposalField;
   }
+
+  /**
+   * @param proposalField
+   */
+  protected abstract void createProposalFieldProviders(ProposalTextField proposalField);
 
   @Override
   public void setEnabled(boolean enabled) {
@@ -102,8 +106,21 @@ public abstract class AbstractProposalPresenter<T extends IContentProposalEx> ex
     }
   }
 
+  /**
+   * @param input
+   *          the source string
+   * @return the value represented by the input string
+   * @throws CoreException
+   *           when the input could not be parsed.
+   */
   protected abstract T parseInput(String input) throws CoreException;
 
+  /**
+   * to store the value in the source file.
+   * 
+   * @param value
+   *          can be null
+   */
   protected abstract void storeValue(T value);
 
   public T getCurrentSourceValue() {
@@ -118,7 +135,7 @@ public abstract class AbstractProposalPresenter<T extends IContentProposalEx> ex
     return m_defaultValue;
   }
 
-  public ProposalTextField getProposalComponent() {
+  public ProposalTextField getProposalField() {
     return m_proposalField;
   }
 
@@ -144,14 +161,4 @@ public abstract class AbstractProposalPresenter<T extends IContentProposalEx> ex
     }
 
   } // end class P_TextListener
-
-  @SuppressWarnings("unchecked")
-  public T[] getProposals() {
-    return (T[]) m_proposalProvider.getShortList();
-  }
-
-  public void setProposals(T[] proposals) {
-    m_proposalProvider.setShortList(proposals);
-  }
-
 }

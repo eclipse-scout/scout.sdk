@@ -8,6 +8,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.TechnologyExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.ITechnologyListener;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.Technology;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.SWT;
@@ -18,14 +19,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class TechnologyPresenter extends AbstractPresenter {
 
   private final IScoutProject m_scoutProject;
   private final LinkedList<P_TechnologyUiModel> m_techModels;
 
-  public TechnologyPresenter(FormToolkit toolkit, Composite parent, IScoutProject scoutProject) {
+  public TechnologyPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutProject scoutProject) {
     super(toolkit, parent);
     m_scoutProject = scoutProject;
     m_techModels = new LinkedList<P_TechnologyUiModel>();

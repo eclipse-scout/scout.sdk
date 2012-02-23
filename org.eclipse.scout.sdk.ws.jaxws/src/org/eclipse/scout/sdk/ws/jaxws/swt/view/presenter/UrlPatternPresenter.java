@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -22,13 +23,12 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.JaxWsServletRegistrationWizardPage;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class UrlPatternPresenter extends AbstractStringActionPresenter {
 
   private SunJaxWsBean m_sunJaxWsBean;
 
-  public UrlPatternPresenter(Composite parent, FormToolkit toolkit) {
+  public UrlPatternPresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit);
     setActionLinkTooltip(Texts.get("ChangeUrlOfWsdl"));
     setActionLinkEnabled(false);

@@ -24,11 +24,8 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -47,11 +44,11 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>CodeTypeWizardPage</h3> ...
  */
 public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
-
+  IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
   final IType basicHierarchyPermission = TypeUtility.getType(RuntimeClasses.BasicHierarchyPermission);
 
   private String m_typeName;
-  private ITypeProposal m_superType;
+  private IType m_superType;
 
   // ui fields
   private StyledTextField m_typeNameField;
@@ -65,7 +62,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewPermission"));
     setDescription(Texts.get("CreateANewPermission"));
-    m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(basicHierarchyPermission)[0];
+    m_superType = basicHierarchyPermission;
   }
 
   @Override
@@ -87,15 +84,13 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(RuntimeClasses.BasicPermission));
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(basicHierarchyPermission, getSharedBundle().getJavaProject()));
-
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(basicPermission),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(basicHierarchyPermission, getSharedBundle().getJavaProject(), basicPermission));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_superType = (ITypeProposal) event.proposal;
+        m_superType = (IType) event.proposal;
         pingStateChanging();
       }
     });
@@ -114,9 +109,9 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     op.setSharedBundle(getSharedBundle());
     op.setTypeName(getTypeName());
 
-    ITypeProposal superTypeProp = getSuperType();
+    IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      op.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+      op.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
     }
     op.run(monitor, workingCopyManager);
     return true;
@@ -180,11 +175,11 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;

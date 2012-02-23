@@ -10,26 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.TextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalPopup.SearchPatternInput;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -46,78 +39,80 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ProposalTextField extends TextField {
 
-  public static int TYPE_INITIAL_SHOW_POPUP = 1 << 1;
-  public static int TYPE_SEARCH_EXPERT_MODE = 1 << 2;
-  public static int TYPE_NO_LABEL = 1 << 10;
+  public static final ISeparatorProposal SEPERATOR = new ISeparatorProposal() {
+  };
+
+  public static int STYLE_DEFAULT = 1 << 0;
+  public static int STYLE_INITIAL_SHOW_POPUP = 1 << 1;
+  public static int STYLE_SEARCH_EXPERT_MODE = 1 << 2;
+  public static int STYLE_NO_LABEL = 1 << 10;
   // public static int TYPE_FIRE_ON_FOCUS_LOST=1 << 14;
 
-  private IContentProposalProvider m_proposalProvider;
+  private IProposalSelectionHandler m_selectionHandler;
 
   private Button m_popupButton;
   private ProposalPopup m_popup;
   private P_ProposalFieldListener m_proposalFieldListener;
-  private IContentProposalEx m_loadingProposal = new ISeparatorProposal() {
-    @Override
-    public String getLabel(boolean selected, boolean expertMode) {
-      return Texts.get("Loading");
-    }
-
-    @Override
-    public Image getImage(boolean selected, boolean expertMode) {
-      return ScoutSdkUi.getImage(ScoutSdkUi.ToolProgress);
-    }
-
-    @Override
-    public int getCursorPosition(boolean selected, boolean expertMode) {
-      return 0;
-    }
-  };
-  private P_ProposalLoaderJob m_currentLoader = null;
+//  private P_ProposalLoaderJob m_currentLoader = null;
   private Object lockProposalAdpter = new Object();
-  private IContentProposalEx m_selectedProposal = null;
+  private Object m_selectedProposal = null;
 
-  private IContentProposalEx m_focusGainedProposal = null;
-  private IContentProposalEx m_lastFiredProposal = null;
-  private P_RequestPattern m_lastRequestPattern;
+  private Object m_focusGainedProposal = null;
+  private Object m_lastFiredProposal = null;
   private EventListenerList m_eventListeners = new EventListenerList();
   private Lock m_updateLock = new Lock();
   private Lock m_focusLock = new Lock();
   private IProposalPopupListener m_popupListener = new P_PopupListener();
-  private int m_type;
-  private boolean m_searchExpertMode;
+  private int m_style;
   private IProposalDescriptionProvider m_proposalDescriptionProvider;
 
+  private Object m_input;
+
   public ProposalTextField(Composite parent) {
-    this(parent, null);
+    this(parent, STYLE_DEFAULT);
   }
 
-  public ProposalTextField(Composite parent, IContentProposalProvider proposalProvider) {
-    this(parent, proposalProvider, 0);
-  }
-
-  public ProposalTextField(Composite parent, IContentProposalProvider proposalProvider, int type) {
+  public ProposalTextField(Composite parent, int style) {
     super(parent);
-    m_type = type;
-    setContentProposalProvider(proposalProvider);
+    m_style = style;
     init();
   }
 
-  public void setContentProposalProvider(IContentProposalProvider provider) {
-    if (!CompareUtility.equals(provider, m_proposalProvider)) {
-      m_lastRequestPattern = null;
+  public void setInput(Object input) {
+    m_input = input;
+    SearchPatternInput searchPatternInput = new SearchPatternInput(input, getText());
+    m_popup.setInput(searchPatternInput);
+  }
+
+  public Object getInput() {
+    return m_input;
+  }
+
+  public void setContentProvider(IContentProvider provider) {
+    if (!CompareUtility.equals(provider, m_popup.getContentProvider())) {
+      m_popup.setContentProvider(provider);
       acceptProposal(null);
-      m_proposalProvider = provider;
-      if (m_proposalProvider == null) {
-        detachProposalListener(getTextComponent());
-      }
-      else {
-        attachProposalListener(getTextComponent());
-      }
     }
   }
 
-  public IContentProposalProvider getContentProposalProvider() {
-    return m_proposalProvider;
+  public IContentProvider getContentProvider() {
+    return m_popup.getContentProvider();
+  }
+
+  public void setLabelProvider(IBaseLabelProvider labelProvider) {
+    m_popup.setLabelProvider(labelProvider);
+  }
+
+  public IBaseLabelProvider getLabelProvider() {
+    return m_popup.getLabelProvider();
+  }
+
+  public void setSelectionHandler(IProposalSelectionHandler selectionHandler) {
+    m_selectionHandler = selectionHandler;
+  }
+
+  public IProposalSelectionHandler getSelectionHandler() {
+    return m_selectionHandler;
   }
 
   private void attachProposalListener(StyledText textComponent) {
@@ -154,7 +149,7 @@ public class ProposalTextField extends TextField {
     StyledText text = getTextComponent();
     FormData labelData = (FormData) label.getLayoutData();
     FormData textData = (FormData) text.getLayoutData();
-    if ((m_type & TYPE_NO_LABEL) != 0) {
+    if ((m_style & STYLE_NO_LABEL) != 0) {
       label.setVisible(false);
       labelData.right = new FormAttachment(0, 0);
       textData.left = new FormAttachment(0, 0);
@@ -164,7 +159,6 @@ public class ProposalTextField extends TextField {
   @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
-
     Label label = getLabelComponent();
     StyledText text = getTextComponent();
     m_popupButton = new Button(parent, SWT.PUSH | SWT.FLAT);
@@ -174,8 +168,8 @@ public class ProposalTextField extends TextField {
       public void widgetSelected(SelectionEvent e) {
         try {
           if (m_updateLock.aquire()) {
-            if (m_popup != null) {
-              m_popup.close();
+            if (m_popup.getShell() != null && !m_popup.getShell().isDisposed()) {
+              closePopup();
             }
             else {
               getTextComponent().setSelection(0);
@@ -190,6 +184,23 @@ public class ProposalTextField extends TextField {
       }
     });
     parent.setTabList(new Control[]{text});
+
+    // popup
+    m_popup = new ProposalPopup(getTextComponent());
+
+//    m_popup.getShell().addDisposeListener(new DisposeListener() {
+//      @Override
+//      public void widgetDisposed(DisposeEvent event) {
+//        if (m_popup != null) {
+//          m_popup.removePopupListener(m_popupListener);
+//        }
+//        m_popup = null;
+//      }
+//    });
+
+    m_popupListener = new P_PopupListener();
+    m_popup.addPopupListener(m_popupListener);
+    attachProposalListener(getTextComponent());
 
     // layout
     parent.setLayout(new FormLayout());
@@ -223,98 +234,102 @@ public class ProposalTextField extends TextField {
 
   }
 
-  public IContentProposalProvider getProposalProvider() {
-    return m_proposalProvider;
+//  protected P_RequestPattern getLastRequestPattern() {
+//    return m_lastRequestPattern;
+//  }
+
+  @Override
+  public int getStyle() {
+    return m_style;
   }
 
-  protected P_RequestPattern getLastRequestPattern() {
-    return m_lastRequestPattern;
-  }
+//  protected void notifyAcceptProposalUpdateUi(Object proposal) {
+//    try {
+//      if (m_updateLock.aquire()) {
+//        if (proposal != null) {
+//          getTextComponent().setText(proposal.getLabel(false, m_searchExpertMode));
+//          getTextComponent().setSelection(proposal.getCursorPosition(m_searchExpertMode, false));
+//        }
+//        else {
+//          getTextComponent().setText("");
+//          getTextComponent().setSelection(0);
+//        }
+//      }
+//    }
+//    finally {
+//      m_updateLock.release();
+//    }
+//    m_selectedProposal = proposal;
+//    notifyAcceptProposal(proposal);
+//  }
 
-  protected void notifyAcceptProposalUpdateUi(IContentProposalEx proposal) {
-    try {
-      if (m_updateLock.aquire()) {
-        if (proposal != null) {
-          getTextComponent().setText(proposal.getLabel(false, m_searchExpertMode));
-          getTextComponent().setSelection(proposal.getCursorPosition(m_searchExpertMode, false));
-        }
-        else {
-          getTextComponent().setText("");
-          getTextComponent().setSelection(0);
-        }
-      }
-    }
-    finally {
-      m_updateLock.release();
-    }
-    m_selectedProposal = proposal;
-    notifyAcceptProposal(proposal);
-  }
-
-  protected void notifyAcceptProposal(IContentProposalEx proposal) {
+  protected void notifyAcceptProposal(Object proposal) {
     ContentProposalEvent event = new ContentProposalEvent(this);
     event.proposal = proposal;
-    if (m_lastRequestPattern == null) {
-      event.text = "";
-      event.cursorPosition = 0;
-    }
-    else {
-      event.text = m_lastRequestPattern.getSearchText();
-      event.cursorPosition = m_lastRequestPattern.getPosition();
-    }
+//    if (m_lastRequestPattern == null) {
+//      event.text = "";
+//      event.cursorPosition = 0;
+//    }
+//    else {
+//      event.text = m_lastRequestPattern.getSearchText();
+//      event.cursorPosition = m_lastRequestPattern.getCursorPosition();
+//    }
     for (IProposalAdapterListener l : m_eventListeners.getListeners(IProposalAdapterListener.class)) {
       l.proposalAccepted(event);
     }
     m_lastFiredProposal = proposal;
   }
 
-  public synchronized void acceptProposal(IContentProposalEx selectedProposal) {
-
-    if (selectedProposal instanceof ISeparatorProposal) {
-      return;
-    }
-    else if (selectedProposal instanceof ICustomProposal) {
-      handleCustomProposalSelected((ICustomProposal) selectedProposal);
-      return;
-    }
+  public synchronized void acceptProposal(Object proposal) {
     // update ui
     try {
       if (m_updateLock.aquire()) {
-        if (selectedProposal == null) {
-          getTextComponent().setText("");
-          getTextComponent().setSelection(1);
+        String text;
+        if (proposal != null) {
+          text = m_popup.getText(proposal);
         }
         else {
-          getTextComponent().setText(selectedProposal.getLabel(false, m_searchExpertMode));
-          getTextComponent().setSelection(selectedProposal.getCursorPosition(m_searchExpertMode, false));
+          text = "";
+        }
+        if (getTextComponent() != null) {
+          getTextComponent().setText(text);
+          if (getLabelProvider() instanceof IContentProposalLabelProvider) {
+            getTextComponent().setSelection(((IContentProposalLabelProvider) getLabelProvider()).getCursorPosition(proposal));
+          }
+          else {
+            getTextComponent().setSelection(text.length());
+          }
         }
       }
     }
     finally {
       m_updateLock.release();
     }
-    if (!CompareUtility.equals(m_selectedProposal, selectedProposal)) {
-      m_selectedProposal = selectedProposal;
+    if (!CompareUtility.equals(m_selectedProposal, proposal)) {
+      m_selectedProposal = proposal;
       notifyAcceptProposal(m_selectedProposal);
     }
     closePopup();
   }
 
-  /**
-   * Overwrite to provide custom proposal handling
-   * 
-   * @param proposal
-   */
-  protected void handleCustomProposalSelected(ICustomProposal proposal) {
-
+  private synchronized void acceptProposalInternal(Object proposal) {
+    if (getSelectionHandler() != null) {
+      getSelectionHandler().handleProposalAccepted(proposal, m_popup.getInput().getPattern(), this);
+    }
+    else if (proposal instanceof ISeparatorProposal) {
+      // void
+    }
+    else {
+      acceptProposal(proposal);
+    }
   }
 
   public void setProposalDescriptionProvider(IProposalDescriptionProvider proposalDescriptionProvider) {
-    m_proposalDescriptionProvider = proposalDescriptionProvider;
+    m_popup.setProposalDescriptionProvider(proposalDescriptionProvider);
   }
 
   public IProposalDescriptionProvider getProposalDescriptionProvider() {
-    return m_proposalDescriptionProvider;
+    return m_popup.getProposalDescriptionProvider();
   }
 
   @Override
@@ -388,39 +403,50 @@ public class ProposalTextField extends TextField {
   // Popup Handling
   // ########################
   protected synchronized void closePopup() {
-    if (m_popup != null) {
+    if (m_popup.getShell() != null && !m_popup.getShell().isDisposed()) {
       m_popup.close();
     }
   }
 
   private synchronized void updateProposals() {
 
-    P_RequestPattern searchPattern = new P_RequestPattern(getText(), getSelection().x);
-    if (searchPattern.equals(m_lastRequestPattern)) {
-      showProposals(m_lastRequestPattern);
-      return;
+    String pattern = getText();
+    int index = getSelection().x;
+    if (index >= 0 && index < pattern.length()) {
+      pattern = pattern.substring(0, index);
     }
-    if (m_currentLoader != null) {
-      m_currentLoader.cancel();
+//    SearchPatternInput searchPatternInput = new SearchPatternInput(getInput(), pattern);
+    m_popup.updatePattern(pattern, getInput());
+    if (!m_popup.isVisible()) {
+//    m_popup.setSearchPattern(pattern);
+      m_popup.open();
     }
-    if (m_popup != null) {
-      m_popup.setProposals(new IContentProposalEx[]{m_loadingProposal});
-    }
-    m_currentLoader = new P_ProposalLoaderJob(searchPattern);
-    m_currentLoader.schedule();
+//    P_RequestPattern searchPattern = new P_RequestPattern(getText(), index);
+//    if (searchPattern.equals(m_lastRequestPattern)) {
+//      showProposals(m_lastRequestPattern);
+//      return;
+//    }
+//    if (m_currentLoader != null) {
+//      m_currentLoader.cancel();
+//    }
+//    if (m_popup != null) {
+//      m_popup.setLoading(true);
+//    }
+//    m_currentLoader = new P_ProposalLoaderJob(searchPattern);
+//    m_currentLoader.schedule();
   }
 
   private synchronized void textModified() {
     String text = getText();
     int cursorPosition = getSelection().x;
-    if (cursorPosition > 0 && m_selectedProposal != null && m_selectedProposal.getLabel(m_searchExpertMode, false).equals(text.substring(0, cursorPosition))) {
+    if (cursorPosition > 0 && m_selectedProposal != null && m_popup.getText(m_selectedProposal).equals(text.substring(0, cursorPosition))) {
       return;
     }
     updateProposals();
   }
 
   private boolean isProposalFieldFocusOwner() {
-    if (m_popup != null) {
+    if (m_popup != null && m_popup.getShell() != null && !m_popup.getShell().isDisposed()) {
       if (m_popup.isFocusOwner()) {
         return true;
       }
@@ -442,52 +468,22 @@ public class ProposalTextField extends TextField {
     return false;
   }
 
-  private synchronized void showProposals(P_RequestPattern searchPattern) {
-    m_lastRequestPattern = searchPattern;
-    if (m_lastRequestPattern.getProposals().length == 0) {
-      if (m_popup != null) {
-        closePopup();
-      }
-    }
-    else {
-      if (m_popup == null) {
-        openPopup();
-      }
-      m_popup.setExpertMode(m_searchExpertMode);
-      m_popup.setProposals(m_lastRequestPattern.getProposals());
-    }
-  }
+//  private synchronized void showProposals(P_RequestPattern searchPattern) {
+//    m_lastRequestPattern = searchPattern;
+//    if (m_lastRequestPattern.getProposals().length == 0) {
+//      if (m_popup != null) {
+//        closePopup();
+//      }
+//    }
+//    else {
+//      if (m_popup == null) {
+//        m_popup.open();
+//      }
+//      m_popup.setProposals(m_lastRequestPattern.getProposals());
+//    }
+//  }
 
-  private synchronized void openPopup() {
-    m_popup = new ProposalPopup(getTextComponent(), m_proposalProvider.supportsExpertMode(), m_searchExpertMode);
-    m_popup.setProposalDescriptionProvider(m_proposalDescriptionProvider);
-    m_popup.open();
-    m_popup.getShell().addDisposeListener(new DisposeListener() {
-      @Override
-      public void widgetDisposed(DisposeEvent event) {
-        if (m_popup != null) {
-          m_popup.removePopupListener(m_popupListener);
-        }
-        m_popup = null;
-      }
-    });
-    m_popup.getShell().addShellListener(new ShellAdapter() {
-      @Override
-      public void shellDeactivated(ShellEvent e) {
-        getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            if (!isProposalFieldFocusOwner()) {
-              closePopup();
-            }
-          }
-        });
-      }
-    });
-    m_popup.addPopupListener(m_popupListener);
-  }
-
-  private boolean equalProposals(IContentProposalEx prop1, IContentProposalEx prop2) {
+  private boolean equalProposals(Object prop1, Object prop2) {
     if (prop1 == null) {
       return prop2 == null;
     }
@@ -496,55 +492,54 @@ public class ProposalTextField extends TextField {
     }
   }
 
-  public IContentProposalEx getSelectedProposal() {
+  public Object getSelectedProposal() {
     return m_selectedProposal;
   }
 
-  private class P_ProposalLoaderJob extends Job {
-
-    private final P_RequestPattern m_requestPattern;
-    private IProgressMonitor m_monitor;
-
-    public P_ProposalLoaderJob(P_RequestPattern requestPattern) {
-      super("Load proposals");
-      m_requestPattern = requestPattern;
-    }
-
-    @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      m_monitor = monitor;
-      IContentProposalEx[] proposals;
-      synchronized (lockProposalAdpter) {
-        if (m_searchExpertMode) {
-          proposals = m_proposalProvider.getProposalsExpertMode(m_requestPattern.getSearchText(),
-              m_requestPattern.getPosition(), monitor);
-        }
-        else {
-          proposals = m_proposalProvider.getProposals(m_requestPattern.getSearchText(),
-              m_requestPattern.getPosition(), monitor);
-        }
-      }
-      if (m_monitor.isCanceled()) {
-        return Status.OK_STATUS;
-      }
-      m_requestPattern.setProposals(proposals);
-      getDisplay().syncExec(new Runnable() {
-        @Override
-        public void run() {
-          if (m_monitor.isCanceled()) {
-            return;
-          }
-          showProposals(m_requestPattern);
-        }
-      });
-      return Status.OK_STATUS;
-    }
-
-    void setCanceled() {
-      m_monitor.setCanceled(true);
-    }
-
-  } // end P_ProposalLoaderJob
+//  private class P_ProposalLoaderJob extends Job {
+//
+//    private final P_RequestPattern m_requestPattern;
+//    private IProgressMonitor m_monitor;
+//
+//    public P_ProposalLoaderJob(P_RequestPattern requestPattern) {
+//      super("Load proposals");
+//      m_requestPattern = requestPattern;
+//    }
+//
+//    @Override
+//    protected IStatus run(IProgressMonitor monitor) {
+//      m_monitor = monitor;
+//      Object[] proposals;
+//      synchronized (lockProposalAdpter) {
+//        if (getContentProvider() != null) {
+//          proposals = getContentProvider().getProposals(m_requestPattern.getSearchText(),
+//              m_requestPattern.getCursorPosition(), monitor);
+//        }
+//        else {
+//          proposals = new Object[0];
+//        }
+//      }
+//      if (m_monitor.isCanceled()) {
+//        return Status.OK_STATUS;
+//      }
+//      m_requestPattern.setProposals(proposals);
+//      getDisplay().syncExec(new Runnable() {
+//        @Override
+//        public void run() {
+//          if (m_monitor.isCanceled()) {
+//            return;
+//          }
+//          showProposals(m_requestPattern);
+//        }
+//      });
+//      return Status.OK_STATUS;
+//    }
+//
+//    void setCanceled() {
+//      m_monitor.setCanceled(true);
+//    }
+//
+//  } // end P_ProposalLoaderJob
 
   private class P_ProposalFieldListener implements Listener {
     @Override
@@ -576,7 +571,7 @@ public class ProposalTextField extends TextField {
               event.doit = false;
               break;
             case SWT.ARROW_DOWN:
-              if (m_popup == null) {
+              if (!m_popup.isVisible()) {
                 updateProposals();
               }
               else {
@@ -587,14 +582,7 @@ public class ProposalTextField extends TextField {
             case SWT.ARROW_RIGHT:
               textModified();
               break;
-            case 'e': {
-              if (event.stateMask == SWT.CONTROL) {
-                m_searchExpertMode = !m_searchExpertMode;
-                m_lastRequestPattern = null;
-                updateProposals();
-              }
-              break;
-            }
+
             default:
               break;
           }
@@ -624,10 +612,10 @@ public class ProposalTextField extends TextField {
                 String text = getText();
                 String input = "";
                 if (m_selectedProposal != null) {
-                  input = m_selectedProposal.getLabel(false, m_searchExpertMode);
+                  input = m_popup.getText(m_selectedProposal);
                 }
                 if (!StringUtility.equalsIgnoreCase(text, input)) {
-                  acceptProposal(null);
+                  acceptProposalInternal(null);
                 }
                 // notifyAcceptProposal(m_selectedProposal);
                 closePopup();
@@ -692,7 +680,7 @@ public class ProposalTextField extends TextField {
               m_focusLock.release();
             }
           }
-          if ((m_type & TYPE_INITIAL_SHOW_POPUP) != 0) {
+          if ((m_style & STYLE_INITIAL_SHOW_POPUP) != 0) {
             updateProposals();
           }
           break;
@@ -711,13 +699,13 @@ public class ProposalTextField extends TextField {
             case SWT.CR:
               if (m_popup != null) {
 
-                acceptProposal(m_popup.getSelectedProposal());
+                acceptProposalInternal(m_popup.getSelectedProposal());
                 event.doit = false;
               }
               break;
             case SWT.TAB:
             case SWT.LF:
-              if (m_popup != null) {
+              if (m_popup.isVisible()) {
                 event.doit = false;
                 m_popup.setFocus();
               }
@@ -734,50 +722,16 @@ public class ProposalTextField extends TextField {
     }
   } // end class P_ProposalFieldListener
 
-  protected class P_RequestPattern {
-    private final int m_position;
-    private final String m_searchText;
-    private IContentProposalEx[] m_proposals;
-
-    public P_RequestPattern(String text, int position) {
-      m_searchText = text;
-      m_position = position;
-    }
-
-    public int getPosition() {
-      return m_position;
-    }
-
-    public String getSearchText() {
-      return m_searchText;
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-      if (!(obj instanceof P_RequestPattern)) {
-        return false;
-      }
-      P_RequestPattern toCheck = (P_RequestPattern) obj;
-      return ((getPosition() == toCheck.getPosition()) && (getSearchText().equals(toCheck.getSearchText())));
-    }
-
-    public IContentProposalEx[] getProposals() {
-      return m_proposals;
-    }
-
-    public void setProposals(IContentProposalEx[] proposals) {
-      m_proposals = proposals;
-    }
-  } // end class P_RequestPattern
-
   private class P_PopupListener implements IProposalPopupListener {
     @Override
     public void popupChanged(ProposalPopupEvent event) {
+      System.out.println("handle popup event " + event.getType());
+
       switch (event.getType()) {
         case ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED:
           try {
             m_focusLock.aquire();
-            acceptProposal((IContentProposalEx) event.getData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL));
+            acceptProposalInternal((Object) event.getData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL));
 
             // only move to the next field, if the current field is not the last (ticket 84'140).
             Control[] siblings = getParent().getChildren();
@@ -791,8 +745,7 @@ public class ProposalTextField extends TextField {
           }
           break;
         case ProposalPopupEvent.TYPE_SEARCH_SHORTENED:
-          m_searchExpertMode = ((Boolean) event.getData(ProposalPopupEvent.IDENTIFIER_SELECTION_SEARCH_SHORTENED)).booleanValue();
-          m_lastRequestPattern = null;
+//          m_lastRequestPattern = null;
           updateProposals();
           break;
         case ProposalPopupEvent.TYPE_PROPOSAL_SELECTED:
@@ -806,7 +759,7 @@ public class ProposalTextField extends TextField {
                 // notifyAcceptProposal(m_selectedProposal);
                 // }
               }
-              m_popup.close();
+//              m_popup.close();
 
             }
             finally {

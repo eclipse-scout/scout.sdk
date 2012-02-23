@@ -41,11 +41,16 @@ public class ScoutWizardDialog extends WizardDialog implements IWizardPageContai
     });
   }
 
+  /**
+   * delegate to the underlying wizard.
+   */
   @Override
   protected IDialogSettings getDialogBoundsSettings() {
-    return ScoutSdkUi.getDefault().getDialogSettingsSection(getWizard().getClass().getName());
+    if (getWizard() != null) {
+      return getWizard().getDialogSettings();
+    }
+    return null;
   }
-
 
   @Override
   public void showPage(IWizardPage page) {

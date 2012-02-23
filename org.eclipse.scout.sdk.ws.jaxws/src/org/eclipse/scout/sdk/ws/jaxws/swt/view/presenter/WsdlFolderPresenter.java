@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
@@ -22,7 +23,6 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsdlFolderViewerFilter;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WsdlFolderPresenter extends FolderPresenter {
 
@@ -30,7 +30,7 @@ public class WsdlFolderPresenter extends FolderPresenter {
   private SunJaxWsBean m_sunJaxWsBean;
   private BuildJaxWsBean m_buildJaxWsBean;
 
-  public WsdlFolderPresenter(Composite parent, FormToolkit toolkit, WebserviceEnum webserviceEnum) {
+  public WsdlFolderPresenter(Composite parent, PropertyViewFormToolkit toolkit, WebserviceEnum webserviceEnum) {
     super(parent, toolkit, DEFAULT_LABEL_WIDTH, false);
     m_webserviceEnum = webserviceEnum;
     callInitializer();

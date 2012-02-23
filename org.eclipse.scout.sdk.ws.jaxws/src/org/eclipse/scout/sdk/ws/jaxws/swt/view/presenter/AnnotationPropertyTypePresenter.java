@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.operation.AnnotationUpdateOperation;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class AnnotationPropertyTypePresenter extends TypePresenter {
 
@@ -24,7 +24,7 @@ public class AnnotationPropertyTypePresenter extends TypePresenter {
   private IType m_declaringType;
   private IType m_annotationType;
 
-  public AnnotationPropertyTypePresenter(Composite parent, FormToolkit toolkit) {
+  public AnnotationPropertyTypePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit);
   }
 

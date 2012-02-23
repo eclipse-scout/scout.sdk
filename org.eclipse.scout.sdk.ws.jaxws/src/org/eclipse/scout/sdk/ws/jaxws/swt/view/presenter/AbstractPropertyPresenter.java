@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
@@ -38,7 +39,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
@@ -78,15 +78,15 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
 
   private int m_stateChanging;
 
-  public AbstractPropertyPresenter(Composite parent, FormToolkit toolkit) {
+  public AbstractPropertyPresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     this(parent, toolkit, DEFAULT_LABEL_WIDTH, true);
   }
 
-  public AbstractPropertyPresenter(Composite parent, FormToolkit toolkit, boolean initialize) {
+  public AbstractPropertyPresenter(Composite parent, PropertyViewFormToolkit toolkit, boolean initialize) {
     this(parent, toolkit, DEFAULT_LABEL_WIDTH, initialize);
   }
 
-  public AbstractPropertyPresenter(Composite parent, FormToolkit toolkit, int labelWidth, boolean initialize) {
+  public AbstractPropertyPresenter(Composite parent, PropertyViewFormToolkit toolkit, int labelWidth, boolean initialize) {
     super(toolkit, parent);
     m_labelWidth = labelWidth;
     m_valueChangedListeners = new LinkedList<IPresenterValueChangedListener>();

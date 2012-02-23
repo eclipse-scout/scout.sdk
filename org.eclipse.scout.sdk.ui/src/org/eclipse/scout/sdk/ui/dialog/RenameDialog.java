@@ -15,8 +15,8 @@ import java.beans.PropertyChangeListener;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.fields.FieldToolkit;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
-import org.eclipse.scout.sdk.ui.wizard.WizardPageFieldToolkit;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RenameDialog extends TitleAreaDialog {
   public static final String PROP_NEW_NAME = "newName";
-  private final WizardPageFieldToolkit m_fieldToolkit;
+  private final FieldToolkit m_fieldToolkit;
   private final String m_title;
   private final String m_oldName;
   private final String m_readOnlySuffix;
@@ -53,7 +53,7 @@ public class RenameDialog extends TitleAreaDialog {
     m_readOnlySuffix = readOnlySuffix;
     m_readOnlyPrefix = readOnlyPrefix;
     setShellStyle(getShellStyle() | SWT.RESIZE);
-    m_fieldToolkit = new WizardPageFieldToolkit();
+    m_fieldToolkit = new FieldToolkit();
   }
 
   @Override

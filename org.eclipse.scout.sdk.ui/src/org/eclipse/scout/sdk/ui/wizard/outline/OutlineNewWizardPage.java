@@ -25,13 +25,8 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -57,13 +52,13 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
   final IType abstractOutline = TypeUtility.getType(RuntimeClasses.AbstractOutline);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
-  private ITypeProposal m_superType;
+  private IType m_superType;
   private boolean m_addToDesktop;
   private boolean m_addToDesktopEnabled;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private Button m_addToDesktopField;
@@ -78,7 +73,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("New Outline"));
     setDescription(Texts.get("CreateANewOutline"));
     // default values
-    m_superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractOutline)[0];
+    m_superType = abstractOutline;
     setAddToDesktopEnabled(false);
     setOperation(new OutlineNewOperation());
   }
@@ -93,14 +88,11 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -121,15 +113,13 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(TypeUtility.getType(RuntimeClasses.AbstractOutline));
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(iOutline, getClientBundle().getJavaProject()));
-
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(abstractOutline),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(iOutline, getClientBundle().getJavaProject(), abstractOutline));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_superType = (ITypeProposal) event.proposal;
+        m_superType = (IType) event.proposal;
         pingStateChanging();
       }
     });
@@ -161,12 +151,12 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
 
     // write back members
     if (getNlsName() != null) {
-      getOperation().setNlsEntry(getNlsName().getNlsEntry());
+      getOperation().setNlsEntry(getNlsName());
     }
     getOperation().setTypeName(getTypeName());
-    ITypeProposal superTypeProp = getSuperType();
+    IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      getOperation().setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+      getOperation().setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
     }
     getOperation().setAddToDesktop(isAddToDesktop());
 
@@ -223,11 +213,11 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     return Status.OK_STATUS;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -257,11 +247,11 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;

@@ -30,9 +30,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
@@ -75,13 +72,13 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
   public void setTablePage(IType tablePage) {
     if (tablePage != null) {
-      m_page1.setTablePageType(ScoutProposalUtility.getScoutTypeProposalsFor(tablePage)[0]);
+      m_page1.setTablePageType(tablePage);
     }
   }
 
   public void setNlsEntry(INlsEntry nlsEntry) {
     if (nlsEntry != null) {
-      m_page1.setNlsName(new NlsProposal(nlsEntry, nlsEntry.getProject().getDevelopmentLanguage()));
+      m_page1.setNlsName(nlsEntry);
       m_page1.setTypeName(nlsEntry.getKey() + SdkProperties.SUFFIX_SEARCH_FORM);
     }
     else {
@@ -116,18 +113,12 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   protected boolean beforeFinish() throws CoreException {
     // fill operation before gui is disposed
     m_operation.setTypeName(m_page1.getTypeName());
-    NlsProposal nlsProp = m_page1.getNlsName();
-    if (nlsProp != null) {
-      m_operation.setNlsEntry(nlsProp.getNlsEntry());
-    }
-    ITypeProposal superTypeProp = m_page1.getSuperType();
+    m_operation.setNlsEntry(m_page1.getNlsName());
+    IType superTypeProp = m_page1.getSuperType();
     if (superTypeProp != null) {
-      m_operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+      m_operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
     }
-    ITypeProposal tablePageProp = m_page1.getTablePageType();
-    if (tablePageProp != null) {
-      m_operation.setTablePage(tablePageProp.getType());
-    }
+    m_operation.setTablePage(m_page1.getTablePageType());
     m_operation.setCreateSearchHandler(m_page2.getTreeNode(TYPE_HANDLER_SEARCH, true, true) != null);
     m_operation.setSearchFormLocationBundle(m_page2.getLocationBundle(TYPE_SEARCH_FORM, true, true));
     m_operation.setSearchFormDataLocationBundle(m_page2.getLocationBundle(TYPE_SEARCH_FORM_DATA, true, true));

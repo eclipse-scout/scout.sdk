@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.wizard;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -21,12 +21,22 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 /**
  * <h3>AbstractWizard</h3> ...
  */
-public class AbstractWizard extends Wizard {
+public class AbstractWizard extends Wizard implements IWizard {
 
   public AbstractWizard(AbstractScoutWizardPage... pages) {
     for (AbstractScoutWizardPage page : pages) {
       addPage(page);
     }
+    setDialogSettings(ScoutSdkUi.getDefault().getDialogSettingsSection(getDialogSettingsKey(), true));
+  }
+
+  /**
+   * may be overwritten to provide a special dialog settings key.
+   * 
+   * @return a dialog settings key (default is the fqn of the wizard.
+   */
+  protected String getDialogSettingsKey() {
+    return getClass().getName();
   }
 
   @Override
@@ -42,18 +52,6 @@ public class AbstractWizard extends Wizard {
   @Override
   public AbstractScoutWizardPage getPage(String name) {
     return (AbstractScoutWizardPage) super.getPage(name);
-  }
-
-  @Override
-  public IDialogSettings getDialogSettings() {
-    if (super.getDialogSettings() == null) {
-      IDialogSettings dialogSettings = ScoutSdkUi.getDefault().getDialogSettings().getSection(getClass().getName());
-      if (dialogSettings == null) {
-        dialogSettings = ScoutSdkUi.getDefault().getDialogSettings().addNewSection(getClass().getName());
-      }
-      setDialogSettings(dialogSettings);
-    }
-    return super.getDialogSettings();
   }
 
   @Override

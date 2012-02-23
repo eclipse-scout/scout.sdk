@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
@@ -23,7 +24,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>AbstractMultiValuePresenter</h3> ...
@@ -35,7 +35,7 @@ public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethod
   private Text m_textComponent;
   private final String m_regexAllowedCharacters;
 
-  public AbstractMultiValuePresenter(FormToolkit toolkit, Composite parent, String regexAllowedInput) {
+  public AbstractMultiValuePresenter(PropertyViewFormToolkit toolkit, Composite parent, String regexAllowedInput) {
     super(toolkit, parent);
     m_regexAllowedCharacters = regexAllowedInput;
   }

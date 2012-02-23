@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
@@ -18,14 +19,13 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.WsdlLocationWizard;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class WsdlFilePresenter extends FilePresenter {
 
   private BuildJaxWsBean m_buildJaxWsBean;
   private SunJaxWsBean m_sunJaxWsBean;
 
-  public WsdlFilePresenter(Composite parent, FormToolkit toolkit) {
+  public WsdlFilePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit);
     setLabel(Texts.get("WsdlFile"));
     setUseLinkAsLabel(true);

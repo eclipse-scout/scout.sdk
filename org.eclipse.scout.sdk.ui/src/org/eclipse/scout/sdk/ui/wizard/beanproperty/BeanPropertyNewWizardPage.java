@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IBeanPropertyNewOperation;
@@ -26,8 +27,8 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposalProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -42,7 +43,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // fields
   private String m_beanName;
-  private SignatureProposal m_beanSignature;
+  private String m_beanSignature;
 
   // ui fields
   private StyledTextField m_beanNameField;
@@ -75,15 +76,19 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_beanTypeField = new ProposalTextField(parent, new SignatureProposalProvider(m_searchScope, true, true));
-    m_beanTypeField.setLabelText(Texts.get("Dialog_propertyBean_typeLabel"));
+    ILabelProvider labelProvider = new SignatureLabelProvider();
+    SignatureProposalProvider contentProvider = new SignatureProposalProvider(m_searchScope, labelProvider, SignatureProposalProvider.DEFAULT_MOST_USED, true);
+    contentProvider.setPrimitivSignatures(SignatureProposalProvider.DEFAULT_PRIMITIV_SIGNATURES);
+    m_beanTypeField = getFieldToolkit().createProposalField(parent, Texts.get("Dialog_propertyBean_typeLabel"));
+    m_beanTypeField.setLabelProvider(labelProvider);
+    m_beanTypeField.setContentProvider(contentProvider);
     m_beanTypeField.acceptProposal(getBeanSignature());
     m_beanTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          m_beanSignature = (SignatureProposal) event.proposal;
+          m_beanSignature = (String) event.proposal;
         }
         finally {
           setStateChanging(false);
@@ -152,7 +157,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   private IStatus getPropertyTypeStatus() {
-    SignatureProposal signature = getBeanSignature();
+    String signature = getBeanSignature();
     if (signature == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_beanTypeNull"));
     }
@@ -162,10 +167,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     m_operation.setBeanName(getBeanName());
-    if (getBeanSignature() != null) {
-      m_operation.setBeanTypeSignature(getBeanSignature().getSignature());
-    }
-
+    m_operation.setBeanTypeSignature(getBeanSignature());
     m_operation.setMethodFlags(Flags.AccPublic);
     m_operation.run(monitor, manager);
     return true;
@@ -216,11 +218,11 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public SignatureProposal getBeanSignature() {
+  public String getBeanSignature() {
     return m_beanSignature;
   }
 
-  public void setBeanSignature(SignatureProposal beanSignature) {
+  public void setBeanSignature(String beanSignature) {
     try {
       setStateChanging(true);
       m_beanSignature = beanSignature;

@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.viewers.DelegatingStyledCellLabelProvider.IStyledLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -27,7 +26,6 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.IWizardContainer;
@@ -103,13 +101,15 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
         if (m_currentSelection != null) {
-          m_table.getViewer().refresh(m_currentSelection);
+          m_table.getViewer().update(m_currentSelection, new String[]{"label"});
         }
         m_currentSelection = null;
         if (!event.getSelection().isEmpty()) {
           m_currentSelection = ((StructuredSelection) event.getSelection()).getFirstElement();
         }
-        m_table.getViewer().refresh(m_currentSelection);
+        if (m_currentSelection != null) {
+          m_table.getViewer().update(m_currentSelection, new String[]{"label"});
+        }
         handleSelection(m_currentSelection);
       }
     });
@@ -184,23 +184,13 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     return m_nextPage;
   }
 
-  private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider, IStyledLabelProvider {
+  private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
 
     private Object[] m_elements;
     private Pattern m_typeNamePattern = Pattern.compile("^(Abstract|Abstract)?(.*)$");
 
     public P_ContentProvider(Object[] elements) {
       m_elements = elements;
-    }
-
-    @Override
-    public StyledString getStyledText(Object element) {
-      return null;
-    }
-
-    @Override
-    public Image getImage(Object element) {
-      return null;
     }
 
     @Override
@@ -235,7 +225,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
         }
         label.append(typeName);
         if (selection.toList().contains(element)) {
-          label.append("  (").append(t.getFullyQualifiedName()).append(")");
+          label.append(" - ").append(t.getFullyQualifiedName());
         }
         return label.toString();
       }
@@ -257,7 +247,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
-      return false;
+      return "label".equals(property);
     }
 
     @Override
@@ -301,5 +291,61 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       return comp1.compareTo(comp2);
     }
   }
+
+//  private class P_StyledLabelProvider extends StyledCellLabelProvider implements ILabelProvider {
+//    private final ITableLabelProvider m_labelProvider;
+//    private Font m_boldFont;
+//    private Styler m_boldStyler;
+//
+//    private P_StyledLabelProvider(ITableLabelProvider labelProvider) {
+//      m_labelProvider = labelProvider;
+//    }
+//
+//    @Override
+//    public void initialize(ColumnViewer viewer, ViewerColumn column) {
+//      super.initialize(viewer, column);
+//      Font defaultFont = viewer.getControl().getFont();
+//      FontData[] defaultFontData = defaultFont.getFontData();
+//      FontData[] boldFontData = new FontData[defaultFontData.length];
+//      for (int i = 0; i < defaultFontData.length; i++) {
+//        boldFontData[i] = new FontData(defaultFontData[i].getName(), defaultFontData[i].getHeight(), defaultFontData[i].getStyle() | SWT.BOLD);
+//      }
+//      m_boldFont = new Font(viewer.getControl().getDisplay(), boldFontData);
+//      m_boldStyler = new Styler() {
+//        @Override
+//        public void applyStyles(TextStyle textStyle) {
+//          textStyle.font = m_boldFont;
+//        }
+//      };
+//    }
+//
+//    @Override
+//    public void dispose() {
+//      super.dispose();
+//      m_boldFont.dispose();
+//      m_boldFont = null;
+//    }
+//
+//    @Override
+//    public void update(ViewerCell cell) {
+//      System.out.println(cell.getText());
+//      StyledString styledString = new StyledString(m_labelProvider.getColumnText(cell.getElement(), 0));//, style);
+//      styledString.setStyle(0, 2, m_boldStyler);
+//
+//      cell.setText(styledString.toString());
+//      cell.setStyleRanges(styledString.getStyleRanges());
+//      super.update(cell);
+//    }
+//
+//    @Override
+//    public Image getImage(Object element) {
+//      return m_labelProvider.getColumnImage(element, 0);
+//    }
+//
+//    @Override
+//    public String getText(Object element) {
+//      return m_labelProvider.getColumnText(element, 0);
+//    }
+//  }
 
 }

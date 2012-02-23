@@ -19,6 +19,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -38,7 +39,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class AnnotationPresenter extends AbstractPropertyPresenter<IAnnotation> {
 
@@ -48,7 +48,7 @@ public class AnnotationPresenter extends AbstractPropertyPresenter<IAnnotation> 
   protected Label m_label;
   private SelectionListener m_selectionListener;
 
-  public AnnotationPresenter(Composite parent, FormToolkit toolkit, IType type, IType annotationType) {
+  public AnnotationPresenter(Composite parent, PropertyViewFormToolkit toolkit, IType type, IType annotationType) {
     super(parent, toolkit, false);
     m_selectionListener = new P_SelectionListener();
     m_type = type;

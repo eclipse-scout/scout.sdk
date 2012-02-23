@@ -22,21 +22,13 @@ import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class BundleImportOperation implements IOperation {
 
-  private static final String SCOUT_BUNDLE_TYPE_CLIENT = "client";
-  private static final String SCOUT_BUNDLE_TYPE_SHARED = "shared";
-  private static final String SCOUT_BUNDLE_TYPE_SERVER = "server";
-  private static final String SCOUT_BUNDLE_TYPE = "Scout-Bundle-Type";
-  private static final String SCOUT_PROJECT = "Scout-Project";
-
   private String m_projectId;
   private IPluginModelBase m_pluginModel;
-  private int m_bundleType;
 
   @Override
   public String getOperationName() {
@@ -47,11 +39,6 @@ public class BundleImportOperation implements IOperation {
   public void validate() throws IllegalArgumentException {
     if (StringUtility.isNullOrEmpty(getProjectId())) {
       throw new IllegalArgumentException("Project ID can not be null");
-    }
-    if ((getBundleType() & (SdkProperties.BUNDLE_TYPE_CLIENT | SdkProperties.BUNDLE_TYPE_CLIENT_APPLICATION | SdkProperties.BUNDLE_TYPE_SERVER |
-        SdkProperties.BUNDLE_TYPE_SERVER_APPLICATION | SdkProperties.BUNDLE_TYPE_SHARED | SdkProperties.BUNDLE_TYPE_TEST_CLIENT |
-        SdkProperties.BUNDLE_TYPE_UI_SWING | SdkProperties.BUNDLE_TYPE_UI_SWT | SdkProperties.BUNDLE_TYPE_UI_SWT_APPLICATION)) == 0) {
-      throw new IllegalArgumentException("Unknown bundle type.");
     }
     if (getPluginModel() == null) {
       throw new IllegalArgumentException("Plugin can not be null.");
@@ -66,23 +53,6 @@ public class BundleImportOperation implements IOperation {
     h.Manifest.removeEntry("BsiCase-ProjectGroupId");
     h.Manifest.removeEntry("BsiCase-Alias");
     h.Manifest.removeEntry("BsiCase-BundleType");
-    // add new
-    h.Manifest.setEntryValue(SCOUT_PROJECT, getProjectId());
-    String bundleType = null;
-    switch (getBundleType()) {
-      case SdkProperties.BUNDLE_TYPE_CLIENT:
-        bundleType = SCOUT_BUNDLE_TYPE_CLIENT;
-        break;
-      case SdkProperties.BUNDLE_TYPE_SERVER:
-        bundleType = SCOUT_BUNDLE_TYPE_SERVER;
-        break;
-      case SdkProperties.BUNDLE_TYPE_SHARED:
-        bundleType = SCOUT_BUNDLE_TYPE_SHARED;
-        break;
-    }
-    if (!StringUtility.isNullOrEmpty(bundleType)) {
-      h.Manifest.setEntryValue(SCOUT_BUNDLE_TYPE, bundleType);
-    }
     h.save();
 
     // nature
@@ -108,14 +78,6 @@ public class BundleImportOperation implements IOperation {
 
   public String getProjectId() {
     return m_projectId;
-  }
-
-  public void setBundleType(int bundleType) {
-    m_bundleType = bundleType;
-  }
-
-  public int getBundleType() {
-    return m_bundleType;
   }
 
   public void setPluginModel(IPluginModelBase pluginModel) {

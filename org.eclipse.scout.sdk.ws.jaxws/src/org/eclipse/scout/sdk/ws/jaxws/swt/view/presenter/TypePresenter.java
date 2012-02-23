@@ -37,6 +37,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -57,7 +58,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.dialogs.SelectionDialog;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 @SuppressWarnings("restriction")
 public class TypePresenter extends AbstractPropertyPresenter<String> {
@@ -76,11 +76,11 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
 
   private P_ScoutSeverityListener m_severityListener;
 
-  public TypePresenter(Composite parent, FormToolkit toolkit) {
+  public TypePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     this(parent, toolkit, AbstractPropertyPresenter.DEFAULT_LABEL_WIDTH, true);
   }
 
-  public TypePresenter(Composite parent, FormToolkit toolkit, int labelWidth, boolean initialize) {
+  public TypePresenter(Composite parent, PropertyViewFormToolkit toolkit, int labelWidth, boolean initialize) {
     super(parent, toolkit, labelWidth, false);
     setLabel(Texts.get("class"));
     setUseLinkAsLabel(true);

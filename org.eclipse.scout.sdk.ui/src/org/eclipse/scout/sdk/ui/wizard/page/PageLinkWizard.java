@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.wizard.page;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -35,7 +34,7 @@ public class PageLinkWizard extends AbstractWorkspaceWizard {
   }
 
   public void setHolderType(IType type) {
-    getLinkPageWizardPage().setHolderType(ScoutProposalUtility.getScoutTypeProposalsFor(type)[0]);
+    getLinkPageWizardPage().setHolderType(type);
   }
 
   public void setHolderEnabled(boolean enabled) {
@@ -43,7 +42,7 @@ public class PageLinkWizard extends AbstractWorkspaceWizard {
   }
 
   public void setPageType(IType type) {
-    getLinkPageWizardPage().setPageType(ScoutProposalUtility.getScoutTypeProposalsFor(type)[0]);
+    getLinkPageWizardPage().setPageType(type);
   }
 
   public void setPageEnabled(boolean enabled) {

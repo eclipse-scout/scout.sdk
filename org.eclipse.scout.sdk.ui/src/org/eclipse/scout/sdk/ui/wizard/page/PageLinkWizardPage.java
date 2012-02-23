@@ -22,11 +22,8 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.page.LinkPageOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
@@ -46,8 +43,8 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   private IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
-  private ITypeProposal m_holderType;
-  private ITypeProposal m_pageType;
+  private IType m_holderType;
+  private IType m_pageType;
 
   private ProposalTextField m_holderTypeField;
   private ProposalTextField m_pageTypeField;
@@ -71,13 +68,13 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     IType[] pages = ScoutTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
-    m_pageTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(ScoutProposalUtility.getScoutTypeProposalsFor(pages)), Texts.get("Page"));
+    m_pageTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Page"), pages);
     m_pageTypeField.acceptProposal(getPageType());
     m_pageTypeField.setEnabled(isPageTypeFieldEnabled());
     m_pageTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setPageType((ITypeProposal) event.proposal);
+        setPageType((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -87,15 +84,14 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     System.arraycopy(pages, 0, propTypes, 0, pages.length);
     System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
     Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(propTypes);
 
-    m_holderTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(proposals), Texts.get("HolderPageOutline"));
+    m_holderTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("HolderPageOutline"), propTypes);
     m_holderTypeField.acceptProposal(getHolderType());
     m_holderTypeField.setEnabled(isHolderTypeEnabled());
     m_holderTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_holderType = (ITypeProposal) event.proposal;
+        m_holderType = (IType) event.proposal;
         pingStateChanging();
       }
     });
@@ -109,8 +105,8 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // write back members
-    getOperation().setHolderType(getHolderType().getType());
-    getOperation().setPage(getPageType().getType());
+    getOperation().setHolderType(getHolderType());
+    getOperation().setPage(getPageType());
     getOperation().run(monitor, workingCopyManager);
     return true;
   }
@@ -140,7 +136,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     return m_clientBundle;
   }
 
-  public void setHolderType(ITypeProposal holderPage) {
+  public void setHolderType(IType holderPage) {
     try {
       setStateChanging(true);
       m_holderType = holderPage;
@@ -153,7 +149,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getHolderType() {
+  public IType getHolderType() {
     return m_holderType;
   }
 
@@ -168,7 +164,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     return m_holderTypeEnabled;
   }
 
-  public void setPageType(ITypeProposal pageType) {
+  public void setPageType(IType pageType) {
     try {
       setStateChanging(true);
       m_pageType = pageType;
@@ -181,7 +177,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public ITypeProposal getPageType() {
+  public IType getPageType() {
     return m_pageType;
   }
 

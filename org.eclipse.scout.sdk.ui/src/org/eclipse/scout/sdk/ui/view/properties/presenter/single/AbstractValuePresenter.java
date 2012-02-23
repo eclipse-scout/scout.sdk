@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.LegacyOperationAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -29,7 +30,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>AbstractValuePresenter</h3> ...
@@ -42,7 +42,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
   private T m_currentSourceValue;
   private T m_defaultValue;
 
-  public AbstractValuePresenter(FormToolkit toolkit, Composite parent, String regexAllowedCharacters) {
+  public AbstractValuePresenter(PropertyViewFormToolkit toolkit, Composite parent, String regexAllowedCharacters) {
     super(toolkit, parent);
     m_regexAllowedCharacters = regexAllowedCharacters;
   }

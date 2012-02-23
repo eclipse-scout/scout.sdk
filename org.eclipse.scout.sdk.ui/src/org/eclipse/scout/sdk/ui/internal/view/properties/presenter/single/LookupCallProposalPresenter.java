@@ -10,19 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
-import org.eclipse.jdt.core.IJavaProject;
+import java.util.ArrayList;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>CodeTypePresenter</h3> ...
@@ -30,20 +40,33 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
   final IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
 
-  public LookupCallProposalPresenter(FormToolkit toolkit, Composite parent) {
-    super(toolkit, parent, null, true);
+  public LookupCallProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
+    super(toolkit, parent);
   }
 
   @Override
-  protected IType[] provideScoutTypes(IJavaProject project, IType ownerType) {
-    return TypeUtility.getPrimaryTypeHierarchy(lookupCall).getAllSubtypes(lookupCall, TypeFilters.getTypesOnClasspath(project), TypeComparators.getTypeNameComparator());
+  protected void createProposalFieldProviders(ProposalTextField proposalField) {
+    JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
+    getProposalField().setLabelProvider(labelProvider);
+    getProposalField().setContentProvider(new P_ContentProvider(labelProvider));
+  }
+
+  @Override
+  protected void init(ConfigurationMethod method) throws CoreException {
+    if (method != null) {
+      getProposalField().setInput(method.getType());
+    }
+    else {
+      getProposalField().setInput(null);
+    }
+    super.init(method);
   }
 
   @Override
   protected void createContextMenu(MenuManager manager) {
     super.createContextMenu(manager);
     if (getCurrentSourceValue() != null) {
-      final IType lc = getCurrentSourceValue().getJavaClass();
+      final IType lc = getCurrentSourceValue();
       if (lc != null) {
         String entityName = NamingUtility.removeSuffixes(lc.getElementName(), "Call");
         String lookupServiceFqn = lc.getPackageFragment().getElementName() + ".I" + entityName + "Service";
@@ -69,6 +92,64 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
               }
             });
           }
+        }
+      }
+    }
+  }
+
+  /**
+   * <h3>{@link P_ContentProvider}</h3> ...
+   * The local lazy content provider.
+   * It is kept lazy to ensure the proposals are only loaded when used. So the creation of the property view is
+   * performance optimized.
+   * 
+   * @author aho
+   * @since 3.8.0 15.02.2012
+   */
+  private class P_ContentProvider extends ContentProposalProvider {
+
+    private IType[] m_proposals;
+    private final ILabelProvider m_labelProvider;
+
+    private P_ContentProvider(ILabelProvider labelProvider) {
+      m_labelProvider = labelProvider;
+
+    }
+
+    @Override
+    public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
+      ensureCache();
+      if (searchPattern == null) {
+        searchPattern = "*";
+      }
+      else {
+        searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+      }
+      char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
+      ArrayList<Object> collector = new ArrayList<Object>();
+      for (Object proposal : m_proposals) {
+        if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
+          collector.add(proposal);
+        }
+      }
+      return collector.toArray(new Object[collector.size()]);
+    }
+
+    @Override
+    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+      if (m_proposals != null) {
+        m_proposals = null;
+      }
+    }
+
+    private void ensureCache() {
+      if (m_proposals == null) {
+        if (getMethod() != null) {
+          m_proposals = TypeUtility.getPrimaryTypeHierarchy(lookupCall).getAllSubtypes(lookupCall,
+              TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator());
+        }
+        else {
+          m_proposals = new IType[0];
         }
       }
     }

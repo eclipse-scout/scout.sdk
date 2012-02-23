@@ -10,85 +10,40 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.ITypeSibling;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>SiblingProposal</h3> ...
  */
-public class SiblingProposal implements IContentProposalEx, ITypeSibling {
-  public static final SiblingProposal SIBLING_BEGINNING = new SiblingProposal("first", TYPE_BEGINNING);
-  public static final SiblingProposal SIBLING_END = new SiblingProposal("last", TYPE_END);
+public class SiblingProposal extends SimpleProposal implements ITypeSibling {
+  public static final SiblingProposal SIBLING_BEGINNING = new SiblingProposal("first", SiblingType.Beginning);
+  public static final SiblingProposal SIBLING_END = new SiblingProposal("last", SiblingType.End);
 
-  private String m_text;
+  // local data names
+  private static final String DATA_JAVA_ELEMENT = "javaElement";
+  private static final String DATA_SIBLING_TYPE = "siblingType";
 
-  private IType m_type;
-
-  private int m_siblingType;
-
-  public SiblingProposal(String text, int siblingType) {
-    m_text = text;
-    m_siblingType = siblingType;
+  public SiblingProposal(IJavaElement sibling) {
+    this(sibling.getElementName() + " [before]", SiblingType.Sibling);
+    setData(DATA_JAVA_ELEMENT, sibling);
   }
 
-  public SiblingProposal(IType sibling) {
-    m_type = sibling;
-    m_text = sibling.getElementName();//ScoutSourceUtilities.getTranslatedMethodStringValue(sibling, "getConfiguredLabel");
-
-    m_text = m_text + " [before]";
-    m_siblingType = TYPE_SIBLING;
+  public SiblingProposal(String text, SiblingType siblingType) {
+    super(text, ScoutSdkUi.getImage(ScoutSdkUi.FormField));
+    setData(DATA_SIBLING_TYPE, siblingType);
   }
 
   @Override
-  public int getCursorPosition(boolean selected, boolean expertMode) {
-    return m_text.length();
+  public IJavaElement getElement() {
+    return (IType) getData(DATA_JAVA_ELEMENT);
   }
 
   @Override
-  public Image getImage(boolean selected, boolean expertMode) {
-    return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
-  }
-
-  @Override
-  public String getLabel(boolean selected, boolean expertMode) {
-    return m_text;
-  }
-
-  @Override
-  public IType getScoutType() {
-    return m_type;
-  }
-
-  @Override
-  public int getSiblingType() {
-    return m_siblingType;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof SiblingProposal) {
-      SiblingProposal sibling = (SiblingProposal) obj;
-      if (sibling.getScoutType() == null && getScoutType() == null) {
-        return super.equals(obj);
-      }
-      else {
-        if (sibling.getScoutType() == null || getScoutType() == null) {
-          return false;
-        }
-      }
-      return getScoutType().equals(((SiblingProposal) obj).getScoutType());
-    }
-    return false;
-  }
-
-  @Override
-  public int hashCode() {
-    if (getScoutType() == null) {
-      return super.hashCode();
-    }
-    return getScoutType().hashCode();
+  public SiblingType getSiblingType() {
+    return (SiblingType) getData(DATA_SIBLING_TYPE);
   }
 
 }

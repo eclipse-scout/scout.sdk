@@ -27,6 +27,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -46,7 +47,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.SelectionDialog;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 @SuppressWarnings("restriction")
 public class PackagePresenter extends AbstractPropertyPresenter<String> {
@@ -58,7 +58,7 @@ public class PackagePresenter extends AbstractPropertyPresenter<String> {
   private String m_sourceFolder;
   private boolean m_allowChangeOfSourceFolder;
 
-  public PackagePresenter(Composite parent, FormToolkit toolkit) {
+  public PackagePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit, false);
     setLabel(Texts.get("package"));
     setUseLinkAsLabel(true);

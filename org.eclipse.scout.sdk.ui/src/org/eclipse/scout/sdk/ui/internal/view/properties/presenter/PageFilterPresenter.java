@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
 import org.eclipse.scout.sdk.ui.view.outline.pages.PageFilter;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -29,7 +30,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 /**
@@ -49,7 +49,7 @@ public class PageFilterPresenter extends AbstractPresenter {
    * @param toolkit
    * @param parent
    */
-  public PageFilterPresenter(FormToolkit toolkit, Composite parent, IPage page) {
+  public PageFilterPresenter(PropertyViewFormToolkit toolkit, Composite parent, IPage page) {
     super(toolkit, parent);
     m_page = page;
 

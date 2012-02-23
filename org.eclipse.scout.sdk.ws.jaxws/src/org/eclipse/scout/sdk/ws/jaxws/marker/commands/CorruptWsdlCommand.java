@@ -61,6 +61,7 @@ public class CorruptWsdlCommand extends AbstractExecutableMarkerCommand {
       m_wizard = new WsdlNewWizard(m_bundle, m_buildJaxWsBean, m_wsdlResource);
     }
     ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(m_wizard);
+    // TODO DWI remove hardcoded sizes
     wizardDialog.setPageSize(650, 410);
     return wizardDialog.open() == Window.OK;
   }

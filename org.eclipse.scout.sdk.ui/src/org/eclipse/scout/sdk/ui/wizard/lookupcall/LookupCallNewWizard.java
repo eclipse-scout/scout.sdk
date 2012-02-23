@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
@@ -65,19 +64,6 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     setWindowTitle(Texts.get("NewLookupCall"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_sharedBundle = sharedBundle;
-    m_page1 = new LookupCallNewWizardPage(getSharedBundle());
-    addPage(m_page1);
-    m_locationPageRoot = createTree(sharedBundle);
-    m_page2 = new BundleTreeWizardPage(Texts.get("LookupCallLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
-    m_page2.addStatusProvider(statusProvider);
-    m_page2.addDndListener(new P_TreeDndListener());
-    addPage(m_page2);
-    // init
-    m_page1.addPropertyChangeListener(new P_LocationPropertyListener());
-
-  }
-
-  private ITreeNode createTree(IScoutBundle sharedBundle) {
     IScoutBundle clientBundle = null;
     IScoutBundle serverBundle = null;
     IScoutProject scoutProject = sharedBundle.getScoutProject();
@@ -87,7 +73,21 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
       serverBundle = scoutProject.getServerBundle();
       scoutProject = scoutProject.getParentProject();
     }
-    m_page1.setServerBundle(serverBundle);
+
+    m_page1 = new LookupCallNewWizardPage(getSharedBundle(), serverBundle);
+    addPage(m_page1);
+    m_locationPageRoot = createTree(clientBundle, sharedBundle, serverBundle);
+    m_page2 = new BundleTreeWizardPage(Texts.get("LookupCallLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
+    m_page2.addStatusProvider(statusProvider);
+    m_page2.addDndListener(new P_TreeDndListener());
+    addPage(m_page2);
+    // init
+    m_page1.addPropertyChangeListener(new P_LocationPropertyListener());
+
+  }
+
+  private ITreeNode createTree(IScoutBundle clientBundle, IScoutBundle sharedBundle, IScoutBundle serverBundle) {
+
     // BundleSet bundleSet=BundleLocationUtility.createBundleSet(clientBundle);
     ITreeNode rootNode = TreeUtility.createBundleTree(sharedBundle.getScoutProject(), NodeFilters.getAcceptAll());
 
@@ -134,16 +134,13 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     m_operation.setServiceInterfaceBundle(m_page2.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true));
     switch (m_page1.getLookupServiceStrategy()) {
       case CREATE_NEW:
-        ITypeProposal superTypeProp = m_page1.getServiceSuperType();
+        IType superTypeProp = m_page1.getServiceSuperType();
         if (superTypeProp != null) {
-          m_operation.setServiceSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+          m_operation.setServiceSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
         }
         break;
       case USE_EXISTING:
-        ITypeProposal lookupServiceProposal = m_page1.getLookupServiceType();
-        if (lookupServiceProposal != null) {
-          m_operation.setLookupService(lookupServiceProposal.getType());
-        }
+        m_operation.setLookupService(m_page1.getLookupServiceType());
         break;
     }
     return true;

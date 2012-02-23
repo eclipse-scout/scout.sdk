@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodErrorPresenterContent;
 import org.eclipse.scout.sdk.util.Regex;
@@ -42,7 +43,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
@@ -60,7 +60,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   private JavadocTooltip m_tooltip;
   private ImageHyperlink m_deleteButton;
 
-  public AbstractMethodPresenter(FormToolkit toolkit, Composite parent) {
+  public AbstractMethodPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
     create(getContainer());
   }

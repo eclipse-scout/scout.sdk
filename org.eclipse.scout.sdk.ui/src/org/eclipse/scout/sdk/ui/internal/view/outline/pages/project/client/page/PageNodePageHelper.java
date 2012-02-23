@@ -22,8 +22,6 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
  * <h3>PageNodePageHelper</h3> ...
  */
 public class PageNodePageHelper {
-  private final static IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
-  private final static IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 
   private PageNodePageHelper() {
   }
@@ -32,11 +30,11 @@ public class PageNodePageHelper {
     ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>();
     for (IType type : types) {
       if (TypeUtility.exists(type)) {
-        if (pageTypeHierarchy.isSubtype(iPageWithNodes, type)) {
+        if (pageTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IPageWithNodes), type)) {
           // create page with node
           pages.add(new PageWithNodeNodePage(parentPage, type));
         }
-        else if (pageTypeHierarchy.isSubtype(iPageWithTable, type)) {
+        else if (pageTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IPageWithTable), type)) {
           // create page with table
           pages.add(new PageWithTableNodePage(parentPage, type));
         }

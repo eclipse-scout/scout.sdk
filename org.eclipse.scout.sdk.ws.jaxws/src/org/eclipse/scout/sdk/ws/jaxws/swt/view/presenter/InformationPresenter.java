@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -21,7 +22,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class InformationPresenter extends AbstractPresenter {
 
@@ -29,15 +29,15 @@ public class InformationPresenter extends AbstractPresenter {
   private ImageDescriptor m_imageDescriptor;
   private Point m_iconDimension;
 
-  public InformationPresenter(Composite parent, String text, FormToolkit toolkit) {
+  public InformationPresenter(Composite parent, String text, PropertyViewFormToolkit toolkit) {
     this(parent, text, null, null, toolkit);
   }
 
-  public InformationPresenter(Composite parent, String text, ImageDescriptor imageDescriptor, FormToolkit toolkit) {
+  public InformationPresenter(Composite parent, String text, ImageDescriptor imageDescriptor, PropertyViewFormToolkit toolkit) {
     this(parent, text, imageDescriptor, new Point(16, 16), toolkit);
   }
 
-  public InformationPresenter(Composite parent, String text, ImageDescriptor imageDescriptor, Point iconDimension, FormToolkit toolkit) {
+  public InformationPresenter(Composite parent, String text, ImageDescriptor imageDescriptor, Point iconDimension, PropertyViewFormToolkit toolkit) {
     super(toolkit, parent);
     m_text = text;
     m_imageDescriptor = imageDescriptor;

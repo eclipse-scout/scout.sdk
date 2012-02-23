@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.lookupcall;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -20,11 +23,10 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -58,9 +60,9 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     CREATE_NEW, USE_EXISTING, NO_SERVICE
   }
 
-  private static final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
-  private static final IType abstractSqlLookupService = TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService);
-  private static final IType abstractLookupService = TypeUtility.getType(RuntimeClasses.AbstractLookupService);
+  protected final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
+  protected final IType abstractSqlLookupService = TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService);
+  protected final IType abstractLookupService = TypeUtility.getType(RuntimeClasses.AbstractLookupService);
 
   /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
@@ -80,16 +82,17 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_lookupServiceTypeField;
 
   // process members
-  private IScoutBundle m_sharedBundle;
-  private IScoutBundle m_serverBundle;
+  private final IScoutBundle m_sharedBundle;
+  private final IScoutBundle m_serverBundle;
 
-  public LookupCallNewWizardPage(IScoutBundle sharedBundle) {
+  public LookupCallNewWizardPage(IScoutBundle sharedBundle, IScoutBundle serverBundle) {
     super(LookupCallNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
+    m_serverBundle = serverBundle;
     setTitle(Texts.get("NewLookupCall"));
     setDescription(Texts.get("CreateANewLookupCall"));
     setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
-    setServiceSuperTypeInternal(ScoutProposalUtility.getScoutTypeProposalsFor(abstractSqlLookupService)[0]);
+    setServiceSuperTypeInternal(abstractSqlLookupService);
 
   }
 
@@ -109,8 +112,6 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     Control lookupServiceGroup = createLookupServiceGroup(parent);
 
-    updateSharedBundle();
-    updateServerBundle();
     // layout
     parent.setLayout(new GridLayout(1, true));
 
@@ -133,21 +134,51 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_noServiceButton.addSelectionListener(new P_LookupServiceStrategyButtonListener(LOOKUP_SERVICE_STRATEGY.NO_SERVICE));
     m_noServiceButton.setText("no lookup service");
 
-    m_serviceSuperTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("LookupServiceSuperType"));
+    m_serviceSuperTypeField = getFieldToolkit().createProposalField(group, Texts.get("LookupServiceSuperType"));
+    if (getServerBundle() != null) {
+      JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
+      m_serviceSuperTypeField.setLabelProvider(labelProvider);
+      List<Object> proposals = new ArrayList<Object>();
+      proposals.add(abstractLookupService);
+      proposals.add(abstractSqlLookupService);
+      proposals.add(ProposalTextField.SEPERATOR);
+      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
+      IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+      for (IType t : abstractLookupServices) {
+        if (!proposals.contains(t)) {
+          proposals.add(t);
+        }
+      }
+      m_serviceSuperTypeField.setContentProvider(new JavaElementContentProvider(labelProvider, proposals.toArray(new Object[proposals.size()])));
+    }
+    else {
+      m_serviceSuperTypeField.setEnabled(false);
+    }
     m_serviceSuperTypeField.acceptProposal(getServiceSuperType());
     m_serviceSuperTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setServiceSuperTypeInternal((ITypeProposal) event.proposal);
+        setServiceSuperTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
 
-    m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, null, Texts.get("LookupService"));
+    m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, Texts.get("LookupService"));
+    if (getSharedBundle() != null) {
+      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
+      IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+      JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
+      m_lookupServiceTypeField.setLabelProvider(labelProvider);
+      m_lookupServiceTypeField.setContentProvider(new JavaElementContentProvider(labelProvider, lookupServices));
+
+    }
+    else {
+      m_lookupServiceTypeField.setEnabled(false);
+    }
     m_lookupServiceTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setLookupServiceTypeInternal((ITypeProposal) event.proposal);
+        setLookupServiceTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -167,44 +198,6 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_lookupServiceTypeField.setLayoutData(lookupServiceData);
 
     return group;
-  }
-
-  private void updateSharedBundle() {
-    DefaultProposalProvider lookupTypeProposalProvider = new DefaultProposalProvider();
-    if (getSharedBundle() != null) {
-      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-      IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(lookupServices);
-      lookupTypeProposalProvider = new DefaultProposalProvider(proposals);
-    }
-
-    ITypeProposal lookupTypeProp = (ITypeProposal) m_serviceSuperTypeField.getSelectedProposal();
-    m_lookupServiceTypeField.setContentProposalProvider(lookupTypeProposalProvider);
-    if (lookupTypeProp != null) {
-      if (getSharedBundle().isOnClasspath(lookupTypeProp.getType())) {
-        m_lookupServiceTypeField.acceptProposal(lookupTypeProp);
-      }
-    }
-  }
-
-  private void updateServerBundle() {
-    DefaultProposalProvider superTypeProvider = new DefaultProposalProvider();
-    if (getServerBundle() != null) {
-      ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(abstractLookupService, abstractSqlLookupService);
-      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-      IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
-      ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(abstractLookupServices);
-      superTypeProvider = new DefaultProposalProvider(shotList, proposals);
-    }
-
-    ITypeProposal superTypeProp = (ITypeProposal) m_serviceSuperTypeField.getSelectedProposal();
-    m_serviceSuperTypeField.setContentProposalProvider(superTypeProvider);
-    if (superTypeProp != null) {
-      if (getServerBundle().isOnClasspath(superTypeProp.getType())) {
-        m_serviceSuperTypeField.acceptProposal(superTypeProp);
-      }
-    }
-
   }
 
   @Override
@@ -262,22 +255,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_sharedBundle;
   }
 
-  public void setSharedBundle(IScoutBundle sharedBundle) {
-    m_sharedBundle = sharedBundle;
-    if (isControlCreated()) {
-      updateSharedBundle();
-    }
-  }
-
   public IScoutBundle getServerBundle() {
     return m_serverBundle;
-  }
-
-  public void setServerBundle(IScoutBundle serverBundle) {
-    m_serverBundle = serverBundle;
-    if (isControlCreated()) {
-      updateServerBundle();
-    }
   }
 
   public String getTypeName() {
@@ -339,11 +318,11 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     setProperty(PROP_LOOKUP_SERVICE_STRATEGY, strategy);
   }
 
-  public ITypeProposal getServiceSuperType() {
-    return (ITypeProposal) getProperty(PROP_SERVICE_SUPER_TYPE);
+  public IType getServiceSuperType() {
+    return (IType) getProperty(PROP_SERVICE_SUPER_TYPE);
   }
 
-  public void setServiceSuperType(ITypeProposal superType) {
+  public void setServiceSuperType(IType superType) {
     try {
       setStateChanging(true);
       setServiceSuperTypeInternal(superType);
@@ -356,15 +335,15 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setServiceSuperTypeInternal(ITypeProposal superType) {
+  private void setServiceSuperTypeInternal(IType superType) {
     setProperty(PROP_SERVICE_SUPER_TYPE, superType);
   }
 
-  public ITypeProposal getLookupServiceType() {
-    return (ITypeProposal) getProperty(PROP_LOOKUP_SERVICE);
+  public IType getLookupServiceType() {
+    return (IType) getProperty(PROP_LOOKUP_SERVICE);
   }
 
-  public void setLookupServiceType(ITypeProposal lookupService) {
+  public void setLookupServiceType(IType lookupService) {
     try {
       setStateChanging(true);
       setLookupServiceTypeInternal(lookupService);
@@ -377,7 +356,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setLookupServiceTypeInternal(ITypeProposal lookupService) {
+  private void setLookupServiceTypeInternal(IType lookupService) {
     setProperty(PROP_LOOKUP_SERVICE, lookupService);
   }
 
@@ -416,4 +395,5 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       pingStateChanging();
     }
   }
+
 }

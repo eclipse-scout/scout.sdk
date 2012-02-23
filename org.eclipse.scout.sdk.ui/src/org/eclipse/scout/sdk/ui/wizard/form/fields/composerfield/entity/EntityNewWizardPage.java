@@ -19,19 +19,15 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.nls.sdk.internal.ui.action.NlsProposal;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.composer.ComposerEntityNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -62,10 +58,10 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
 
   /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link ITypeProposal} **/
+  /** {@link IType} **/
   public static final String PROP_SUPER_TYPE = "superType";
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
 
@@ -80,9 +76,9 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    ITypeProposal superType = getSuperType();
+    IType superType = getSuperType();
     if (superType == null) {
-      superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractComposerEntity)[0];
+      superType = abstractComposerEntity;
     }
     setSuperTypeInternal(superType);
   }
@@ -97,15 +93,12 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          NlsProposal newEntry = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          INlsEntry newEntry = (INlsEntry) event.proposal;
           setNlsNameInternal(newEntry);
           if (newEntry != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(newEntry.getNlsEntry().getKey());
+              m_typeNameField.setText(newEntry.getKey());
             }
           }
         }
@@ -126,15 +119,13 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ITypeProposal[] shotList = ScoutProposalUtility.getScoutTypeProposalsFor(abstractComposerEntity);
-    ITypeProposal[] proposals = ScoutProposalUtility.getScoutTypeProposalsFor(ScoutTypeUtility.getAbstractTypesOnClasspath(iComposerEntity, m_declaringType.getJavaProject()));
-
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(shotList, proposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(abstractComposerEntity),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(iComposerEntity, m_declaringType.getJavaProject(), abstractComposerEntity));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setSuperTypeInternal((ITypeProposal) event.proposal);
+        setSuperTypeInternal((IType) event.proposal);
         pingStateChanging();
       }
     });
@@ -152,13 +143,10 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     ComposerEntityNewOperation operation = new ComposerEntityNewOperation(m_declaringType);
 
     // write back members
-    if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName().getNlsEntry());
-    }
+    operation.setNlsEntry(getNlsName());
     operation.setTypeName(getTypeName());
-    ITypeProposal superTypeProp = getSuperType();
-    if (superTypeProp != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+    if (getSuperType() != null) {
+      operation.setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true));
     }
     IStructuredType structuredType = ScoutTypeUtility.createStructuredComposer(m_declaringType);
     operation.setSibling(structuredType.getSiblingComposerEntity(getTypeName()));
@@ -208,11 +196,11 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_createdEntity;
   }
 
-  public NlsProposal getNlsName() {
-    return (NlsProposal) getProperty(PROP_NLS_NAME);
+  public INlsEntry getNlsName() {
+    return (INlsEntry) getProperty(PROP_NLS_NAME);
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       setNlsNameInternal(nlsName);
@@ -225,7 +213,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setNlsNameInternal(NlsProposal nlsName) {
+  private void setNlsNameInternal(INlsEntry nlsName) {
     setProperty(PROP_NLS_NAME, nlsName);
   }
 
@@ -250,11 +238,11 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     setPropertyString(PROP_TYPE_NAME, typeName);
   }
 
-  public ITypeProposal getSuperType() {
-    return (ITypeProposal) getProperty(PROP_SUPER_TYPE);
+  public IType getSuperType() {
+    return (IType) getProperty(PROP_SUPER_TYPE);
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       setSuperTypeInternal(superType);
@@ -267,7 +255,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setSuperTypeInternal(ITypeProposal superType) {
+  private void setSuperTypeInternal(IType superType) {
     setProperty(PROP_SUPER_TYPE, superType);
   }
 

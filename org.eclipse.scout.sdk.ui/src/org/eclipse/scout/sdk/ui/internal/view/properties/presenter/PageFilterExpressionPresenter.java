@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.FilterExpressionProperty;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -24,7 +25,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class PageFilterExpressionPresenter extends AbstractPresenter {
 
@@ -32,7 +32,7 @@ public class PageFilterExpressionPresenter extends AbstractPresenter {
   private Button m_useRegexField;
   private final FilterExpressionProperty m_filterProperty;
 
-  public PageFilterExpressionPresenter(FormToolkit toolkit, Composite parent, FilterExpressionProperty filterProperty) {
+  public PageFilterExpressionPresenter(PropertyViewFormToolkit toolkit, Composite parent, FilterExpressionProperty filterProperty) {
     super(toolkit, parent);
     m_filterProperty = filterProperty;
     createContent(getContainer());

@@ -14,19 +14,27 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.icon.IIconProvider;
+import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.fields.proposal.IconProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
+import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.icon.IconContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.icon.IconLabelProvider;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
-import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
+import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
+import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -37,16 +45,20 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
  * <h3>IconPresenter</h3> ...
  */
-public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
+public class IconPresenter extends AbstractMethodPresenter {
 
   private Label m_currentIconPresenter;
+  private ProposalTextField m_proposalField;
+  private IIconProvider m_iconProvider;
+  private ScoutIconDesc m_defaultIcon;
+  private OptimisticLock storeValueLock = new OptimisticLock();
+  private ScoutIconDesc m_currentSourceIcon;
 
-  public IconPresenter(FormToolkit toolkit, Composite parent) {
+  public IconPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
@@ -54,7 +66,16 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
   protected Control createContent(Composite container) {
     Composite rootPane = getToolkit().createComposite(container);
     m_currentIconPresenter = getToolkit().createLabel(rootPane, "", SWT.FLAT);
-    Control text = super.createContent(rootPane);
+    m_proposalField = getToolkit().createProposalField(rootPane, ProposalTextField.STYLE_NO_LABEL);
+    toolkitAdapt(m_proposalField);
+    m_proposalField.setLabelProvider(new IconLabelProvider(m_proposalField.getDisplay()));
+    m_proposalField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        handleProposalAccepted(event);
+      }
+
+    });
 
     // layout
     GridLayout gLayout = new GridLayout(2, false);
@@ -63,7 +84,7 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
     gLayout.marginWidth = 0;
     gLayout.verticalSpacing = 0;
     rootPane.setLayout(gLayout);
-    text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+    m_proposalField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 
     GridData gData = new GridData(SdkProperties.TOOL_BUTTON_SIZE, SdkProperties.TOOL_BUTTON_SIZE);
     gData.exclude = true;
@@ -72,40 +93,79 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
   }
 
   @Override
-  public void setCurrentSourceValue(IconProposal value) {
-    super.setCurrentSourceValue(value);
-    Image icon = null;
-    if (value != null) {
-      icon = value.getImage();
+  protected void init(ConfigurationMethod method) throws CoreException {
+    if (method == null) return;
+    super.init(method);
+    IIconProvider newIconProvider = ScoutTypeUtility.findIconProvider(method.getType());
+    if (!CompareUtility.equals(newIconProvider, m_iconProvider)) {
+      m_iconProvider = newIconProvider;
+      m_proposalField.setContentProvider(new IconContentProvider(m_iconProvider, (ILabelProvider) m_proposalField.getLabelProvider()));
+      m_proposalField.setEnabled(m_iconProvider != null);
     }
-    if (icon != null) {
-      ((GridData) m_currentIconPresenter.getLayoutData()).exclude = false;
-      m_currentIconPresenter.setVisible(true);
+
+    m_defaultIcon = parseInput(getMethod().computeDefaultValue());
+    try {
+      storeValueLock.acquire();
+      m_currentSourceIcon = parseInput(getMethod().computeValue());
+      // TODO handle not parsable see nls presenter
+      if (m_currentSourceIcon != null) {
+        m_proposalField.acceptProposal(m_currentSourceIcon);
+      }
+      else {
+        m_proposalField.acceptProposal(null);
+      }
+      m_proposalField.setEnabled(true);
+    }
+    finally {
+      storeValueLock.release();
+    }
+  }
+
+  protected void handleProposalAccepted(ContentProposalEvent event) {
+    Object proposal = event.proposal;
+    if (proposal == null) {
+      m_proposalField.setText("");
+      storeValue(null);
     }
     else {
-      ((GridData) m_currentIconPresenter.getLayoutData()).exclude = true;
-      m_currentIconPresenter.setVisible(false);
+      storeValue((ScoutIconDesc) proposal);
     }
-    m_currentIconPresenter.setImage(icon);
-    getContainer().layout(true, true);
   }
 
   @Override
-  protected void init(ConfigurationMethod method) throws CoreException {
-    IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(method.getType());
-    setProposals(ScoutProposalUtility.getScoutIconProposals(ScoutSdkUi.getDisplay(), scoutBundle));
-    super.init(method);
+  public void setEnabled(boolean enabled) {
+    if (!isDisposed()) {
+      m_proposalField.setEnabled(enabled && getIconProvider() != null);
+    }
+    super.setEnabled(enabled);
   }
 
   @Override
-  protected IconProposal parseInput(String input) throws CoreException {
+  public boolean isEnabled() {
+    if (!isDisposed()) {
+      return m_proposalField.getEnabled() && super.isEnabled();
+    }
+    return false;
+  }
+
+  public IIconProvider getIconProvider() {
+    return m_iconProvider;
+  }
+
+  protected ScoutIconDesc parseInput(String input) throws CoreException {
     String parsedString = PropertyMethodSourceUtility.parseReturnParameterIcon(input, getMethod().peekMethod());
-    IconProposal findProposal = findProposal(parsedString);
-    return findProposal;
+    if (getIconProvider() != null && !StringUtility.isNullOrEmpty(parsedString)) {
+      String simpleIconName = parsedString.replaceAll("^.*\\.([^\\.]+)$", "$1");
+      return getIconProvider().getIcon(simpleIconName);
+    }
+    return null;
   }
 
-  @Override
-  protected synchronized void storeValue(final IconProposal value) {
+  public ScoutIconDesc getDefaultValue() {
+    return m_defaultIcon;
+  }
+
+  protected synchronized void storeValue(final ScoutIconDesc value) {
     IOperation op = null;
     if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {
@@ -119,8 +179,8 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
           StringBuilder source = new StringBuilder();
           source.append("return ");
           if (value != null) {
-            String iconTypeSig = Signature.createTypeSignature(value.getImageDescription().getConstantField().getDeclaringType().getFullyQualifiedName(), false);
-            source.append("  " + SignatureUtility.getTypeReference(iconTypeSig, validator) + "." + value.getImageDescription().getConstantField().getElementName());
+            String iconTypeSig = Signature.createTypeSignature(value.getConstantField().getDeclaringType().getFullyQualifiedName(), false);
+            source.append("  " + SignatureUtility.getTypeReference(iconTypeSig, validator) + "." + value.getConstantField().getElementName());
             source.append(";");
           }
           else {
@@ -133,18 +193,20 @@ public class IconPresenter extends AbstractProposalPresenter<IconProposal> {
     if (op != null) {
       new OperationJob(op).schedule();
     }
-  }
-
-  private IconProposal findProposal(String value) {
+    Image icon = null;
     if (value != null) {
-      String simpleIconName = value.replaceAll("^.*\\.([^\\.]+)$", "$1");
-      for (IconProposal prop : getProposals()) {
-        if (prop.getImageDescription().getIconName().equals(simpleIconName)) {
-          return prop;
-        }
-      }
+      icon = ((ILabelProvider) m_proposalField.getLabelProvider()).getImage(value);
     }
-    return null;
+    if (icon != null) {
+      ((GridData) m_currentIconPresenter.getLayoutData()).exclude = false;
+      m_currentIconPresenter.setVisible(true);
+    }
+    else {
+      ((GridData) m_currentIconPresenter.getLayoutData()).exclude = true;
+      m_currentIconPresenter.setVisible(false);
+    }
+    m_currentIconPresenter.setImage(icon);
+    getContainer().layout(true, true);
   }
 
 }

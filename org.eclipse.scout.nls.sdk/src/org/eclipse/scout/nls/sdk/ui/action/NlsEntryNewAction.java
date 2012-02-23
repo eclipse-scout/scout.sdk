@@ -15,7 +15,7 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsEntryNewDialog;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 /** <h4>NlsEntryNewAction</h4> */
 public class NlsEntryNewAction extends AbstractWorkspaceAction {
@@ -26,12 +26,15 @@ public class NlsEntryNewAction extends AbstractWorkspaceAction {
 
   private NlsEntry m_initialEntry;
 
-  public NlsEntryNewAction(INlsProject project) {
-    this(null, project);
+  private final Shell m_parentShell;
+
+  public NlsEntryNewAction(Shell parentShell, INlsProject project) {
+    this(parentShell, project, null);
   }
 
-  public NlsEntryNewAction(NlsEntry entry, INlsProject project) {
+  public NlsEntryNewAction(Shell parentShell, INlsProject project, NlsEntry entry) {
     super("New Entry...", true);
+    m_parentShell = parentShell;
     m_initialEntry = entry;
     m_project = project;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.TextAdd));
@@ -46,7 +49,7 @@ public class NlsEntryNewAction extends AbstractWorkspaceAction {
     else {
       m_entry = m_initialEntry;
     }
-    NlsEntryNewDialog dialog = new NlsEntryNewDialog(Display.getDefault().getActiveShell(), m_entry, m_project);
+    NlsEntryNewDialog dialog = new NlsEntryNewDialog(m_parentShell, m_entry, m_project);
     m_entry = dialog.show();
     return m_entry != null;
   }

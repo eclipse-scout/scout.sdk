@@ -24,21 +24,14 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.calendar.CalendarItemProviderNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ITypeProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -59,7 +52,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
   final IType abstractCalendarItemProvider = TypeUtility.getType(RuntimeClasses.AbstractCalendarItemProvider);
 
   private String m_typeName;
-  private ITypeProposal m_superType;
+  private IType m_superType;
   private SiblingProposal m_sibling;
 
   private StyledTextField m_typeNameField;
@@ -76,9 +69,9 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     setDescription(Texts.get("CreateANewCalendarItemProvider"));
     m_declaringType = declaringType;
 
-    ITypeProposal superType = getSuperType();
+    IType superType = getSuperType();
     if (superType == null) {
-      superType = ScoutProposalUtility.getScoutTypeProposalsFor(abstractCalendarItemProvider)[0];
+      superType = abstractCalendarItemProvider;
     }
     m_superType = superType;
     m_sibling = SiblingProposal.SIBLING_END;
@@ -98,27 +91,19 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
       }
     });
 
-    IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()),
-        TypeFilters.getSubtypeFilter(iCalendarItemProvider, formFieldHierarchy)
-        );
-
-    ITypeProposal[] superTypeProposals = ScoutProposalUtility.getScoutTypeProposalsFor(formFieldHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator()));
-    m_superTypeField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(superTypeProposals), Texts.get("SuperType"));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(abstractCalendarItemProvider),
+        ScoutTypeUtility.getAbstractTypesOnClasspath(iCalendarItemProvider, m_declaringType.getJavaProject(), abstractCalendarItemProvider));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_superType = (ITypeProposal) event.proposal;
+        m_superType = (IType) event.proposal;
         pingStateChanging();
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(ScoutTypeUtility.getFormFields(m_declaringType));
-    m_siblingField = getFieldToolkit().createProposalField(parent, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
+    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, iCalendarItemProvider);
     m_siblingField.acceptProposal(m_sibling);
-    m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -141,9 +126,9 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     operation.setFormatSource(true);
     // write back members
     operation.setTypeName(getTypeName());
-    ITypeProposal superTypeProp = getSuperType();
+    IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getType().getFullyQualifiedName(), true));
+      operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
     }
 
     if (getSibling() == SiblingProposal.SIBLING_END) {
@@ -151,7 +136,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
     operation.validate();
     operation.run(monitor, workingCopyManager);
@@ -220,11 +205,11 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     }
   }
 
-  public ITypeProposal getSuperType() {
+  public IType getSuperType() {
     return m_superType;
   }
 
-  public void setSuperType(ITypeProposal superType) {
+  public void setSuperType(IType superType) {
     try {
       setStateChanging(true);
       m_superType = superType;

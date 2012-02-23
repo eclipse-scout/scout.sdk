@@ -30,14 +30,9 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.IButtonGroupListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
-import org.eclipse.scout.sdk.ui.fields.proposal.DefaultProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.NlsProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.ScoutProposalUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
-import org.eclipse.scout.sdk.ui.fields.proposal.SignatureProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
@@ -68,12 +63,12 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
 
   final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
 
-  private NlsProposal m_nlsName;
+  private INlsEntry m_nlsName;
   private String m_typeName;
-  private SignatureProposal m_genericSignature;
+  private String m_genericSignature;
   private SiblingProposal m_sibling;
 
-  private NlsProposalTextField m_nlsNameField;
+  private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_genericTypeField;
   private ProposalTextField m_siblingField;
@@ -90,7 +85,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     setTitle(Texts.get("NewTableColumn"));
     setDescription(Texts.get("CreateANewTableColumn"));
     // default values
-    m_genericSignature = new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true));
+    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
     m_declaringType = declaringType;
     m_sibling = SiblingProposal.SIBLING_END;
   }
@@ -125,26 +120,22 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   }
 
   private void createFieldGroup(Composite p) {
-    Group g = new Group(p, SWT.NONE);
-    g.setText(Texts.get("Column"));
+    Group fieldGroup = new Group(p, SWT.NONE);
+    fieldGroup.setText(Texts.get("Column"));
 
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(m_declaringType);
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, null, Texts.get("Name"));
-    m_nlsNameField.setNlsProject(nlsProject);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(fieldGroup, nlsProject, Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         try {
           setStateChanging(true);
-          INlsEntry oldEntry = null;
-          if (getNlsName() != null) {
-            oldEntry = getNlsName().getNlsEntry();
-          }
-          m_nlsName = (NlsProposal) event.proposal;
+          INlsEntry oldEntry = getNlsName();
+          m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getNlsEntry().getKey());
+              m_typeNameField.setText(m_nlsName.getKey());
             }
           }
         }
@@ -154,7 +145,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(g, Texts.get("TypeName"));
+    m_typeNameField = getFieldToolkit().createStyledTextField(fieldGroup, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_TABLE_COLUMN);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -165,21 +156,19 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(g, ScoutTypeUtility.getScoutBundle(m_declaringType), Texts.get("GenericType"));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(fieldGroup, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType));
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        m_genericSignature = (SignatureProposal) event.proposal;
+        m_genericSignature = (String) event.proposal;
         pingStateChanging();
       }
     });
 
-    SiblingProposal[] availableSiblings = ScoutProposalUtility.getSiblingProposals(ScoutTypeUtility.getColumns(m_declaringType));
-    m_siblingField = getFieldToolkit().createProposalField(g, new DefaultProposalProvider(availableSiblings), Texts.get("Sibling"));
+    m_siblingField = getFieldToolkit().createSiblingProposalField(fieldGroup, m_declaringType, TypeUtility.getType(RuntimeClasses.IColumn));
     m_siblingField.acceptProposal(m_sibling);
-    m_siblingField.setEnabled(availableSiblings != null && availableSiblings.length > 0);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -189,8 +178,8 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     });
 
     // layout
-    g.setLayout(new GridLayout(1, false));
-    g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    fieldGroup.setLayout(new GridLayout(1, false));
+    fieldGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
@@ -220,23 +209,21 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     if (superTypeProp != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature().getSignature()) + ">", true);
+        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
       }
       else {
         sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true);
       }
       operation.setSuperTypeSignature(sig);
     }
-    if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName().getNlsEntry());
-    }
+    operation.setNlsEntry(getNlsName());
     operation.setTypeName(getTypeName());
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_COLUMN));
     }
     else {
-      operation.setSibling(getSibling().getScoutType());
+      operation.setSibling(getSibling().getElement());
     }
     operation.validate();
     operation.run(monitor, workingCopyManager);
@@ -297,7 +284,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     try {
       setStateChanging(true);
       if (TypeUtility.isGenericType(getSuperType())) {
-        setGenericSignature(new SignatureProposal(Signature.createTypeSignature(Long.class.getName(), true)));
+        setGenericSignature(Signature.createTypeSignature(Long.class.getName(), true));
       }
       else {
         setGenericSignature(null);
@@ -313,11 +300,11 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     return m_superType;
   }
 
-  public NlsProposal getNlsName() {
+  public INlsEntry getNlsName() {
     return m_nlsName;
   }
 
-  public void setNlsName(NlsProposal nlsName) {
+  public void setNlsName(INlsEntry nlsName) {
     try {
       setStateChanging(true);
       m_nlsName = nlsName;
@@ -347,7 +334,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     }
   }
 
-  public void setGenericSignature(SignatureProposal genericSignature) {
+  public void setGenericSignature(String genericSignature) {
     try {
       setStateChanging(true);
       m_genericSignature = genericSignature;
@@ -360,7 +347,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     }
   }
 
-  public SignatureProposal getGenericSignature() {
+  public String getGenericSignature() {
     return m_genericSignature;
   }
 
