@@ -49,7 +49,6 @@ public class ProposalPresenter<T extends SimpleProposal> extends AbstractPropert
   }
 
   public void setProposals(SimpleProposal[] proposals) {
-    setStateChanging(true);
     m_proposals = proposals;
     initializeProposalField(proposals);
   }
@@ -58,24 +57,16 @@ public class ProposalPresenter<T extends SimpleProposal> extends AbstractPropert
     setStateChanging(true);
     try {
       if (isControlCreated()) {
-        try {
-          StaticContentProvider provider = new StaticContentProvider(m_proposals, new SimpleLabelProvider());
-          m_proposalField.setContentProvider(provider);
-        }
-        finally {
-          setStateChanging(false);
-        }
+        StaticContentProvider provider = new StaticContentProvider(m_proposals, new SimpleLabelProvider());
+        m_proposalField.setContentProvider(provider);
         if (!isStateChanging()) {
           setInput(getValue());
         }
       }
-
     }
     finally {
       setStateChanging(false);
-
     }
-
   }
 
   public SimpleProposal[] getProposals() {
