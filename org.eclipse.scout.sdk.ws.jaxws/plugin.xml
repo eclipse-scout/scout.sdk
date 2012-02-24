@@ -188,7 +188,7 @@
       <technology
             category="Backend Features"
             id="scout.technology.ws.jaxws"
-            name="Webservices with JAX-WS 2.1.6">
+            name="Webservices with JAX-WS RI 2.1.6">
       </technology>
       <handler
             class="org.eclipse.scout.sdk.ws.jaxws.technology.JaxWsServerProdTechnologyHandler"
