@@ -21,6 +21,8 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.FormAttachment;
@@ -71,6 +73,12 @@ public class ProposalTextField extends TextField {
 
   public ProposalTextField(Composite parent, int style) {
     super(parent);
+    addDisposeListener(new DisposeListener() {
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        m_popup.dispose();
+      }
+    });
     m_style = style;
     init();
   }
@@ -165,7 +173,7 @@ public class ProposalTextField extends TextField {
       public void widgetSelected(SelectionEvent e) {
         try {
           if (m_updateLock.aquire()) {
-            if (m_popup.getShell() != null && !m_popup.getShell().isDisposed()) {
+            if (m_popup.isVisible()) {
               closePopup();
             }
             else {
@@ -504,13 +512,12 @@ public class ProposalTextField extends TextField {
         case SWT.Traverse: {
           switch (event.keyCode) {
             case SWT.ESC:
-              if (m_popup != null) {
+              if (m_popup.isVisible()) {
                 event.doit = false;
               }
               break;
             case SWT.CR:
-              if (m_popup != null) {
-
+              if (m_popup.isVisible()) {
                 acceptProposalInternal(m_popup.getSelectedProposal());
                 event.doit = false;
               }

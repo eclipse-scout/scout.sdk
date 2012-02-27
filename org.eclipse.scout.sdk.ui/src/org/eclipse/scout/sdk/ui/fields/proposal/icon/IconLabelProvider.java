@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * <h3>{@link IconLabelProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 14.02.2012
  */
 public class IconLabelProvider extends LabelProvider {

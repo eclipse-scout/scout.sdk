@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * <h3>{@link RecreateTypeTest}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 1.0.8 15.07.2011
  */
 public class RecreateTypeTest extends AbstractScoutSdkTest {

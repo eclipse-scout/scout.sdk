@@ -20,7 +20,7 @@ import org.eclipse.swt.graphics.Image;
 /**
  * <h3>{@link SimpleProposal}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 07.02.2012
  */
 public class SimpleProposal {
@@ -113,11 +113,6 @@ public class SimpleProposal {
       }
     }
     return hashCode;
-  }
-
-  public static void main(String[] args) {
-    int i = 0 ^ "blubber".hashCode();
-    System.out.println(i);
   }
 
 }

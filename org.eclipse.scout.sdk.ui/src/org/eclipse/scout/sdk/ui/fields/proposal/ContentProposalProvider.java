@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.StringUtility;
 /**
  * <h3>{@link ContentProposalProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 13.02.2012
  */
 public class ContentProposalProvider implements ILazyProposalContentProvider {

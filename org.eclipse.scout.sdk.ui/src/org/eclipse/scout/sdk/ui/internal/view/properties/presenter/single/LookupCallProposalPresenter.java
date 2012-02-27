@@ -103,7 +103,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
    * It is kept lazy to ensure the proposals are only loaded when used. So the creation of the property view is
    * performance optimized.
    * 
-   * @author aho
+   * @author Andreas Hoegger
    * @since 3.8.0 15.02.2012
    */
   private class P_ContentProvider extends ContentProposalProvider {

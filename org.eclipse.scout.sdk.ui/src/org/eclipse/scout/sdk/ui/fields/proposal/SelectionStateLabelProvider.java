@@ -16,19 +16,19 @@ import org.eclipse.swt.graphics.Image;
 /**
  * <h3>{@link SelectionStateLabelProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 09.02.2012
  */
 public class SelectionStateLabelProvider extends LabelProvider implements ISelectionStateLabelProvider {
 
   @Override
   public Image getImageSelected(Object element) {
-    return null;
+    return getImage(element);
   }
 
   @Override
   public String getTextSelected(Object element) {
-    return null;
+    return getText(element);
   }
 
 }

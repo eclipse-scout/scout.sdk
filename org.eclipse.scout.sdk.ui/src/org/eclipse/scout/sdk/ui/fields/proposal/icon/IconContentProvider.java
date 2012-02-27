@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 /**
  * <h3>{@link IconContentProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 14.02.2012
  */
 public class IconContentProvider extends ContentProposalProvider implements IStructuredContentProvider {

@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
 /**
  * <h3>{@link StaticContentProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 12.02.2012
  */
 public class StaticContentProvider extends ContentProposalProvider {
@@ -35,7 +35,6 @@ public class StaticContentProvider extends ContentProposalProvider {
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    System.out.println("getproposals for '" + searchPattern + "'");
     if (StringUtility.isNullOrEmpty(searchPattern)) {
       searchPattern = "*";
     }

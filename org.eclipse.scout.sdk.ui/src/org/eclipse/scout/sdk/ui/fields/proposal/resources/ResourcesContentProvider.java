@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 /**
  * <h3>{@link ResourcesContentProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 15.02.2012
  */
 public class ResourcesContentProvider extends ContentProposalProvider {

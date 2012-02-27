@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 /**
  * <h3>{@link ScoutProjectUpdateFormDataOperation}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 1.0.8 20.07.2011
  */
 public class ScoutProjectUpdateFormDataOperation implements IOperation {

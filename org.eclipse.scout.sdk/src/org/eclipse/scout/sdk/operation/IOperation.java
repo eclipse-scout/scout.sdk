@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * used with and {@link OperationJob} the user is responsible to call validate first and execute only on successed
  * validation.
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 23.02.2012
  * @see OperationJob
  */

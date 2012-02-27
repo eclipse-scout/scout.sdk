@@ -12,42 +12,17 @@ package org.eclipse.scout.sdk.ui.fields.proposal.styled;
 
 import java.util.HashMap;
 
-import org.eclipse.jface.viewers.ILabelProviderListener;
-import org.eclipse.scout.sdk.ui.fields.proposal.ISelectionStateLabelProvider;
-import org.eclipse.swt.graphics.Image;
+import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 
 /**
  * <h3>{@link SearchRangeStyledLabelProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 17.02.2012
  */
-public class SearchRangeStyledLabelProvider implements ISelectionStateLabelProvider, ISearchRangeConsumer {
+public class SearchRangeStyledLabelProvider extends SelectionStateLabelProvider implements ISearchRangeConsumer {
 
   private HashMap<Object, int[]> m_searchRanges = new HashMap<Object, int[]>();
-
-  @Override
-  public Image getImage(Object element) {
-    return null;
-  }
-
-  @Override
-  public Image getImageSelected(Object element) {
-    return getImage(element);
-  }
-
-  @Override
-  public String getText(Object element) {
-    if (element != null) {
-      return element.toString();
-    }
-    return null;
-  }
-
-  @Override
-  public String getTextSelected(Object element) {
-    return getText(element);
-  }
 
   @Override
   public int[] getMatchRanges(Object element) {
@@ -70,20 +45,8 @@ public class SearchRangeStyledLabelProvider implements ISelectionStateLabelProvi
 
   @Override
   public void dispose() {
+    super.dispose();
     m_searchRanges.clear();
-  }
-
-  @Override
-  public boolean isLabelProperty(Object element, String property) {
-    return false;
-  }
-
-  @Override
-  public void addListener(ILabelProviderListener listener) {
-  }
-
-  @Override
-  public void removeListener(ILabelProviderListener listener) {
   }
 
 }

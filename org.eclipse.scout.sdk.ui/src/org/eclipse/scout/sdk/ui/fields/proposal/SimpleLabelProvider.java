@@ -16,7 +16,7 @@ import org.eclipse.swt.graphics.Image;
 /**
  * <h3>{@link SimpleLabelProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 12.02.2012
  */
 public class SimpleLabelProvider extends SearchRangeStyledLabelProvider {

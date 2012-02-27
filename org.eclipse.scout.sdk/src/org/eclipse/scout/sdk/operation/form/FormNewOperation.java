@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * <h3>{@link FormNewOperation}</h3>
  * To create a new form. A form is either a view, editor or a dialog.
  *
- * @author aho
+ * @author Andreas Hoegger
  * @since 1.0.0 2008
  */
 public class FormNewOperation implements IOperation {

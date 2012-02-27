@@ -102,27 +102,45 @@ public class ProposalPopup extends Window {
   private OptimisticLock m_uiLock = new OptimisticLock();
   private IDialogSettings m_dialogSettings;
 
-  private Listener m_parentShellListener = new Listener() {
-
-    @Override
-    public void handleEvent(Event event) {
-      close();
-    }
-  };
-
   public ProposalPopup(Control proposalField) {
     super(proposalField.getShell());
     m_proposalField = proposalField;
     int style = SWT.RESIZE | SWT.NO_FOCUS | SWT.ON_TOP | SWT.TOOL;
     setShellStyle(style);
-//    setShellStyle(SWT.RESIZE | SWT.ON_TOP | SWT.POP_UP);
     setBlockOnOpen(false);
+    // listeners
+    getOwnerControl().getShell().addListener(SWT.Move, new Listener() {
+      @Override
+      public void handleEvent(Event event) {
+        close();
+      }
+    });
   }
 
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
     shell.setBackground(shell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    // listener
+    shell.addShellListener(new ShellAdapter() {
+      @Override
+      public void shellDeactivated(ShellEvent e) {
+        getShell().getDisplay().asyncExec(new Runnable() {
+          @Override
+          public void run() {
+            if (getOwnerControl() != null && !getOwnerControl().isDisposed()) {
+              if (!getOwnerControl().isFocusControl()) {
+                close();
+              }
+            }
+            else {
+              close();
+            }
+
+          }
+        });
+      }
+    });
   }
 
   @Override
@@ -137,28 +155,11 @@ public class ProposalPopup extends Window {
     m_tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        // refresh selected label
-        if (m_selectedProposal != null) {
-          m_tableViewer.update(m_selectedProposal, new String[]{"label"});
-        }
-        m_selectedProposal = null;
+        Object newSelection = null;
         if (!event.getSelection().isEmpty()) {
-          m_selectedProposal = ((StructuredSelection) event.getSelection()).getFirstElement();
-          m_tableViewer.update(m_selectedProposal, new String[]{"label"});
+          newSelection = ((IStructuredSelection) event.getSelection()).getFirstElement();
         }
-        // update description
-        updateDescription(m_selectedProposal);
-        try {
-          if (m_uiLock.acquire()) {
-            // handleSelection
-            ProposalPopupEvent delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
-            delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, m_selectedProposal);
-            firePopupEvent(delegateEvent);
-          }
-        }
-        finally {
-          m_uiLock.release();
-        }
+        handleProposalSelection(newSelection);
 
       }
     });
@@ -244,6 +245,32 @@ public class ProposalPopup extends Window {
     return parent;
   }
 
+  private void handleProposalSelection(Object proposal) {
+    // refresh selected label
+    if (m_selectedProposal != null) {
+      m_tableViewer.update(m_selectedProposal, new String[]{"label"});
+    }
+    m_selectedProposal = null;
+
+    m_selectedProposal = proposal;
+    if (m_selectedProposal != null) {
+      m_tableViewer.update(m_selectedProposal, new String[]{"label"});
+    }
+    // update description
+    updateDescription(m_selectedProposal);
+    try {
+      if (m_uiLock.acquire()) {
+        // handleSelection
+        ProposalPopupEvent delegateEvent = new ProposalPopupEvent(ProposalPopupEvent.TYPE_PROPOSAL_SELECTED);
+        delegateEvent.setData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL, m_selectedProposal);
+        firePopupEvent(delegateEvent);
+      }
+    }
+    finally {
+      m_uiLock.release();
+    }
+  }
+
   public void setDialogSettings(IDialogSettings dialogSettings) {
     m_dialogSettings = dialogSettings;
   }
@@ -267,11 +294,16 @@ public class ProposalPopup extends Window {
   }
 
   public void setInput(SearchPatternInput input) {
-    Object oldInput = getInput();
+    SearchPatternInput oldInput = getInput();
     if (!CompareUtility.equals(oldInput, input)) {
+      // if old input equals new input except proposals and in old input proposal are loaded -> void
+      if (oldInput != null && input != null && CompareUtility.equals(oldInput.getInput(), input.getInput())
+          && CompareUtility.equals(oldInput.getPattern(), input.getPattern())
+          && oldInput.getProposals() != null && input.getProposals() == null) {
+        return;
+      }
       m_input = input;
-//      m_contentProvider.inputChanged(m_tableViewer, oldInput, input);
-      if (isVisible()) {//m_tableViewer != null && !m_tableViewer.getTable().isDisposed()) {
+      if (getShell() != null && !getShell().isDisposed()) {//m_tableViewer != null && !m_tableViewer.getTable().isDisposed()) {
         try {
           m_uiLock.acquire();
           m_tableViewer.getTable().setRedraw(false);
@@ -381,19 +413,6 @@ public class ProposalPopup extends Window {
       create();
       shell = getShell();
     }
-    shell.addShellListener(new ShellAdapter() {
-      @Override
-      public void shellDeactivated(ShellEvent e) {
-        getShell().getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            close();
-
-          }
-        });
-      }
-    });
-    getOwnerControl().getShell().addListener(SWT.Move, m_parentShellListener);
 
     // provide a hook for adjusting the bounds. This is only
     // necessary when there is content driven sizing that must be
@@ -504,18 +523,28 @@ public class ProposalPopup extends Window {
 
   @Override
   public boolean close() {
-    getOwnerControl().getShell().removeListener(SWT.Resize, m_parentShellListener);
-    firePopupEvent(new ProposalPopupEvent(ProposalPopupEvent.TYPE_POPUP_CLOSED));
-    if (getDialogSettings() != null) {
-      Point size = getShell().getSize();
-      // double width if description area is visisble
-      if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
-        size.x = size.x / 2;
+    if (isVisible()) {
+      firePopupEvent(new ProposalPopupEvent(ProposalPopupEvent.TYPE_POPUP_CLOSED));
+      if (getDialogSettings() != null) {
+        Point size = getShell().getSize();
+        // double width if description area is visisble
+        if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
+          size.x = size.x / 2;
+        }
+        getDialogSettings().put(DIALOG_SETTINGS_WIDTH, size.x);
+        getDialogSettings().put(DIALOG_SETTINGS_HEIGHT, size.y);
       }
-      getDialogSettings().put(DIALOG_SETTINGS_WIDTH, size.x);
-      getDialogSettings().put(DIALOG_SETTINGS_HEIGHT, size.y);
+      getShell().setVisible(false);
+      return true;
     }
-    return super.close();
+    return false;
+  }
+
+  /**
+   *
+   */
+  public void dispose() {
+    super.close();
   }
 
   public boolean isFocusOwner() {
@@ -527,7 +556,6 @@ public class ProposalPopup extends Window {
   }
 
   public boolean isVisible() {
-
     return getShell() != null && !getShell().isDisposed() && getShell().isVisible();
   }
 
@@ -552,39 +580,6 @@ public class ProposalPopup extends Window {
   boolean setFocus() {
     return m_tableViewer.getTable().setFocus();
   }
-
-//  private void adjustBounds() {
-//    // Get our control's location in display coordinates.
-////    FormData data = (FormData) m_tableViewer.getTable().getLayoutData();
-////    data.height = m_tableViewer.getTable().getItemHeight() * POPUP_CHAR_HEIGHT;
-////    data.width = Math.max(m_proposalField.getSize().x, POPUP_MINIMUM_WIDTH);
-////    m_tableViewer.getTable().setLayoutData(data);
-//    Point location = m_proposalField.getDisplay().map(m_proposalField.getParent(), null, m_proposalField.getLocation());
-//    int initialX = location.x + POPUP_OFFSET;
-//    int initialY = location.y + m_proposalField.getSize().y + POPUP_OFFSET;
-//
-//    // If there is no specified size, force it by setting
-//    // up a layout on the table.
-//    Point size = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-//    if (((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
-//      size.x = POPUP_MINIMUM_WIDTH;
-//    }
-//    else {
-//      size.x = POPUP_MINIMUM_WIDTH * 2;
-//    }
-//    size.y = POPUP_MINIMUM_WIDTH;
-//    getShell().setBounds(initialX, initialY, size.x, size.y);
-////    if (popupSize == null) {
-////    FormData data = (FormData) m_tableViewer.getTable().getLayoutData();
-////    data.height = m_tableViewer.getTable().getItemHeight() * POPUP_CHAR_HEIGHT;
-////    data.width = Math.max(m_proposalField.getSize().x, POPUP_MINIMUM_WIDTH);
-////    m_tableViewer.getTable().setLayoutData(data);
-////      getShell().pack();
-////      popupSize = getShell().getSize();
-////    }
-////    getShell().setBounds(initialX, initialY, popupSize.x, popupSize.y);
-//
-//  }
 
   protected Control getOwnerControl() {
     return m_proposalField;
@@ -627,8 +622,6 @@ public class ProposalPopup extends Window {
     @Override
     public synchronized Object[] getElements(Object inputElement) {
       SearchPatternInput input = (SearchPatternInput) inputElement;
-      System.out.println("getELements '" + input.getPattern() + "'");
-//      new Exception().printStackTrace();
       if (input.getProposals() == null) {
         if (m_lazyLoaderJob != null) {
           m_lazyLoaderJob.cancel();
@@ -643,10 +636,6 @@ public class ProposalPopup extends Window {
         return input.getProposals();
       }
     }
-
-//    public synchronized void resetCache() {
-//      m_proposals = null;
-//    }
   }
 
   private class P_LazyLoader extends Job {
@@ -682,7 +671,6 @@ public class ProposalPopup extends Window {
                 if (monitor.isCanceled()) {
                   return;
                 }
-                System.out.println("DISPLAY refresh " + m_input);
                 setInput(m_input);
               }
               finally {
@@ -744,7 +732,7 @@ public class ProposalPopup extends Window {
     @Override
     public void update(ViewerCell cell) {
       Object element = cell.getElement();
-      StyledString text = new StyledString(getText(element, cell.getColumnIndex(), m_selectedProposal == element));
+      StyledString text = new StyledString(getText(element, cell.getColumnIndex(), CompareUtility.equals(m_selectedProposal, element)));
       if (cell.getColumnIndex() == 0) {
         if (m_wrappedLabelProvider instanceof ISearchRangeConsumer) {
           int[] matchingRegions = ((ISearchRangeConsumer) m_wrappedLabelProvider).getMatchRanges(element);
@@ -814,8 +802,16 @@ public class ProposalPopup extends Window {
     }
 
     public void setProposals(Object[] proposals) {
-      System.out.println("setproposals " + proposals);
       m_proposals = proposals;
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder();
+      builder.append("input[").append(getInput()).append("] ");
+      builder.append("pattern[").append(getPattern()).append("] ");
+      builder.append("proposals[").append(getProposals()).append("] ");
+      return builder.toString();
     }
 
     @Override

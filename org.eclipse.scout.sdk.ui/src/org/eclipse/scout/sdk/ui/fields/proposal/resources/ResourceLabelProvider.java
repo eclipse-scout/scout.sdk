@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Image;
 /**
  * <h3>{@link ResourceLabelProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 15.02.2012
  */
 public class ResourceLabelProvider extends SelectionStateLabelProvider {

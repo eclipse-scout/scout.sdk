@@ -47,6 +47,7 @@ import org.eclipse.swt.widgets.Composite;
  * <h3> {@link FormHandlerNewWizardPage1}</h3> ...
  */
 public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
+
   final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
   private IType m_declaringType;
   private boolean m_showAllTemplates;

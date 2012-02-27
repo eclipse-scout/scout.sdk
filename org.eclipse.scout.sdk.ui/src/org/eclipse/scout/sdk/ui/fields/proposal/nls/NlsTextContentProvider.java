@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 /**
  * <h3>{@link NlsTextContentProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 07.02.2012
  */
 public class NlsTextContentProvider extends ContentProposalProvider implements IDialogSettingsProvider {
@@ -47,15 +47,11 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
     TuningUtility.startTimer();
     HashSet<INlsEntry> entries = new HashSet<INlsEntry>();
-
-//    ArrayList<Object> props = new ArrayList<Object>();
     if (getLabelProvider().getNlsProject() != null) {
       if (searchPattern == null) {
         searchPattern = "*";
       }
-      else {
-        searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
-      }
+
       getLabelProvider().startRecordMatchRegions();
       NormalizedPattern pattern = createNormalizedSearchPattern(searchPattern);
       Language developmentLanguage = getLabelProvider().getNlsProject().getDevelopmentLanguage();

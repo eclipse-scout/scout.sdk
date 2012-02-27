@@ -15,7 +15,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 /**
  * <h3>{@link IContentProposalLabelProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 05.02.2012
  */
 public interface IContentProposalLabelProvider extends ILabelProvider {

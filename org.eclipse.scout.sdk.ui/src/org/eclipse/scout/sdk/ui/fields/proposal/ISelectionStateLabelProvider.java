@@ -16,7 +16,7 @@ import org.eclipse.swt.graphics.Image;
 /**
  * <h3>{@link ISelectionStateLabelProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 07.02.2012
  */
 public interface ISelectionStateLabelProvider extends ILabelProvider {

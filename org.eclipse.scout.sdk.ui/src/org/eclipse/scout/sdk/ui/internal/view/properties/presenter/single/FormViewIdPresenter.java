@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormViewIdPresenter.ViewId;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
@@ -57,7 +57,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
 
   @Override
   protected void createProposalFieldProviders(ProposalTextField proposalField) {
-    ILabelProvider labelProvider = new LabelProvider() {
+    ILabelProvider labelProvider = new SearchRangeStyledLabelProvider() {
       @Override
       public String getText(Object element) {
         ViewId value = (ViewId) element;

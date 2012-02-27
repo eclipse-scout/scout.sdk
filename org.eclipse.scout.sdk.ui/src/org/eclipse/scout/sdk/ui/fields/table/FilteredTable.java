@@ -326,7 +326,7 @@ public class FilteredTable extends Composite {
   /**
    * <h3>{@link P_TableViewer}</h3> ...
    * 
-   * @author aho
+   * @author Andreas Hoegger
    * @since 3.8.0 17.02.2012
    */
   private class P_TableViewer extends TableViewer {

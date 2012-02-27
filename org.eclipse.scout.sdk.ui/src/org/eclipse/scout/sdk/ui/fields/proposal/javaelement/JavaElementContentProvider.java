@@ -15,15 +15,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
 
 /**
  * <h3>{@link JavaElementContentProvider}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 09.02.2012
  */
 public class JavaElementContentProvider extends ContentProposalProvider {
@@ -50,13 +50,18 @@ public class JavaElementContentProvider extends ContentProposalProvider {
     if (searchPattern == null) {
       searchPattern = "*";
     }
-    else {
-      searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
-    }
-    char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
+    NormalizedPattern pattern = createNormalizedSearchPattern(searchPattern);
     ArrayList<Object> result = new ArrayList<Object>();
+    // avoid checking for every single entry instanceof ISearchRangeConsumer
+    ISearchRangeConsumer searchRangeSupport = null;
+    if (getLabelProvider() instanceof ISearchRangeConsumer) {
+      searchRangeSupport = (ISearchRangeConsumer) getLabelProvider();
+    }
+    else {
+      searchRangeSupport = new P_EmptySearchRangeSupport();
+    }
     for (Object[] group : m_allProposals) {
-      Collection<Object> groupResult = getProposals(pattern, group, monitor);
+      Collection<Object> groupResult = getProposals(pattern, group, searchRangeSupport, monitor);
       if (result.size() > 0 && groupResult.size() > 0) {
         result.add(SEPERATOR);
       }
@@ -65,16 +70,39 @@ public class JavaElementContentProvider extends ContentProposalProvider {
     return result.toArray(new Object[result.size()]);
   }
 
-  private Collection<Object> getProposals(char[] pattern, Object[] proposals, IProgressMonitor monitor) {
+  private Collection<Object> getProposals(NormalizedPattern pattern, Object[] proposals, ISearchRangeConsumer searchRangeSupport, IProgressMonitor monitor) {
     if (proposals == null) {
       return new ArrayList<Object>(0);
     }
     List<Object> result = new ArrayList<Object>();
     for (Object proposal : proposals) {
-      if (CharOperation.match(pattern, getLabelProvider().getText(proposal).toCharArray(), false)) {
-        result.add(0, proposal);
+      int[] matchingRegions = getMatchingRegions(proposal, getLabelProvider().getText(proposal), pattern);
+      if (matchingRegions != null) {
+        result.add(proposal);
+        searchRangeSupport.addMatchRegions(proposal, matchingRegions);
       }
     }
     return result;
+  }
+
+  private class P_EmptySearchRangeSupport implements ISearchRangeConsumer {
+
+    @Override
+    public int[] getMatchRanges(Object element) {
+      return null;
+    }
+
+    @Override
+    public void startRecordMatchRegions() {
+    }
+
+    @Override
+    public void addMatchRegions(Object element, int[] matchRegions) {
+    }
+
+    @Override
+    public void endRecordMatchRegions() {
+    }
+
   }
 }
