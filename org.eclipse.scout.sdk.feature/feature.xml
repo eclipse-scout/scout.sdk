@@ -3,7 +3,8 @@
       id="org.eclipse.scout.sdk.feature"
       label="%featureName"
       version="3.8.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.eclipse.scout.sdk">
 
    <description>
       Scout SDK
