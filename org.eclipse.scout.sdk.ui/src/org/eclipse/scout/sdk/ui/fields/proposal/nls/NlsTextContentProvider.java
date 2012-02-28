@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
@@ -45,7 +44,6 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    TuningUtility.startTimer();
     HashSet<INlsEntry> entries = new HashSet<INlsEntry>();
     if (getLabelProvider().getNlsProject() != null) {
       if (searchPattern == null) {
@@ -86,7 +84,6 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
       Object[] result = new Object[nlsEntryResult.length + 1];
       System.arraycopy(nlsEntryResult, 0, result, 0, nlsEntryResult.length);
       result[result.length - 1] = NLS_NEW_PROPOSAL;
-      TuningUtility.stopTimer("GET NLS PROPOSALS FOR '" + searchPattern + "' hits '" + result.length + "'");
       return result;
     }
     else {

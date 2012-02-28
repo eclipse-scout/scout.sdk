@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
@@ -33,7 +34,7 @@ public class JavaElementContentProvider extends ContentProposalProvider {
   private final Object[][] m_allProposals;
 
   public JavaElementContentProvider(ILabelProvider labelProvider, Object[] proposals) {
-    this(labelProvider, new Object[][]{{proposals}});
+    this(labelProvider, new Object[][]{proposals});
   }
 
   public JavaElementContentProvider(ILabelProvider labelProvider, Object[]... proposalGroups) {
@@ -47,7 +48,7 @@ public class JavaElementContentProvider extends ContentProposalProvider {
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    if (searchPattern == null) {
+    if (!StringUtility.hasText(searchPattern)) {
       searchPattern = "*";
     }
     NormalizedPattern pattern = createNormalizedSearchPattern(searchPattern);

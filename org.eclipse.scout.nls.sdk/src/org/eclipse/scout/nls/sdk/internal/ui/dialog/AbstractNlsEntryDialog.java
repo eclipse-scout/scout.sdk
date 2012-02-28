@@ -108,8 +108,9 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       tabItem.setText(l.getDispalyName());
       tabItem.setControl(control);
 
-      translationGroup.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-      control.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+      GridData txtGd = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
+      txtGd.minimumHeight = 80;
+      control.setLayoutData(txtGd);
       field.setText(m_nlsEntry.getTranslation(l));
       m_translationFields.put(l, control);
     }

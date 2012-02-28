@@ -42,7 +42,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
 import org.eclipse.swt.SWT;
@@ -660,26 +659,18 @@ public class ProposalPopup extends Window {
         return Status.CANCEL_STATUS;
       }
 
-      TuningUtility.startTimer();
       synchronized (ProposalPopup.this) {
         if (!m_tableViewer.getControl().isDisposed()) {
           m_tableViewer.getControl().getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
-              TuningUtility.startTimer();
-              try {
-                if (monitor.isCanceled()) {
-                  return;
-                }
-                setInput(m_input);
+              if (monitor.isCanceled()) {
+                return;
               }
-              finally {
-                TuningUtility.stopTimer("DISPLAY update inner for '" + m_input.getPattern() + "'");
-              }
+              setInput(m_input);
             }
           });
         }
-        TuningUtility.stopTimer("DISPLAY proposal update for '" + m_input.getPattern() + "'");
         return Status.OK_STATUS;
       }
     }

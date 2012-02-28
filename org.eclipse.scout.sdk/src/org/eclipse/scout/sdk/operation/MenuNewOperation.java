@@ -125,8 +125,8 @@ public class MenuNewOperation implements IOperation {
             IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy));
             if (TypeUtility.exists(table)) {
               createFormParameterSource(getFormToOpen(), getFormHandler(), table, hierarchy, sourceBuilder, validator);
-              createStartFormSource(getFormToOpen(), getFormHandler(), table, sourceBuilder, validator);
             }
+            createStartFormSource(getFormToOpen(), getFormHandler(), sourceBuilder, validator);
           }
           else {
             sourceBuilder.append(ScoutUtility.getCommentBlock("start form here.") + "\n");
@@ -169,7 +169,7 @@ public class MenuNewOperation implements IOperation {
     }
   }
 
-  private void createStartFormSource(IType form, IType formHandler, IType table, StringBuilder builder, IImportValidator validator) {
+  private void createStartFormSource(IType form, IType formHandler, StringBuilder builder, IImportValidator validator) {
     String startMethodName = formHandler.getElementName().replaceAll("^(.*)Handler$", "start$1");
     IMethod startMethod = TypeUtility.getMethod(form, startMethodName);
     if (TypeUtility.exists(startMethod)) {

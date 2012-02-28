@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.internal.ui.action.NlsProposal;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;

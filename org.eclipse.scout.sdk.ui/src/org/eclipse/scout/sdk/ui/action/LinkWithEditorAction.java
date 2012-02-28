@@ -24,7 +24,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
@@ -169,12 +168,7 @@ public class LinkWithEditorAction extends Action {
             IJavaElement element = JdtUtility.findJavaElement(m_currentIcuSelection.getJavaFile(), m_currentIcuSelection.getSelection());
             EditorSelectionVisitor visitor = new EditorSelectionVisitor(element);
             IPage nodeToSelect = null;
-            try {
-              nodeToSelect = visitor.findPageToSelect(startPage);
-            }
-            finally {
-              TuningUtility.stopTimer("visit nodes to find selection");
-            }
+            nodeToSelect = visitor.findPageToSelect(startPage);
             if (nodeToSelect != null) {
               StructuredSelection outlineSelection = new StructuredSelection(nodeToSelect);
               m_viewPart.getSite().getSelectionProvider().setSelection(outlineSelection);

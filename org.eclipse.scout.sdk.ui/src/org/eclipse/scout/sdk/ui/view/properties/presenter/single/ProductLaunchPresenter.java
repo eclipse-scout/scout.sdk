@@ -27,12 +27,15 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.debug.core.ILaunchListener;
 import org.eclipse.debug.core.ILaunchManager;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.pde.internal.core.iproduct.IConfigurationFileInfo;
 import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
@@ -40,6 +43,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresen
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
@@ -80,6 +84,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   private WorkspaceProductModel m_productModel;
 
   private final static Pattern PATTERN = Pattern.compile("name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"", Pattern.MULTILINE);
+  private final static String MAC_OS_X_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
 
   /**
    * @param toolkit
@@ -136,7 +141,25 @@ public class ProductLaunchPresenter extends AbstractPresenter {
    */
   protected void create(Composite parent, IFile productFile) {
     m_mainGroup = new Group(parent, SWT.SHADOW_ETCHED_OUT);
-    m_mainGroup.setText(getBundle().getBundleName());
+    m_mainGroup.setText(productFile.getParent().getName());
+
+    Label l = getToolkit().createLabel(m_mainGroup, "");
+    switch (getBundle().getType()) {
+      case IScoutBundle.BUNDLE_SERVER:
+        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherServer));
+        break;
+      case IScoutBundle.BUNDLE_UI_SWING:
+        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwing));
+        break;
+      case IScoutBundle.BUNDLE_UI_SWT:
+        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwt));
+        break;
+      // XXX RAP replace by better code
+      case 8:
+        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherRap));
+        break;
+    }
+
     m_productModel = null;
     try {
       m_productModel = new WorkspaceProductModel(getProductFile(), false);
@@ -157,6 +180,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     layout.verticalSpacing = 0;
     layout.horizontalSpacing = 0;
     m_mainGroup.setLayout(layout);
+    l.setLayoutData(new GridData(GridData.FILL_VERTICAL));
     linkPart.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     GridData actionPartData = new GridData(GridData.FILL_VERTICAL | GridData.FILL_HORIZONTAL);
     actionPartData.minimumWidth = actionPart.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
@@ -256,6 +280,26 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   }
 
   private Job startProduct(final boolean debug) {
+
+    if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+      try {
+        ProductFileModelHelper pfmh = new ProductFileModelHelper(m_productFile);
+        if (pfmh.ProductFile.existsDependency(RuntimeClasses.ScoutUiSwingBundleId)) {
+          // it is a swing product to be launched on Mac OS X: show warning
+          IPreferenceStore store = ScoutSdkUi.getDefault().getPreferenceStore();
+          String doNotShowAgainString = store.getString(MAC_OS_X_WARNING_MESSAGE_KEY);
+          boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
+          if (!doNotShowAgain) {
+            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwingWarningTitle"), Texts.get("MacOsXSwingWarningMessage"),
+                Texts.get("DoNotShowAgain"), false, store, MAC_OS_X_WARNING_MESSAGE_KEY);
+          }
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
+    }
+
     Job job = new Job("starting '" + getProductName() + "' product...") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
