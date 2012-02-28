@@ -160,7 +160,7 @@ public class LinkWithEditorAction extends Action {
         SafeRunner.run(new ISafeRunnable() {
           @Override
           public void run() throws Exception {
-            IPage startPage = m_viewPart.getRoot();
+            IPage startPage = (IPage) m_viewPart.getTreeViewer().getInput();
             IStructuredSelection selection = (IStructuredSelection) m_viewPart.getTreeViewer().getSelection();
             if (selection != null && selection.size() > 0) {
               startPage = (IPage) selection.getFirstElement();

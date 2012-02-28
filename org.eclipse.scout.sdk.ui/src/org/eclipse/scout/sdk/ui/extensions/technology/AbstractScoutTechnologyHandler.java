@@ -271,6 +271,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   protected void refreshScoutExplorerPageAsync(final Class<? extends IPage> pageToRefresh) {
+    // TODO MVI replace with dirty page support
     ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
       @Override
       public void run() {

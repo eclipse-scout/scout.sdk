@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart.InvisibleRootNode;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwingNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwtNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientLookupCallTablePage;
@@ -232,7 +233,10 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return CANCEL_SUBTREE;
     }
     m_visitedNodes.add(page);
-    if (page instanceof ScoutExplorerRootNodePage) {
+    if (page instanceof InvisibleRootNode) {
+      return CONTINUE;
+    }
+    else if (page instanceof ProjectsTablePage) {
       return CONTINUE;
     }
     else if (page instanceof UiSwingNodePage) {

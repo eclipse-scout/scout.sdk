@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ScoutExplorerRootNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -176,7 +176,7 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
      * must be running in java thread
      */
     public void refreshStructure(IPage p) {
-      if (p.getParent() != null || (p instanceof ScoutExplorerRootNodePage)) {
+      if (p.getParent() != null || (p instanceof ProjectsTablePage)) {
         p.unloadChildren();
         if (m_expanded) {
           p.loadChildren();

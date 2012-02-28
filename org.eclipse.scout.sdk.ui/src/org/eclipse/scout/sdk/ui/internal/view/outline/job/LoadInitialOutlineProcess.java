@@ -39,7 +39,7 @@ public class LoadInitialOutlineProcess extends AbstractWorkspaceBlockingJob {
     if (c.isDisposed()) return;
     //
     Display display = c.getDisplay();
-    final IPage rootPage = m_view.getViewContentProvider().getRoot();
+    final IPage rootPage = (IPage) m_view.getTreeViewer().getInput();
     final Cursor waitCursor = new Cursor(display, SWT.CURSOR_WAIT);
     try {
       // gui thread

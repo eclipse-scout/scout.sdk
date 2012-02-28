@@ -24,10 +24,10 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadOutlineChildrenJob
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 public class ViewContentProvider implements IStructuredContentProvider, ITreeContentProvider {
-  private IPage m_invisibleRoot;
   private boolean m_autoLoadChildren;
   private EventListenerList m_listener;
   private boolean m_loadSync = false;
+  private IPage m_invisibleRootNode;
 
   public ViewContentProvider() {
     m_autoLoadChildren = true;
@@ -61,16 +61,9 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
     return m_autoLoadChildren;
   }
 
-  public void setRoot(IPage invisibleRoot) {
-    m_invisibleRoot = invisibleRoot;
-  }
-
-  public IPage getRoot() {
-    return m_invisibleRoot;
-  }
-
   @Override
   public void inputChanged(Viewer v, Object oldInput, Object newInput) {
+    m_invisibleRootNode = (IPage) newInput;
   }
 
   @Override
@@ -82,7 +75,10 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
    */
   @Override
   public Object[] getElements(Object parent) {
-    return new Object[]{m_invisibleRoot};
+    if (m_invisibleRootNode != null) {
+      return m_invisibleRootNode.getChildArray();
+    }
+    return new Object[0];
   }
 
   @Override

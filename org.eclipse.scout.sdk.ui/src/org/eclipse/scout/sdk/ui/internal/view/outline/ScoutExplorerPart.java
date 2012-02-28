@@ -50,12 +50,15 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineProcess;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ScoutExplorerRootNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ProjectsTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageVisitor;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 import org.eclipse.swt.SWT;
@@ -81,7 +84,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   public static final int IS_LINKING_ENABLED_PROPERTY = 1;
   private String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
   private TreeViewer m_viewer;
-  private ScoutExplorerRootNodePage m_invisibleRoot;
+//  private IPage m_invisibleRoot;
   private ViewContentProvider m_viewContentProvider;
   // init/update
   private DirtyUpdateManager m_dirtyManager;
@@ -134,12 +137,10 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
         m_viewer.refresh(page);
       }
     });
-    m_viewer.setContentProvider(m_viewContentProvider);
     m_viewer.setLabelProvider(new ViewLabelProvider(parent, this));
+    m_viewer.setContentProvider(m_viewContentProvider);
     m_viewer.setSorter(null);
-    m_invisibleRoot = new ScoutExplorerRootNodePage(null, this);
-    m_viewContentProvider.setRoot(m_invisibleRoot);
-    m_viewer.setInput(m_viewContentProvider);// getViewSite());
+    m_viewer.setInput(new InvisibleRootNode(this));
     hookDragAndDrop(m_viewer);
     hookContextMenu();
     hookSelectionAction();
@@ -171,12 +172,28 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   public void expandAndSelectProjectLevel() {
     try {
       m_viewContentProvider.setLoadSync(true);
-      m_viewer.expandToLevel(4);
-      IPage[] children = m_invisibleRoot.getChildArray();
-      if (children != null && children.length > 0) {
-        IPage p = children[0];
-        StructuredSelection outlineSelection = new StructuredSelection(p);
-        m_viewer.setSelection(outlineSelection);
+      final ArrayList<IPage> projectPages = new ArrayList<IPage>();
+      INodeVisitor visitor = new INodeVisitor() {
+        @Override
+        public int visit(IPage page) {
+          if (page instanceof InvisibleRootNode) {
+            return CONTINUE;
+          }
+          else if (page instanceof ProjectsTablePage) {
+            return CONTINUE;
+          }
+          else if (page instanceof ProjectNodePage) {
+            projectPages.add(page);
+            return CANCEL_SUBTREE;
+          }
+          return CANCEL;
+        }
+      };
+      IPage invRoot = (IPage) getTreeViewer().getInput();
+      invRoot.accept(visitor);
+      if (projectPages.size() > 0) {
+        m_viewer.setExpandedElements(projectPages.toArray(new IPage[projectPages.size()]));
+        m_viewer.setSelection(new StructuredSelection(projectPages.get(0)));
       }
     }
     finally {
@@ -186,7 +203,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
   @Override
   public void visitPages(IPageVisitor visitor) {
-    visitPagesRec(visitor, m_invisibleRoot);
+    visitPagesRec(visitor, (IPage) getTreeViewer().getInput());
   }
 
   private void visitPagesRec(IPageVisitor visitor, IPage p) {
@@ -196,9 +213,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
   }
 
-  public ScoutExplorerRootNodePage getRoot() {
-    return m_invisibleRoot;
-  }
+//  public IPage getInvisibleRoot() {
+//    return m_invisibleRoot;
+//  }
 
   @Override
   public void init(IViewSite site, IMemento memento) throws PartInitException {
@@ -587,6 +604,30 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       return false;
     }
 
+  }
+
+  public static final class InvisibleRootNode extends AbstractPage {
+
+    private final ScoutExplorerPart m_explorerPart;
+
+    public InvisibleRootNode(ScoutExplorerPart explorerPart) {
+      m_explorerPart = explorerPart;
+    }
+
+    @Override
+    public String getPageId() {
+      return IScoutPageConstants.INVISIBLE_ROOT_NODE;
+    }
+
+    @Override
+    protected void loadChildrenImpl() {
+      new ProjectsTablePage(this);
+    }
+
+    @Override
+    public ScoutExplorerPart getOutlineView() {
+      return m_explorerPart;
+    }
   }
 
 }

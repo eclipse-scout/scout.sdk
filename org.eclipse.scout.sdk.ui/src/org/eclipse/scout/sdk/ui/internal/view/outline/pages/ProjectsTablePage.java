@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ImportPluginAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -25,8 +24,7 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 
-public class ScoutExplorerRootNodePage extends AbstractPage {
-  private ScoutExplorerPart m_view;
+public class ProjectsTablePage extends AbstractPage {
 
   private IScoutWorkspaceListener m_workspaceListener = new IScoutWorkspaceListener() {
     @Override
@@ -41,10 +39,9 @@ public class ScoutExplorerRootNodePage extends AbstractPage {
             }
   }; // end IScoutWorkspaceListener
 
-  public ScoutExplorerRootNodePage(IPage parent, ScoutExplorerPart view) {
+  public ProjectsTablePage(IPage parent) {
     setParent(parent);
     setName(Texts.get("RootNodeName"));
-    m_view = view;
     ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
   }
 
@@ -55,17 +52,12 @@ public class ScoutExplorerRootNodePage extends AbstractPage {
 
   @Override
   public String getPageId() {
-    return IScoutPageConstants.INVISIBLE_ROOT_NODE_PAGE;
+    return IScoutPageConstants.PROJECT_TABLE_PAGE;
   }
 
   @Override
   public boolean isInitiallyLoaded() {
     return true;
-  }
-
-  @Override
-  public ScoutExplorerPart getOutlineView() {
-    return m_view;
   }
 
   @Override

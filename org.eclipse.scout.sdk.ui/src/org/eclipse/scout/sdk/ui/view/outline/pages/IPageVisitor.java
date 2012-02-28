@@ -15,7 +15,9 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
  * 
  * @author mvi
  * @since 3.8.0 11.02.2012
+ * @deprecated use {@link INodeVisitor} instead.
  */
+@Deprecated
 public interface IPageVisitor {
   void visit(IPage p);
 }

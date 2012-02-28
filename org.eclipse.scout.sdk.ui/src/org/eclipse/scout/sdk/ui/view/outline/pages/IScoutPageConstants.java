@@ -65,10 +65,12 @@ public abstract interface IScoutPageConstants {
   public static final String ICON_NODE_PAGE = "org.eclipse.scout.sdk.page.IconNodePage";
   public static final String IMAGE_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.ImageFieldNodePage";
   public static final String INTEGER_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.IntegerFieldNodePage";
-  public static final String INVISIBLE_ROOT_NODE_PAGE = "org.eclipse.scout.sdk.page.InvisibleRootNodePage";
+  public static final String INVISIBLE_ROOT_NODE = "org.eclipse.scout.sdk.page.InvisibleRootNode";
   public static final String KEY_STROKE_NODE_PAGE = "org.eclipse.scout.sdk.page.KeyStrokeNodePage";
   public static final String KEY_STROKE_TABLE_PAGE = "org.eclipse.scout.sdk.page.KeyStrokeTablePage";
   public static final String LABEL_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.LabelFieldNodePage";
+  public static final String LIBRARIES_NODE_PAGE = "org.eclipse.scout.sdk.page.LibrariesNodePage";
+  public static final String LIBRARIES_TABLE_PAGE = "org.eclipse.scout.sdk.page.LibrariesTablePage";
   public static final String LIST_BOX_NODE_PAGE = "org.eclipse.scout.sdk.page.ListBoxNodePage";
   public static final String LONG_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.LongFieldNodePage";
   public static final String LOOKUP_CALL_NODE_PAGE = "org.eclipse.scout.sdk.page.LookupCallNodePage";
@@ -94,6 +96,7 @@ public abstract interface IScoutPageConstants {
   public static final String PROCESS_SERVICE_NODE_PAGE = "org.eclipse.scout.sdk.page.ProcessServiceNodePage";
   public static final String PROCESS_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.ProcessServiceTablePage";
   public static final String PROJECT_NODE_PAGE = "org.eclipse.scout.sdk.page.ProjectNodePage";
+  public static final String PROJECT_TABLE_PAGE = "org.eclipse.scout.sdk.page.ProjectsTablePage";
   public static final String RADIO_BUTTON_GROUP_NODE_PAGE = "org.eclipse.scout.sdk.page.RadioButtonGroupNodePage";
 
   public static final String SEQUENCE_BOX_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.SequenceBoxFieldNodePage";
