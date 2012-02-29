@@ -3,7 +3,8 @@
       id="org.eclipse.scout.sdk.rap.feature"
       label="%featureName"
       version="3.8.0.qualifier"
-      provider-name="%providerName">
+      provider-name="%providerName"
+      plugin="org.eclipse.scout.sdk.rap">
 
    <description url="http://www.example.com/description">
       RAP (Rich Ajax Platform) support for Eclipse Scout.
