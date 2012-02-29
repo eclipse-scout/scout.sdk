@@ -74,7 +74,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdField;
 
   public SmartFieldNewWizardPage(IType declaringType) {
-    super(Texts.get("NewSmartField"));
+    super(SmartFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     // default
     setSuperType(abstractSmartField);

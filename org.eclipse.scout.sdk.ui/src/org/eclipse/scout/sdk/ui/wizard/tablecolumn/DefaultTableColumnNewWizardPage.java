@@ -81,7 +81,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   private IType m_createdColumn;
 
   public DefaultTableColumnNewWizardPage(IType declaringType) {
-    super(Texts.get("NewTableColumn"));
+    super(DefaultTableColumnNewWizardPage.class.getName());
     setTitle(Texts.get("NewTableColumn"));
     setDescription(Texts.get("CreateANewTableColumn"));
     // default values

@@ -82,7 +82,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdMenu;
 
   public MenuNewWizardPage(IType declaringType) {
-    super(Texts.get("NewMenu"));
+    super(MenuNewWizardPage.class.getName());
     setTitle(Texts.get("NewMenu"));
     setDescription(Texts.get("CreateANewMenu"));
     m_declaringType = declaringType;

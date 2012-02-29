@@ -61,7 +61,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
   private final IScoutBundle m_clientBundle;
 
   public WizardNewWizardPage(IScoutBundle clientBundle) {
-    super(Texts.get("NewWizard"));
+    super(WizardNewWizardPage.class.getName());
     setTitle(Texts.get("NewWizard"));
     setDescription(Texts.get("CreateANewWizard"));
     m_clientBundle = clientBundle;

@@ -70,7 +70,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdField;
 
   public DefaultFormFieldNewWizardPage(IType declaringType) {
-    super(Texts.get("NewDefaultField"));
+    super(DefaultFormFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     m_superType = abstractFormField;
     m_sibling = SiblingProposal.SIBLING_END;

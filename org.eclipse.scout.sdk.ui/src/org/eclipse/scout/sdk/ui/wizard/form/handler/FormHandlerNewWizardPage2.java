@@ -53,7 +53,7 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
   private IType m_createdFormHandler;
 
   public FormHandlerNewWizardPage2(IType declaringType) {
-    super(Texts.get("NewFormHandler"));
+    super(FormHandlerNewWizardPage2.class.getName());
     setTitle(Texts.get("NewFormHandler"));
     setDescription(Texts.get("CreateANewCalendarFormHandler"));
     m_declaringType = declaringType;

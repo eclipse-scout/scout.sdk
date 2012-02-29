@@ -62,7 +62,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdKeystroke;
 
   public KeyStrokeNewWizardPage(IType declaringType) {
-    super(Texts.get("NewKeyStroke"));
+    super(KeyStrokeNewWizardPage.class.getName());
     setTitle(Texts.get("NewKeyStroke"));
     setDescription(Texts.get("CreateANewKeyStroke"));
     // default

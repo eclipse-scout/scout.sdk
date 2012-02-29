@@ -59,7 +59,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
   private IWizardPage m_nextPage;
 
   public FormHandlerNewWizardPage1(IType declaringType) {
-    super(Texts.get("FormHandlerTemplates"));
+    super(FormHandlerNewWizardPage1.class.getName());
     setTitle(Texts.get("FormHandlerTemplates"));
     setDescription(Texts.get("ChooseATemplateForYourFormHandler"));
     m_declaringType = declaringType;

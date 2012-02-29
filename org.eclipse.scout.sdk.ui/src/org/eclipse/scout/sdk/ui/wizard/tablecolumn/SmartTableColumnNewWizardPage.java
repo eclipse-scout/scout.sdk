@@ -87,7 +87,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdColumn;
 
   public SmartTableColumnNewWizardPage(IType declaringType) {
-    super(Texts.get("NewSmartTableColumn"));
+    super(SmartTableColumnNewWizardPage.class.getName());
     setTitle(Texts.get("NewSmartTableColumn"));
     setDescription(Texts.get("CreateANewSmartTableColumn"));
     m_declaringType = declaringType;

@@ -45,7 +45,7 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
   private IContentTemplate m_selectedTemplate;
 
   public SequenceBoxTemplateWizardPage(IType declaringType) {
-    super(Texts.get("TemplatesForSequenceBox"));
+    super(SequenceBoxTemplateWizardPage.class.getName());
     m_declaringType = declaringType;
   }
 

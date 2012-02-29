@@ -76,7 +76,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_createdCode;
 
   public CodeNewWizardPage(IType declaringType) {
-    super(Texts.get("NewCode"));
+    super(CodeNewWizardPage.class.getName());
     setTitle(Texts.get("NewCode"));
     setDescription(Texts.get("CreateANewCode"));
     m_declaringType = declaringType;

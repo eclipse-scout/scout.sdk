@@ -56,7 +56,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   private final IJavaSearchScope m_searchScope;
 
   public BeanPropertyNewWizardPage(IJavaSearchScope searchScope) {
-    super(Texts.get("NewPropertyBean"));
+    super(BeanPropertyNewWizardPage.class.getName());
     m_searchScope = searchScope;
     setTitle(Texts.get("NewPropertyBean"));
     setDescription(Texts.get("NewPropertyBeanDesc"));
