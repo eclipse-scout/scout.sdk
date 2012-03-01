@@ -29,8 +29,8 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPageVisitor;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -271,21 +271,23 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   protected void refreshScoutExplorerPageAsync(final Class<? extends IPage> pageToRefresh) {
-    // TODO MVI replace with dirty page support
     ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
       @Override
       public void run() {
         IScoutExplorerPart explorer = ScoutSdkUi.getExplorer(false);
         if (explorer != null) {
-          JdtUtility.waitForSilentWorkspace();
-          explorer.visitPages(new IPageVisitor() {
+          INodeVisitor visitor = new INodeVisitor() {
             @Override
-            public void visit(IPage p) {
-              if (pageToRefresh.isAssignableFrom(p.getClass())) {
-                p.refresh(false);
+            public int visit(IPage page) {
+              if (pageToRefresh.isAssignableFrom(page.getClass())) {
+                page.markStructureDirty();
+                return CANCEL_SUBTREE;
               }
+              return CONTINUE;
             }
-          });
+          };
+          JdtUtility.waitForSilentWorkspace();
+          explorer.getRootPage().accept(visitor);
         }
       }
     });

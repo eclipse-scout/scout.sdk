@@ -47,7 +47,7 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
     HashSet<INlsEntry> entries = new HashSet<INlsEntry>();
     if (getLabelProvider().getNlsProject() != null) {
-      if (StringUtility.isNullOrEmpty(searchPattern)) {
+      if (!StringUtility.hasText(searchPattern)) {
         searchPattern = "*";
       }
 

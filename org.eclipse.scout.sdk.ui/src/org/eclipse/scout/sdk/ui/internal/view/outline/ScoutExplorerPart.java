@@ -57,7 +57,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPageVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
@@ -189,8 +188,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
           return CANCEL;
         }
       };
-      IPage invRoot = (IPage) getTreeViewer().getInput();
-      invRoot.accept(visitor);
+      getRootPage().accept(visitor);
       if (projectPages.size() > 0) {
         m_viewer.setExpandedElements(projectPages.toArray(new IPage[projectPages.size()]));
         m_viewer.setSelection(new StructuredSelection(projectPages.get(0)));
@@ -202,20 +200,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   }
 
   @Override
-  public void visitPages(IPageVisitor visitor) {
-    visitPagesRec(visitor, (IPage) getTreeViewer().getInput());
+  public IPage getRootPage() {
+    return (IPage) getTreeViewer().getInput();
   }
-
-  private void visitPagesRec(IPageVisitor visitor, IPage p) {
-    visitor.visit(p);
-    for (IPage c : p.getChildren()) {
-      visitPagesRec(visitor, c);
-    }
-  }
-
-//  public IPage getInvisibleRoot() {
-//    return m_invisibleRoot;
-//  }
 
   @Override
   public void init(IViewSite site, IMemento memento) throws PartInitException {

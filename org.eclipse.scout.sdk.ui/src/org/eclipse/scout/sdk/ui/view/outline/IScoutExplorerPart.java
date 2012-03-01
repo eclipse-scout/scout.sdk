@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.outline;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPageVisitor;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**
  * <h3>IScoutExplorerPart</h3> ...
@@ -19,19 +19,29 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPageVisitor;
 public interface IScoutExplorerPart {
 
   /**
-   * @return
+   * gets the current selection of the scout explorer tree.
+   * 
+   * @return The structured selection of the tree.
    */
   IStructuredSelection getSelection();
 
   /**
+   * sets the new selection of the scout explorer tree.
+   * 
    * @param selection
+   *          the new selection containing the {@link IPage} instances that should be selected.
    */
   void setSelection(IStructuredSelection selection);
 
+  /**
+   * expands the scout explorer tree to project level and sets the selection to the first project in the tree.
+   */
   void expandAndSelectProjectLevel();
 
   /**
-   * @param visitor
+   * gets the (invisible) root page. this page contains the project nodes.
+   * 
+   * @return the invisible root page.
    */
-  void visitPages(IPageVisitor visitor);
+  IPage getRootPage();
 }
