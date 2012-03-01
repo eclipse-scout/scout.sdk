@@ -36,6 +36,11 @@ public class RapExportEntryHandler implements IExportScoutProjectEntryHandler {
   }
 
   @Override
+  public boolean getDefaultSelection() {
+    return true;
+  }
+
+  @Override
   public File createModule(IExportScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       ExportRapWizardPage rapPage = (ExportRapWizardPage) wizard.getPage(ExportRapWizardPage.class.getName());

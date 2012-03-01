@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.util.pde;
 
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -10,11 +11,16 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.adaptor.EclipseStarter;
+import org.eclipse.osgi.service.resolver.BundleDescription;
+import org.eclipse.osgi.service.resolver.State;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.internal.core.TargetPlatformHelper;
+import org.eclipse.pde.internal.core.iproduct.IProduct;
 import org.eclipse.pde.internal.core.iproduct.IProductModel;
 import org.eclipse.pde.internal.core.iproduct.IProductPlugin;
 import org.eclipse.pde.internal.core.product.ProductPlugin;
+import org.osgi.framework.Version;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -166,6 +172,45 @@ public final class ProductFileModelHelper {
      */
     public boolean isValid() throws CoreException {
       return m_model.getWorkspaceProductModel().isValid();
+    }
+
+    /**
+     * Gets the plugin models of all plugins of the product associated with this helper.
+     * 
+     * @return the plugin models of all plugins this product is dependent of.
+     * @throws CoreException
+     */
+    public BundleDescription[] getPluginModels() throws CoreException {
+      ArrayList<BundleDescription> list = new ArrayList<BundleDescription>();
+      State state = TargetPlatformHelper.getState();
+
+      IProductPlugin[] plugins = m_model.getWorkspaceProductModel().getProduct().getPlugins();
+      for (int i = 0; i < plugins.length; i++) {
+        BundleDescription bundle = null;
+
+        String v = plugins[i].getVersion();
+        if (v != null && v.length() > 0) {
+          bundle = state.getBundle(plugins[i].getId(), Version.parseVersion(v));
+        }
+        if (bundle == null) {
+          bundle = state.getBundle(plugins[i].getId(), null);
+        }
+        if (bundle != null) {
+          list.add(bundle);
+        }
+      }
+
+      return list.toArray(new BundleDescription[list.size()]);
+    }
+
+    /**
+     * Gets the {@link IProduct} model for this product.
+     * 
+     * @return the product model.
+     * @throws CoreException
+     */
+    public IProduct getProduct() throws CoreException {
+      return m_model.getWorkspaceProductModel().getProduct();
     }
   }
 

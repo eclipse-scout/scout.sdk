@@ -2,10 +2,12 @@ package org.eclipse.scout.sdk.ui.internal.extensions.export;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.sdk.operation.export.ExportClientZipOperation;
 import org.eclipse.scout.sdk.ui.extensions.export.IExportScoutProjectEntryHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportClientWizardPage;
@@ -22,20 +24,39 @@ public class ClientExportEntryHandler implements IExportScoutProjectEntryHandler
 
   @Override
   public IStatus getStatus(IExportScoutProjectWizard wizard) {
-    if (!wizard.getExportWizardPage().isNodesSelected(ServerExportEntryHandler.ID)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientEarWithoutServer"));
-    }
     return Status.OK_STATUS;
   }
 
   @Override
-  public File createModule(IExportScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    return null;
+  public boolean getDefaultSelection() {
+    return false;
+  }
+
+  @Override
+  public File createModule(IExportScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    if (!wizard.getExportWizardPage().isNodesSelected(ClientExportEntryHandler.ID)) {
+      return null;
+    }
+    try {
+      ExportClientWizardPage clientPage = (ExportClientWizardPage) wizard.getPage(ExportClientWizardPage.class.getName());
+
+      File tmpFolder = IOUtility.createTempDirectory("earExportClientBuildDir");
+
+      ExportClientZipOperation op = new ExportClientZipOperation(clientPage.getClientProductFile());
+      op.setTargetDirectory(tmpFolder.getAbsolutePath());
+      op.setHtmlFolder(clientPage.getClientExportFolder());
+      op.validate();
+      op.run(monitor, workingCopyManager);
+      return op.getResultingZipFile();
+    }
+    catch (Exception e) {
+      throw new CoreException(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "could not export server war file", e));
+    }
   }
 
   @Override
   public boolean isAvailable(IExportScoutProjectWizard wizard) {
-    return wizard.getProject().getServerBundle() != null &&
+    return wizard.getProject().getClientBundle() != null &&
         (wizard.getProject().getUiSwingBundle() != null || wizard.getProject().getUiSwtBundle() != null);
   }
 
@@ -46,6 +67,6 @@ public class ClientExportEntryHandler implements IExportScoutProjectEntryHandler
       page = new ExportClientWizardPage(wizard.getProject());
       wizard.addPage(page);
     }
-    page.setExcludePage(!selected);
+    page.setExcludePage(!selected && !wizard.getExportWizardPage().isNodesSelected(ServerExportEntryHandler.ID));
   }
 }

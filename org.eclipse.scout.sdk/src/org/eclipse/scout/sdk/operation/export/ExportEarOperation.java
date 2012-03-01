@@ -67,13 +67,15 @@ public class ExportEarOperation implements IOperation {
       StringBuilder moduleXml = new StringBuilder();
       for (File module : m_modules) {
         String fileName = module.getName();
-        String context = cutExtension(fileName);
+        if (fileName.toLowerCase().endsWith(".war")) {
+          String context = cutExtension(fileName);
 
-        moduleXml.append("  <module><web><web-uri>");
-        moduleXml.append(fileName);
-        moduleXml.append("</web-uri><context-root>/");
-        moduleXml.append(context);
-        moduleXml.append("</context-root></web></module>\n");
+          moduleXml.append("  <module><web><web-uri>");
+          moduleXml.append(fileName);
+          moduleXml.append("</web-uri><context-root>/");
+          moduleXml.append(context);
+          moduleXml.append("</context-root></web></module>\n");
+        }
         installFile(module.toURI().toURL(), fileName);
       }
 

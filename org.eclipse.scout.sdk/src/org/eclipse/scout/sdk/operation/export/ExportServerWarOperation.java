@@ -12,13 +12,11 @@ package org.eclipse.scout.sdk.operation.export;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
@@ -33,22 +31,18 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.service.resolver.BundleDescription;
-import org.eclipse.osgi.service.resolver.State;
-import org.eclipse.pde.internal.core.TargetPlatformHelper;
 import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
 import org.eclipse.pde.internal.core.exports.ProductExportOperation;
+import org.eclipse.pde.internal.core.iproduct.IProduct;
 import org.eclipse.pde.internal.core.iproduct.IProductModel;
-import org.eclipse.pde.internal.core.iproduct.IProductPlugin;
-import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.osgi.framework.Version;
 
 /**
  * <h3>{@link ExportServerWarOperation}</h3> ...
@@ -96,10 +90,9 @@ public class ExportServerWarOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    // create war
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("warExportBuildDir");
-      buildClientProduct(monitor);
+      buildClientProduct(monitor, workingCopyManager);
       buildServerProduct(monitor);
       installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/servletbridge.jar"), WEB_INF + "/lib/servletbridge.jar");
       installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/web.xml"), WEB_INF + "/web.xml");
@@ -118,6 +111,7 @@ public class ExportServerWarOperation implements IOperation {
     finally {
       if (m_clientZipFile != null && m_clientZipFile.exists()) {
         m_clientZipFile.delete(true, monitor);
+        getHtmlFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
       }
       try {
         IOUtility.deleteDirectory(m_tempBuildDir);
@@ -126,62 +120,20 @@ public class ExportServerWarOperation implements IOperation {
         // nop
       }
     }
-
   }
 
-  private void buildClientProduct(IProgressMonitor monitor) throws CoreException {
+  private void buildClientProduct(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getClientProduct() == null) return;
-    WorkspaceProductModel clientModel = new WorkspaceProductModel(getClientProduct(), false);
-    clientModel.load();
     try {
-      String productName = getZipName(getHtmlFolder(), clientModel);
+      ExportClientZipOperation exportClient = new ExportClientZipOperation(getClientProduct());
+      exportClient.setHtmlFolder(getHtmlFolder());
+      exportClient.setTargetDirectory(getHtmlFolder().getLocation().toOSString());
+      exportClient.validate();
+      exportClient.run(monitor, workingCopyManager);
 
-      FeatureExportInfo featureInfo = new FeatureExportInfo();
-      featureInfo.toDirectory = true;
-      featureInfo.exportSource = false;
-      featureInfo.exportSourceBundle = false;
-      featureInfo.allowBinaryCycles = true;
-      featureInfo.exportMetadata = false;
-      featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/client/buildDir/" + productName;
-//      featureInfo.zipFileName = productName + ".zip";
-      featureInfo.items = getPluginModels(clientModel);
-
-      ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + productName + "'...", clientModel.getProduct(), ".");
-      productExportOp.schedule();
-      productExportOp.join();
-      IStatus result = productExportOp.getResult();
-      if (!result.isOK()) {
-        throw new CoreException(result);
-      }
-      // create zip file
-      File zipDir = new File(m_tempBuildDir.getAbsolutePath() + File.separator + "client");
-      File tempZipFile = new File(zipDir.getAbsoluteFile() + File.separator + productName + ".zip");
-      if (!tempZipFile.exists()) {
-        tempZipFile.getParentFile().mkdirs();
-      }
-      ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(tempZipFile));
-      ResourcesUtility.addFolderToZip(new File(m_tempBuildDir.getAbsolutePath() + File.separator + "client/buildDir/"), zipOut);
-      zipOut.flush();
-      zipOut.close();
-      // copy to server bundle
-      m_clientZipFile = getHtmlFolder().getFile(productName + ".zip");
-      if (m_clientZipFile.exists()) {
-        m_clientZipFile.delete(true, monitor);
-      }
-      FileInputStream fis = null;
-      try {
-        fis = new FileInputStream(tempZipFile);
-        m_clientZipFile.create(fis, true, monitor);
-      }
-      finally {
-        if (fis != null) {
-          try {
-            fis.close();
-          }
-          catch (Exception e) {
-          }
-        }
-      }
+      // zip has directly been exported into the html folder -> refresh and remember the file
+      getHtmlFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+      m_clientZipFile = getHtmlFolder().getFile(exportClient.getZipName());
     }
     catch (Exception e) {
       if (e instanceof CoreException) {
@@ -197,8 +149,7 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   private void buildServerProduct(IProgressMonitor monitor) throws CoreException {
-    WorkspaceProductModel serverModel = new WorkspaceProductModel(getServerProduct(), false);
-    serverModel.load();
+    ProductFileModelHelper pfmh = new ProductFileModelHelper(getServerProduct());
     try {
       FeatureExportInfo featureInfo = new FeatureExportInfo();
       featureInfo.toDirectory = true;
@@ -208,8 +159,10 @@ public class ExportServerWarOperation implements IOperation {
       featureInfo.exportMetadata = false;
       featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/" + WEB_INF + "/eclipse";
       featureInfo.zipFileName = "export.zip";
-      featureInfo.items = getPluginModels(serverModel);
-      ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + serverModel.getProduct().getName() + "'...", serverModel.getProduct(), ".");
+      featureInfo.items = pfmh.ProductFile.getPluginModels();
+
+      IProduct prod = pfmh.ProductFile.getProduct();
+      ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + prod.getName() + "'...", prod, ".");
       productExportOp.schedule();
       productExportOp.join();
       IStatus result = productExportOp.getResult();
@@ -231,7 +184,7 @@ public class ExportServerWarOperation implements IOperation {
     }
   }
 
-  protected File packWar() throws FileNotFoundException, IOException {
+  private File packWar() throws FileNotFoundException, IOException {
     File destinationFile = new File(getWarFileName());
     if (!destinationFile.exists()) {
       destinationFile.getParentFile().mkdirs();
@@ -380,23 +333,6 @@ public class ExportServerWarOperation implements IOperation {
    */
   public void setClientProduct(IFile clientProduct) {
     m_clientProduct = clientProduct;
-  }
-
-  private BundleDescription[] getPluginModels(WorkspaceProductModel model) {
-    ArrayList<BundleDescription> list = new ArrayList<BundleDescription>();
-    State state = TargetPlatformHelper.getState();
-    IProductPlugin[] plugins = model.getProduct().getPlugins();
-    for (int i = 0; i < plugins.length; i++) {
-      BundleDescription bundle = null;
-      String v = plugins[i].getVersion();
-      if (v != null && v.length() > 0) {
-        bundle = state.getBundle(plugins[i].getId(), Version.parseVersion(v));
-      }
-      // if there's no version, just grab a bundle like before
-      if (bundle == null) bundle = state.getBundle(plugins[i].getId(), null);
-      if (bundle != null) list.add(bundle);
-    }
-    return list.toArray(new BundleDescription[list.size()]);
   }
 
   public File getResultingWarFile() {

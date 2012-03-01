@@ -829,14 +829,14 @@
             class="org.eclipse.scout.sdk.ui.internal.extensions.export.ServerExportEntryHandler"
             icon="resources/icons/serverBundle.png"
             id="server"
-            name="Server Web Application"
+            name="Server Web Application (If available, the client will be included)"
             order="100">
       </entry>
       <entry
             class="org.eclipse.scout.sdk.ui.internal.extensions.export.ClientExportEntryHandler"
             icon="resources/icons/clientBundle.png"
             id="ui.client"
-            name="Include Client Application"
+            name="Client Application (ZIP)"
             order="200">
       </entry>
    </extension>

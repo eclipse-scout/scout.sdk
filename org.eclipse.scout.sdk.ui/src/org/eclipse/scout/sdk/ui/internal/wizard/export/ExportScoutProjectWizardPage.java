@@ -46,6 +46,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
   private static final String PROP_EXPORT_EAR = "exportEAR";
   private static final String PROP_EAR_FILE_NAME = "earFileName";
 
+  private static final String SETTINGS_SELECTED_ENTRIES = "selectedEntriesSetting";
   private static final String SETTINGS_TARGET_DIR = "targetDirSetting";
   private static final String SETTINGS_EXPORT_EAR = "exportEARSetting";
   private static final String SETTINGS_EAR_FILE_NAME = "earFileNameSetting";
@@ -118,6 +119,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
       @Override
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
         m_propertySupport.setProperty(PROP_SELECTED_ENTRIES, m_entryTree.getCheckedNodes());
+        saveTreeSelection();
         ExportScoutProjectEntry ext = (ExportScoutProjectEntry) node.getData();
         if (ext != null) {
           ext.getHandler().selectionChanged(getWizard(), checkState);
@@ -125,7 +127,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
         pingStateChanging();
       }
     });
-    m_entryTree.setChecked(m_invisibleRootNode.getChildren().toArray(new ITreeNode[]{}));
+    m_entryTree.setChecked(getInitiallyCheckedNodes());
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -179,9 +181,39 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
     return (IExportScoutProjectWizard) super.getWizard();
   }
 
+  private ITreeNode[] getNodes(String... entryIds) {
+    return TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByIdFilter(entryIds));
+  }
+
+  private ITreeNode[] getInitiallyCheckedNodes() {
+    String[] ids = getDialogSettings().getArray(SETTINGS_SELECTED_ENTRIES);
+    if (ids == null) {
+      ArrayList<String> defaultSelection = new ArrayList<String>();
+      ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
+      for (ITreeNode n : nodes) {
+        ExportScoutProjectEntry e = (ExportScoutProjectEntry) n.getData();
+        if (e.getHandler().getDefaultSelection()) {
+          defaultSelection.add(e.getId());
+        }
+      }
+      ids = defaultSelection.toArray(new String[defaultSelection.size()]);
+    }
+    return getNodes(ids);
+  }
+
+  private void saveTreeSelection() {
+    ITreeNode[] checked = m_entryTree.getCheckedNodes();
+    ArrayList<String> ids = new ArrayList<String>(checked.length);
+    for (ITreeNode n : checked) {
+      ExportScoutProjectEntry e = (ExportScoutProjectEntry) n.getData();
+      ids.add(e.getId());
+    }
+    getDialogSettings().put(SETTINGS_SELECTED_ENTRIES, ids.toArray(new String[ids.size()]));
+  }
+
   @Override
   public boolean isNodesSelected(String... entryIds) {
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByIdFilter(entryIds));
+    ITreeNode[] nodes = getNodes(entryIds);
     for (ITreeNode n : nodes) {
       if (m_entryTree.isChecked(n)) {
         return true;

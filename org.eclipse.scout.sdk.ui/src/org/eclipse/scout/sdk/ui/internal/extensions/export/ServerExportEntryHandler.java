@@ -29,6 +29,11 @@ public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler
   }
 
   @Override
+  public boolean getDefaultSelection() {
+    return true;
+  }
+
+  @Override
   public File createModule(IExportScoutProjectWizard wizard, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       ExportServerWizardPage serverPage = (ExportServerWizardPage) wizard.getPage(ExportServerWizardPage.class.getName());
@@ -36,7 +41,7 @@ public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler
 
       ExportServerWarOperation op = new ExportServerWarOperation(serverPage.getProductFile());
       op.setWarFileName(new File(tmpFolder, serverPage.getWarName()).getAbsolutePath());
-      if (wizard.getExportWizardPage().isNodesSelected(ClientExportEntryHandler.ID)) {
+      if (isClientAvailable(wizard)) {
         ExportClientWizardPage clientPage = (ExportClientWizardPage) wizard.getPage(ExportClientWizardPage.class.getName());
         op.setClientProduct(clientPage.getClientProductFile());
         op.setHtmlFolder(clientPage.getClientExportFolder());
@@ -55,6 +60,11 @@ public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler
     return wizard.getProject().getServerBundle() != null;
   }
 
+  private boolean isClientAvailable(IExportScoutProjectWizard wizard) {
+    return wizard.getProject().getClientBundle() != null &&
+          (wizard.getProject().getUiSwingBundle() != null || wizard.getProject().getUiSwtBundle() != null);
+  }
+
   @Override
   public void selectionChanged(IExportScoutProjectWizard wizard, boolean selected) {
     AbstractScoutWizardPage page = wizard.getPage(ExportServerWizardPage.class.getName());
@@ -63,5 +73,14 @@ public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler
       wizard.addPage(page);
     }
     page.setExcludePage(!selected);
+
+    page = wizard.getPage(ExportClientWizardPage.class.getName());
+    if (page == null) {
+      page = new ExportClientWizardPage(wizard.getProject());
+      wizard.addPage(page);
+    }
+
+    page.setExcludePage((!selected && !wizard.getExportWizardPage().isNodesSelected(ClientExportEntryHandler.ID)) ||
+         !isClientAvailable(wizard));
   }
 }

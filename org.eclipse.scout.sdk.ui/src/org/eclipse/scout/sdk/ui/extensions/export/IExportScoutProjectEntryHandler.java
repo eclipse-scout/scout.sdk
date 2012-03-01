@@ -30,6 +30,13 @@ public interface IExportScoutProjectEntryHandler {
   boolean isAvailable(IExportScoutProjectWizard wizard);
 
   /**
+   * Specifies if the entry associated with this handler should be checked by default or not.
+   * 
+   * @return true if it should be checked by default, false otherwise.
+   */
+  boolean getDefaultSelection();
+
+  /**
    * called when the selection of the entry tree changes.
    * 
    * @param wizard
