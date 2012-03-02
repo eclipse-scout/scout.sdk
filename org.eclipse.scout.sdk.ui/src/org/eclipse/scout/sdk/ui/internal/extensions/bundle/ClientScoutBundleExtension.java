@@ -17,11 +17,18 @@ import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 
-/**
- *
- */
 public class ClientScoutBundleExtension implements IScoutBundleProvider {
+
+  public final static String ID = "org.eclipse.scout.sdk.ui.ClientBundle";
+
+  @Override
+  public void init(IScoutProjectWizard wizard, IScoutProject project) {
+    IScoutBundle client = project.getClientBundle();
+    wizard.getProjectWizardPage().setBundleNodeAvailable(client == null, ID);
+  }
 
   @Override
   public IStatus getStatus(IScoutProjectWizard wizard) {

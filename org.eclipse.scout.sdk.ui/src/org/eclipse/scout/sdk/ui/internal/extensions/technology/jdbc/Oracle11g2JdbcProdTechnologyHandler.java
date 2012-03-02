@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
@@ -30,7 +31,7 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 public class Oracle11g2JdbcProdTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected,
         new String[]{ORACLE_JDBC_FRAGMENT, ORACLE_JDBC_PLUGIN});
   }

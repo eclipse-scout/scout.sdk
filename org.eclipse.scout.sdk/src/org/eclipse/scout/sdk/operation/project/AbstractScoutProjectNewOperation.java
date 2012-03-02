@@ -30,9 +30,6 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     if (StringUtility.isNullOrEmpty(getProjectName())) {
       throw new IllegalArgumentException("the project name may not be null.");
     }
-    if (getCheckedNodeIds() == null || getCheckedNodeIds().size() < 1) {
-      throw new IllegalArgumentException("At least one project node must be selected");
-    }
   }
 
   protected final void addCreatedBundle(IJavaProject javaProject) {

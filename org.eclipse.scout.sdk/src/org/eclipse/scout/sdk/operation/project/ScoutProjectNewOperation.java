@@ -139,8 +139,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
   }
 
-  private void execOperations(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, P_OperationElement[] ops) throws CoreException, IllegalArgumentException {
-    // put system properties
+  protected void putInitialProperties() {
     getProperties().setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<IJavaProject>());
     getProperties().setProperty(IScoutProjectNewOperation.PROP_OS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_OS));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_WS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_WS));
@@ -148,7 +147,10 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     getProperties().setProperty(IScoutProjectNewOperation.PROP_LOCALHOST, getHostName());
     getProperties().setProperty(IScoutProjectNewOperation.PROP_CURRENT_DATE, SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT).format(new Date()));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_USER_NAME, System.getProperty("user.name"));
+  }
 
+  private void execOperations(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, P_OperationElement[] ops) throws CoreException, IllegalArgumentException {
+    putInitialProperties();
     for (P_OperationElement opElement : ops) {
       // execute the pipeline as defined in IScoutProjectNewOperation
       IScoutProjectNewOperation o = opElement.op;

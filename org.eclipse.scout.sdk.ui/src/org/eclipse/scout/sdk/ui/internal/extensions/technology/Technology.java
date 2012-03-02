@@ -13,14 +13,13 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.dialog.CheckableTreeSelectionDialog;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -28,6 +27,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.model.IWorkbenchAdapter;
@@ -105,7 +105,7 @@ public class Technology implements Comparable<Technology> {
     if (dialog.open() == Dialog.OK) {
       ITreeNode[] selectedNodes = dialog.getCheckedNodes();
       if (selectedNodes != null && selectedNodes.length > 0) {
-        P_ChangeSelectionJob job = new P_ChangeSelectionJob(selectedNodes, selected);
+        OperationJob job = new OperationJob(new P_ChangeSelectionOperation(selectedNodes, selected));
         job.schedule();
       }
     }
@@ -244,18 +244,17 @@ public class Technology implements Comparable<Technology> {
     }
   }
 
-  private class P_ChangeSelectionJob extends Job {
+  private class P_ChangeSelectionOperation implements IOperation {
     private final ITreeNode[] m_selectedNodes;
     private final boolean m_newSelection;
 
-    private P_ChangeSelectionJob(ITreeNode[] selectedNodes, boolean newSelection) {
-      super("change technology selection...");
+    private P_ChangeSelectionOperation(ITreeNode[] selectedNodes, boolean newSelection) {
       m_selectedNodes = selectedNodes;
       m_newSelection = newSelection;
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
       // map the checked resources to the contributing handler
       HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> resourcesToModify = new HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>>();
       for (ITreeNode selectedNode : m_selectedNodes) {
@@ -274,7 +273,7 @@ public class Technology implements Comparable<Technology> {
       for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
         try {
           if (!entry.getKey().preSelectionChanged(m_newSelection, monitor)) {
-            return Status.CANCEL_STATUS; // cancel the execution if a handler requests an abort
+            return; // cancel the execution if a handler requests an abort
           }
         }
         catch (CoreException e) {
@@ -285,7 +284,7 @@ public class Technology implements Comparable<Technology> {
       // fire selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
       for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
         try {
-          entry.getKey().selectionChanged(entry.getValue().toArray(new IScoutTechnologyResource[entry.getValue().size()]), m_newSelection, monitor);
+          entry.getKey().selectionChanged(entry.getValue().toArray(new IScoutTechnologyResource[entry.getValue().size()]), m_newSelection, monitor, workingCopyManager);
         }
         catch (CoreException e) {
           ScoutSdkUi.logError("Error while applying technology changes.", e);
@@ -307,7 +306,15 @@ public class Technology implements Comparable<Technology> {
           fireSelectionChanged(m_newSelection);
         }
       });
-      return Status.OK_STATUS;
+    }
+
+    @Override
+    public String getOperationName() {
+      return "change technology selection...";
+    }
+
+    @Override
+    public void validate() throws IllegalArgumentException {
     }
   }
 }

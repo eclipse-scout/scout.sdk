@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
@@ -46,7 +47,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, RuntimeClasses.ScoutClientSvgBundleId);
   }
 

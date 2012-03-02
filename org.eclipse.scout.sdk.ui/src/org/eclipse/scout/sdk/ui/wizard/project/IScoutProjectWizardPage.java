@@ -40,4 +40,10 @@ public interface IScoutProjectWizardPage {
   String getProjectAlias();
 
   String getProjectNamePostfix();
+
+  /**
+   * @param available
+   * @param extensionIds
+   */
+  void setBundleNodeAvailable(boolean available, String... extensionIds);
 }

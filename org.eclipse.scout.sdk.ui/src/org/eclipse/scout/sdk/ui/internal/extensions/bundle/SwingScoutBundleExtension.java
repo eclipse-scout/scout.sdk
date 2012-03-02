@@ -7,9 +7,17 @@ import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class SwingScoutBundleExtension implements IScoutBundleProvider {
-  public SwingScoutBundleExtension() {
+
+  public final static String ID = "org.eclipse.scout.sdk.ui.UiSwingBundle";
+
+  @Override
+  public void init(IScoutProjectWizard wizard, IScoutProject project) {
+    IScoutBundle swing = project.getUiSwingBundle();
+    wizard.getProjectWizardPage().setBundleNodeAvailable(swing == null, ID);
   }
 
   @Override

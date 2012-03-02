@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
@@ -36,7 +37,7 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
   private final static String RAYO_LAF_NAME = "com.bsiag.scout.rt.ui.swing.laf.rayo.Rayo";
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected, new String[]{RAYO_LAF_PLUGIN, RAYO_LAF_FRAGMENT});
 
     for (IScoutTechnologyResource res : resources) {

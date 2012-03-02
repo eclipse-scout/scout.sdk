@@ -14,19 +14,31 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
 import org.eclipse.scout.sdk.rap.ui.internal.wizard.project.RapTargetPlatformWizardPage;
 import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.osgi.framework.Version;
 
 public class RapScoutBundleExtension implements IScoutBundleProvider {
   private boolean m_rapUiSelected;
 
+  public final static String ID = "org.eclipse.scout.sdk.ui.UiRapBundle";
+
   public RapScoutBundleExtension() {
     m_rapUiSelected = true;/* by default all nodes are checked */
+  }
+
+  @Override
+  public void init(IScoutProjectWizard wizard, IScoutProject project) {
+    IScoutBundle[] rapUi = project.getAllBundles(UiRapBundleNodeFactory.BUNDLE_UI_RAP);
+    boolean available = rapUi == null || rapUi.length == 0;
+    wizard.getProjectWizardPage().setBundleNodeAvailable(available, ID);
   }
 
   @Override

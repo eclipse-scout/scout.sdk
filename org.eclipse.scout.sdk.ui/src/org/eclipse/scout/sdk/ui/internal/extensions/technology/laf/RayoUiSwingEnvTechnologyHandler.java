@@ -29,7 +29,6 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -39,6 +38,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.text.edits.MalformedTreeException;
@@ -55,15 +55,16 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
   private final static Pattern RAYO_ENV_REGEX = Pattern.compile("public.*class.*extends.*RayoSwingEnvironment.*", Pattern.DOTALL);
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, final boolean selected, IProgressMonitor monitor) throws CoreException {
+  public void selectionChanged(IScoutTechnologyResource[] resources, final boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource res : resources) {
       IType swingEnv = getType(res.getBundle(), res.getResource());
-      setSuperClass(swingEnv, selected, monitor);
+      setSuperClass(swingEnv, selected, monitor, workingCopyManager);
     }
   }
 
-  private void setSuperClass(IType swingEnv, boolean selected, IProgressMonitor monitor) throws CoreException {
+  private void setSuperClass(IType swingEnv, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit cu = swingEnv.getCompilationUnit();
+    workingCopyManager.register(cu, monitor);
     String source = cu.getSource();
     Document document = new Document(source);
     ASTParser parser = ASTParser.newParser(AST.JLS3);
@@ -99,13 +100,9 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
     }
     cu.getBuffer().setContents(document.get());
 
-    OperationJob job = new OperationJob(new OrganizeImportOperation(cu));
-    job.schedule();
-    try {
-      job.join();
-    }
-    catch (InterruptedException e) {
-    }
+    OrganizeImportOperation o = new OrganizeImportOperation(cu);
+    o.validate();
+    o.run(monitor, workingCopyManager);
   }
 
   private IType getType(IScoutBundle bundle, IFile f) {

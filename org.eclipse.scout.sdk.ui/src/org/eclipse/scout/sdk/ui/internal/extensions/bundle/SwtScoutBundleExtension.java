@@ -7,9 +7,17 @@ import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class SwtScoutBundleExtension implements IScoutBundleProvider {
-  public SwtScoutBundleExtension() {
+
+  public final static String ID = "org.eclipse.scout.sdk.ui.UiSwtBundle";
+
+  @Override
+  public void init(IScoutProjectWizard wizard, IScoutProject project) {
+    IScoutBundle swt = project.getUiSwtBundle();
+    wizard.getProjectWizardPage().setBundleNodeAvailable(swt == null, ID);
   }
 
   @Override

@@ -21,10 +21,10 @@ import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -49,11 +49,6 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
   }
 
   @Override
-  public void setContainer(IWizardContainer wizardContainer) {
-    super.setContainer(wizardContainer);
-  }
-
-  @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     m_page1 = new ScoutProjectNewWizardPage();
     addPage(m_page1);
@@ -62,7 +57,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
   }
 
   @Override
-  public final boolean performFinish() {
+  public boolean performFinish() {
     new P_PerformFinishJob(getContainer().getShell().getDisplay()).schedule();
     return true;
   }
@@ -72,7 +67,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
     return m_page1;
   }
 
-  private class P_PerformFinishJob extends Job {
+  protected class P_PerformFinishJob extends Job {
 
     private final Display m_display;
 
@@ -83,6 +78,10 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
       super("Create new Scout project...");
       m_display = display;
 
+    }
+
+    protected IScoutProjectNewOperation getFinishOperation() {
+      return new ScoutProjectNewOperation();
     }
 
     @Override
@@ -96,7 +95,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
       }
 
       // execute project creation operations
-      ScoutProjectNewOperation mainOperation = new ScoutProjectNewOperation();
+      IScoutProjectNewOperation mainOperation = getFinishOperation();
       mainOperation.setProperties(properties);
       OperationJob job = new OperationJob(mainOperation);
       job.schedule();

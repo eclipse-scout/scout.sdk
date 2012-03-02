@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHan
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
@@ -34,7 +35,7 @@ public class DerbyJdbcManifestTechnologyHandler extends AbstractScoutTechnologyH
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, DERBY_JDBC_PLUGIN);
   }
 

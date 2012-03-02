@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.extensions.technology;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public interface IScoutTechnologyHandler {
@@ -38,7 +39,7 @@ public interface IScoutTechnologyHandler {
    * @param selected
    *          the new selection value
    */
-  void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor) throws CoreException;
+  void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException;
 
   /**
    * called when the technology selection checkbox changes its values. this method is called for all handlers after the

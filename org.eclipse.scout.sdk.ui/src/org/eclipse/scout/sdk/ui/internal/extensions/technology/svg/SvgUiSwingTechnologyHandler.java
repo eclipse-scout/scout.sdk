@@ -8,6 +8,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler {
@@ -18,7 +19,7 @@ public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler 
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected, SvgClientTechnologyHandler.COMMON_SVG_PLUGINS, SWING_SVG_PLUGIN);
   }
 

@@ -16,8 +16,19 @@ import org.eclipse.scout.sdk.ui.extensions.bundle.IScoutBundleProvider;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class ServerScoutBundleExtension implements IScoutBundleProvider {
+
+  public final static String ID = "org.eclipse.scout.sdk.ui.ServerBundle";
+
+  @Override
+  public void init(IScoutProjectWizard wizard, IScoutProject project) {
+    IScoutBundle server = project.getServerBundle();
+    wizard.getProjectWizardPage().setBundleNodeAvailable(server == null, ID);
+  }
+
   @Override
   public IStatus getStatus(IScoutProjectWizard wizard) {
     if (!wizard.getProjectWizardPage().hasSelectedBundle(BundleTypes.Shared_Bundle)) {

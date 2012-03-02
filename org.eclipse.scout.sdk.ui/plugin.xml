@@ -554,9 +554,8 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.rename.WizardStepRenameAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction"></contextMenu>
-  <contextMenu
-        class="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction">
-  </contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction"></contextMenu>
    </extension>
    <extension
          id="sqlBindCompletionProposalComputer"

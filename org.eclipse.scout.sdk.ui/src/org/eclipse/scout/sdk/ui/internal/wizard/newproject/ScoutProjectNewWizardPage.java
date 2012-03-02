@@ -54,15 +54,15 @@ import org.eclipse.swt.widgets.Label;
  */
 
 public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage implements IScoutProjectWizardPage {
-  static final int TYPE_BUNDLE = 99;
+  private static final int TYPE_BUNDLE = 99;
 
   private BasicPropertySupport m_propertySupport;
 
-  private StyledTextField m_projectNameField;
-  private StyledTextField m_postFixField;
-  private CheckableTree m_bundleTree;
-  private ITreeNode m_invisibleRootNode;
-  private StyledTextField m_projectAliasNameField;
+  protected StyledTextField m_projectNameField;
+  protected StyledTextField m_postFixField;
+  protected CheckableTree m_bundleTree;
+  protected ITreeNode m_invisibleRootNode;
+  protected StyledTextField m_projectAliasNameField;
 
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
@@ -110,6 +110,9 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
         m_propertySupport.setProperty(PROP_SELECTED_BUNDLES, m_bundleTree.getCheckedNodes());
         ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+        if (!node.isEnabled()) {
+          checkState = false;
+        }
         if (ext != null) {
           ext.getBundleExtention().bundleSelectionChanged(getWizard(), checkState);
         }
@@ -169,7 +172,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     m_projectAliasNameField.setText(alias);
   }
 
-  private Control createAliasGroup(Composite parent) {
+  protected Control createAliasGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_IN);
     group.setText(Texts.get("ProjectAlias"));
     Label label = new Label(group, SWT.NONE);
@@ -209,7 +212,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
     HashSet<String> checkedNodeExtensionIds = new HashSet<String>(nodes.length);
     for (ITreeNode node : nodes) {
-      if (m_bundleTree.isChecked(node)) {
+      if (m_bundleTree.isChecked(node) && node.isEnabled()) {
         ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
         if (ext != null) {
           checkedNodeExtensionIds.add(ext.getBundleID());
@@ -300,6 +303,14 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     }
     return true;
+  }
+
+  @Override
+  public void setBundleNodeAvailable(boolean available, String... extensionIds) {
+    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
+    for (ITreeNode n : nodes) {
+      n.setEnabled(available);
+    }
   }
 
   @Override

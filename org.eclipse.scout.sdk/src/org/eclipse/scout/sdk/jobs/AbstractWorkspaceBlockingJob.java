@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -87,22 +86,6 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
 
   protected abstract void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException;
 
-  /**
-   * Avoid deadlock: check if currently running job is blocking this one
-   */
-  @Override
-  public boolean shouldSchedule() {
-    Job job = Job.getJobManager().currentJob();
-    if (job != null) {
-      ISchedulingRule activeRule = job.getRule();
-      ISchedulingRule myRule = getRule();
-      if (activeRule != null && myRule != null && activeRule.isConflicting(myRule)) {
-        ScoutSdk.logWarning("POTENTIAL DEAD LOCK DETECTED: running job " + job + " and scheduling " + this + " (check that no join() is done)");
-      }
-    }
-    return super.shouldSchedule();
-  }
-
   public void setDebug(boolean debug) {
     m_debug = debug;
   }
@@ -110,5 +93,4 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
   public boolean isDebug() {
     return m_debug;
   }
-
 }

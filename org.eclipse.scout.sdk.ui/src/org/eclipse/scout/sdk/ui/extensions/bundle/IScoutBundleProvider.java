@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.extensions.bundle;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public interface IScoutBundleProvider {
 
@@ -19,4 +20,5 @@ public interface IScoutBundleProvider {
 
   IStatus getStatus(IScoutProjectWizard wizard);
 
+  void init(IScoutProjectWizard wizard, IScoutProject project);
 }

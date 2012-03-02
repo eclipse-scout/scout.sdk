@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ImportPluginAction;
 import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.action.export.ExportScoutProjectAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
@@ -151,8 +152,8 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ImportPluginAction.class, OrganizeAllImportsAction.class, WellformAction.class,
-        FormDataUpdateAction.class, FormDataSqlBindingValidateAction.class, ExportScoutProjectAction.class};
+    return new Class[]{ImportPluginAction.class, OrganizeAllImportsAction.class, WellformAction.class, FormDataUpdateAction.class,
+        FormDataSqlBindingValidateAction.class, ExportScoutProjectAction.class, ScoutBundleNewAction.class};
   }
 
   @Override
@@ -179,6 +180,9 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
     }
     else if (menu instanceof ExportScoutProjectAction) {
       ((ExportScoutProjectAction) menu).setScoutProject(getScoutResource());
+    }
+    else if (menu instanceof ScoutBundleNewAction) {
+      ((ScoutBundleNewAction) menu).setScoutProject(getScoutResource());
     }
   }
 
