@@ -54,17 +54,19 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     m_serverBundle = serverBundle;
     setWindowTitle(Texts.get("NewSQLService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSQLService"), Texts.get("CreateANewSQLService"), TypeUtility.getType(RuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE);
-    m_serviceNewWizardPage.setLocationBundle(serverBundle);
-    m_serviceNewWizardPage.addStatusProvider(statusProvider);
-    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.AbstractSqlService));
-    m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
-    addPage(m_serviceNewWizardPage);
 
     m_locationWizardPageRoot = createTree(serverBundle);
     m_locationWizardPage = new BundleTreeWizardPage(Texts.get("SQLServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckerFilter());
     m_locationWizardPage.addStatusProvider(statusProvider);
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
+
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSQLService"), Texts.get("CreateANewSQLService"), TypeUtility.getType(RuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE);
+    m_serviceNewWizardPage.setLocationBundle(serverBundle);
+    m_serviceNewWizardPage.addStatusProvider(statusProvider);
+    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.AbstractSqlService));
+    m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
+
+    addPage(m_serviceNewWizardPage);
     addPage(m_locationWizardPage);
 
     // init
@@ -251,5 +253,4 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     }
 
   } // end class P_StatusRevalidator
-
 }
