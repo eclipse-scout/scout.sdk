@@ -14,22 +14,15 @@ import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.bundle.BundleImportWizard;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public class ImportPluginAction extends AbstractWizardAction {
-
-  private IScoutProject m_resource;
 
   public ImportPluginAction() {
     super(Texts.get("ImportPlugin"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd), null, false, Category.IMPORT);
   }
 
-  public void setScoutProject(IScoutProject resource) {
-    m_resource = resource;
-  }
-
   @Override
   protected IWizard getNewWizardInstance() {
-    return new BundleImportWizard(m_resource);
+    return new BundleImportWizard();
   }
 }

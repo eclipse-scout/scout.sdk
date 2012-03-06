@@ -158,10 +158,7 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof ImportPluginAction) {
-      ((ImportPluginAction) menu).setScoutProject(getScoutResource());
-    }
-    else if (menu instanceof OrganizeAllImportsAction) {
+    if (menu instanceof OrganizeAllImportsAction) {
       ((OrganizeAllImportsAction) menu).setScoutProject(getScoutResource());
     }
     else if (menu instanceof WellformAction) {

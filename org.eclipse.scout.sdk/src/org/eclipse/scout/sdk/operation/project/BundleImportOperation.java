@@ -19,7 +19,6 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -27,7 +26,6 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class BundleImportOperation implements IOperation {
 
-  private String m_projectId;
   private IPluginModelBase m_pluginModel;
 
   @Override
@@ -37,9 +35,6 @@ public class BundleImportOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
-    if (StringUtility.isNullOrEmpty(getProjectId())) {
-      throw new IllegalArgumentException("Project ID can not be null");
-    }
     if (getPluginModel() == null) {
       throw new IllegalArgumentException("Plugin can not be null.");
     }
@@ -60,6 +55,7 @@ public class BundleImportOperation implements IOperation {
     IProjectDescription description = project.getDescription();
     String[] existingNatures = description.getNatureIds();
     ArrayList<String> newNatures = new ArrayList<String>(Arrays.asList(existingNatures));
+
     // remove legacy
     for (Iterator<String> it = newNatures.iterator(); it.hasNext();) {
       String visitNature = it.next();
@@ -72,14 +68,6 @@ public class BundleImportOperation implements IOperation {
     project.setDescription(description, monitor);
   }
 
-  public void setProjectId(String projectId) {
-    m_projectId = projectId;
-  }
-
-  public String getProjectId() {
-    return m_projectId;
-  }
-
   public void setPluginModel(IPluginModelBase pluginModel) {
     m_pluginModel = pluginModel;
   }
@@ -87,5 +75,4 @@ public class BundleImportOperation implements IOperation {
   public IPluginModelBase getPluginModel() {
     return m_pluginModel;
   }
-
 }
