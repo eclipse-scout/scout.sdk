@@ -84,7 +84,8 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   private WorkspaceProductModel m_productModel;
 
   private final static Pattern PATTERN = Pattern.compile("name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"", Pattern.MULTILINE);
-  private final static String MAC_OS_X_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
+  private final static String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
+  private final static String MAC_OS_X_SWT_WARNING_MESSAGE_KEY = "scoutSwtMacOsXWarningKey";
 
   /**
    * @param toolkit
@@ -281,24 +282,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
 
   private Job startProduct(final boolean debug) {
 
-    if (Platform.OS_MACOSX.equals(Platform.getOS())) {
-      try {
-        ProductFileModelHelper pfmh = new ProductFileModelHelper(m_productFile);
-        if (pfmh.ProductFile.existsDependency(RuntimeClasses.ScoutUiSwingBundleId)) {
-          // it is a swing product to be launched on Mac OS X: show warning
-          IPreferenceStore store = ScoutSdkUi.getDefault().getPreferenceStore();
-          String doNotShowAgainString = store.getString(MAC_OS_X_WARNING_MESSAGE_KEY);
-          boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
-          if (!doNotShowAgain) {
-            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwingWarningTitle"), Texts.get("MacOsXSwingWarningMessage"),
-                Texts.get("DoNotShowAgain"), false, store, MAC_OS_X_WARNING_MESSAGE_KEY);
-          }
-        }
-      }
-      catch (CoreException e) {
-        ScoutSdkUi.logError(e);
-      }
-    }
+    showMacOsXWarnings();
 
     Job job = new Job("starting '" + getProductName() + "' product...") {
       @Override
@@ -317,6 +301,36 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     job.setRule(getProductFile());
     job.schedule();
     return job;
+  }
+
+  private void showMacOsXWarnings() {
+    if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+      try {
+        IPreferenceStore store = ScoutSdkUi.getDefault().getPreferenceStore();
+        ProductFileModelHelper pfmh = new ProductFileModelHelper(m_productFile);
+        if (pfmh.ProductFile.existsDependency(RuntimeClasses.ScoutUiSwingBundleId)) {
+          // it is a swing product to be launched on Mac OS X: show warning
+          String doNotShowAgainString = store.getString(MAC_OS_X_SWING_WARNING_MESSAGE_KEY);
+          boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
+          if (!doNotShowAgain) {
+            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwingWarningTitle"), Texts.get("MacOsXSwingWarningMessage"),
+                Texts.get("DoNotShowAgain"), false, store, MAC_OS_X_SWING_WARNING_MESSAGE_KEY);
+          }
+        }
+        else if (Platform.ARCH_X86.equals(Platform.getOSArch()) && pfmh.ProductFile.existsDependency(RuntimeClasses.ScoutUiSwtBundleId)) {
+          // it is a swt product to be launched on Mac OS X with eclipse 32 bit: show warning
+          String doNotShowAgainString = store.getString(MAC_OS_X_SWT_WARNING_MESSAGE_KEY);
+          boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
+          if (!doNotShowAgain) {
+            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwtWarningTitle"), Texts.get("MacOsXSwtWarningMessage"),
+                Texts.get("DoNotShowAgain"), false, store, MAC_OS_X_SWT_WARNING_MESSAGE_KEY);
+          }
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
+    }
   }
 
   private Job stopProduct() {

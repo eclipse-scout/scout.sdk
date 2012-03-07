@@ -186,6 +186,11 @@
             referenceId="fill.ui.swt">
       </operation>
       <operation
+            class="org.eclipse.scout.sdk.operation.project.SwtProductFileMacOsXOperation"
+            id="finalize.ui.swt.product.macosx"
+            referenceId="fill.ui.swt">
+      </operation>
+      <operation
             class="org.eclipse.scout.sdk.operation.project.SwtProductFileUpgradeOperation"
             id="finalize.ui.swt.products"
             referenceId="fill.ui.swt">
