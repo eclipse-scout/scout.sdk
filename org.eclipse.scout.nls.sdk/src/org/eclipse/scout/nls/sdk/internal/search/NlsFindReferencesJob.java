@@ -63,7 +63,7 @@ public class NlsFindReferencesJob extends Job {
     IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     try {
       for (IProject project : projects) {
-        if (project.isOpen() && project.hasNature(JavaCore.NATURE_ID) && project.hasNature(PDE.PLUGIN_NATURE)) {
+        if (project.exists() && project.isOpen() && project.hasNature(JavaCore.NATURE_ID) && project.hasNature(PDE.PLUGIN_NATURE)) {
           jProjects.add(JavaCore.create(project));
         }
       }
@@ -72,14 +72,11 @@ public class NlsFindReferencesJob extends Job {
       NlsCore.logError("Could not create java projects for nls search.");
     }
     IJavaSearchScope scope = SearchEngine.createJavaSearchScope(jProjects.toArray(new IJavaElement[jProjects.size()]), true);
-
     SearchPattern pattern = SearchPattern.createPattern(m_nlsType, IJavaSearchConstants.REFERENCES);
     SearchEngine engine = new SearchEngine();
 
     try {
-
       engine.search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, m_searchRequstor, monitor);
-
     }
     catch (CoreException e) {
       NlsCore.logError("NLS search failed.", e);

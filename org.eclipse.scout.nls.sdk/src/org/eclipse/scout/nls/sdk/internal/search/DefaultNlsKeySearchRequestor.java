@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
@@ -29,7 +28,7 @@ import org.eclipse.search.ui.text.Match;
 public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor {
   private Map<String, List<Match>> m_matches;
   private EventListenerList m_eventListeners = new EventListenerList();
-  private static final Pattern PATTERN = Pattern.compile("\\A\\s*\\.\\s*get\\s*\\(\\s*\\\"([^\\\"]*)\\\"\\s*[\\)\\,\\s]{1}", Pattern.MULTILINE);
+  private static final Pattern PATTERN = Pattern.compile("\\A\\s*[A-Za-z0-9_]+\\s*\\.\\s*get\\s*\\(\\s*\\\"([^\\\"]*)\\\"\\s*[\\)\\,\\s]{1}", Pattern.MULTILINE);
 
   /**
    * @param project
@@ -66,7 +65,6 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
       Match nlsMatch = new Match(match.getResource(), match.getOffset(), statement.length());
       acceptNlsKeyMatch(nlsKey, nlsMatch);
     }
-
   }
 
   protected void acceptNlsKeyMatch(String nlsKey, Match match) {
@@ -99,20 +97,9 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
   }
 
   private String parseKey(String statement, SearchMatch match) {
-    if (match.getElement() instanceof IImportDeclaration) {
-      return null;
-    }
-    // statement = statement.replaceAll("\n", "");
-    String elementName = getProject().getNlsAccessorType().getElementName();
-    int startIndex = statement.indexOf(elementName) + elementName.length();
-    if (startIndex > 0 && startIndex < statement.length()) {
-      statement = statement.substring(startIndex);
-    }
-
-    // Create a matcher with an input string
     Matcher m = PATTERN.matcher(statement);
     if (m.find()) {
-      return statement.substring(m.start(1), m.end(1));
+      return m.group(1);
     }
     return null;
   }
@@ -128,5 +115,4 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
   public Map<String, List<Match>> getAllMatches() {
     return new HashMap<String, List<Match>>(m_matches);
   }
-
 }

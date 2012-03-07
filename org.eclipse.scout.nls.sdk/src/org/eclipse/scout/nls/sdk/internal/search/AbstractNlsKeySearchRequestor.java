@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.search;
 
-import java.io.IOException;
+import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.internal.jdt.JavaFileInputReader;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 
 /**
@@ -36,35 +36,33 @@ public abstract class AbstractNlsKeySearchRequestor extends SearchRequestor {
     if (!(match.getResource() instanceof IFile)) {
       return;
     }
-    JavaFileInputReader reader = new JavaFileInputReader((IFile) match.getResource());
+    if (match.getElement() instanceof IImportDeclaration) {
+      return;
+    }
+    IFile f = (IFile) match.getResource();
+    InputStream is = null;
     try {
-      int in = -1;
-      for (int i = 0; i < match.getOffset(); i++) {
-        in = reader.read();
-      }
-      if (reader.isCommentBlock()) {
-        // nobody is interessted in this match
-        return;
-      }
-      StringBuffer buffer = new StringBuffer();
+      is = f.getContents();
+      is.skip(match.getOffset());
+
+      int in;
+      StringBuilder buffer = new StringBuilder(64);
       // record till end of the statement
-      while (!(in < 0) && !(in == ';')) {
-        in = reader.read();
+      while ((in = is.read()) != ';') {
         buffer.append((char) in);
       }
       acceptMatch(buffer.toString(), match);
-
     }
-    catch (IOException ex) {
-      NlsCore.logError("could not read file of ICompilationUnit '" + match.getResource().getName() + "'.", ex);
+    catch (Throwable t) {
+      NlsCore.logError("could not read file of ICompilationUnit '" + match.getResource().getName() + "'.", t);
     }
     finally {
-      try {
-        reader.close();
-      }
-      catch (IOException e) {
-        NlsCore.logError(e);
-
+      if (is != null) {
+        try {
+          is.close();
+        }
+        catch (Throwable tt) {
+        }
       }
     }
   }
