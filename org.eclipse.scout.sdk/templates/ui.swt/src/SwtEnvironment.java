@@ -10,10 +10,13 @@
  ******************************************************************************/
 package @@BUNDLE_SWT_NAME@@;
 
-import org.osgi.framework.Bundle;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.ISwtEnvironmentListener;
+import org.eclipse.scout.rt.ui.swt.SwtEnvironmentEvent;
+import org.eclipse.ui.PlatformUI;
+import org.osgi.framework.Bundle;
 
 
 /** <h3>SwtEnvironment</h3>
@@ -32,12 +35,21 @@ import org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment;
  *  </pre>
 */
 public class SwtEnvironment extends AbstractSwtEnvironment{
-	
+
   public SwtEnvironment(Bundle bundle,String perspectiveId,Class<? extends AbstractClientSession> clientSessionClazz) {
     super(bundle, perspectiveId, clientSessionClazz);
     registerPart(IForm.VIEW_ID_CENTER, Activator.CENTER_VIEW_ID);
     registerPart(IForm.VIEW_ID_OUTLINE, Activator.OUTLINE_VIEW_ID);
     registerPart(IForm.VIEW_ID_PAGE_TABLE, Activator.TABLE_PAGE_VIEW_ID);
     registerPart(IForm.VIEW_ID_PAGE_SEARCH, Activator.SEAECH_VIEW_ID);
+
+    addEnvironmentListener(new ISwtEnvironmentListener() {
+      @Override
+      public void environmentChanged(SwtEnvironmentEvent e) {
+        if (e.getType() == SwtEnvironmentEvent.STOPPED) {
+          PlatformUI.getWorkbench().close();
+        }
+      }
+    });
   }
 }

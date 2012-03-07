@@ -61,4 +61,15 @@
           value="resources/icons/eclipseScout16x16.gif,resources/icons/eclipseScout32x32.gif"/>
     </product>
   </extension>
+  <extension
+        point="org.eclipse.ui.menus">
+     <menuContribution
+           allPopups="false"
+           locationURI="menu:org.eclipse.ui.main.menu">
+        <dynamic
+              class="@@BUNDLE_SWT_NAME@@.application.menu.DesktopMenuBar"
+              id="org.eclipse.scout.swt.menu.dynamic">
+        </dynamic>
+     </menuContribution>
+  </extension>
 </plugin>

@@ -67,11 +67,14 @@ public class FillUiSwtPluginOperation extends AbstractScoutProjectNewOperation {
 
     new InstallJavaFileOperation("templates/ui.swt/src/SwtEnvironment.java", destPathPref + "SwtEnvironment.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/SwtStartup.java", destPathPref + "SwtStartup.java", m_project, props).run(monitor, workingCopyManager);
+
     // application
     new InstallJavaFileOperation("templates/ui.swt/src/application/Application.java", destPathPref + "application/Application.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationActionBarAdvisor.java", destPathPref + "application/ApplicationActionBarAdvisor.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationWorkbenchAdvisor.java", destPathPref + "application/ApplicationWorkbenchAdvisor.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationWorkbenchWindowAdvisor.java", destPathPref + "application/ApplicationWorkbenchWindowAdvisor.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/application/menu/DesktopMenuBar.java", destPathPref + "application/menu/DesktopMenuBar.java", m_project, props).run(monitor, workingCopyManager);
+
     m_project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 }

@@ -189,8 +189,8 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
         }
       };
       getRootPage().accept(visitor);
+      m_viewer.expandToLevel(4);
       if (projectPages.size() > 0) {
-        m_viewer.setExpandedElements(projectPages.toArray(new IPage[projectPages.size()]));
         m_viewer.setSelection(new StructuredSelection(projectPages.get(0)));
       }
     }
