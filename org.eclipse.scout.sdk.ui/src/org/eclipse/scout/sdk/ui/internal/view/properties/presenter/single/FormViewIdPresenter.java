@@ -161,7 +161,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
       }
     }
     else {
-      StringBuilder source = new StringBuilder();
+      StringBuilder source = new StringBuilder("  return ");
       switch (value) {
         case Outline:
           source.append("VIEW_ID_OUTLINE");
