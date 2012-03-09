@@ -91,6 +91,7 @@ public final class RuntimeClasses {
   public static final String AbstractOkButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton"; // NO_UCD
   public static final String AbstractOutline = "org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline"; // NO_UCD
   public static final String AbstractOutlineToolButton = "org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineToolButton"; // NO_UCD
+  public static final String AbstractOutlineViewButton = "org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton"; // NO_UCD
   public static final String AbstractPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes"; // NO_UCD
   public static final String AbstractPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable"; // NO_UCD
   public static final String AbstractPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField"; // NO_UCD

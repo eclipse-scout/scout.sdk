@@ -226,10 +226,10 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    multiStatus.add(getStatusLocal());
+    multiStatus.add(getStatusStrategy());
   }
 
-  private IStatus getStatusLocal() {
+  private IStatus getStatusStrategy() {
     if (TARGET_STRATEGY.STRATEGY_LOCAL.equals(getTargetStrategy())) {
       if (StringUtility.isNullOrEmpty(getLocalTargetFolder())) {
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, "No RAP target location defined.");
@@ -272,6 +272,9 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
         }
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, "No RAP target found under '" + getLocalTargetFolder() + "'.");
       }
+    }
+    else if (TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy())) {
+      return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, "The RAP target will be downloaded. This can take some minutes.");
     }
     else {
       return Status.OK_STATUS;

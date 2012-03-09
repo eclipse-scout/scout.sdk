@@ -75,7 +75,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
      * @param name
      */
     public P_PerformFinishJob(Display display) {
-      super("Create new Scout project...");
+      super("Creating new Scout project...");
       m_display = display;
 
     }

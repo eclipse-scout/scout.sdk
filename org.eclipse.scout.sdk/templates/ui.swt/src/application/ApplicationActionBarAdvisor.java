@@ -27,9 +27,6 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 */
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
-
-	private IWorkbenchAction exitAction;
-
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
 		super(configurer);
 	}

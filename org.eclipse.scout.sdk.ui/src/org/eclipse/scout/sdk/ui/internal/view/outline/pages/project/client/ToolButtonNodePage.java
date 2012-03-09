@@ -11,6 +11,10 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
+import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -44,8 +48,19 @@ public class ToolButtonNodePage extends AbstractScoutTypePage {
     return (IScoutBundle) super.getScoutResource();
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public void loadChildrenImpl() {
-    new ToolButtonTablePage(this, getType());
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, MemberListDeleteAction.class,};
+  }
+
+  @Override
+  public void prepareMenuAction(IScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof MemberListDeleteAction) {
+      MemberListDeleteAction action = (MemberListDeleteAction) menu;
+      action.addMemberToDelete(getType());
+      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ButtonRemove));
+    }
   }
 }

@@ -101,6 +101,7 @@ public final class SdkProperties {
   public static final String SUFFIX_WIZARD = "Wizard";
   public static final String SUFFIX_WIZARD_STEP = "Step";
   public static final String SUFFIX_FORM_HANDLER = "Handler";
+  public static final String SUFFIX_VIEW_BUTTON = "ViewButton";
   // non field suffixes
   public static final String SUFFIX_FROM = "From";
   public static final String SUFFIX_TO = "To";

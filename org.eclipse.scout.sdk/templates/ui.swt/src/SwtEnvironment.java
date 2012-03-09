@@ -18,22 +18,6 @@ import org.eclipse.scout.rt.ui.swt.SwtEnvironmentEvent;
 import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
-
-/** <h3>SwtEnvironment</h3>
- *  This class provides the possibility to write a own representation of any scout field.
- *  Furthermore the scout view id to swt view id mapping is done here. Ensure that each
- *  swt view id you are mapping to a certain scout view id is defined in the plugin.xml
- *  as a view extension.
- *  <br>
- *  e.g.
- *  <pre>
- *  public ISwtScoutSmartField createSmartField(Composite parent, ISmartField<?> model) {
- *    // create your own component
- *    ISwtScoutSmartField sf = ...
- *    return sf;
- *  }
- *  </pre>
-*/
 public class SwtEnvironment extends AbstractSwtEnvironment{
 
   public SwtEnvironment(Bundle bundle,String perspectiveId,Class<? extends AbstractClientSession> clientSessionClazz) {

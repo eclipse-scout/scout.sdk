@@ -205,7 +205,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          sourceBuilder.append("// dektop form\n");
+          sourceBuilder.append("// desktop form\n");
           String treeFormRef = validator.getSimpleTypeRef(Signature.createTypeSignature(form.getFullyQualifiedName(), true));
           sourceBuilder.append(treeFormRef + " desktopForm = new " + treeFormRef + "();\n");
           ScoutIconDesc icn = m_scoutProject.getIconProvider().getIcon("eclipse_scout");

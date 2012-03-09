@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
@@ -28,11 +29,14 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
+import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -80,6 +84,8 @@ public class OutlineNewOperation implements IOperation {
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdOutline = newOp.getCreatedType();
+    boolean addToDesktop = TypeUtility.exists(getDesktopType()) && isAddToDesktop();
+
     workingCopyManager.register(m_createdOutline.getCompilationUnit(), monitor);
 
     // nls text
@@ -91,8 +97,9 @@ public class OutlineNewOperation implements IOperation {
     }
 
     // add to desktop
-    if (getDesktopType() != null && isAddToDesktop()) {
+    if (addToDesktop) {
       addOutlineToDesktop(getCreatedOutline(), monitor, workingCopyManager);
+      addOutlineButtonToDesktop(getCreatedOutline(), monitor, workingCopyManager);
     }
 
     // add to exported packages
@@ -103,12 +110,16 @@ public class OutlineNewOperation implements IOperation {
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedOutline(), true);
       formatOp.validate();
       formatOp.run(monitor, workingCopyManager);
-    }
 
+      if (addToDesktop) {
+        JavaElementFormatOperation desktopFormatOp = new JavaElementFormatOperation(getDesktopType(), true);
+        desktopFormatOp.validate();
+        desktopFormatOp.run(monitor, workingCopyManager);
+      }
+    }
   }
 
   private void addOutlineToDesktop(final IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-
     String methodName = "getConfiguredOutlines";
     IMethod method = TypeUtility.getMethod(getDesktopType(), methodName);
     if (TypeUtility.exists(method)) {
@@ -124,7 +135,11 @@ public class OutlineNewOperation implements IOperation {
             listName = matcher.group(1);
           }
           if (index > 0) {
-            InsertEdit edit = new InsertEdit(index, "\n" + listName + ".add(" + validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class);");
+            String addSource = listName + ".add(" + validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class);";
+            if (methodBody.get().contains(addSource)) {
+              return;
+            }
+            InsertEdit edit = new InsertEdit(index, "\n" + addSource);
             try {
               edit.apply(methodBody);
             }
@@ -139,7 +154,11 @@ public class OutlineNewOperation implements IOperation {
               String list = matcher.group(1).trim();
               boolean appendComma = !list.endsWith(",");
               int pos = matcher.end(1);
-              InsertEdit edit = new InsertEdit(pos, (appendComma ? ", " : "") + "\n" + validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class");
+              String addSource = validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class";
+              if (methodBody.get().contains(addSource)) {
+                return;
+              }
+              InsertEdit edit = new InsertEdit(pos, (appendComma ? ", " : "") + "\n" + addSource);
               try {
                 edit.apply(methodBody);
               }
@@ -166,7 +185,7 @@ public class OutlineNewOperation implements IOperation {
           String outlineRef = validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true));
           builder.append(arrayListRef + "<Class> outlines = new " + arrayListRef + "<Class>();\n");
           builder.append("outlines.add(" + outlineRef + ".class);\n");
-          builder.append("return outlines.toArray(new Class[outlines.size()]);\n");
+          builder.append("return outlines.toArray(new Class[outlines.size()]);");
           return builder.toString();
         }
       };
@@ -175,7 +194,38 @@ public class OutlineNewOperation implements IOperation {
       overrideOp.setSibling(structuredType.getSiblingMethodConfigGetConfigured(methodName));
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
+
+      AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(overrideOp.getCreatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true), false);
+      createSuppressWarning.addParameter("\"unchecked\"");
+      createSuppressWarning.validate();
+      createSuppressWarning.run(monitor, workingCopyManager);
     }
+  }
+
+  private void addOutlineButtonToDesktop(IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+
+    final String className = getTypeName() + SdkProperties.SUFFIX_VIEW_BUTTON;
+    for (IType innerType : getDesktopType().getTypes()) {
+      if (className.equals(innerType.getElementName())) {
+        return;
+      }
+    }
+
+    OrderedInnerTypeNewOperation outlineButtonOp = new OrderedInnerTypeNewOperation(className, getDesktopType(), false) {
+      @Override
+      protected void createContent(StringBuilder source, IImportValidator validator) {
+        source.append("public ");
+        source.append(className);
+        source.append("() { super(Desktop.this, ");
+        source.append(validator.getSimpleTypeRef(Signature.createTypeSignature(OutlineNewOperation.this.getTypeName(), true)));
+        source.append(".class); }");
+      }
+    };
+    outlineButtonOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IViewButton));
+    outlineButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractOutlineViewButton, true));
+    outlineButtonOp.setTypeModifiers(Flags.AccPublic);
+    outlineButtonOp.validate();
+    outlineButtonOp.run(monitor, workingCopyManager);
   }
 
   public void setClientBundle(IScoutBundle clientBundle) {

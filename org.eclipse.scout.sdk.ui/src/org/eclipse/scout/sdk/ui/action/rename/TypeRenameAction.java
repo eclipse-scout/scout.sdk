@@ -34,7 +34,7 @@ public class TypeRenameAction extends AbstractRenameAction {
     }
     IType declaringType = getType().getDeclaringType();
     if (declaringType != null) {
-      if (declaringType.getType(newName) != null) {
+      if (TypeUtility.exists(declaringType.getType(newName))) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
       }
     }

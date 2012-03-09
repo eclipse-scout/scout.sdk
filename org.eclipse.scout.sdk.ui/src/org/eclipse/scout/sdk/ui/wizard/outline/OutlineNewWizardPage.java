@@ -148,6 +148,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
     getOperation().setClientBundle(getClientBundle());
+    getOperation().setFormatSource(true);
 
     // write back members
     if (getNlsName() != null) {

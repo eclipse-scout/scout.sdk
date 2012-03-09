@@ -11,18 +11,17 @@
 package org.eclipse.scout.sdk.ui.action.create;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.ISharedImages;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.toolbutton.ToolbuttonNewWizard;
 
 public class ToolbuttonNewAction extends AbstractWizardAction {
   private IType m_type;
 
   public ToolbuttonNewAction() {
-    super(Texts.get("Action_newTypeX", "Tool item"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS), null, false, Category.NEW);
+    super(Texts.get("Action_newTypeX", "Tool item"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ButtonAdd), null, false, Category.NEW);
   }
 
   public void init(IType t) {

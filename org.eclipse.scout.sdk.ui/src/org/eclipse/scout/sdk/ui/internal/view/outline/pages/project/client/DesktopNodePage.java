@@ -10,13 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
-import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
-import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -59,20 +56,12 @@ public class DesktopNodePage extends AbstractScoutTypePage {
   public void loadChildrenImpl() {
     new DesktopMenuTablePage(this, getType());
     new DesktopOutlineTablePage(this, getType());
+    new ToolButtonTablePage(this, getType());
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, MemberListDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof MemberListDeleteAction) {
-      MemberListDeleteAction action = (MemberListDeleteAction) menu;
-      action.setTypesToDelete(new IMember[]{getType()});
-    }
+    return new Class[]{ShowJavaReferencesAction.class};
   }
 }

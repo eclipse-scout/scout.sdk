@@ -80,7 +80,6 @@ public class AnnotationCreateOperation implements IOperation {
         for (String fqi : validator.getImportsToCreate()) {
           getAnnotationOwner().getCompilationUnit().createImport(fqi, null, monitor);
         }
-
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not add annotation to '" + getAnnotationOwner().getElementName() + "'.");

@@ -86,6 +86,10 @@ public class JavaElementDeleteOperation implements IOperation {
     for (IJavaElement m : m_typesToDelete) {
       deleteMember(m, icuForOrganizeImports, monitor, workingCopyManager);
     }
+    for (ICompilationUnit icu : icuForOrganizeImports) {
+      OrganizeImportOperation op = new OrganizeImportOperation(icu);
+      op.run(monitor, workingCopyManager);
+    }
   }
 
   protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {

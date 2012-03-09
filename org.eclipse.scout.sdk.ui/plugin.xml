@@ -556,6 +556,7 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.OutlineDeleteAction"></contextMenu>
    </extension>
    <extension
          id="sqlBindCompletionProposalComputer"
@@ -767,7 +768,7 @@
       <template
             class="org.eclipse.scout.sdk.ui.internal.extensions.project.template.DesktopFormTemplate"
             icon="resources/icons/default.gif"
-            id="org.eclipse.scout.sdk.ui.dektopFormTemplate"
+            id="org.eclipse.scout.sdk.ui.desktopFormTemplate"
             orderNumber="10">
       </template>
       <template

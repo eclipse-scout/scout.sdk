@@ -26,48 +26,38 @@ import org.eclipse.ui.PlatformUI;
 public class Application implements IApplication {
 
   @Override
-	public Object start(final IApplicationContext context) throws Exception {
-    Subject subject=new Subject();
+  public Object start(final IApplicationContext context) throws Exception {
+    Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
-    return Subject.doAs(subject, new PrivilegedExceptionAction<Object>(){
+    return Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
       @Override
-      public Object run() throws Exception{
+      public Object run() throws Exception {
         return startSecure(context);
       }
     });
-	}
+  }
 
-	public Integer startSecure(final IApplicationContext context)
-			throws Exception {
-		Display display = PlatformUI.createDisplay();
-		//Subject.getSubject(AccessController.getContext()).getPrincipals().add(new NetPrincipal("localhost", "admin", "manager"));
-		NetActivator.install();
-//    NetActivator.getDefault().addCallbackHandler(new UserPassDialogCallbackHandler(getSwingEnvironment()));
-//    if (FenixUpdater.update(getProgressMonitor())==State.RestartRequired){
-//      return EXIT_RESTART;
-//    }
-		if(PlatformUI.createAndRunWorkbench(display,new ApplicationWorkbenchAdvisor())==PlatformUI.RETURN_RESTART) {
-			return EXIT_RESTART;
-		}
-		return EXIT_OK;
-	}
+  public Integer startSecure(final IApplicationContext context)
+      throws Exception {
+    Display display = PlatformUI.createDisplay();
+    NetActivator.install();
+    if (PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor()) == PlatformUI.RETURN_RESTART) {
+      return EXIT_RESTART;
+    }
+    return EXIT_OK;
+  }
 
-	/*
-	 * (non-Javadoc)
-* @see org.eclipse.equinox.app.IApplication#stop()
-	 */
-	@Override
-	public void stop() {
-		final IWorkbench workbench = PlatformUI.getWorkbench();
-		if (workbench == null)
-			return;
-		final Display display = workbench.getDisplay();
-		display.syncExec(new Runnable() {
-		  @Override
-			public void run() {
-				if (!display.isDisposed())
-					workbench.close();
-			}
-		});
-	}
+  @Override
+  public void stop() {
+    final IWorkbench workbench = PlatformUI.getWorkbench();
+    if (workbench == null) return;
+    final Display display = workbench.getDisplay();
+    display.syncExec(new Runnable() {
+      @Override
+      public void run() {
+        if (!display.isDisposed())
+          workbench.close();
+        }
+    });
+  }
 }

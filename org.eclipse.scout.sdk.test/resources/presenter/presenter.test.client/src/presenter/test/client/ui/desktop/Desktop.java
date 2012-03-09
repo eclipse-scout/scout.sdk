@@ -40,7 +40,7 @@ public class Desktop extends AbstractDesktop implements IDesktop {
 
   @Override
   protected void execOpened() throws ProcessingException {
-    // dektop form
+    // desktop form
     DesktopForm desktopForm = new DesktopForm();
     desktopForm.startView();
   }

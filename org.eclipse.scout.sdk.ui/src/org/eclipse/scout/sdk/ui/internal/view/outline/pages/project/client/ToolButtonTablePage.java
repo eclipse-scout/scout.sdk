@@ -19,8 +19,9 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
@@ -31,17 +32,13 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
  */
 public class ToolButtonTablePage extends AbstractPage {
 
+  final IType iToolButton = TypeUtility.getType(RuntimeClasses.IToolButton);
+
+  private InnerTypePageDirtyListener m_toolButtonChangedListener;
   private final IType m_declaringType;
-  private IType[] m_toolbuttons;
 
   public ToolButtonTablePage(IPage parentPage, IType declaringType) {
-    this(parentPage, declaringType, null);
-
-  }
-
-  public ToolButtonTablePage(IPage parentPage, IType declaringType, IType[] toolbuttons) {
     m_declaringType = declaringType;
-    m_toolbuttons = toolbuttons;
     setName(Texts.get("ToolTablePage"));
     setParent(parentPage);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Buttons));
@@ -72,19 +69,22 @@ public class ToolButtonTablePage extends AbstractPage {
     return m_declaringType;
   }
 
-  /**
-   * @return the toolbuttons
-   */
-  public IType[] getToolbuttons() {
-    return m_toolbuttons;
+  @Override
+  public void unloadPage() {
+    super.unloadPage();
+    if (m_toolButtonChangedListener != null) {
+      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_toolButtonChangedListener);
+      m_toolButtonChangedListener = null;
+    }
   }
 
   @Override
   public void loadChildrenImpl() {
-    if (getToolbuttons() == null) {
-      m_toolbuttons = TypeUtility.getInnerTypes(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IToolButton)), ScoutTypeComparators.getOrderAnnotationComparator());
+    if (m_toolButtonChangedListener == null) {
+      m_toolButtonChangedListener = new InnerTypePageDirtyListener(this, iToolButton);
+      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_toolButtonChangedListener);
     }
-    for (IType toolbutton : getToolbuttons()) {
+    for (IType toolbutton : TypeUtility.getInnerTypesOrdered(getDeclaringType(), iToolButton, ScoutTypeComparators.getOrderAnnotationComparator())) {
       new ToolButtonNodePage(this, toolbutton);
     }
   }
