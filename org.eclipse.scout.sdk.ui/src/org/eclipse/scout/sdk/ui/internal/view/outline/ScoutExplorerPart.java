@@ -42,6 +42,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -53,6 +54,9 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJ
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
@@ -172,7 +176,8 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   public void expandAndSelectProjectLevel() {
     try {
       m_viewContentProvider.setLoadSync(true);
-      final ArrayList<IPage> projectPages = new ArrayList<IPage>();
+      final Holder<IPage> selectedPage = new Holder<IPage>(null);
+      final ArrayList<IPage> expandedPages = new ArrayList<IPage>();
       INodeVisitor visitor = new INodeVisitor() {
         @Override
         public int visit(IPage page) {
@@ -183,16 +188,34 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
             return CONTINUE;
           }
           else if (page instanceof ProjectNodePage) {
-            projectPages.add(page);
+            if (selectedPage.getValue() == null) {
+              selectedPage.setValue(page);
+            }
+            if (page.getParent() instanceof ProjectsTablePage) {
+              expandedPages.add(page);
+              return CONTINUE;
+            }
             return CANCEL_SUBTREE;
           }
-          return CANCEL;
+          else if (page instanceof ClientNodePage) {
+            expandedPages.add(page);
+            return CANCEL_SUBTREE;
+          }
+          else if (page instanceof SharedNodePage) {
+            expandedPages.add(page);
+            return CANCEL_SUBTREE;
+          }
+          else if (page instanceof ServerNodePage) {
+            expandedPages.add(page);
+            return CANCEL_SUBTREE;
+          }
+          return CANCEL_SUBTREE;
         }
       };
       getRootPage().accept(visitor);
-      if (projectPages.size() > 0) {
-        m_viewer.setExpandedElements(projectPages.toArray(new IPage[projectPages.size()]));
-        m_viewer.setSelection(new StructuredSelection(projectPages.get(0)));
+      if (expandedPages.size() > 0) {
+        m_viewer.setExpandedElements(expandedPages.toArray(new IPage[expandedPages.size()]));
+        m_viewer.setSelection(new StructuredSelection(expandedPages.get(0)));
       }
     }
     finally {
