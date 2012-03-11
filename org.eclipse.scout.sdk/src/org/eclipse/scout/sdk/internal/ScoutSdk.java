@@ -24,6 +24,7 @@ public class ScoutSdk extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk";
   public static final String NATURE_ID = PLUGIN_ID + ".ScoutNature";
+  public static final String LIBRARY_NATURE_ID = PLUGIN_ID + ".ScoutLibraryNature";
 
   private static ScoutSdk plugin;
   private static SdkLogManager logManager;

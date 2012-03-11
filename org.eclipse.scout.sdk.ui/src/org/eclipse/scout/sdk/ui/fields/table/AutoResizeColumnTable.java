@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.fields.table;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -50,10 +49,10 @@ public class AutoResizeColumnTable extends Table {
   public void setAutoResizeColumns(boolean autoResizeColumns) {
     m_autoResizeColumns = autoResizeColumns;
     if (autoResizeColumns) {
-      addListener(SWT.Resize, m_autoResizeListener);
+      getParent().addListener(SWT.Resize, m_autoResizeListener);
     }
     else {
-      removeListener(SWT.Resize, m_autoResizeListener);
+      getParent().removeListener(SWT.Resize, m_autoResizeListener);
     }
   }
 
@@ -77,12 +76,12 @@ public class AutoResizeColumnTable extends Table {
         if (col == null || col.isDisposed()) {
           continue;
         }
-        Object colWeightData = col.getData(COLUMN_WEIGHT);
-        if (colWeightData == null) {
-          ScoutSdkUi.logWarning("auto resizable table, contains columns with no weights setted!");
-          continue;
+        Integer colWeight = (Integer) col.getData(COLUMN_WEIGHT);
+        if (colWeight == null) {
+          // use column with initially
+          colWeight = Integer.valueOf(col.getWidth());
+          col.setData(COLUMN_WEIGHT, colWeight);
         }
-        Integer colWeight = (Integer) colWeightData;
         columnWeights.put(col, colWeight);
         totalWeight += colWeight;
       }

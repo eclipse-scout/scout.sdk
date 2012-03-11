@@ -10,48 +10,69 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal.resources;
 
-import org.eclipse.core.resources.IResource;
+import java.io.File;
+
+import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link ResourceLabelProvider}</h3>
+ * <h3>{@link IoFileLabelProvider}</h3> ...
  * 
  * @author Andreas Hoegger
- * @since 3.8.0 15.02.2012
+ * @since 3.8.0 01.03.2012
  */
-public class ResourceLabelProvider extends SelectionStateLabelProvider {
+public class IoFileLabelProvider extends SelectionStateLabelProvider implements ITableLabelProvider {
 
   @Override
   public String getText(Object element) {
-    IResource resource = (IResource) element;
+    File resource = (File) element;
     return resource.getName();
   }
 
   @Override
   public String getTextSelected(Object element) {
     StringBuilder text = new StringBuilder(getText(element));
-    IResource resource = (IResource) element;
-    text.append(" (").append(resource.getFullPath().toString()).append(")");
+    File file = (File) element;
+    text.append(" (").append(file.getParent()).append(")");
     return text.toString();
   }
 
   @Override
   public Image getImage(Object element) {
-    IResource resource = (IResource) element;
-    switch (resource.getType()) {
-      case IResource.FILE:
-        return ScoutSdkUi.getImage(ScoutSdkUi.File);
-      case IResource.FOLDER:
-        return ScoutSdkUi.getImage(ScoutSdkUi.FolderOpen);
-      default:
-        return ScoutSdkUi.getImage(ScoutSdkUi.Default);
+    File file = (File) element;
+    if (file.isDirectory()) {
+      return ScoutSdkUi.getImage(ScoutSdkUi.FolderOpen);
+    }
+    else {
+      return ScoutSdkUi.getImage(ScoutSdkUi.File);
     }
   }
 
   @Override
   public Image getImageSelected(Object element) {
     return getImage(element);
+  }
+
+  @Override
+  public Image getColumnImage(Object element, int columnIndex) {
+    if (columnIndex == 0) {
+      return getImage(element);
+    }
+    return null;
+  }
+
+  @Override
+  public String getColumnText(Object element, int columnIndex) {
+    File file = (File) element;
+    switch (columnIndex) {
+      case 0:
+        return getText(element);
+      case 1:
+        return file.getParent();
+      default:
+    }
+    return "";
   }
 }

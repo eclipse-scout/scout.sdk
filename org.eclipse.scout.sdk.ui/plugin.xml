@@ -557,6 +557,9 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.OutlineDeleteAction"></contextMenu>
+  <contextMenu
+        class="org.eclipse.scout.sdk.ui.action.create.LibraryBundleNewAction">
+  </contextMenu>
    </extension>
    <extension
          id="sqlBindCompletionProposalComputer"

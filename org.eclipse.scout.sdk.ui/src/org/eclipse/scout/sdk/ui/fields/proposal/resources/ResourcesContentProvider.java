@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 
 /**
@@ -26,18 +26,21 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
  * @author Andreas Hoegger
  * @since 3.8.0 15.02.2012
  */
-public class ResourcesContentProvider extends ContentProposalProvider {
+public class ResourcesContentProvider extends ContentProposalProvider implements IStructuredContentProvider {
 
-  private final List<IResource> m_resources;
   private final ILabelProvider m_labelProvider;
+  private List<Object> m_elements;
 
-  public ResourcesContentProvider(List<IResource> resources, ILabelProvider labelProvider) {
-    m_resources = resources;
-    m_labelProvider = labelProvider;
+  public ResourcesContentProvider(ILabelProvider labelProvider) {
+    this(labelProvider, null);
   }
 
-  public ResourcesContentProvider(IResource[] resources, ILabelProvider labelProvider) {
-    this(Arrays.asList(resources), labelProvider);
+  public ResourcesContentProvider(ILabelProvider labelProvider, Object[] elements) {
+    m_labelProvider = labelProvider;
+    m_elements = new ArrayList<Object>();
+    if (elements != null) {
+      m_elements.addAll(Arrays.asList(elements));
+    }
   }
 
   @Override
@@ -50,7 +53,7 @@ public class ResourcesContentProvider extends ContentProposalProvider {
     }
     char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
     ArrayList<Object> collector = new ArrayList<Object>();
-    for (Object proposal : getAllResources()) {
+    for (Object proposal : getElements()) {
       if (CharOperation.match(pattern, getLabelProvider().getText(proposal).toCharArray(), false)) {
         collector.add(proposal);
       }
@@ -58,11 +61,30 @@ public class ResourcesContentProvider extends ContentProposalProvider {
     return collector.toArray(new Object[collector.size()]);
   }
 
-  public List<IResource> getAllResources() {
-    return m_resources;
-  }
-
   public ILabelProvider getLabelProvider() {
     return m_labelProvider;
   }
+
+  @Override
+  public final Object[] getElements(Object inputElement) {
+    return getElements();
+  }
+
+  public Object[] getElements() {
+    return m_elements.toArray(new Object[m_elements.size()]);
+  }
+
+  public void setElements(Object[] resources) {
+    m_elements.clear();
+    m_elements.addAll(Arrays.asList(resources));
+  }
+
+  public boolean remove(Object element) {
+    return m_elements.remove(element);
+  }
+
+  public boolean add(Object element) {
+    return m_elements.add(element);
+  }
+
 }

@@ -51,6 +51,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineProcess;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ProjectsTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -189,8 +190,8 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
         }
       };
       getRootPage().accept(visitor);
-      m_viewer.expandToLevel(4);
       if (projectPages.size() > 0) {
+        m_viewer.setExpandedElements(projectPages.toArray(new IPage[projectPages.size()]));
         m_viewer.setSelection(new StructuredSelection(projectPages.get(0)));
       }
     }
@@ -609,6 +610,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     @Override
     protected void loadChildrenImpl() {
       new ProjectsTablePage(this);
+      new LibrariesTablePage(this);
     }
 
     @Override

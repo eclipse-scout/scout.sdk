@@ -216,6 +216,10 @@ public class PluginModelHelper {
       return existing != null;
     }
 
+    public IPluginImport[] getAllDependencies() {
+      return m_model.getPluginBase().getImports();
+    }
+
     private IPluginImport getDependency(String pluginId) {
       if (pluginId == null || pluginId.length() < 1) return null;
       for (IPluginImport existing : m_model.getPluginBase().getImports()) {

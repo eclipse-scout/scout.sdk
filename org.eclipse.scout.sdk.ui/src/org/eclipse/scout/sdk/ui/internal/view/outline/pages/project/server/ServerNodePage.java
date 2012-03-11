@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom.CustomServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
@@ -140,6 +141,12 @@ public class ServerNodePage extends AbstractPage {
     }
     catch (Exception e) {
       ScoutSdkUi.logWarning("Error occured during loading '" + CustomServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+    }
+    try {
+      new LibrariesTablePage(this, getScoutResource());
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
     }
   }
 

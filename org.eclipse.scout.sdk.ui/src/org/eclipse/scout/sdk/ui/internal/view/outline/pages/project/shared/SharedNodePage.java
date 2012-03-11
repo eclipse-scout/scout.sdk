@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.operation.util.wellform.WellformSharedBundleOperati
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -83,6 +84,12 @@ public class SharedNodePage extends AbstractPage {
     }
     catch (Exception e) {
       ScoutSdkUi.logWarning("could not create LookupCallTablePage in project '" + getScoutResource().getRootPackageName() + "'", e);
+    }
+    try {
+      new LibrariesTablePage(this, getScoutResource());
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
     }
   }
 

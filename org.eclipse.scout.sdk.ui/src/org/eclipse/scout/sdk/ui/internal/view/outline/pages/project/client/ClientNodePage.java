@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.SearchFormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.AllPagesTablePage;
@@ -157,6 +158,12 @@ public class ClientNodePage extends AbstractPage {
     new OutlineTablePage(this);
     new AllPagesTablePage(this);
     new TemplateTablePage(this);
+    try {
+      new LibrariesTablePage(this, getScoutResource());
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+    }
   }
 
   @SuppressWarnings("unchecked")

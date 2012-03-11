@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.library;
 
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -18,14 +19,17 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 /**
  * <h3>{@link LibraryNodePage}</h3> ...
  * 
- * @author aho
+ * @author Andreas Hoegger
  * @since 3.8.0 28.02.2012
  */
 public class LibraryNodePage extends AbstractPage {
 
-  public LibraryNodePage(IPage parent) {
+  private IJavaProject m_project;
+
+  public LibraryNodePage(IPage parent, IJavaProject project) {
+    m_project = project;
     setParent(parent);
-    setName("TODO LibName");
+    setName(project.getElementName());
     // TODO create library image
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default));
   }
@@ -34,5 +38,4 @@ public class LibraryNodePage extends AbstractPage {
   public String getPageId() {
     return IScoutPageConstants.LIBRARIES_NODE_PAGE;
   }
-
 }

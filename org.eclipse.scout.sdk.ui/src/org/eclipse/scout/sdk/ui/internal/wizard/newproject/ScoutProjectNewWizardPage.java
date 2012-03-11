@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionP
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.validation.BundleValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -255,21 +256,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   protected IStatus getStatusProjectName() {
-    if (StringUtility.isNullOrEmpty(getProjectName())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectNameMissing"));
-    }
-    if (getProjectName().contains("..")) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid project names are similar to 'org.eclipse.testapp'.");
-    }
-    if (getProjectName().matches("[a-zA-Z]{1}[a-zA-Z0-9\\.]*[a-zA-Z]{1}")) {
-      if (getProjectName().matches(".*[A-Z].*")) {
-        return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "Project name should contain only lower case characters (e.g. 'org.eclipse.testapp').");
-      }
-    }
-    else {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project name is not valid. Valid project names are similar to 'org.eclipse.testapp'.");
-    }
-    return Status.OK_STATUS;
+    return BundleValidator.validateNewBundleName(getProjectName());
   }
 
   protected IStatus getStatusProjectAlias() {

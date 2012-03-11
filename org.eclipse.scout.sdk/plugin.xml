@@ -196,4 +196,20 @@
             referenceId="fill.ui.swt">
       </operation>
    </extension>
+   <extension
+         id="org.eclipse.scout.sdk.ScoutLibraryNature"
+         name="Scout Library Bundle"
+         point="org.eclipse.core.resources.natures">
+      <runtime>
+         <run
+               class="org.eclipse.scout.sdk.ScoutLibraryNature">
+         </run>
+      </runtime>
+      <requires-nature
+            id="org.eclipse.jdt.core.javanature">
+      </requires-nature>
+      <requires-nature
+            id="org.eclipse.pde.PluginNature">
+      </requires-nature>
+   </extension>
 </plugin>
