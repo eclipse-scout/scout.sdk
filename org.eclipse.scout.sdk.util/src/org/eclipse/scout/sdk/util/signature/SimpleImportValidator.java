@@ -35,7 +35,7 @@ public class SimpleImportValidator implements IImportValidator {
   }
 
   @Override
-  public String getSimpleTypeRef(String singleTypeSignature) {
+  public String getTypeName(String singleTypeSignature) {
     String prefix = "";
     if (EXT_REGEX.matcher(singleTypeSignature).matches()) {
       prefix = "? extends ";

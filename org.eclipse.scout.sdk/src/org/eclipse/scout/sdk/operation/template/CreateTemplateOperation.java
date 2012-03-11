@@ -211,7 +211,7 @@ public class CreateTemplateOperation implements IOperation {
       Matcher superClassMatcher = Pattern.compile("\\sextends\\s*(" + Regex.REGEX_JAVAFIELD + "(\\<[^>]*\\>)?)", Pattern.MULTILINE).matcher(getFormField().getSource());
       if (superClassMatcher.find()) {
         edit.addChild(new ReplaceEdit(getFormField().getSourceRange().getOffset() + superClassMatcher.start(1), superClassMatcher.end(1) - superClassMatcher.start(1),
-            validator.getSimpleTypeRef(Signature.createTypeSignature(templateType.getFullyQualifiedName(), true))));
+            validator.getTypeName(Signature.createTypeSignature(templateType.getFullyQualifiedName(), true))));
       }
       IMethod templateFieldGetter = ScoutTypeUtility.getFormFieldGetterMethod(getFormField(), hierarchy);
       if (TypeUtility.exists(templateFieldGetter)) {
@@ -271,7 +271,7 @@ public class CreateTemplateOperation implements IOperation {
         }
         Matcher deprecatedMatcher = Pattern.compile("(public|protected|private)\\s*(" + formField.getElementName() + "|" + fqFormFieldName + ")", Pattern.MULTILINE).matcher(methodSource);
         if (deprecatedMatcher.find()) {
-          edit.addChild(new InsertEdit(getterMethod.getSourceRange().getOffset() + deprecatedMatcher.start(), "@" + validator.getSimpleTypeRef(Signature.createTypeSignature(Deprecated.class.getName(), true)) + NL));
+          edit.addChild(new InsertEdit(getterMethod.getSourceRange().getOffset() + deprecatedMatcher.start(), "@" + validator.getTypeName(Signature.createTypeSignature(Deprecated.class.getName(), true)) + NL));
         }
         Matcher returnMatcher = Pattern.compile("(\\s*return\\s*)getFieldByClass\\([^;]*\\;", Pattern.MULTILINE).matcher(methodSource);
         if (returnMatcher.find()) {

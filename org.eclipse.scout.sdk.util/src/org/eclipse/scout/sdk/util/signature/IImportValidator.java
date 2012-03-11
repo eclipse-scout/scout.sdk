@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,15 +15,15 @@ import org.eclipse.jdt.core.Signature;
 public interface IImportValidator {
 
   /**
-   * to evaluate if an type can be imported and used as simple type name within
-   * a context.
+   * To get the scope qualified name to use for this signature.
    * 
    * @see Signature
    * @param singleTypeSignature
    *          a simple type signature e.g. 'Ljava.lang.String;'
-   * @return
+   * @return a simple name if the import is not used so far (e.g. String) or the fully qualified name if there is an
+   *         other type with the same simple name in the scope (e.g. java.lang.String).
    */
-  String getSimpleTypeRef(String singleTypeSignature);
+  String getTypeName(String singleTypeSignature);
 
   /**
    * @return the imports has to be created of this validator

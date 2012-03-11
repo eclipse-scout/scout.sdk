@@ -66,8 +66,8 @@ public class LocalLookupCallNewOperation implements IOperation {
     MethodOverrideOperation execCreateLookupRowsMethodOp = new MethodOverrideOperation(m_outLookupCall, "execCreateLookupRows", false) {
       @Override
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        String refLookupRow = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.LookupRow, true));
-        String refArrayList = validator.getSimpleTypeRef(Signature.createTypeSignature(ArrayList.class.getName(), true));
+        String refLookupRow = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.LookupRow, true));
+        String refArrayList = validator.getTypeName(Signature.createTypeSignature(ArrayList.class.getName(), true));
         StringBuilder body = new StringBuilder();
         body.append(refArrayList + "<" + refLookupRow + "> rows = new " + refArrayList + "<" + refLookupRow + ">();\n");
         body.append("  " + ScoutUtility.getCommentBlock("create lookup rows here.") + "\n");

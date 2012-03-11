@@ -75,7 +75,7 @@ public class ServiceOperationNewOperation implements IOperation {
         }
       }
     }
-    methodBody.append(") throws " + validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)));
+    methodBody.append(") throws " + validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)));
 
     // interface
     workingCopyManager.register(m_serviceInterface.getCompilationUnit(), monitor);

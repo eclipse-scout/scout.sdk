@@ -72,21 +72,21 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
           sourceBuilder.append("// outline tree\n");
-          String treeFormRef = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.DefaultOutlineTreeForm, true));
+          String treeFormRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.DefaultOutlineTreeForm, true));
           sourceBuilder.append(treeFormRef + " treeForm = new " + treeFormRef + "();\n");
           ScoutIconDesc icon = m_scoutProject.getIconProvider().getIcon("eclipse_scout");
           if (icon != null) {
-            String iconsRef = validator.getSimpleTypeRef(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
+            String iconsRef = validator.getTypeName(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
             sourceBuilder.append("treeForm.setIconId(" + iconsRef + "." + icon.getConstantField().getElementName() + ");\n");
           }
           sourceBuilder.append("treeForm.startView();\n");
           sourceBuilder.append("\n");
           // tree form
           sourceBuilder.append("//outline table\n");
-          String tableFormRef = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.DefaultOutlineTableForm, true));
+          String tableFormRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.DefaultOutlineTableForm, true));
           sourceBuilder.append(tableFormRef + " tableForm=new " + tableFormRef + "();\n");
           if (icon != null) {
-            String iconsRef = validator.getSimpleTypeRef(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
+            String iconsRef = validator.getTypeName(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
             sourceBuilder.append("tableForm.setIconId(" + iconsRef + "." + icon.getConstantField().getElementName() + ");\n");
           }
           sourceBuilder.append("tableForm.startView();\n");

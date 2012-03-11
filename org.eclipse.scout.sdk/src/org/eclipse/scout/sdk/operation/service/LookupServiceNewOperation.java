@@ -49,9 +49,9 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
     }
     else {
       IImportValidator validator = new CompilationUnitImportValidator(serviceImplementation.getCompilationUnit());
-      String lookupRowRef = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.LookupRow, true));
-      String lookupCallRef = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.LookupCall, true));
-      String processingExceptionRef = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+      String lookupRowRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.LookupRow, true));
+      String lookupCallRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.LookupCall, true));
+      String processingExceptionRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
 
       StringBuffer methodSource = new StringBuffer();
       methodSource.append("public ");

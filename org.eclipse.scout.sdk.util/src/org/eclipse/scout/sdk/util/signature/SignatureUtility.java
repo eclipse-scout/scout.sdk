@@ -276,7 +276,7 @@ public final class SignatureUtility {
                 fqName = fqName + ".";
               }
               fqName = fqName + resolvedTypeName[0][1];
-              sigBuilder.append(validator.getSimpleTypeRef(Signature.createTypeSignature(fqName, true)));
+              sigBuilder.append(validator.getTypeName(Signature.createTypeSignature(fqName, true)));
             }
           }
           else {
@@ -285,7 +285,7 @@ public final class SignatureUtility {
         }
         else {
           // resolved
-          sigBuilder.append(validator.getSimpleTypeRef(signature));
+          sigBuilder.append(validator.getTypeName(signature));
         }
         if (typeArguments != null && typeArguments.length > 0) {
           sigBuilder.append("<");

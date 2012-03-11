@@ -110,7 +110,7 @@ public class SmartFieldNewOperation implements IOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String lookupCallRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getLookupCall().getFullyQualifiedName(), true));
+          String lookupCallRef = validator.getTypeName(Signature.createTypeSignature(getLookupCall().getFullyQualifiedName(), true));
           sourceBuilder.append("return " + lookupCallRef + ".class;\n");
           return sourceBuilder.toString();
         }

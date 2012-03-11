@@ -64,7 +64,7 @@ public class CompilationUnitImportValidator implements IImportValidator {
   }
 
   @Override
-  public String getSimpleTypeRef(String singleTypeSignature) {
+  public String getTypeName(String singleTypeSignature) {
     String prefix = "";
     if (singleTypeSignature.matches("^\\+.*$")) {
       prefix = "? extends ";

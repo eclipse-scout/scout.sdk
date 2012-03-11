@@ -135,7 +135,7 @@ public class OutlineNewOperation implements IOperation {
             listName = matcher.group(1);
           }
           if (index > 0) {
-            String addSource = listName + ".add(" + validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class);";
+            String addSource = listName + ".add(" + validator.getTypeName(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class);";
             if (methodBody.get().contains(addSource)) {
               return;
             }
@@ -154,7 +154,7 @@ public class OutlineNewOperation implements IOperation {
               String list = matcher.group(1).trim();
               boolean appendComma = !list.endsWith(",");
               int pos = matcher.end(1);
-              String addSource = validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class";
+              String addSource = validator.getTypeName(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class";
               if (methodBody.get().contains(addSource)) {
                 return;
               }
@@ -181,8 +181,8 @@ public class OutlineNewOperation implements IOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder builder = new StringBuilder();
-          String arrayListRef = validator.getSimpleTypeRef(Signature.createTypeSignature(ArrayList.class.getName(), true));
-          String outlineRef = validator.getSimpleTypeRef(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true));
+          String arrayListRef = validator.getTypeName(Signature.createTypeSignature(ArrayList.class.getName(), true));
+          String outlineRef = validator.getTypeName(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true));
           builder.append(arrayListRef + "<Class> outlines = new " + arrayListRef + "<Class>();\n");
           builder.append("outlines.add(" + outlineRef + ".class);\n");
           builder.append("return outlines.toArray(new Class[outlines.size()]);");
@@ -217,7 +217,7 @@ public class OutlineNewOperation implements IOperation {
         source.append("public ");
         source.append(className);
         source.append("() { super(Desktop.this, ");
-        source.append(validator.getSimpleTypeRef(Signature.createTypeSignature(OutlineNewOperation.this.getTypeName(), true)));
+        source.append(validator.getTypeName(Signature.createTypeSignature(OutlineNewOperation.this.getTypeName(), true)));
         source.append(".class); }");
       }
     };

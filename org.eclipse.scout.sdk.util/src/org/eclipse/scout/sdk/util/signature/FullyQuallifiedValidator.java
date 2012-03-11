@@ -27,7 +27,7 @@ public class FullyQuallifiedValidator implements IImportValidator {
   }
 
   @Override
-  public String getSimpleTypeRef(String singleTypeSignature) {
+  public String getTypeName(String singleTypeSignature) {
     String pckName = Signature.getSignatureQualifier(singleTypeSignature);
     String simpleName = Signature.getSignatureSimpleName(singleTypeSignature);
     return pckName + "." + simpleName;

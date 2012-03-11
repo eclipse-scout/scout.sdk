@@ -85,7 +85,7 @@ public class WizardStepNewOperation implements IOperation {
     InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedWizardStep(), getDeclaringType(), true) {
       @Override
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        String wizardStepRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getField().getFullyQualifiedName(), true));
+        String wizardStepRef = validator.getTypeName(Signature.createTypeSignature(getField().getFullyQualifiedName(), true));
         StringBuilder source = new StringBuilder();
         source.append("return getStep(" + wizardStepRef + ".class);");
         return source.toString();

@@ -102,7 +102,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
       MethodOverrideOperation iconIdOverrideOp = new MethodOverrideOperation(form, "getConfiguredIconId", true) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String iconRef = validator.getSimpleTypeRef(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
+          String iconRef = validator.getTypeName(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
           return "  return " + iconRef + "." + icon.getConstantField().getElementName() + ";";
         }
       };
@@ -179,9 +179,9 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         StringBuilder builder = new StringBuilder();
         if (TypeUtility.exists(serviceInterface)) { /* service interface can be null on a client only project */
-          String servicesRef = validator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.SERVICES, true));
-          String serviceRef = validator.getSimpleTypeRef(Signature.createTypeSignature(serviceInterface.getFullyQualifiedName(), true));
-          String formDataRef = validator.getSimpleTypeRef(Signature.createTypeSignature(fqnFormData, true));
+          String servicesRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.SERVICES, true));
+          String serviceRef = validator.getTypeName(Signature.createTypeSignature(serviceInterface.getFullyQualifiedName(), true));
+          String formDataRef = validator.getTypeName(Signature.createTypeSignature(fqnFormData, true));
           builder.append(serviceRef + " service = " + servicesRef + ".getService(" + serviceRef + ".class);\n");
           builder.append(formDataRef + " formData = new " + formDataRef + "();\n");
           builder.append("exportFormData(formData);\n");
@@ -206,11 +206,11 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
           sourceBuilder.append("// desktop form\n");
-          String treeFormRef = validator.getSimpleTypeRef(Signature.createTypeSignature(form.getFullyQualifiedName(), true));
+          String treeFormRef = validator.getTypeName(Signature.createTypeSignature(form.getFullyQualifiedName(), true));
           sourceBuilder.append(treeFormRef + " desktopForm = new " + treeFormRef + "();\n");
           ScoutIconDesc icn = m_scoutProject.getIconProvider().getIcon("eclipse_scout");
           if (icn != null) {
-            String iconsRef = validator.getSimpleTypeRef(Signature.createTypeSignature(icn.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
+            String iconsRef = validator.getTypeName(Signature.createTypeSignature(icn.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
             sourceBuilder.append("desktopForm.setIconId(" + iconsRef + "." + icn.getConstantField().getElementName() + ");\n");
           }
           sourceBuilder.append("desktopForm.startView();");

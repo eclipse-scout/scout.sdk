@@ -52,7 +52,7 @@ public class SmartTableColumnNewOperation extends TableColumnNewOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String codeTypeRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getCodeType().getFullyQualifiedName(), true));
+          String codeTypeRef = validator.getTypeName(Signature.createTypeSignature(getCodeType().getFullyQualifiedName(), true));
           sourceBuilder.append("return " + codeTypeRef + ".class;\n");
           return sourceBuilder.toString();
         }
@@ -65,7 +65,7 @@ public class SmartTableColumnNewOperation extends TableColumnNewOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String lookupCallRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getLookupCall().getFullyQualifiedName(), true));
+          String lookupCallRef = validator.getTypeName(Signature.createTypeSignature(getLookupCall().getFullyQualifiedName(), true));
           sourceBuilder.append("return " + lookupCallRef + ".class;\n");
           return sourceBuilder.toString();
         }

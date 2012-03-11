@@ -135,7 +135,7 @@ public class SearchFormNewOperation implements IOperation {
       MethodOverrideOperation overrideOp = new MethodOverrideOperation(getTablePage(), "getConfiguredSearchForm") {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String simpleRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getCreatedFormType().getFullyQualifiedName(), true));
+          String simpleRef = validator.getTypeName(Signature.createTypeSignature(getCreatedFormType().getFullyQualifiedName(), true));
           return "return " + simpleRef + ".class;";
         }
       };

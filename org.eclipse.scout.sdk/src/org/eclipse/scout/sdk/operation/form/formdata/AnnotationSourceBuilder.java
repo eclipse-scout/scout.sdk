@@ -37,7 +37,7 @@ public class AnnotationSourceBuilder implements ISourceBuilder {
 
   @Override
   public String createSource(IImportValidator validator) {
-    return "@" + validator.getSimpleTypeRef(getAnnotationSignature());
+    return "@" + validator.getTypeName(getAnnotationSignature());
   }
 
   @Override

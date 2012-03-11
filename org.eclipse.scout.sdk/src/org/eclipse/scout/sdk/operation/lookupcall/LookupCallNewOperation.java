@@ -89,7 +89,7 @@ public class LookupCallNewOperation implements IOperation {
       MethodOverrideOperation lookupServiceMethodOp = new MethodOverrideOperation(m_outLookupCall, "getConfiguredService", false) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String serviceTypeRef = validator.getSimpleTypeRef(Signature.createTypeSignature(finalService.getFullyQualifiedName(), true));
+          String serviceTypeRef = validator.getTypeName(Signature.createTypeSignature(finalService.getFullyQualifiedName(), true));
           return "  return " + serviceTypeRef + ".class;";
         }
       };

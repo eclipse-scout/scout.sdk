@@ -53,7 +53,7 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String outlineRef = validator.getSimpleTypeRef(Signature.createTypeSignature(getOutlineType().getFullyQualifiedName(), true));
+          String outlineRef = validator.getTypeName(Signature.createTypeSignature(getOutlineType().getFullyQualifiedName(), true));
           sourceBuilder.append("super(Desktop.this, " + outlineRef + ".class);");
           return sourceBuilder.toString();
         }

@@ -110,10 +110,10 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       StringBuilder content = new StringBuilder();
       content.append("@Override\n");
       content.append("protected void execResetSearchFilter(");
-      content.append(icuvalidator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.SearchFilter, true)) + " searchFilter) ");
-      content.append("throws " + icuvalidator.getSimpleTypeRef(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)) + "{\n");
+      content.append(icuvalidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.SearchFilter, true)) + " searchFilter) ");
+      content.append("throws " + icuvalidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)) + "{\n");
       content.append(SdkProperties.TAB + "super.execResetSearchFilter(searchFilter);\n");
-      String simpleFormDataName = icuvalidator.getSimpleTypeRef(Signature.createTypeSignature(m_formDataType.getFullyQualifiedName(), true));
+      String simpleFormDataName = icuvalidator.getTypeName(Signature.createTypeSignature(m_formDataType.getFullyQualifiedName(), true));
       content.append(SdkProperties.TAB + simpleFormDataName + " formData = new " + simpleFormDataName + "();\n");
       content.append(SdkProperties.TAB + "exportFormData(formData);\n");
       content.append(SdkProperties.TAB + "searchFilter.setFormData(formData);\n");
@@ -287,7 +287,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
           MethodOverrideOperation codeTypeOp = new MethodOverrideOperation(createdField, "getConfiguredCodeType") {
             @Override
             protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-              String typeRef = validator.getSimpleTypeRef(Signature.createTypeSignature(codeType.getFullyQualifiedName(), true));
+              String typeRef = validator.getTypeName(Signature.createTypeSignature(codeType.getFullyQualifiedName(), true));
               return "return " + typeRef + ".class;";
             }
           };
@@ -310,7 +310,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
             MethodOverrideOperation lookupCallOp = new MethodOverrideOperation(createdField, "getConfiguredLookupCall") {
               @Override
               protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-                String typeRef = validator.getSimpleTypeRef(Signature.createTypeSignature(lookupCall.getFullyQualifiedName(), true));
+                String typeRef = validator.getTypeName(Signature.createTypeSignature(lookupCall.getFullyQualifiedName(), true));
                 return "return " + typeRef + ".class;";
               }
             };
