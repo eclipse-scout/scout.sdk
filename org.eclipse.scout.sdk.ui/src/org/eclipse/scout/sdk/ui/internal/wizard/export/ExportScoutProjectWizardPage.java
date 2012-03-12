@@ -337,7 +337,6 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
     rootNode.setVisible(false);
     for (ExportScoutProjectEntry e : ExportScoutProjectEntryExtensionPoint.getEntries()) {
       if (e.getHandler().isAvailable(getWizard())) {
-        e.getHandler().selectionChanged(getWizard(), true);
         TreeUtility.createNode(rootNode, TYPE_EXPORT_ENTRY, e.getName(), ScoutSdkUi.getImageDescriptor(e.getIcon()), e.getOrder(), e);
       }
     }
