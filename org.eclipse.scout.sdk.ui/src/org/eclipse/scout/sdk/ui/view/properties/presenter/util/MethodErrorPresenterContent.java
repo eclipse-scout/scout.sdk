@@ -87,6 +87,7 @@ public class MethodErrorPresenterContent extends Composite {
         new OperationJob(new ScoutMethodDeleteOperation(getMethod().peekMethod())).schedule();
       }
     });
+
     GridLayout glayout = new GridLayout(3, false);
     glayout.marginHeight = 0;
     glayout.marginWidth = 0;
@@ -141,6 +142,7 @@ public class MethodErrorPresenterContent extends Composite {
     }
     m_deleteButton.setEnabled(method.isImplemented());
     setStatus(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("CustomImplementation")));
+    m_deleteButton.setToolTipText(Texts.get("RemoveXinY", getMethod().getMethodName(), getMethod().getType().getElementName()));
   }
 
   public void setStatus(IStatus status) {
