@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -28,18 +28,11 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
@@ -47,6 +40,7 @@ import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
+import org.eclipse.ui.forms.widgets.ImageHyperlink;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 public class MethodErrorPresenterContent extends Composite {
@@ -55,7 +49,7 @@ public class MethodErrorPresenterContent extends Composite {
   private Hyperlink m_labelLink;
   private Label m_statusLabel;
   private Label m_statusIcon;
-  private Button m_deleteButton;
+  private ImageHyperlink m_deleteButton;
   private ConfigurationMethod m_configurationMethod;
 
   private CustomTooltip m_customTooltip;
@@ -67,33 +61,29 @@ public class MethodErrorPresenterContent extends Composite {
   }
 
   private void createContent(Composite parent) {
-    Control labelArea = createLabelArea(parent);
-    Control bodyArea = createBodyArea(parent);
+    createLabelArea(parent);
+    createBodyArea(parent);
 
     // layout
-    parent.setLayout(new FormLayout());
-    FormData data = new FormData();
-    data.top = new FormAttachment(0, 0);
-    data.left = new FormAttachment(0, 0);
-    data.bottom = new FormAttachment(100, 0);
-    data.right = new FormAttachment(0, 150);
-    labelArea.setLayoutData(data);
-    data = new FormData();
-    data.top = new FormAttachment(0, 0);
-    data.left = new FormAttachment(labelArea, 5);
-    data.bottom = new FormAttachment(100, 0);
-    data.right = new FormAttachment(100, 0);
-    bodyArea.setLayoutData(data);
+    GridLayout bodyLayout = new GridLayout(3, false);
+    bodyLayout.horizontalSpacing = 0;
+    bodyLayout.marginHeight = 0;
+    bodyLayout.marginWidth = 0;
+    bodyLayout.verticalSpacing = 0;
+    parent.setLayout(bodyLayout);
+    parent.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
   }
 
-  private Control createBodyArea(Composite rootArea) {
+  private void createBodyArea(Composite rootArea) {
     Composite area = getToolkit().createComposite(rootArea);
     m_statusIcon = getToolkit().createLabel(area, "");
     m_statusLabel = getToolkit().createLabel(area, "");
-    m_deleteButton = getToolkit().createButton(area, Texts.get("Delete"), SWT.PUSH);
-    m_deleteButton.addSelectionListener(new SelectionAdapter() {
+
+    m_deleteButton = getToolkit().createImageHyperlink(rootArea, SWT.PUSH);
+    m_deleteButton.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolRemove));
+    m_deleteButton.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
-      public void widgetSelected(SelectionEvent e) {
+      public void linkActivated(HyperlinkEvent e) {
         new OperationJob(new ScoutMethodDeleteOperation(getMethod().peekMethod())).schedule();
       }
     });
@@ -103,18 +93,18 @@ public class MethodErrorPresenterContent extends Composite {
     glayout.verticalSpacing = 0;
     glayout.horizontalSpacing = 3;
     area.setLayout(glayout);
+    area.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
+
     m_statusIcon.setLayoutData(new GridData(GridData.BEGINNING));
     m_statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-    GridData gData = new GridData(SWT.DEFAULT, SdkProperties.TOOL_BUTTON_SIZE);
 
-    m_deleteButton.setLayoutData(gData);
+    m_deleteButton.setLayoutData(new GridData(SWT.DEFAULT, SdkProperties.TOOL_BUTTON_SIZE));
     m_deleteButton.setEnabled(false);
-    return area;
   }
 
-  private Control createLabelArea(Composite parent) {
-    Composite area = getToolkit().createComposite(parent);
-    m_labelLink = getToolkit().createHyperlink(area, "", SWT.NONE);
+  private void createLabelArea(Composite parent) {
+    Composite linkComposite = getToolkit().createComposite(parent);
+    m_labelLink = getToolkit().createHyperlink(linkComposite, "", SWT.NONE);
     m_customTooltip = new CustomTooltip(m_labelLink, true);
 
     m_labelLink.addHyperlinkListener(new HyperlinkAdapter() {
@@ -126,15 +116,12 @@ public class MethodErrorPresenterContent extends Composite {
     m_labelLink.setEnabled(false);
 
     // layout
-    GridLayout glayout = new GridLayout(3, false);
-    glayout.marginHeight = 0;
-    glayout.marginWidth = 0;
-    glayout.verticalSpacing = 0;
-    glayout.horizontalSpacing = 3;
-    area.setLayout(glayout);
-    m_labelLink.setLayoutData(new GridData());
+    GridData linkCompData = new GridData();
+    linkCompData.widthHint = 180;
+    linkComposite.setLayoutData(linkCompData);
+    linkComposite.setLayout(new GridLayout(1, true));
 
-    return area;
+    m_labelLink.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false));
   }
 
   public ConfigurationMethod getMethod() {
@@ -153,11 +140,10 @@ public class MethodErrorPresenterContent extends Composite {
       ScoutSdkUi.logWarning("could not create tooltip for '" + method.getMethodName() + "'", e1);
     }
     m_deleteButton.setEnabled(method.isImplemented());
-    setStatus(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Unaccepted value!"));
+    setStatus(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("CustomImplementation")));
   }
 
   public void setStatus(IStatus status) {
-
     Image image = null;
     String message = "";
     if (status != null) {

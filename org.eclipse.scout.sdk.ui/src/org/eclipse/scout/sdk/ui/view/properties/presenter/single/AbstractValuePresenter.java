@@ -204,7 +204,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
             }
           }
           catch (CoreException e) {
-            ScoutSdkUi.logInfo("input is not well fomed " + input);
+            ScoutSdkUi.logInfo("input is not well formed " + input);
             getTextComponent().setForeground(getTextComponent().getDisplay().getSystemColor(SWT.COLOR_RED));
           }
           break;

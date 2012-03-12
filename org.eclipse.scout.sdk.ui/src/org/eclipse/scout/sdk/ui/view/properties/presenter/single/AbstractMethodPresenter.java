@@ -120,10 +120,8 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
     Control content = createContent(m_body);
     Composite buttonArea = getToolkit().createComposite(m_body);
-//    buttonArea.setSize(0, 0);
     Control placeHolderControl = new Canvas(buttonArea, SWT.NONE);
     fillButtonArea(buttonArea);
-//    placeHolderControl.setSize(new Point(1, 1));
 
     //layout
     GridLayout bodyLayout = new GridLayout(3, false);
@@ -134,7 +132,6 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     m_body.setLayout(bodyLayout);
 
     GridData bodyLayoutData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-    //bodyLayoutData.horizontalAlignment = SWT.LEFT;
     m_body.setLayoutData(bodyLayoutData);
 
     GridData linkCompData = new GridData();
@@ -189,9 +186,9 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
         init(configurationMethod);
         m_body.setVisible(true);
         m_errorContent.setVisible(false);
+
         ((GridData) m_errorContent.getLayoutData()).exclude = true;
         ((GridData) m_body.getLayoutData()).exclude = false;
-
       }
       catch (CoreException e) {
         m_errorContent.setMethod(configurationMethod);
