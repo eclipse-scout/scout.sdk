@@ -30,8 +30,12 @@ public class LibraryNodePage extends AbstractPage {
     m_project = project;
     setParent(parent);
     setName(project.getElementName());
-    // TODO create library image
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Library));
+  }
+
+  @Override
+  public boolean isFolder() {
+    return true;
   }
 
   @Override

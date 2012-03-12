@@ -55,10 +55,12 @@ public class LibrariesTablePage extends AbstractPage {
     m_ownerBundle = ownerBundle;
     setParent(parent);
     setName(Texts.get("Libraries"));
+    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Libraries));
+  }
 
-    // TODO create libraries icon
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default));
-
+  @Override
+  public boolean isFolder() {
+    return true;
   }
 
   @Override

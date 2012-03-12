@@ -47,7 +47,6 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
     m_jarSelectionWizardPage.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        System.out.println("PROP CHANGED '" + evt.getPropertyName() + "'");
         if (evt.getPropertyName().equals(JarSelectionWizardPage.PROP_JAR_FILES)) {
           // recompute bundle name
           StringBuilder nameBuilder = new StringBuilder();

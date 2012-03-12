@@ -216,6 +216,11 @@ public class PluginModelHelper {
       return existing != null;
     }
 
+    /**
+     * Returns all dependencies defined in the plug-in project associated with this helper.
+     * 
+     * @return an array of import objects
+     */
     public IPluginImport[] getAllDependencies() {
       return m_model.getPluginBase().getImports();
     }

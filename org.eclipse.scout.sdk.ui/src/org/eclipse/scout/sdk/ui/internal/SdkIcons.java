@@ -115,6 +115,9 @@ public interface SdkIcons {
   String Keystrokes = "keystrokes.png";
   String KeystrokeAdd = "keystroke_add.png";
   String KeystrokeRemove = "keystroke_remove.png";
+  String Library = "library.png";
+  String Libraries = "libraries.png";
+  String LibrariesAdd = "libraries_add.png";
   String LookupCall = "lookupCall.png";
   String LookupCalls = "lookupCalls.png";
   String LookupCallAdd = "lookupCall_add.png";

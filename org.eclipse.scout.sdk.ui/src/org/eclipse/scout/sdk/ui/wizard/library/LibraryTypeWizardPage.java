@@ -37,6 +37,7 @@ import org.eclipse.pde.core.plugin.IPluginModel;
 import org.eclipse.pde.internal.ui.dialogs.PluginSelectionDialog;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -101,8 +102,8 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
   public LibraryTypeWizardPage(IScoutBundle ownerBundle) {
     super(LibraryTypeWizardPage.class.getName());
 
-    setTitle("New Library Bundle");
-    setDescription("TODO ");
+    setTitle(Texts.get("NewLibraryBundle"));
+    setDescription(Texts.get("NewLibraryBundleDesc"));
     // defaults
     setLibraryType(LibraryType.Plugin);
     TreeSet<IJavaProject> libraryUserBundles = new TreeSet<IJavaProject>(new P_JavaProjectComparator());
@@ -114,7 +115,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_bundleNameField = getFieldToolkit().createStyledTextField(parent, "Bundle name"); // TODO NLS
+    m_bundleNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("BundleName"));
     m_bundleNameField.setText(getBundleName());
     m_bundleNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -126,7 +127,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
 
     m_unpackButton = new Button(parent, SWT.CHECK);
     m_unpackButton.setVisible(false);
-    m_unpackButton.setText("Unpack the jar archives in the libary bundle.");
+    m_unpackButton.setText(Texts.get("UnpackJarFiles"));
     m_unpackButton.setSelection(isUnpackJarFiles());
     m_unpackButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -152,7 +153,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     m_pluginRadioButton.setSelection(getLibraryType() == LibraryType.Plugin);
     m_pluginRadioButton.addSelectionListener(radioButtonListener);
     m_pluginRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.Plugin);
-    m_pluginRadioButton.setText("Create a plug-in to be referenced from library users.");
+    m_pluginRadioButton.setText(Texts.get("CreatePluginForLib"));
     Control userPluginBox = createUserPluginBox(group);
 
     //line separator
@@ -162,7 +163,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     m_fragmentRadioButton.setSelection(getLibraryType() == LibraryType.Fragment);
     m_fragmentRadioButton.addSelectionListener(radioButtonListener);
     m_fragmentRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.Fragment);
-    m_fragmentRadioButton.setText("Create a fragment with the host bundle as the library user.");
+    m_fragmentRadioButton.setText(Texts.get("CreateFragmentForLib"));
 
     Control fragmentBox = createFragmentBox(group);
 
@@ -174,7 +175,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     m_systemFragmentRadioButton.setSelection(getLibraryType() == LibraryType.SystemBundleFragment);
     m_systemFragmentRadioButton.addSelectionListener(radioButtonListener);
     m_systemFragmentRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.SystemBundleFragment);
-    m_systemFragmentRadioButton.setText("Create a fragemnt to the system bundle. The library can be used from any bundle.");
+    m_systemFragmentRadioButton.setText(Texts.get("CreateSystemFragmentForLib"));
 
     //layout
     group.setLayout(new GridLayout(1, true));
@@ -207,7 +208,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     m_userBundleViewer.setInput(libraryUserBundles.toArray(new Object[libraryUserBundles.size()]));
     Composite buttonGroup = new Composite(box, SWT.NONE);
     m_addUserBundleButton = new Button(buttonGroup, SWT.PUSH | SWT.FLAT);
-    m_addUserBundleButton.setText("add");
+    m_addUserBundleButton.setText(Texts.get("Add"));
     m_addUserBundleButton.setEnabled(getLibraryType() == LibraryType.Plugin);
     m_addUserBundleButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -216,7 +217,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
     m_removeUserBundleButton = new Button(buttonGroup, SWT.PUSH | SWT.FLAT);
-    m_removeUserBundleButton.setText("remove");
+    m_removeUserBundleButton.setText(Texts.get("Remove"));
     m_removeUserBundleButton.setEnabled(false);
     m_removeUserBundleButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -255,7 +256,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_hostBundleIdField.setEnabled(getLibraryType() == LibraryType.Fragment);
     m_fragmentHostBundleSelectionButton = new Button(m_hostBundleIdField, SWT.PUSH | SWT.FLAT);
-    m_fragmentHostBundleSelectionButton.setText("Bundle");
+    m_fragmentHostBundleSelectionButton.setText(Texts.get("Bundle"));
     m_fragmentHostBundleSelectionButton.setEnabled(getLibraryType() == LibraryType.Fragment);
     m_fragmentHostBundleSelectionButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -466,10 +467,10 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusHostBundle() {
     String fragmentHost = getFragmentHost();
     if (StringUtility.isNullOrEmpty(fragmentHost)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Fragment host bundle can not be null.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("FragmentHostBundleNotFound"));
     }
     else if (Platform.getBundle(fragmentHost) == null && !ResourcesPlugin.getWorkspace().getRoot().getProject(fragmentHost).exists()) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Fragment host bundle does not exist.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("FragmentHostBundleNotExists"));
     }
     else {
       return Status.OK_STATUS;

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.action.create;
 
 import org.eclipse.jface.wizard.IWizard;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.library.LibraryNewWizard;
@@ -31,7 +32,7 @@ public class LibraryBundleNewAction extends AbstractWizardAction {
    * @param image
    */
   public LibraryBundleNewAction() {
-    super("New Library Bundle", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Default));
+    super(Texts.get("NewLibraryBundlePopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LibrariesAdd));
   }
 
   @Override
@@ -46,5 +47,4 @@ public class LibraryBundleNewAction extends AbstractWizardAction {
   public void setOwnerBundle(IScoutBundle ownerBundle) {
     m_ownerBundle = ownerBundle;
   }
-
 }

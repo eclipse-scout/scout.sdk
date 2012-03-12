@@ -37,6 +37,7 @@ import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
  * @author Andreas Hoegger
  * @since 3.8.0 09.03.2012
  */
+@SuppressWarnings("restriction")
 public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
   private static final String DIALOG_SETTINGS = JavaProjectSelectionDialog.class.getName();
   private IJavaProject[] m_javaProjects;
