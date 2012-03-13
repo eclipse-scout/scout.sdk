@@ -28,17 +28,34 @@ public class ScoutBundleNewOperation extends ScoutProjectNewOperation {
   }
 
   private void putExistingProjectProperties() {
+    IScoutBundle uiSwing = m_project.getUiSwingBundle();
+
     IScoutBundle client = m_project.getClientBundle();
-    IScoutBundle shared = m_project.getSharedBundle();
-    IScoutBundle server = m_project.getServerBundle();
     if (client != null) {
       getProperties().setProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, client.getProject().getName());
+      addCreatedBundle(client.getJavaProject());
     }
+
+    IScoutBundle shared = m_project.getSharedBundle();
     if (shared != null) {
       getProperties().setProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, shared.getProject().getName());
+      addCreatedBundle(shared.getJavaProject());
     }
+
+    IScoutBundle server = m_project.getServerBundle();
     if (server != null) {
       getProperties().setProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, server.getProject().getName());
+      addCreatedBundle(server.getJavaProject());
+    }
+    if (uiSwing != null) {
+      getProperties().setProperty(CreateUiSwingPluginOperation.PROP_BUNDLE_SWING_NAME, uiSwing.getProject().getName());
+      addCreatedBundle(uiSwing.getJavaProject());
+    }
+
+    IScoutBundle uiSwt = m_project.getUiSwtBundle();
+    if (uiSwt != null) {
+      getProperties().setProperty(CreateUiSwtPluginOperation.PROP_BUNDLE_SWT_NAME, uiSwt.getProject().getName());
+      addCreatedBundle(uiSwt.getJavaProject());
     }
   }
 

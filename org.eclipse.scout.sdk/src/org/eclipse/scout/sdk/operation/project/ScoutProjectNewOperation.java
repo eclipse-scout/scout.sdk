@@ -47,7 +47,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
 
   @Override
   public String getOperationName() {
-    return "Create new Scout Project";
+    return "Creating new Scout project...";
   }
 
   @Override
