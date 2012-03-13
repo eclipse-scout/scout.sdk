@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
@@ -40,19 +41,19 @@ public class IconContentProvider extends ContentProposalProvider implements IStr
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    if (searchPattern == null) {
+    if (!StringUtility.hasText(searchPattern)) {
       searchPattern = "*";
     }
     else {
-      searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+      searchPattern = searchPattern.replaceAll("\\*$", "").toLowerCase() + "*";
     }
-    searchPattern = searchPattern.toLowerCase() + "*";
+
+    char[] pattern = searchPattern.toCharArray();
     ArrayList<Object> accepted = new ArrayList<Object>();
     for (Object element : getElements(this)) {
       String iconName = m_labelProvider.getText(element);
-      if (iconName != null && CharOperation.match(searchPattern.toCharArray(), iconName.toCharArray(), false)) {
+      if (iconName != null && CharOperation.match(pattern, iconName.toCharArray(), false)) {
         accepted.add(element);
-        break;
       }
     }
     return accepted.toArray(new Object[accepted.size()]);

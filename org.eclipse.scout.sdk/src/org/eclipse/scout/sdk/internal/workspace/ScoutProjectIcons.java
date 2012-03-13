@@ -152,9 +152,14 @@ public class ScoutProjectIcons implements IIconProvider {
         if (Flags.isPublic(field.getFlags()) && field.getSource() != null && field.getSource().contains(" String ")) {
           String source = field.getSource();
           String iconDeclaration = ScoutUtility.removeComments(source);
-          String iconSimpleName = null;
           try {
-            iconSimpleName = Regex.getFieldDeclarationRightHandSide(iconDeclaration);
+            String iconSimpleName = Regex.getFieldDeclarationRightHandSide(iconDeclaration);
+            if (iconSimpleName.startsWith("\"")) {
+              iconSimpleName = iconSimpleName.substring(1);
+            }
+            if (iconSimpleName.endsWith("\"")) {
+              iconSimpleName = iconSimpleName.substring(0, iconSimpleName.length() - 1);
+            }
             collector.put(iconSimpleName, new ScoutIconDesc(field.getElementName(), Regex.getIconSimpleName(iconSimpleName), field, inherited));
           }
           catch (Exception e) {

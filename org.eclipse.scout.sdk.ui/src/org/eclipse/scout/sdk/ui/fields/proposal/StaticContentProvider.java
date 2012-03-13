@@ -35,7 +35,7 @@ public class StaticContentProvider extends ContentProposalProvider {
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    if (StringUtility.isNullOrEmpty(searchPattern)) {
+    if (!StringUtility.hasText(searchPattern)) {
       searchPattern = "*";
     }
 

@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 
 /**
@@ -45,7 +46,7 @@ public class ResourcesContentProvider extends ContentProposalProvider implements
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    if (searchPattern == null) {
+    if (!StringUtility.hasText(searchPattern)) {
       searchPattern = "*";
     }
     else {

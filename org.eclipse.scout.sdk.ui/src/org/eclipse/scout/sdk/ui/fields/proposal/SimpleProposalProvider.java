@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 
 public class SimpleProposalProvider extends ContentProposalProvider {
 
@@ -31,13 +32,12 @@ public class SimpleProposalProvider extends ContentProposalProvider {
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    if (searchPattern == null) {
+    if (!StringUtility.hasText(searchPattern)) {
       searchPattern = "*";
     }
     else {
-      searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+      searchPattern = searchPattern.replaceAll("\\*$", "").toLowerCase() + "*";
     }
-    searchPattern = searchPattern.toLowerCase() + "*";
 
     ArrayList<Object> props = new ArrayList<Object>();
     for (SimpleProposal prop : getProposals()) {

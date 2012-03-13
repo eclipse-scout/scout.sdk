@@ -20,6 +20,7 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -119,7 +120,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
     @Override
     public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
       ensureCache();
-      if (searchPattern == null) {
+      if (!StringUtility.hasText(searchPattern)) {
         searchPattern = "*";
       }
       else {

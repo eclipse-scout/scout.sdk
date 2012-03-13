@@ -68,18 +68,9 @@ public class IconsEditor extends EditorPart {
     Composite body = m_form.getBody();
     body.setLayout(new FillLayout());
     createFormBody(body);
-//    m_form.reflow(true);
   }
 
   private void createFormBody(Composite parent) {
-    // final Button hideInheritedButton=m_toolkit.createButton(parent, "hide inherited rows", SWT.CHECK);
-    // hideInheritedButton.setSelection(true);
-    // hideInheritedButton.addSelectionListener(new SelectionAdapter(){
-    // @Override
-    // public void widgetSelected(SelectionEvent e){
-    // setHideInherited(hideInheritedButton.getSelection());
-    // }
-    // });
     m_table = m_toolkit.createTable(parent, SWT.FULL_SELECTION);
     m_table.setLinesVisible(true);
     m_table.setHeaderVisible(true);
@@ -101,15 +92,14 @@ public class IconsEditor extends EditorPart {
     m_viewer = new TableViewer(m_table);
 
     P_IconLabelProvider labelProvider = new P_IconLabelProvider(m_table.getDisplay());
+    IconContentProvider contentProvider = new IconContentProvider(m_iconProvider, labelProvider);
     m_viewer.setLabelProvider(labelProvider);
-    m_viewer.setContentProvider(new IconContentProvider(m_iconProvider, labelProvider));
+    m_viewer.setContentProvider(contentProvider);
     m_viewer.setSorter(new P_Sorter());
-
-    // setHideInherited(hideInheritedButton.getSelection());
+    m_viewer.setInput(contentProvider.getProposals(null, null));
 
     // layout
     parent.setLayout(new GridLayout(1, true));
-    // hideInheritedButton.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_table.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
   }
 
@@ -241,24 +231,18 @@ public class IconsEditor extends EditorPart {
       }
       return c;
     }
-
   } // end class P_IconLabelProvider
 
   private class P_Sorter extends ViewerSorter {
     @Override
     public int compare(Viewer viewer, Object e1, Object e2) {
       Table table = (Table) viewer.getControl();
-      TableColumn sortCol = table.getSortColumn();
-      ITableLabelProvider labelProvider = (ITableLabelProvider) ((TableViewer) viewer).getLabelProvider();
       boolean sortAsc = table.getSortDirection() == SWT.UP;
-      int columnIndex = (sortCol != null ? table.indexOf(sortCol) : 1);
-      int c = super.compare(viewer, labelProvider.getColumnText(e1, columnIndex), labelProvider.getColumnText(e2, columnIndex));
+      int c = super.compare(viewer, e1, e2);
       if (!sortAsc) {
         c = -c;
       }
       return c;
     }
-
   }
-
 }

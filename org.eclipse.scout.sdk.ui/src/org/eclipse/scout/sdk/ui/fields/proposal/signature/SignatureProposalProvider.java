@@ -37,6 +37,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -129,7 +130,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    if (searchPattern == null) {
+    if (!StringUtility.hasText(searchPattern)) {
       searchPattern = "*";
     }
     else {

@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -50,6 +54,8 @@ import org.eclipse.swt.widgets.Label;
  * <h3>IconPresenter</h3> ...
  */
 public class IconPresenter extends AbstractMethodPresenter {
+
+  private final static Pattern REGEX = Pattern.compile("^.*\\.([^\\.]+)$");
 
   private Label m_currentIconPresenter;
   private ProposalTextField m_proposalField;
@@ -155,7 +161,7 @@ public class IconPresenter extends AbstractMethodPresenter {
   protected ScoutIconDesc parseInput(String input) throws CoreException {
     String parsedString = PropertyMethodSourceUtility.parseReturnParameterIcon(input, getMethod().peekMethod());
     if (getIconProvider() != null && !StringUtility.isNullOrEmpty(parsedString)) {
-      String simpleIconName = parsedString.replaceAll("^.*\\.([^\\.]+)$", "$1");
+      String simpleIconName = REGEX.matcher(parsedString).replaceAll("$1");
       return getIconProvider().getIcon(simpleIconName);
     }
     return null;
@@ -191,22 +197,34 @@ public class IconPresenter extends AbstractMethodPresenter {
       };
     }
     if (op != null) {
-      new OperationJob(op).schedule();
+      final OperationJob job = new OperationJob(op);
+      job.addJobChangeListener(new JobChangeAdapter() {
+        @Override
+        public void done(IJobChangeEvent event) {
+          job.removeJobChangeListener(this);
+          getContainer().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+              Image icon = null;
+              if (value != null) {
+                icon = ((ILabelProvider) m_proposalField.getLabelProvider()).getImage(value);
+              }
+              if (icon != null) {
+                ((GridData) m_currentIconPresenter.getLayoutData()).exclude = false;
+                m_currentIconPresenter.setVisible(true);
+              }
+              else {
+                ((GridData) m_currentIconPresenter.getLayoutData()).exclude = true;
+                m_currentIconPresenter.setVisible(false);
+              }
+              m_currentIconPresenter.setImage(icon);
+              getContainer().layout(true, true);
+            }
+          });
+        }
+      });
+      job.schedule();
     }
-    Image icon = null;
-    if (value != null) {
-      icon = ((ILabelProvider) m_proposalField.getLabelProvider()).getImage(value);
-    }
-    if (icon != null) {
-      ((GridData) m_currentIconPresenter.getLayoutData()).exclude = false;
-      m_currentIconPresenter.setVisible(true);
-    }
-    else {
-      ((GridData) m_currentIconPresenter.getLayoutData()).exclude = true;
-      m_currentIconPresenter.setVisible(false);
-    }
-    m_currentIconPresenter.setImage(icon);
-    getContainer().layout(true, true);
   }
 
 }

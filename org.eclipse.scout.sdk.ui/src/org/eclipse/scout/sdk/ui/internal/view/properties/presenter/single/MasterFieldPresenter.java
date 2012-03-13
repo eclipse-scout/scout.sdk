@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
@@ -76,7 +77,7 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
     @Override
     public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
       ensureCache();
-      if (searchPattern == null) {
+      if (!StringUtility.hasText(searchPattern)) {
         searchPattern = "*";
       }
       else {
