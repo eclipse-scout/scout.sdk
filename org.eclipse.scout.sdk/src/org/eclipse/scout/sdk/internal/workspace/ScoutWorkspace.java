@@ -245,13 +245,13 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     return collector.toArray(new ScoutBundle[collector.size()]);
   }
 
-  // workspace internal
-
-  private void rebuildGraph() {
+  public void rebuildGraph() {
     ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
     rebuildGraphNoFire(eventCollector);
     fireWorkspaceEvnets(eventCollector.getAllEvents());
   }
+
+  // workspace internal
 
   private void rebuildGraphNoFire(ScoutWorkspaceEventList eventCollector) {
     m_bundleGraph.buildTree();

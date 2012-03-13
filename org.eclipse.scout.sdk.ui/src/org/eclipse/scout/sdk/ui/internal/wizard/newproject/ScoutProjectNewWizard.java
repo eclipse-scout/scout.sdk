@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
@@ -113,6 +114,9 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
       catch (Exception e) {
         ScoutSdkUi.logError("error during waiting for auto build and refresh");
       }
+
+      // rebuild bundle graph (the target platform could have been changed -> this could change the node types).
+      ScoutWorkspace.getInstance().rebuildGraph();
 
       // switch to scout perspective and expand scout explorer
       m_display.asyncExec(new Runnable() {
