@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
+import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -56,31 +57,23 @@ import org.eclipse.swt.widgets.Group;
  * <h3>DefaultTableColumnNewWizardPage</h3> ...
  */
 public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
-
-  private static enum CONTINUE_OPERATION {
-    ADD_MORE_COLUMNS, FINISH
-  }
-
-  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
-
   private INlsEntry m_nlsName;
   private String m_typeName;
   private String m_genericSignature;
   private SiblingProposal m_sibling;
+  private CONTINUE_OPERATION m_continueOperation;
 
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_genericTypeField;
   private ProposalTextField m_siblingField;
 
-  private CONTINUE_OPERATION m_continueOperation;
-
   // process members
   private final IType m_declaringType;
   private IType m_superType;
   private IType m_createdColumn;
 
-  public DefaultTableColumnNewWizardPage(IType declaringType) {
+  public DefaultTableColumnNewWizardPage(IType declaringType, CONTINUE_OPERATION op) {
     super(DefaultTableColumnNewWizardPage.class.getName());
     setTitle(Texts.get("NewTableColumn"));
     setDescription(Texts.get("CreateANewTableColumn"));
@@ -88,14 +81,13 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
     m_declaringType = declaringType;
     m_sibling = SiblingProposal.SIBLING_END;
+    m_continueOperation = op;
   }
 
   @Override
   protected void createContent(Composite parent) {
-
     createFieldGroup(parent);
     createNextStepsGroup(parent);
-
     parent.setLayout(new GridLayout(1, false));
   }
 
@@ -115,7 +107,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
         m_continueOperation = newSelection.get(0);
       }
     });
-    nextStepOptions.setValue(CONTINUE_OPERATION.FINISH);
+    nextStepOptions.setValue(m_continueOperation);
     nextStepOptions.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
@@ -195,7 +187,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       Display.getDefault().asyncExec(new Runnable() {
         @Override
         public void run() {
-          TableColumnNewWizard wizard = new TableColumnNewWizard();
+          TableColumnNewWizard wizard = new TableColumnNewWizard(m_continueOperation);
           wizard.initWizard(m_declaringType);
           ScoutWizardDialog wizardDialog = new ScoutWizardDialog(wizard);
           wizardDialog.open();

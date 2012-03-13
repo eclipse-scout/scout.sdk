@@ -14,20 +14,23 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class DefaultTableColumnNewWizard extends AbstractFormFieldWizard {
 
   private DefaultTableColumnNewWizardPage m_page1;
+  private CONTINUE_OPERATION m_nextOperation;
 
-  public DefaultTableColumnNewWizard() {
+  public DefaultTableColumnNewWizard(CONTINUE_OPERATION op) {
     setWindowTitle(Texts.get("NewTableColumn"));
+    m_nextOperation = op;
   }
 
   @Override
   public void initWizard(IType declaringType) {
     super.initWizard(declaringType);
-    m_page1 = new DefaultTableColumnNewWizardPage(getDeclaringType());
+    m_page1 = new DefaultTableColumnNewWizardPage(getDeclaringType(), m_nextOperation);
     addPage(m_page1);
   }
 

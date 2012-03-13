@@ -23,15 +23,21 @@ import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 public class TableColumnNewWizard extends AbstractFormFieldWizard {
 
   private TableColumnNewWizardPage1 m_page1;
+  private CONTINUE_OPERATION m_nextOperation;
 
-  public TableColumnNewWizard() {
+  public static enum CONTINUE_OPERATION {
+    ADD_MORE_COLUMNS, FINISH
+  }
+
+  public TableColumnNewWizard(CONTINUE_OPERATION op) {
     setWindowTitle(Texts.get("NewTableColumn"));
+    m_nextOperation = op;
   }
 
   @Override
   public void initWizard(IType declaringType) {
     super.initWizard(declaringType);
-    m_page1 = new TableColumnNewWizardPage1(getDeclaringType());
+    m_page1 = new TableColumnNewWizardPage1(getDeclaringType(), m_nextOperation);
     addPage(m_page1);
   }
 

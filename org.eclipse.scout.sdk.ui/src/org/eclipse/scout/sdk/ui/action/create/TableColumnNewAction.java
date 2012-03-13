@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard;
+import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 
 /**
  *
@@ -33,7 +34,7 @@ public class TableColumnNewAction extends AbstractWizardAction {
 
   @Override
   protected IWizard getNewWizardInstance() {
-    TableColumnNewWizard wizard = new TableColumnNewWizard();
+    TableColumnNewWizard wizard = new TableColumnNewWizard(CONTINUE_OPERATION.FINISH);
     wizard.initWizard(m_type);
     return wizard;
   }

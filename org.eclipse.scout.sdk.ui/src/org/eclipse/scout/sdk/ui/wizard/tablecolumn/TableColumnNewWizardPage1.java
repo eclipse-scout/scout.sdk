@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -52,20 +53,22 @@ import org.eclipse.swt.widgets.Composite;
 public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
   final IType iSmartColumn = TypeUtility.getType(RuntimeClasses.ISmartColumn);
+
   private IType m_declaringType;
   private boolean m_showAllTemplates;
+  private CONTINUE_OPERATION m_nextOperation;
 
   private FilteredTable m_filteredTable;
   private Button m_showAllTemplatesField;
-
   private P_BCTypeTemplate m_selectedTemplate;
   private IWizardPage m_nextPage;
 
-  public TableColumnNewWizardPage1(IType declaringType) {
+  public TableColumnNewWizardPage1(IType declaringType, CONTINUE_OPERATION op) {
     super(TableColumnNewWizardPage1.class.getName());
     setTitle(Texts.get("TableColumnTemplates"));
     setDescription(Texts.get("ChooseATemplateForYourTableColumn"));
     m_declaringType = declaringType;
+    m_nextOperation = op;
   }
 
   @Override
@@ -163,13 +166,13 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
         ScoutSdkUi.logError("could not build type hierarchy of '" + m_selectedTemplate.getType().getFullyQualifiedName() + "'.", e);
       }
       if (selectedSuperTypeHierarchy != null && selectedSuperTypeHierarchy.contains(iSmartColumn)) {
-        SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard();
+        SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);
         wizard.setSuperType(m_selectedTemplate.getType());
         m_nextPage = wizard.getPages()[0];
       }
       else {
-        DefaultTableColumnNewWizard wizard = new DefaultTableColumnNewWizard();
+        DefaultTableColumnNewWizard wizard = new DefaultTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);
         wizard.setSuperType(m_selectedTemplate.getType());
         m_nextPage = wizard.getPages()[0];
