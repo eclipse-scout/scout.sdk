@@ -26,6 +26,7 @@ import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 
 public final class SchemaUtility {
@@ -57,10 +58,14 @@ public final class SchemaUtility {
     // set inline schemas to WSDL resources and resolve referenced schema resources
     Artefact[] wsdlArtefacts = artefacts.toArray(new Artefact[artefacts.size()]);
     for (Artefact artefact : wsdlArtefacts) {
+      if (!(artefact instanceof WsdlArtefact)) {
+        continue;
+      }
       WsdlArtefact wsdlArtefact = (WsdlArtefact) artefact;
 
       if (wsdlArtefact.getWsdlDefintion() == null) {
-        System.out.println("should be not null"); // TODO dwi SCOUT SDK
+        JaxWsSdk.logWarning("Unexpected: WSDL definition should not be null '" + wsdlArtefact + "'");
+        continue;
       }
 
       Types types = wsdlArtefact.getWsdlDefintion().getTypes();
@@ -192,13 +197,15 @@ public final class SchemaUtility {
       return reader.readWSDL(file.getAbsolutePath());
     }
     catch (Exception e) {
-      e.printStackTrace();// TODO dwi
-//      JaxWsSdk.logError("Could not load WSDL file '" + file.getAbsolutePath() + "'", e);
+      JaxWsSdk.logError("Could not load WSDL file '" + file.getAbsolutePath() + "'", e);
     }
     return null;
   }
 
   private static File toFile(File folder, String locationUri) {
+    if (locationUri == null) {
+      return null;
+    }
     if (folder != null && folder.exists()) {
       File file = new File(folder, locationUri);
       if (file.exists()) {
