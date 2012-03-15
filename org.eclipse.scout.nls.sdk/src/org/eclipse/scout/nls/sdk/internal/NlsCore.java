@@ -12,6 +12,7 @@ package org.eclipse.scout.nls.sdk.internal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.nls.sdk.internal.model.workspace.NlsWorkspace;
@@ -165,6 +166,15 @@ public class NlsCore extends AbstractUIPlugin implements INlsIcons {
       plugin.getImageRegistry().put(name, desc);
     }
     return desc;
+  }
+
+  public IDialogSettings getDialogSettingsSection(String name, boolean createIfNotExist) {
+    IDialogSettings dialogSettings = getDialogSettings();
+    IDialogSettings section = dialogSettings.getSection(name);
+    if (section == null) {
+      section = dialogSettings.addNewSection(name);
+    }
+    return section;
   }
 
   public static INlsWorkspace getNlsWorkspace() {

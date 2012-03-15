@@ -40,7 +40,6 @@ public class TextField<T> extends Composite {
   public static final int VALIDATE_ON_MODIFY = 1 << 99;
   public static final int VALIDATE_ON_FOCUS_LOST = 1 << 98;
   public static final int MULTI_LINE_TEXT_FIELD = 1 << 97;
-  public static final int LABEL_NO_ALIGN = 1 << 96;
 
   private Text m_text;
   private Label m_label;
@@ -51,6 +50,7 @@ public class TextField<T> extends Composite {
   private Object m_input;
   private boolean m_valid;
   private IStatus m_status;
+  private final int m_labelColWidth;
 
   public TextField(Composite parent) {
     this(parent, VALIDATE_ON_FOCUS_LOST);
@@ -76,7 +76,12 @@ public class TextField<T> extends Composite {
   }
 
   public TextField(Composite parent, int style, String labelName) {
+    this(parent, style, labelName, 40);
+  }
+
+  public TextField(Composite parent, int style, String labelName, int labelColWidth) {
     super(parent, SWT.NONE);
+    m_labelColWidth = labelColWidth;
     setLayout(new FormLayout());
     createComposite(this, style);
     setLabelText(labelName);
@@ -129,9 +134,7 @@ public class TextField<T> extends Composite {
     FormData labelData = new FormData();
     labelData.top = new FormAttachment(0, 0);
     labelData.left = new FormAttachment(0, 0);
-    if ((style & LABEL_NO_ALIGN) == 0) {
-      labelData.right = new FormAttachment(40, 0);
-    }
+    labelData.right = new FormAttachment(m_labelColWidth, 0);
     labelData.bottom = new FormAttachment(100, 0);
     m_label.setLayoutData(labelData);
 
@@ -166,19 +169,10 @@ public class TextField<T> extends Composite {
     }
     // validate
     validate();
-    if (m_status.getSeverity() != IStatus.ERROR) {
-      m_text.setForeground(null);
-      // notify
-      for (IInputChangedListener<T> listener : m_inputChangedListener) {
-        listener.inputChanged(m_inputFormatter.parse(this, input));
-      }
-    }
-    else {
-      m_text.setForeground(getDisplay().getSystemColor(SWT.COLOR_RED));
-      // notify
-      for (IInputChangedListener<T> listener : m_inputChangedListener) {
-        listener.inputChanged(m_inputFormatter.parse(this, null));
-      }
+
+    // notify
+    for (IInputChangedListener<T> listener : m_inputChangedListener) {
+      listener.inputChanged(m_inputFormatter.parse(this, input));
     }
     m_input = input;
   }
@@ -198,7 +192,18 @@ public class TextField<T> extends Composite {
       }
       m_valid = valid.isOK();
     }
+    if (m_valid) {
+      m_text.setForeground(null);
+    }
+    else {
+      m_text.setForeground(getDisplay().getSystemColor(SWT.COLOR_RED));
+    }
     return valid;
+  }
+
+  @Override
+  public boolean setFocus() {
+    return m_text.setFocus();
   }
 
   @Override

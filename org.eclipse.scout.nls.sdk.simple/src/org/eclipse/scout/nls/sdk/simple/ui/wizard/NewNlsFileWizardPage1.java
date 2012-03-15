@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -344,17 +345,20 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
       List<IFile> files = new LinkedList<IFile>();
       Assert.isTrue(m_desc.getParentPlugin() != null);
 
-      IProject project = m_desc.getParentPlugin().getUnderlyingResource().getProject();
-      try {
-        IJavaProject jp = JavaCore.create(project);
-        for (Object o : jp.getNonJavaResources()) {
-          if (o instanceof IFile && ((IFile) o).getFileExtension().equalsIgnoreCase("nls")) {
-            files.add((IFile) o);
+      IResource r = m_desc.getParentPlugin().getUnderlyingResource();
+      if (r != null) {
+        IProject project = r.getProject();
+        try {
+          IJavaProject jp = JavaCore.create(project);
+          for (Object o : jp.getNonJavaResources()) {
+            if (o instanceof IFile && ((IFile) o).getFileExtension().equalsIgnoreCase("nls")) {
+              files.add((IFile) o);
+            }
           }
         }
-      }
-      catch (CoreException e) {
-        NlsCore.logWarning(e);
+        catch (CoreException e) {
+          NlsCore.logWarning(e);
+        }
       }
       return new ArrayList<Object>(files);
     }

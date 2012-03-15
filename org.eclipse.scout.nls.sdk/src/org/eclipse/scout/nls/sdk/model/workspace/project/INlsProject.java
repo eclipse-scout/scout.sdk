@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
+import org.eclipse.scout.nls.sdk.model.workspace.translationResource.ITranslationResource;
 import org.eclipse.scout.nls.sdk.ui.action.INewLanguageContext;
 
 /**
@@ -174,4 +175,21 @@ public interface INlsProject {
    * @return
    */
   IType getNlsAccessorType();
+
+  /**
+   * gets the translation resource for the given language.
+   * 
+   * @param language
+   * @return
+   */
+  ITranslationResource getTranslationResource(Language language);
+
+  /**
+   * Generates a new key based on the given input text.
+   * 
+   * @param baseText
+   *          The input text a key should be generated for.
+   * @return a new key. it is guaranteed, that this key does not exist in this project at the time of key generation.
+   */
+  String generateNewKey(String baseText);
 }

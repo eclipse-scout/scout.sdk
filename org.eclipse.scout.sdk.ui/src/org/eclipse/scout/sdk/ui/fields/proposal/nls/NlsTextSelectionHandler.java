@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal.nls;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -54,7 +51,7 @@ public class NlsTextSelectionHandler implements IProposalSelectionHandler {
       String key = getNewKey(proposalFieldText);
       NlsEntry entry = new NlsEntry(key, getNlsProject());
       entry.addTranslation(getNlsProject().getDevelopmentLanguage(), proposalFieldText);
-      NlsEntryNewAction action = new NlsEntryNewAction(proposalTextField.getShell(), getNlsProject(), entry);
+      NlsEntryNewAction action = new NlsEntryNewAction(proposalTextField.getShell(), getNlsProject(), entry, true);
       action.run();
       try {
         action.join();
@@ -77,23 +74,6 @@ public class NlsTextSelectionHandler implements IProposalSelectionHandler {
   }
 
   protected String getNewKey(String value) {
-    List<String> existingKeys = Arrays.asList(getNlsProject().getAllKeys());
-
-    if (value == null || value.length() == 0) {
-      return null;
-    }
-    else {
-      String[] split = value.split(" ");
-      value = "";
-      for (String splitValue : split) {
-        value = value + Character.toUpperCase(splitValue.charAt(0)) + ((splitValue.length() > 1) ? (splitValue.substring(1)) : (""));
-      }
-      String newKey = value;
-      int i = 0;
-      while (existingKeys.contains(newKey)) {
-        newKey = value + i++;
-      }
-      return newKey;
-    }
+    return getNlsProject().generateNewKey(value);
   }
 }

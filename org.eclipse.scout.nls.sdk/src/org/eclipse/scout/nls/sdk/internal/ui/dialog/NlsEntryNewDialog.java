@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;
+import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IValidationListener;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -23,23 +24,34 @@ import org.eclipse.swt.widgets.Shell;
 
 public class NlsEntryNewDialog extends AbstractNlsEntryDialog {
 
-  public NlsEntryNewDialog(Shell parentShell, INlsProject project) {
-    this(parentShell, new NlsEntry("", project), project);
+  private final IValidationListener m_validationListener;
+
+  public NlsEntryNewDialog(Shell parentShell, INlsProject project, boolean showProjectList) {
+    this(parentShell, new NlsEntry("", project), project, showProjectList);
   }
 
-  public NlsEntryNewDialog(Shell parentShell, NlsEntry row, INlsProject project) {
-    super(parentShell, "New Entry", row, project);
-  }
-
-  @Override
-  protected void postCreate() {
-    getKeyField().setInputValidator(InputValidator.getNlsKeyValidator(getNlsProject()));
-    getKeyField().addValidationListener(new IValidationListener() {
+  public NlsEntryNewDialog(Shell parentShell, NlsEntry row, INlsProject project, boolean showProjectList) {
+    super(parentShell, "New Entry", row, project, showProjectList);
+    m_validationListener = new IValidationListener() {
       @Override
       public void validationChanged(IStatus valid) {
         revalidate();
       }
+    };
+  }
+
+  @Override
+  protected void postCreate() {
+    getKeyField().setInputValidator(new IInputValidator() {
+      @Override
+      public IStatus isValid(String value) {
+        IInputValidator tmp = InputValidator.getNlsKeyValidator(getNlsProject());
+        return tmp.isValid(value);
+      }
     });
+
+    getKeyField().removeValidationListener(m_validationListener);
+    getKeyField().addValidationListener(m_validationListener);
 
     TextField<String> defaultField = getDefaultTranslationField();
     defaultField.setInputValidator(InputValidator.getDefaultTranslationValidator());

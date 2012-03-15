@@ -10,21 +10,31 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui.dialog;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.IInputChangedListener;
+import org.eclipse.scout.nls.sdk.internal.ui.smartfield.ISmartFieldListener;
+import org.eclipse.scout.nls.sdk.internal.ui.smartfield.ISmartFieldModel;
+import org.eclipse.scout.nls.sdk.internal.ui.smartfield.SmartField;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -38,19 +48,33 @@ import org.eclipse.swt.widgets.TabItem;
  */
 public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
 
+  protected static final String DIALOG_SETTINGS_WIDTH = "dialogSettingsWidth";
+  protected static final String DIALOG_SETTINGS_HEIGHT = "dialogSettingsHeight";
+  protected static final String DIALOG_SETTINGS_X = "dialogSettingsX";
+  protected static final String DIALOG_SETTINGS_Y = "dialogSettingsY";
+
+  private NlsEntry m_nlsEntry;
+  private INlsProject m_nlsProject;
+  private boolean m_showProjectList;
+
+  private final IDialogSettings m_dialogSettings;
   private final String m_title;
-  private final NlsEntry m_nlsEntry;
-  private final INlsProject m_nlsProject;
-
   private final HashMap<Language, TextField<String>> m_translationFields;
-  private TextField<String> m_keyField;
+  private final INlsProject m_rootProject;
 
-  protected AbstractNlsEntryDialog(Shell parentShell, String title, NlsEntry row, INlsProject project) {
+  private TextField<String> m_keyField;
+  private SmartField m_projectProposalField;
+  private Composite m_fixDialogArea;
+
+  protected AbstractNlsEntryDialog(Shell parentShell, String title, NlsEntry row, INlsProject project, boolean showProjectList) {
     super(parentShell);
     m_nlsProject = project;
     m_title = title;
     m_nlsEntry = row;
+    m_rootProject = project;
     m_translationFields = new HashMap<Language, TextField<String>>();
+    m_showProjectList = showProjectList;
+    m_dialogSettings = NlsCore.getDefault().getDialogSettingsSection(AbstractNlsEntryDialog.class.getName(), true);
   }
 
   @Override
@@ -71,14 +95,48 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     postCreate();
 
     getButton(IDialogConstants.OK_ID).setText("&Ok");
+    getDefaultTranslationField().setFocus();
     return contents;
   }
 
   @Override
-  protected final Control createDialogArea(Composite parent) {
-    Composite rootArea = new Composite(parent, SWT.NONE);
+  protected final Control createDialogArea(final Composite parent) {
+    if (m_fixDialogArea == null) {
+      m_fixDialogArea = new Composite(parent, SWT.NONE);
+      m_fixDialogArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+      m_fixDialogArea.setLayout(new GridLayout(1, true));
+    }
+    final Composite rootArea = new Composite(m_fixDialogArea, SWT.NONE);
     Composite inputComp = new Composite(rootArea, SWT.NONE);
-    m_keyField = new TextField<String>(inputComp, TextField.VALIDATE_ON_MODIFY | TextField.LABEL_NO_ALIGN, "Key Name");
+
+    P_ProjectSmartfieldModel model = new P_ProjectSmartfieldModel();
+    if (model.getProposals("").size() < 2) {
+      m_showProjectList = false;
+    }
+    m_projectProposalField = new SmartField(inputComp, SWT.NONE, 10);
+    m_projectProposalField.setLabel("Create in");
+    m_projectProposalField.setSmartFieldModel(new P_ProjectSmartfieldModel());
+    m_projectProposalField.setValue(getNlsProject());
+    m_projectProposalField.addSmartFieldListener(new ISmartFieldListener() {
+      @Override
+      public void itemSelected(Object item) {
+        if (item instanceof INlsProject) {
+          m_nlsProject = (INlsProject) item;
+          m_nlsEntry = new NlsEntry(m_nlsEntry, m_nlsProject);
+
+          rootArea.dispose();
+          createDialogArea(parent);
+          postCreate();
+          m_fixDialogArea.layout(true, true);
+          parent.redraw();
+
+          m_keyField.validate();
+        }
+      }
+    });
+    m_projectProposalField.setVisible(isShowProjectList());
+
+    m_keyField = new TextField<String>(inputComp, TextField.VALIDATE_ON_MODIFY, "Key Name", 10);
     String key = m_nlsEntry.getKey();
     if (key == null) {
       key = "";
@@ -99,6 +157,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
         translationGroup.getItem(translationGroup.getSelectionIndex()).getControl().setFocus();
       }
     });
+    m_translationFields.clear();
     for (Language l : m_nlsProject.getAllLanguages()) {
       TranslationField field = new TranslationField(l);
       TextField<String> control = field.create(translationGroup);
@@ -119,6 +178,10 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     rootArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
     rootArea.setLayout(new GridLayout(1, true));
 
+    GridData plgd = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+    plgd.exclude = !isShowProjectList();
+    m_projectProposalField.setLayoutData(plgd);
+
     GridData data = new GridData(300, SWT.DEFAULT);
     data.grabExcessHorizontalSpace = true;
     data.horizontalAlignment = SWT.FILL;
@@ -133,11 +196,15 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     data.heightHint = 100;
     translationGroup.setLayoutData(data);
     translationGroup.setLayout(new GridLayout(1, true));
-    return rootArea;
+    return m_fixDialogArea;
   }
 
   public final TextField<String> getKeyField() {
     return m_keyField;
+  }
+
+  public final SmartField getProjectProposalField() {
+    return m_projectProposalField;
   }
 
   public NlsEntry show() {
@@ -158,6 +225,69 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
 
   protected TextField<String> getDefaultTranslationField() {
     return getTranslationField(Language.LANGUAGE_DEFAULT);
+  }
+
+  public IDialogSettings getDialogSettings() {
+    return m_dialogSettings;
+  }
+
+  @Override
+  protected void constrainShellSize() {
+    super.constrainShellSize();
+    Shell shell = getShell();
+    try {
+      shell.setRedraw(false);
+      Rectangle displayBounds = shell.getDisplay().getBounds();
+      Rectangle shellBounds = shell.getBounds();
+
+      String widthString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
+      if (!StringUtility.isNullOrEmpty(widthString)) {
+        shellBounds.width = Integer.parseInt(widthString);
+      }
+
+      String heightString = getDialogSettings().get(DIALOG_SETTINGS_HEIGHT);
+      if (!StringUtility.isNullOrEmpty(heightString)) {
+        shellBounds.height = Integer.parseInt(heightString);
+      }
+
+      String xString = getDialogSettings().get(DIALOG_SETTINGS_X);
+      if (!StringUtility.isNullOrEmpty(xString)) {
+        shellBounds.x = Integer.parseInt(xString);
+      }
+
+      String yString = getDialogSettings().get(DIALOG_SETTINGS_Y);
+      if (!StringUtility.isNullOrEmpty(yString)) {
+        shellBounds.y = Integer.parseInt(yString);
+      }
+
+      shellBounds.height = Math.min(displayBounds.height - 200, shellBounds.height);
+      shellBounds.width = Math.min(displayBounds.width - 200, shellBounds.width);
+
+      int yDiff = (displayBounds.y + displayBounds.height) - (shellBounds.y + shellBounds.height);
+      if (yDiff < 0) {
+        shellBounds.y = shellBounds.y + yDiff;
+      }
+      int xDiff = (displayBounds.x + displayBounds.width) - (shellBounds.x + shellBounds.width);
+      if (xDiff < 0) {
+        shellBounds.x = shellBounds.x + xDiff;
+      }
+
+      shell.setBounds(shellBounds);
+      shell.layout();
+    }
+    finally {
+      shell.setRedraw(true);
+    }
+  }
+
+  @Override
+  public boolean close() {
+    Rectangle b = getShell().getBounds();
+    getDialogSettings().put(DIALOG_SETTINGS_WIDTH, b.width);
+    getDialogSettings().put(DIALOG_SETTINGS_HEIGHT, b.height);
+    getDialogSettings().put(DIALOG_SETTINGS_X, b.x);
+    getDialogSettings().put(DIALOG_SETTINGS_Y, b.y);
+    return super.close();
   }
 
   public void setMessage(IStatus status) {
@@ -188,6 +318,10 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     return m_nlsProject;
   }
 
+  private boolean isShowProjectList() {
+    return m_showProjectList;
+  }
+
   protected class TranslationField {
     private TextField<String> m_input;
     private Language m_language;
@@ -210,6 +344,24 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
           }
         }
       });
+      m_input.addInputChangedListener(new IInputChangedListener<String>() {
+        private String m_oldInput;
+
+        @Override
+        public void inputChanged(String input) {
+          if (m_keyField.isEnabled() && StringUtility.hasText(input)) {
+            String oldKey = getNlsProject().generateNewKey(m_oldInput);
+            String curVal = m_keyField.getValue();
+            if (!StringUtility.hasText(curVal)) {
+              curVal = null;
+            }
+            if (!StringUtility.hasText(curVal) || CompareUtility.equals(curVal, oldKey)) {
+              m_keyField.setValue(getNlsProject().generateNewKey(input));
+            }
+          }
+          m_oldInput = input;
+        }
+      });
       return m_input;
     }
 
@@ -218,6 +370,40 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
         text = "";
       }
       m_input.setValue(text);
+    }
+  }
+
+  private class P_ProjectSmartfieldModel implements ISmartFieldModel {
+    @Override
+    public List<Object> getProposals(String pattern) {
+      ArrayList<Object> collector = new ArrayList<Object>();
+      INlsProject p = m_rootProject;
+      do {
+        Language[] languages = p.getAllLanguages();
+        if (languages.length > 0 && !p.getTranslationResource(languages[0]).isReadOnly()) {
+          if (!StringUtility.hasText(pattern) || p.getName().toLowerCase().startsWith(pattern.toLowerCase())) {
+            collector.add(p);
+          }
+        }
+      }
+      while ((p = p.getParent()) != null);
+
+      return collector;
+    }
+
+    @Override
+    public String getText(Object item) {
+      if (item instanceof INlsProject) {
+        return ((INlsProject) item).getName();
+      }
+      else {
+        return null;
+      }
+    }
+
+    @Override
+    public Image getImage(Object item) {
+      return null;
     }
   }
 }

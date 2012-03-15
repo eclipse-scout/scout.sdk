@@ -24,6 +24,7 @@ import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
+import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
@@ -163,8 +164,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   private static boolean isDocsService(IType service) throws JavaModelException {
     String docsInterfaceClassName = RuntimeClasses.IDocumentationTextProviderService.substring(RuntimeClasses.IDocumentationTextProviderService.lastIndexOf('.') + 1);
-    for (String ifs : service.getSuperInterfaceNames()) {
-      if (docsInterfaceClassName.equals(ifs)) {
+    TypeHierarchy th = TypeCacheAccessor.getHierarchyCache().getSuperHierarchy(service);
+    for (IType ifs : th.getAllSuperInterfaces(service)) {
+      if (docsInterfaceClassName.equals(ifs.getElementName())) {
         return true;
       }
     }

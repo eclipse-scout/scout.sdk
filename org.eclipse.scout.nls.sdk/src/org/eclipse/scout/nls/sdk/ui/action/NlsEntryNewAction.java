@@ -21,22 +21,21 @@ import org.eclipse.swt.widgets.Shell;
 public class NlsEntryNewAction extends AbstractWorkspaceAction {
 
   private NlsEntry m_entry;
-
-  private final INlsProject m_project;
-
   private NlsEntry m_initialEntry;
-
+  private INlsProject m_project;
   private final Shell m_parentShell;
+  private final boolean m_showProjectList;
 
-  public NlsEntryNewAction(Shell parentShell, INlsProject project) {
-    this(parentShell, project, null);
+  public NlsEntryNewAction(Shell parentShell, INlsProject project, boolean showProjectList) {
+    this(parentShell, project, null, showProjectList);
   }
 
-  public NlsEntryNewAction(Shell parentShell, INlsProject project, NlsEntry entry) {
+  public NlsEntryNewAction(Shell parentShell, INlsProject project, NlsEntry entry, boolean showProjectList) {
     super("New Entry...", true);
     m_parentShell = parentShell;
     m_initialEntry = entry;
     m_project = project;
+    m_showProjectList = showProjectList;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.TextAdd));
     setEnabled(project != null);
   }
@@ -49,8 +48,9 @@ public class NlsEntryNewAction extends AbstractWorkspaceAction {
     else {
       m_entry = m_initialEntry;
     }
-    NlsEntryNewDialog dialog = new NlsEntryNewDialog(m_parentShell, m_entry, m_project);
+    NlsEntryNewDialog dialog = new NlsEntryNewDialog(m_parentShell, m_entry, m_project, m_showProjectList);
     m_entry = dialog.show();
+    m_project = dialog.getNlsProject();
     return m_entry != null;
   }
 

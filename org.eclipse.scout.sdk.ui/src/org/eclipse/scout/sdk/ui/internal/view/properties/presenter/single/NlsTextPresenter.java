@@ -89,7 +89,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   protected void init(ConfigurationMethod method) throws CoreException {
     if (method == null) return;
     super.init(method);
-    INlsProject newNlsProject = ScoutTypeUtility.findNlsProject(method.getType());
+    INlsProject newNlsProject = resolveNlsProject(method);
     if (!CompareUtility.equals(newNlsProject, m_nlsProject)) {
       m_nlsProject = newNlsProject;
       m_proposalField.setLabelProvider(createLabelProvider(getNlsProject()));

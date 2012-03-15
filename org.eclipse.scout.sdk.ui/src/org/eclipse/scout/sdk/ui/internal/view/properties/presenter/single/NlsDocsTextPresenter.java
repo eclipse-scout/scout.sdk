@@ -48,7 +48,7 @@ public class NlsDocsTextPresenter extends NlsTextPresenter {
         String pckName = type.getPackageFragment().getElementName();
         value = fqn.substring(pckName.length() + 1).replace('$', '.');
       }
-      return super.getNewKey(value);
+      return getNlsProject().generateNewKey(value);
     }
   }
 }

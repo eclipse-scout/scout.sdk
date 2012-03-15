@@ -25,18 +25,14 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.scout.nls.sdk.internal.ui.TextField;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.FocusAdapter;
-import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -64,7 +60,6 @@ public class SmartDialog {
   private P_SmartFieldTableModel m_smartTableModel;
   private List<ISmartDialogListener> m_smartDialogListeners = new LinkedList<ISmartDialogListener>();
   private Point m_defaultSize = new Point(200, 250);
-  private TextField<String> m_textField;
   private static Collator s_collator = Collator.getInstance(Locale.getDefault());
 
   public SmartDialog(Shell parentShell) {
@@ -102,37 +97,12 @@ public class SmartDialog {
     });
 
     CLabel borderComp = new CLabel(m_shell, SWT.INHERIT_DEFAULT);
-    borderComp.setBackground(new Color[]{
-        borderComp.getDisplay().getSystemColor(SWT.COLOR_BLACK),
-        borderComp.getDisplay().getSystemColor(SWT.COLOR_YELLOW)},
-        new int[]{100}, true);
+    borderComp.setBackground(borderComp.getDisplay().getSystemColor(SWT.COLOR_GRAY));
     Composite rootArea = new Composite(borderComp, SWT.INHERIT_DEFAULT);
 
-    m_textField = new TextField<String>(rootArea, SWT.INHERIT_DEFAULT);
-    m_textField.setLabelText("Suche");
-    m_textField.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusLost(FocusEvent e) {
-        String input = m_textField.getValue();
-        if (input == null)
-        {
-          input = "";
-        }
-        updateProposals(input);
-      }
-    });
-    m_textField.addKeyListener(new KeyAdapter() {
-      @Override
-      public void keyPressed(KeyEvent e) {
-        if (e.keyCode == SWT.ARROW_DOWN)
-        {
-          m_table.setFocus();
-        }
-      }
-    });
     m_table = new Table(rootArea, SWT.FULL_SELECTION | SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
     m_table.setHeaderVisible(false);
-    m_table.setLinesVisible(true);
+    m_table.setLinesVisible(false);
     m_table.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
@@ -145,8 +115,7 @@ public class SmartDialog {
     });
 
     TableColumn col = new TableColumn(m_table, SWT.RIGHT);
-    col.setWidth(170);
-    col.setText("Perspektiven");
+    col.setWidth(100);
     m_viewer = new TableViewer(m_table);
     m_viewer.setLabelProvider(m_smartTableModel);
     m_viewer.setContentProvider(m_smartTableModel);
@@ -171,12 +140,6 @@ public class SmartDialog {
 
     FormData data = new FormData();
     data.top = new FormAttachment(0, 0);
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(100, 0);
-    m_textField.setLayoutData(data);
-
-    data = new FormData();
-    data.top = new FormAttachment(m_textField, 0);
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(100, 0);
     data.bottom = new FormAttachment(m_infoLabel, 0);
@@ -209,10 +172,6 @@ public class SmartDialog {
 
   public Font getFont() {
     return m_table.getFont();
-  }
-
-  public void setFocus() {
-    m_textField.setFocus();
   }
 
   public void setInitialShellSize(Point initialSize) {
@@ -249,7 +208,6 @@ public class SmartDialog {
   }
 
   public void open(Point location, String text) {
-    m_textField.setValue(text);
     List<Object> props = m_smartModel.getProposals(text);
     openInternal(location, props);
   }
@@ -267,7 +225,6 @@ public class SmartDialog {
    *          the filter to get some proposals
    */
   public void lazyOpen(Point location, String text) {
-    m_textField.setValue(text);
     List<Object> props = m_smartModel.getProposals(text);
     if (props.size() == 1) {
       notifyItemSelection(props.get(0));
@@ -304,15 +261,17 @@ public class SmartDialog {
     m_shell.setLocation(location);
     m_shell.setSize(m_defaultSize);
     m_shell.setVisible(true);
-    m_table.setFocus();
   }
 
   protected void handleItemSelection(Object item) {
     notifyItemSelection(((P_CompareableSmartItem) item).getItem());
   }
 
-  protected void notifyItemSelection(Object item) {
+  public boolean isVisible() {
+    return m_shell.isVisible();
+  }
 
+  protected void notifyItemSelection(Object item) {
     List<ISmartDialogListener> listeners = new ArrayList<ISmartDialogListener>(
         m_smartDialogListeners);
     for (ISmartDialogListener listener : listeners) {

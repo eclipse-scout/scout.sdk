@@ -105,7 +105,7 @@ public class NlsTablePage extends Composite {
   private void createFormMenu(IToolBarManager manager) {
     manager.add(new NlsRefreshAction(m_nlsProjects));
     manager.add(new UpdateReferenceCountAction(m_nlsProjects, m_table, m_tableModel));
-    manager.add(new NlsEntryNewAction(m_table.getShell(), m_nlsProjects));
+    manager.add(new NlsEntryNewAction(m_table.getShell(), m_nlsProjects, false));
     manager.add(new TranslationNewAction(m_nlsProjects, m_table.getShell()));
     manager.add(new NlsImportAction(m_nlsProjects, m_table.getShell()));
     manager.add(new NlsExportAction(m_nlsProjects, m_table.getShell()));

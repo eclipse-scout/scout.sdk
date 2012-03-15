@@ -437,16 +437,16 @@ public class ProposalPopup extends Window {
       shellBounds.x = ownerBounds.x + POPUP_OFFSET;
       shellBounds.y = ownerBounds.y + ownerBounds.height + POPUP_OFFSET;
       if (getDialogSettings() != null) {
-        String withString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
-        if (!StringUtility.isNullOrEmpty(withString)) {
-          shellBounds.width = Integer.parseInt(withString);
+        String widthString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
+        if (!StringUtility.isNullOrEmpty(widthString)) {
+          shellBounds.width = Integer.parseInt(widthString);
         }
         String heightString = getDialogSettings().get(DIALOG_SETTINGS_HEIGHT);
         if (!StringUtility.isNullOrEmpty(heightString)) {
           shellBounds.height = Integer.parseInt(heightString);
         }
       }
-      // double width if description area is visisble
+      // double width if description area is visible
       if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
         shellBounds.width = shellBounds.width * 2;
       }
@@ -526,7 +526,7 @@ public class ProposalPopup extends Window {
       firePopupEvent(new ProposalPopupEvent(ProposalPopupEvent.TYPE_POPUP_CLOSED));
       if (getDialogSettings() != null) {
         Point size = getShell().getSize();
-        // double width if description area is visisble
+        // double width if description area is visible
         if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
           size.x = size.x / 2;
         }

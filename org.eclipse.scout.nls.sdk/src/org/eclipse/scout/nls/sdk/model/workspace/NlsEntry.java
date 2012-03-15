@@ -34,7 +34,11 @@ public class NlsEntry implements INlsEntry {
    * @param row
    */
   public NlsEntry(INlsEntry row) {
-    m_project = row.getProject();
+    this(row, row.getProject());
+  }
+
+  public NlsEntry(INlsEntry row, INlsProject project) {
+    m_project = project;
     update(row);
   }
 

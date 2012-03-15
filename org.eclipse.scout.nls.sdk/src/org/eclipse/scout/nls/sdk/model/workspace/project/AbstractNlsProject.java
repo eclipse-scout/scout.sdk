@@ -88,6 +88,7 @@ public abstract class AbstractNlsProject implements INlsProject {
     return m_resourceProvider.getAllLanguages();
   }
 
+  @Override
   public ITranslationResource getTranslationResource(Language language) {
     return m_resourceProvider.getResource(language);
   }
@@ -198,6 +199,60 @@ public abstract class AbstractNlsProject implements INlsProject {
     return m_parent;
   }
 
+  @Override
+  public String generateNewKey(String baseText) {
+    if (!StringUtility.hasText(baseText)) {
+      return null;
+    }
+    else {
+      String[] split = baseText.split(" ");
+      StringBuilder ret = new StringBuilder(baseText.length());
+      for (String splitValue : split) {
+        splitValue = splitValue.replaceAll("[^a-zA-Z0-9_.]*", "").trim();
+        if (splitValue.length() > 0) {
+          ret.append(Character.toUpperCase(splitValue.charAt(0)) + (splitValue.length() > 1 ? splitValue.substring(1) : ""));
+        }
+      }
+
+      boolean changed = false;
+      do {
+        changed = false;
+        while (ret.length() > 0 && ret.charAt(0) == '.') {
+          ret.deleteCharAt(0);
+          changed = true;
+        }
+        while (ret.length() > 0 && ret.charAt(0) == '_') {
+          ret.deleteCharAt(0);
+          changed = true;
+        }
+        while (ret.length() > 0 && ret.charAt(0) >= '0' && ret.charAt(0) <= '9') {
+          ret.deleteCharAt(0);
+          changed = true;
+        }
+      }
+      while (changed);
+
+      while (ret.length() > 0 && ret.charAt(ret.length() - 1) == '.') {
+        ret.deleteCharAt(ret.length() - 1);
+      }
+      int maxLength = 190;
+      String newKey;
+      if (ret.length() > maxLength) {
+        newKey = ret.substring(0, maxLength);
+      }
+      else {
+        newKey = ret.toString();
+      }
+
+      int i = 0;
+      String result = newKey;
+      while (m_entries.containsKey(result)) {
+        result = newKey + i++;
+      }
+      return result;
+    }
+  }
+
   protected void setParent(INlsProject newParent) {
     m_parent = newParent;
     m_parent.addProjectListener(new P_ParentListener());
@@ -259,6 +314,9 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   @Override
   public void updateRow(INlsEntry row, IProgressMonitor monitor) {
+    if (!StringUtility.hasText(row.getKey())) {
+      throw new IllegalArgumentException("a text key cannot be null.");
+    }
     if (m_entries != null) {
       try {
         m_translationResourceEventLock.acquire();
@@ -314,10 +372,7 @@ public abstract class AbstractNlsProject implements INlsProject {
   private void handleParentRowAdded(INlsEntry superRow) {
     if (m_entries != null) {
       NlsEntry entry = m_entries.get(superRow.getKey());
-      if (entry != null) {
-        NlsCore.logError("NLS entry with key:'" + superRow.getKey() + "' already exists");
-      }
-      else {
+      if (entry == null || entry.getType() == INlsEntry.TYPE_INHERITED) {
         entry = new InheritedNlsEntry(superRow, this);
         m_entries.put(entry.getKey(), entry);
         fireNlsProjectEvent(new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_ADDED));
@@ -327,9 +382,12 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   private void handleParentRowRemoved(INlsEntry superRow) {
     if (m_entries != null) {
-      NlsEntry removedEntry = m_entries.remove(superRow.getKey());
-      if (removedEntry != null) {
-        fireNlsProjectEvent(new NlsProjectEvent(this, removedEntry, NlsProjectEvent.TYPE_ENTRY_REMOVEED));
+      NlsEntry existing = m_entries.get(superRow.getKey());
+      if (existing.getType() == INlsEntry.TYPE_INHERITED) {
+        NlsEntry removedEntry = m_entries.remove(superRow.getKey());
+        if (removedEntry != null) {
+          fireNlsProjectEvent(new NlsProjectEvent(this, removedEntry, NlsProjectEvent.TYPE_ENTRY_REMOVEED));
+        }
       }
     }
   }
@@ -341,8 +399,10 @@ public abstract class AbstractNlsProject implements INlsProject {
         NlsCore.logError("NLS entry with key:'" + superRow.getKey() + "' not found");
         return;
       }
-      entry.update(superRow);
-      fireNlsProjectEvent(new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_MODIFYED));
+      if (entry.getType() == INlsEntry.TYPE_INHERITED) {
+        entry.update(superRow);
+        fireNlsProjectEvent(new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_MODIFYED));
+      }
     }
   }
 

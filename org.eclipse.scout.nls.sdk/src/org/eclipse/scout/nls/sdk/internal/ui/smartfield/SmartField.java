@@ -23,6 +23,8 @@ import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -83,14 +85,29 @@ public class SmartField extends Composite {
     });
     m_text.addKeyListener(new KeyAdapter() {
       @Override
-      public void keyPressed(KeyEvent e) {
-        if (e.keyCode == SWT.F2) {
-          if (!m_text.getText().equals(m_lastVerifiedInput)) {
-            showSmartDialog(m_text.getText());
+      public void keyReleased(KeyEvent e) {
+        if (e.keyCode == SWT.CR || e.keyCode == SWT.ESC) {
+          return;
+        }
+        showSmartDialog(m_text.getText());
+      }
+    });
+    m_text.addTraverseListener(new TraverseListener() {
+      @Override
+      public void keyTraversed(TraverseEvent e) {
+        List<Object> props;
+        if (e.character == SWT.ESC) {
+          props = m_smartFieldModel.getProposals(m_lastVerifiedInput);
+          e.doit = !m_smartDialog.isVisible();
+        }
+        else {
+          props = m_smartFieldModel.getProposals(m_text.getText());
+          if (props.size() == 0) {
+            props = m_smartFieldModel.getProposals(m_lastVerifiedInput);
           }
-          else {
-            showSmartDialog("");
-          }
+        }
+        if (props.size() > 0) {
+          m_smartDialog.notifyItemSelection(props.get(0));
         }
       }
     });
@@ -128,7 +145,6 @@ public class SmartField extends Composite {
 
     data = new FormData();
     data.top = new FormAttachment(0, 0);
-    // data.left = new FormAttachment(m_label,5);
     data.bottom = new FormAttachment(100, 0);
     data.right = new FormAttachment(100, 0);
     m_smartButton.setLayoutData(data);
@@ -157,11 +173,9 @@ public class SmartField extends Composite {
 
   protected void showSmartDialog(String text) {
     Rectangle textBounds = m_text.getBounds();
-
     Point location = m_text.toDisplay(new Point(0, textBounds.height));
     Rectangle popupBounds = new Rectangle(location.x, location.y, textBounds.width, SWT.DEFAULT);
     m_smartDialog.open(popupBounds, text);
-    m_smartDialog.setFocus();
   }
 
   protected void showSmartDialogLazy(String text) {
@@ -169,7 +183,6 @@ public class SmartField extends Composite {
     Point location = m_text.toDisplay(new Point(0, textBounds.height));
     Rectangle popupBounds = new Rectangle(location.x, location.y, textBounds.width, SWT.DEFAULT);
     m_smartDialog.lazyOpen(popupBounds, text);
-    m_smartDialog.setFocus();
   }
 
   public void addSmartFieldListener(ISmartFieldListener listener) {
@@ -181,7 +194,9 @@ public class SmartField extends Composite {
   }
 
   public void setValue(Object value) {
-    m_text.setText(m_smartFieldModel.getText(value));
+    String txt = m_smartFieldModel.getText(value);
+    m_text.setText(txt);
+    m_text.setSelection(0, txt.length());
     m_lastVerifiedInput = m_text.getText();
     fireInputChanged(value);
   }
