@@ -276,7 +276,6 @@ public final class ScoutWorkspace implements IScoutWorkspace {
       e.printStackTrace();
     }
     return false;
-
   }
 
   private boolean addProjectNoFire(IProject project, ScoutWorkspaceEventList eventCollector) throws CoreException {

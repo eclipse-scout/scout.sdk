@@ -93,6 +93,9 @@ public class JavaElementDeleteOperation implements IOperation {
   }
 
   protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    if (member == null) {
+      return;
+    }
     if (!member.exists()) {
       ScoutSdk.logWarning("Can not delete a non existing member '" + member.getElementName() + "'.");
       return;
