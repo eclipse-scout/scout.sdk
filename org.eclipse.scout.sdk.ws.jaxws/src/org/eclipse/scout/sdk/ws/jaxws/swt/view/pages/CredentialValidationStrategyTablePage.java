@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -44,7 +44,7 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
     setName(Texts.get("CredentialValidation1"));
 
     try {
-      m_hierarchy = JaxWsRuntimeClasses.ICredentialValidationStrategy.newTypeHierarchy(new NullProgressMonitor());
+      m_hierarchy = TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy).newTypeHierarchy(new NullProgressMonitor());
       m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
       m_hierarchy.addTypeHierarchyChangedListener(m_hierarchyChangedListener);
     }
@@ -75,7 +75,7 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
     if (clearCache) {
       try {
         if (m_hierarchy == null) {
-          m_hierarchy = JaxWsRuntimeClasses.ICredentialValidationStrategy.newTypeHierarchy(new NullProgressMonitor());
+          m_hierarchy = TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy).newTypeHierarchy(new NullProgressMonitor());
           m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
           m_hierarchy.addTypeHierarchyChangedListener(m_hierarchyChangedListener);
         }
@@ -117,7 +117,7 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
     // Scout SDK hierarchy (IPrimaryTypeTypeHierarchy) cannot be used as type creation events are not propagates because they are created by JDT NewClassWizardPage.
     List<IType> types = new ArrayList<IType>();
     try {
-      for (IType type : m_hierarchy.getAllSubtypes(JaxWsRuntimeClasses.ICredentialValidationStrategy)) {
+      for (IType type : m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy))) {
         if (TypeUtility.isOnClasspath(type, getScoutResource().getJavaProject()) &&
             !type.isInterface() && !Flags.isAbstract(type.getFlags()) && !Signature.getQualifier(type.getFullyQualifiedName()).contains("internal")) {
           types.add(type);

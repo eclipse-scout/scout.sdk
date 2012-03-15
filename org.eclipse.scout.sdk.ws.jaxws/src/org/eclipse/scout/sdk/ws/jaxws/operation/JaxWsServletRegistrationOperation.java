@@ -92,7 +92,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     xml.setAttribute(ServletRegistrationUtility.XML_NAME, m_registrationBundle.getBundleName());
     ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xml.getDocument(), IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
 
-    String jaxWsServletClass = JaxWsRuntimeClasses.JaxWsServlet.getFullyQualifiedName();
+    String jaxWsServletClass = TypeUtility.getType(JaxWsRuntimeClasses.JaxWsServlet).getFullyQualifiedName();
     String alias = StringUtility.trim(JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType));
 
     // get original alias of servlet registration bundle and remove the servlet registration to be registered anew
@@ -136,7 +136,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
 
         @Override
         public boolean accept(IScoutBundle bundle) {
-          return bundle.getType() == IScoutBundle.BUNDLE_SERVER && TypeUtility.isOnClasspath(JaxWsRuntimeClasses.JaxWsActivator, bundle.getJavaProject()); // ensure JAX-WS installed on bundle
+          return bundle.getType() == IScoutBundle.BUNDLE_SERVER && TypeUtility.isOnClasspath(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator), bundle.getJavaProject()); // ensure JAX-WS installed on bundle
         }
       }, true);
 

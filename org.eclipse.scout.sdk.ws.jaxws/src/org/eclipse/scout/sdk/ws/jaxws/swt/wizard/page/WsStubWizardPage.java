@@ -87,7 +87,7 @@ public class WsStubWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_packageBrowseButton = new Button(parent, SWT.PUSH);
+    m_packageBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_packageBrowseButton.setText(Texts.get("Browse"));
     m_packageBrowseButton.addSelectionListener(new SelectionAdapter() {
 

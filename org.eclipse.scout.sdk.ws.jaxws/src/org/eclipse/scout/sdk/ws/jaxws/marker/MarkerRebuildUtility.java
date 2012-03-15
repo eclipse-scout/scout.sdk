@@ -104,8 +104,8 @@ public final class MarkerRebuildUtility {
       }
       // validate port type package
       String recommendedPackageName = JaxWsSdkUtility.getRecommendedProviderImplPackageName(bundle);
-      if (!recommendedPackageName.equals(portType.getPackageFragment().getElementName())) {
-        MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, IMarker.SEVERITY_WARNING, Texts.get("ByConventionXShouldByY", Texts.get("Package"), recommendedPackageName));
+      if (!portType.getPackageFragment().getElementName().startsWith(recommendedPackageName)) {
+        MarkerUtility.createMarker(portType.getResource(), MarkerType.Package, markerGroupUUID, IMarker.SEVERITY_WARNING, Texts.get("ByConventionXShouldStartWithY", Texts.get("Package"), recommendedPackageName));
         return false;
       }
 
@@ -166,9 +166,10 @@ public final class MarkerRebuildUtility {
       }
 
       // validate ScoutWebService annotation
-      IAnnotation scoutWebServiceAnnotation = JaxWsSdkUtility.getAnnotation(portType, JaxWsRuntimeClasses.ScoutWebService.getElementName(), false);
+      IAnnotation scoutWebServiceAnnotation = JaxWsSdkUtility.getAnnotation(portType, TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName(), false);
       if (!TypeUtility.exists(scoutWebServiceAnnotation)) {
-        String markerSourceId = MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, IMarker.SEVERITY_WARNING, Texts.get("ToConfigureAuthenticationAndSessionHandlingForTheWebserviceAnnotateThePortTypeWithX", JaxWsRuntimeClasses.ScoutWebService.getElementName()));
+        String markerSourceId = MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, IMarker.SEVERITY_WARNING,
+            Texts.get("ToConfigureAuthenticationAndSessionHandlingForTheWebserviceAnnotateThePortTypeWithX", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName()));
         JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingScoutWebServiceAnnotationCommand(portType));
         return false;
       }
@@ -605,9 +606,10 @@ public final class MarkerRebuildUtility {
       }
 
       // validate ScoutWebService annotation
-      IAnnotation scoutWebServiceAnnotation = JaxWsSdkUtility.getAnnotation(portType, JaxWsRuntimeClasses.ScoutWebService.getElementName(), false);
+      IAnnotation scoutWebServiceAnnotation = JaxWsSdkUtility.getAnnotation(portType, TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName(), false);
       if (!TypeUtility.exists(scoutWebServiceAnnotation)) {
-        String markerSourceId = MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, IMarker.SEVERITY_WARNING, Texts.get("ToConfigureAuthenticationAndSessionHandlingForTheWebserviceAnnotateThePortTypeWithX", JaxWsRuntimeClasses.ScoutWebService.getElementName()));
+        String markerSourceId = MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, IMarker.SEVERITY_WARNING,
+            Texts.get("ToConfigureAuthenticationAndSessionHandlingForTheWebserviceAnnotateThePortTypeWithX", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName()));
         JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingScoutWebServiceAnnotationCommand(portType));
         return;
       }

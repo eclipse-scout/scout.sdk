@@ -228,13 +228,13 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       m_authenticationHandlerPresenter.setLabel(Texts.get("Authentication"));
       m_authenticationHandlerPresenter.setAcceptNullValue(true);
       m_authenticationHandlerPresenter.setBundle(m_bundle);
-      m_authenticationHandlerPresenter.setAnnotationType(JaxWsRuntimeClasses.ScoutWebServiceClient);
+      m_authenticationHandlerPresenter.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient));
       m_authenticationHandlerPresenter.setProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER);
       m_authenticationHandlerPresenter.setDefaultPackageNameNewType(JaxWsSdkUtility.getRecommendedConsumerSecurityPackageName(m_bundle));
       m_authenticationHandlerPresenter.setMarkerGroupUUID(getPage().getMarkerGroupUUID());
-      m_authenticationHandlerPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer));
+      m_authenticationHandlerPresenter.setSearchScopeFactory(createSubClassesSearchScopeFactory(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer)));
       m_authenticationHandlerPresenter.setAllowChangeOfInterfaceType(true);
-      m_authenticationHandlerPresenter.setInterfaceTypes(new IType[]{JaxWsRuntimeClasses.IAuthenticationHandlerConsumer});
+      m_authenticationHandlerPresenter.setInterfaceTypes(new IType[]{TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer)});
       m_authenticationHandlerPresenter.addValueChangedListener(m_presenterListener);
       m_authenticationHandlerPresenter.getContainer().setLayoutData(new GridData());
       applyLayoutData(m_authenticationHandlerPresenter);
@@ -373,7 +373,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
     m_wsdlFilePresenter.setInput(wsdlFile);
     m_wsdlFilePresenter.setBuildJaxWsBean(buildJaxWsBean);
 
-    IAnnotation scoutWebServiceClientAnnotation = JaxWsSdkUtility.getAnnotation(getPage().getType(), JaxWsRuntimeClasses.ScoutWebServiceClient.getFullyQualifiedName(), false);
+    IAnnotation scoutWebServiceClientAnnotation = JaxWsSdkUtility.getAnnotation(getPage().getType(), TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient).getFullyQualifiedName(), false);
     getSection(SECTION_ID_SCOUT_WEB_SERVICE_CLIENT_ANNOTATION).setVisible(TypeUtility.exists(scoutWebServiceClientAnnotation));
     if (TypeUtility.exists(scoutWebServiceClientAnnotation)) {
       AnnotationProperty propertyValue = JaxWsSdkUtility.parseAnnotationTypeValue(getPage().getType(), scoutWebServiceClientAnnotation, JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER);
@@ -599,7 +599,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
 
           AnnotationUpdateOperation op = new AnnotationUpdateOperation();
           op.setDeclaringType(type);
-          op.setAnnotationType(JaxWsRuntimeClasses.ScoutWebServiceClient);
+          op.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient));
           op.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, factoryType);
           new OperationJob(op).schedule();
           break;

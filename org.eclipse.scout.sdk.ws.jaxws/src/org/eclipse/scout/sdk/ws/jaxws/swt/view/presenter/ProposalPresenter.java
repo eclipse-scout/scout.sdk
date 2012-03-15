@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -39,9 +39,13 @@ public class ProposalPresenter<T extends IContentProposalEx> extends AbstractPro
   }
 
   public void setProposals(IContentProposalEx[] proposals) {
-    setStateChanging(true);
     m_proposals = proposals;
+    initializeProposalField(proposals);
+  }
+
+  private void initializeProposalField(IContentProposalEx[] proposals) {
     if (isControlCreated()) {
+      setStateChanging(true);
       try {
         DefaultProposalProvider provider = new DefaultProposalProvider();
         provider.setShortList(m_proposals);

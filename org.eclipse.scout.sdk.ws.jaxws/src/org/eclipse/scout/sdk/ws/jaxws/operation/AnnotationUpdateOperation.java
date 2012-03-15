@@ -75,7 +75,7 @@ public class AnnotationUpdateOperation implements IOperation {
 
     Map<String, String> resolvedTypePropertyMap = new HashMap<String, String>();
 
-    // if annotation is already installed, get propeties already set
+    // if annotation is already installed, get properties already set
     if (TypeUtility.exists(annotation)) {
       for (IMemberValuePair pair : annotation.getMemberValuePairs()) {
         String propertyName = pair.getMemberName();

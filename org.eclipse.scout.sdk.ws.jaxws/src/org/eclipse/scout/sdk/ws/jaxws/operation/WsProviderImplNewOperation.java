@@ -106,22 +106,22 @@ public class WsProviderImplNewOperation implements IOperation {
     if (m_createScoutWebServiceAnnotation) {
       annotationOp = new AnnotationUpdateOperation();
       annotationOp.setDeclaringType(m_createdType);
-      annotationOp.setAnnotationType(JaxWsRuntimeClasses.ScoutWebService);
+      annotationOp.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService));
 
-      String defaultSessionFactory = (String) JaxWsRuntimeClasses.ScoutWebService.getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
-      String defaultAuthFactory = (String) JaxWsRuntimeClasses.ScoutWebService.getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
-      String defaultCredentialFactory = (String) JaxWsRuntimeClasses.ScoutWebService.getMethod(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY, new String[0]).getDefaultValue().getValue();
+      String defaultSessionFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
+      String defaultAuthFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
+      String defaultCredentialFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY, new String[0]).getDefaultValue().getValue();
 
       if (m_sessionFactoryQName != null && !isSameType(m_sessionFactoryQName, defaultSessionFactory)) {
-        IType type = createType(m_sessionFactoryQName, JaxWsRuntimeClasses.IServerSessionFactory, monitor, workingCopyManager);
+        IType type = createType(m_sessionFactoryQName, TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory), monitor, workingCopyManager);
         annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, type);
       }
       if (m_authenticationHandlerQName != null && !isSameType(m_authenticationHandlerQName, defaultAuthFactory)) {
-        IType type = createType(m_authenticationHandlerQName, JaxWsRuntimeClasses.IAuthenticationHandlerProvider, monitor, workingCopyManager);
+        IType type = createType(m_authenticationHandlerQName, TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider), monitor, workingCopyManager);
         annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, type);
       }
       if (m_credentialValidationStrategyQName != null && !isSameType(m_credentialValidationStrategyQName, defaultCredentialFactory)) {
-        IType type = createType(m_credentialValidationStrategyQName, JaxWsRuntimeClasses.ICredentialValidationStrategy, monitor, workingCopyManager);
+        IType type = createType(m_credentialValidationStrategyQName, TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy), monitor, workingCopyManager);
         annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY, type);
       }
 

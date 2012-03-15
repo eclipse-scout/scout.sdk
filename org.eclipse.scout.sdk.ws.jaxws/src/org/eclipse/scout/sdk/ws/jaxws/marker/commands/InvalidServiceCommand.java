@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -88,7 +89,7 @@ public class InvalidServiceCommand extends AbstractExecutableMarkerCommand {
     int insertPosition = -1;
 
     ReplaceEdit edit = null;
-    Pattern pattern = Pattern.compile(JaxWsRuntimeClasses.AbstractWebServiceClient.getElementName() + "\\s*\\<\\s*([^\\,]*?)\\,([^\\>]*?)\\s*\\>");
+    Pattern pattern = Pattern.compile(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getElementName() + "\\s*\\<\\s*([^\\,]*?)\\,([^\\>]*?)\\s*\\>");
     Matcher matcher = pattern.matcher(sourceAfterClassName);
     if (matcher.find()) {
       insertPosition = positionAfterClassName + matcher.start(1);
@@ -96,7 +97,7 @@ public class InvalidServiceCommand extends AbstractExecutableMarkerCommand {
       edit = new ReplaceEdit(insertionRange.getOffset(), insertionRange.getLength(), m_serviceType.getElementName());
     }
     else {
-      pattern = Pattern.compile(JaxWsRuntimeClasses.AbstractWebServiceClient.getElementName() + "\\s*\\<\\s*([^\\>]*?)\\>");
+      pattern = Pattern.compile(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getElementName() + "\\s*\\<\\s*([^\\>]*?)\\>");
       matcher = pattern.matcher(sourceAfterClassName);
       if (matcher.find()) {
         insertPosition = positionAfterClassName + matcher.start(1);
@@ -104,7 +105,7 @@ public class InvalidServiceCommand extends AbstractExecutableMarkerCommand {
         edit = new ReplaceEdit(insertionRange.getOffset(), insertionRange.getLength(), m_serviceType.getElementName() + ", Object");
       }
       else {
-        pattern = Pattern.compile("(" + JaxWsRuntimeClasses.AbstractWebServiceClient.getElementName() + ")");
+        pattern = Pattern.compile("(" + TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getElementName() + ")");
         matcher = pattern.matcher(sourceAfterClassName);
         if (matcher.find()) {
           insertPosition = positionAfterClassName + matcher.end(1);

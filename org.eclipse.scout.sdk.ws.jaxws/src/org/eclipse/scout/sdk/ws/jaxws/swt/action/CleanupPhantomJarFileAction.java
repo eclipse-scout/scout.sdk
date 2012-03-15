@@ -149,8 +149,8 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
   private IFile[] getConsumerJarFiles() {
     Set<IFile> jarFiles = new HashSet<IFile>();
 
-    IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.AbstractWebServiceClient);
-    IType[] wsConsumerTypes = hierarchy.getAllSubtypes(JaxWsRuntimeClasses.AbstractWebServiceClient, TypeFilters.getClassesInProject(m_bundle.getJavaProject()));
+    IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient));
+    IType[] wsConsumerTypes = hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), TypeFilters.getClassesInProject(m_bundle.getJavaProject()));
 
     for (IType consumerType : wsConsumerTypes) {
       if (!TypeUtility.exists(consumerType)) {

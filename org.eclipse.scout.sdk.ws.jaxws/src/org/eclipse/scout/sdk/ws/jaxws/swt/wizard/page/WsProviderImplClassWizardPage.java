@@ -102,9 +102,9 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
   private void applyDefaults() {
     setAnnotateImplClass(true);
-    setSessionFactory(JaxWsRuntimeClasses.DefaultServerSessionFactory.getFullyQualifiedName());
-    setAuthenticationHandler(JaxWsRuntimeClasses.BasicAuthenticationHandlerProvider.getFullyQualifiedName());
-    setCredentialValidationStrategy(JaxWsRuntimeClasses.ConfigIniCredentialValidationStrategy.getFullyQualifiedName());
+    setSessionFactory(TypeUtility.getType(JaxWsRuntimeClasses.DefaultServerSessionFactory).getFullyQualifiedName());
+    setAuthenticationHandler(TypeUtility.getType(JaxWsRuntimeClasses.BasicAuthenticationHandlerProvider).getFullyQualifiedName());
+    setCredentialValidationStrategy(TypeUtility.getType(JaxWsRuntimeClasses.ConfigIniCredentialValidationStrategy).getFullyQualifiedName());
 
     setPackageName(JaxWsSdkUtility.getRecommendedProviderImplPackageName(m_bundle));
   }
@@ -141,7 +141,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_packageBrowseButton = new Button(parent, SWT.PUSH);
+    m_packageBrowseButton = new Button(parent, SWT.PUSH | SWT.FLAT);
     m_packageBrowseButton.setText(Texts.get("Browse"));
     m_packageBrowseButton.addSelectionListener(new SelectionAdapter() {
 
@@ -155,7 +155,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_annotateImplButton = new Button(parent, SWT.CHECK);
-    m_annotateImplButton.setText(Texts.get("AnnotateImplClass", JaxWsRuntimeClasses.ScoutWebService.getElementName()));
+    m_annotateImplButton.setText(Texts.get("AnnotateImplClass", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName()));
     m_annotateImplButton.setSelection(isAnnotateImplClass());
     m_annotateImplButton.addSelectionListener(new SelectionAdapter() {
 
@@ -169,7 +169,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
     m_descriptionScoutAnnotation = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
     m_descriptionScoutAnnotation.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
-    m_descriptionScoutAnnotation.setText(Texts.get("DescriptionScoutWebServiceAnnotation", JaxWsRuntimeClasses.ScoutWebService.getElementName()));
+    m_descriptionScoutAnnotation.setText(Texts.get("DescriptionScoutWebServiceAnnotation", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName()));
 
     m_descriptionSessionFactory = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
     m_descriptionSessionFactory.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
@@ -186,14 +186,14 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_tooltipSessionFactory = new JavadocTooltip(m_sessionFactoryField.getTextComponent());
 
-    m_sessionFactoryBrowseButton = new Button(m_containerAnnotation, SWT.PUSH);
+    m_sessionFactoryBrowseButton = new Button(m_containerAnnotation, SWT.PUSH | SWT.FLAT);
     m_sessionFactoryBrowseButton.setText(Texts.get("Browse"));
     m_sessionFactoryBrowseButton.addSelectionListener(new SelectionAdapter() {
 
       @Override
       public void widgetSelected(SelectionEvent e) {
         try {
-          IJavaSearchScope searchScope = createSubClassesSearchScope(JaxWsRuntimeClasses.IServerSessionFactory);
+          IJavaSearchScope searchScope = createSubClassesSearchScope(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory));
 
           SelectionDialog dialog = JavaUI.createTypeDialog(ScoutSdkUi.getShell(), null, searchScope, IJavaElementSearchConstants.CONSIDER_CLASSES, false, "*.*");
           dialog.setTitle(Texts.get("SessionFactory"));
@@ -228,14 +228,14 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_tooltipAuthenticationHandler = new JavadocTooltip(m_authenticationHandlerField.getTextComponent());
 
-    m_authenticationHandlerBrowseButton = new Button(m_containerAnnotation, SWT.PUSH);
+    m_authenticationHandlerBrowseButton = new Button(m_containerAnnotation, SWT.PUSH | SWT.FLAT);
     m_authenticationHandlerBrowseButton.setText(Texts.get("Browse"));
     m_authenticationHandlerBrowseButton.addSelectionListener(new SelectionAdapter() {
 
       @Override
       public void widgetSelected(SelectionEvent e) {
         try {
-          IJavaSearchScope searchScope = createSubClassesSearchScope(JaxWsRuntimeClasses.IAuthenticationHandlerProvider);
+          IJavaSearchScope searchScope = createSubClassesSearchScope(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider));
 
           SelectionDialog dialog = JavaUI.createTypeDialog(ScoutSdkUi.getShell(), null, searchScope, IJavaElementSearchConstants.CONSIDER_CLASSES, false, "*.*");
           dialog.setTitle(Texts.get("AuthenticationMechanism"));
@@ -270,14 +270,14 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_tooltipCredentialValidationStrategy = new JavadocTooltip(m_credentialValidationStrategyField.getTextComponent());
 
-    m_credentialValidationStrategyButton = new Button(m_containerAnnotation, SWT.PUSH);
+    m_credentialValidationStrategyButton = new Button(m_containerAnnotation, SWT.PUSH | SWT.FLAT);
     m_credentialValidationStrategyButton.setText(Texts.get("Browse"));
     m_credentialValidationStrategyButton.addSelectionListener(new SelectionAdapter() {
 
       @Override
       public void widgetSelected(SelectionEvent e) {
         try {
-          IJavaSearchScope searchScope = createSubClassesSearchScope(JaxWsRuntimeClasses.ICredentialValidationStrategy);
+          IJavaSearchScope searchScope = createSubClassesSearchScope(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy));
 
           SelectionDialog dialog = JavaUI.createTypeDialog(ScoutSdkUi.getShell(), null, searchScope, IJavaElementSearchConstants.CONSIDER_CLASSES, false, "*.*");
           dialog.setTitle(Texts.get("CredentialValidationStrategy"));
@@ -400,9 +400,9 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     validateType(multiStatus);
 
     if (isAnnotateImplClass()) {
-      validateFactoryType(multiStatus, Texts.get("SessionFactory"), getSessionFactory(), JaxWsRuntimeClasses.IServerSessionFactory, JaxWsSdkUtility.getRecommendedSessionPackageName(m_bundle));
-      validateFactoryType(multiStatus, Texts.get("AuthenticationFactory"), getAuthenticationHandler(), JaxWsRuntimeClasses.IAuthenticationHandlerProvider, JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
-      validateFactoryType(multiStatus, Texts.get("CredentialValidationFactory"), getCredentialValidationStrategy(), JaxWsRuntimeClasses.ICredentialValidationStrategy, JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
+      validateFactoryType(multiStatus, Texts.get("SessionFactory"), getSessionFactory(), TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory), JaxWsSdkUtility.getRecommendedSessionPackageName(m_bundle));
+      validateFactoryType(multiStatus, Texts.get("AuthenticationFactory"), getAuthenticationHandler(), TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider), JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
+      validateFactoryType(multiStatus, Texts.get("CredentialValidationFactory"), getCredentialValidationStrategy(), TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy), JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
     }
   }
 
@@ -578,7 +578,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
         if (TypeUtility.existsType(sessionFactory)) {
           IType type = TypeUtility.getType(sessionFactory);
-          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.IServerSessionFactory)) {
+          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory))) {
             m_tooltipSessionFactory.setMember(type);
           }
         }
@@ -621,7 +621,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(authenticationHandler)) {
         IType type = TypeUtility.getType(authenticationHandler);
         try {
-          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.IAuthenticationHandlerProvider)) {
+          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider))) {
             m_tooltipAuthenticationHandler.setMember(type);
           }
         }
@@ -658,7 +658,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(credentialValidationStrategy)) {
         IType type = TypeUtility.getType(credentialValidationStrategy);
         try {
-          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(JaxWsRuntimeClasses.ICredentialValidationStrategy)) {
+          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy))) {
             m_tooltipCredentialValidationStrategy.setMember(type);
           }
         }

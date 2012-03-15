@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -47,10 +47,10 @@ public class AuthenticationHandlerTablePage extends AbstractPage {
     setName(Texts.get("Authentication"));
     m_webserviceEnum = webserviceEnum;
     if (webserviceEnum == WebserviceEnum.Provider) {
-      m_superInterfaceType = JaxWsRuntimeClasses.IAuthenticationHandlerProvider;
+      m_superInterfaceType = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider);
     }
     else {
-      m_superInterfaceType = JaxWsRuntimeClasses.IAuthenticationHandlerConsumer;
+      m_superInterfaceType = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer);
     }
     try {
       m_hierarchy = m_superInterfaceType.newTypeHierarchy(new NullProgressMonitor());

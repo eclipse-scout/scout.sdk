@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -105,7 +105,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
 
     Composite buttonComposite = new Composite(container, SWT.NONE);
 
-    m_addButton = new Button(buttonComposite, SWT.PUSH);
+    m_addButton = new Button(buttonComposite, SWT.PUSH | SWT.FLAT);
     m_addButton.setText(Texts.get("Add"));
     m_addButton.addSelectionListener(new SelectionAdapter() {
 
@@ -115,7 +115,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_removeButton = new Button(buttonComposite, SWT.PUSH);
+    m_removeButton = new Button(buttonComposite, SWT.PUSH | SWT.FLAT);
     m_removeButton.setText(Texts.get("Remove"));
     m_removeButton.setEnabled(false);
     m_removeButton.addSelectionListener(new SelectionAdapter() {

@@ -26,11 +26,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -95,24 +97,25 @@ public class BindingFileCreateOperation implements IOperation {
     if (isCreateGlobalBindingSection()) {
       ScoutXmlElement globalBindingsXml = rootXml.addChild();
       globalBindingsXml.setName("jaxb:globalBindings");
+      IType utcDateAdapterType = TypeUtility.getType(JaxWsRuntimeClasses.UtcDateAdapter);
 
       ScoutXmlElement bindingJavaTypeXml = globalBindingsXml.addChild();
       bindingJavaTypeXml.setName("xjc:javaType");
       bindingJavaTypeXml.setAttribute("name", Date.class.getName());
       bindingJavaTypeXml.setAttribute("xmlType", "xsd:date");
-      bindingJavaTypeXml.setAttribute("adapter", JaxWsRuntimeClasses.UtcDateAdapter.getFullyQualifiedName());
+      bindingJavaTypeXml.setAttribute("adapter", utcDateAdapterType.getFullyQualifiedName());
 
       bindingJavaTypeXml = globalBindingsXml.addChild();
       bindingJavaTypeXml.setName("xjc:javaType");
       bindingJavaTypeXml.setAttribute("name", Date.class.getName());
       bindingJavaTypeXml.setAttribute("xmlType", "xsd:time");
-      bindingJavaTypeXml.setAttribute("adapter", JaxWsRuntimeClasses.UtcDateAdapter.getFullyQualifiedName());
+      bindingJavaTypeXml.setAttribute("adapter", utcDateAdapterType.getFullyQualifiedName());
 
       bindingJavaTypeXml = globalBindingsXml.addChild();
       bindingJavaTypeXml.setName("xjc:javaType");
       bindingJavaTypeXml.setAttribute("name", Date.class.getName());
       bindingJavaTypeXml.setAttribute("xmlType", "xsd:dateTime");
-      bindingJavaTypeXml.setAttribute("adapter", JaxWsRuntimeClasses.UtcDateAdapter.getFullyQualifiedName());
+      bindingJavaTypeXml.setAttribute("adapter", utcDateAdapterType.getFullyQualifiedName());
     }
     /*
      *  legacy: the following code dynamically creates adapters when stub is generated.

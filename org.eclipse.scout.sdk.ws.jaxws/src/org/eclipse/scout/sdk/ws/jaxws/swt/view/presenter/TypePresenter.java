@@ -110,7 +110,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
     });
     m_javaDocTooltip = new JavadocTooltip(m_textField);
 
-    m_button = new Button(composite, SWT.PUSH);
+    m_button = new Button(composite, SWT.PUSH | SWT.FLAT);
     m_button.setText(Texts.get("Browse"));
     m_button.addSelectionListener(new SelectionAdapter() {
 

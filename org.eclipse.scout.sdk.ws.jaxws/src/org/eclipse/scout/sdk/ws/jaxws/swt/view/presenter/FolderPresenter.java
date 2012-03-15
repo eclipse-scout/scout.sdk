@@ -79,7 +79,7 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
     m_textField.setEditable(false);
     m_textField.setBackground(JaxWsSdkUtility.getColorLightGray());
 
-    m_button = new Button(m_composite, SWT.PUSH);
+    m_button = new Button(m_composite, SWT.PUSH | SWT.FLAT);
     m_button.setText(getConfiguredBrowseButtonLabel());
     m_button.addSelectionListener(new SelectionAdapter() {
 

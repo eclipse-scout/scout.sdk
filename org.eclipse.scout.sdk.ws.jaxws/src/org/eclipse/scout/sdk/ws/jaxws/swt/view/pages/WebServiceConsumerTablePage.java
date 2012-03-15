@@ -46,7 +46,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
     m_bundle = getScoutResource();
 
     m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
-    m_hierarchy = TypeUtility.getPrimaryTypeHierarchy(JaxWsRuntimeClasses.AbstractWebServiceClient);
+    m_hierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient));
     m_hierarchy.addHierarchyListener(m_hierarchyChangedListener);
 
     // listener on build-jaxws.xml is necessary to reflect created consumers. That is because type listener is not notified about created types (bug).
@@ -102,7 +102,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    IType[] wsConsumerTypes = m_hierarchy.getAllSubtypes(JaxWsRuntimeClasses.AbstractWebServiceClient, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] wsConsumerTypes = m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType consumerType : wsConsumerTypes) {
       new WebServiceConsumerNodePage(this, consumerType);
     }

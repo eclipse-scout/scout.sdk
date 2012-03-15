@@ -67,7 +67,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
     superTypeSignature += ", ";
     superTypeSignature += Signature.toString(Signature.createTypeSignature(jaxWsPortType.getFullyQualifiedName(), true));
     superTypeSignature += ">";
-    superTypeSignature = Signature.createTypeSignature(JaxWsRuntimeClasses.AbstractWebServiceClient.getFullyQualifiedName() + superTypeSignature, true);
+    superTypeSignature = Signature.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getFullyQualifiedName() + superTypeSignature, true);
     setServiceSuperTypeSignature(superTypeSignature);
     super.run(monitor, workingCopyManager);
 
@@ -81,13 +81,13 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
     if (m_createScoutWebServiceAnnotation) {
       AnnotationUpdateOperation annotationOp = new AnnotationUpdateOperation();
       annotationOp.setDeclaringType(createdType);
-      annotationOp.setAnnotationType(JaxWsRuntimeClasses.ScoutWebServiceClient);
+      annotationOp.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient));
 
-      String defaultAuthFactory = (String) JaxWsRuntimeClasses.ScoutWebServiceClient.getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
+      String defaultAuthFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient).getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
       // only add annotation property if different to default
 
       if (m_authenticationHandlerQName != null && !isSameType(m_authenticationHandlerQName, defaultAuthFactory)) {
-        IType type = createType(m_authenticationHandlerQName, JaxWsRuntimeClasses.IAuthenticationHandlerConsumer, monitor, workingCopyManager);
+        IType type = createType(m_authenticationHandlerQName, TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer), monitor, workingCopyManager);
         annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, type);
       }
       annotationOp.validate();
