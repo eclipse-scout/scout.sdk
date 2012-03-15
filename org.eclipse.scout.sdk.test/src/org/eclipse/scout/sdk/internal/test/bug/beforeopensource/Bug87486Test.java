@@ -77,7 +77,7 @@ public class Bug87486Test extends AbstractScoutSdkTest {
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("a.shared");
     IScoutProject scoutProject = ScoutSdkCore.getScoutWorkspace().getScoutBundle(project).getScoutProject();
     IIconProvider projectIcons = scoutProject.getIconProvider();
-    ScoutIconDesc iconDesc = projectIcons.getIcon("\"" + iconName + "\"");
+    ScoutIconDesc iconDesc = projectIcons.getIcon(iconName);
 
     Assert.assertNotNull(iconDesc);
     Assert.assertEquals(iconName, iconDesc.getIconName());
