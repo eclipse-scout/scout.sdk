@@ -15,6 +15,7 @@ import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
@@ -36,6 +37,26 @@ public final class JdtUtility {
 
   public static boolean hasAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
     return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
+  }
+
+  public static Double getNumericAnnotationValue(IAnnotation annotation, String name) throws JavaModelException {
+    if (TypeUtility.exists(annotation)) {
+      IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
+      for (IMemberValuePair p : memberValues) {
+        if (name.equals(p.getMemberName())) {
+          switch (p.getValueKind()) {
+            case IMemberValuePair.K_DOUBLE:
+              return ((Double) p.getValue()).doubleValue();
+            case IMemberValuePair.K_FLOAT:
+              return ((Float) p.getValue()).doubleValue();
+            case IMemberValuePair.K_INT:
+              return ((Integer) p.getValue()).doubleValue();
+          }
+          break;
+        }
+      }
+    }
+    return null;
   }
 
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
@@ -61,7 +82,7 @@ public final class JdtUtility {
 
   /**
    * Escape the given string in java style.
-   * 
+   *
    * @param s
    *          The string to escape.
    * @return A new string with backslashes and double-quotes escaped in java style.
@@ -74,7 +95,7 @@ public final class JdtUtility {
   /**
    * converts the given string into a string literal with leading and ending double-quotes including escaping of the
    * given value.
-   * 
+   *
    * @param s
    *          the string to convert.
    * @return the literal string.

@@ -99,7 +99,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * }
    * // execCreateChildPages.getAllNewTypeOccurrences() returns BCType[]{A,B}
    * </xmp>
-   * 
+   *
    * @return
    * @throws JavaModelException
    */
@@ -545,31 +545,8 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static Double getOrderAnnotationValue(IAnnotatable a) throws JavaModelException {
-    Double sortNo = null;
-    IAnnotation annotation = JdtUtility.getAnnotation(a, RuntimeClasses.Order);
-    if (TypeUtility.exists(annotation)) {
-      IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
-      for (IMemberValuePair p : memberValues) {
-        if ("value".equals(p.getMemberName())) {
-          switch (p.getValueKind()) {
-            case IMemberValuePair.K_DOUBLE:
-              sortNo = ((Double) p.getValue()).doubleValue();
-              break;
-            case IMemberValuePair.K_FLOAT:
-              sortNo = ((Float) p.getValue()).doubleValue();
-              break;
-            case IMemberValuePair.K_INT:
-              sortNo = ((Integer) p.getValue()).doubleValue();
-              break;
-            default:
-              sortNo = null;
-              break;
-          }
-          break;
-        }
-      }
-    }
-    return sortNo;
+	IAnnotation annotation = JdtUtility.getAnnotation(a, RuntimeClasses.Order);
+	return JdtUtility.getNumericAnnotationValue(annotation, "value");
   }
 
   public static IType[] getFormFieldsWithoutButtons(IType declaringType) {
@@ -1123,7 +1100,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   /**
    * don not hang on this object.
-   * 
+   *
    * @param type
    * @return
    */
