@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
@@ -137,7 +138,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(g, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType));
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(g, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType), SignatureProposalProvider.DEFAULT_MOST_USED);
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -220,7 +221,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
         m_continueOperation = newSelection.get(0);
       }
     });
-    nextStepOptions.setValue(CONTINUE_OPERATION.FINISH);
+    nextStepOptions.setValue(m_continueOperation);
     nextStepOptions.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
@@ -255,9 +256,9 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setNlsEntry(getNlsName());
     operation.setTypeName(getTypeName());
     operation.setCodeType(getCodeType());
-    /*if (getLookupCall() != null) {
-      operation.setLookupCall(getLookupCall().getType());
-    }*/
+    if (getLookupCall() != null) {
+      operation.setLookupCall(getLookupCall());
+    }
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_COLUMN));
@@ -312,11 +313,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusLookupCallCodeType() {
-    // if(getCodeType() == null && getLookupCall() == null){
-    // return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "A lookup call or a code type must be set.");
-    // }
-    // else
-    if (getCodeType() != null/* && getLookupCall() != null*/) {
+    if (getCodeType() != null && getLookupCall() != null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("OnlyOneOfCodeTypeOrLookupCallCanBeProcessed"));
     }
     return Status.OK_STATUS;
@@ -446,5 +443,4 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       setStateChanging(false);
     }
   }
-
 }
