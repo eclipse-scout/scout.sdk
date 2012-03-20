@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.internal.core.PDECore;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
@@ -187,13 +187,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
     // second check class annotation
     try {
-      IAnnotation a = registration.getAnnotation("org.eclipse.scout.commons.annotations.Priority");
-      if (a != null) {
-        for (IMemberValuePair mvp : a.getMemberValuePairs()) {
-          if ("value".equals(mvp.getMemberName()) && mvp.getValue() instanceof Float) {
-            return ((Float) mvp.getValue()).floatValue();
-          }
-        }
+      IAnnotation a = JdtUtility.getAnnotation(registration, RuntimeClasses.Ranking);
+      Double val = JdtUtility.getNumericAnnotationValue(a, "value");
+      if (val != null) {
+        return val.floatValue();
       }
     }
     catch (Exception e) {

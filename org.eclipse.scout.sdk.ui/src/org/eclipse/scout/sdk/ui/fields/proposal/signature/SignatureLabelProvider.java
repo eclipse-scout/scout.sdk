@@ -44,16 +44,16 @@ public class SignatureLabelProvider extends SelectionStateLabelProvider {
 
   @Override
   public String getTextSelected(Object element) {
-    String signature = (String) element;
-    if (SignatureUtility.getTypeSignatureKind(signature) != Signature.BASE_TYPE_SIGNATURE) {
-      // append packageName
-      StringBuilder textBuilder = new StringBuilder(getText(element));
-      textBuilder.append("  (").append(Signature.getSignatureQualifier(signature)).append(")");
-      return textBuilder.toString();
+    if (element instanceof String) {
+      String signature = (String) element;
+      if (SignatureUtility.getTypeSignatureKind(signature) != Signature.BASE_TYPE_SIGNATURE) {
+        // append packageName
+        StringBuilder textBuilder = new StringBuilder(getText(element));
+        textBuilder.append("  (").append(Signature.getSignatureQualifier(signature)).append(")");
+        return textBuilder.toString();
+      }
     }
-    else {
-      return getText(element);
-    }
+    return getText(element);
   }
 
   @Override

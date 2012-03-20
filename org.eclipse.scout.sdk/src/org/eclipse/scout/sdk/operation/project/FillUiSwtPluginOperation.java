@@ -57,10 +57,11 @@ public class FillUiSwtPluginOperation extends AbstractScoutProjectNewOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Map<String, String> props = getStringProperties();
     String destPathPref = "src/" + (m_project.getName().replace('.', '/')) + "/";
+
     new InstallJavaFileOperation("templates/ui.swt/src/Activator.java", destPathPref + "Activator.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/perspective/Perspective.java", destPathPref + "perspective/Perspective.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/CenterView.java", destPathPref + "views/CenterView.java", m_project, props).run(monitor, workingCopyManager);
 
+    new InstallJavaFileOperation("templates/ui.swt/src/views/CenterView.java", destPathPref + "views/CenterView.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/views/OutlinePageView.java", destPathPref + "views/OutlinePageView.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/views/SearchView.java", destPathPref + "views/SearchView.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/views/TablePageView.java", destPathPref + "views/TablePageView.java", m_project, props).run(monitor, workingCopyManager);

@@ -12,77 +12,94 @@ package org.eclipse.scout.sdk.rap.operations.project;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class InstallTargetPlatformFileOperation extends InstallTextFileOperation {
   private static final String TARGET_FILE_NAME = "ScoutRAP.target";
   private static final String VARIABLE_RAP_LOCATION = "RAP_LOCATION";
 
-  private static final String SCOUT_RT_RAP_FEATURE_URL = "http://download.eclipse.org/scout/nightly/update";
-  //TODO: enable juno update site
-  //private static final String SCOUT_RT_RAP_FEATURE_URL = "http://download.eclipse.org/releases/juno";
-  private static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.feature.feature.group";
+  // Scout RAP runtime
+  public static final String SCOUT_RT_RAP_FEATURE_URL = "http://download.eclipse.org/releases/juno";
+  public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.feature.feature.group";
 
-  // RAP runtime
-  private static final String ECLIPSE_RT_RAP_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/runtime";
-  private static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.runtime.feature.group";
+  // Eclipse RAP runtime
+  public static final String ECLIPSE_RT_RAP_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/runtime";
+  public static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.runtime.feature.group";
 
-  // RAP Incubator
-  private static final String ECLIPSE_RT_RAP_INCUB_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/incubator";
-  private static final String ECLIPSE_RT_RAP_INCUB_FEATURE = "org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group";
+  // Eclipse RAP Incubator
+  public static final String ECLIPSE_RT_RAP_INCUB_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/incubator";
+  public static final String ECLIPSE_RT_RAP_INCUB_FEATURE = "org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group";
 
-  private String m_rapTargetLocalFolder;
+  private final ArrayList<ITargetEntryContributor> m_entryList;
+
+  protected static interface ITargetEntryContributor {
+    void contributeXml(StringBuilder sb, IProgressMonitor monitor) throws CoreException;
+  }
 
   public InstallTargetPlatformFileOperation(IProject dstProject) {
     super("templates/ui.rap/ScoutRAP.target", TARGET_FILE_NAME, ScoutSdkRap.getDefault().getBundle(), dstProject, new HashMap<String, String>());
+    m_entryList = new ArrayList<ITargetEntryContributor>();
+  }
+
+  public void addEclipseHomeEntry() {
+    m_entryList.add(new ITargetEntryContributor() {
+      @Override
+      public void contributeXml(StringBuilder sb, IProgressMonitor monitor) {
+        sb.append("    <location path=\"${eclipse_home}\" type=\"Profile\"/>\n");
+      }
+    });
+  }
+
+  public void addLocalDirectory(final String dir) {
+    m_entryList.add(new ITargetEntryContributor() {
+      @Override
+      public void contributeXml(StringBuilder sb, IProgressMonitor monitor) {
+        sb.append("    <location path=\"" + dir + "\" type=\"Directory\"/>\n");
+      }
+    });
+  }
+
+  public void addUpdateSite(final String locationUrl, final String featureId) throws CoreException {
+    ITargetEntryContributor entry = new ITargetEntryContributor() {
+      @Override
+      public void contributeXml(StringBuilder sb, IProgressMonitor monitor) throws CoreException {
+        try {
+          String version = P2Utility.getLatestVersion(featureId, new URI(locationUrl), monitor);
+          sb.append("    <location includeAllPlatforms=\"false\" includeMode=\"slicer\" type=\"InstallableUnit\">\n");
+          sb.append("      <unit id=\"" + featureId + "\" version=\"" + version + "\"/>\n");
+          sb.append("      <repository location=\"" + locationUrl + "\"/>\n");
+          sb.append("    </location>\n");
+        }
+        catch (URISyntaxException e) {
+          throw new CoreException(new ScoutStatus(e));
+        }
+      }
+    };
+    m_entryList.add(entry);
+
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    String location = null;
-    if (getRapTargetLocalFolder() != null) {
-      location = "<location path=\"" + getRapTargetLocalFolder() + "\" type=\"Directory\"/>";
-    }
-    else {
-      try {
-        String latestScoutRapVersion = P2Utility.getLatestVersion(SCOUT_RT_RAP_FEATURE, new URI(SCOUT_RT_RAP_FEATURE_URL), monitor);
-        String latestEclipseRapVersion = P2Utility.getLatestVersion(ECLIPSE_RT_RAP_FEATURE, new URI(ECLIPSE_RT_RAP_FEATURE_URL), monitor);
-        String latestEclipseRapIncubVersion = P2Utility.getLatestVersion(ECLIPSE_RT_RAP_INCUB_FEATURE, new URI(ECLIPSE_RT_RAP_INCUB_FEATURE_URL), monitor);
-        if (latestScoutRapVersion != null && latestEclipseRapVersion != null && latestEclipseRapIncubVersion != null) {
-          StringBuilder remoteLocationBuilder = new StringBuilder();
-          remoteLocationBuilder.append("<location includeAllPlatforms=\"false\" includeMode=\"slicer\" type=\"InstallableUnit\">\n");
-          remoteLocationBuilder.append("  <unit id=\"" + SCOUT_RT_RAP_FEATURE + "\" version=\"" + latestScoutRapVersion + "\"/>\n");
-          remoteLocationBuilder.append("  <repository location=\"" + SCOUT_RT_RAP_FEATURE_URL + "\"/>\n");
-          remoteLocationBuilder.append("</location>\n");
-          remoteLocationBuilder.append("<location includeAllPlatforms=\"false\" includeMode=\"slicer\" type=\"InstallableUnit\">\n");
-          remoteLocationBuilder.append("  <unit id=\"" + ECLIPSE_RT_RAP_FEATURE + "\" version=\"" + latestEclipseRapVersion + "\"/>\n");
-          remoteLocationBuilder.append("  <repository location=\"" + ECLIPSE_RT_RAP_FEATURE_URL + "\"/>\n");
-          remoteLocationBuilder.append("</location>\n");
-          remoteLocationBuilder.append("<location includeAllPlatforms=\"false\" includeMode=\"slicer\" type=\"InstallableUnit\">\n");
-          remoteLocationBuilder.append("  <unit id=\"" + ECLIPSE_RT_RAP_INCUB_FEATURE + "\" version=\"" + latestEclipseRapIncubVersion + "\"/>\n");
-          remoteLocationBuilder.append("  <repository location=\"" + ECLIPSE_RT_RAP_INCUB_FEATURE_URL + "\"/>\n");
-          remoteLocationBuilder.append("</location>\n");
-          location = remoteLocationBuilder.toString();
-        }
-      }
-      catch (URISyntaxException e) {
-        ScoutSdkRap.logError("could not install rap target file.", e);
-      }
-      catch (IllegalArgumentException e) {
-        ScoutSdkRap.logError("could not parse scout rap remote version.", e);
-      }
+    StringBuilder locations = new StringBuilder(1024);
+    for (ITargetEntryContributor entry : m_entryList) {
+      entry.contributeXml(locations, monitor);
     }
 
-    if (location != null) {
+    String location = locations.toString();
+    if (StringUtility.hasText(location)) {
       getProperties().put(VARIABLE_RAP_LOCATION, location); // used as replacement in the parent call
       super.run(monitor, workingCopyManager);
 
@@ -93,13 +110,5 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
         ScoutSdkRap.logError("could not set target to file '" + getCreatedFile().getProjectRelativePath().toString() + "'.", e);
       }
     }
-  }
-
-  public String getRapTargetLocalFolder() {
-    return m_rapTargetLocalFolder;
-  }
-
-  public void setRapTargetLocalFolder(String rapTargetLocalFolder) {
-    m_rapTargetLocalFolder = rapTargetLocalFolder;
   }
 }

@@ -220,6 +220,7 @@ public final class RuntimeClasses {
   public static final String LookupCall = "org.eclipse.scout.rt.shared.services.lookup.LookupCall"; // NO_UCD
   public static final String LookupRow = "org.eclipse.scout.rt.shared.services.lookup.LookupRow"; // NO_UCD
   public static final String Order = "org.eclipse.scout.commons.annotations.Order"; // NO_UCD
+  public static final String Ranking = "org.eclipse.scout.commons.annotations.Priority"; // NO_UCD
   public static final String ScoutTexts = "org.eclipse.scout.rt.shared.ScoutTexts"; // NO_UCD
   public static final String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter"; // NO_UCD
   public static final String ServerServiceFactory = "org.eclipse.scout.rt.server.services.ServerServiceFactory"; // NO_UCD

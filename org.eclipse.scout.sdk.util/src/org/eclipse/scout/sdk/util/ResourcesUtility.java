@@ -10,10 +10,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IOpenable;
@@ -26,7 +28,7 @@ import org.eclipse.scout.commons.IOUtility;
 @SuppressWarnings("restriction")
 public final class ResourcesUtility {
 
-  private final static int BUF_SIZE = 8192;
+  public final static int BUF_SIZE = 8192;
 
   private ResourcesUtility() {
   }
@@ -159,6 +161,53 @@ public final class ResourcesUtility {
     }
   }
 
+  /**
+   * recursively creates all parent directories of the given file
+   * 
+   * @param toCreate
+   *          The file for which the parent directories should be created.
+   * @param monitor
+   * @throws CoreException
+   */
+  public static void mkdirs(IFile toCreate, IProgressMonitor monitor) throws CoreException {
+    if (toCreate == null || toCreate.exists()) {
+      return;
+    }
+    mkdirs(toCreate.getParent(), monitor);
+  }
+
+  /**
+   * create the given directory and all of its parents.
+   * 
+   * @param toCreate
+   *          the directory to create.
+   * @param monitor
+   * @throws CoreException
+   */
+  public static void mkdirs(IContainer toCreate, IProgressMonitor monitor) throws CoreException {
+    if (toCreate == null || toCreate.exists()) {
+      return;
+    }
+    else {
+      IContainer parent = toCreate.getParent();
+      if (parent instanceof IFolder) {
+        mkdirs(parent, monitor);
+      }
+      if (toCreate instanceof IFolder) {
+        ((IFolder) toCreate).create(true, true, monitor);
+      }
+    }
+  }
+
+  /**
+   * move the given file into the given folder.
+   * 
+   * @param from
+   *          the file to move
+   * @param destFolder
+   *          the destination folder.
+   * @throws IOException
+   */
   public static void moveFile(File from, File destFolder) throws IOException {
     if (from == null || !from.isFile()) {
       throw new IOException("source file is not valid");
@@ -206,23 +255,5 @@ public final class ResourcesUtility {
       to.write(b, 0, len);
     }
     to.flush();
-  }
-
-  /**
-   * creates a folder recursively
-   * 
-   * @param folder
-   * @throws CoreException
-   */
-  public static void createFolder(IContainer folder) throws CoreException {
-    if (!folder.exists()) {
-      IContainer parent = folder.getParent();
-      if (parent instanceof IFolder) {
-        createFolder(parent);
-      }
-      if (folder instanceof IFolder) {
-        ((IFolder) folder).create(true, true, null);
-      }
-    }
   }
 }

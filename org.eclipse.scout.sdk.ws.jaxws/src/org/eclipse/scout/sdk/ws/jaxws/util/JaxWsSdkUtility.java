@@ -206,7 +206,7 @@ public final class JaxWsSdkUtility {
       try {
         // create the folders if they do not exist yet
         if (file.getParent() instanceof IFolder) {
-          ResourcesUtility.createFolder(file.getParent());
+          ResourcesUtility.mkdirs(file.getParent(), new NullProgressMonitor());
         }
         // the file does not already exist. Therefore create an empty file
         InputStream inputStream = new ByteArrayInputStream(new byte[0]);
@@ -250,7 +250,7 @@ public final class JaxWsSdkUtility {
     if (!folder.exists() && autoCreate) {
       try {
         // create the folders if they do not exist yet
-        ResourcesUtility.createFolder(folder);
+        ResourcesUtility.mkdirs(folder, new NullProgressMonitor());
       }
       catch (CoreException e) {
         throw new RuntimeException("An unexpected error occured while creating the report design file", e);

@@ -14,11 +14,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -58,15 +59,19 @@ public class InstallJavaFileOperation extends InstallTextFileOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
-    // export package
-    IJavaProject javaProject = JavaCore.create(m_dstProject);
-    String pckName = "/" + m_dstProject.getName() + "/" + m_dstPath;
-    int i = pckName.lastIndexOf("/");
-    if (i >= 0) {
-      pckName = pckName.substring(0, i);
+    // create java element from created resource
+    IJavaElement e = JavaCore.create(getCreatedFile());
+    if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+      ICompilationUnit cu = (ICompilationUnit) e;
+      IJavaElement pck = cu.getParent();
+      if (pck.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
+        // add package to exported packages
+        IPackageFragment frag = (IPackageFragment) pck;
+        ResourcesPlugin.getWorkspace().checkpoint(false);
+        ManifestExportPackageOperation op = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{frag}, true);
+        op.validate();
+        op.run(monitor, workingCopyManager);
+      }
     }
-    IPackageFragment pck = javaProject.findPackageFragment(new Path(pckName));
-    new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{pck}, true).run(monitor, workingCopyManager);
   }
-
 }

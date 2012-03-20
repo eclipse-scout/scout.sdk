@@ -19,5 +19,6 @@ package org.eclipse.scout.sdk.rap;
 public final class RapRuntimeClasses {
 //CHECKSTYLE:OFF
   public final static String ScoutUiRapBundleId = "org.eclipse.scout.rt.ui.rap"; // NO_UCD
+  public final static String ScoutRapTargetPlugin = "org.eclipse.scout.rt.rap.target"; // NO_UCD
 //CHECKSTYLE:ON
 }

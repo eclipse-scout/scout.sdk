@@ -67,12 +67,12 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
     // src folder
     IFolder folder = project.getFolder("src");
     if (!folder.exists()) {
-      ResourcesUtility.createFolder(folder);
+      ResourcesUtility.mkdirs(folder, monitor);
     }
     // resources folder
     folder = project.getFolder("resources");
     if (isCreateResourcesFolder() && !folder.exists()) {
-      ResourcesUtility.createFolder(folder);
+      ResourcesUtility.mkdirs(folder, monitor);
     }
 
     m_javaProject = JavaCore.create(project);

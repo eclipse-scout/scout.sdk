@@ -51,7 +51,6 @@ public abstract class AbstractCreateEclipseProjectOperation extends AbstractScou
       ScoutSdk.logError("Bundle: " + getSymbolicName() + " exists already!");
       throw new CoreException(new ScoutStatus("Bundle: " + getSymbolicName() + " exists already!"));
     }
-    m_createdProject = null;
     m_createdProject = createProject(monitor, workingCopyManager);
   }
 
@@ -86,7 +85,7 @@ public abstract class AbstractCreateEclipseProjectOperation extends AbstractScou
     project.open(monitor);
     // set the natures of the project
     IProjectDescription description = project.getDescription();
-    description.setNatureIds(m_natures.toArray(new String[0]));
+    description.setNatureIds(m_natures.toArray(new String[m_natures.size()]));
     project.setDescription(description, monitor);
     return project;
   }

@@ -161,10 +161,12 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       }
     }
 
-    Collection<Object> serchResult = collectTypes(searchPattern, getMaxProposalAmount() - counter - 1, monitor);
-    if (serchResult.size() > 0) {
-      result.add(SEPERATOR);
-      result.addAll(serchResult);
+    Collection<Object> searchResult = collectTypes(searchPattern, getMaxProposalAmount() - counter - 1, monitor);
+    if (searchResult.size() > 0) {
+      if (result.size() > 0) {
+        result.add(SEPERATOR);
+      }
+      result.addAll(searchResult);
     }
     return result.toArray(new Object[result.size()]);
   }

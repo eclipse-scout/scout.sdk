@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.template;
 
-import java.io.File;
-import java.io.FileWriter;
+import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -27,6 +25,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
@@ -69,10 +68,9 @@ public class InstallTextFileOperation implements IOperation {
     if (getSrcPath() == null) {
       throw new IllegalArgumentException("source path can not be null.");
     }
-    if (getDstProject() == null) {
+    if (getDstPath() == null) {
       throw new IllegalArgumentException("destination path can not be null.");
     }
-
   }
 
   @Override
@@ -91,12 +89,16 @@ public class InstallTextFileOperation implements IOperation {
         throw new CoreException(new ScoutStatus("Missing tag replacement for tag " + m.group(1) + " in template " + getSrcPath()));
       }
 
-      // write file
-      File f = new File(new File(m_dstProject.getLocation().toOSString()), m_dstPath);
-      f.getParentFile().mkdirs();
-      IOUtility.writeContent(new FileWriter(f), s);
-      m_createdFile = m_dstProject.getFile(new Path(m_dstPath));
-      m_createdFile.refreshLocal(IResource.DEPTH_ZERO, monitor);
+      // create file
+      m_createdFile = m_dstProject.getFile(m_dstPath);
+      if (m_createdFile.exists()) {
+        m_createdFile.delete(true, false, monitor);
+      }
+      else {
+        ResourcesUtility.mkdirs(m_createdFile, monitor);
+      }
+
+      m_createdFile.create(new ByteArrayInputStream(s.getBytes()), true, monitor);
     }
     catch (Exception e) {
       ScoutSdk.logError("could not install text file.", e);

@@ -1,5 +1,7 @@
 package org.eclipse.scout.sdk.rap.operations.project;
 
+import java.io.File;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -13,11 +15,13 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
 
   public static enum TARGET_STRATEGY {
     STRATEGY_REMOTE,
-    STRATEGY_LOCAL,
+    STRATEGY_LOCAL_EXISTING,
+    STRATEGY_LOCAL_EXTRACT,
     STRATEGY_LATER
   }
 
   public final static String PROP_TARGET_STRATEGY = "propTargetStrategy";
+  public final static String PROP_EXTRACT_TARGET_FOLDER = "propExtractTargetFolder";
   public final static String PROP_LOCAL_TARGET_FOLDER = "propLocalTargetFolder";
   public final static String PROP_TARGET_FILE = "propTargetFile";
 
@@ -57,23 +61,46 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       createAjaxServletOperation.run(monitor, workingCopyManager);
     }
 
-    InstallTargetPlatformFileOperation op = new InstallTargetPlatformFileOperation(m_project);
-    switch (getTargetStrategy()) {
-      case STRATEGY_LOCAL:
-        op.setRapTargetLocalFolder(getLocalTargetFolder());
-        break;
-      case STRATEGY_REMOTE:
-        // do nothing
-        break;
-      case STRATEGY_LATER:
-        return;
+    if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LATER) {
+      // no target set
+      return;
     }
+
+    InstallTargetPlatformFileOperation op = new InstallTargetPlatformFileOperation(m_project);
+    if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING) {
+      // existing local RAP target
+      op.addEclipseHomeEntry();
+      op.addLocalDirectory(getLocalTargetFolder());
+    }
+    else if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_REMOTE) {
+      // remote target using the update sites
+      op.addEclipseHomeEntry();
+      op.addUpdateSite(InstallTargetPlatformFileOperation.ECLIPSE_RT_RAP_FEATURE_URL, InstallTargetPlatformFileOperation.ECLIPSE_RT_RAP_FEATURE);
+      op.addUpdateSite(InstallTargetPlatformFileOperation.ECLIPSE_RT_RAP_INCUB_FEATURE_URL, InstallTargetPlatformFileOperation.ECLIPSE_RT_RAP_INCUB_FEATURE);
+      op.addUpdateSite(InstallTargetPlatformFileOperation.SCOUT_RT_RAP_FEATURE_URL, InstallTargetPlatformFileOperation.SCOUT_RT_RAP_FEATURE);
+    }
+    else if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT) {
+      // locally extracted, complete target from rap.target plug-in
+
+      ScoutRapTargetCreationOperation scoutRapTargetExtractOp = new ScoutRapTargetCreationOperation();
+      scoutRapTargetExtractOp.setDestinationDirectory(new File(getExtractTargetFolder()));
+      scoutRapTargetExtractOp.validate();
+      scoutRapTargetExtractOp.run(monitor, workingCopyManager);
+
+      op.addEclipseHomeEntry(); //TODO: remove and unpack eclipse itself instead?
+      op.addLocalDirectory(getExtractTargetFolder());
+    }
+    op.validate();
     op.run(monitor, workingCopyManager);
     getProperties().setProperty(PROP_TARGET_FILE, op.getCreatedFile());
   }
 
   protected String getLocalTargetFolder() {
     return getProperties().getProperty(PROP_LOCAL_TARGET_FOLDER, String.class);
+  }
+
+  protected String getExtractTargetFolder() {
+    return getProperties().getProperty(PROP_EXTRACT_TARGET_FOLDER, String.class);
   }
 
   protected TARGET_STRATEGY getTargetStrategy() {
