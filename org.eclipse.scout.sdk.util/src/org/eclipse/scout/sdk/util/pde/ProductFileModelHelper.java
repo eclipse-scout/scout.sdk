@@ -371,11 +371,11 @@ public final class ProductFileModelHelper {
       writer.println("/>"); //$NON-NLS-1$
     }
 
-    private boolean isFragment() {
+    public boolean isFragment() {
       return m_fragment;
     }
 
-    private void setFragment(boolean isFragment) {
+    public void setFragment(boolean isFragment) {
       m_fragment = isFragment;
     }
   }
