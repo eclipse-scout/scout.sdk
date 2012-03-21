@@ -114,7 +114,9 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
             if (!selection.isEmpty()) {
               selectedNode = (ITreeNode) selection.getFirstElement();
             }
-            setSelectedNode(selectedNode);
+            if (selectedNode != null) {
+              setSelectedNode(selectedNode);
+            }
           }
         }
         finally {

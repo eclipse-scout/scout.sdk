@@ -169,7 +169,6 @@ public class Technology implements Comparable<Technology> {
 
   private ITreeNode createNode(ITreeNode parent, int type, String text, boolean bold, boolean checkable, ImageDescriptor img, IScoutTechnologyResource data) {
     TreeNode node = new TreeNode(type, text, data);
-    //node.setOrderNr(orderNr);
     node.setCheckable(checkable);
     node.setBold(bold);
     if (img != null) {

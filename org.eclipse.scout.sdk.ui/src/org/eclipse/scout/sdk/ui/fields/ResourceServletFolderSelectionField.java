@@ -165,7 +165,6 @@ public class ResourceServletFolderSelectionField extends TextField {
       finally {
         m_inputLock.release();
       }
-
     }
   }
 

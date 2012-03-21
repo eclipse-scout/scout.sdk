@@ -68,21 +68,21 @@ import org.eclipse.swt.widgets.TreeItem;
  */
 public class CheckableTree extends Composite {
   public static final int TYPE_ROOT = -1;
-
   private static final int TEXT_MARGIN = 2;
+
+  private final ITreeNode m_rootNode;
+  private final HashMap<ITreeNode, Rectangle> m_checkableNodeBounds = new HashMap<ITreeNode, Rectangle>();
+  private final HashSet<ITreeNode> m_checkedNodes = new HashSet<ITreeNode>();
+  private final Image m_imgCheckboxYes = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYes);
+  private final Image m_imgCheckboxNo = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNo);
+  private final Image m_imgCheckboxYesDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYesDisabled);
+  private final Image m_imgCheckboxNoDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNoDisabled);
+  private final EventListenerList m_eventListeners = new EventListenerList();
+  private final ArrayList<ITreeNodeFilter> m_filters = new ArrayList<ITreeNodeFilter>();
+  private final HashMap<ImageDescriptor, Image> m_icons = new HashMap<ImageDescriptor, Image>();
+
   private Tree m_tree;
   private TreeViewer m_viewer;
-  private ITreeNode m_rootNode;
-  private HashMap<ITreeNode, Rectangle> m_checkableNodeBounds = new HashMap<ITreeNode, Rectangle>();
-  private HashSet<ITreeNode> m_checkedNodes = new HashSet<ITreeNode>();
-  private Image m_imgCheckboxYes = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYes);
-  private Image m_imgCheckboxNo = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNo);
-  private Image m_imgCheckboxYesDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYesDisabled);
-  private Image m_imgCheckboxNoDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNoDisabled);
-  private EventListenerList m_eventListeners = new EventListenerList();
-  private ArrayList<ITreeNodeFilter> m_filters = new ArrayList<ITreeNodeFilter>();
-  private HashMap<ImageDescriptor, Image> m_icons = new HashMap<ImageDescriptor, Image>();
-
   private P_TreePaintListener m_paintListener;
 
   /**
@@ -92,10 +92,10 @@ public class CheckableTree extends Composite {
   public CheckableTree(Composite parent, ITreeNode rootNode) {
     super(parent, SWT.NONE);
     m_rootNode = rootNode;
+    m_filters.add(NodeFilters.getVisible());
     setLayout(new FillLayout());
     createControl(this);
     addDisposeListener(new DisposeListener() {
-
       @Override
       public void widgetDisposed(DisposeEvent e) {
         for (Image img : m_icons.values()) {
@@ -117,7 +117,6 @@ public class CheckableTree extends Composite {
     m_viewer.setContentProvider(model);
     m_viewer.setLabelProvider(model);
     m_viewer.setInput(model);
-    m_filters.add(NodeFilters.getVisible());
   }
 
   protected void installListeners() {
@@ -326,8 +325,6 @@ public class CheckableTree extends Composite {
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -528,7 +525,6 @@ public class CheckableTree extends Composite {
       m_viewer.refresh();
       m_viewer.expandAll();
     }
-
   } // end class P_DragSourceListener
 
   private class P_DropTargetListener extends ViewerDropAdapter {

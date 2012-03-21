@@ -65,7 +65,6 @@ public class ResourceServletFolderTree {
     ArrayList<P_ResourceServletExtension> extensions = new ArrayList<P_ResourceServletExtension>();
     findServletExtensions(rootNode, extensions);
     TreeUtility.findNodes(rootNode, new P_FolderTreeBuilder(extensions.toArray(new P_ResourceServletExtension[extensions.size()])));
-
   }
 
   private void findServletExtensions(ITreeNode curentNode, ArrayList<P_ResourceServletExtension> extensions) {
@@ -105,7 +104,6 @@ public class ResourceServletFolderTree {
                         }
 
                       }
-
                     }
                     if (ext.isValid()) {
                       extensions.add(ext);
@@ -162,7 +160,6 @@ public class ResourceServletFolderTree {
             node.setVisible(false);
           }
           break;
-
         default:
           break;
       }
@@ -207,6 +204,5 @@ public class ResourceServletFolderTree {
         }
       }
     }
-
   }
 }
