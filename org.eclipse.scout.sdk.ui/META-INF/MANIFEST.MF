@@ -22,6 +22,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.scout.sdk.ui,
  org.eclipse.scout.sdk.ui.action,
  org.eclipse.scout.sdk.ui.action.delete,
+ org.eclipse.scout.sdk.ui.action.library,
  org.eclipse.scout.sdk.ui.action.rename,
  org.eclipse.scout.sdk.ui.dialog,
  org.eclipse.scout.sdk.ui.extensions,

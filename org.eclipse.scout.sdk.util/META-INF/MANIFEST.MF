@@ -28,6 +28,7 @@ Export-Package: org.eclipse.scout.sdk.util,
  org.eclipse.scout.sdk.util.jdt.finegraned,
  org.eclipse.scout.sdk.util.log,
  org.eclipse.scout.sdk.util.pde,
+ org.eclipse.scout.sdk.util.resources,
  org.eclipse.scout.sdk.util.signature,
  org.eclipse.scout.sdk.util.type,
  org.eclipse.scout.sdk.util.typecache

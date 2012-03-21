@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.library;
 
-import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.pde.core.plugin.IPluginModelBase;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
+import org.eclipse.scout.sdk.ui.action.library.LibrariesBundleUnlinkAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link LibraryNodePage}</h3> ...
@@ -24,22 +27,43 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
  */
 public class LibraryNodePage extends AbstractPage {
 
-  private IJavaProject m_project;
+  private final IPluginModelBase m_pluginModel;
 
-  public LibraryNodePage(IPage parent, IJavaProject project) {
-    m_project = project;
+  public LibraryNodePage(IPage parent, IPluginModelBase pluginModel) {
+    m_pluginModel = pluginModel;
     setParent(parent);
-    setName(project.getElementName());
+    setName(m_pluginModel.getPluginBase().getId());
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Library));
-  }
-
-  @Override
-  public boolean isFolder() {
-    return true;
   }
 
   @Override
   public String getPageId() {
     return IScoutPageConstants.LIBRARIES_NODE_PAGE;
+  }
+
+  @Override
+  public IScoutBundle getScoutResource() {
+    return (IScoutBundle) super.getScoutResource();
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{LibrariesBundleUnlinkAction.class};
+  }
+
+  @Override
+  public void prepareMenuAction(IScoutHandler menu) {
+    if (menu.getClass() == LibrariesBundleUnlinkAction.class) {
+      LibrariesBundleUnlinkAction unlinkAction = (LibrariesBundleUnlinkAction) menu;
+      unlinkAction.addLibraryToRemove(getScoutResource(), getPluginModel());
+    }
+    else {
+      super.prepareMenuAction(menu);
+    }
+  }
+
+  public IPluginModelBase getPluginModel() {
+    return m_pluginModel;
   }
 }

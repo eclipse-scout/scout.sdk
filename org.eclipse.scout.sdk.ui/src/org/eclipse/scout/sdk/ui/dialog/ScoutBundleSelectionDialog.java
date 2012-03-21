@@ -8,70 +8,49 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.wizard.library;
+package org.eclipse.scout.sdk.ui.dialog;
 
 import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.ui.JavaElementLabelProvider;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.viewer.ScoutBundleLableProvider;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 
 /**
- * <h3>{@link JavaProjectSelectionDialog}</h3> ...
+ * <h3>{@link ScoutBundleSelectionDialog}</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 09.03.2012
  */
-@SuppressWarnings("restriction")
-public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
-  private static final String DIALOG_SETTINGS = JavaProjectSelectionDialog.class.getName();
-  private IJavaProject[] m_javaProjects;
+public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
+  private static final String DIALOG_SETTINGS = ScoutBundleSelectionDialog.class.getName();
+  private IScoutBundle[] m_bundles;
 
   /**
    * @param shell
    */
-  public JavaProjectSelectionDialog(Shell shell, boolean includeFragments, boolean multiSelect) {
-    this(shell, getAllWorkspaceScoutProjects(includeFragments), multiSelect);
+  public ScoutBundleSelectionDialog(Shell shell, boolean multiSelect) {
+    this(shell, ScoutSdkCore.getScoutWorkspace().getAllBundles(), multiSelect);
   }
 
-  public JavaProjectSelectionDialog(Shell shell, IJavaProject[] projects, boolean multiSelect) {
+  public ScoutBundleSelectionDialog(Shell shell, IScoutBundle[] bundles, boolean multiSelect) {
     super(shell, multiSelect);
-    setListLabelProvider(new JavaElementLabelProvider());
-    setDetailsLabelProvider(new JavaElementLabelProvider());
+    // XXX AHO
+    setListLabelProvider(new ScoutBundleLableProvider());
+    setDetailsLabelProvider(new ScoutBundleLableProvider());
     setInitialPattern("**");
-    m_javaProjects = projects;
-  }
-
-  public static IJavaProject[] getAllWorkspaceScoutProjects(boolean includeFragments) {
-    IProject[] workspaceProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    List<IJavaProject> plugins = new LinkedList<IJavaProject>();
-    for (IProject project : workspaceProjects) {
-      try {
-        if (project.exists() && project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && !project.hasNature(ScoutSdk.LIBRARY_NATURE_ID)) {
-          IJavaProject jp = JavaCore.create(project);
-          plugins.add(jp);
-        }
-      }
-      catch (CoreException e) {
-        ScoutSdkUi.logWarning("could not validate plugin '" + project.getName() + "'.", e);
-      }
-    }
-    return plugins.toArray(new IJavaProject[plugins.size()]);
+    m_bundles = bundles;
   }
 
   @Override
@@ -86,12 +65,12 @@ public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
 
   @Override
   protected ItemsFilter createFilter() {
-    return new P_JavaProjectSearchItemsFilter();
+    return new P_BundleSearchItemsFilter();
   }
 
   @Override
   protected void fillContentProvider(AbstractContentProvider contentProvider, ItemsFilter itemsFilter, IProgressMonitor progressMonitor) throws CoreException {
-    for (IJavaProject project : m_javaProjects) {
+    for (IScoutBundle project : m_bundles) {
       contentProvider.add(project, itemsFilter);
       progressMonitor.worked(1);
     }
@@ -111,15 +90,15 @@ public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
 
   @Override
   public String getElementName(Object item) {
-    if (item instanceof IJavaProject) {
-      return ((IJavaProject) item).getElementName();
+    if (item instanceof IScoutBundle) {
+      return ((IScoutBundle) item).getBundleName();
     }
     return null;
   }
 
   @Override
   protected Comparator getItemsComparator() {
-    return new P_JavaProjectSearchComparator();
+    return new P_BundleSearchComparator();
   }
 
   /* (non-Javadoc)
@@ -130,7 +109,7 @@ public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
     return new Status(IStatus.OK, ScoutSdkUi.PLUGIN_ID, 0, "", null); //$NON-NLS-1$
   }
 
-  private class P_JavaProjectSearchItemsFilter extends ItemsFilter {
+  private class P_BundleSearchItemsFilter extends ItemsFilter {
 
     @Override
     public boolean isConsistentItem(Object item) {
@@ -140,9 +119,9 @@ public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
     @Override
     public boolean matchItem(Object item) {
       String id = null;
-      if (item instanceof IJavaProject) {
-        IJavaProject project = (IJavaProject) item;
-        id = project.getElementName();
+      if (item instanceof IScoutBundle) {
+        IScoutBundle project = (IScoutBundle) item;
+        id = project.getBundleName();
       }
 
       return (matches(id));
@@ -157,9 +136,9 @@ public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
       }
       return patternMatcher.matches(text);
     }
-  } // end class P_JavaProjectSearchItemsFilter
+  } // end class P_BundleSearchItemsFilter
 
-  private class P_JavaProjectSearchComparator implements Comparator {
+  private class P_BundleSearchComparator implements Comparator {
 
     @Override
     public int compare(Object o1, Object o2) {
@@ -178,13 +157,13 @@ public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
     }
 
     private int compareSimilarObjects(Object o1, Object o2) {
-      if (o1 instanceof IJavaProject && o2 instanceof IJavaProject) {
-        IJavaProject ipmb1 = (IJavaProject) o1;
-        IJavaProject ipmb2 = (IJavaProject) o2;
-        return ipmb1.getElementName().compareTo(ipmb2.getElementName());
+      if (o1 instanceof IScoutBundle && o2 instanceof IScoutBundle) {
+        IScoutBundle ipmb1 = (IScoutBundle) o1;
+        IScoutBundle ipmb2 = (IScoutBundle) o2;
+        return ipmb1.getBundleName().compareTo(ipmb2.getBundleName());
       }
       return 0;
     }
 
-  } // end class P_JavaProjectSearchComparator
+  } // end class P_BundleSearchComparator
 }

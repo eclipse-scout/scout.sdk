@@ -15,16 +15,12 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.util.Set;
 
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.operation.library.LibraryBundleCreateOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
-import org.eclipse.scout.sdk.ui.wizard.library.LibraryTypeWizardPage.LibraryType;
-import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -92,19 +88,19 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
     LibraryBundleCreateOperation operation = new LibraryBundleCreateOperation();
     operation.setBundleName(getLibraryWizardPage().getBundleName());
     operation.setLibraryFiles(getJarSelectionWizardPage().getJarFiles());
-    if (getLibraryWizardPage().getLibraryType() == LibraryType.Fragment) {
-      operation.setFragmentHost(getLibraryWizardPage().getFragmentHost());
+    switch (getLibraryWizardPage().getLibraryType()) {
+      case Plugin:
+        operation.setLibraryUserBundles(getLibraryWizardPage().getLibraryUserBundles());
+        break;
+      case Fragment:
+        operation.setFragmentHost(getLibraryWizardPage().getFragmentHost());
+        break;
+      case SystemBundleFragment:
+        operation.setFragmentHost("system.bundle");
+        break;
     }
     operation.validate();
     operation.run(monitor, workingCopyManager);
-    if (getLibraryWizardPage().getLibraryType() == LibraryType.Plugin) {
-      IProject createdProject = operation.getCreatedProject();
-      for (IJavaProject p : getLibraryWizardPage().getLibraryUserBundles()) {
-        PluginModelHelper helper = new PluginModelHelper(p.getProject());
-        helper.Manifest.addDependency(createdProject.getName());
-        helper.save();
-      }
-    }
     return true;
   }
 

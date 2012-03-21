@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.library;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -21,8 +21,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.ui.JavaElementLabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -37,9 +35,12 @@ import org.eclipse.pde.core.plugin.IPluginModel;
 import org.eclipse.pde.internal.ui.dialogs.PluginSelectionDialog;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.dialog.ScoutBundleSelectionDialog;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.viewer.ScoutBundleLableProvider;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.validation.BundleValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -106,9 +107,9 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("NewLibraryBundleDesc"));
     // defaults
     setLibraryType(LibraryType.Plugin);
-    TreeSet<IJavaProject> libraryUserBundles = new TreeSet<IJavaProject>(new P_JavaProjectComparator());
+    TreeSet<IScoutBundle> libraryUserBundles = new TreeSet<IScoutBundle>(new P_JavaProjectComparator());
     if (ownerBundle != null) {
-      libraryUserBundles.add(ownerBundle.getJavaProject());
+      libraryUserBundles.add(ownerBundle);
     }
     setLibraryUserBundles(libraryUserBundles);
   }
@@ -204,7 +205,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_userBundleViewer.setLabelProvider(new P_UserBundleLabelProvider());
     m_userBundleViewer.setContentProvider(new P_UserBundleContentProvider());
-    Set<IJavaProject> libraryUserBundles = getLibraryUserBundles();
+    Set<IScoutBundle> libraryUserBundles = getLibraryUserBundles();
     m_userBundleViewer.setInput(libraryUserBundles.toArray(new Object[libraryUserBundles.size()]));
     Composite buttonGroup = new Composite(box, SWT.NONE);
     m_addUserBundleButton = new Button(buttonGroup, SWT.PUSH | SWT.FLAT);
@@ -224,8 +225,8 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
       public void widgetSelected(SelectionEvent e) {
         ISelection currentSelection = m_userBundleViewer.getSelection();
         if (!currentSelection.isEmpty()) {
-          Set<IJavaProject> userBundles = getLibraryUserBundles();
-          if (userBundles.remove((IJavaProject) ((IStructuredSelection) currentSelection).getFirstElement())) {
+          Set<IScoutBundle> userBundles = getLibraryUserBundles();
+          if (userBundles.remove((IScoutBundle) ((IStructuredSelection) currentSelection).getFirstElement())) {
             setLibraryUserBundles(userBundles);
           }
         }
@@ -287,6 +288,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void run() {
         PluginSelectionDialog dialog = new PluginSelectionDialog(getShell().getShell(), false, false);
+        dialog.setInitialPattern("**");
         dialog.create();
         if (dialog.open() == Window.OK) {
           IPluginModel model = (IPluginModel) dialog.getFirstResult();
@@ -302,22 +304,22 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void run() {
         // find all available bundles
-        Set<IJavaProject> alreadyAddedBundles = getLibraryUserBundles();
-        IJavaProject[] workspaceProjects = JavaProjectSelectionDialog.getAllWorkspaceScoutProjects(false);
-        List<IJavaProject> plugins = new LinkedList<IJavaProject>();
-        for (IJavaProject project : workspaceProjects) {
-          if (!alreadyAddedBundles.contains(project)) {
-            plugins.add(project);
+        Set<IScoutBundle> alreadyAddedBundles = getLibraryUserBundles();
+        IScoutBundle[] workspaceBundles = ScoutSdkCore.getScoutWorkspace().getAllBundles();
+        List<IScoutBundle> plugins = new ArrayList<IScoutBundle>(workspaceBundles.length);
+        for (IScoutBundle bundle : workspaceBundles) {
+          if (!alreadyAddedBundles.contains(bundle)) {
+            plugins.add(bundle);
           }
         }
-        JavaProjectSelectionDialog dialog = new JavaProjectSelectionDialog(getControl().getShell(), plugins.toArray(new IJavaProject[plugins.size()]), true);
+        ScoutBundleSelectionDialog dialog = new ScoutBundleSelectionDialog(getControl().getShell(), plugins.toArray(new IScoutBundle[plugins.size()]), true);
         dialog.create();
         if (dialog.open() == Window.OK) {
-          Set<IJavaProject> userBundles = alreadyAddedBundles;
+          Set<IScoutBundle> userBundles = alreadyAddedBundles;
           Object[] result = dialog.getResult();
           for (Object o : result) {
-            if (o instanceof IJavaProject) {
-              userBundles.add((IJavaProject) o);
+            if (o instanceof IScoutBundle) {
+              userBundles.add((IScoutBundle) o);
             }
           }
           setLibraryUserBundles(userBundles);
@@ -400,16 +402,16 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     setProperty(PROP_LIBRARY_TYPE, libraryType);
   }
 
-  public Set<IJavaProject> getLibraryUserBundles() {
+  public Set<IScoutBundle> getLibraryUserBundles() {
     @SuppressWarnings("unchecked")
-    Set<IJavaProject> libraryUserBundles = (Set<IJavaProject>) getProperty(PROP_USER_BUNDLES);
+    Set<IScoutBundle> libraryUserBundles = (Set<IScoutBundle>) getProperty(PROP_USER_BUNDLES);
     if (libraryUserBundles == null) {
-      libraryUserBundles = new TreeSet<IJavaProject>();
+      libraryUserBundles = new TreeSet<IScoutBundle>();
     }
     return libraryUserBundles;
   }
 
-  public void setLibraryUserBundles(Set<IJavaProject> libraryUsers) {
+  public void setLibraryUserBundles(Set<IScoutBundle> libraryUsers) {
     try {
       setStateChanging(true);
       setLibraryUserBundlesInternal(libraryUsers);
@@ -422,7 +424,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  private void setLibraryUserBundlesInternal(Set<IJavaProject> libraryUsers) {
+  private void setLibraryUserBundlesInternal(Set<IScoutBundle> libraryUsers) {
     setPropertyAlwaysFire(PROP_USER_BUNDLES, libraryUsers);
   }
 
@@ -518,10 +520,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
 
   }
 
-  private class P_UserBundleLabelProvider extends JavaElementLabelProvider implements ITableLabelProvider {
-    public P_UserBundleLabelProvider() {
-      super(SHOW_DEFAULT);
-    }
+  private class P_UserBundleLabelProvider extends ScoutBundleLableProvider implements ITableLabelProvider {
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
@@ -554,9 +553,9 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
 
   } // end class P_UserBundleLabelProvider
 
-  private class P_JavaProjectComparator implements Comparator<IJavaProject> {
+  private class P_JavaProjectComparator implements Comparator<IScoutBundle> {
     @Override
-    public int compare(IJavaProject o1, IJavaProject o2) {
+    public int compare(IScoutBundle o1, IScoutBundle o2) {
       if (o1 == null && o2 == null) {
         return 0;
       }
@@ -567,7 +566,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
         return 1;
       }
       else {
-        return CompareUtility.compareTo(o1.getElementName(), o2.getElementName());
+        return CompareUtility.compareTo(o1.getBundleName(), o2.getBundleName());
       }
     }
   }

@@ -34,7 +34,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -57,7 +56,6 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   private INlsProject m_nlsProject;
   private boolean m_showProjectList;
 
-  private final IDialogSettings m_dialogSettings;
   private final String m_title;
   private final HashMap<Language, TextField<String>> m_translationFields;
   private final INlsProject m_rootProject;
@@ -74,7 +72,6 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     m_rootProject = project;
     m_translationFields = new HashMap<Language, TextField<String>>();
     m_showProjectList = showProjectList;
-    m_dialogSettings = NlsCore.getDefault().getDialogSettingsSection(AbstractNlsEntryDialog.class.getName(), true);
   }
 
   @Override
@@ -86,6 +83,11 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   @Override
   protected int getShellStyle() {
     return super.getShellStyle() | SWT.RESIZE;
+  }
+
+  @Override
+  protected IDialogSettings getDialogBoundsSettings() {
+    return NlsCore.getDefault().getDialogSettingsSection(AbstractNlsEntryDialog.class.getName() + ".dialogBounds");
   }
 
   @Override
@@ -225,69 +227,6 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
 
   protected TextField<String> getDefaultTranslationField() {
     return getTranslationField(Language.LANGUAGE_DEFAULT);
-  }
-
-  public IDialogSettings getDialogSettings() {
-    return m_dialogSettings;
-  }
-
-  @Override
-  protected void constrainShellSize() {
-    super.constrainShellSize();
-    Shell shell = getShell();
-    try {
-      shell.setRedraw(false);
-      Rectangle displayBounds = shell.getDisplay().getBounds();
-      Rectangle shellBounds = shell.getBounds();
-
-      String widthString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
-      if (!StringUtility.isNullOrEmpty(widthString)) {
-        shellBounds.width = Integer.parseInt(widthString);
-      }
-
-      String heightString = getDialogSettings().get(DIALOG_SETTINGS_HEIGHT);
-      if (!StringUtility.isNullOrEmpty(heightString)) {
-        shellBounds.height = Integer.parseInt(heightString);
-      }
-
-      String xString = getDialogSettings().get(DIALOG_SETTINGS_X);
-      if (!StringUtility.isNullOrEmpty(xString)) {
-        shellBounds.x = Integer.parseInt(xString);
-      }
-
-      String yString = getDialogSettings().get(DIALOG_SETTINGS_Y);
-      if (!StringUtility.isNullOrEmpty(yString)) {
-        shellBounds.y = Integer.parseInt(yString);
-      }
-
-      shellBounds.height = Math.min(displayBounds.height - 200, shellBounds.height);
-      shellBounds.width = Math.min(displayBounds.width - 200, shellBounds.width);
-
-      int yDiff = (displayBounds.y + displayBounds.height) - (shellBounds.y + shellBounds.height);
-      if (yDiff < 0) {
-        shellBounds.y = shellBounds.y + yDiff;
-      }
-      int xDiff = (displayBounds.x + displayBounds.width) - (shellBounds.x + shellBounds.width);
-      if (xDiff < 0) {
-        shellBounds.x = shellBounds.x + xDiff;
-      }
-
-      shell.setBounds(shellBounds);
-      shell.layout();
-    }
-    finally {
-      shell.setRedraw(true);
-    }
-  }
-
-  @Override
-  public boolean close() {
-    Rectangle b = getShell().getBounds();
-    getDialogSettings().put(DIALOG_SETTINGS_WIDTH, b.width);
-    getDialogSettings().put(DIALOG_SETTINGS_HEIGHT, b.height);
-    getDialogSettings().put(DIALOG_SETTINGS_X, b.x);
-    getDialogSettings().put(DIALOG_SETTINGS_Y, b.y);
-    return super.close();
   }
 
   public void setMessage(IStatus status) {

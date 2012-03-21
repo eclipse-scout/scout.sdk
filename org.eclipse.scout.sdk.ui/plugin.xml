@@ -558,7 +558,13 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.OutlineDeleteAction"></contextMenu>
   <contextMenu
-        class="org.eclipse.scout.sdk.ui.action.create.LibraryBundleNewAction">
+        class="org.eclipse.scout.sdk.ui.action.library.LibraryBundleNewAction">
+  </contextMenu>
+  <contextMenu
+        class="org.eclipse.scout.sdk.ui.action.library.LibraryBundleLinkAction">
+  </contextMenu>
+  <contextMenu
+        class="org.eclipse.scout.sdk.ui.action.library.LibrariesBundleUnlinkAction">
   </contextMenu>
    </extension>
    <extension

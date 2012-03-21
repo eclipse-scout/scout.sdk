@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.action.create;
+package org.eclipse.scout.sdk.ui.action.library;
 
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;

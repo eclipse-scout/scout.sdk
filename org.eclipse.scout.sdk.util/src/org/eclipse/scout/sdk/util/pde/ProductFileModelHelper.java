@@ -212,6 +212,7 @@ public final class ProductFileModelHelper {
     public IProduct getProduct() throws CoreException {
       return m_model.getWorkspaceProductModel().getProduct();
     }
+
   }
 
   /**

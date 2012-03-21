@@ -17,17 +17,18 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.pde.core.plugin.IPluginImport;
+import org.eclipse.pde.core.plugin.IPluginModelBase;
+import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.IPluginModelListener;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.PluginModelDelta;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.create.LibraryBundleNewAction;
+import org.eclipse.scout.sdk.ui.action.library.LibraryBundleLinkAction;
+import org.eclipse.scout.sdk.ui.action.library.LibraryBundleNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -89,7 +90,7 @@ public class LibrariesTablePage extends AbstractPage {
     }
     try {
       // find library projects
-      List<IProject> libraries = new ArrayList<IProject>(3);
+      List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>(3);
       if (getScoutResource() != null) {
         PluginModelHelper helper = new PluginModelHelper(getScoutResource().getProject());
         IPluginImport[] allDependencies = helper.Manifest.getAllDependencies();
@@ -97,8 +98,8 @@ public class LibrariesTablePage extends AbstractPage {
         for (IPluginImport dependency : allDependencies) {
           dependencyIds.add(dependency.getId());
         }
-        for (IProject potLib : getAllLibrariesInWorkspace()) {
-          if (dependencyIds.contains(potLib.getName())) {
+        for (IPluginModelBase potLib : getAllLibrariesInWorkspace()) {
+          if (dependencyIds.contains(potLib.getPluginBase().getId())) {
             libraries.add(potLib);
           }
         }
@@ -107,8 +108,8 @@ public class LibrariesTablePage extends AbstractPage {
         libraries.addAll(getAllLibrariesInWorkspace());
       }
 
-      for (IProject project : libraries) {
-        new LibraryNodePage(this, JavaCore.create(project));
+      for (IPluginModelBase pluginModel : libraries) {
+        new LibraryNodePage(this, pluginModel);
       }
     }
     catch (CoreException e) {
@@ -116,27 +117,32 @@ public class LibrariesTablePage extends AbstractPage {
     }
   }
 
-  private Collection<IProject> getAllLibrariesInWorkspace() throws CoreException {
-    IProject[] workspaceProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    List<IProject> libraries = new ArrayList<IProject>(Math.max(2, workspaceProjects.length / 2));
-    for (IProject project : workspaceProjects) {
-      if (project.exists() && project.isOpen() && project.hasNature(ScoutSdk.LIBRARY_NATURE_ID)) {
-        libraries.add(project);
+  private Collection<IPluginModelBase> getAllLibrariesInWorkspace() throws CoreException {
+    IPluginModelBase[] workspaceModels = PluginRegistry.getWorkspaceModels();
+    List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>();
+    for (IPluginModelBase model : workspaceModels) {
+      IProject project = model.getUnderlyingResource().getProject();
+      if (project != null && project.exists() && project.isOpen() && project.hasNature(ScoutSdk.LIBRARY_NATURE_ID)) {
+        libraries.add(model);
       }
     }
+
     return libraries;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{LibraryBundleNewAction.class};
+    return new Class[]{LibraryBundleNewAction.class, LibraryBundleLinkAction.class};
   }
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof LibraryBundleNewAction) {
       ((LibraryBundleNewAction) menu).setOwnerBundle((IScoutBundle) getScoutResource());
+    }
+    else if (menu instanceof LibraryBundleLinkAction) {
+      ((LibraryBundleLinkAction) menu).setLibraryUserBundle(getScoutResource());
     }
     super.prepareMenuAction(menu);
   }

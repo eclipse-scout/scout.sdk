@@ -24,6 +24,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -37,13 +38,18 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ClasspathComputer;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper.ManifestPart;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.JavaElementComparator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.validation.BundleValidator;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.resource.ScoutResourceFilters;
 import org.osgi.framework.Version;
 
 /**
@@ -60,10 +66,11 @@ public class LibraryBundleCreateOperation implements IOperation {
   private boolean m_unpack;
   private String m_fragmentHost;
   private IProject m_createdProject;
+  private Set<IScoutBundle> m_libraryUserBundles;
 
   @Override
   public String getOperationName() {
-    return "Create library bundle '" + getBundleName() + "'.";
+    return Texts.get("CreateLibraryBundleOperationName", getBundleName());
   }
 
   @Override
@@ -82,7 +89,12 @@ public class LibraryBundleCreateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    IProject libraryProject = createProject(monitor, workingCopyManager);
+    processLibraryUserBundles(libraryProject);
 
+  }
+
+  protected IProject createProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(getBundleName());
     project.create(monitor);
     project.open(monitor);
@@ -126,7 +138,7 @@ public class LibraryBundleCreateOperation implements IOperation {
     }
     helper.save();
 
-    m_createdProject = project;
+    return project;
   }
 
   private void fillManifest(PluginModelHelper helper) {
@@ -180,6 +192,30 @@ public class LibraryBundleCreateOperation implements IOperation {
     ScoutSdk.logError("an unpacked library creation is not yet implemented.");
   }
 
+  protected void processLibraryUserBundles(IProject libraryBundle) throws CoreException {
+    Set<IScoutBundle> libraryUserBundles = getLibraryUserBundles();
+    if (libraryUserBundles != null) {
+      for (IScoutBundle libraryUser : libraryUserBundles) {
+        // add dependency to manifest
+        PluginModelHelper helper = new PluginModelHelper(libraryUser.getProject());
+        helper.Manifest.addDependency(libraryBundle.getName());
+        helper.save();
+
+        // add the dependencies to the product files
+        // find all product files in the current scout project.
+        for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(libraryUser.getScoutProject()))) {
+          ProductFileModelHelper h = new ProductFileModelHelper((IFile) productFile);
+          // add library bundle if there is already the library owner bundle in it.
+          if (h.ProductFile.existsDependency(libraryUser.getBundleName())) {
+            h.ProductFile.addDependency(libraryBundle.getName());
+            h.save();
+          }
+        }
+
+      }
+    }
+  }
+
   public String getBundleName() {
     return m_bundleName;
   }
@@ -210,6 +246,14 @@ public class LibraryBundleCreateOperation implements IOperation {
 
   public void setFragmentHost(String fragmentHost) {
     m_fragmentHost = fragmentHost;
+  }
+
+  public Set<IScoutBundle> getLibraryUserBundles() {
+    return m_libraryUserBundles;
+  }
+
+  public void setLibraryUserBundles(Set<IScoutBundle> libraryUserBundles) {
+    m_libraryUserBundles = libraryUserBundles;
   }
 
   // out variables
