@@ -5,7 +5,7 @@ import org.osgi.framework.Version;
 
 public final class PlatformVersionUtility {
 
-  private final static Version PLATFORM_VERSION = Platform.getProduct().getDefiningBundle().getVersion();
+  private final static Version PLATFORM_VERSION = Platform.getBundle("org.eclipse.platform").getVersion();
 
   public static boolean isPlatformJuno() {
     return (getPlatformVersion().getMajor() == 3 && getPlatformVersion().getMinor() == 8) ||

@@ -87,7 +87,7 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       scoutRapTargetExtractOp.validate();
       scoutRapTargetExtractOp.run(monitor, workingCopyManager);
 
-      op.addEclipseHomeEntry(); //TODO: remove and unpack eclipse itself instead?
+      op.addEclipseHomeEntry();
       op.addLocalDirectory(getExtractTargetFolder());
     }
     op.validate();

@@ -74,20 +74,23 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     super(RapTargetPlatformWizardPage.class.getName());
     m_isRapTargetPluginAvailable = checkIfRapTargetPluginAvailable();
     setTitle(Texts.get("RapTargetDownloadWizardPageTitle"));
-    if (isRapTargetPluginAvailable()) {
-      setTargetStrategy(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT);
-      setExtractTargetFolder(getDefaultRapLocation().getAbsolutePath());
-    }
-    else {
-      setTargetStrategy(TARGET_STRATEGY.STRATEGY_REMOTE);
-    }
-
     File defRap = getDefaultRapLocation();
     if (defRap != null && defRap.exists()) {
-      setLocalTargetFolder(getDefaultRapLocation().getAbsolutePath());
+      setTargetStrategy(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING);
+      setLocalTargetFolder(defRap.getAbsolutePath());
+      if (isRapTargetPluginAvailable()) {
+        setExtractTargetFolder(getDefaultRapLocation().getAbsolutePath());
+      }
     }
     else {
       setLocalTargetFolder(getEclipseInstallLocation().getAbsolutePath());
+      if (isRapTargetPluginAvailable()) {
+        setTargetStrategy(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT);
+        setExtractTargetFolder(getDefaultRapLocation().getAbsolutePath());
+      }
+      else {
+        setTargetStrategy(TARGET_STRATEGY.STRATEGY_REMOTE);
+      }
     }
   }
 
