@@ -623,6 +623,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
     public InvisibleRootNode(ScoutExplorerPart explorerPart) {
       m_explorerPart = explorerPart;
+      loadChildren();
     }
 
     @Override
@@ -641,5 +642,4 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       return m_explorerPart;
     }
   }
-
 }
