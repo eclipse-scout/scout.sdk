@@ -39,16 +39,10 @@
     <entrypoint
       class="@@BUNDLE_RAP_NAME@@.StandaloneRwtEnvironment"
       id="default"
-      parameter="default"/>
+      path="/web"/>
   </extension>
-
   <extension point="org.eclipse.rap.ui.branding">
-    <branding body="web-resources/startup-body.html" favicon="web-resources/eclipseScout.gif" id="@@BUNDLE_RAP_NAME@@.branding" servletName="rap" themeId="org.eclipse.scout.rt.ui.rap.theme" title="@@ALIAS@@">
-      <additionalHeaders>
-        <link href="res/html-styles.css" rel="stylesheet"/>
-      </additionalHeaders>
-    </branding>
-    <branding body="web-resources/startup-body.html" favicon="web-resources/eclipseScout.gif" id="@@BUNDLE_RAP_NAME@@.branding" servletName="extern.rap" themeId="org.eclipse.scout.rt.ui.rap.theme" title="@@ALIAS@@">
+    <branding body="web-resources/startup-body.html" favicon="web-resources/eclipseScout.gif" id="@@BUNDLE_RAP_NAME@@.branding" servletName="web" themeId="org.eclipse.scout.rt.ui.rap.theme" title="@@ALIAS@@">
       <additionalHeaders>
         <link href="res/html-styles.css" rel="stylesheet"/>
       </additionalHeaders>
@@ -68,7 +62,7 @@
       ranking="10">
     </filter>
     <filter
-      aliases="/rap"
+      aliases="/web"
       class="org.eclipse.scout.http.servletfilter.security.BasicSecurityFilter"
       ranking="20">
     </filter>

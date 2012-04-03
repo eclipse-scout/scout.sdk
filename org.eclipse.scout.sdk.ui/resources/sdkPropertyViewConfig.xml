@@ -244,7 +244,7 @@
 		<config name="getConfiguredFileExtensions" type="Advanced" category="Data" />
 		<config name="getConfiguredDirectory" type="Advanced" category="Data" />
 		<config name="getConfiguredFileIconId" type="Advanced" category="Appearance" />
-		<config name="getConfiguredMaxLength" type="Advanced" category="Data" />
+		<config name="getConfiguredMaxLength" type="Normal" category="Data" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.AbstractForm">
 		<config name="getConfiguredTitle" type="Normal" category="Appearance" />
@@ -575,21 +575,23 @@
 		<config name="execEndTransaction" type="Normal" category="BusinessLogic" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn">
-		<config name="getConfiguredMaxLength" type="Advanced" category="Data" />
+		<config name="getConfiguredMaxLength" type="Normal" category="Data" />
 		<config name="getConfiguredInputMasked" type="Advanced" category="Behavior" />
 		<config name="getConfiguredDisplayFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredTextWrap" type="Advanced" category="Behavior" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField">
+		<config name="getConfiguredGridW" type="Normal" category="Layout" />
+		<config name="getConfiguredGridH" type="Normal" category="Layout" />
 		<config name="getConfiguredDecorationLink" type="Advanced" category="Appearance" />
 		<config name="getConfiguredFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredInputMasked" type="Advanced" category="Behavior" />
 		<config name="getConfiguredFormatLower" type="Advanced" category="Appearance" />
-		<config name="getConfiguredMaxLength" type="Advanced" category="Data" />
-		<config name="getConfiguredMultilineText" type="Advanced" category="Behavior" />
+		<config name="getConfiguredMaxLength" type="Normal" category="Data" />
+		<config name="getConfiguredMultilineText" type="Normal" category="Behavior" />
 		<config name="getConfiguredFormatUpper" type="Advanced" category="Appearance" />
 		<config name="getConfiguredValidateOnAnyKey" type="Advanced" category="Behavior" />
-		<config name="getConfiguredWrapText" type="Advanced" category="Behavior" />
+		<config name="getConfiguredWrapText" type="Normal" category="Behavior" />
 		<config name="getConfiguredValueFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredSelectAllOnFocus" type="Advanced" category="Behavior" />
 		<config name="getConfiguredDropType" type="Advanced" category="Misc" />

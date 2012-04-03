@@ -67,7 +67,7 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipseScout16x16.gif", project, "resources/icons/eclipseScout16x16.gif").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipseScout32x32.gif", project, "resources/icons/eclipseScout32x32.gif").run(monitor, workingCopyManager);
-      new InstallBinaryFileOperation("templates/ui.swt/resources/icons/progress_none.gif", project, "resources/icons/progress_none.gif").run(monitor, workingCopyManager);
+      new InstallBinaryFileOperation("templates/ui.swt/resources/icons/progress_view.gif", project, "resources/icons/progress_view.gif").run(monitor, workingCopyManager);
     }
     catch (MalformedURLException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));

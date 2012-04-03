@@ -8,21 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package @@BUNDLE_SWT_NAME@@.views;
+package @@BUNDLE_SWT_NAME@@.editor;
 
-import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
-import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
-import @@BUNDLE_SWT_NAME@@.SwtEnvironment;
 import @@BUNDLE_SWT_NAME@@.Activator;
+import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import org.eclipse.scout.rt.ui.swt.window.desktop.editor.AbstractScoutEditorPart;
 
-/** <h3>TablePageView</h3>
- *  A view used of scout is registered as a view extension point in the plugin.xml and linked to
- *  scout view id in the SwtEnvironment.
- * @see SwtEnvironment
- */
-public class TablePageView extends AbstractScoutView {
+public class ScoutEditorPart extends AbstractScoutEditorPart {
+
   @Override
-  protected ISwtEnvironment getSwtEnvironment(){
+  protected ISwtEnvironment getSwtEnvironment() {
     return Activator.getDefault().getEnvironment();
   }
 }

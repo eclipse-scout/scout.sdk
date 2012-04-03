@@ -30,12 +30,15 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
   private static final String TARGET_FILE_NAME = "ScoutRAP.target";
   private static final String VARIABLE_RAP_LOCATION = "RAP_LOCATION";
 
+  // Juno Updatesite
+  private static final String JUNO_UPDATE_SITE_URL = "http://download.eclipse.org/releases/juno";
+
   // Scout RAP runtime
-  public static final String SCOUT_RT_RAP_FEATURE_URL = "http://download.eclipse.org/releases/juno";
+  public static final String SCOUT_RT_RAP_FEATURE_URL = JUNO_UPDATE_SITE_URL;
   public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.feature.feature.group";
 
   // Eclipse RAP runtime
-  public static final String ECLIPSE_RT_RAP_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/runtime";
+  public static final String ECLIPSE_RT_RAP_FEATURE_URL = JUNO_UPDATE_SITE_URL;
   public static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.runtime.feature.group";
 
   // Eclipse RAP Incubator
@@ -88,7 +91,6 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
       }
     };
     m_entryList.add(entry);
-
   }
 
   @Override

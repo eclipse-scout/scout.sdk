@@ -59,15 +59,21 @@ public class FillUiSwtPluginOperation extends AbstractScoutProjectNewOperation {
     String destPathPref = "src/" + (m_project.getName().replace('.', '/')) + "/";
 
     new InstallJavaFileOperation("templates/ui.swt/src/Activator.java", destPathPref + "Activator.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/perspective/Perspective.java", destPathPref + "perspective/Perspective.java", m_project, props).run(monitor, workingCopyManager);
-
-    new InstallJavaFileOperation("templates/ui.swt/src/views/CenterView.java", destPathPref + "views/CenterView.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/OutlinePageView.java", destPathPref + "views/OutlinePageView.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/SearchView.java", destPathPref + "views/SearchView.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/TablePageView.java", destPathPref + "views/TablePageView.java", m_project, props).run(monitor, workingCopyManager);
-
     new InstallJavaFileOperation("templates/ui.swt/src/SwtEnvironment.java", destPathPref + "SwtEnvironment.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/SwtStartup.java", destPathPref + "SwtStartup.java", m_project, props).run(monitor, workingCopyManager);
+
+    // perspective
+    new InstallJavaFileOperation("templates/ui.swt/src/perspective/Perspective.java", destPathPref + "perspective/Perspective.java", m_project, props).run(monitor, workingCopyManager);
+
+    // editor part
+    new InstallJavaFileOperation("templates/ui.swt/src/editor/ScoutEditorPart.java", destPathPref + "editor/ScoutEditorPart.java", m_project, props).run(monitor, workingCopyManager);
+
+    // views
+    new InstallJavaFileOperation("templates/ui.swt/src/views/CenterView.java", destPathPref + "views/CenterView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/DetailView.java", destPathPref + "views/DetailView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/EastView.java", destPathPref + "views/EastView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/OutlineView.java", destPathPref + "views/OutlineView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/TableView.java", destPathPref + "views/TableView.java", m_project, props).run(monitor, workingCopyManager);
 
     // application
     new InstallJavaFileOperation("templates/ui.swt/src/application/Application.java", destPathPref + "application/Application.java", m_project, props).run(monitor, workingCopyManager);

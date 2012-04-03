@@ -107,6 +107,7 @@ public class CodeTypeNewOperation implements IOperation {
     // getid method
     MethodOverrideOperation getIdOp = new MethodOverrideOperation(getCreatedType(), "getId", false);
     getIdOp.setSimpleBody("return ID;");
+    getIdOp.setReturnTypeSignature(getGenericTypeSignature());
     getIdOp.validate();
     getIdOp.run(monitor, workingCopyManager);
 

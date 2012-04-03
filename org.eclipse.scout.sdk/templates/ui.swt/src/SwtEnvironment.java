@@ -10,22 +10,32 @@
  ******************************************************************************/
 package @@BUNDLE_SWT_NAME@@;
 
+import javax.swing.text.TableView;
+
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironmentListener;
 import org.eclipse.scout.rt.ui.swt.SwtEnvironmentEvent;
 import org.eclipse.ui.PlatformUI;
+import @@BUNDLE_SWT_NAME@@.editor.ScoutEditorPart;
+import @@BUNDLE_SWT_NAME@@.views.CenterView;
+import @@BUNDLE_SWT_NAME@@.views.DetailView;
+import @@BUNDLE_SWT_NAME@@.views.EastView;
+import @@BUNDLE_SWT_NAME@@.views.OutlineView;
 import org.osgi.framework.Bundle;
 
 public class SwtEnvironment extends AbstractSwtEnvironment{
 
   public SwtEnvironment(Bundle bundle,String perspectiveId,Class<? extends AbstractClientSession> clientSessionClazz) {
     super(bundle, perspectiveId, clientSessionClazz);
-    registerPart(IForm.VIEW_ID_CENTER, Activator.CENTER_VIEW_ID);
-    registerPart(IForm.VIEW_ID_OUTLINE, Activator.OUTLINE_VIEW_ID);
-    registerPart(IForm.VIEW_ID_PAGE_TABLE, Activator.TABLE_PAGE_VIEW_ID);
-    registerPart(IForm.VIEW_ID_PAGE_SEARCH, Activator.SEAECH_VIEW_ID);
+
+    registerPart(IForm.VIEW_ID_OUTLINE, OutlineView.class.getName());
+    registerPart(IForm.VIEW_ID_PAGE_DETAIL, DetailView.class.getName());
+    registerPart(IForm.VIEW_ID_CENTER, CenterView.class.getName());
+    registerPart(IForm.VIEW_ID_PAGE_TABLE, TableView.class.getName());
+    registerPart(IForm.VIEW_ID_E, EastView.class.getName());
+    registerPart(IForm.EDITOR_ID, ScoutEditorPart.class.getName());
 
     addEnvironmentListener(new ISwtEnvironmentListener() {
       @Override

@@ -22,7 +22,7 @@ import org.eclipse.ui.PlatformUI;
 
 /** <h3>Activator</h3>
  *  This class controls all aspects of the application's execution
-*/
+ */
 public class Application implements IApplication {
 
   @Override
@@ -37,8 +37,7 @@ public class Application implements IApplication {
     });
   }
 
-  public Integer startSecure(final IApplicationContext context)
-      throws Exception {
+  public Integer startSecure(final IApplicationContext context) throws Exception {
     Display display = PlatformUI.createDisplay();
     NetActivator.install();
     if (PlatformUI.createAndRunWorkbench(display, new ApplicationWorkbenchAdvisor()) == PlatformUI.RETURN_RESTART) {

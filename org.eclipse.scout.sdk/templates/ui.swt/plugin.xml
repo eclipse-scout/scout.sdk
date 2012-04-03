@@ -9,34 +9,51 @@
             name="@@ALIAS@@"/>
    </extension>
    <extension
-         point="org.eclipse.ui.views">
-      <view
-            class="@@BUNDLE_SWT_NAME@@.views.CenterView"
-            icon="resources/icons/eclipse_scout.gif"
-            id="@@BUNDLE_SWT_NAME@@.views.CenterView"
-            name="CenterView">
-      </view>
-      <view
-            class="@@BUNDLE_SWT_NAME@@.views.OutlinePageView"
-            icon="resources/icons/eclipse_scout.gif"
-            id="@@BUNDLE_SWT_NAME@@.views.OutlinePageView"
-            name="Outline"
+            point="org.eclipse.ui.views">
+         <view
+               class="@@BUNDLE_SWT_NAME@@.views.OutlineView"
+               id="@@BUNDLE_SWT_NAME@@.views.OutlineView"
+               name="OutlineView"
+               icon="resources/icons/eclipse_scout.gif"
+               restorable="true">
+         </view>
+         <view
+               class="@@BUNDLE_SWT_NAME@@.views.DetailView"
+               id="@@BUNDLE_SWT_NAME@@.views.DetailView"
+               name="DetailView"
+               icon="resources/icons/eclipse_scout.gif"
+               restorable="true">
+         </view>
+         <view
+               class="@@BUNDLE_SWT_NAME@@.views.CenterView"
+               id="@@BUNDLE_SWT_NAME@@.views.CenterView"
+               name="Center View"
+               icon="resources/icons/eclipse_scout.gif"
+               restorable="true">
+         </view>
+         <view
+               class="@@BUNDLE_SWT_NAME@@.views.TableView"
+               id="@@BUNDLE_SWT_NAME@@.views.TableView"
+               name="Table View"
+               icon="resources/icons/eclipse_scout.gif"
+               restorable="true">
+         </view>
+     	 <view
+            allowMultiple="false"
+            category="org.eclipse.ui"
+            class="org.eclipse.ui.ExtensionFactory:progressView"
+            icon="resources/icons/progress_view.gif"
+            id="org.eclipse.ui.views.ProgressView"
+            name="Progress View"
             restorable="true">
       </view>
-      <view
-            class="@@BUNDLE_SWT_NAME@@.views.TablePageView"
-            icon="resources/icons/eclipse_scout.gif"
-            id="@@BUNDLE_SWT_NAME@@.views.TablePageView"
-            name="Table Page"
-            restorable="true">
-      </view>
-      <view
-            class="@@BUNDLE_SWT_NAME@@.views.SearchView"
-            icon="resources/icons/eclipse_scout.gif"
-            id="@@BUNDLE_SWT_NAME@@.views.SearchView"
-            name="Search"
-            restorable="true">
-      </view>
+       <view
+             class="@@BUNDLE_SWT_NAME@@.views.EastView"
+             id="@@BUNDLE_SWT_NAME@@.views.EastView"
+             name="East View"
+             icon="resources/icons/eclipse_scout.gif"
+             restorable="true">
+       </view>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
@@ -48,6 +65,17 @@
     <application>
       <run class="@@BUNDLE_SWT_NAME@@.application.Application"/>
     </application>
+  </extension>
+  <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="@@BUNDLE_SWT_NAME@@.editor.ScoutEditorPart"
+            default="false"
+            icon="resources/icons/eclipse_scout.gif"
+            id="@@BUNDLE_SWT_NAME@@.editor.ScoutEditorPart"
+            matchingStrategy="org.eclipse.scout.rt.ui.swt.window.desktop.editor.ScoutEditorMatchingStrategy"
+            name="ScoutEditorPart">
+      </editor>
   </extension>
   <extension id="product" point="org.eclipse.core.runtime.products">
     <product
@@ -72,4 +100,57 @@
         </dynamic>
      </menuContribution>
   </extension>
+  <extension
+             point="org.eclipse.ui.perspectiveExtensions">
+          <perspectiveExtension
+                targetID="@@BUNDLE_SWT_NAME@@.perspective.Perspective">
+             <view
+                   closeable="false"
+                   id="@@BUNDLE_SWT_NAME@@.views.OutlineView"
+                   minimized="false"
+                   relationship="left"
+                   relative="org.eclipse.ui.editorss"
+                   visible="false">
+             </view>
+             <view
+                   id="@@BUNDLE_SWT_NAME@@.views.EastView"
+                   minimized="false"
+                   ratio="0.75"
+                   relationship="right"
+                   relative="@@BUNDLE_SWT_NAME@@.views.OutlineView"
+                   visible="false">
+             </view>
+             <view
+                   id="@@BUNDLE_SWT_NAME@@.views.TableView"
+                   minimized="false"
+                   ratio="0.25"
+                   relationship="right"
+                   relative="@@BUNDLE_SWT_NAME@@.views.OutlineView"
+                   visible="false">
+             </view>
+             <view
+                   id="@@BUNDLE_SWT_NAME@@.views.DetailView"
+                   minimized="false"
+                   ratio="0.25"
+                   relationship="bottom"
+                   relative="@@BUNDLE_SWT_NAME@@.views.TableView"
+                   visible="false">
+             </view>
+             <view
+                   id="@@BUNDLE_SWT_NAME@@.views.CenterView"
+                   minimized="false"
+                   relationship="stack"
+                   relative="@@BUNDLE_SWT_NAME@@.views.TableView"
+                   visible="false">
+             </view>
+             <view
+                   id="org.eclipse.ui.views.ProgressView"
+                   minimized="false"
+                   ratio="0.75"
+                   relationship="bottom"
+                   relative="@@BUNDLE_SWT_NAME@@.views.EastView"
+                   visible="false">
+             </view>
+          </perspectiveExtension>
+   </extension>
 </plugin>

@@ -10,35 +10,38 @@
  ******************************************************************************/
 package @@BUNDLE_SWT_NAME@@;
 
+import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
+import @@BUNDLE_CLIENT_NAME@@.ClientSession;
+import @@BUNDLE_SWT_NAME@@.perspective.Perspective;
+import @@BUNDLE_SWT_NAME@@.views.CenterView;
+import @@BUNDLE_SWT_NAME@@.views.DetailView;
+import @@BUNDLE_SWT_NAME@@.views.EastView;
+import @@BUNDLE_SWT_NAME@@.views.OutlineView;
+import @@BUNDLE_SWT_NAME@@.views.TableView;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import @@BUNDLE_CLIENT_NAME@@.ClientSession;
-import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 
-/** <h3>Activator</h3>
- *  All view ids and perspective ids are kept here.
-*/
 public class Activator implements BundleActivator{
 
   // the plugin id
   public static final String BUNDLE_ID = "@@BUNDLE_SWT_NAME@@";
-  // the initial perspective id
-  public static final String PERSPECITVE_ID = "@@BUNDLE_SWT_NAME@@.perspective.Perspective";
-  // all view ids comodity to access.
-  public static final String CENTER_VIEW_ID = "@@BUNDLE_SWT_NAME@@.views.CenterView";
-  public static final String TABLE_PAGE_VIEW_ID = "@@BUNDLE_SWT_NAME@@.views.TablePageView";
-  public static final String OUTLINE_VIEW_ID = "@@BUNDLE_SWT_NAME@@.views.OutlinePageView";
-  public static final String SEAECH_VIEW_ID = "@@BUNDLE_SWT_NAME@@.views.SearchView";
 
+  // all view ID's commodity to access.
+  public static final String CENTER_VIEW_ID = CenterView.class.getName();
+  public static final String DETAIL_VIEW_ID = DetailView.class.getName();
+  public static final String EAST_VIEW_ID = EastView.class.getName();
+  public static final String OUTLINE_VIEW_ID = OutlineView.class.getName();
+  public static final String TABLE_VIEW_ID = TableView.class.getName();
 
   private ISwtEnvironment m_environment;
+
   // the shared instance
   private static Activator m_bundle;
 
   @Override
   public void start(BundleContext context) throws Exception {
     m_bundle = this;
-    m_environment = new SwtEnvironment(context.getBundle(), PERSPECITVE_ID, ClientSession.class);
+    m_environment = new SwtEnvironment(context.getBundle(), Perspective.ID, ClientSession.class);
   }
 
   @Override

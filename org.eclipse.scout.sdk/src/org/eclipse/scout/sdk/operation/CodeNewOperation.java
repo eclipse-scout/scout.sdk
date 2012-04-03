@@ -182,8 +182,10 @@ public class CodeNewOperation implements IOperation {
         idOp.setSimpleInitValue(codeId);
         idOp.validate();
         idOp.run(monitor, workingCopyManager);
+
         MethodOverrideOperation getIdOp = new MethodOverrideOperation(getCreatedCode(), "getId", false);
         getIdOp.setSimpleBody("return ID;");
+        getIdOp.setReturnTypeSignature(getGenericTypeSignature());
         getIdOp.validate();
         getIdOp.run(monitor, workingCopyManager);
         nlsMethodSibling = getIdOp.getCreatedMethod();

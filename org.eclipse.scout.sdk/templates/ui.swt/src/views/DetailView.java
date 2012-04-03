@@ -12,17 +12,15 @@ package @@BUNDLE_SWT_NAME@@.views;
 
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
-import @@BUNDLE_SWT_NAME@@.SwtEnvironment;
 import @@BUNDLE_SWT_NAME@@.Activator;
 
-/** <h3>SearchView</h3>
- *  A view used of scout is registered as a view extension point in the plugin.xml and linked to
- *  scout view id in the SwtEnvironment.
- * @see SwtEnvironment
- */
-public class SearchView extends AbstractScoutView {
+public class DetailView extends AbstractScoutView {
+
+  public DetailView() {
+  }
+
   @Override
-  protected ISwtEnvironment getSwtEnvironment(){
+  protected ISwtEnvironment getSwtEnvironment() {
     return Activator.getDefault().getEnvironment();
   }
 }
