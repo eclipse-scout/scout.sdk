@@ -16,10 +16,12 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu;
+import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
 import @@BUNDLE_CLIENT_NAME@@.ClientSession;
 import org.eclipse.scout.rt.shared.TEXTS;
@@ -94,6 +96,25 @@ public class Desktop extends AbstractDesktop implements IDesktop{
       public void execAction() throws ProcessingException{
         ScoutInfoForm form=new ScoutInfoForm();
         form.startModify();
+      }
+    }
+  }
+
+  @Order(10.0)
+  public class RefreshOutlineKeyStroke extends AbstractKeyStroke {
+
+    @Override
+    protected String getConfiguredKeyStroke() {
+      return "f5";
+    }
+
+    @Override
+    protected void execAction() throws ProcessingException {
+      if (getOutline() != null) {
+        IPage page = getOutline().getActivePage();
+        if (page != null) {
+          page.reloadPage();
+        }
       }
     }
   }

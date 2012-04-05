@@ -31,7 +31,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
 
   @Override
   public boolean isRelevant() {
-    return PlatformVersionUtility.isPlatformE4() && isNodeChecked(CreateUiSwtPluginOperation.BUNDLE_ID);
+    return PlatformVersionUtility.isE4(getTargetPlatformVersion()) && isNodeChecked(CreateUiSwtPluginOperation.BUNDLE_ID);
   }
 
   @Override

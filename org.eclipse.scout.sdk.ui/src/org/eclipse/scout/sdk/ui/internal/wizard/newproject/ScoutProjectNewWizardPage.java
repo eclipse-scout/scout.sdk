@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension;
 import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
@@ -208,6 +209,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, getProjectName().trim());
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, postfix);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, getProjectAlias().trim());
+    properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, PlatformVersionUtility.getPlatformVersion());
 
     // go through all node extensions and put properties which node has been checked
     ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());

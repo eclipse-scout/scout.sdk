@@ -10,8 +10,6 @@
  ******************************************************************************/
 package @@BUNDLE_SWT_NAME@@;
 
-import javax.swing.text.TableView;
-
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ui.form.IForm;
 import org.eclipse.scout.rt.ui.swt.AbstractSwtEnvironment;
@@ -23,6 +21,7 @@ import @@BUNDLE_SWT_NAME@@.views.CenterView;
 import @@BUNDLE_SWT_NAME@@.views.DetailView;
 import @@BUNDLE_SWT_NAME@@.views.EastView;
 import @@BUNDLE_SWT_NAME@@.views.OutlineView;
+import @@BUNDLE_SWT_NAME@@.views.TableView;
 import org.osgi.framework.Bundle;
 
 public class SwtEnvironment extends AbstractSwtEnvironment{

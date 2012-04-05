@@ -22,12 +22,14 @@ public class DesktopMenuBar extends CompoundContributionItem {
   @Override
   protected IContributionItem[] getContributionItems() {
     ISwtEnvironment env = Activator.getDefault().getEnvironment();
-    if (env.isInitialized()) {
-      IMenu[] menus = env.getClientSession().getDesktop().getMenus();
-      return SwtMenuUtility.getMenuContribution(menus, env);
+    if (env != null && env.isInitialized()) {
+      if (env.getClientSession() != null && env.getClientSession().getDesktop() != null) {
+        IMenu[] menus = env.getClientSession().getDesktop().getMenus();
+        if (menus != null && menus.length > 0) {
+          return SwtMenuUtility.getMenuContribution(menus, env);
+        }
+      }
     }
-    else {
-      return new IContributionItem[0];
-    }
+    return new IContributionItem[0];
   }
 }

@@ -11,6 +11,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.osgi.framework.Version;
 
 public abstract class AbstractScoutProjectNewOperation implements IScoutProjectNewOperation {
 
@@ -138,6 +139,10 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
 
   protected final String getUserName() {
     return getProperties().getProperty(PROP_USER_NAME, String.class);
+  }
+
+  protected final Version getTargetPlatformVersion() {
+    return getProperties().getProperty(PROP_TARGET_PLATFORM_VERSION, Version.class);
   }
 
   protected final String getScoutProjectName() {

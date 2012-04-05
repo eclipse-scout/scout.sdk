@@ -25,10 +25,11 @@
                restorable="true">
          </view>
          <view
+               allowMultiple="true"
                class="@@BUNDLE_SWT_NAME@@.views.CenterView"
+               icon="resources/icons/eclipse_scout.gif"
                id="@@BUNDLE_SWT_NAME@@.views.CenterView"
                name="Center View"
-               icon="resources/icons/eclipse_scout.gif"
                restorable="true">
          </view>
          <view
@@ -39,7 +40,6 @@
                restorable="true">
          </view>
      	 <view
-            allowMultiple="false"
             category="org.eclipse.ui"
             class="org.eclipse.ui.ExtensionFactory:progressView"
             icon="resources/icons/progress_view.gif"
@@ -48,10 +48,11 @@
             restorable="true">
       </view>
        <view
+             allowMultiple="true"
              class="@@BUNDLE_SWT_NAME@@.views.EastView"
+             icon="resources/icons/eclipse_scout.gif"
              id="@@BUNDLE_SWT_NAME@@.views.EastView"
              name="East View"
-             icon="resources/icons/eclipse_scout.gif"
              restorable="true">
        </view>
    </extension>
@@ -113,6 +114,7 @@
                    visible="false">
              </view>
              <view
+                   closeable="true"
                    id="@@BUNDLE_SWT_NAME@@.views.EastView"
                    minimized="false"
                    ratio="0.75"
@@ -121,6 +123,7 @@
                    visible="false">
              </view>
              <view
+                   closeable="false"
                    id="@@BUNDLE_SWT_NAME@@.views.TableView"
                    minimized="false"
                    ratio="0.25"
@@ -129,6 +132,7 @@
                    visible="false">
              </view>
              <view
+                   closeable="false"
                    id="@@BUNDLE_SWT_NAME@@.views.DetailView"
                    minimized="false"
                    ratio="0.25"
@@ -137,6 +141,7 @@
                    visible="false">
              </view>
              <view
+                   closeable="true"
                    id="@@BUNDLE_SWT_NAME@@.views.CenterView"
                    minimized="false"
                    relationship="stack"
@@ -144,6 +149,7 @@
                    visible="false">
              </view>
              <view
+                   closeable="true"
                    id="org.eclipse.ui.views.ProgressView"
                    minimized="false"
                    ratio="0.75"
