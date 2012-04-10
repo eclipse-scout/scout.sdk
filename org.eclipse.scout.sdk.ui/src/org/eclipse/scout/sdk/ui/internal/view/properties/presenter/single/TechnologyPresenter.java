@@ -78,13 +78,18 @@ public class TechnologyPresenter extends AbstractPresenter {
         checkbox.addMouseListener(new MouseAdapter() {
           @Override
           public void mouseDown(MouseEvent e) {
-            tec.setSelection(m_scoutProject, !checkbox.getSelection());
+            checkbox.setEnabled(false);
+            boolean saved = tec.setSelection(m_scoutProject, !checkbox.getSelection());
+            if (!saved) {
+              checkbox.setEnabled(true);
+            }
           }
         });
         tec.addSelectionChangedListener(new ITechnologyListener() {
           @Override
           public void handleSelectionChanged(boolean newSelection) {
             setCheckBoxVal(checkbox, TriState.parseTriState(newSelection));
+            checkbox.setEnabled(true);
           }
         });
       }

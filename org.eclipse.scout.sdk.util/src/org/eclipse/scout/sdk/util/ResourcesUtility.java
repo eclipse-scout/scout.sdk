@@ -1,10 +1,12 @@
 package org.eclipse.scout.sdk.util;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -24,6 +26,7 @@ import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 
 @SuppressWarnings("restriction")
 public final class ResourcesUtility {
@@ -49,6 +52,42 @@ public final class ResourcesUtility {
       }
     }
     return getLineSeparator();
+  }
+
+  /**
+   * Gets the content of the given file as string.
+   * 
+   * @param f
+   *          the file to get the content from
+   * @return a string containing the content of the given file
+   */
+  public static String getContent(IFile f) throws CoreException {
+    InputStream is = null;
+    try {
+      is = f.getContents();
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      StringBuilder sb = new StringBuilder();
+      String line = null;
+      String nl = getLineSeparator(f);
+      while ((line = reader.readLine()) != null) {
+        sb.append(line);
+        sb.append(nl);
+      }
+      return sb.toString();
+    }
+    catch (IOException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
+    finally {
+      if (is != null) {
+        try {
+          is.close();
+        }
+        catch (IOException e) {
+          //nop
+        }
+      }
+    }
   }
 
   /**

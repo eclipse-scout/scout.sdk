@@ -23,6 +23,8 @@ package org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.scout.nls.sdk.extension.NlsExportImportExtensionPoints;
+import org.eclipse.scout.nls.sdk.extension.WizardExtension;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.widgets.Shell;
@@ -44,7 +46,11 @@ public class NlsImportAction extends Action {
     m_nlsProject = nlsProject;
     m_parentShell = parentShell;
     setImageDescriptor(NlsCore.getImageDescriptor("import"));
-    setEnabled(nlsProject != null);
+
+    WizardExtension[] wizExts = NlsExportImportExtensionPoints.getExtensions(NlsExportImportExtensionPoints.EXTENSION_POINT_ID_NLS_IMPORTER);
+    boolean importWizardsAvailable = wizExts != null && wizExts.length > 0;
+
+    setEnabled(nlsProject != null && importWizardsAvailable);
   }
 
   @Override
@@ -54,5 +60,4 @@ public class NlsImportAction extends Action {
     dialog.setBlockOnOpen(true);
     dialog.open();
   }
-
 }

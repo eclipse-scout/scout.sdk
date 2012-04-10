@@ -39,9 +39,12 @@ public class NlsServiceType extends NlsType {
       int flags = getter.getFlags();
       int refFlags = Flags.AccProtected;
       if ((refFlags & flags) == refFlags) {
-        Matcher matcher = REGEX_RESOURCE_BUNDLE_GETTER.matcher(getter.getSource());
-        if (matcher.find()) {
-          return matcher.group(1);
+        String source = getter.getSource();
+        if (source != null) {
+          Matcher matcher = REGEX_RESOURCE_BUNDLE_GETTER.matcher(source);
+          if (matcher.find()) {
+            return matcher.group(1);
+          }
         }
       }
     }

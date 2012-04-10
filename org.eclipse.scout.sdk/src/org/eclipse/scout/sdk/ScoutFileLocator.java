@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
  */
 public class ScoutFileLocator {
 
-  // TODO ensure input stram close!!!!
+  // ensure input stream will be closed!
   public static InputStream resolve(String bundleID, String path) {
     InputStream stream = null;
     try {

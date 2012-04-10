@@ -15,7 +15,21 @@ public final class TargetPlatformUtility {
   }
 
   public static void resolveTargetPlatform(IFile targetFile, boolean loadPlatform, IProgressMonitor monitor) throws CoreException {
-    ITargetPlatformCompatService svc = ScoutCompatibilityActivator.getDefault().acquireCompatibilityService(ITargetPlatformCompatService.class);
+    ITargetPlatformCompatService svc = getService();
     svc.resolveTargetPlatform(targetFile, loadPlatform, monitor);
+  }
+
+  private static ITargetPlatformCompatService getService() {
+    return ScoutCompatibilityActivator.getDefault().acquireCompatibilityService(ITargetPlatformCompatService.class);
+  }
+
+  public static void addInstallableUnitsToTarget(IFile targetFile, String[] unitIds, String[] versions, String[] repositories) throws CoreException {
+    ITargetPlatformCompatService svc = getService();
+    svc.addInstallableUnitsToTarget(targetFile, unitIds, versions, repositories);
+  }
+
+  public static void removeInstallableUnitsFromTarget(IFile targetFile, String[] unitIds) throws CoreException {
+    ITargetPlatformCompatService svc = getService();
+    svc.removeInstallableUnitsFromTarget(targetFile, unitIds);
   }
 }

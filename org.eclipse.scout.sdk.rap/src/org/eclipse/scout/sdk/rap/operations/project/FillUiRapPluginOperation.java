@@ -33,10 +33,6 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
   public static final String ECLIPSE_EMF_ECORE_FEATURE = "org.eclipse.emf.ecore.feature.group";
   public static final String ECLIPSE_EMF_COMMON_FEATURE = "org.eclipse.emf.common.feature.group";
 
-  //TODO: remove incubator
-  private static final String ECLIPSE_RT_RAP_INCUB_FEATURE_URL = "http://download.eclipse.org/rt/rap/1.5/incubator";
-  private static final String ECLIPSE_RT_RAP_INCUB_FEATURE = "org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group";
-
   public final static String PROP_TARGET_STRATEGY = "propTargetStrategy";
   public final static String PROP_EXTRACT_TARGET_FOLDER = "propExtractTargetFolder";
   public final static String PROP_LOCAL_TARGET_FOLDER = "propLocalTargetFolder";
@@ -126,8 +122,6 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       else {
         op.addRunningEclipseEntries();
       }
-      //TODO: remove incubator
-      op.addUpdateSite(ECLIPSE_RT_RAP_INCUB_FEATURE_URL, ECLIPSE_RT_RAP_INCUB_FEATURE);
     }
     else if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT) {
       // locally extracted, new target from rap.target plug-in

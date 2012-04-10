@@ -68,7 +68,7 @@ public class Technology implements Comparable<Technology> {
     }
   }
 
-  public void setSelection(IScoutProject project, boolean selected) {
+  public boolean setSelection(IScoutProject project, boolean selected) {
     // collect all resources from all handlers
     HashSet<IScoutTechnologyResource> allResources = new HashSet<IScoutTechnologyResource>();
     for (IScoutTechnologyHandler handler : getHandlers(project)) {
@@ -108,7 +108,9 @@ public class Technology implements Comparable<Technology> {
         OperationJob job = new OperationJob(new P_ChangeSelectionOperation(selectedNodes, selected));
         job.schedule();
       }
+      return true;
     }
+    return false;
   }
 
   private ITreeNode[] getDefaultSelectedNodes(ITreeNode root) {
