@@ -62,7 +62,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.nls.sdk.extension.AbstractImportExportWizard"/>
+                  <meta.attribute kind="java" basedOn="org.eclipse.scout.nls.sdk.extension.AbstractImportExportWizard:"/>
                </appInfo>
             </annotation>
          </attribute>
