@@ -15,6 +15,7 @@ import java.util.HashSet;
 import junit.framework.Assert;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
@@ -48,6 +49,7 @@ public final class ScoutProjectHelper {
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, projectName);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, "");
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, "alias");
+    properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, PlatformVersionUtility.getPlatformVersion());
     HashSet<String> nodesToCreate = new HashSet<String>();
     if (client) {
       nodesToCreate.add(CreateClientPluginOperation.BUNDLE_ID);
