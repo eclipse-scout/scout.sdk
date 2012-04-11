@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
@@ -110,13 +112,28 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   }
 
   private static ScoutTechnologyResource[] getTargetFiles(IScoutProject project) {
-    ArrayList<ScoutTechnologyResource> ret = new ArrayList<ScoutTechnologyResource>();
-    IScoutBundle[] rapBundles = project.getAllBundles(UiRapBundleNodeFactory.BUNDLE_UI_RAP);
-    for (IScoutBundle bundle : rapBundles) {
-      IFile targetFile = bundle.getProject().getFile(InstallTargetPlatformFileOperation.TARGET_FILE_NAME);
-      if (targetFile != null && targetFile.exists()) {
-        ret.add(new ScoutTechnologyResource(bundle, targetFile));
+    final ArrayList<ScoutTechnologyResource> ret = new ArrayList<ScoutTechnologyResource>();
+    try {
+      for (IScoutBundle b : project.getAllScoutBundles()) {
+        final IScoutBundle bundle = b;
+        bundle.getProject().accept(new IResourceVisitor() {
+          @Override
+          public boolean visit(IResource resource) throws CoreException {
+            if (resource != null && resource.getType() == IResource.FILE && resource.exists()) {
+              IFile f = (IFile) resource;
+              String fileName = f.getName();
+              if (fileName.toLowerCase().endsWith(".target")) {
+                boolean checked = fileName.equals(InstallTargetPlatformFileOperation.TARGET_FILE_NAME);
+                ret.add(new ScoutTechnologyResource(bundle, f, checked));
+              }
+            }
+            return true;
+          }
+        }, IResource.DEPTH_INFINITE, false);
       }
+    }
+    catch (CoreException e) {
+      ScoutSdkRap.logError(e);
     }
     return ret.toArray(new ScoutTechnologyResource[ret.size()]);
   }

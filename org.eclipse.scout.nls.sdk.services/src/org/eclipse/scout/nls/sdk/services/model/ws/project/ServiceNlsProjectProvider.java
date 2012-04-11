@@ -105,26 +105,28 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     if (superType == null) return null;
 
     IType[] serviceImpls = TypeCacheAccessor.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType);
+    HashMap<String, IType> typeMap = new HashMap<String, IType>(serviceImpls.length);
+    for (IType t : serviceImpls) {
+      typeMap.put(t.getFullyQualifiedName(), t);
+    }
+
     HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.length);
     IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IScoutBundleConstantes.EXTENSION_POINT_SERVICES, true);
     for (IExtension e : allServiceExtensions) {
       for (IConfigurationElement c : e.getConfigurationElements()) {
-        for (IType serviceType : serviceImpls) {
-          if (acceptsFilter(returnDocServices, projectFilter, serviceType)) {
-            if (IScoutBundleConstantes.EXTENSION_ELEMENT_SERVICE.equals(c.getName())) {
-              String serviceClassDef = c.getAttribute("class");
-              if (serviceClassDef != null && serviceClassDef.equals(serviceType.getFullyQualifiedName())) {
-                TextProviderService s = new TextProviderService(serviceType);
-                TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(s, getPriority(serviceType, c));
+        if (IScoutBundleConstantes.EXTENSION_ELEMENT_SERVICE.equals(c.getName())) {
+          String serviceClassDef = c.getAttribute("class");
+          IType serviceImpl = typeMap.get(serviceClassDef);
+          if (acceptsFilter(returnDocServices, projectFilter, serviceImpl)) {
+            TextProviderService s = new TextProviderService(serviceImpl);
+            TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(s, getPriority(serviceImpl, c));
 
-                // if the same service is registered more than once with different priorities: use always the one with the higher priority
-                // meaning: if we have the current service with a higher prio in the list already -> do not overwrite with the new one.
-                TextProviderServiceDeclaration existing = result.get(s);
-                if (existing == null || existing.prio < d.prio) {
-                  // we do not have this service or we have a service with lower prio -> overwrite
-                  result.put(s, d);
-                }
-              }
+            // if the same service is registered more than once with different priorities: use always the one with the higher priority
+            // meaning: if we have the current service with a higher prio in the list already -> do not overwrite with the new one.
+            TextProviderServiceDeclaration existing = result.get(s);
+            if (existing == null || existing.prio < d.prio) {
+              // we do not have this service or we have a service with lower prio -> overwrite
+              result.put(s, d);
             }
           }
         }
@@ -149,6 +151,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static boolean acceptsFilter(Boolean returnDocServices, String[] projects, IType candidate) throws JavaModelException {
+    if (candidate == null) return false;
     boolean acceptsDocPart = returnDocServices == null || returnDocServices == isDocsService(candidate);
     if (acceptsDocPart) {
       if (candidate.isReadOnly()) return true; // always include all text services from the platform
