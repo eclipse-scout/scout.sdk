@@ -89,7 +89,9 @@ public class TechnologyPresenter extends AbstractPresenter {
           @Override
           public void handleSelectionChanged(boolean newSelection) {
             setCheckBoxVal(checkbox, TriState.parseTriState(newSelection));
-            checkbox.setEnabled(true);
+            if (!checkbox.isDisposed()) {
+              checkbox.setEnabled(true);
+            }
           }
         });
       }

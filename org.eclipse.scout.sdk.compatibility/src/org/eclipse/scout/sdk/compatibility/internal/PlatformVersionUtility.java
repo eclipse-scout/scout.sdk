@@ -5,7 +5,7 @@ import org.osgi.framework.Version;
 
 public final class PlatformVersionUtility {
 
-  private final static Version PLATFORM_VERSION = Platform.getBundle("org.eclipse.platform").getVersion();
+  private static Version platformVersion = null;
 
   public static boolean isJuno() {
     return isJuno(getPlatformVersion());
@@ -49,6 +49,14 @@ public final class PlatformVersionUtility {
   }
 
   public static Version getPlatformVersion() {
-    return PLATFORM_VERSION;
+    if (platformVersion == null) {
+      Version v = Platform.getBundle("org.eclipse.platform").getVersion();
+      if (v.getMajor() == 3 && v.getMinor() == 3) {
+        // eclipse galileo (3.5) uses platform version 3.3. older versions are not supported.
+        v = new Version(3, 5, 0);
+      }
+      platformVersion = v;
+    }
+    return platformVersion;
   }
 }

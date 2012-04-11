@@ -256,50 +256,55 @@ public class Technology implements Comparable<Technology> {
 
     @Override
     public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-      // map the checked resources to the contributing handler
-      HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> resourcesToModify = new HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>>();
-      for (ITreeNode selectedNode : m_selectedNodes) {
-        if (selectedNode.isVisible() && selectedNode.getData() instanceof IScoutTechnologyResource) {
-          IScoutTechnologyResource res = (IScoutTechnologyResource) selectedNode.getData();
-          HashSet<IScoutTechnologyResource> set = resourcesToModify.get(res.getHandler());
-          if (set == null) {
-            set = new HashSet<IScoutTechnologyResource>();
-            resourcesToModify.put(res.getHandler(), set);
-          }
-          set.add(res);
-        }
-      }
-
-      // fire pre-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
-      for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
-        try {
-          if (!entry.getKey().preSelectionChanged(m_newSelection, monitor)) {
-            return; // cancel the execution if a handler requests an abort
+      try {
+        // map the checked resources to the contributing handler
+        HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> resourcesToModify = new HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>>();
+        for (ITreeNode selectedNode : m_selectedNodes) {
+          if (selectedNode.isVisible() && selectedNode.getData() instanceof IScoutTechnologyResource) {
+            IScoutTechnologyResource res = (IScoutTechnologyResource) selectedNode.getData();
+            HashSet<IScoutTechnologyResource> set = resourcesToModify.get(res.getHandler());
+            if (set == null) {
+              set = new HashSet<IScoutTechnologyResource>();
+              resourcesToModify.put(res.getHandler(), set);
+            }
+            set.add(res);
           }
         }
-        catch (CoreException e) {
-          ScoutSdkUi.logError("Error while preparing technology changes.", e);
+
+        // fire pre-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
+        for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
+          try {
+            if (!entry.getKey().preSelectionChanged(m_newSelection, monitor)) {
+              return; // cancel the execution if a handler requests an abort
+            }
+          }
+          catch (CoreException e) {
+            ScoutSdkUi.logError("Error while preparing technology changes.", e);
+          }
+        }
+
+        // fire selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
+        for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
+          try {
+            entry.getKey().selectionChanged(entry.getValue().toArray(new IScoutTechnologyResource[entry.getValue().size()]), m_newSelection, monitor, workingCopyManager);
+          }
+          catch (CoreException e) {
+            ScoutSdkUi.logError("Error while applying technology changes.", e);
+          }
+        }
+
+        // fire post-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
+        for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
+          try {
+            entry.getKey().postSelectionChanged(m_newSelection, monitor);
+          }
+          catch (CoreException e) {
+            ScoutSdkUi.logError("Error while finishing technology changes.", e);
+          }
         }
       }
-
-      // fire selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
-      for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
-        try {
-          entry.getKey().selectionChanged(entry.getValue().toArray(new IScoutTechnologyResource[entry.getValue().size()]), m_newSelection, monitor, workingCopyManager);
-        }
-        catch (CoreException e) {
-          ScoutSdkUi.logError("Error while applying technology changes.", e);
-        }
-      }
-
-      // fire post-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
-      for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
-        try {
-          entry.getKey().postSelectionChanged(m_newSelection, monitor);
-        }
-        catch (CoreException e) {
-          ScoutSdkUi.logError("Error while finishing technology changes.", e);
-        }
+      catch (Throwable t) {
+        ScoutSdkUi.logError(t);
       }
       ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
         @Override
