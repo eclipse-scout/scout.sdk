@@ -47,7 +47,7 @@ public class ServiceRenameAction extends AbstractRenameAction {
   @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
     transaction.add(m_serviceImplementation, newName);
-    if (m_serviceInterface != null) {
+    if (TypeUtility.exists(m_serviceInterface) && !m_serviceInterface.isBinary()) {
       transaction.add(m_serviceInterface, "I" + newName);
     }
   }

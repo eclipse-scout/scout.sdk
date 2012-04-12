@@ -79,9 +79,13 @@ public class ClientServiceTablePage extends AbstractPage {
     }
     IType[] serviceTypes = m_servieHierarchy.getAllSubtypes(iService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType type : serviceTypes) {
-      ClientServiceNodePage childPage = new ClientServiceNodePage();
-      childPage.setParent(this);
-      childPage.setType(type);
+      IType serviceInterface = null;
+      IType[] interfaces = m_servieHierarchy.getSuperInterfaces(type, TypeFilters.getElementNameFilter("I" + type.getElementName()));
+      if (interfaces.length > 0) {
+        serviceInterface = interfaces[0];
+      }
+
+      new ClientServiceNodePage(this, type, serviceInterface);
     }
   }
 

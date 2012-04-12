@@ -74,7 +74,12 @@ public class LookupServiceTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     for (IType service : resolveAllLookupServices()) {
-      new LookupServiceNodePage(this, service, iLookupService);
+      IType serviceInterface = null;
+      IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
+      if (interfaces != null && interfaces.length > 0) {
+        serviceInterface = interfaces[0];
+      }
+      new LookupServiceNodePage(this, service, serviceInterface);
     }
   }
 

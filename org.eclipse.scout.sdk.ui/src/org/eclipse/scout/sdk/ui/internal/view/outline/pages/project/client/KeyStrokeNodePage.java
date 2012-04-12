@@ -53,6 +53,7 @@ public class KeyStrokeNodePage extends AbstractScoutTypePage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
+    super.prepareMenuAction(menu);
     if (menu instanceof DeleteAction) {
       DeleteAction action = (DeleteAction) menu;
       action.addType(getType());
