@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
@@ -37,6 +36,7 @@ import org.eclipse.scout.sdk.ui.fields.IFileSelectionListener;
 import org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -91,7 +91,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       }
     }
     else {
-      setLocalTargetFolder(getEclipseInstallLocation().getAbsolutePath());
+      setLocalTargetFolder(ResourcesUtility.getEclipseInstallLocation().getAbsolutePath());
       if (isRapTargetPluginAvailable()) {
         setTargetStrategy(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT);
         setExtractTargetFolder(getDefaultRapLocation().getAbsolutePath());
@@ -164,17 +164,8 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     }
   }
 
-  private File getEclipseInstallLocation() {
-    Location l = Platform.getInstallLocation();
-    File ret = null;
-    if (l != null) {
-      ret = new File(l.getURL().getPath());
-    }
-    return ret;
-  }
-
   private File getDefaultRapLocation() {
-    File l = getEclipseInstallLocation();
+    File l = ResourcesUtility.getEclipseInstallLocation();
     File ret = null;
     if (l != null) {
       ret = new File(l, RAP_TARGET_DEFAULT_SUB_FOLDER);
@@ -470,7 +461,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       if (!StringUtility.hasText(getExtractTargetFolder())) {
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, Texts.get("NoRAPTargetLocationDefined"));
       }
-      File eclipseFolder = getEclipseInstallLocation();
+      File eclipseFolder = ResourcesUtility.getEclipseInstallLocation();
       File targetDir = new File(getExtractTargetFolder());
       if (CompareUtility.equals(eclipseFolder, targetDir)) {
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, Texts.get("RAPTargetNotInstallableInPlatform"));

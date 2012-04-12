@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.jface.text.Document;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -88,6 +89,20 @@ public final class ResourcesUtility {
         }
       }
     }
+  }
+
+  /**
+   * gets the install location of the running eclipse.
+   * 
+   * @return the location or null if no location could be found.
+   */
+  public static File getEclipseInstallLocation() {
+    Location l = Platform.getInstallLocation();
+    File ret = null;
+    if (l != null) {
+      ret = new File(l.getURL().getPath());
+    }
+    return ret;
   }
 
   /**

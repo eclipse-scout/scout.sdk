@@ -22,13 +22,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
-import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -47,14 +47,7 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
   public InstallTargetPlatformFileOperation(IProject dstProject) {
     super("templates/ui.rap/ScoutRAP.target", TARGET_FILE_NAME, ScoutSdkRap.getDefault().getBundle(), dstProject, new HashMap<String, String>());
     m_entryList = new ArrayList<ITargetEntryContributor>();
-
-    Location installLoc = Platform.getInstallLocation();
-    if (installLoc != null) {
-      m_installLocation = new File(installLoc.getURL().getPath());
-    }
-    else {
-      m_installLocation = null;
-    }
+    m_installLocation = ResourcesUtility.getEclipseInstallLocation();
   }
 
   public void addEclipseHomeEntry() {
@@ -94,7 +87,6 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
   private File getBundleLocation(BundleDescription bundle) {
     if (bundle != null) {
       String location = bundle.getLocation();
-
       if (StringUtility.hasText(location)) {
         try {
           final String URI_INITIAL_SCHEME = "initial@";
@@ -105,12 +97,24 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
           if (location.startsWith(URI_REFERENCE_SCHEME)) {
             location = location.substring(URI_REFERENCE_SCHEME.length());
           }
-          URI uri = URIUtil.fromString(location);
-          String scheme = uri.getScheme();
-          if (uri.isAbsolute() && !uri.isOpaque() && scheme != null && scheme.equals("file")) {
-            File f = new File(uri);
-            if (f.exists()) {
-              return f;
+          String fileLocationScheme = "file:";
+          if (location.startsWith(fileLocationScheme)) {
+            URI uri = URIUtil.fromString(location);
+            if (uri.isAbsolute()) {
+              // absolute path
+              if (!uri.isOpaque()) {
+                File f = new File(uri);
+                if (f.exists()) {
+                  return f;
+                }
+              }
+            }
+            else if (m_installLocation != null) {
+              // path relative to the eclipse home
+              File f = new File(m_installLocation, location.substring(fileLocationScheme.length()));
+              if (f.exists()) {
+                return f;
+              }
             }
           }
         }
