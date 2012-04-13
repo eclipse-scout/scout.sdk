@@ -387,20 +387,22 @@ public class ProductLaunchPresenter extends AbstractPresenter {
           ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
           for (ILaunch l : launches) {
             if (l.getLaunchConfiguration().getName().equals(getProductFile().getName())) {
-              if (l.isTerminated()) {
-                m_stopLink.setEnabled(false);
-                m_mainGroup.setText(getProductFile().getParent().getName());
-              }
-              else {
-                m_stopLink.setEnabled(true);
-                if (l.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-                  m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
-                }
-                else if (l.getLaunchMode().equals(ILaunchManager.RUN_MODE)) {
-                  m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+              if (!m_stopLink.isDisposed() && !m_mainGroup.isDisposed()) {
+                if (l.isTerminated()) {
+                  m_stopLink.setEnabled(false);
+                  m_mainGroup.setText(getProductFile().getParent().getName());
                 }
                 else {
-                  m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("UndefinedState") + "...");
+                  m_stopLink.setEnabled(true);
+                  if (l.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
+                    m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
+                  }
+                  else if (l.getLaunchMode().equals(ILaunchManager.RUN_MODE)) {
+                    m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+                  }
+                  else {
+                    m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("UndefinedState") + "...");
+                  }
                 }
               }
             }

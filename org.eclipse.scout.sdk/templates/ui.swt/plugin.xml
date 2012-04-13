@@ -81,7 +81,7 @@
   <extension id="product" point="org.eclipse.core.runtime.products">
     <product
           application="@@BUNDLE_SWT_NAME@@.application"
-          name="@@ALIAS@@">
+          name="">
        <property
              name="appName"
              value="@@ALIAS@@"/>
