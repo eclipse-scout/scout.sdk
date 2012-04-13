@@ -44,7 +44,6 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.widgets.Shell;
 
@@ -79,13 +78,10 @@ public class FormDeleteAction extends AbstractScoutHandler {
         @Override
         protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
           if (m_processServiceInterface != null && member.equals(m_processServiceInterface)) {
-            ScoutUtility.unregisterServiceClass(m_processServiceInterface.getJavaProject().getProject(),
-                "org.eclipse.scout.rt.client.serviceProxies", "serviceProxy", m_processServiceInterface.getFullyQualifiedName(), null, monitor);
+            ScoutUtility.unregisterServiceProxy(m_processServiceInterface, monitor);
           }
           if (m_processServiceImplementation != null && member.equals(m_processServiceImplementation)) {
-            IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(m_processServiceImplementation.getJavaProject().getProject());
-            ScoutUtility.unregisterServiceClass(m_processServiceImplementation.getJavaProject().getProject(),
-                "org.eclipse.scout.rt.server.services", "service", m_processServiceImplementation.getFullyQualifiedName(), implementationBundle.getRootPackageName() + ".ServerSession", monitor);
+            ScoutUtility.unregisterServiceImplementation(m_processServiceImplementation, monitor);
           }
           super.deleteMember(member, icuForOrganizeImports, monitor, manager);
         }

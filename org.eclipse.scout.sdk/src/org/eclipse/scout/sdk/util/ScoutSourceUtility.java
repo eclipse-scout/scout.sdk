@@ -66,6 +66,9 @@ public class ScoutSourceUtility {
       String methodSource = null;
       try {
         methodSource = method.getSource();
+        if (methodSource == null) {
+          return name;
+        }
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not find nls text of method '" + method.getElementName() + "'.", e);

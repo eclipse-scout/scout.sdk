@@ -28,9 +28,12 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>BcUtilities</h3> ...
@@ -128,6 +131,21 @@ public final class ScoutUtility {
       }
       h.PluginXml.addSimpleExtension(extensionPoint, elemType, attributes);
       h.save();
+    }
+  }
+
+  public static void unregisterServiceProxy(IType interfaceType, IProgressMonitor monitor) throws CoreException {
+    IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(interfaceType.getJavaProject().getProject());
+    for (IScoutBundle clientBundle : interfaceBundle.getDependentBundles(ScoutBundleFilters.getClientFilter(), false)) {
+      ScoutUtility.unregisterServiceClass(clientBundle.getProject(), IScoutBundle.CLIENT_EXTENSION_POINT_SERVICE_PROXIES, IScoutBundle.CLIENT_EXTENSION_ELEMENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName(), monitor);
+    }
+  }
+
+  public static void unregisterServiceImplementation(IType serviceType, IProgressMonitor monitor) throws CoreException {
+    IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(serviceType.getJavaProject().getProject());
+    ScoutUtility.unregisterServiceClass(implementationBundle.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), monitor);
+    for (IScoutBundle serverBundle : implementationBundle.getRequiredBundles(ScoutBundleFilters.getServerFilter(), true)) {
+      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
     }
   }
 

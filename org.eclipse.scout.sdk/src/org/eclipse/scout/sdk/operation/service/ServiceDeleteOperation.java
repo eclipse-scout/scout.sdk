@@ -14,14 +14,11 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.ResourceDeleteOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ServiceDeleteOperation implements IOperation {
 
@@ -55,16 +52,10 @@ public class ServiceDeleteOperation implements IOperation {
     if (getServiceInterface() != null) {
       javaMemberDeleteOperation.addMember(getServiceInterface());
       // unregister client side
-      IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(getServiceInterface().getJavaProject().getProject());
-      for (IScoutBundle clientBundle : interfaceBundle.getDependentBundles(ScoutBundleFilters.getClientFilter(), false)) {
-        ScoutUtility.unregisterServiceClass(clientBundle.getProject(), IScoutBundle.CLIENT_EXTENSION_POINT_SERVICE_PROXIES, IScoutBundle.CLIENT_EXTENSION_ELEMENT_SERVICE_PROXY, getServiceInterface().getFullyQualifiedName(), monitor);
-      }
+      ScoutUtility.unregisterServiceProxy(getServiceInterface(), monitor);
     }
     // unregister server side
-    IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(getServiceImplementation().getJavaProject().getProject());
-    for (IScoutBundle serverBundle : implementationBundle.getRequiredBundles(ScoutBundleFilters.getServerFilter(), true)) {
-      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, getServiceImplementation().getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
-    }
+    ScoutUtility.unregisterServiceImplementation(getServiceImplementation(), monitor);
 
     for (IType type : getAdditionalTypesToBeDeleted()) {
       javaMemberDeleteOperation.addMember(type);
@@ -76,7 +67,6 @@ public class ServiceDeleteOperation implements IOperation {
 
     javaMemberDeleteOperation.run(monitor, workingCopyManager);
     resourceDeleteOperation.run(monitor, workingCopyManager);
-
   }
 
   public void setServiceImplementation(IType serviceImplementation) {
