@@ -466,7 +466,12 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       if (CompareUtility.equals(eclipseFolder, targetDir)) {
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, Texts.get("RAPTargetNotInstallableInPlatform"));
       }
-      return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("ANewRAPTargetWillBeCreated", getExtractTargetFolder()));
+      if (targetDir.exists()) {
+        return new Status(IStatus.WARNING, ScoutSdkRapUI.PLUGIN_ID, Texts.get("RAPTargetAlreadyExists"));
+      }
+      else {
+        return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("ANewRAPTargetWillBeCreated", getExtractTargetFolder()));
+      }
     }
     else if (TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy())) {
       if (isDownloadEclipsePlatform()) {

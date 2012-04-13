@@ -22,6 +22,7 @@ import java.util.Enumeration;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.rap.RapRuntimeClasses;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
@@ -62,6 +63,7 @@ public class ScoutRapTargetCreationOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    IOUtility.deleteDirectory(getDestinationDirectory());
     Enumeration urls = getSourcePlugin().findEntries(SCOUT_RAP_TARGET_PLUGIN_SUB_DIR, "*", true);
     if (urls != null) {
       while (urls.hasMoreElements()) {
@@ -85,9 +87,6 @@ public class ScoutRapTargetCreationOperation implements IOperation {
           destRelPath = destRelPath.substring(prefix.length());
         }
         File dest = new File(getDestinationDirectory(), destRelPath);
-        if (dest.exists()) {
-          dest.delete();
-        }
         dest.getParentFile().mkdirs();
         out = new BufferedOutputStream(new FileOutputStream(dest), ResourcesUtility.BUF_SIZE);
         in = source.openStream();
