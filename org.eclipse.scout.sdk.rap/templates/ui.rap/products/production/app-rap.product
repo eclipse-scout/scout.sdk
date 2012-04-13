@@ -48,8 +48,6 @@
       <plugin id="org.apache.batik.util.gui"/>
       <plugin id="org.apache.batik.xml"/>
       <plugin id="org.apache.commons.codec"/>
-      <plugin id="org.apache.commons.fileupload" fragment=""/>
-      <plugin id="org.apache.commons.io"/>
       <plugin id="org.apache.commons.logging"/>
       <plugin id="org.eclipse.core.commands"/>
       <plugin id="org.eclipse.core.contenttype"/>
@@ -82,8 +80,6 @@
       <plugin id="org.eclipse.rap.jface.databinding" fragment=""/>
       <plugin id="org.eclipse.rap.rwt" fragment=""/>
       <plugin id="org.eclipse.rap.rwt.osgi" fragment=""/>
-      <plugin id="org.eclipse.rap.rwt.supplemental.filedialog" fragment=""/>
-      <plugin id="org.eclipse.rap.rwt.supplemental.fileupload" fragment=""/>
       <plugin id="org.eclipse.rap.ui" fragment=""/>
       <plugin id="org.eclipse.rap.ui.forms" fragment=""/>
       <plugin id="org.eclipse.rap.ui.workbench" fragment=""/>
@@ -99,10 +95,8 @@
       <plugin id="org.eclipse.scout.svg.client"/>
       <plugin id="org.eclipse.scout.svg.ui.rap"/>
       <plugin id="org.eclipse.update.configurator"/>
-      <plugin id="org.mozilla.javascript"/>
       <plugin id="org.w3c.css.sac"/>
       <plugin id="org.w3c.dom.smil"/>
-      <plugin id="org.w3c.dom.events"/>
       <plugin id="org.w3c.dom.svg"/>
    </plugins>
 

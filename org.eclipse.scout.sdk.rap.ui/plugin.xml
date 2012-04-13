@@ -60,5 +60,9 @@
             class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.FileChooserRapTargetTechnologyHandler"
             technology="scout.technology.rap.filechooser">
       </handler>
+      <handler
+            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.FileChooserRapProductTechnologyHandler"
+            technology="scout.technology.rap.filechooser">
+      </handler>
    </extension>
 </plugin>

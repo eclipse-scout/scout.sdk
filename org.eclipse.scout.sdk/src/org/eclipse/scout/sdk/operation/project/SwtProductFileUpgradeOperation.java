@@ -91,7 +91,6 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         "org.eclipse.platform",
         "org.eclipse.ui.intro",
         "org.w3c.css.sac",
-        "org.w3c.dom.events",
         "org.w3c.dom.smil",
         "org.w3c.dom.svg",
         "javax.annotation",

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.extensions.technology.svg;
+package org.eclipse.scout.sdk.rap.ui.internal.extensions.technology;
 
 import java.util.List;
 
@@ -16,57 +16,45 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.rap.RapRuntimeClasses;
+import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
-public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
+/**
+ * <h3>{@link FileChooserRapProductTechnologyHandler}</h3> ...
+ * 
+ * @author mvi
+ * @since 3.8.0 13.04.2012
+ */
+public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public final static String[] COMMON_SVG_PLUGINS = new String[]{
-      "org.apache.batik.bridge",
-      "org.apache.batik.css",
-      "org.apache.batik.dom",
-      "org.apache.batik.dom.svg",
-      "org.apache.batik.ext.awt",
-      "org.apache.batik.parser",
-      "org.apache.batik.svggen",
-      "org.apache.batik.swing",
-      "org.apache.batik.transcoder",
-      "org.apache.batik.util",
-      "org.apache.batik.util.gui",
-      "org.apache.batik.xml",
-      "org.eclipse.scout.svg.client",
-      "org.w3c.css.sac",
-      "org.w3c.dom.smil",
-      "org.w3c.dom.svg"};
-
-  public SvgClientTechnologyHandler() {
-  }
+  public final static String[] RAP_FILE_CHOOSER_PLUGINS = new String[]{"org.eclipse.scout.rt.ui.rap.incubator.filechooser",
+      "org.apache.commons.fileupload", "org.apache.commons.io", "org.eclipse.rap.rwt.supplemental.filedialog", "org.eclipse.rap.rwt.supplemental.fileupload"};
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    selectionChangedManifest(resources, selected, RuntimeClasses.ScoutClientSvgBundleId);
-  }
-
-  @Override
-  public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IFormField)).invalidate();
-  }
-
-  @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getClientBundle() != null && project.getClientBundle().getProject().exists();
+    selectionChangedProductFiles(resources, selected, RAP_FILE_CHOOSER_PLUGINS);
   }
 
   @Override
   public TriState getSelection(IScoutProject project) {
-    return getSelectionManifest(project.getClientBundle(), RuntimeClasses.ScoutClientSvgBundleId);
+    return getSelectionProductFiles(project,
+        new String[]{RuntimeClasses.ScoutClientBundleId, RapRuntimeClasses.ScoutUiRapBundleId},
+        RAP_FILE_CHOOSER_PLUGINS);
+  }
+
+  @Override
+  public boolean isActive(IScoutProject project) {
+    IScoutBundle[] rapBundles = project.getAllBundles(UiRapBundleNodeFactory.BUNDLE_UI_RAP);
+    return project.getClientBundle() != null && rapBundles != null && rapBundles.length > 0;
   }
 
   @Override
   protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeManifestFile(project.getClientBundle(), list);
+    contributeProductFiles(project, list, RuntimeClasses.ScoutClientBundleId, RapRuntimeClasses.ScoutUiRapBundleId);
   }
 }
