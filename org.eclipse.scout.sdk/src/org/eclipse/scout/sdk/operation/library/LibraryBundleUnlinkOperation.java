@@ -10,21 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.library;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.resource.ScoutResourceFilters;
 
 /**
@@ -35,10 +42,10 @@ import org.eclipse.scout.sdk.workspace.resource.ScoutResourceFilters;
  */
 public class LibraryBundleUnlinkOperation implements IOperation {
 
-  private final Set<IPluginModelBase> m_libraries;
+  private final Collection<IPluginModelBase> m_libraries;
   private final IScoutBundle m_bundle;
 
-  public LibraryBundleUnlinkOperation(IScoutBundle bundle, Set<IPluginModelBase> libraries) {
+  public LibraryBundleUnlinkOperation(IScoutBundle bundle, Collection<IPluginModelBase> libraries) {
     m_bundle = bundle;
     m_libraries = libraries;
 
@@ -59,6 +66,9 @@ public class LibraryBundleUnlinkOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
+    if (getBundle() == null) {
+      throw new IllegalArgumentException("The bundle to mremove the library from can not be null");
+    }
     if (getLibraries() == null || getLibraries().isEmpty()) {
       throw new IllegalArgumentException("Libraries to add can not be null or empty.");
     }
@@ -66,32 +76,61 @@ public class LibraryBundleUnlinkOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    // add to manifest
-    PluginModelHelper ownerHelper = new PluginModelHelper(getBundle().getProject());
-    Set<IPluginModelBase> libraries = getLibraries();
-    for (IPluginModelBase lib : libraries) {
-      ownerHelper.Manifest.addDependency(lib.getBundleDescription().getName());
+    Set<IFile> productsToCheck = new HashSet<IFile>();
+    Set<IScoutProject> checkedScoutProjects = new HashSet<IScoutProject>();
+    List<IPluginModelBase> allUnlinkedLibraries = new LinkedList<IPluginModelBase>();
+    IScoutBundle bundle = getBundle();
+    PluginModelHelper helper = new PluginModelHelper(bundle.getProject());
+    for (IPluginModelBase model : getLibraries()) {
+      helper.Manifest.removeDependency(model.getPluginBase().getId());
+      allUnlinkedLibraries.add(model);
     }
-    ownerHelper.save();
-    // add the dependencies to the product files
-    // find all product files in the current scout project.
-    for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(getBundle().getScoutProject()))) {
-      ProductFileModelHelper h = new ProductFileModelHelper((IFile) productFile);
-      // add library bundle if there is already the library owner bundle in it.
-      if (h.ProductFile.existsDependency(getBundle().getBundleName())) {
-        for (IPluginModelBase lib : libraries) {
-          h.ProductFile.addDependency(lib.getBundleDescription().getName());
+    helper.save();
+    // grab product files
+    if (!checkedScoutProjects.contains(bundle.getScoutProject())) {
+      for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(bundle.getScoutProject()))) {
+        productsToCheck.add((IFile) productFile);
+      }
+    }
+
+    for (IFile productFile : productsToCheck) {
+      try {
+        ProductFileModelHelper h = new ProductFileModelHelper(productFile);
+        for (IPluginModelBase lib : allUnlinkedLibraries) {
+          if (h.ProductFile.existsDependency(lib.getBundleDescription().getSymbolicName())) {
+            removeLibraryFromProduct(h, lib);
+          }
         }
         h.save();
       }
+      catch (CoreException e) {
+        ScoutSdk.logError("error during checking product files.", e);
+      }
+
     }
+  }
+
+  /**
+   * removes the library from the product file if the library bundle is not used by any other bundle of the product.
+   * 
+   * @param prodcutModelHelper
+   * @param libraryBundle
+   * @throws CoreException
+   */
+  private void removeLibraryFromProduct(ProductFileModelHelper prodcutModelHelper, IPluginModelBase libraryBundle) throws CoreException {
+    for (BundleDescription libDependentBundle : libraryBundle.getBundleDescription().getDependents()) {
+      if (prodcutModelHelper.ProductFile.existsDependency(libDependentBundle.getSymbolicName())) {
+        return;
+      }
+    }
+    prodcutModelHelper.ProductFile.removeDependency(libraryBundle.getBundleDescription().getSymbolicName());
   }
 
   public IScoutBundle getBundle() {
     return m_bundle;
   }
 
-  public Set<IPluginModelBase> getLibraries() {
+  public Collection<IPluginModelBase> getLibraries() {
     return m_libraries;
   }
 

@@ -97,7 +97,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
     // setter
-    StringBuffer sourceSetter = new StringBuffer();
+    StringBuilder sourceSetter = new StringBuilder();
     sourceSetter.append(methodFlagsToString());
     sourceSetter.append(" void set" + getBeanName(true) + "(");
     sourceSetter.append(beanReference);
@@ -105,7 +105,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceSetter.append("setSharedContextVariable(\"" + getBeanName(false) + "\"," + sigTypeSimpleName + ".class," + getBeanName(false) + ");\n}\n");
     IMethod writeMethod = serverSession.createMethod(sourceSetter.toString(), getSiblingServerSession(), true, monitor);
     // getter
-    StringBuffer sourceGetter = new StringBuffer();
+    StringBuilder sourceGetter = new StringBuilder();
     sourceGetter.append(methodFlagsToString());
     sourceGetter.append(" " + beanReference + " ");
 
@@ -125,7 +125,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
     // getter
-    StringBuffer sourceGetter = new StringBuffer();
+    StringBuilder sourceGetter = new StringBuilder();
     sourceGetter.append(methodFlagsToString());
     sourceGetter.append(" " + beanReference + " ");
     sourceGetter.append("get" + getBeanName(true) + "() {\n" + SdkProperties.TAB);

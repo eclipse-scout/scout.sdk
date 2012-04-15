@@ -255,8 +255,8 @@ public final class ScoutUtility {
   }
 
   public static String sourceCodeToSql(String source) {
-    StringBuffer buf = new StringBuffer();
-    StringBuffer outsideSqlCode = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
+    StringBuilder outsideSqlCode = new StringBuilder();
     // meta levels
     boolean incomment1 = false;// /*...*/
     boolean incomment0 = false;// //...
@@ -340,8 +340,8 @@ public final class ScoutUtility {
     sql = sql.replace("[\\n\\r]+", "\\n");
     // meta levels
     boolean incomment = false;// /**...**/
-    StringBuffer buf = new StringBuffer();
-    StringBuffer currentSqlLine = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
+    StringBuilder currentSqlLine = new StringBuilder();
     for (int i = 0; i < sql.length(); i++) {
       char ch = sql.charAt(i);
       if (ch == '\\') {

@@ -18,12 +18,15 @@ import java.util.Map.Entry;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.library.LibraryBundleUnlinkOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Shell;
@@ -49,26 +52,36 @@ public class LibrariesBundleUnlinkAction extends AbstractScoutHandler {
     BusyIndicator.showWhile(shell.getDisplay(), new Runnable() {
       @Override
       public void run() {
-        removeLibraries();
+        unlinkLibraries();
       }
 
     });
     return null;
   }
 
-  protected void removeLibraries() {
+  protected void unlinkLibraries() {
+    OperationJob job = new OperationJob();
     for (Entry<IScoutBundle, List<IPluginModelBase>> workUnit : m_libraries.entrySet()) {
-      try {
-        PluginModelHelper helper = new PluginModelHelper(workUnit.getKey().getProject());
-        for (IPluginModelBase model : workUnit.getValue()) {
-          helper.Manifest.removeDependency(model.getPluginBase().getId());
-        }
-        helper.save();
-      }
-      catch (CoreException ex) {
-        ScoutSdkUi.logError("Could not remove library dependency of '" + workUnit.getKey().getBundleName() + "'.", ex);
+      LibraryBundleUnlinkOperation op = new LibraryBundleUnlinkOperation(workUnit.getKey(), workUnit.getValue());
+      job.addOperation(op);
+    }
+    job.schedule();
+  }
+
+  /**
+   * removes the library from the product file if the library bundle is not used by any other bundle of the product.
+   * 
+   * @param prodcutModelHelper
+   * @param libraryBundle
+   * @throws CoreException
+   */
+  private void removeLibraryFromProduct(ProductFileModelHelper prodcutModelHelper, IPluginModelBase libraryBundle) throws CoreException {
+    for (BundleDescription libDependentBundle : libraryBundle.getBundleDescription().getDependents()) {
+      if (prodcutModelHelper.ProductFile.existsDependency(libDependentBundle.getSymbolicName())) {
+        return;
       }
     }
+    prodcutModelHelper.ProductFile.removeDependency(libraryBundle.getBundleDescription().getSymbolicName());
   }
 
   public void addLibraryToRemove(IScoutBundle ownerBundle, IPluginModelBase libraryModel) {

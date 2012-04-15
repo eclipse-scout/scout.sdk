@@ -46,6 +46,7 @@ Export-Package: org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.util,
  org.eclipse.scout.sdk.validation,
  org.eclipse.scout.sdk.workspace,
+ org.eclipse.scout.sdk.workspace.resource,
  org.eclipse.scout.sdk.workspace.type,
  org.eclipse.scout.sdk.workspace.type.config
 Bundle-ClassPath: .
