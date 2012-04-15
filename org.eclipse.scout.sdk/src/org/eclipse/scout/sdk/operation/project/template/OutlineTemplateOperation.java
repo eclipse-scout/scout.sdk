@@ -20,7 +20,9 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -101,6 +103,34 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
       execOpenOp.setFormatSource(true);
       execOpenOp.validate();
       execOpenOp.run(monitor, workingCopyManager);
+      workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
+      // create the outline
+      OutlineNewOperation outlineOp = new OutlineNewOperation();
+      outlineOp.setAddToDesktop(true);
+      outlineOp.setClientBundle(getScoutProject().getClientBundle());
+      outlineOp.setDesktopType(desktopType);
+      outlineOp.setFormatSource(true);
+      outlineOp.setTypeName("StandardOutline");
+      outlineOp.run(monitor, workingCopyManager);
+      workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
+      if (getScoutProject().getServerBundle() != null && getScoutProject().getSharedBundle() != null) {
+        // create outline service
+        ServiceNewOperation outlineServiceOp = new ServiceNewOperation();
+        outlineServiceOp.addProxyRegistrationBundle(getScoutProject().getClientBundle());
+        outlineServiceOp.addServiceRegistrationBundle(getScoutProject().getServerBundle());
+        outlineServiceOp.setImplementationBundle(getScoutProject().getServerBundle());
+        outlineServiceOp.setInterfaceBundle(getScoutProject().getSharedBundle());
+        outlineServiceOp.setServiceInterfaceName("IStandardOutlineService");
+        outlineServiceOp.setServiceInterfacePackageName(getScoutProject().getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_OUTLINE));
+        outlineServiceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.IService2, true));
+        outlineServiceOp.setServiceName("StandardOutlineService");
+        outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_OUTLINE));
+        outlineServiceOp.setServiceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractService, true));
+
+        outlineServiceOp.run(monitor, workingCopyManager);
+
+      }
+
     }
     else {
       ScoutSdk.logWarning("could not find desktop type");
