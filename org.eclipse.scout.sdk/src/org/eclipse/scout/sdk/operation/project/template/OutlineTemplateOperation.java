@@ -16,6 +16,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.nls.sdk.model.util.Language;
+import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -104,13 +106,20 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
       execOpenOp.validate();
       execOpenOp.run(monitor, workingCopyManager);
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
+
       // create the outline
+      String name = "StandardOutline";
+      NlsEntry entry = new NlsEntry(name, getScoutProject().getNlsProject());
+      entry.addTranslation(Language.LANGUAGE_DEFAULT, "Standard");
+      getScoutProject().getNlsProject().updateRow(entry, monitor);
+
       OutlineNewOperation outlineOp = new OutlineNewOperation();
       outlineOp.setAddToDesktop(true);
       outlineOp.setClientBundle(getScoutProject().getClientBundle());
       outlineOp.setDesktopType(desktopType);
       outlineOp.setFormatSource(true);
-      outlineOp.setTypeName("StandardOutline");
+      outlineOp.setTypeName(name);
+      outlineOp.setNlsEntry(entry);
       outlineOp.run(monitor, workingCopyManager);
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
       if (getScoutProject().getServerBundle() != null && getScoutProject().getSharedBundle() != null) {
@@ -126,11 +135,8 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         outlineServiceOp.setServiceName("StandardOutlineService");
         outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_OUTLINE));
         outlineServiceOp.setServiceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractService, true));
-
         outlineServiceOp.run(monitor, workingCopyManager);
-
       }
-
     }
     else {
       ScoutSdk.logWarning("could not find desktop type");

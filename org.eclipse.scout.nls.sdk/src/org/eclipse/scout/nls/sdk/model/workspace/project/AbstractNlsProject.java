@@ -317,25 +317,24 @@ public abstract class AbstractNlsProject implements INlsProject {
     if (!StringUtility.hasText(row.getKey())) {
       throw new IllegalArgumentException("a text key cannot be null.");
     }
-    if (m_entries != null) {
-      try {
-        m_translationResourceEventLock.acquire();
-        NlsEntry existingEntry = m_entries.get(row.getKey());
-        if (existingEntry != null) {
-          if (existingEntry.getType() == INlsEntry.TYPE_INHERITED) {
-            createNewRowInternal(row, monitor); // override
-          }
-          else {
-            updateExistingRowInternal(existingEntry, row, monitor);
-          }
+    cache();
+    try {
+      m_translationResourceEventLock.acquire();
+      NlsEntry existingEntry = m_entries.get(row.getKey());
+      if (existingEntry != null) {
+        if (existingEntry.getType() == INlsEntry.TYPE_INHERITED) {
+          createNewRowInternal(row, monitor); // override
         }
         else {
-          createNewRowInternal(row, monitor);
+          updateExistingRowInternal(existingEntry, row, monitor);
         }
       }
-      finally {
-        m_translationResourceEventLock.release();
+      else {
+        createNewRowInternal(row, monitor);
       }
+    }
+    finally {
+      m_translationResourceEventLock.release();
     }
   }
 

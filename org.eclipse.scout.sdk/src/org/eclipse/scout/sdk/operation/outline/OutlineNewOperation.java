@@ -226,6 +226,13 @@ public class OutlineNewOperation implements IOperation {
     outlineButtonOp.setTypeModifiers(Flags.AccPublic);
     outlineButtonOp.validate();
     outlineButtonOp.run(monitor, workingCopyManager);
+
+    if (getNlsEntry() != null) {
+      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(outlineButtonOp.getCreatedType(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TEXT, false);
+      nlsOp.setNlsEntry(getNlsEntry());
+      nlsOp.validate();
+      nlsOp.run(monitor, workingCopyManager);
+    }
   }
 
   public void setClientBundle(IScoutBundle clientBundle) {
