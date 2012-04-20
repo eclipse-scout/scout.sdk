@@ -14,13 +14,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.sdk.compatibility.License;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
@@ -29,7 +33,10 @@ import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
 import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -48,6 +55,33 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   private final static Version RAP_INCUBATOR_FEATURE_VERSION = new Version(1, 5, 0, "20120220-1720"); // the supported version. must be present at the update site
   private final static String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.feature.group";
   private final static String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/3.8";
+
+  @Override
+  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+    if (!selected) {
+      return true;
+    }
+    try {
+      final BooleanHolder licAccepted = new BooleanHolder(false);
+      final Map<String, License[]> lic = P2Utility.getLicense(RAP_INCUBATOR_FEATURE_NAME, new URI(RAP_INCUBATOR_UPDATE_SITE_URL), monitor);
+      Map<String, License[]> licScout = P2Utility.getLicense(SCOUT_INCUBATOR_FEATURE_NAME, new URI(SCOUT_INCUBATOR_UPDATE_SITE_URL), monitor);
+      lic.putAll(licScout);
+
+      ScoutSdkUi.getDisplay().syncExec(new Runnable() {
+        @Override
+        public void run() {
+          LicenseDialog licDialog = new LicenseDialog(ScoutSdkUi.getShell(), lic);
+          if (licDialog.open() == Dialog.OK) {
+            licAccepted.setValue(true);
+          }
+        }
+      });
+      return licAccepted.getValue();
+    }
+    catch (URISyntaxException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
+  }
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
