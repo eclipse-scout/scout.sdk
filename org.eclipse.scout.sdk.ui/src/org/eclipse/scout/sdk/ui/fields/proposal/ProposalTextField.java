@@ -41,30 +41,21 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ProposalTextField extends TextField {
 
-  public static final ISeparatorProposal SEPERATOR = new ISeparatorProposal() {
-  };
-
   public static int STYLE_DEFAULT = 1 << 0;
   public static int STYLE_INITIAL_SHOW_POPUP = 1 << 1;
   public static int STYLE_NO_LABEL = 1 << 10;
 
   private IProposalSelectionHandler m_selectionHandler;
-
   private Button m_popupButton;
   private ProposalPopup m_popup;
   private P_ProposalFieldListener m_proposalFieldListener;
-  private Object lockProposalAdpter = new Object();
   private Object m_selectedProposal = null;
-
-  private Object m_focusGainedProposal = null;
   private Object m_lastFiredProposal = null;
   private EventListenerList m_eventListeners = new EventListenerList();
   private Lock m_updateLock = new Lock();
   private Lock m_focusLock = new Lock();
   private IProposalPopupListener m_popupListener = new P_PopupListener();
   private int m_style;
-  private IProposalDescriptionProvider m_proposalDescriptionProvider;
-
   private Object m_input;
 
   public ProposalTextField(Composite parent) {
@@ -131,21 +122,6 @@ public class ProposalTextField extends TextField {
       textComponent.addListener(SWT.Traverse, m_proposalFieldListener);
       textComponent.addListener(SWT.MouseUp, m_proposalFieldListener);
       textComponent.addListener(SWT.Verify, m_proposalFieldListener);
-    }
-  }
-
-  private void detachProposalListener(StyledText textComponent) {
-
-    if (m_proposalFieldListener != null) {
-      textComponent.removeListener(SWT.KeyDown, m_proposalFieldListener);
-      textComponent.removeListener(SWT.KeyUp, m_proposalFieldListener);
-      textComponent.removeListener(SWT.Modify, m_proposalFieldListener);
-      textComponent.removeListener(SWT.FocusOut, m_proposalFieldListener);
-      textComponent.removeListener(SWT.FocusIn, m_proposalFieldListener);
-      textComponent.removeListener(SWT.Traverse, m_proposalFieldListener);
-      textComponent.removeListener(SWT.MouseUp, m_proposalFieldListener);
-      textComponent.removeListener(SWT.Verify, m_proposalFieldListener);
-      m_proposalFieldListener = null;
     }
   }
 
@@ -492,14 +468,6 @@ public class ProposalTextField extends TextField {
           break;
         } // end FocusOut
         case SWT.FocusIn: {
-          if (m_focusLock.aquire()) {
-            try {
-              m_focusGainedProposal = m_selectedProposal;
-            }
-            finally {
-              m_focusLock.release();
-            }
-          }
           if ((m_style & STYLE_INITIAL_SHOW_POPUP) != 0) {
             updateProposals();
           }

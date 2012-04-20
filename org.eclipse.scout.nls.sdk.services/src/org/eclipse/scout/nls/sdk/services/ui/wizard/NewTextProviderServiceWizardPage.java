@@ -44,12 +44,12 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -66,6 +66,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
   // base interface
   private final IType iTextProviderService = TypeUtility.getType(RuntimeClasses.ITextProviderService);
+  private final IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
 
   // properties
   private static final String PROP_TRANSLATION_FOLDER = "translationFolder";
@@ -139,11 +140,8 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     Group group = new Group(parent, SWT.NONE);
     group.setText("Text Provider Service Class");
 
-    IType[] proposals = null;
-    if (m_bundle != null) {
-      proposals = ScoutTypeUtility.getAbstractTypesOnClasspath(iTextProviderService, m_bundle.getJavaProject());
-    }
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, "Super Class", proposals);
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, "Super Class",
+        new JavaElementAbstractTypeContentProvider(iTextProviderService, m_bundle.getJavaProject(), abstractDynamicNlsTextProviderService));
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {

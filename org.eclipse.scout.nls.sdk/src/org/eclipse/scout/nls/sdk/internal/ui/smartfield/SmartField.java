@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
@@ -95,18 +96,21 @@ public class SmartField extends Composite {
     m_text.addTraverseListener(new TraverseListener() {
       @Override
       public void keyTraversed(TraverseEvent e) {
-        List<Object> props;
+        List<Object> props = null;
         if (e.character == SWT.ESC) {
           props = m_smartFieldModel.getProposals(m_lastVerifiedInput);
           e.doit = !m_smartDialog.isVisible();
         }
         else {
-          props = m_smartFieldModel.getProposals(m_text.getText());
-          if (props.size() == 0) {
-            props = m_smartFieldModel.getProposals(m_lastVerifiedInput);
+          String text = m_text.getText();
+          if (StringUtility.hasText(text)) {
+            props = m_smartFieldModel.getProposals(m_text.getText());
+            if (props.size() == 0) {
+              props = m_smartFieldModel.getProposals(m_lastVerifiedInput);
+            }
           }
         }
-        if (props.size() > 0) {
+        if (props != null && props.size() > 0) {
           m_smartDialog.notifyItemSelection(props.get(0));
         }
       }

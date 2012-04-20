@@ -147,7 +147,7 @@ public class BindBasesVisitor extends DefaultAstVisitor {
     String source = node.toString();
     Matcher nvPairMatcher = Pattern.compile("new\\s*(org\\.eclipse\\.scout\\.commons\\.holders)?NVPair\\s*\\(\\s*\\\"([^\\\"]*)\\\"").matcher(source);
     if (nvPairMatcher.find()) {
-      NVPairBindVisitor subVisitor = new NVPairBindVisitor(m_rootNode, m_serviceMethod);
+      NVPairBindVisitor subVisitor = new NVPairBindVisitor(m_rootNode);
       node.accept(subVisitor);
       BindBaseNVPair subBindBase = subVisitor.getBindBase();
       m_bindBases.add(subBindBase);

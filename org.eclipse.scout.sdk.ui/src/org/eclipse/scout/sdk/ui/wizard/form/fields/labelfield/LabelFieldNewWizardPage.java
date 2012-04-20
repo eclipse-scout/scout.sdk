@@ -59,7 +59,6 @@ public class LabelFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,8 +67,6 @@ public class LabelFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewLabelField"));
     setDescription(Texts.get("CreateANewLabelField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.ILabelField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractLabelField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

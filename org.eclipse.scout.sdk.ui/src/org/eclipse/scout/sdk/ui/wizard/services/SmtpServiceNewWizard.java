@@ -44,14 +44,12 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
   public static final int TYPE_SERVICE_IMPLEMENTATION = 108;
   public static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  private final IScoutBundle m_serverBundle;
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public SmtpServiceNewWizard(IScoutBundle serverBundle) {
-    m_serverBundle = serverBundle;
     setWindowTitle(Texts.get("NewSmtpService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSmtpService"), Texts.get("CreateANewSMTPService"), TypeUtility.getType(RuntimeClasses.ISMTPService), SdkProperties.SUFFIX_SMTP_SERVICE);

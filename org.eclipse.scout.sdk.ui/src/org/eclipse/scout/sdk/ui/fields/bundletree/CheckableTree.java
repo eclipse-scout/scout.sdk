@@ -15,7 +15,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
@@ -614,58 +613,4 @@ public class CheckableTree extends Composite {
     }
 
   } // end class P_DropTargetListener
-
-  private class P_TypeNodeVisitor implements ITreeNodeFilter {
-    private final int m_nodeType;
-    private List<ITreeNode> m_nodes = new ArrayList<ITreeNode>();
-    private final boolean m_singleNode;
-
-    public P_TypeNodeVisitor(int nodeType, boolean singleNode) {
-      m_nodeType = nodeType;
-      m_singleNode = singleNode;
-
-    }
-
-    @Override
-    public boolean accept(ITreeNode node) {
-      if (node.getType() == m_nodeType) {
-        m_nodes.add(node);
-        if (m_singleNode) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    public List<ITreeNode> getNodes() {
-      return m_nodes;
-    }
-  } // end class P_TypeNodeVisitor
-
-  private class P_DataNodeVisitor implements ITreeNodeFilter {
-    private final Object m_data;
-    private List<ITreeNode> m_nodes = new ArrayList<ITreeNode>();
-    private final boolean m_singleNode;
-
-    public P_DataNodeVisitor(Object data, boolean singleNode) {
-      m_data = data;
-      m_singleNode = singleNode;
-
-    }
-
-    @Override
-    public boolean accept(ITreeNode node) {
-      if (node.getData().equals(m_data)) {
-        m_nodes.add(node);
-        if (m_singleNode) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    public List<ITreeNode> getNodes() {
-      return m_nodes;
-    }
-  } // end class P_DataNodeVisitor
 }

@@ -59,14 +59,12 @@ public class BigdecimalFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
   public BigdecimalFieldNewWizardPage(IType declaringType) {
     super(BigdecimalFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IBigDecimalField);
     m_superType = TypeUtility.getType(RuntimeClasses.AbstractBigDecimalField);
     m_sibling = SiblingProposal.SIBLING_END;
   }

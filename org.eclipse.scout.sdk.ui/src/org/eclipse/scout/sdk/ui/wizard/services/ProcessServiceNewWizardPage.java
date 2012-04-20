@@ -23,6 +23,8 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -32,7 +34,6 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -85,9 +86,8 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(TypeUtility.getTypes(RuntimeClasses.AbstractService)),
-        ScoutTypeUtility.getAbstractTypesOnClasspath(iService, getServerBundle().getJavaProject(), abstractService));
-
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
+        new JavaElementAbstractTypeContentProvider(iService, getServerBundle().getJavaProject(), abstractService));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -97,10 +97,14 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ICachedTypeHierarchy formDataHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractFormData);
-
-    IType[] formDataTypes = formDataHierarchy.getAllSubtypes(abstractFormData, TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
-    m_formDataTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("FormData"), formDataTypes);
+    m_formDataTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("FormData"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        ICachedTypeHierarchy formDataHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractFormData);
+        IType[] formDataTypes = formDataHierarchy.getAllSubtypes(abstractFormData, TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+        return new Object[][]{formDataTypes};
+      }
+    });
     m_formDataTypeField.acceptProposal(getFormDataType());
     m_formDataTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

@@ -249,7 +249,7 @@ public class VariableResolveVisitor extends DefaultAstVisitor {
       return false;
     }
     if (m_currentVariable != null) {
-      TypeSignatureResolveVisitor innerVisitor = new TypeSignatureResolveVisitor(m_rootNode, node, m_containerElement);
+      TypeSignatureResolveVisitor innerVisitor = new TypeSignatureResolveVisitor(m_rootNode, m_containerElement);
       node.accept(innerVisitor);
       String[] assignedSignatures = innerVisitor.getAssignedSignatures();
       if (assignedSignatures.length > 0) {

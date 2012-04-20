@@ -59,7 +59,6 @@ public class FileChooserFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,8 +67,6 @@ public class FileChooserFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewFileChooserField"));
     setDescription(Texts.get("CreateANnewFileChooserField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IFileChooserField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractFileChooserField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

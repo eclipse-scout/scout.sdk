@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.fields.proposal.nls;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
@@ -34,10 +33,7 @@ public class NlsTextLabelProvider extends SearchRangeStyledLabelProvider {
 
   @Override
   public String getText(Object element) {
-    if (element == NlsTextContentProvider.NLS_NEW_PROPOSAL) {
-      return Texts.get("Nls_newProposal_name");
-    }
-    else if (element == null) {
+    if (element == null) {
       return "";
     }
     else if (element instanceof INlsEntry) {
@@ -71,12 +67,7 @@ public class NlsTextLabelProvider extends SearchRangeStyledLabelProvider {
 
   @Override
   public Image getImage(Object element) {
-    if (element == NlsTextContentProvider.NLS_NEW_PROPOSAL) {
-      return ScoutSdkUi.getImage(ScoutSdkUi.TextAdd);
-    }
-    else {
-      return ScoutSdkUi.getImage(ScoutSdkUi.Text);
-    }
+    return ScoutSdkUi.getImage(ScoutSdkUi.Text);
   }
 
   @Override

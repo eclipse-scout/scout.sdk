@@ -257,8 +257,6 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
       }
       else {
         columnWidths = new int[numColumns];
-        int colSpace = tableWidth - leftMargin - rightMargin;
-        colSpace -= (numColumns - 1) * horizontalSpacing;
         int extra = parentWidth - maxWidth;
         int colExtra = extra / growingColumns.length;
         for (int i = 0; i < numColumns; i++) {

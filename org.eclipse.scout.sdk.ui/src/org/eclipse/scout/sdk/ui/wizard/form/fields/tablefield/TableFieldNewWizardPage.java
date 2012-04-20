@@ -59,7 +59,6 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,7 +67,6 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewTableField"));
     setDescription(Texts.get("CreateANewTableField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.ITableField);
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractTableField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

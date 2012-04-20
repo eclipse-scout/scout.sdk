@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -26,8 +25,6 @@ import org.eclipse.swt.widgets.Shell;
  * @since 3.8.0 12.03.2012
  */
 public class LibraryBundleRemoveAction extends AbstractScoutHandler {
-
-  private IScoutBundle m_libraryUserBundle;
 
   public LibraryBundleRemoveAction() {
     super(Texts.get("RemoveLibraryBundlePopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LibrariesRemove));

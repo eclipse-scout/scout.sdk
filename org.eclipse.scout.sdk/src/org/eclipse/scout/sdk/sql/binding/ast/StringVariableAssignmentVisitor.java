@@ -27,14 +27,12 @@ import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 public class StringVariableAssignmentVisitor extends DefaultAstVisitor {
 
   private final String m_variableName;
-  private final String m_currentValue;
   private boolean m_nextVarName = false;
   private final ASTNode m_rootNode;
   private StringBuilder m_value;
 
   public StringVariableAssignmentVisitor(String variableName, String currentValue, ASTNode rootNode) {
     m_variableName = variableName;
-    m_currentValue = currentValue;
     m_rootNode = rootNode;
     m_value = new StringBuilder();
   }

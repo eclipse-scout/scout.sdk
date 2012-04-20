@@ -59,15 +59,12 @@ public class GroupBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
   public GroupBoxNewWizardPage(IType declaringType) {
     super(GroupBoxNewWizardPage.class.getName());
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IGroupBox);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractGroupBox));
     m_sibling = SiblingProposal.SIBLING_END;
   }

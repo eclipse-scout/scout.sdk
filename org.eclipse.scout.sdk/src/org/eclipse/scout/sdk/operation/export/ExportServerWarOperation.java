@@ -10,15 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.export;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.core.resources.IFile;
@@ -34,7 +30,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
 import org.eclipse.pde.internal.core.exports.ProductExportOperation;
 import org.eclipse.pde.internal.core.iproduct.IProduct;
-import org.eclipse.pde.internal.core.iproduct.IProductModel;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -221,58 +216,6 @@ public class ExportServerWarOperation implements IOperation {
       }
     }
     return false;
-  }
-
-  private String getZipName(IFolder destinationFolder, IProductModel clientModel) {
-    BufferedReader reader = null;
-    try {
-      IResource indexResource = destinationFolder.findMember("index.html");
-      if (indexResource.exists() && indexResource.getType() == IResource.FILE) {
-        reader = new BufferedReader(new InputStreamReader(((IFile) indexResource).getContents()));
-        Pattern p = Pattern.compile("\\<a\\shref\\=(\\\")?[^a-zA-Z0-9]*([a-zA-Z0-9]*)\\.zip(\\\")?\\>");
-        String l = reader.readLine();
-        while (l != null) {
-          Matcher m = p.matcher(l);
-          if (m.find()) {
-            return m.group(2);
-          }
-          l = reader.readLine();
-        }
-      }
-    }
-    catch (Exception e) {
-      ScoutSdk.logWarning("could not parse application name out of the index.html in '" + destinationFolder.getFullPath() + "'");
-    }
-    finally {
-      if (reader != null) {
-        try {
-          reader.close();
-        }
-        catch (IOException e) {
-          // void
-        }
-
-      }
-    }
-    String productName = clientModel.getProduct().getName();
-    if (productName == null) {
-      productName = "clientApplication";
-    }
-    else {
-      StringBuilder productNameBuilder = new StringBuilder();
-      String[] split = productName.split("\\s");
-      for (String s : split) {
-        if (s.length() > 0) {
-          productNameBuilder.append(Character.toUpperCase(s.charAt(0)));
-          if (s.length() > 1) {
-            productNameBuilder.append(s.substring(1));
-          }
-        }
-      }
-      productName = productNameBuilder.toString();
-    }
-
-    return productName;
   }
 
   /**

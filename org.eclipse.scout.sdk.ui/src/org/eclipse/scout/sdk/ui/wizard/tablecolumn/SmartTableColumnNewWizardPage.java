@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -148,7 +149,13 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    m_lookupCallField = getFieldToolkit().createJavaElementProposalField(g, Texts.get("LookupCall"), ScoutTypeUtility.getClassesOnClasspath(lookupCall, getSharedBundle().getJavaProject()));
+
+    m_lookupCallField = getFieldToolkit().createJavaElementProposalField(g, Texts.get("LookupCall"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(lookupCall, getSharedBundle().getJavaProject())};
+      }
+    });
     m_lookupCallField.acceptProposal(getLookupCall());
     m_lookupCallField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -166,7 +173,12 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_codeTypeField = getFieldToolkit().createJavaElementProposalField(g, Texts.get("CodeType"), ScoutTypeUtility.getClassesOnClasspath(iCodeType, getSharedBundle().getJavaProject()));
+    m_codeTypeField = getFieldToolkit().createJavaElementProposalField(g, Texts.get("CodeType"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(iCodeType, getSharedBundle().getJavaProject())};
+      }
+    });
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

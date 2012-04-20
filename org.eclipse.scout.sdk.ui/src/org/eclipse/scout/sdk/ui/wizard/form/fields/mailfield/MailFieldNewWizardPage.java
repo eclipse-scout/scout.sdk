@@ -60,7 +60,6 @@ public class MailFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -69,8 +68,6 @@ public class MailFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewMailField"));
     setDescription(Texts.get("CreateANewMailField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IMailField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractMailField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

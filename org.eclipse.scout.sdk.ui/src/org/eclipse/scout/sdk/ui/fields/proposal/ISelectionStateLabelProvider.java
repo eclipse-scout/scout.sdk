@@ -21,7 +21,7 @@ import org.eclipse.swt.graphics.Image;
  */
 public interface ISelectionStateLabelProvider extends ILabelProvider {
 
-  public Image getImageSelected(Object element);
+  Image getImageSelected(Object element);
 
-  public String getTextSelected(Object element);
+  String getTextSelected(Object element);
 }

@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -72,7 +73,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IMemento;
-import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -88,7 +88,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   public static final int IS_LINKING_ENABLED_PROPERTY = 1;
   private String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
   private TreeViewer m_viewer;
-//  private IPage m_invisibleRoot;
   private ViewContentProvider m_viewContentProvider;
   // init/update
   private DirtyUpdateManager m_dirtyManager;
@@ -96,8 +95,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   // filtering
   private Object m_pageFilterCacheLock = new Object();
   private LRUCache<String/* path */, IPageFilter> m_pageFilterCache = new LRUCache<String, IPageFilter>(10000, -1);
-  private ISelectionListener m_javaEditorSelectionListner;
-  // private P_PreferencesPropertyChangedListener m_preferencesPropertyChangedListener;
   private P_OutlineSelectionProvider m_outlineSelectionProvider;
   private boolean m_linkingEnabled;
   private LinkWithEditorAction m_linkWithEditorAction;
@@ -552,6 +549,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
      */
     public P_ReloadNodeJob() {
       super("reload node");
+      setRule(ResourcesPlugin.getWorkspace().getRoot());
     }
 
     public void reloadDelayed(IPage page) {
@@ -560,7 +558,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
         m_page = page;
         schedule(300);
       }
-
     }
 
     @Override

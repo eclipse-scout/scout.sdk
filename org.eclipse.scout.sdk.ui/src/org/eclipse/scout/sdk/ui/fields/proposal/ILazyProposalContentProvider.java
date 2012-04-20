@@ -16,5 +16,4 @@ import org.eclipse.jface.viewers.IContentProvider;
 public interface ILazyProposalContentProvider extends IContentProvider {
 
   Object[] getProposals(String searchPattern, IProgressMonitor monitor);
-
 }

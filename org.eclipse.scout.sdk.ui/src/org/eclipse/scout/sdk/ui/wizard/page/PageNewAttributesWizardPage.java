@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -133,17 +134,22 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_OUT);
     group.setText(Texts.get("AddTo"));
 
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        ScoutTypeFilters.getInScoutBundles(getClientBundle()),
-        TypeFilters.getClassFilter());
+    m_holderTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("PageOutline"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+            ScoutTypeFilters.getInScoutBundles(getClientBundle()),
+            TypeFilters.getClassFilter());
 
-    IType[] pages = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithNodes, filter);
-    IType[] outlines = TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter);
-    IType[] propTypes = new IType[pages.length + outlines.length];
-    System.arraycopy(pages, 0, propTypes, 0, pages.length);
-    System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
-    Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
-    m_holderTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("PageOutline"), propTypes);
+        IType[] pages = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithNodes, filter);
+        IType[] outlines = TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter);
+        IType[] propTypes = new IType[pages.length + outlines.length];
+        System.arraycopy(pages, 0, propTypes, 0, pages.length);
+        System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
+        Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
+        return new Object[][]{propTypes};
+      }
+    });
     m_holderTypeField.acceptProposal(getHolderType());
     m_holderTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

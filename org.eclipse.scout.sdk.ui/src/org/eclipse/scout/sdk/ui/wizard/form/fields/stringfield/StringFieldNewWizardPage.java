@@ -59,7 +59,6 @@ public class StringFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,7 +67,6 @@ public class StringFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewStringField"));
     setDescription(Texts.get("CreateANewStringField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IStringField);
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractStringField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

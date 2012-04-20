@@ -30,5 +30,4 @@ public class SelectionStateLabelProvider extends LabelProvider implements ISelec
   public String getTextSelected(Object element) {
     return getText(element);
   }
-
 }

@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.dnd;
 import java.util.List;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.scout.sdk.operation.dnd.FormFieldDndOperation;
@@ -26,8 +25,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
@@ -143,17 +140,6 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
       }
     }
     return false;
-  }
-
-  private int getPositionInDeclaringType(IType element) throws JavaModelException {
-    int i = -1;
-    if (element != null) {
-      for (IType candidate : TypeUtility.getInnerTypes(element, null, ScoutTypeComparators.getOrderAnnotationComparator())) {
-        i++;
-        if (element.equals(candidate)) return i;
-      }
-    }
-    return i;
   }
 
   @Override

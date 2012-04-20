@@ -27,7 +27,6 @@ import org.eclipse.ui.texteditor.ITextEditor;
 public abstract class AbstractScoutTypePage extends AbstractPage implements ITypePage {
 
   private IType m_type;
-  private int m_nodeTypeIndex = -1;
   private final String m_readOnlySuffix;
 
   public AbstractScoutTypePage() {

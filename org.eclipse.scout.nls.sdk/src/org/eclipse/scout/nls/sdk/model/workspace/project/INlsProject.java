@@ -141,7 +141,7 @@ public interface INlsProject {
    */
   INewLanguageContext getTranslationCreationContext();
 
-  IStatus removeEntries(INlsEntry[] entries);
+  IStatus removeEntries(INlsEntry[] entries, IProgressMonitor m);
 
   /**
    * To find the best matching language supported of the project:

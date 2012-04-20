@@ -49,7 +49,6 @@ public class CustomServiceNewWizard extends AbstractWorkspaceWizard {
   public static final int TYPE_SERVICE_REG_CLIENT = 109;
   public static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  private final IScoutBundle m_serverBundle;
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
@@ -61,7 +60,6 @@ public class CustomServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(implPackage);
     m_customAppendix = implPackage.getElementName().replaceFirst(bundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM) + ".", "");
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serverBundle = serverBundle;
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewCustomService"), Texts.get("CreateANewCustomService"), TypeUtility.getType(RuntimeClasses.IService), SdkProperties.SUFFIX_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);

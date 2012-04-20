@@ -42,12 +42,10 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
   private final String m_prefix;
   private final int m_offset;
   private final Image m_image;
-  private final String m_replacement;
 
-  public NlsProposal(INlsEntry nlsEntry, String prefix, String replacement, int offset, Image image) {
+  public NlsProposal(INlsEntry nlsEntry, String prefix, int offset, Image image) {
     m_nlsEntry = nlsEntry;
     m_prefix = prefix;
-    m_replacement = replacement;
     m_offset = offset;
     m_image = image;
   }

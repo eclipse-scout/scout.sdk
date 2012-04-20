@@ -59,7 +59,6 @@ public class ImageFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,8 +67,6 @@ public class ImageFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewImageField"));
     setDescription(Texts.get("CreateANnewImageField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IImageField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractImageField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

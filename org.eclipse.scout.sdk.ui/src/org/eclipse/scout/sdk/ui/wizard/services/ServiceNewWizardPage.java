@@ -21,11 +21,10 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -76,8 +75,8 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(getSuperType()),
-        ScoutTypeUtility.getAbstractTypesOnClasspath(m_definitionType, getLocationBundle().getJavaProject(), getSuperType()));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
+        new JavaElementAbstractTypeContentProvider(m_definitionType, getLocationBundle().getJavaProject(), getSuperType()));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

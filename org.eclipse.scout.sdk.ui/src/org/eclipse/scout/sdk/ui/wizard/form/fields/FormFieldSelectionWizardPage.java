@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -187,7 +186,6 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
 
     private Object[] m_elements;
-    private Pattern m_typeNamePattern = Pattern.compile("^(Abstract|Abstract)?(.*)$");
 
     public P_ContentProvider(Object[] elements) {
       m_elements = elements;
@@ -214,7 +212,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       if (columnIndex == 0) {
         StringBuilder label = new StringBuilder();
         if (element instanceof ISeparator) {
-          return "-------------- more fields ------------------";
+          return "------------------ more fields ------------------";
         }
         StructuredSelection selection = (StructuredSelection) m_table.getViewer().getSelection();
 

@@ -29,9 +29,6 @@ public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
 
   @Override
   public void dispose() {
-  }
-
-  private void disposeInternal() {
     super.dispose();
     for (Iterator iter = fRegistry.values().iterator(); iter.hasNext();) {
       Image image = (Image) iter.next();

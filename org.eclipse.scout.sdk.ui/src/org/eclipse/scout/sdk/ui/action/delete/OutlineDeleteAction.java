@@ -32,7 +32,6 @@ import org.eclipse.swt.widgets.Shell;
 public class OutlineDeleteAction extends AbstractScoutHandler {
 
   private IType m_outlineType;
-  private IType m_desktopType;
 
   public OutlineDeleteAction() {
     super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolRemove), "Delete", true, Category.DELETE);

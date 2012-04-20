@@ -38,10 +38,6 @@ public class HorizontalAlignmentPresenter extends AbstractProposalPresenter<Hori
     Right
   }
 
-  private static final int LEFT = -1;
-  private static final int CENTER = 0;
-  private static final int RIGHT = 1;
-
   public HorizontalAlignmentPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
 

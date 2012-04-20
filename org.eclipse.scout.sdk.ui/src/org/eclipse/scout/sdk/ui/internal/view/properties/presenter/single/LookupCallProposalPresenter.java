@@ -114,7 +114,6 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
 
     private P_ContentProvider(ILabelProvider labelProvider) {
       m_labelProvider = labelProvider;
-
     }
 
     @Override

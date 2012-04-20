@@ -107,7 +107,6 @@ public class IconsEditor extends EditorPart {
     // XXX load async
     if (sharedBundle != null) {
       m_iconProvider = sharedBundle.findBestMatchIconProvider();
-      m_inheritedFilter.setScoutBundle(sharedBundle);
       if (m_viewer != null && !m_viewer.getControl().isDisposed()) {
         m_viewer.setContentProvider(new IconContentProvider(m_iconProvider, (ILabelProvider) m_viewer.getLabelProvider()));
         m_viewer.refresh();

@@ -18,32 +18,35 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
 
 /**
- * <h3>{@link JavaElementContentProvider}</h3> ...
+ * <h3>{@link AbstractJavaElementContentProvider}</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 09.02.2012
  */
-public class JavaElementContentProvider extends ContentProposalProvider {
-  private Object SEPERATOR = new ISeparatorProposal() {
-  };
+public abstract class AbstractJavaElementContentProvider extends ContentProposalProvider {
   private final ILabelProvider m_labelProvider;
-  private final Object[][] m_allProposals;
+  private Object[][] m_allProposals;
 
-  public JavaElementContentProvider(ILabelProvider labelProvider, Object[] proposals) {
-    this(labelProvider, new Object[][]{proposals});
-  }
-
-  public JavaElementContentProvider(ILabelProvider labelProvider, Object[]... proposalGroups) {
-    m_labelProvider = labelProvider;
-    m_allProposals = proposalGroups;
+  protected AbstractJavaElementContentProvider() {
+    m_labelProvider = new JavaElementLabelProvider();
+    m_allProposals = null;
   }
 
   public ILabelProvider getLabelProvider() {
     return m_labelProvider;
+  }
+
+  protected abstract Object[][] computeProposals();
+
+  private Object[][] getAllProposals() {
+    if (m_allProposals == null) {
+      m_allProposals = computeProposals();
+    }
+    return m_allProposals;
   }
 
   @Override
@@ -61,10 +64,11 @@ public class JavaElementContentProvider extends ContentProposalProvider {
     else {
       searchRangeSupport = new P_EmptySearchRangeSupport();
     }
-    for (Object[] group : m_allProposals) {
+
+    for (Object[] group : getAllProposals()) {
       Collection<Object> groupResult = getProposals(pattern, group, searchRangeSupport, monitor);
       if (result.size() > 0 && groupResult.size() > 0) {
-        result.add(SEPERATOR);
+        result.add(MoreElementsProposal.INSTANCE);
       }
       result.addAll(groupResult);
     }
@@ -104,6 +108,5 @@ public class JavaElementContentProvider extends ContentProposalProvider {
     @Override
     public void endRecordMatchRegions() {
     }
-
   }
 }

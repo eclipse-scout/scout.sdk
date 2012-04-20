@@ -21,7 +21,6 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 public class WizardExtension {
   private Class<? extends AbstractImportExportWizard> m_wizard;
   private String m_name;
-  private String icon;
 
   /**
    * @return the wizard
@@ -51,5 +50,4 @@ public class WizardExtension {
   public String getName() {
     return m_name;
   }
-
 }

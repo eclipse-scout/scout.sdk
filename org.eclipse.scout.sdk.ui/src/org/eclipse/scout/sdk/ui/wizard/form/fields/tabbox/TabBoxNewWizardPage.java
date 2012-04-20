@@ -59,7 +59,6 @@ public class TabBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,7 +67,6 @@ public class TabBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewTabBox"));
     setDescription(Texts.get("CreateANewTabBox"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.ITabBox);
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractTabBox));
     m_sibling = SiblingProposal.SIBLING_END;
   }

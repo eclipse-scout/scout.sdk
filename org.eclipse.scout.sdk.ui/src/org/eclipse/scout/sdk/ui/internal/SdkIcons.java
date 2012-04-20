@@ -118,7 +118,7 @@ public interface SdkIcons {
   String Library = "library.png";
   String Libraries = "libraries.png";
   String LibrariesAdd = "libraries_add.png";
-  String LibrariesRemove = Library; // TODO own image
+  String LibrariesRemove = "libraries_remove.png";
   String LookupCall = "lookupCall.png";
   String LookupCalls = "lookupCalls.png";
   String LookupCallAdd = "lookupCall_add.png";

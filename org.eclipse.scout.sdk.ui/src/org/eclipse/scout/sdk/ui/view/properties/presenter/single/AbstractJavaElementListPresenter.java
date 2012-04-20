@@ -42,7 +42,6 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
 
   private TableViewer m_viewer;
   private Table m_table;
-  private TableColumn m_textColumn;
   private IJavaElement[] m_sourceElements;
   private JavaElementTableContentProvider m_tableModel;
   private Button m_removeButton;

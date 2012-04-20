@@ -43,16 +43,14 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
   public String m_indent = "";
 
   private final IJavaElement m_containerElement;
-  private final ASTNode m_stopNode;
   private final ASTNode m_rootNode;
   private int m_mode;
   private HashSet<String> m_assignedSignatures;
   private String m_typeSignature;
   private P_MethodInvocation m_methodInvocation;
 
-  public TypeSignatureResolveVisitor(ASTNode rootNode, ASTNode stopNode, IJavaElement containerElement) {
+  public TypeSignatureResolveVisitor(ASTNode rootNode, IJavaElement containerElement) {
     m_rootNode = rootNode;
-    m_stopNode = stopNode;
     m_containerElement = containerElement;
     m_assignedSignatures = new HashSet<String>();
   }

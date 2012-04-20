@@ -21,8 +21,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.SimpleLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementContentProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsProposalDescriptionProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextLabelProvider;
@@ -126,17 +125,10 @@ public class FieldToolkit {
     return field;
   }
 
-  public ProposalTextField createJavaElementProposalField(Composite parent, String label, IType... types) {
-    return createJavaElementProposalField(parent, label, types, null);
-  }
-
-  public ProposalTextField createJavaElementProposalField(Composite parent, String label, IType[] mostlyUsed, IType[] other) {
+  public ProposalTextField createJavaElementProposalField(Composite parent, String label, AbstractJavaElementContentProvider contentProvider) {
     ProposalTextField field = createProposalField(parent, label);
-    JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
-    JavaElementContentProvider contentProvider = new JavaElementContentProvider(labelProvider, mostlyUsed, other);
-    field.setLabelProvider(labelProvider);
+    field.setLabelProvider(contentProvider.getLabelProvider());
     field.setContentProvider(contentProvider);
     return field;
   }
-
 }

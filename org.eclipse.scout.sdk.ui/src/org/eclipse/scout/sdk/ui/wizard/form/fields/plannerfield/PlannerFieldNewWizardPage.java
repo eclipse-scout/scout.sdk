@@ -59,7 +59,6 @@ public class PlannerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,7 +67,6 @@ public class PlannerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewPlannerField"));
     setDescription(Texts.get("CreateANewPlannerField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IPlannerField);
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractPlannerField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

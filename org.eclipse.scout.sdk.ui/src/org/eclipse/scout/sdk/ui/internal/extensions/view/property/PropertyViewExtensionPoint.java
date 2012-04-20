@@ -36,9 +36,6 @@ import org.osgi.framework.Bundle;
  */
 public class PropertyViewExtensionPoint {
   private static final String propertyViewExtensionId = "propertyViewPart";
-  private static final String partAttribute = "part";
-  private static final String pageFactoryAttribute = "pageFactory";
-
   private static PropertyViewExtensionPoint instance = new PropertyViewExtensionPoint();
 
   private ArrayList<PropertyViewExtension> m_extensions;
@@ -49,7 +46,6 @@ public class PropertyViewExtensionPoint {
 
   private void init() {
     try {
-//      TreeMap<CompositeObject, PropertyViewExtension> orderedExtensions = new TreeMap<CompositeObject, PropertyViewExtension>();
       HashMap<Class<? extends IPage>, PropertyViewExtension> extendsions = new HashMap<Class<? extends IPage>, PropertyViewExtension>();
       IExtensionRegistry reg = Platform.getExtensionRegistry();
       IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, propertyViewExtensionId);
@@ -103,26 +99,6 @@ public class PropertyViewExtensionPoint {
         }
         catch (Throwable tt) {
           ScoutSdkUi.logWarning("could not load class '" + clazzName + "' of bunlde '" + bundle.getSymbolicName() + "'.", tt);
-        }
-      }
-    }
-    return clazz;
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> Class<? extends T> getClassOfContribution(Bundle bundle, IConfigurationElement[] elements, String attribute, Class<T> t) {
-    Class<? extends T> clazz = null;
-    if (bundle != null) {
-      // wizard
-      if (elements != null && elements.length == 1) {
-        String clazzName = elements[0].getAttribute(attribute);
-        if (!StringUtility.isNullOrEmpty(clazzName)) {
-          try {
-            clazz = (Class<? extends T>) bundle.loadClass(clazzName);
-          }
-          catch (Throwable tt) {
-            ScoutSdkUi.logWarning("could not load class of extension '" + elements[0].getName() + "'.", tt);
-          }
         }
       }
     }

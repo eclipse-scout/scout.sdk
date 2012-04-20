@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -87,10 +88,16 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeFilters.getNotInTypes(localLookupCall));
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCallSuperType"), TypeUtility.toArray(localLookupCall),
-        lookupServiceHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator()));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCallSuperType"),
+        new AbstractJavaElementContentProvider() {
+          @Override
+          protected Object[][] computeProposals() {
+            ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeFilters.getNotInTypes(localLookupCall));
+            ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
+            return new Object[][]{TypeUtility.toArray(localLookupCall), lookupServiceHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator())};
+          }
+        });
+
     m_superTypeField.acceptProposal(getLookupCallSuperType());
 
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {

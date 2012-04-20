@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.fields.table;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -45,7 +44,6 @@ public class ColumnViewerFilter extends Composite {
   private Button m_resetButton;
   private Text[] m_filterFields;
   private IColumnProvider m_columnProvider;
-  private List<Object> m_disabledRows = new ArrayList<Object>();
   private LayoutUpdateListener m_layoutUpdateListener = new LayoutUpdateListener() {
     @Override
     public void updateLayout() {

@@ -165,7 +165,6 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
       commitChanges(monitor);
       fireTranslationResourceChanged(event);
     }
-
   }
 
   @Override

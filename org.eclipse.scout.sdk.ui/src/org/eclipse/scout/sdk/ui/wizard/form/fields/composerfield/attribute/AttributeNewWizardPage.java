@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -119,8 +120,8 @@ public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), TypeUtility.toArray(abstractComposerAttribute),
-        ScoutTypeUtility.getAbstractTypesOnClasspath(iComposerAttribute, m_declaringType.getJavaProject(), abstractComposerAttribute));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
+        new JavaElementAbstractTypeContentProvider(iComposerAttribute, m_declaringType.getJavaProject(), abstractComposerAttribute));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

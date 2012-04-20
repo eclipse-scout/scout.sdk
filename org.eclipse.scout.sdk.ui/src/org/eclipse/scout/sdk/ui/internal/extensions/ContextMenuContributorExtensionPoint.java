@@ -22,8 +22,6 @@ public class ContextMenuContributorExtensionPoint {
 
   private final static Object contextMenuContributorExtensionsCacheLock = new Object();
   private static MenuContributionInfo[] contextMenuContributorExtensions;
-
-  private final static Object contextMenuByCatLock = new Object();
   private static Map<IScoutHandler.Category, ArrayList<IScoutHandler>> contextMenuByCat;
 
   private static class MenuContributionInfo {

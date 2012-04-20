@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
-import org.eclipse.scout.sdk.ui.extensions.IPageFilterExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.osgi.framework.Bundle;
@@ -108,7 +107,6 @@ public class ExplorerPageExtensionPoint {
   }
 
   public class ExplorerPageExtension {
-    private IPageFilterExtension m_filter;
     private Class<? extends IPage> m_pageClass;
     private Class<? extends IPageFactory> m_factoryClass;
     private String m_parentPageId;

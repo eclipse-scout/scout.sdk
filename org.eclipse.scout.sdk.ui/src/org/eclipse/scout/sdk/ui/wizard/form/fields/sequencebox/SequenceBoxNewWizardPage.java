@@ -59,7 +59,6 @@ public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
 
   private IType m_createdType;
@@ -69,7 +68,6 @@ public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewSequenceBox"));
     setDescription(Texts.get("CreateANewSequenceBox"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.ISequenceBox);
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractSequenceBox));
     m_sibling = SiblingProposal.SIBLING_END;
   }

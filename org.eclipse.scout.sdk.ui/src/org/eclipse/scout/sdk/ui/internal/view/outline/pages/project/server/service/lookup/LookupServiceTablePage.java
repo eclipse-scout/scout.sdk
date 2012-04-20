@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class LookupServiceTablePage extends AbstractPage {
@@ -110,21 +109,6 @@ public class LookupServiceTablePage extends AbstractPage {
     }
     else if (menu instanceof LookupServiceNewAction) {
       ((LookupServiceNewAction) menu).setScoutBundle(getScoutResource());
-    }
-  }
-
-  private class P_HierarchyListener implements ITypeHierarchyChangedListener {
-    @Override
-    public void handleEvent(int eventType, IType type) {
-      switch (eventType) {
-        case PRE_TYPE_REMOVING:
-        case POST_TYPE_ADDING:
-        case POST_TYPE_CHANGED:
-          if (m_serviceHierarchy.isSubtype(iLookupService, type)) {
-            markStructureDirty();
-          }
-          break;
-      }
     }
   }
 }

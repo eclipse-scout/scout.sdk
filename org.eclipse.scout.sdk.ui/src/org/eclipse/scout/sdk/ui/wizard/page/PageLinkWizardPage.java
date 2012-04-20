@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.operation.page.LinkPageOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
@@ -67,8 +68,13 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    IType[] pages = ScoutTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
-    m_pageTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Page"), pages);
+    m_pageTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Page"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        IType[] pages = ScoutTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
+        return new Object[][]{pages};
+      }
+    });
     m_pageTypeField.acceptProposal(getPageType());
     m_pageTypeField.setEnabled(isPageTypeFieldEnabled());
     m_pageTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -79,13 +85,18 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    IType[] outlines = ScoutTypeUtility.getClassesOnClasspath(iOutline, getClientBundle().getJavaProject());
-    IType[] propTypes = new IType[pages.length + outlines.length];
-    System.arraycopy(pages, 0, propTypes, 0, pages.length);
-    System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
-    Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
-
-    m_holderTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("HolderPageOutline"), propTypes);
+    m_holderTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("HolderPageOutline"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        IType[] pages = ScoutTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
+        IType[] outlines = ScoutTypeUtility.getClassesOnClasspath(iOutline, getClientBundle().getJavaProject());
+        IType[] propTypes = new IType[pages.length + outlines.length];
+        System.arraycopy(pages, 0, propTypes, 0, pages.length);
+        System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
+        Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
+        return new Object[][]{propTypes};
+      }
+    });
     m_holderTypeField.acceptProposal(getHolderType());
     m_holderTypeField.setEnabled(isHolderTypeEnabled());
     m_holderTypeField.addProposalAdapterListener(new IProposalAdapterListener() {

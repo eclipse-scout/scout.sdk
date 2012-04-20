@@ -59,7 +59,6 @@ public class CalendarFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,8 +67,6 @@ public class CalendarFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewCalendarField"));
     setDescription(Texts.get("CreateANewCalendarField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.ICalendarField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractCalendarField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

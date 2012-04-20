@@ -17,7 +17,6 @@ import org.osgi.framework.BundleContext;
 public class ScoutSdkRap extends Plugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.rap";
-  private static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
 
   private static ScoutSdkRap plugin;
   private static SdkLogManager logManager;

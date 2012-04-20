@@ -53,7 +53,6 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
   }
 
   protected void fillLinkSection(Composite parent) {
-    int productCount = 0;
     IScoutBundle bundle = (IScoutBundle) getPage().getScoutResource();
     if (bundle != null) {
       IResource resource = bundle.getProject().findMember(SdkProperties.PRODUCT_FOLDER);
@@ -68,7 +67,6 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
           ScoutSdkUi.logError("error during visiting folder '" + productFolder.getFullPath() + "'.", e);
         }
         for (IFile productFile : productVisitor.getProductFiles()) {
-          productCount++;
           ProductLaunchPresenter p = new ProductLaunchPresenter(getFormToolkit(), parent, productFile, bundle);
           GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
           layoutData.widthHint = 200;

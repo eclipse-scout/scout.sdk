@@ -47,7 +47,6 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
   public static final int TYPE_SERVICE_REG_CLIENT = 109;
   public static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  private final IScoutBundle m_serverBundle;
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
@@ -56,7 +55,6 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
   public BookmarkStorageServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewBookmarkService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serverBundle = serverBundle;
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewBookmarkStorageService"), Texts.get("CreateANewBookmarkStorageService"), TypeUtility.getType(RuntimeClasses.IBookmarkStorageService), SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.IBookmarkStorageService));

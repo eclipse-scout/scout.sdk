@@ -155,56 +155,56 @@ public class NlsTablePage extends Composite {
     @Override
     public void handleRefreshReferenceCount(final String key) {
     }
-
-    public void handleReload() {
-    }
   } // end class P_TableActionHandler
 
-  protected void handleProjectChangedEvnet(NlsProjectEvent event) {
+  private void handleProjectChangedEvent(NlsProjectEvent event) {
     try {
       m_table.setRedraw(false);
-      handleProjectChangedEvnetInternal(event);
+      boolean fullRefresh = handleProjectChangedEventInternalRec(event);
+      m_table.refreshAll(fullRefresh);
     }
     finally {
       m_table.setRedraw(true);
     }
   }
 
-  protected void handleProjectChangedEvnetInternal(NlsProjectEvent event) {
+  private boolean handleProjectChangedEventInternalRec(NlsProjectEvent event) {
+    boolean full = false;
     if (event.isMultiEvent()) {
       for (NlsProjectEvent e : event.getChildEvents()) {
-        handleProjectChangedEvnetInternal(e);
+        if (handleProjectChangedEventInternalRec(e)) {
+          full = true;
+        }
       }
     }
     else {
       switch (event.getType()) {
         case NlsProjectEvent.TYPE_ENTRY_ADDED:
-          //m_table.getViewer().add(event.getEntry());
           m_table.getViewer().reveal(event.getEntry());
           m_table.getViewer().setSelection(new StructuredSelection(event.getEntry()));
-          m_table.refreshAll(false);
           break;
-        case NlsProjectEvent.TYPE_ENTRY_REMOVEED:
+        case NlsProjectEvent.TYPE_ENTRY_REMOVED:
           m_table.getViewer().remove(event.getEntry());
-          m_table.refreshAll(false);
           break;
         case NlsProjectEvent.TYPE_ENTRY_MODIFYED:
         case NlsProjectEvent.TYPE_REFRESH:
         case NlsProjectEvent.TYPE_TRANSLATION_RESOURCE_ADDED:
         case NlsProjectEvent.TYPE_FULL_REFRESH:
-          m_table.refreshAll(true);
+          full = true;
+          break;
       }
     }
+    return full;
   }
 
   private class P_ProjectListener implements INlsProjectListener {
     @Override
     public void notifyProjectChanged(NlsProjectEvent event) {
-      if (m_table != null) {
+      if (m_table != null && !m_table.isDisposed()) {
         m_table.getDisplay().asyncExec(new UiRunnable(new Object[]{event}) {
           @Override
           public void run() {
-            handleProjectChangedEvnet((NlsProjectEvent) p_args[0]);
+            handleProjectChangedEvent((NlsProjectEvent) p_args[0]);
           }
         });
       }
@@ -215,7 +215,7 @@ public class NlsTablePage extends Composite {
     @Override
     public void menuAboutToShow(IMenuManager manager) {
       IStructuredSelection selection = (IStructuredSelection) m_table.getViewer().getSelection();
-      ArrayList<NlsEntry> entries = new ArrayList<NlsEntry>();
+      ArrayList<NlsEntry> entries = new ArrayList<NlsEntry>(selection.size());
       for (Iterator it = selection.iterator(); it.hasNext();) {
         entries.add((NlsEntry) it.next());
       }

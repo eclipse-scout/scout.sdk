@@ -59,15 +59,12 @@ public class BooleanFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
   public BooleanFieldNewWizardPage(IType declaringType) {
     super(BooleanFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IBooleanField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractBooleanField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

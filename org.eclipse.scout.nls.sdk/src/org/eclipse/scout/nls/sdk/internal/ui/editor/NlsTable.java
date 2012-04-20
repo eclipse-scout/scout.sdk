@@ -386,9 +386,6 @@ public class NlsTable extends Composite {
         TableItem row = (selection.length == 0) ? m_table.getItem(m_table.getTopIndex()) : selection[0];
         m_table.showItem(row);
         m_cursorManager.ensureFocus(row);
-        // m_cursor.setSelection(row, NlsTable.INDEX_COLUMN_KEYS);
-        // m_cursor.setVisible(true);
-        // m_cursor.setFocus();
       }
     }
     finally {
@@ -415,19 +412,15 @@ public class NlsTable extends Composite {
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-
       if (m_tableModel.getSortIndex() == m_index) {
         m_tableModel.setAscSorting(!m_tableModel.isAscSorting());
-
       }
       else {
         m_tableModel.setAscSorting(false);
         m_tableModel.setSortIndex(m_index);
-
       }
       updateSortIcon();
       refreshAll(false);
     }
   } // end P_SortSelectionAdapter
-
 }

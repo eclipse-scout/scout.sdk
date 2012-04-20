@@ -48,9 +48,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iButton = TypeUtility.getType(RuntimeClasses.IButton);
-  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
-
   private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;

@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 public final class AstUtility {
 
   public static VariableType getTypeSignature(ASTNode node, ASTNode rootNode, IJavaElement containerElement) {
-    TypeSignatureResolveVisitor visitor = new TypeSignatureResolveVisitor(rootNode, node, containerElement);
+    TypeSignatureResolveVisitor visitor = new TypeSignatureResolveVisitor(rootNode, containerElement);
     node.accept(visitor);
     VariableType var = new VariableType("");
     var.setTypeSignature(visitor.getTypeSignature());

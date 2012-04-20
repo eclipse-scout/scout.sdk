@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.fields.proposal.signature;
 
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -28,11 +27,7 @@ import org.eclipse.swt.graphics.Image;
 public class SignatureLabelProvider extends SelectionStateLabelProvider {
   @Override
   public String getText(Object element) {
-    if (element instanceof ISeparatorProposal) {
-      return "------------ common used ------------------";
-    }
     String signature = (String) element;
-
     try {
       return SignatureUtility.getTypeReference(signature, new SimpleImportValidator());
     }
@@ -58,9 +53,6 @@ public class SignatureLabelProvider extends SelectionStateLabelProvider {
 
   @Override
   public Image getImage(Object element) {
-    if (element instanceof ISeparatorProposal) {
-      return ScoutSdkUi.getImage(ScoutSdkUi.Separator);
-    }
     if (SignatureUtility.getTypeSignatureKind((String) element) == Signature.BASE_TYPE_SIGNATURE) {
       return ScoutSdkUi.getImage(ScoutSdkUi.FieldPublic);
     }

@@ -39,13 +39,10 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 public class SignatureProposalProvider extends ContentProposalProvider {
-
-  private Object SEPERATOR = new ISeparatorProposal() {
-  };
 
   public static final String[] DEFAULT_PRIMITIV_SIGNATURES = new String[]{
       Signature.SIG_BOOLEAN,
@@ -164,7 +161,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
     Collection<Object> searchResult = collectTypes(searchPattern, getMaxProposalAmount() - counter - 1, monitor);
     if (searchResult.size() > 0) {
       if (result.size() > 0) {
-        result.add(SEPERATOR);
+        result.add(MoreElementsProposal.INSTANCE);
       }
       result.addAll(searchResult);
     }

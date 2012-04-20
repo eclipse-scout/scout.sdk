@@ -263,10 +263,6 @@ public class FilteredTable extends Composite {
       m_pattern = pattern;
     }
 
-    private String getUniqueKey(Object element) {
-      return Integer.toHexString(element.hashCode());
-    }
-
     public P_FilterResult getFilterResult(Viewer viewer, Object element) {
       if (viewer == null) return null;
       String key = DATA_FILTER_RESULT_PREFIX + Integer.toString(element.hashCode());

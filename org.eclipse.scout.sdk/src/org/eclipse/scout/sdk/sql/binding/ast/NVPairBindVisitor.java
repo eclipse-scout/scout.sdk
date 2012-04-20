@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.sql.binding.ast;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.StringLiteral;
@@ -36,11 +35,9 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
   private final ASTNode m_rootNode;
   private String m_bindName;
   private ASTNode m_valueNode;
-  private final IMethod m_serviceMethod;
 
-  public NVPairBindVisitor(ASTNode rootNode, IMethod serviceMethod) {
+  public NVPairBindVisitor(ASTNode rootNode) {
     m_rootNode = rootNode;
-    m_serviceMethod = serviceMethod;
     m_segments = new ArrayList<String>();
   }
 

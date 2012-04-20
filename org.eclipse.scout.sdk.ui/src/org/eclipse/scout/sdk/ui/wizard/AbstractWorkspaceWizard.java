@@ -99,15 +99,10 @@ public class AbstractWorkspaceWizard extends AbstractWizard {
   }
 
   private class P_PerformFinishOperation implements IOperation {
-    private boolean m_success;
     private final Display m_display;
 
     private P_PerformFinishOperation(Display display) {
       m_display = display;
-    }
-
-    public boolean isSuccess() {
-      return m_success;
     }
 
     @Override
@@ -123,7 +118,7 @@ public class AbstractWorkspaceWizard extends AbstractWizard {
     @Override
     public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       try {
-        m_success = performFinish(monitor, workingCopyManager);
+        performFinish(monitor, workingCopyManager);
         m_display.asyncExec(new Runnable() {
 
           @Override
@@ -134,9 +129,7 @@ public class AbstractWorkspaceWizard extends AbstractWizard {
       }
       catch (Exception e) {
         ScoutSdkUi.logError("exception during perfoming finish on wizard page '" + AbstractWorkspaceWizard.this.getClass().getName() + "'.", e);
-        m_success = false;
       }
     }
   } // end class P_PerformFinishOperation
-
 }

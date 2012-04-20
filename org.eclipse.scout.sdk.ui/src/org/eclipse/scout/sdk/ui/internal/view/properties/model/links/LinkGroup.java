@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.model.links;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 
 /**
  * <h3>ILinkGroup</h3> A group having a name and an order number.
@@ -62,20 +61,4 @@ public class LinkGroup {
   public ILink[] getLinks() {
     return m_links.toArray(new ILink[m_links.size()]);
   }
-
-  private class P_LinkComparator implements Comparator<ILink> {
-    @Override
-    public int compare(ILink o1, ILink o2) {
-      int diff = o1.getOrderNumber() - o2.getOrderNumber();
-      if (diff == 0) {
-        if (o1.getName() != null && o2.getName() != null) {
-          diff = o1.getName().compareTo(o2.getName());
-        }
-        else {
-          diff = o1.hashCode() - o2.hashCode();
-        }
-      }
-      return diff;
-    }
-  } // end class P_LinkComparator
 }

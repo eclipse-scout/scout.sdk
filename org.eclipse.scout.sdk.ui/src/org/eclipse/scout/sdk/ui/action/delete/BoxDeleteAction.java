@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.field.BoxDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
-import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -64,17 +63,4 @@ public class BoxDeleteAction extends AbstractScoutHandler {
   public void setBoxType(IType boxType) {
     m_boxType = boxType;
   }
-
-  private class P_SelectionValidationListener implements IMemberSelectionChangedListener {
-    @Override
-    public void handleSelectionChanged(IMember[] selection) {
-      m_confirmDialog.setMessage("");
-      boolean canOk = true;
-      if (selection == null || selection.length == 0) {
-        canOk = false;
-      }
-      m_confirmDialog.getOkButton().setEnabled(canOk);
-
-    }
-  } // end class P_SelectionValidationListener
 }

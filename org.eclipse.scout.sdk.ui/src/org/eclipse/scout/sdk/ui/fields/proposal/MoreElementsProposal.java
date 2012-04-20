@@ -8,22 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.fields.javacode;
+package org.eclipse.scout.sdk.ui.fields.proposal;
 
-import org.eclipse.jface.fieldassist.IContentProposal;
-import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
-public class JavaCodeFieldLabelProvider extends LabelProvider {
+/**
+ * <h3>{@link MoreElementsProposal}</h3> ...
+ * 
+ * @author mvi
+ * @since 3.8.0 16.04.2012
+ */
+public final class MoreElementsProposal implements ISeparatorProposal {
+  private final static String LINE = "---------------";
+  private final static String LABEL = LINE + " " + Texts.get("MoreElements") + " " + LINE;
 
-  @Override
-  public Image getImage(Object element) {
-    return ScoutSdkUi.getImage(ScoutSdkUi.Class);
+  public final static ISeparatorProposal INSTANCE = new MoreElementsProposal();
+
+  private MoreElementsProposal() {
   }
 
   @Override
-  public String getText(Object element) {
-    return ((IContentProposal) element).getLabel();
+  public String getLabel() {
+    return LABEL;
+  }
+
+  @Override
+  public Image getImage() {
+    return ScoutSdkUi.getImage(ScoutSdkUi.Separator);
   }
 }

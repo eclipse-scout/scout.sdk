@@ -29,7 +29,6 @@ public class TableColumnRelocateAction extends Action {
   private IType m_columnToMove;
   private IType m_targetDeclaringType;
   private IType m_neighborField;
-  private String m_newFieldName;
   private final Shell m_shell;
 
   public TableColumnRelocateAction(IType columnToMove, Shell shell) {

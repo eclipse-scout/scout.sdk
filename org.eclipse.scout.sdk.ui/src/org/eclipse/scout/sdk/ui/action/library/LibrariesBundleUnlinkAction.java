@@ -39,7 +39,6 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class LibrariesBundleUnlinkAction extends AbstractScoutHandler {
 
-  private IScoutBundle m_bundle;
   private HashMap<IScoutBundle, List<IPluginModelBase>> m_libraries;
 
   public LibrariesBundleUnlinkAction() {

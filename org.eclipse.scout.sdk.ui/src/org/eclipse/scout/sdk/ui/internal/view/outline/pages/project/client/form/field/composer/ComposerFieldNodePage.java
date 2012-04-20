@@ -27,9 +27,7 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
 
-  private boolean m_hasTree;
   protected IType abstractComposerField_tree = TypeUtility.getType(RuntimeClasses.AbstractComposerField_Tree);
-
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public ComposerFieldNodePage() {
@@ -58,13 +56,11 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
     }
     new KeyStrokeTablePage(this, getType());
     // find tree
-    m_hasTree = false;
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType(), abstractComposerField_tree);
     if (hierarchy != null) {
       IType[] trees = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(abstractComposerField_tree, hierarchy));
       if (trees.length > 0) {
         new TreeNodePage(this, trees[0], true);
-        m_hasTree = true;
       }
     }
     // entities

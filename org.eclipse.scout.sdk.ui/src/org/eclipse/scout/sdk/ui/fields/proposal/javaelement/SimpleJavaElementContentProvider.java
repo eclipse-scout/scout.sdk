@@ -8,17 +8,25 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.fields.proposal;
+package org.eclipse.scout.sdk.ui.fields.proposal.javaelement;
 
-import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>ISeparatorProposal</h3> A marker interface to provide unselectable proposal items
+ * <h3>{@link SimpleJavaElementContentProvider}</h3> ...
  * 
- * @see AsyncContentProposalAdapter
+ * @author mvi
+ * @since 3.8.0 16.04.2012
  */
-public interface ISeparatorProposal {
-  String getLabel();
+public class SimpleJavaElementContentProvider extends AbstractJavaElementContentProvider {
 
-  Image getImage();
+  private final Object[][] m_proposals;
+
+  public SimpleJavaElementContentProvider(Object[] proposals) {
+    m_proposals = new Object[][]{proposals};
+  }
+
+  @Override
+  protected Object[][] computeProposals() {
+    return m_proposals;
+  }
 }

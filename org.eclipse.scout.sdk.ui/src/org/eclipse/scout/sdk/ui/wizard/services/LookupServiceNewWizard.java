@@ -47,7 +47,6 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
   public static final int TYPE_SERVICE_REG_CLIENT = 109;
   public static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  private final IScoutBundle m_serverBundle;
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
@@ -56,7 +55,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
   public LookupServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewLookupService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serverBundle = serverBundle;
+
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewLookupService"), Texts.get("CreateANewLookupService"), TypeUtility.getType(RuntimeClasses.ILookupService), SdkProperties.SUFFIX_LOOKUP_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);

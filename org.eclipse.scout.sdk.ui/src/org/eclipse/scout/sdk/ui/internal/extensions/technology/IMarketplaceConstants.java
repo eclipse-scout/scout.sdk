@@ -18,8 +18,8 @@ package org.eclipse.scout.sdk.ui.internal.extensions.technology;
  */
 public interface IMarketplaceConstants {
 
-  final static String SCOUT_JDBC_FEATURE_URL = "https://tools.bsiag.com/marketplace/jdbc/3.8";
-  final static String SCOUT_RAYO_FEATURE_URL = "https://tools.bsiag.com/marketplace/rayo/3.8";
+  final static String SCOUT_JDBC_FEATURE_URL = "http://tools.bsiag.com/marketplace/jdbc/3.8";
+  final static String SCOUT_RAYO_FEATURE_URL = "http://tools.bsiag.com/marketplace/rayo/3.8";
 
   final static String SCOUT_MYSQL_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.mysql5117.feature.feature.group";
   final static String MY_SQL_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.mysql5117";

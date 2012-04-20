@@ -98,7 +98,6 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
       Matcher m = PATTERN.matcher(linePart);
       if (m.find()) {
         String prefix = linePart.substring(m.start(2), offset - lineInfo.getOffset());
-        String replacement = m.group(2);
         IType contextType = findContextType(context.getCompilationUnit(), offset);
         IType referencedType = getReferencedType(contextType, m.group(1));
         if (referencedType != null) {
@@ -108,7 +107,7 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
           }
           List<ICompletionProposal> result = new ArrayList<ICompletionProposal>();
           for (INlsEntry e : nlsProject.getEntries(prefix, false)) {
-            result.add(new NlsProposal(e, prefix, replacement, offset, m_image));
+            result.add(new NlsProposal(e, prefix, offset, m_image));
           }
           return result.toArray(new ICompletionProposal[result.size()]);
         }

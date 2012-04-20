@@ -14,8 +14,7 @@ import java.util.Date;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementContentProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.SimpleJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -43,9 +42,8 @@ public class PrimitiveTypePresenter extends AbstractTypeProposalPresenter {
 
   @Override
   protected void createProposalFieldProviders(ProposalTextField proposalField) {
-    JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
-    getProposalField().setLabelProvider(labelProvider);
-    JavaElementContentProvider contentProvider = new JavaElementContentProvider(labelProvider, PRIMITIVE_TYPES);
+    SimpleJavaElementContentProvider contentProvider = new SimpleJavaElementContentProvider(PRIMITIVE_TYPES);
+    getProposalField().setLabelProvider(contentProvider.getLabelProvider());
     getProposalField().setContentProvider(contentProvider);
   }
 }

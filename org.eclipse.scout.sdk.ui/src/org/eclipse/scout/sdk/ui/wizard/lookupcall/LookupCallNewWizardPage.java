@@ -24,9 +24,9 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
+import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementContentProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -122,39 +122,49 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected Control createLookupServiceGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     group.setText("Lookup Service");
+
+    boolean serverAvailable = getServerBundle() != null;
+
     Composite radioButtons = new Composite(group, SWT.INHERIT_DEFAULT);
     m_createServiceButton = new Button(radioButtons, SWT.RADIO);
     m_createServiceButton.addSelectionListener(new P_LookupServiceStrategyButtonListener(LOOKUP_SERVICE_STRATEGY.CREATE_NEW));
     m_createServiceButton.setText("create new lookup service");
-    m_createServiceButton.setSelection(true);
+    m_createServiceButton.setSelection(serverAvailable);
     m_useServiceButton = new Button(radioButtons, SWT.RADIO);
     m_useServiceButton.addSelectionListener(new P_LookupServiceStrategyButtonListener(LOOKUP_SERVICE_STRATEGY.USE_EXISTING));
     m_useServiceButton.setText("use existing lookup service");
     m_noServiceButton = new Button(radioButtons, SWT.RADIO);
     m_noServiceButton.addSelectionListener(new P_LookupServiceStrategyButtonListener(LOOKUP_SERVICE_STRATEGY.NO_SERVICE));
     m_noServiceButton.setText("no lookup service");
+    m_noServiceButton.setSelection(!serverAvailable);
 
     m_serviceSuperTypeField = getFieldToolkit().createProposalField(group, Texts.get("LookupServiceSuperType"));
-    if (getServerBundle() != null) {
-      JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
-      m_serviceSuperTypeField.setLabelProvider(labelProvider);
-      List<Object> proposals = new ArrayList<Object>();
-      proposals.add(abstractLookupService);
-      proposals.add(abstractSqlLookupService);
-      proposals.add(ProposalTextField.SEPERATOR);
-      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-      IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
-      for (IType t : abstractLookupServices) {
-        if (!proposals.contains(t)) {
-          proposals.add(t);
+    if (serverAvailable) {
+      AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
+        @Override
+        protected Object[][] computeProposals() {
+          List<Object> proposals = new ArrayList<Object>();
+          proposals.add(abstractLookupService);
+          proposals.add(abstractSqlLookupService);
+          proposals.add(MoreElementsProposal.INSTANCE);
+          ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
+          IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+          for (IType t : abstractLookupServices) {
+            if (!proposals.contains(t)) {
+              proposals.add(t);
+            }
+          }
+          return new Object[][]{proposals.toArray(new Object[proposals.size()])};
         }
-      }
-      m_serviceSuperTypeField.setContentProvider(new JavaElementContentProvider(labelProvider, proposals.toArray(new Object[proposals.size()])));
+      };
+      m_serviceSuperTypeField.setContentProvider(contentProvider);
+      m_serviceSuperTypeField.setLabelProvider(contentProvider.getLabelProvider());
+      m_serviceSuperTypeField.acceptProposal(getServiceSuperType());
     }
     else {
       m_serviceSuperTypeField.setEnabled(false);
+      radioButtons.setEnabled(false);
     }
-    m_serviceSuperTypeField.acceptProposal(getServiceSuperType());
     m_serviceSuperTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -165,12 +175,16 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, Texts.get("LookupService"));
     if (getSharedBundle() != null) {
-      ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-      IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
-      JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
-      m_lookupServiceTypeField.setLabelProvider(labelProvider);
-      m_lookupServiceTypeField.setContentProvider(new JavaElementContentProvider(labelProvider, lookupServices));
-
+      AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
+        @Override
+        protected Object[][] computeProposals() {
+          ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
+          IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+          return new Object[][]{lookupServices};
+        }
+      };
+      m_lookupServiceTypeField.setContentProvider(contentProvider);
+      m_lookupServiceTypeField.setLabelProvider(contentProvider.getLabelProvider());
     }
     else {
       m_lookupServiceTypeField.setEnabled(false);

@@ -59,7 +59,6 @@ public class TreeFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,7 +67,6 @@ public class TreeFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewTreeField"));
     setDescription(Texts.get("CreateANewTreeField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.ITreeField);
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractTreeField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

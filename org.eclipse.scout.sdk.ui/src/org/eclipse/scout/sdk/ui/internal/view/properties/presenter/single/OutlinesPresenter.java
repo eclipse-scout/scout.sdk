@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.ui.dialog.JavaElementSelectionDialog;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractJavaElementListPresenter;
-import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -53,18 +52,11 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
 
   @Override
   public IJavaElement[] readSource() throws CoreException {
-    //ICachedTypeHierarchy outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
     ArrayList<IJavaElement> props = new ArrayList<IJavaElement>();
     for (IType type : ScoutTypeUtility.getTypeOccurenceInMethod(getMethod().peekMethod())) {
-      //if (outlineHierarchy.isSubtype(iOutline, type)) {
       props.add(type);
-      //}
     }
     return props.toArray(new IJavaElement[props.size()]);
-  }
-
-  private String getFieldName(IType field, String labelMethodName) {
-    return ScoutSourceUtility.getTranslatedMethodStringValue(field, labelMethodName);
   }
 
   @Override

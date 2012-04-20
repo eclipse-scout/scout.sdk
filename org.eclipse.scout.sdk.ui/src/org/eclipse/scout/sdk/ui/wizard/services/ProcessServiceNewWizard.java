@@ -51,14 +51,12 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
 
   final IType abstractService = TypeUtility.getType(RuntimeClasses.AbstractService);
 
-  private final IScoutBundle m_serverBundle;
   private BundleTreeWizardPage m_locationWizardPage;
   private ProcessServiceNewWizardPage m_serviceNewWizardPage;
   private ProcessServiceNewOperation m_operation = new ProcessServiceNewOperation();
   private ITreeNode m_locationWizardPageRoot;
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
-    m_serverBundle = serverBundle;
     setWindowTitle(Texts.get("NewProcessService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ProcessServiceNewWizardPage();

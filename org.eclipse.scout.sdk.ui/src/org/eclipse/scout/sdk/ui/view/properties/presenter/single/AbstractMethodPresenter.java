@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
@@ -27,8 +26,6 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodErrorPresenterContent;
 import org.eclipse.scout.sdk.util.Regex;
-import org.eclipse.scout.sdk.util.ScoutSourceUtility;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
@@ -40,7 +37,6 @@ import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
@@ -268,16 +264,5 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
       ScoutSdkUi.logError(e);
       return null;
     }
-  }
-
-  private String wellFormMethod() throws JavaModelException, MalformedTreeException, BadLocationException {
-    String methodBody = getMethod().peekMethod().getSource();
-    if (methodBody == null) {
-      ScoutSdkUi.logWarning("methodBody of " + getMethod().getMethodName() + " in " + getMethod().getType().getFullyQualifiedName() + " is null");
-    }
-    String newBody = methodBody;
-    newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().peekMethod().getDeclaringType()).length() + 1, newBody);
-    newBody = newBody.replaceAll("\t", SdkProperties.TAB);
-    return newBody;
   }
 }

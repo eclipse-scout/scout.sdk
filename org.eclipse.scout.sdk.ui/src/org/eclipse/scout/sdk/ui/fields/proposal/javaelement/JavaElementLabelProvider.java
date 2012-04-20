@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.fields.proposal.javaelement;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ITableLabelProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
@@ -28,10 +27,7 @@ public class JavaElementLabelProvider extends SearchRangeStyledLabelProvider imp
 
   @Override
   public String getText(Object element) {
-    if (element instanceof ISeparatorProposal) {
-      return "------------ more ------------------";
-    }
-    else if (element instanceof IJavaElement) {
+    if (element instanceof IJavaElement) {
       return ((IJavaElement) element).getElementName();
     }
     return null;
@@ -72,10 +68,7 @@ public class JavaElementLabelProvider extends SearchRangeStyledLabelProvider imp
 
   @Override
   public Image getImage(Object element) {
-    if (element instanceof ISeparatorProposal) {
-      return ScoutSdkUi.getImage(ScoutSdkUi.Separator);
-    }
-    else if (element instanceof IJavaElement) {
+    if (element instanceof IJavaElement) {
       return ScoutSdkUi.getImage((IJavaElement) element);
     }
     else {

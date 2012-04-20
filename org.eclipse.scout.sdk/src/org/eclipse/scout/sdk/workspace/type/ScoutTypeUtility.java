@@ -321,21 +321,6 @@ public class ScoutTypeUtility extends TypeUtility {
     }
   }
 
-  private static String getQualifiedNameOf(IJavaElement element) {
-    if (element == null) {
-      return "null";
-    }
-    switch (element.getElementType()) {
-      case IJavaElement.TYPE:
-        return ((IType) element).getFullyQualifiedName();
-      case IJavaElement.METHOD:
-        IMethod m = (IMethod) element;
-        return m.getElementName() + "on " + m.getDeclaringType().getFullyQualifiedName();
-      default:
-        return element.getElementName();
-    }
-  }
-
   public static IType[] getPotentialMasterFields(IType field) {
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(field.getCompilationUnit());
     IType mainbox = TypeUtility.getAncestor(field, TypeFilters.getRegexSimpleNameFilter("MainBox"));

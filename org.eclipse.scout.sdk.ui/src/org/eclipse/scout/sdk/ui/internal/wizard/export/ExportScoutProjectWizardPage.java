@@ -53,7 +53,6 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
 
   private static final int TYPE_EXPORT_ENTRY = 101;
 
-  private final IScoutProject m_scoutProject;
   private final BasicPropertySupport m_propertySupport;
 
   private FileSelectionField m_destDirFileField;
@@ -64,7 +63,6 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
 
   public ExportScoutProjectWizardPage(IScoutProject scoutProject) {
     super(ExportScoutProjectWizardPage.class.getName());
-    m_scoutProject = scoutProject;
     setTitle(Texts.get("ExportScoutProject"));
     setDescription(Texts.get("ExportScoutProjectMessage"));
     m_propertySupport = new BasicPropertySupport(this);

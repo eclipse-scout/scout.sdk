@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -24,7 +23,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
@@ -65,7 +63,6 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   private static SdkLogManager logManager;
 
   public static final String PROPERTY_RELEASE_NOTES = PLUGIN_ID + ".releaseNotes";
-  private static String PROPERTY_PLUGIN_VERSION = "pluginVersion";
 
   private static final String IMAGE_PATH = "resources/icons/";
 
@@ -453,23 +450,6 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     catch (Exception ex) {
       logWarning(ex);
     }
-  }
-
-  private int parseLogLevel(String loglevel) {
-    int level = IStatus.INFO | IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
-    if (!StringUtility.isNullOrEmpty(loglevel)) {
-      String lowerLoglevel = loglevel.toLowerCase();
-      if (lowerLoglevel.equals("warning")) {
-        level = IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
-      }
-      else if (lowerLoglevel.equals("error")) {
-        level = IStatus.ERROR | IStatus.CANCEL;
-      }
-      else if (lowerLoglevel.equals("cancel")) {
-        level = IStatus.CANCEL;
-      }
-    }
-    return level;
   }
 
   private class P_PreferenceStorePropertyListener implements IPropertyChangeListener {

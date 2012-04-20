@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.fields.proposal.nls;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.ui.action.NlsEntryNewAction;
@@ -50,7 +51,11 @@ public class NlsTextSelectionHandler implements IProposalSelectionHandler {
       }
       String key = getNewKey(proposalFieldText);
       NlsEntry entry = new NlsEntry(key, getNlsProject());
-      entry.addTranslation(getNlsProject().getDevelopmentLanguage(), proposalFieldText);
+      Language devLang = getNlsProject().getDevelopmentLanguage();
+      entry.addTranslation(devLang, proposalFieldText);
+      if (!Language.LANGUAGE_DEFAULT.equals(devLang)) {
+        entry.addTranslation(Language.LANGUAGE_DEFAULT, proposalFieldText);
+      }
       NlsEntryNewAction action = new NlsEntryNewAction(proposalTextField.getShell(), getNlsProject(), entry, true);
       action.run();
       try {

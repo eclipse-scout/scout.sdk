@@ -302,18 +302,5 @@ public class StyledTextField extends TextField {
         getTextComponent().setStyleRanges(null);
       }
     }
-
-    /**
-     * set the style for the suffix.
-     * <p>
-     * NOTE: range.start and range.length will be changed.
-     * 
-     * @param range
-     */
-    void setStyleRange(StyleRange range) {
-      m_suffixStyleRange = range;
-    }
-
   } // end class P_SuffixListener
-
 }

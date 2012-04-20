@@ -29,7 +29,6 @@ public class FormFieldRelocateAction extends Action {
   private IType m_formField;
   private IType m_targetDeclaringType;
   private IType m_neighborField;
-  private String m_newFieldName;
   private final Shell m_shell;
 
   public FormFieldRelocateAction(IType formFieldToMove, Shell shell) {

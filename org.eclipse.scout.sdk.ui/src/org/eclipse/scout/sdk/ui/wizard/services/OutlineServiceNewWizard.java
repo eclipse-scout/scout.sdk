@@ -47,7 +47,6 @@ public class OutlineServiceNewWizard extends AbstractWorkspaceWizard {
   public static final int TYPE_SERVICE_REG_CLIENT = 109;
   public static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  private final IScoutBundle m_serverBundle;
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
@@ -56,7 +55,7 @@ public class OutlineServiceNewWizard extends AbstractWorkspaceWizard {
   public OutlineServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewOutlineService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serverBundle = serverBundle;
+
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewOutlineService"), Texts.get("CreateANewOutlineService"), TypeUtility.getType(RuntimeClasses.IService), SdkProperties.SUFFIX_OUTLINE_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);

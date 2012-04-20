@@ -15,9 +15,6 @@ import java.util.HashMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.pde.core.plugin.IPluginBase;
-import org.eclipse.pde.core.plugin.IPluginExtension;
-import org.eclipse.pde.core.plugin.IPluginModelFactory;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -54,25 +51,6 @@ public class CreateAjaxServletOperation implements IOperation {
       h.PluginXml.addSimpleExtension(EXTENSION_POINT_SERVLET, "servlet", attributes);
       h.save();
     }
-  }
-
-  /**
-   * @param pluginBase
-   * @return
-   * @throws CoreException
-   */
-  private IPluginExtension findOrCreateServletExtension(IPluginBase pluginBase) throws CoreException {
-    IPluginExtension[] extensions = pluginBase.getExtensions();
-    for (int i = 0; i < extensions.length; i++) {
-      String point = extensions[i].getPoint();
-      //String id = extensions[i].getId();
-      if (/*fProductId.equals(id) && */"org.eclipse.equinox.http.registry.servlets".equals(point)) { //$NON-NLS-1$
-        return extensions[i];
-      }
-    }
-    IPluginExtension extension = ((IPluginModelFactory) pluginBase.getPluginModel()).createExtension();
-    extension.setPoint("org.eclipse.core.runtime.products"); //$NON-NLS-1$
-    return extension;
   }
 
   public IJavaProject getServerProject() {

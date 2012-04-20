@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -130,7 +131,12 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_codeTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("CodeType"), ScoutTypeUtility.getClassesOnClasspath(iCodeType, m_declaringType.getJavaProject()));
+    m_codeTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("CodeType"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(iCodeType, m_declaringType.getJavaProject())};
+      }
+    });
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

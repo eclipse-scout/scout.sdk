@@ -13,12 +13,14 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>ISeparatorProposal</h3> A marker interface to provide unselectable proposal items
+ * <h3>{@link ISeparatorLabelProvider}</h3> ...
  * 
- * @see AsyncContentProposalAdapter
+ * @author mvi
+ * @since 3.8.0 20.04.2012
  */
-public interface ISeparatorProposal {
-  String getLabel();
+public interface ISeparatorLabelProvider {
 
-  Image getImage();
+  String getSeparatorText(ISeparatorProposal element);
+
+  Image getSeparatorImage(ISeparatorProposal element);
 }

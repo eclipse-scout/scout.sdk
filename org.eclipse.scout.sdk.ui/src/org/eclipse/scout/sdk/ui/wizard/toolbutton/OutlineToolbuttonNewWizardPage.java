@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
@@ -74,7 +75,12 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
   @Override
   protected void createContent(Composite parent) {
 
-    m_outlineField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Outline"), ScoutTypeUtility.getClassesOnClasspath(iOutline, m_declaringType.getJavaProject()));
+    m_outlineField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Outline"), new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(iOutline, m_declaringType.getJavaProject())};
+      }
+    });
     m_outlineField.acceptProposal(getOutline());
     m_outlineField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

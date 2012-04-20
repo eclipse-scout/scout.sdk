@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.CodeIdExtensionPoint;
@@ -135,7 +136,12 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        TypeUtility.toArray(m_declaringType), ScoutTypeUtility.getCodes(m_declaringType));
+        new AbstractJavaElementContentProvider() {
+          @Override
+          protected Object[][] computeProposals() {
+            return new Object[][]{TypeUtility.toArray(m_declaringType), ScoutTypeUtility.getCodes(m_declaringType)};
+          }
+        });
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

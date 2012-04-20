@@ -92,7 +92,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
 
   @Override
   public IStatus remove(String key, IProgressMonitor monitor) {
-    super.setTranslation(key, null, monitor);
+    super.setTranslation(key, null, false, monitor);
     return Status.OK_STATUS;
   }
 

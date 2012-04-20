@@ -25,7 +25,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
@@ -56,7 +55,6 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
   private Button m_showAllTemplatesField;
 
   private HandlerTemplate m_selectedTemplate;
-  private IWizardPage m_nextPage;
 
   public FormHandlerNewWizardPage1(IType declaringType) {
     super(FormHandlerNewWizardPage1.class.getName());

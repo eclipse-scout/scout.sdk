@@ -36,7 +36,6 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
   public static final String SELECTION_PREVENTER = "selectionPreventer";
   private ScoutExplorerPart m_view;
   private P_BackupNode[] m_backupTree;
-  private String m_selectedNodeName;
   private ITreeSelection m_backupedSelection;
 
   public RefreshOutlineSubTreeJob(ScoutExplorerPart view, String name) {
@@ -75,8 +74,6 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
             m_treeControl.setCursor(waitCursor);
             m_view.getViewContentProvider().setAutoLoadChildren(false);
             m_backupedSelection = (ITreeSelection) m_treeViewer.getSelection();
-            IPage selectedPage = (IPage) ((ITreeSelection) m_treeViewer.getSelection()).getFirstElement();
-            m_selectedNodeName = (selectedPage != null ? selectedPage.getName() : null);
             for (int i = 0; i < m_backupTree.length; i++) {
               m_backupTree[i] = new P_BackupNode(null, dirtyStructureRoots[i]);
             }

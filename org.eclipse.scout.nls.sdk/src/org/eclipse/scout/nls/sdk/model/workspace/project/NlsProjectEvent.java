@@ -19,7 +19,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.translationResource.ITranslatio
 /** <h4>NlsProjectEvent</h4> */
 public class NlsProjectEvent {
   public static final int TYPE_ENTRY_ADDED = 1 << 0;
-  public static final int TYPE_ENTRY_REMOVEED = 1 << 1;
+  public static final int TYPE_ENTRY_REMOVED = 1 << 1;
   public static final int TYPE_ENTRY_MODIFYED = 1 << 2;
   public static final int TYPE_REFRESH = 1 << 3;
   public static final int TYPE_FULL_REFRESH = 1 << 4;

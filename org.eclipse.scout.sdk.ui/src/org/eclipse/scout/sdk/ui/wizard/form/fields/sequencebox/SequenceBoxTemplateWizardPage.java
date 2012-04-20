@@ -40,13 +40,11 @@ import org.eclipse.swt.widgets.Composite;
 
 public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
 
-  private IType m_declaringType;
   private FilteredTable m_filteredTable;
   private IContentTemplate m_selectedTemplate;
 
   public SequenceBoxTemplateWizardPage(IType declaringType) {
     super(SequenceBoxTemplateWizardPage.class.getName());
-    m_declaringType = declaringType;
   }
 
   @Override

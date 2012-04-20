@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.fields.javacode;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -37,7 +36,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 public class JavaCodeFieldContentProvider implements IContentProposalProvider {
 
-  private IContentProposal[] m_props = new IContentProposal[]{new JavaTypeProposal("int"), new JavaTypeProposal("long"), new JavaTypeProposal("ArrayList")};
   private final IJavaSearchScope m_seachScope;
   private SearchEngine m_searchEngine;
 
@@ -48,8 +46,6 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
   }
 
   public IContentProposal[] findExactMatch(String input) {
-
-    // ArrayList<IContentProposal> props = new ArrayList<IContentProposal>();
     String searchText = parseSearchText(input);
     if (searchText == null) {
       return new IContentProposal[]{};
@@ -57,17 +53,10 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
     ArrayList<IContentProposal> collector = new ArrayList<IContentProposal>();
     collectTypes(searchText, collector, SearchPattern.R_PATTERN_MATCH, null);
     return collector.toArray(new IContentProposal[collector.size()]);
-    //
-    // for(IContentProposal prop : m_props){
-    // if(prop.getLabel().equals(searchText)){
-    // props.add(prop);
-    // }
-    // }
   }
 
   @Override
   public IContentProposal[] getProposals(String contents, int position) {
-    // ArrayList<IContentProposal> props = new ArrayList<IContentProposal>();
     String searchText = parseSearchText(contents.substring(0, position));
     if (searchText == null) {
       return new IContentProposal[]{};
@@ -77,12 +66,6 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
     ArrayList<IContentProposal> proposals = new ArrayList<IContentProposal>();
     collectTypes(searchText, proposals, SearchPattern.R_PATTERN_MATCH, null);
     return proposals.toArray(new IContentProposal[proposals.size()]);
-    // for(IContentProposal prop : pro){
-    // if(prop.getLabel().startsWith(searchText)){
-    // props.add(prop);
-    // }
-    // }
-    // return props.toArray(new IContentProposal[props.size()]);
   }
 
   private String parseSearchText(String contents) {
@@ -132,13 +115,10 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
   }
 
   private class P_SearchRequestor extends org.eclipse.jdt.core.search.SearchRequestor {
-    private IProgressMonitor m_monitor;
     private TreeMap<CompositeObject, IContentProposal> m_foundTypes = new TreeMap<CompositeObject, IContentProposal>();
-    private HashMap<CompositeObject, JavaTypeProposal> m_doubleEntryCheck = new HashMap<CompositeObject, JavaTypeProposal>();
     private int counter = 0;
 
     public P_SearchRequestor(IProgressMonitor monitor) {
-      m_monitor = monitor;
     }
 
     @Override

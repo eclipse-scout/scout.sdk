@@ -59,7 +59,6 @@ public class MatrixFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,7 +67,6 @@ public class MatrixFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewMatrixField"));
     setDescription(Texts.get("CreateANewMatrixField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IMatrixField);
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractMatrixField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

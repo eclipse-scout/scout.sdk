@@ -27,7 +27,6 @@ import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
-import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -136,21 +135,6 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
       }
     }
   } // end class P_LocationPropertyListener
-
-  private class P_NodeFilter implements ITreeNodeFilter {
-    @Override
-    public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_SERVICE_IMPLEMENTATION:
-        case TYPE_SERVICE_INTERFACE:
-        case TYPE_SERVICE_REGISTRATION:
-          return true;
-        case IScoutBundle.BUNDLE_CLIENT:
-        default:
-          return false;
-      }
-    }
-  } // end class P_NodeFilter
 
   private class P_TreeDndListener implements ITreeDndListener {
     @Override

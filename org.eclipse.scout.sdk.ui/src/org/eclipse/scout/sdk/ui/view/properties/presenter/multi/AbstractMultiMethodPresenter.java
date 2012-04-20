@@ -50,10 +50,7 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
   private Composite m_body;
   private MethodErrorPresenterContent m_errorContent;
   private CustomTooltip m_tooltip;
-//  private IMethod[] m_methods;
   private HashMap<String, MethodBean<T>> m_methodSources = new HashMap<String, MethodBean<T>>();
-
-//  private List<ConfigurationMethod> m_methods = new ArrayList<ConfigurationMethod>();
 
   public AbstractMultiMethodPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -84,25 +81,6 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
     catch (JavaModelException e) {
       ScoutSdkUi.logWarning("could not compare method body with cached body of presenter '" + methodSet.getMethodName() + "'", e);
     }
-//    try {
-//      m_methods = methods;
-//      init(methods);
-//      m_body.setVisible(true);
-//      m_errorContent.setVisible(false);
-//      ((GridData) m_errorContent.getLayoutData()).exclude = true;
-//      ((GridData) m_body.getLayoutData()).exclude = false;
-//
-//    }
-//    catch (CoreException e) {
-//      ScoutSdkUi.logWarning("parse error in multi presenter. ", e);
-//      // XXX
-//      // m_errorContent.setMethod(method);
-//      // m_body.setVisible(false);
-//      // m_errorContent.setVisible(true);
-//      //
-//      // ((GridData)m_errorContent.getLayoutData()).exclude = false;
-//      // ((GridData)m_body.getLayoutData()).exclude = true;
-//    }
     getContainer().layout(true);
   }
 
@@ -114,18 +92,6 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
       T defaultValue = parseSourceInput(bean.getMethod().computeDefaultValue(), bean.getMethod());
       bean.setDefaultValue(defaultValue);
     }
-
-    // m_labelLink.setEnabled(true);
-    // m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, getMethod().isImplemented()));
-    // if(getMethod().isImplemented()){
-    // try {
-    // m_tooltip.setText(wellFormMethod());
-    // } catch (Exception e) {
-    // ScoutSdkUi.logWarning("could not create tooltip for method '"+method.getName()+"'",e);
-    // }
-    // }else{
-    // m_tooltip.setText(null);
-    // }
   }
 
   protected abstract String formatSourceValue(T value) throws CoreException;
@@ -140,13 +106,6 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
     m_errorContent = new MethodErrorPresenterContent(parent, getToolkit());
     m_body = getToolkit().createComposite(parent);
     m_labelLink = getToolkit().createHyperlink(m_body, "", SWT.NONE);
-
-    // IHyperlinkListener actionListener = new HyperlinkAdapter() {
-    // public void linkActivated(HyperlinkEvent e) {
-    // handleLabelLinkSelected();
-    // }
-    // };
-    // m_labelLink.addHyperlinkListener(actionListener);
     m_tooltip = new CustomTooltip(m_labelLink, false);
     Control content = createContent(m_body);
 

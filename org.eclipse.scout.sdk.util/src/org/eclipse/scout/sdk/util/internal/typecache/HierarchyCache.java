@@ -218,39 +218,6 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
-  private void handleCompilationUnitAdded(ICompilationUnit icu) {
-    try {
-      // get types
-      IType[] types = icu.getTypes();
-      if (types != null && types.length > 0) {
-        for (IType t : types) {
-          recHandleTypeAdded(t);
-        }
-      }
-
-    }
-    catch (Exception e) {
-      SdkUtilActivator.logError("could not handle icu added ('" + icu.getElementName() + "') change in hierarchies.");
-    }
-  }
-
-  private void recHandleTypeAdded(IType type) {
-    try {
-      if (TypeUtility.exists(type)) {
-        handleTypeChange(type, type.newSupertypeHierarchy(new NullProgressMonitor()));
-        IType[] innerTypes = type.getTypes();
-        if (innerTypes != null) {
-          for (IType t : innerTypes) {
-            recHandleTypeAdded(t);
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      SdkUtilActivator.logError("could not handle type added ('" + type.getElementName() + "') in hierarchies.");
-    }
-  }
-
   private void handleCompilationUnitChagnedExternal(ICompilationUnit icu) {
     IRegion region = JavaCore.newRegion();
     region.add(icu);

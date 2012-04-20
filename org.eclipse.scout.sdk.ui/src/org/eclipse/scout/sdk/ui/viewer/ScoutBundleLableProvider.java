@@ -45,6 +45,5 @@ public class ScoutBundleLableProvider extends SearchRangeStyledLabelProvider {
         // TODO default bundle img
         return ScoutSdkUi.getImage(ScoutSdkUi.SharedBundle);
     }
-
   }
 }

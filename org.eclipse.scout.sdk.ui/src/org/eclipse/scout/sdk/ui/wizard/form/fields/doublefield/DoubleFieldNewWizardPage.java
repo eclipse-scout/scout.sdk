@@ -59,7 +59,6 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,8 +67,6 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewDoubleField"));
     setDescription(Texts.get("CreateANewDoubleField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.IDoubleField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractDoubleField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

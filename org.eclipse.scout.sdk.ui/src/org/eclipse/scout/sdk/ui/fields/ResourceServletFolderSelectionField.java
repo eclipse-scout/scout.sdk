@@ -47,18 +47,14 @@ import org.eclipse.swt.widgets.Label;
 public class ResourceServletFolderSelectionField extends TextField {
 
   private Button m_popupButton;
-
   private IFolder m_folder;
   private EventListenerList m_eventListeners;
   private OptimisticLock m_inputLock = new OptimisticLock();
-
-  private final IScoutProject m_scoutProject;
 
   private ITreeNode m_rootNode;
 
   public ResourceServletFolderSelectionField(Composite parent, IScoutProject scoutProject) {
     super(parent);
-    m_scoutProject = scoutProject;
     m_eventListeners = new EventListenerList();
     m_rootNode = new ResourceServletFolderTree(scoutProject).getRootNode();
   }

@@ -32,10 +32,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class AbstractTooltip {
 
-  private Point m_mouseLocation;
-
   private Control m_sourceControl;
-
   private CloseJob m_closeJob = new CloseJob();
 
   public Control getSourceControl() {
@@ -105,7 +102,6 @@ public abstract class AbstractTooltip {
         m_shell.setLayout(shellLayout);
         createContent(m_shell);
       }
-      m_mouseLocation = new Point(x, y);
       m_shell.pack();
       m_shell.setBounds(computeBounds(m_shell.getSize()));
       m_shell.setVisible(true);
@@ -172,10 +168,6 @@ public abstract class AbstractTooltip {
         }
       }
     }
-  }
-
-  private void mouseMoved(int x, int y) {
-
   }
 
   private class P_PopupListener implements Listener {

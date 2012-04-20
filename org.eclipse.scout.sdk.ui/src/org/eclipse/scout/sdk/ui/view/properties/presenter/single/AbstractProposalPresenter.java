@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.ui.action.LegacyOperationAction;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
@@ -38,7 +37,6 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
   private ProposalTextField m_proposalField;
   private T m_currentSourceValue;
   private T m_defaultValue;
-  private SimpleProposalProvider m_proposalProvider;
   private OptimisticLock storeValueLock = new OptimisticLock();
 
   public AbstractProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {

@@ -13,17 +13,11 @@ package org.eclipse.scout.sdk.ui.internal.view.icons;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * Accept only rows with icons of the current bc project, hide inherited rows
  */
 public class IconRowFilter extends ViewerFilter {
-  private IScoutBundle m_sharedBundle;
-
-  public void setScoutBundle(IScoutBundle sharedBundle) {
-    m_sharedBundle = sharedBundle;
-  }
 
   @Override
   public boolean select(Viewer viewer, Object parentElement, Object element) {

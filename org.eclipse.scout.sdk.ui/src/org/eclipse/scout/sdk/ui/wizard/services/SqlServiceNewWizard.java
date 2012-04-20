@@ -44,14 +44,12 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
   public static final int TYPE_SERVICE_IMPLEMENTATION = 108;
   public static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  private final IScoutBundle m_serverBundle;
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
   private ServiceNewOperation m_operation = new ServiceNewOperation();
 
   public SqlServiceNewWizard(IScoutBundle serverBundle) {
-    m_serverBundle = serverBundle;
     setWindowTitle(Texts.get("NewSQLService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 

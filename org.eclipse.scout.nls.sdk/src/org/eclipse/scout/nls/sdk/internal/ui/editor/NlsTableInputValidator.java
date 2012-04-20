@@ -18,11 +18,9 @@ import org.eclipse.scout.nls.sdk.ui.IStructuredInputValidator;
 import org.eclipse.scout.nls.sdk.ui.InputValidator;
 
 public class NlsTableInputValidator implements IStructuredInputValidator {
-  private final INlsProject m_project;
   private final IInputValidator m_keyValidator;
 
   public NlsTableInputValidator(INlsProject project) {
-    m_project = project;
     m_keyValidator = InputValidator.getNlsKeyValidator(project);
   }
 

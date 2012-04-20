@@ -39,7 +39,7 @@ public class RemoveAction extends Action {
     AbstractJob job = new AbstractJob("update translations") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        return m_nlsProject.removeEntries(m_entries);
+        return m_nlsProject.removeEntries(m_entries, monitor);
       }
     };
     job.setUser(false);

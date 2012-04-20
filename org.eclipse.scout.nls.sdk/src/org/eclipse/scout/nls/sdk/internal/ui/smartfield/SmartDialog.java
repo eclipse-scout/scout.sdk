@@ -186,15 +186,6 @@ public class SmartDialog {
     m_smartDialogListeners.remove(listener);
   }
 
-  private void updateProposals(String text) {
-    List<Object> props = m_smartModel.getProposals(text);
-    m_infoLabel.setText(props.size() + " items found");
-    m_smartTableModel.setItems(props);
-    m_viewer.setInput(m_smartTableModel);
-    m_viewer.refresh(true);
-    m_shell.layout(true);
-  }
-
   public void lazyOpen(String text) {
     Control c = Display.getDefault().getCursorControl();
     if (c != null) {

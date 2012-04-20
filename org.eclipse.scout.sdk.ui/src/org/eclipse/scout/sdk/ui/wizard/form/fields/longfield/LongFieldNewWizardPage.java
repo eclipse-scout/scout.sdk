@@ -59,7 +59,6 @@ public class LongFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
-  private final IType m_definitionType;
   private final IType m_declaringType;
   private IType m_createdField;
 
@@ -68,8 +67,6 @@ public class LongFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewLongField"));
     setDescription(Texts.get("CreateANewLongField"));
     m_declaringType = declaringType;
-    m_definitionType = TypeUtility.getType(RuntimeClasses.ILongField);
-
     setSuperType(TypeUtility.getType(RuntimeClasses.AbstractLongField));
     m_sibling = SiblingProposal.SIBLING_END;
   }

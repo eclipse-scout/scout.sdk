@@ -23,7 +23,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.License;
 import org.eclipse.swt.SWT;
@@ -49,7 +48,6 @@ import org.eclipse.swt.widgets.Text;
 public class LicenseDialog extends TitleAreaDialog {
 
   private final Map<String, License[]> m_iuToLicenses;
-  private final BasicPropertySupport m_propertySupport;
 
   private boolean m_complete;
 
@@ -63,7 +61,6 @@ public class LicenseDialog extends TitleAreaDialog {
     super(parentShell);
     setShellStyle(getShellStyle() | SWT.RESIZE);
     m_iuToLicenses = iuToLicenses;
-    m_propertySupport = new BasicPropertySupport(this);
     m_complete = false;
   }
 

@@ -40,7 +40,6 @@ import org.eclipse.swt.widgets.Control;
 public class BooleanPresenter extends AbstractMethodPresenter {
 
   private Button m_checkbox;
-  private boolean m_defaultValue;
 
   public BooleanPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -89,8 +88,6 @@ public class BooleanPresenter extends AbstractMethodPresenter {
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     super.init(method);
-
-    m_defaultValue = Boolean.valueOf(getMethod().computeDefaultValue());
     try {
       parseMethodBody();
     }

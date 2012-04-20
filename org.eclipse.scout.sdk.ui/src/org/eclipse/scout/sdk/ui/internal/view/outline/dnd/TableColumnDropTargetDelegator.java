@@ -101,16 +101,6 @@ public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
     return true;
   }
 
-  private IType getDeclaringTableType(Object target) {
-    if (target instanceof ColumnTablePage) {
-      return ((ColumnTablePage) target).getColumnDeclaringType();
-    }
-    else if (target instanceof ColumnNodePage) {
-      return ((ColumnNodePage) target).getType().getDeclaringType();
-    }
-    return null;
-  }
-
   private int dndToMoveOperationLocation(int location) {
     switch (location) {
       case ViewerDropAdapter.LOCATION_AFTER:
@@ -121,5 +111,4 @@ public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
         return AbstractTypeDndOperation.LAST;
     }
   }
-
 }

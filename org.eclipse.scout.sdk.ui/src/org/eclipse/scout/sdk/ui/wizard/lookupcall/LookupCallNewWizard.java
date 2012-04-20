@@ -332,21 +332,6 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
       return Status.OK_STATUS;
     }
 
-    protected IStatus getStatusPermission(int permissionType) {
-      IScoutBundle permissionBundle = m_page2.getLocationBundle(permissionType, true, true);
-      if (permissionBundle != null) {
-        ITreeNode permissionNode = m_page2.getTreeNode(permissionType, true, true);
-        if (permissionNode != null) {
-          String fqn = permissionBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SECURITY) + "." + permissionNode.getText();
-          IType permission = permissionBundle.findType(fqn);
-          if (permission != null && permission.exists()) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
-          }
-        }
-      }
-      return Status.OK_STATUS;
-    }
-
     protected IStatus getStatusLookupCall() {
       IScoutBundle lookupCallBundle = m_page2.getLocationBundle(TYPE_LOOKUPCALL, true, true);
       if (lookupCallBundle != null) {

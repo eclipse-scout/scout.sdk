@@ -137,8 +137,7 @@ public abstract class AbstractNlsProject implements INlsProject {
   }
 
   @Override
-  public IStatus removeEntries(INlsEntry[] entries) {
-    NullProgressMonitor m = new NullProgressMonitor();
+  public IStatus removeEntries(INlsEntry[] entries, IProgressMonitor m) {
     for (ITranslationResource r : getAllTranslationResources()) {
       for (INlsEntry e : entries) {
         IStatus status = r.remove(e.getKey(), m);
@@ -147,7 +146,9 @@ public abstract class AbstractNlsProject implements INlsProject {
           return status;
         }
       }
+      r.commitChanges(m);
     }
+    refresh();
     return Status.OK_STATUS;
   }
 
@@ -293,7 +294,7 @@ public abstract class AbstractNlsProject implements INlsProject {
           return;
         }
         else {
-          multiEvent.addChildEvent(new NlsProjectEvent(this, originalEntry, NlsProjectEvent.TYPE_ENTRY_REMOVEED));
+          multiEvent.addChildEvent(new NlsProjectEvent(this, originalEntry, NlsProjectEvent.TYPE_ENTRY_REMOVED));
           for (Entry<Language, String> e : entry.getAllTranslations().entrySet()) {
             ITranslationResource r = getTranslationResource(e.getKey());
             if (r != null) {
@@ -385,7 +386,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       if (existing.getType() == INlsEntry.TYPE_INHERITED) {
         NlsEntry removedEntry = m_entries.remove(superRow.getKey());
         if (removedEntry != null) {
-          fireNlsProjectEvent(new NlsProjectEvent(this, removedEntry, NlsProjectEvent.TYPE_ENTRY_REMOVEED));
+          fireNlsProjectEvent(new NlsProjectEvent(this, removedEntry, NlsProjectEvent.TYPE_ENTRY_REMOVED));
         }
       }
     }
@@ -561,7 +562,7 @@ public abstract class AbstractNlsProject implements INlsProject {
                   m_entries.put(entry.getKey(), new InheritedNlsEntry(e, this));
                 }
               }
-              removeEvents.put(entry, new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_REMOVEED));
+              removeEvents.put(entry, new NlsProjectEvent(this, entry, NlsProjectEvent.TYPE_ENTRY_REMOVED));
               modifyEvents.remove(entry);
             }
             else {
@@ -604,7 +605,7 @@ public abstract class AbstractNlsProject implements INlsProject {
             handleParentRowAdded(event.getEntry());
             break;
           }
-          case NlsProjectEvent.TYPE_ENTRY_REMOVEED: {
+          case NlsProjectEvent.TYPE_ENTRY_REMOVED: {
             handleParentRowRemoved(event.getEntry());
             break;
           }
