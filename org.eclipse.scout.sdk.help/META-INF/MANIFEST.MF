@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout SDK Help & Intro
+Bundle-SymbolicName: org.eclipse.scout.sdk.help;singleton:=true
+Bundle-Version: 3.8.0.qualifier
+Bundle-Activator: org.eclipse.scout.sdk.help.internal.ScoutSdkHelpActivator
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.ui.intro,
+ org.eclipse.ui.workbench,
+ org.eclipse.scout.sdk.ui,
+ org.eclipse.scout.sdk.util
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Eclipse Scout Project

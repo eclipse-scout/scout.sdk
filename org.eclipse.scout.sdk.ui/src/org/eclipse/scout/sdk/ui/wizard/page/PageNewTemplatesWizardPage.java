@@ -93,10 +93,8 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
           IWizardContainer container = getWizard().getContainer();
           if (container != null) {
             container.showPage(page);
-
           }
         }
-
       }
     });
     ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<introContent>
+	<extensionContent id="scout-introExtension" style="css/style.css" path="overview/@">
+		<group style-id="content-group" id="scout-overviewLink-group" label="Eclipse for Scout Developers">
+			<text>Eclipse Scout is a mature and open framework for modern, service oriented business applications. It substantially boosts developer productivity and is simple to learn.</text>
+			<link label="Eclipse Scout Overview"
+				url="http://wiki.eclipse.org/Scout/Overview"
+				id="scout-overviewLink"
+				style-id="content-link">
+				<text>
+					Read the overview about Eclipse Scout.
+        		</text>
+			</link>
+			<link label="Create new Scout Project"
+				url="http://org.eclipse.ui.intro/runAction?class=org.eclipse.scout.sdk.help.internal.action.CreateNewScoutProjectHandler&amp;pluginId=org.eclipse.scout.sdk.help&amp;standby=true"
+				id="scout-newprojectLink"
+				style-id="content-link">
+				<text>
+					Create a new Scout Project to start developing.
+          		</text>
+			</link>
+		</group>
+	</extensionContent>
+	<extensionContent id="scout-tutIntroExtension" style="css/style.css" name="Eclipse for Scout Developers" path="tutorials/@">
+		<group style-id="content-group" id="scout-tutIntroLink-group" label="Eclipse for Scout Developers">
+			<text>Eclipse Scout is a mature and open framework for modern, service oriented business applications. It substantially boosts developer productivity and is simple to learn.</text>
+			<link label="Scout Tutorials"
+				url="http://wiki.eclipse.org/Scout/Tutorial/3.8"
+				id="scout-tutIntroLink"
+				style-id="content-link">
+				<text>
+					Learn how to be productive using Scout by completing end-to-end tutorials that will guide you along the way.
+        		</text>
+			</link>
+			<link label="Scout HowTo's"
+				url="http://wiki.eclipse.org/Scout/HowTo"
+				id="scout-howtoIntroLink"
+				style-id="content-link">
+				<text>
+					Read about recipes for common Scout tasks.
+        		</text>
+			</link>
+			<link label="Scout Webinar"
+				url="http://live.eclipse.org/node/1020"
+				id="scout-webinarIntroLink"
+				style-id="content-link">
+				<text>
+					Join the Scout team for an overview of the project, the development of a small demo application, Scout key concept (e.g. separation of UI and GUI in Scout to support SWT, Swing and web front ends), and an outlook to current ideas regarding Scout on Eclipse 4.
+        		</text>
+			</link>
+		</group>
+	</extensionContent>
+	<extensionContent id="scout-newIntroExtension" style="css/style.css" name="Eclipse for Scout Developers" path="whatsnew/@">
+		<group style-id="content-group" id="scout-newIntroLink-group" label="Eclipse for Scout Developers">
+			<text>Eclipse Scout is a mature and open framework for modern, service oriented business applications. It substantially boosts developer productivity and is simple to learn.</text>
+			<link label="Eclipse Scout New and Noteworthy "
+				url="http://wiki.eclipse.org/Scout/NewAndNoteworty#Scout_3.8_Overview_.28Juno.29"
+				id="scout-newIntroLink"
+				style-id="content-link">
+				<text>
+					Find out about changes made to Eclipse Scout.
+        		</text>
+			</link>
+		</group>
+	</extensionContent>
+</introContent>

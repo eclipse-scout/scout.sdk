@@ -123,4 +123,11 @@ BSI Business Systems Integration AG - initial API and implementation
          fragment="true"
          unpack="false"/>
 
+   <plugin
+         id="org.eclipse.scout.sdk.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
 </feature>
