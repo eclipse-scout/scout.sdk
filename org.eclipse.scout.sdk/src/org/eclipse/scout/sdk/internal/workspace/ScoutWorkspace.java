@@ -64,7 +64,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     }
     rebuildGraphNoFire(eventCollector);
     eventCollector.addEvent(ScoutWorkspaceEvent.TYPE_WORKSPACE_INITIALIZED, null);
-    fireWorkspaceEvnets(eventCollector.getAllEvents());
+    fireWorkspaceEvents(eventCollector.getAllEvents());
   }
 
   public static ScoutWorkspace getInstance() {
@@ -81,7 +81,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     m_eventListeners.remove(IScoutWorkspaceListener.class, listener);
   }
 
-  private void fireWorkspaceEvnets(ScoutWorkspaceEvent[] events) {
+  private void fireWorkspaceEvents(ScoutWorkspaceEvent[] events) {
     for (ScoutWorkspaceEvent e : events) {
       fireWorkspaceEvent(e);
     }
@@ -248,7 +248,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   public void rebuildGraph() {
     ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
     rebuildGraphNoFire(eventCollector);
-    fireWorkspaceEvnets(eventCollector.getAllEvents());
+    fireWorkspaceEvents(eventCollector.getAllEvents());
   }
 
   // workspace internal
@@ -266,7 +266,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
           boolean result = addProjectNoFire(project, eventCollector);
           if (result) {
             rebuildGraphNoFire(eventCollector);
-            fireWorkspaceEvnets(eventCollector.getAllEvents());
+            fireWorkspaceEvents(eventCollector.getAllEvents());
           }
           return result;
         }
@@ -307,7 +307,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     ScoutBundle bundle = m_bundleGraph.removeWorkspaceProject(bundleId, eventCollector);
     if (bundle != null) {
       rebuildGraphNoFire(eventCollector);
-      fireWorkspaceEvnets(eventCollector.getAllEvents());
+      fireWorkspaceEvents(eventCollector.getAllEvents());
       return true;
     }
     return false;
