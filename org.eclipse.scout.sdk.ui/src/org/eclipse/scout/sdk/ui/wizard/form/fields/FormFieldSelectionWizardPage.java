@@ -85,7 +85,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     elements.add(new ISeparator() {
     });
     // entries
-    IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IFormField));
+    IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
     IType[] abstractFormFields = formFieldHierarchy.getAllSubtypes(iFormField, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()));
     for (IType formField : abstractFormFields) {
       IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1);
