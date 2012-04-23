@@ -30,6 +30,7 @@ import @@BUNDLE_SWT_NAME@@.views.DetailView;
 import @@BUNDLE_SWT_NAME@@.views.EastView;
 import @@BUNDLE_SWT_NAME@@.views.OutlineView;
 import @@BUNDLE_SWT_NAME@@.views.TableView;
+import @@BUNDLE_SWT_NAME@@.views.SearchView;
 
 public class SwtEnvironment extends AbstractSwtEnvironment{
 
@@ -40,6 +41,7 @@ public class SwtEnvironment extends AbstractSwtEnvironment{
     registerPart(IForm.VIEW_ID_PAGE_DETAIL, DetailView.class.getName());
     registerPart(IForm.VIEW_ID_CENTER, CenterView.class.getName());
     registerPart(IForm.VIEW_ID_PAGE_TABLE, TableView.class.getName());
+    registerPart(IForm.VIEW_ID_PAGE_SEARCH, SearchView.class.getName());
     registerPart(IForm.VIEW_ID_E, EastView.class.getName());
     registerPart(IForm.EDITOR_ID, ScoutEditorPart.class.getName());
 

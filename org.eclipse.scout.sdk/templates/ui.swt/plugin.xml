@@ -39,6 +39,13 @@
                icon="resources/icons/eclipse_scout.gif"
                restorable="true">
          </view>
+         <view
+               class="@@BUNDLE_SWT_NAME@@.views.SearchView"
+               id="@@BUNDLE_SWT_NAME@@.views.SearchView"
+               name="Search View"
+               icon="resources/icons/eclipse_scout.gif"
+               restorable="true">
+         </view>
      	 <view
             category="org.eclipse.ui"
             class="org.eclipse.ui.ExtensionFactory:progressView"
@@ -46,15 +53,15 @@
             id="org.eclipse.ui.views.ProgressView"
             name="Progress View"
             restorable="true">
-      </view>
-       <view
+         </view>
+         <view
              allowMultiple="true"
              class="@@BUNDLE_SWT_NAME@@.views.EastView"
              icon="resources/icons/eclipse_scout.gif"
              id="@@BUNDLE_SWT_NAME@@.views.EastView"
              name="East View"
              restorable="true">
-       </view>
+         </view>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
@@ -136,6 +143,15 @@
                    id="@@BUNDLE_SWT_NAME@@.views.DetailView"
                    minimized="false"
                    ratio="0.25"
+                   relationship="bottom"
+                   relative="@@BUNDLE_SWT_NAME@@.views.TableView"
+                   visible="false">
+             </view>
+             <view
+                   closeable="false"
+                   id="@@BUNDLE_SWT_NAME@@.views.SearchView"
+                   minimized="false"
+                   ratio="0.66"
                    relationship="bottom"
                    relative="@@BUNDLE_SWT_NAME@@.views.TableView"
                    visible="false">

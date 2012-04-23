@@ -74,6 +74,7 @@ public class FillUiSwtPluginOperation extends AbstractScoutProjectNewOperation {
     new InstallJavaFileOperation("templates/ui.swt/src/views/EastView.java", destPathPref + "views/EastView.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/views/OutlineView.java", destPathPref + "views/OutlineView.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/views/TableView.java", destPathPref + "views/TableView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/SearchView.java", destPathPref + "views/SearchView.java", m_project, props).run(monitor, workingCopyManager);
 
     // application
     new InstallJavaFileOperation("templates/ui.swt/src/application/Application.java", destPathPref + "application/Application.java", m_project, props).run(monitor, workingCopyManager);
