@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsProposalDescriptionProvid
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextSelectionHandler;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
@@ -46,7 +47,6 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   private ProposalTextField m_proposalField;
   private INlsEntry m_currentSourceTuple;
-  private INlsEntry m_defaultTuple;
   private INlsProject m_nlsProject;
   private OptimisticLock storeValueLock = new OptimisticLock();
 
@@ -98,17 +98,13 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
       m_proposalField.setEnabled(getNlsProject() != null);
     }
 
-    String defaultKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
-    if (defaultKey != null) {
-      m_defaultTuple = getNlsProject().getEntry(defaultKey);
-    }
     String currentSourceValueKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeValue());
     try {
       storeValueLock.acquire();
       if (currentSourceValueKey != null) {
         m_currentSourceTuple = getNlsProject().getEntry(currentSourceValueKey);
         if (m_currentSourceTuple == null) {
-          throw new CoreException(new ScoutStatus("could not parse nls presenter of : " + getMethod().getMethodName()));
+          throw new MethodErrorPresenterException(new ScoutStatus("Key '" + currentSourceValueKey + "' not found!"));
         }
         else {
           m_proposalField.acceptProposal(m_currentSourceTuple);
@@ -185,21 +181,31 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
    * @param event
    */
   protected void handleProposalAccepted(ContentProposalEvent event) {
-    Object proposal = event.proposal;
-    if (proposal == null) {
-      m_proposalField.setText("");
-      storeNlsText(null);
+    try {
+      Object proposal = event.proposal;
+      if (proposal == null) {
+        m_proposalField.setText("");
+        storeNlsText(null);
+      }
+      else {
+        storeNlsText((INlsEntry) proposal);
+      }
     }
-    else {
-      storeNlsText((INlsEntry) proposal);
+    catch (CoreException e) {
+      ScoutSdkUi.logError(e);
     }
   }
 
-  protected synchronized void storeNlsText(final INlsEntry proposal) {
+  protected synchronized void storeNlsText(final INlsEntry proposal) throws CoreException {
     try {
       if (storeValueLock.acquire()) {
         IOperation op = null;
-        if (UiUtility.equals(m_defaultTuple, proposal)) {
+        INlsEntry defaultTuple = null;
+        String defaultKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
+        if (defaultKey != null) {
+          defaultTuple = getNlsProject().getEntry(defaultKey);
+        }
+        if (UiUtility.equals(defaultTuple, proposal)) {
           if (getMethod().isImplemented()) {
             op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
           }

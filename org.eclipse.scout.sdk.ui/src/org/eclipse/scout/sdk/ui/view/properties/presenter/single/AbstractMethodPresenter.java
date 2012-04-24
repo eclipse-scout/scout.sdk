@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.JFaceResources;
@@ -94,11 +95,6 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   }
 
   protected void create(Composite parent) {
-    m_errorContent = new MethodErrorPresenterContent(parent, getToolkit());
-    GridData errorLayoutData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL);
-    errorLayoutData.exclude = true;
-    m_errorContent.setLayoutData(errorLayoutData);
-
     // layout parent
     GridLayout glayout = new GridLayout(1, true);
     glayout.horizontalSpacing = 0;
@@ -180,19 +176,18 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
       m_configurationMethod = configurationMethod;
       try {
         init(configurationMethod);
-        m_body.setVisible(true);
-        m_errorContent.setVisible(false);
-
-        ((GridData) m_errorContent.getLayoutData()).exclude = true;
-        ((GridData) m_body.getLayoutData()).exclude = false;
+        setErrorPresenterVisible(false);
       }
       catch (CoreException e) {
+        if (m_errorContent == null) {
+          m_errorContent = new MethodErrorPresenterContent(getContainer(), getToolkit());
+          m_errorContent.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
+        }
+        if (e instanceof MethodErrorPresenterException) {
+          m_errorContent.setPresenterText(e.getMessage());
+        }
         m_errorContent.setMethod(configurationMethod);
-        m_body.setVisible(false);
-        m_errorContent.setVisible(true);
-
-        ((GridData) m_errorContent.getLayoutData()).exclude = false;
-        ((GridData) m_body.getLayoutData()).exclude = true;
+        setErrorPresenterVisible(true);
       }
       ((GridData) m_deleteButton.getLayoutData()).exclude = !configurationMethod.isImplemented();
       m_deleteButton.setVisible(configurationMethod.isImplemented());
@@ -201,6 +196,16 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     finally {
       getContainer().setRedraw(true);
       getContainer().layout(true, true);
+    }
+  }
+
+  private void setErrorPresenterVisible(boolean visible) {
+    m_body.setVisible(!visible);
+    ((GridData) m_body.getLayoutData()).exclude = visible;
+
+    if (m_errorContent != null) {
+      m_errorContent.setVisible(visible);
+      ((GridData) m_errorContent.getLayoutData()).exclude = !visible;
     }
   }
 
@@ -225,7 +230,9 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   @Override
   public void setEnabled(boolean enabled) {
     if (!isDisposed()) {
-      m_errorContent.setEnabled(enabled);
+      if (m_errorContent != null) {
+        m_errorContent.setEnabled(enabled);
+      }
       m_deleteButton.setEnabled(enabled);
     }
   }
@@ -233,7 +240,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   @Override
   public boolean isEnabled() {
     if (!isDisposed()) {
-      return m_errorContent.isEnabled();
+      return m_deleteButton.isEnabled();
     }
     return false;
   }
@@ -263,6 +270,14 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     catch (JavaModelException e) {
       ScoutSdkUi.logError(e);
       return null;
+    }
+  }
+
+  protected static class MethodErrorPresenterException extends CoreException {
+    private static final long serialVersionUID = 1L;
+
+    public MethodErrorPresenterException(IStatus status) {
+      super(status);
     }
   }
 }

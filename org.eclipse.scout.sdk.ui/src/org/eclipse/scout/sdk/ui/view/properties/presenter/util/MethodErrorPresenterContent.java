@@ -51,12 +51,13 @@ public class MethodErrorPresenterContent extends Composite {
   private Label m_statusIcon;
   private ImageHyperlink m_deleteButton;
   private ConfigurationMethod m_configurationMethod;
-
+  private String m_presenterText;
   private CustomTooltip m_customTooltip;
 
   public MethodErrorPresenterContent(Composite parent, FormToolkit toolkit) {
     super(parent, SWT.NONE);
     m_toolkit = toolkit;
+    setPresenterText(Texts.get("CustomImplementation"));
     createContent(this);
   }
 
@@ -141,7 +142,7 @@ public class MethodErrorPresenterContent extends Composite {
       ScoutSdkUi.logWarning("could not create tooltip for '" + method.getMethodName() + "'", e1);
     }
     m_deleteButton.setEnabled(method.isImplemented());
-    setStatus(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("CustomImplementation")));
+    setStatus(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, getPresenterText()));
     m_deleteButton.setToolTipText(Texts.get("RemoveXinY", getMethod().getMethodName(), getMethod().getType().getElementName()));
   }
 
@@ -180,7 +181,6 @@ public class MethodErrorPresenterContent extends Composite {
         if (reg != null) {
           textEditor.setHighlightRange(reg.getOffset(), reg.getLength(), true);
         }
-
       }
     }
     catch (Exception e) {
@@ -203,5 +203,13 @@ public class MethodErrorPresenterContent extends Composite {
     else {
       return PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry().get(symbolicName);
     }
+  }
+
+  public void setPresenterText(String presenterText) {
+    m_presenterText = presenterText;
+  }
+
+  public String getPresenterText() {
+    return m_presenterText;
   }
 }
