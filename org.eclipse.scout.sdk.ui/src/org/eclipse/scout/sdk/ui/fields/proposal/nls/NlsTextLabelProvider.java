@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal.nls;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -27,6 +29,9 @@ import org.eclipse.swt.graphics.Image;
 public class NlsTextLabelProvider extends SearchRangeStyledLabelProvider {
 
   private final INlsProject m_nlsProject;
+
+  private final static Pattern REGEX_CR = Pattern.compile("\r", Pattern.LITERAL);
+  private final static Pattern REGEX_LF = Pattern.compile("\n", Pattern.LITERAL);
 
   public NlsTextLabelProvider(INlsProject nlsProject) {
     m_nlsProject = nlsProject;
@@ -46,6 +51,10 @@ public class NlsTextLabelProvider extends SearchRangeStyledLabelProvider {
       if (StringUtility.isNullOrEmpty(text)) {
         text = entry.getKey();
       }
+
+      text = REGEX_CR.matcher(text).replaceAll("");
+      text = REGEX_LF.matcher(text).replaceAll(" ");
+
       return text;
     }
     throw new IllegalArgumentException("expected instanceof INlsEntry, got '" + element + "'");
