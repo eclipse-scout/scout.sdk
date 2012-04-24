@@ -26,6 +26,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -190,6 +191,16 @@ public class FileSelectionField extends TextField {
 
   public void removeProductSelectionListener(IFileSelectionListener listener) {
     m_eventListeners.remove(IFileSelectionListener.class, listener);
+  }
+
+  @Override
+  public void addTraverseListener(TraverseListener listener) {
+    getTextComponent().addTraverseListener(listener);
+  }
+
+  @Override
+  public void removeTraverseListener(TraverseListener listener) {
+    getTextComponent().removeTraverseListener(listener);
   }
 
   private void fireFileSelected(File file) {

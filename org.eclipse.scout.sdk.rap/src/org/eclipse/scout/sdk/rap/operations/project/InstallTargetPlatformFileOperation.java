@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class InstallTargetPlatformFileOperation extends InstallTextFileOperation {
   public static final String TARGET_FILE_NAME = "ScoutRAP.target";
   private static final String VARIABLE_RAP_LOCATION = "RAP_LOCATION";
-  private static final String ECLIPSE_HOME_VAR = "${eclipse_home}";
+  public static final String ECLIPSE_HOME_VAR = "${eclipse_home}";
 
   private final ArrayList<ITargetEntryContributor> m_entryList;
   private final File m_installLocation;

@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.rap.RapRuntimeClasses;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation.TARGET_STRATEGY;
+import org.eclipse.scout.sdk.rap.operations.project.InstallTargetPlatformFileOperation;
 import org.eclipse.scout.sdk.rap.ui.internal.ScoutSdkRapUI;
 import org.eclipse.scout.sdk.ui.fields.FileSelectionField;
 import org.eclipse.scout.sdk.ui.fields.IFileSelectionListener;
@@ -40,6 +41,8 @@ import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.TraverseEvent;
+import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -186,7 +189,19 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     m_extractTargetLocationField.setLabelText(Texts.get("RAPTargetLocation"));
     m_extractTargetLocationField.setFolderMode(true);
     m_extractTargetLocationField.setFile(new File(getExtractTargetFolder()));
-
+    m_extractTargetLocationField.addTraverseListener(new TraverseListener() {
+      @Override
+      public void keyTraversed(TraverseEvent e) {
+        if (e.detail == SWT.TRAVERSE_TAB_NEXT || e.detail == SWT.TRAVERSE_ARROW_NEXT) {
+          File f = getFileFromInpuString(m_extractTargetLocationField.getText());
+          File existing = new File(getExtractTargetFolder());
+          if (f != null && !f.equals(existing)) {
+            setExtractTargetFolderInternal(f.getAbsolutePath());
+            pingStateChanging();
+          }
+        }
+      }
+    });
     m_extractTargetLocationField.addProductSelectionListener(new IFileSelectionListener() {
       @Override
       public void fileSelected(File file) {
@@ -233,6 +248,20 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     return group;
   }
 
+  private File getFileFromInpuString(String input) {
+    try {
+      if (StringUtility.hasText(input)) {
+        if (input.contains(InstallTargetPlatformFileOperation.ECLIPSE_HOME_VAR)) {
+          input = input.replace(InstallTargetPlatformFileOperation.ECLIPSE_HOME_VAR, ResourcesUtility.getEclipseInstallLocation().getAbsolutePath());
+        }
+        return new File(input);
+      }
+    }
+    catch (Exception e) {
+    }
+    return new File("");
+  }
+
   private Control createLocalTargetGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     group.setText(Texts.get("LocalRAPTarget"));
@@ -240,7 +269,19 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     m_localTargetLocationField.setLabelText(Texts.get("RAPTargetLocation"));
     m_localTargetLocationField.setFolderMode(true);
     m_localTargetLocationField.setFile(new File(getLocalTargetFolder()));
-
+    m_localTargetLocationField.addTraverseListener(new TraverseListener() {
+      @Override
+      public void keyTraversed(TraverseEvent e) {
+        if (e.detail == SWT.TRAVERSE_TAB_NEXT || e.detail == SWT.TRAVERSE_ARROW_NEXT) {
+          File f = getFileFromInpuString(m_localTargetLocationField.getText());
+          File existing = new File(getLocalTargetFolder());
+          if (f != null && !f.equals(existing)) {
+            setLocalTargetFolderInternal(f.getAbsolutePath());
+            pingStateChanging();
+          }
+        }
+      }
+    });
     m_localTargetLocationField.addProductSelectionListener(new IFileSelectionListener() {
       @Override
       public void fileSelected(File file) {
