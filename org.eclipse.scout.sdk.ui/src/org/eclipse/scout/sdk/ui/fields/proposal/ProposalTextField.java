@@ -463,7 +463,6 @@ public class ProposalTextField extends TextField {
                 closePopup();
               }
             }
-
           });
           break;
         } // end FocusOut

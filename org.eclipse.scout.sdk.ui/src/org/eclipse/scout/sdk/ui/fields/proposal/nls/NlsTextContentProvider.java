@@ -22,10 +22,8 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IDialogSettingsProvider;
-import org.eclipse.scout.sdk.ui.fields.proposal.ISeparatorProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
@@ -36,17 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
  */
 public class NlsTextContentProvider extends ContentProposalProvider implements IDialogSettingsProvider {
 
-  public static final ISeparatorProposal NLS_NEW_PROPOSAL = new ISeparatorProposal() {
-    @Override
-    public String getLabel() {
-      return Texts.get("Nls_newProposal_name");
-    }
-
-    @Override
-    public org.eclipse.swt.graphics.Image getImage() {
-      return ScoutSdkUi.getImage(ScoutSdkUi.TextAdd);
-    }
-  };
+  public static final Object NLS_NEW_PROPOSAL = new Object();
 
   private NlsTextLabelProvider m_labelProvider;
 
