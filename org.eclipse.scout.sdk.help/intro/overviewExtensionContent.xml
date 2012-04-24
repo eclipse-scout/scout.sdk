@@ -40,14 +40,6 @@
 					Read about recipes for common Scout tasks.
         		</text>
 			</link>
-			<link label="Scout Webinar"
-				url="http://live.eclipse.org/node/1020"
-				id="scout-webinarIntroLink"
-				style-id="content-link">
-				<text>
-					Join the Scout team for an overview of the project, the development of a small demo application, Scout key concept (e.g. separation of UI and GUI in Scout to support SWT, Swing and web front ends), and an outlook to current ideas regarding Scout on Eclipse 4.
-        		</text>
-			</link>
 		</group>
 	</extensionContent>
 	<extensionContent id="scout-newIntroExtension" style="css/style.css" name="Eclipse for Scout Developers" path="whatsnew/@">
