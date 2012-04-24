@@ -60,7 +60,7 @@ public class Technology implements Comparable<Technology> {
   private void fireSelectionChanged(boolean newSelection) {
     for (ITechnologyListener l : m_eventListeners.getListeners(ITechnologyListener.class)) {
       try {
-        l.handleSelectionChanged(newSelection);
+        l.selectionChangeCompleted(newSelection);
       }
       catch (Exception e) {
         ScoutSdkUi.logError("error during listener notification.", e);
@@ -303,15 +303,14 @@ public class Technology implements Comparable<Technology> {
           }
         }
       }
-      catch (Throwable t) {
-        ScoutSdkUi.logError(t);
+      finally {
+        ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
+          @Override
+          public void run() {
+            fireSelectionChanged(m_newSelection);
+          }
+        });
       }
-      ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          fireSelectionChanged(m_newSelection);
-        }
-      });
     }
 
     @Override

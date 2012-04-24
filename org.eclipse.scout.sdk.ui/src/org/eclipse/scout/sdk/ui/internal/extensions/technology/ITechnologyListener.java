@@ -19,5 +19,5 @@ import java.util.EventListener;
  * @since 3.8.0 19.02.2012
  */
 public interface ITechnologyListener extends EventListener {
-  void handleSelectionChanged(boolean newSelection);
+  void selectionChangeCompleted(boolean newSelection);
 }
