@@ -59,6 +59,6 @@ public class SwingApplication extends AbstractSwingApplication{
 
   @Override
   protected IClientSession getClientSession() {
-    return SERVICES.getService(IClientSessionRegistryService.class).getClientSession(ClientSession.class);
+    return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(ClientSession.class, initUserAgent());
   }
 }
