@@ -28,7 +28,7 @@ import org.eclipse.search.ui.text.Match;
 public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor {
   private Map<String, List<Match>> m_matches;
   private EventListenerList m_eventListeners = new EventListenerList();
-  private static final Pattern PATTERN = Pattern.compile("\\s*[A-Za-z0-9_]+\\s*\\.\\s*get\\s*\\(\\s*\\\"([^\\\"]*)\\\"\\s*[\\)\\,\\s]{1}", Pattern.MULTILINE);
+  private static final Pattern PATTERN = Pattern.compile("\\s*[A-Za-z0-9_]+\\s*\\.\\s*get\\s*\\(\\s*[A-Za-z0-9_\\s,]*\\\"([^\\\"]*)\\\"\\s*[\\)\\,\\s]{1}", Pattern.MULTILINE);
 
   /**
    * @param project
