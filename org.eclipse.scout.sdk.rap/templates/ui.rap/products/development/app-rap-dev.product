@@ -88,7 +88,6 @@
       <plugin id="org.eclipse.scout.rt.client"/>
       <plugin id="org.eclipse.scout.rt.shared"/>
       <plugin id="org.eclipse.scout.rt.ui.rap"/>
-      <plugin id="org.eclipse.scout.rt.ui.rap.core"/>
       <plugin id="org.eclipse.scout.rt.ui.svg.calendar"/>
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.scout.svg.client"/>
