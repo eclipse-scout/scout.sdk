@@ -313,7 +313,11 @@ public class ProductLaunchPresenter extends AbstractPresenter {
           String doNotShowAgainString = store.getString(MAC_OS_X_SWING_WARNING_MESSAGE_KEY);
           boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
           if (!doNotShowAgain) {
-            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwingWarningTitle"), Texts.get("MacOsXSwingWarningMessage"),
+            String x64AddMessage = "";
+            if (Platform.ARCH_X86_64.equals(Platform.getOSArch())) {
+              x64AddMessage = "\n    - add '-d32'";
+            }
+            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwingWarningTitle"), Texts.get("MacOsXSwingWarningMessage", x64AddMessage),
                 Texts.get("DoNotShowAgain"), false, store, MAC_OS_X_SWING_WARNING_MESSAGE_KEY);
           }
         }
