@@ -130,7 +130,7 @@ public class FormDataAutoUpdater {
   private class P_UpdateFormDataJob extends Job {
 
     public P_UpdateFormDataJob() {
-      super("Update form data...");
+      super("Updating form data");
       setPriority(Job.DECORATE);
     }
 
@@ -147,6 +147,7 @@ public class FormDataAutoUpdater {
       }
       int totalCompilationUnits = compilationUnits.length;
       if (totalCompilationUnits > 0) {
+        monitor.beginTask(getName(), totalCompilationUnits);
         for (int i = 0; i < totalCompilationUnits; i++) {
           if (monitor.isCanceled()) {
             return Status.CANCEL_STATUS;
@@ -172,10 +173,10 @@ public class FormDataAutoUpdater {
               ScoutSdk.logWarning("could not determ type for form data update '" + icu.getElementName() + "'.", e);
             }
           }
+          monitor.worked(1);
         }
       }
       return Status.OK_STATUS;
     }
   }
-
 }
