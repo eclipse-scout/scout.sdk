@@ -41,7 +41,6 @@ BSI Business Systems Integration AG - initial API and implementation
       <import feature="org.eclipse.jdt" version="3.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.scout.rt.feature" version="3.5.5" match="greaterOrEqual"/>
       <import feature="org.eclipse.scout.rt.feature.source" version="3.5.5" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jst.web_ui.feature" version="3.4.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
