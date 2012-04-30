@@ -280,6 +280,7 @@ public class Technology implements Comparable<Technology> {
           }
           catch (CoreException e) {
             ScoutSdkUi.logError("Error while preparing technology changes.", e);
+            return; // cancel further processing
           }
         }
 
@@ -290,6 +291,7 @@ public class Technology implements Comparable<Technology> {
           }
           catch (CoreException e) {
             ScoutSdkUi.logError("Error while applying technology changes.", e);
+            return; // cancel further processing
           }
         }
 
@@ -300,6 +302,7 @@ public class Technology implements Comparable<Technology> {
           }
           catch (CoreException e) {
             ScoutSdkUi.logError("Error while finishing technology changes.", e);
+            return; // cancel further processing
           }
         }
       }
