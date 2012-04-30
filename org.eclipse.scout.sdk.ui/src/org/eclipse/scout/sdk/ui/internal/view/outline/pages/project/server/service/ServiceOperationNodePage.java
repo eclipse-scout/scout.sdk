@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -36,8 +37,22 @@ public class ServiceOperationNodePage extends AbstractPage {
     setParent(parent);
     m_interfaceOpMethod = method;
     m_implementationOpMethod = implementationMethod;
-    setName(m_implementationOpMethod.getElementName());
+    setName(getMethodDisplayName(m_implementationOpMethod));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperation));
+  }
+
+  private static String getMethodDisplayName(IMethod m) {
+    StringBuilder displayName = new StringBuilder(m.getElementName());
+    displayName.append("(");
+    String[] paramTypes = m.getParameterTypes();
+    for (int i = 0; i < paramTypes.length; i++) {
+      displayName.append(Signature.getSignatureSimpleName(paramTypes[i]));
+      if (i < paramTypes.length - 1) {
+        displayName.append(", ");
+      }
+    }
+    displayName.append(")");
+    return displayName.toString();
   }
 
   @Override

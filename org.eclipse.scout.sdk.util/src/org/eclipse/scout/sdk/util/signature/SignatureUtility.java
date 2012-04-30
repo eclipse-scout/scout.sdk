@@ -395,8 +395,7 @@ public final class SignatureUtility {
    * @throws JavaModelException
    */
   public static String getMethodIdentifier(IMethod method) throws JavaModelException {
-    StringBuilder methodIdBuilder = new StringBuilder();
-    methodIdBuilder.append(method.getElementName());
+    StringBuilder methodIdBuilder = new StringBuilder(method.getElementName());
     methodIdBuilder.append("(");
     String[] resolvedParamSignatures = getMethodParameterSignatureResolved(method);
     for (int i = 0; i < resolvedParamSignatures.length; i++) {

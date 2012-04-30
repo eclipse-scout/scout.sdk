@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service;
 
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -26,6 +27,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodComparators;
 import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -77,15 +79,20 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     }
     IMethod[] serviceMethods = TypeUtility.getMethods(getType(), MethodFilters.getFlagsFilter(Flags.AccPublic), MethodComparators.getNameComparator());
 
-    TreeMap<String, IMethod> interfaceMethodsMap = new TreeMap<String, IMethod>();
-    if (TypeUtility.exists(getInterfaceType())) {
-      for (IMethod m : TypeUtility.getMethods(getType(), MethodFilters.getFlagsFilter(Flags.AccPublic | Flags.AccDefault), MethodComparators.getNameComparator())) {
-        interfaceMethodsMap.put(m.getElementName(), m);
+    try {
+      TreeMap<String, IMethod> interfaceMethodsMap = new TreeMap<String, IMethod>();
+      if (TypeUtility.exists(getInterfaceType())) {
+        for (IMethod m : TypeUtility.getMethods(getInterfaceType(), MethodFilters.getFlagsFilter(Flags.AccPublic | Flags.AccDefault), MethodComparators.getNameComparator())) {
+          interfaceMethodsMap.put(SignatureUtility.getMethodIdentifier(m), m);
+        }
+      }
+
+      for (IMethod implMethod : serviceMethods) {
+        new ServiceOperationNodePage(this, interfaceMethodsMap.get(SignatureUtility.getMethodIdentifier(implMethod)), implMethod);
       }
     }
-
-    for (IMethod implMethod : serviceMethods) {
-      new ServiceOperationNodePage(this, interfaceMethodsMap.get(implMethod.getElementName()), implMethod);
+    catch (CoreException e) {
+      ScoutSdkUi.logError(e);
     }
   }
 
