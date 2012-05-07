@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.project.template.ProjectTemp
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -99,6 +100,12 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
       // set which template has been selected
       properties.setProperty(IScoutProjectNewOperation.PROP_SELECTED_TEMPLATE_NAME, m_selectedTemplate.getTemplate().getId());
     }
+  }
+
+  @Override
+  public void performHelp() {
+    //TODO: remove external link and use eclipse help instead
+    ResourceUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.8/Create_a_new_project#Step_2");
   }
 
   @Override

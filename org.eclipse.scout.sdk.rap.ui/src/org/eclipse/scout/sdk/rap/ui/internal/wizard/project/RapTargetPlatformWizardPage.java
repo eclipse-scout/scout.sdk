@@ -325,6 +325,12 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     }
   }
 
+  @Override
+  public void performHelp() {
+    //TODO: remove external link and use eclipse help instead
+    ResourceUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.8/Create_a_new_project#Step_3_.28Optional.29");
+  }
+
   private Version getRemotePlatformVersion() {
     try {
       String version = P2Utility.getLatestVersion(FillUiRapPluginOperation.ECLIPSE_PLATFORM_FEATURE,

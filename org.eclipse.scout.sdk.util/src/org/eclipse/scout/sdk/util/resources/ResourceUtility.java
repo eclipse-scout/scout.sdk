@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.resources;
 
+import java.awt.Desktop;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.net.URI;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -41,6 +43,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 
 /**
@@ -77,6 +80,26 @@ public final class ResourceUtility {
           collectResourcesRec(child, collector, filter);
         }
       }
+    }
+  }
+
+  /**
+   * Tries to open the given url in the system default browser.
+   * 
+   * @param url
+   *          the url to show
+   */
+  public static void showUrlInBrowser(String url) {
+    try {
+      if (Desktop.isDesktopSupported()) {
+        Desktop d = Desktop.getDesktop();
+        if (d.isSupported(Desktop.Action.BROWSE)) {
+          d.browse(new URI(url));
+        }
+      }
+    }
+    catch (Throwable e) {
+      SdkUtilActivator.logWarning("Could not open web browser. ", e);
     }
   }
 
