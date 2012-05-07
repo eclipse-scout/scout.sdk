@@ -27,9 +27,9 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -129,7 +129,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
         try {
           ICompilationUnit icu = method.getDeclaringType().getCompilationUnit();
           Document doc = new Document(icu.getSource());
-          String nl = ResourcesUtility.getLineSeparator(doc);
+          String nl = ResourceUtility.getLineSeparator(doc);
           if (source.contains(replacement + nl)) {
             source = source.replace(replacement + nl, "");
           }

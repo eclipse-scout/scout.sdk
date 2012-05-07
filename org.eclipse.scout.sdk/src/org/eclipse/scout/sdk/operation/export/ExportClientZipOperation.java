@@ -31,8 +31,8 @@ import org.eclipse.pde.internal.core.exports.ProductExportOperation;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -126,7 +126,7 @@ public class ExportClientZipOperation implements IOperation {
 
       ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(m_clientZipFile));
       File baseDir = new File(m_tempBuildDir.getAbsolutePath(), "client/buildDir/" + getZipName());
-      ResourcesUtility.addFolderToZip(baseDir, zipOut);
+      ResourceUtility.addFolderToZip(baseDir, zipOut);
       zipOut.flush();
       zipOut.close();
     }

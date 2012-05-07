@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
@@ -45,7 +45,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
   private static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
 
   public SourceBuilderWithProperties(final IType type) {
-    super(ResourcesUtility.getLineSeparator(type.getOpenable()));
+    super(ResourceUtility.getLineSeparator(type.getOpenable()));
     visitProperties(type);
     addValidationRules(type);
   }

@@ -31,8 +31,8 @@ import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
 import org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile.AbstractNlsFile;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOperation {
 
@@ -123,7 +123,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     String filename = filePrefix + lang + ".properties";
     IFile file = folder.getFile(filename);
     if (!file.exists()) {
-      file.create(new ByteArrayInputStream(getDefaultMessagesFileContent(ResourcesUtility.getLineSeparator(folder))), true, monitor);
+      file.create(new ByteArrayInputStream(getDefaultMessagesFileContent(ResourceUtility.getLineSeparator(folder))), true, monitor);
     }
   }
 

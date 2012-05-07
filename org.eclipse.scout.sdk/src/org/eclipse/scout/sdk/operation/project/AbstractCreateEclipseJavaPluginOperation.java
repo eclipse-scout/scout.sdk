@@ -22,7 +22,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -67,12 +67,12 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
     // src folder
     IFolder folder = project.getFolder("src");
     if (!folder.exists()) {
-      ResourcesUtility.mkdirs(folder, monitor);
+      ResourceUtility.mkdirs(folder, monitor);
     }
     // resources folder
     folder = project.getFolder("resources");
     if (isCreateResourcesFolder() && !folder.exists()) {
-      ResourcesUtility.mkdirs(folder, monitor);
+      ResourceUtility.mkdirs(folder, monitor);
     }
 
     m_javaProject = JavaCore.create(project);

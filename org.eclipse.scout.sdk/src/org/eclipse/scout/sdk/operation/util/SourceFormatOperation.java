@@ -23,8 +23,8 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
@@ -88,7 +88,7 @@ public class SourceFormatOperation implements IOperation {
       // XXX check which code is calling this with a type source
       CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getJavaProject().getOptions(false));
       int kind = CodeFormatter.F_INCLUDE_COMMENTS | CodeFormatter.K_UNKNOWN;
-      TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent, ResourcesUtility.getLineSeparator(getDocument()));
+      TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent, ResourceUtility.getLineSeparator(getDocument()));
       if (te != null) {
         te.apply(getDocument());
       }

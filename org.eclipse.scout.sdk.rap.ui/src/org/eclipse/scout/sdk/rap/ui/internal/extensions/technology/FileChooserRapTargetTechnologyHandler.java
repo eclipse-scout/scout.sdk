@@ -35,8 +35,8 @@ import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -130,7 +130,7 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
 
   private boolean containsIncubator(IFile targetFile) {
     try {
-      String content = ResourcesUtility.getContent(targetFile);
+      String content = ResourceUtility.getContent(targetFile);
       return content.contains(SCOUT_INCUBATOR_FEATURE_NAME) && content.contains(RAP_INCUBATOR_FEATURE_NAME);
     }
     catch (CoreException e) {

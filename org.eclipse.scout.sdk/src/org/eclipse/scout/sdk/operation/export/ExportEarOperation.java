@@ -26,8 +26,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class ExportEarOperation implements IOperation {
@@ -110,7 +110,7 @@ public class ExportEarOperation implements IOperation {
     ZipOutputStream zipOut = null;
     try {
       zipOut = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(destinationFile)));
-      ResourcesUtility.addFolderToZip(m_tempBuildDir, zipOut);
+      ResourceUtility.addFolderToZip(m_tempBuildDir, zipOut);
       zipOut.flush();
     }
     finally {
@@ -177,7 +177,7 @@ public class ExportEarOperation implements IOperation {
         destFile.getParentFile().mkdirs();
       }
       out = new FileOutputStream(destFile);
-      ResourcesUtility.copy(in, out);
+      ResourceUtility.copy(in, out);
       return destFile;
     }
     finally {

@@ -18,8 +18,8 @@ import org.eclipse.scout.sdk.ui.internal.extensions.export.ExportScoutProjectEnt
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizardPage;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
@@ -71,7 +71,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
         // do not pack the artifacts into an ear -> just move them to the destination
         for (File artifact : artifacts) {
           try {
-            ResourcesUtility.moveFile(artifact, m_page1.getTargetDirectory());
+            ResourceUtility.moveFile(artifact, m_page1.getTargetDirectory());
           }
           catch (IOException e) {
             throw new CoreException(new ScoutStatus(e));

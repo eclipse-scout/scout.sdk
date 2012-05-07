@@ -87,8 +87,8 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -206,7 +206,7 @@ public final class JaxWsSdkUtility {
       try {
         // create the folders if they do not exist yet
         if (file.getParent() instanceof IFolder) {
-          ResourcesUtility.mkdirs(file.getParent(), new NullProgressMonitor());
+          ResourceUtility.mkdirs(file.getParent(), new NullProgressMonitor());
         }
         // the file does not already exist. Therefore create an empty file
         InputStream inputStream = new ByteArrayInputStream(new byte[0]);
@@ -250,7 +250,7 @@ public final class JaxWsSdkUtility {
     if (!folder.exists() && autoCreate) {
       try {
         // create the folders if they do not exist yet
-        ResourcesUtility.mkdirs(folder, new NullProgressMonitor());
+        ResourceUtility.mkdirs(folder, new NullProgressMonitor());
       }
       catch (CoreException e) {
         throw new RuntimeException("An unexpected error occured while creating the report design file", e);

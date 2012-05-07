@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.TextEdit;
 
@@ -45,7 +45,7 @@ public class JavaDoc {
   }
 
   public TextEdit getEdit() {
-    String NL = ResourcesUtility.getLineSeparator(getMember().getCompilationUnit());
+    String NL = ResourceUtility.getLineSeparator(getMember().getCompilationUnit());
     StringBuilder javaDoc = new StringBuilder();
     String[] newLines = getNewLines();
     if (newLines.length > 0) {

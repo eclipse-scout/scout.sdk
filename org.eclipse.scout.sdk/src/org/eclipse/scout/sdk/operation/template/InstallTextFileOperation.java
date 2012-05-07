@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
 
@@ -95,7 +95,7 @@ public class InstallTextFileOperation implements IOperation {
         m_createdFile.delete(true, false, monitor);
       }
       else {
-        ResourcesUtility.mkdirs(m_createdFile, monitor);
+        ResourceUtility.mkdirs(m_createdFile, monitor);
       }
 
       m_createdFile.create(new ByteArrayInputStream(s.getBytes()), true, monitor);

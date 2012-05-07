@@ -28,8 +28,8 @@ import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class InstallTargetPlatformFileOperation extends InstallTextFileOperation {
@@ -47,7 +47,7 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
   public InstallTargetPlatformFileOperation(IProject dstProject) {
     super("templates/ui.rap/ScoutRAP.target", TARGET_FILE_NAME, ScoutSdkRap.getDefault().getBundle(), dstProject, new HashMap<String, String>());
     m_entryList = new ArrayList<ITargetEntryContributor>();
-    m_installLocation = ResourcesUtility.getEclipseInstallLocation();
+    m_installLocation = ResourceUtility.getEclipseInstallLocation();
   }
 
   public void addEclipseHomeEntry() {

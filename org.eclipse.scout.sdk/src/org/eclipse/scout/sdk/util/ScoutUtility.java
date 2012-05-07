@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -89,11 +90,11 @@ public final class ScoutUtility {
   }
 
   public static String cleanLineSeparator(String buffer, ICompilationUnit icu) {
-    return cleanLineSeparatorImpl(buffer, ResourcesUtility.getLineSeparator(icu));
+    return cleanLineSeparatorImpl(buffer, ResourceUtility.getLineSeparator(icu));
   }
 
   public static String cleanLineSeparator(String buffer, Document doc) {
-    return cleanLineSeparatorImpl(buffer, ResourcesUtility.getLineSeparator(doc));
+    return cleanLineSeparatorImpl(buffer, ResourceUtility.getLineSeparator(doc));
   }
 
   private static String cleanLineSeparatorImpl(String buffer, String separator) {

@@ -35,8 +35,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -185,7 +185,7 @@ public class ExportServerWarOperation implements IOperation {
       destinationFile.getParentFile().mkdirs();
     }
     ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(destinationFile));
-    ResourcesUtility.addFolderToZip(m_tempBuildDir, zipOut);
+    ResourceUtility.addFolderToZip(m_tempBuildDir, zipOut);
     zipOut.flush();
     zipOut.close();
     return destinationFile;

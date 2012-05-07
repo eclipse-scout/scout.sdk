@@ -26,7 +26,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 public abstract class AbstractCreateNlsProjectOperation extends Job {
 
@@ -38,7 +38,7 @@ public abstract class AbstractCreateNlsProjectOperation extends Job {
   protected AbstractCreateNlsProjectOperation(NewNlsFileOperationDesc desc) {
     super("Create new NLS Project...");
     m_desc = desc;
-    NL = ResourcesUtility.getLineSeparator(m_desc.getPlugin());
+    NL = ResourceUtility.getLineSeparator(m_desc.getPlugin());
   }
 
   public final IStatus runSync() {

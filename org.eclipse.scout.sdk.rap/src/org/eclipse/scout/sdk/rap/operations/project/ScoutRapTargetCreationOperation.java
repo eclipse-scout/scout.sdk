@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.rap.RapRuntimeClasses;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
 
@@ -88,9 +88,9 @@ public class ScoutRapTargetCreationOperation implements IOperation {
         }
         File dest = new File(getDestinationDirectory(), destRelPath);
         dest.getParentFile().mkdirs();
-        out = new BufferedOutputStream(new FileOutputStream(dest), ResourcesUtility.BUF_SIZE);
+        out = new BufferedOutputStream(new FileOutputStream(dest), ResourceUtility.BUF_SIZE);
         in = source.openStream();
-        ResourcesUtility.copy(in, out);
+        ResourceUtility.copy(in, out);
       }
     }
     catch (IOException e) {

@@ -35,7 +35,7 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.AbstractTranslationResource;
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.TranslationResourceEvent;
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
-import org.eclipse.scout.sdk.util.ResourcesUtility;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 /**
  * <h4>WorkspaceTranslationFile</h4>
@@ -114,7 +114,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
       }
 
       Properties prop = new Properties();
-      String NL = ResourcesUtility.getLineSeparator(m_file);
+      String NL = ResourceUtility.getLineSeparator(m_file);
 
       Map<String, String> allTranslations = getAllTranslations();
       prop.putAll(allTranslations);
