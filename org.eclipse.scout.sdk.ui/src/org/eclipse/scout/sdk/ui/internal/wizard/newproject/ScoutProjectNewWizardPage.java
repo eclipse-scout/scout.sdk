@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionP
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.util.ResourcesUtility;
 import org.eclipse.scout.sdk.validation.BundleValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -223,6 +224,12 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     }
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_CHECKED_NODES, checkedNodeExtensionIds);
+  }
+
+  @Override
+  public void performHelp() {
+    //TODO: remove external link and use eclipse help instead
+    ResourcesUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.8/Create_a_new_project#Step_1");
   }
 
   @Override
