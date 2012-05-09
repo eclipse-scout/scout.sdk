@@ -48,18 +48,18 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
     IType jaxWsPortType = null;
     if (TypeUtility.exists(getJaxWsPortType())) {
       jaxWsPortType = getJaxWsPortType();
-      JaxWsSdk.logError("Could not link webservice consumer to port type as port type could not be found");
     }
     else {
       jaxWsPortType = TypeUtility.getType(Object.class.getName());
+      JaxWsSdk.logError("Could not link webservice consumer to port type as port type could not be found");
     }
     IType jaxWsServiceType = null;
     if (TypeUtility.exists(getJaxWsServiceType())) {
       jaxWsServiceType = getJaxWsServiceType();
-      JaxWsSdk.logError("Could not link webservice consumer to service as service could not be found");
     }
     else {
       jaxWsServiceType = TypeUtility.getType(Service.class.getName());
+      JaxWsSdk.logError("Could not link webservice consumer to service as service could not be found");
     }
 
     String superTypeSignature = "<";
