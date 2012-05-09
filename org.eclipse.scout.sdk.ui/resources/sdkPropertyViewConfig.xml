@@ -546,7 +546,8 @@
 	</type>
 	<type name="org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService">
 		<config name="getConfiguredSqlSelect" type="Normal" category="Data" />
-		<config name="getConfiguredSortColumn" type="Advanced" category="Data" />
+		<config name="getConfiguredSortColumn" type="Normal" category="Data" />
+		<config name="execLoadLookupRows" type="Normal" category="BusinessLogic" />
 	</type>
 	<type name="org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService">
 		<config name="getConfiguredDirectJdbcConnection" type="Normal" category="Data" />

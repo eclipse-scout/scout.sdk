@@ -25,11 +25,6 @@ public class MultiLineStringPresenter extends StringPresenter {
   }
 
   @Override
-  protected String formatSourceValue(String value) throws CoreException {
-    return "\"" + value + "\"";
-  }
-
-  @Override
   protected String formatDisplayValue(String value) throws CoreException {
     return value;
   }
