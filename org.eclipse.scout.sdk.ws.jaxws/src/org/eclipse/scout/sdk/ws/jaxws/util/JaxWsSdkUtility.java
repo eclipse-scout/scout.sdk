@@ -548,7 +548,7 @@ public final class JaxWsSdkUtility {
     final Set<IType> types = new HashSet<IType>();
     try {
       new SearchEngine().search(
-          SearchPattern.createPattern("*", IJavaSearchConstants.INTERFACE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_REGEXP_MATCH),
+          SearchPattern.createPattern("*", IJavaSearchConstants.INTERFACE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_PATTERN_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           new JarFileSearchScope(jarFile), //SearchEngine.createWorkspaceScope(),
           new SearchRequestor() {
@@ -625,7 +625,7 @@ public final class JaxWsSdkUtility {
     final Set<IType> types = new HashSet<IType>();
     try {
       new SearchEngine().search(
-          SearchPattern.createPattern("*", IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_REGEXP_MATCH),
+          SearchPattern.createPattern("*", IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_PATTERN_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           new JarFileSearchScope(jarFile), //SearchEngine.createWorkspaceScope(),
           new SearchRequestor() {
@@ -710,6 +710,9 @@ public final class JaxWsSdkUtility {
 
   public static IType extractGenericSuperType(IType type, int index) {
     try {
+      if (!TypeUtility.exists(type)) {
+        return null;
+      }
       String superTypeSignature = type.getSuperclassTypeSignature();
       if (superTypeSignature == null) {
         return null;
