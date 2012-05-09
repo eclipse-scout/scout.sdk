@@ -103,7 +103,7 @@ public final class JdtUtility {
    */
   public static String escapeStringJava(String s) {
     if (s == null) return null;
-    return s.replace("\\", "\\\\").replace("\"", "\\\"");
+    return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
   }
 
   /**
