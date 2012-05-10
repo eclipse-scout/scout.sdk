@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public class ScoutSourceUtility {
 
-  private static final Pattern m_fieldValue = Pattern.compile("=\\s*([^\\s\\;]*)\\s*\\;", Pattern.DOTALL);
+  private static final Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(\\\".*\\\")\\s*\\;", Pattern.DOTALL);
 
   private ScoutSourceUtility() {
   }
@@ -120,7 +120,6 @@ public class ScoutSourceUtility {
   }
 
   public static String findReferencedFieldValue(IType type, String value, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
-
     String retVal = findFieldValueInDeclaringHierarchy(type, value);
     if (retVal == null) {
       retVal = findFieldValueInHierarchyImpl(type, value, superTypeHierarchy);
@@ -134,7 +133,7 @@ public class ScoutSourceUtility {
     }
     IField field = type.getField(name);
     if (TypeUtility.exists(field)) {
-      Matcher matcher = m_fieldValue.matcher(field.getSource());
+      Matcher matcher = REGEX_FIELD_VALUE.matcher(field.getSource());
       if (matcher.find()) {
         return matcher.group(1);
       }
@@ -150,15 +149,15 @@ public class ScoutSourceUtility {
   }
 
   private static String findFieldValueInDeclaringHierarchy(IType type, String value) throws JavaModelException {
-    if (type == null) {
+    if (!TypeUtility.exists(type)) {
       return null;
     }
     IField field = type.getField(value);
-    if (field == null || !field.exists()) {
+    if (!TypeUtility.exists(field)) {
       return findFieldValueInDeclaringHierarchy(type.getDeclaringType(), value);
     }
     else {
-      Matcher matcher = m_fieldValue.matcher(field.getSource());
+      Matcher matcher = REGEX_FIELD_VALUE.matcher(field.getSource());
       if (matcher.find()) {
         return matcher.group(1);
       }
@@ -174,7 +173,7 @@ public class ScoutSourceUtility {
     return methodBody;
   }
 
-  public static String removeLineLeadingTab(int i, String methodBlock) {
+  public static String removeLineLeadingTab(int i, String methodBlock, final String newLine) {
     Pattern p = Pattern.compile("^[\\t]{" + i + "}");
     BufferedReader reader = null;
     StringBuilder newBody = new StringBuilder();
@@ -184,7 +183,7 @@ public class ScoutSourceUtility {
       boolean addNewLine = false;
       while (line != null) {
         if (addNewLine) {
-          newBody.append("\n");
+          newBody.append(newLine);
         }
         else {
           addNewLine = true;

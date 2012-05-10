@@ -25,12 +25,12 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public final class PropertyMethodSourceUtility {
 
-  private static final Pattern REGEX_STRING_SIMPLE = Pattern.compile("^(\\\")([^\\\"]*)(\\\")$");
   /**
    * with "com.bsiag.test.ClassA.Field"
    * group1 = com.bsiag.test.ClassA.
@@ -114,16 +114,16 @@ public final class PropertyMethodSourceUtility {
     if (REGEX_NULL.matcher(parameter).matches()) {
       return null;
     }
-    Matcher matcher = REGEX_STRING_SIMPLE.matcher(parameter);
-    if (matcher.find()) {
-      return matcher.group(2);
+    String val = JdtUtility.fromStringLiteral(parameter);
+    if (val != null) {
+      return val;
     }
     else {
       String referencedValue = findReferencedValue(parameter, method, superTypeHierarchy);
       if (referencedValue != null) {
-        matcher = REGEX_STRING_SIMPLE.matcher(referencedValue);
-        if (matcher.find()) {
-          return matcher.group(2);
+        val = JdtUtility.fromStringLiteral(referencedValue);
+        if (val != null) {
+          return val;
         }
       }
     }

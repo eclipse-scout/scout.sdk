@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
@@ -191,7 +192,8 @@ public class MethodErrorPresenterContent extends Composite {
   private String wellFormMethod() throws JavaModelException {
     String methodBody = getMethod().peekMethod().getSource();
     String newBody = ScoutSourceUtility.removeLeadingCommentAndAnnotationLines(methodBody);
-    newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody);
+    String newLine = ResourceUtility.getLineSeparator(getMethod().getType().getCompilationUnit());
+    newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody, newLine);
     newBody = newBody.replaceAll("\t", SdkProperties.TAB);
     return newBody;
   }

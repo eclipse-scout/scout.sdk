@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.jdt;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,6 +43,22 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Bundle;
 
 public final class JdtUtility {
+  private final static String DOUBLE_QUOTES = "\"";
+  private final static Pattern LIT_ESC_1 = Pattern.compile("\\", Pattern.LITERAL);
+  private final static String REP_1 = Matcher.quoteReplacement("\\\\");
+  private final static Pattern LIT_ESC_2 = Pattern.compile("\"", Pattern.LITERAL);
+  private final static String REP_2 = Matcher.quoteReplacement("\\\"");
+  private final static Pattern LIT_ESC_3 = Pattern.compile("\n", Pattern.LITERAL);
+  private final static String REP_3 = Matcher.quoteReplacement("\\n");
+  private final static Pattern LIT_ESC_4 = Pattern.compile("\r", Pattern.LITERAL);
+  private final static String REP_4 = Matcher.quoteReplacement("");
+  private final static Pattern LIT_ESC_5 = Pattern.compile("\\\\", Pattern.LITERAL);
+  private final static String REP_5 = Matcher.quoteReplacement("\\");
+  private final static Pattern LIT_ESC_6 = Pattern.compile("\\\"", Pattern.LITERAL);
+  private final static String REP_6 = Matcher.quoteReplacement("\"");
+  private final static Pattern LIT_ESC_7 = Pattern.compile("([^\\\\]{1})\\\\n");
+  private final static String REP_7 = "$1\n";
+
   private JdtUtility() {
   }
 
@@ -95,27 +114,40 @@ public final class JdtUtility {
   }
 
   /**
-   * Escape the given string in java style.
-   * 
-   * @param s
-   *          The string to escape.
-   * @return A new string with backslashes and double-quotes escaped in java style.
-   */
-  public static String escapeStringJava(String s) {
-    if (s == null) return null;
-    return s.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
-  }
-
-  /**
    * converts the given string into a string literal with leading and ending double-quotes including escaping of the
-   * given value.
+   * given string.<br>
+   * this is the inverse function of {@link JdtUtility#fromStringLiteral(String)}
    * 
    * @param s
    *          the string to convert.
-   * @return the literal string.
+   * @return the literal string ready to be directly inserted into java source or null if the input string is null.
    */
   public static String toStringLiteral(String s) {
-    return "\"" + escapeStringJava(s) + "\"";
+    if (s == null) return null;
+    String escaped = s;
+    escaped = LIT_ESC_1.matcher(escaped).replaceAll(REP_1);
+    escaped = LIT_ESC_2.matcher(escaped).replaceAll(REP_2);
+    escaped = LIT_ESC_3.matcher(escaped).replaceAll(REP_3);
+    escaped = LIT_ESC_4.matcher(escaped).replaceAll(REP_4);
+    return DOUBLE_QUOTES + escaped + DOUBLE_QUOTES;
+  }
+
+  /**
+   * converts the given input string literal into the representing original string.<br>
+   * this is the inverse function of {@link JdtUtility#toStringLiteral(String)}
+   * 
+   * @param l
+   *          the literal with leading and ending double-quotes
+   * @return the original (un-escaped) string. if it is no valid literal string, null is returned.
+   */
+  public static String fromStringLiteral(String l) {
+    if (l == null || l.length() < 3 || !l.startsWith(DOUBLE_QUOTES) || !l.endsWith(DOUBLE_QUOTES)) return null;
+    String inner = l.substring(1, l.length() - 1);
+    String ret = inner;
+    ret = LIT_ESC_7.matcher(ret).replaceAll(REP_7);
+    ret = LIT_ESC_5.matcher(ret).replaceAll(REP_5);
+    ret = LIT_ESC_6.matcher(ret).replaceAll(REP_6);
+    return ret;
   }
 
   public static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {
