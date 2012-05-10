@@ -33,7 +33,7 @@ public class MethodOverrideOperation extends MethodCreateOperation {
   private String m_genericWildcardReplacement;
 
   public MethodOverrideOperation(IType declaringType, String methodName) throws JavaModelException {
-    this(declaringType, methodName, false);
+    this(declaringType, methodName, true);
   }
 
   public MethodOverrideOperation(IType declaringType, String methodName, boolean formatSource) throws JavaModelException {

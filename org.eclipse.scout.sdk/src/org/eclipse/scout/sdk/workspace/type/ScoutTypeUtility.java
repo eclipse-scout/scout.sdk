@@ -64,6 +64,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
 public class ScoutTypeUtility extends TypeUtility {
@@ -429,6 +430,26 @@ public class ScoutTypeUtility extends TypeUtility {
 
   public static IType[] getColumns(IType table) {
     return getInnerTypes(table, TypeUtility.getType(RuntimeClasses.IColumn), ScoutTypeComparators.getOrderAnnotationComparator());
+  }
+
+  public static IType[] getPrimaryKeyColumns(IType table) {
+    IType[] columns = getColumns(table);
+    ArrayList<IType> ret = new ArrayList<IType>();
+    for (IType col : columns) {
+      try {
+        IMethod primKeyMethod = TypeUtility.getMethod(col, "getConfiguredPrimaryKey");
+        if (TypeUtility.exists(primKeyMethod)) {
+          String isPrimaryKey = PropertyMethodSourceUtility.getMethodReturnValue(primKeyMethod);
+          if (Boolean.valueOf(isPrimaryKey)) {
+            ret.add(col);
+          }
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdk.logError("cold not parse column '" + col.getFullyQualifiedName() + "' for primary key.", e);
+      }
+    }
+    return ret.toArray(new IType[ret.size()]);
   }
 
   public static IType[] getCodes(IType declaringType) {

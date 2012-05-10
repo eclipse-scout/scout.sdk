@@ -43,6 +43,7 @@ public abstract class AbstractPageOperation implements IOperation {
   final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 
   private IType m_holderType;
+  private final static String CHILD_PAGE_VAR_NAME = "childPage";
 
   protected void addToHolder(IType page, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getHolderType() != null) {
@@ -145,7 +146,7 @@ public abstract class AbstractPageOperation implements IOperation {
     }
   }
 
-  private void addToPageWithTable(final IType pageType, IType pageWithTable, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  private void addToPageWithTable(final IType pageType, final IType pageWithTable, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String methodName = "execCreateChildPage";
     IMethod childPagesMethod = TypeUtility.getMethod(pageWithTable, methodName);
     if (TypeUtility.exists(childPagesMethod)) {
@@ -154,9 +155,9 @@ public abstract class AbstractPageOperation implements IOperation {
         protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
           StringBuilder b = new StringBuilder();
           String pageRef = validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
-          b.append(pageRef + " childPage=new " + pageRef + "();\n");
-          b.append(ScoutUtility.getCommentBlock("propagate the selected row to the childPage.") + "\n");
-          b.append("return childPage;\n");
+          b.append(pageRef + " " + CHILD_PAGE_VAR_NAME + "=new " + pageRef + "();\n");
+          createPageParameterSource(pageType, pageWithTable, validator, b);
+          b.append("return " + CHILD_PAGE_VAR_NAME + ";");
           return b.toString();
         }
       };
@@ -170,9 +171,9 @@ public abstract class AbstractPageOperation implements IOperation {
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           String pageRef = validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
           StringBuilder b = new StringBuilder();
-          b.append(pageRef + " childPage=new " + pageRef + "();\n");
-          b.append(ScoutUtility.getCommentBlock("propagate the selected row to the childPage.") + "\n");
-          b.append("return childPage;\n");
+          b.append(pageRef + " " + CHILD_PAGE_VAR_NAME + "=new " + pageRef + "();\n");
+          createPageParameterSource(pageType, pageWithTable, validator, b);
+          b.append("return " + CHILD_PAGE_VAR_NAME + ";");
           return b.toString();
         }
       };
@@ -181,7 +182,29 @@ public abstract class AbstractPageOperation implements IOperation {
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
     }
+  }
 
+  private void createPageParameterSource(IType page, IType pageWithTable, IImportValidator validator, StringBuilder builder) {
+    if (TypeUtility.exists(page) && TypeUtility.exists(pageWithTable)) {
+      IType[] tables = ScoutTypeUtility.getTables(pageWithTable);
+      if (tables != null && tables.length > 0 && TypeUtility.exists(tables[0])) {
+        IType[] columns = ScoutTypeUtility.getPrimaryKeyColumns(tables[0]);
+        for (IType col : columns) {
+          // find method on form
+          String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
+          IMethod writeMethodOnChildPage = TypeUtility.getMethod(page, "set" + colPropName);
+          if (TypeUtility.exists(writeMethodOnChildPage)) {
+            builder.append(CHILD_PAGE_VAR_NAME);
+            builder.append(".");
+            builder.append(writeMethodOnChildPage.getElementName());
+            builder.append("(getTable().get");
+            builder.append(col.getElementName());
+            builder.append("().getValue(row));\n");
+          }
+        }
+      }
+    }
+    builder.append(ScoutUtility.getCommentBlock("propagate the selected row to the childPage.") + "\n");
   }
 
   public void setHolderType(IType holderType) {
