@@ -40,141 +40,119 @@ public class BundleGraph {
 
   private final HashMap<String, BundleGraphNode> m_nodeLinks;
   private final HashMap<String, ScoutBundle> m_scoutBundles;
-  // private final Set<ScoutBundle> m_scoutBundles;
-  // private final HashMap<String, ScoutBundle> m_projectLinks;
-
-  private Object lock = new Object();
 
   public BundleGraph() {
     m_nodeLinks = new HashMap<String, BundleGraphNode>();
     m_scoutBundles = new HashMap<String, ScoutBundle>();
-    // m_projectLinks=new HashMap<String, ScoutBundle>();
   }
 
-  public ScoutBundle addWorkspaceProject(IProject project, ScoutWorkspaceEventList eventCollector) {
-    synchronized (lock) {
-      ScoutBundle scoutBundle = m_scoutBundles.get(project.getName());
-      if (scoutBundle == null) {
-        scoutBundle = new ScoutBundle(project, eventCollector.getSource());
-        // m_projectLinks.put(project.getName(), scoutBundle);
-        m_scoutBundles.put(project.getName(), scoutBundle);
-        eventCollector.setEvent(ScoutWorkspaceEvent.TYPE_BUNDLE_ADDED, scoutBundle, true);
-        return scoutBundle;
-      }
-      else {
-        // return null if already registered
-        return null;
-      }
+  public synchronized ScoutBundle addWorkspaceProject(IProject project, ScoutWorkspaceEventList eventCollector) {
+    ScoutBundle scoutBundle = m_scoutBundles.get(project.getName());
+    if (scoutBundle == null) {
+      scoutBundle = new ScoutBundle(project, eventCollector.getSource());
+      m_scoutBundles.put(project.getName(), scoutBundle);
+      eventCollector.setEvent(ScoutWorkspaceEvent.TYPE_BUNDLE_ADDED, scoutBundle, true);
+      return scoutBundle;
     }
-  }
-
-  public ScoutBundle removeWorkspaceProject(String bundleId, ScoutWorkspaceEventList eventCollector) {
-    synchronized (lock) {
-      ScoutBundle scoutBundle = m_scoutBundles.remove(bundleId);
-      if (scoutBundle != null) {
-        m_scoutBundles.remove(bundleId);
-        eventCollector.setEvent(ScoutWorkspaceEvent.TYPE_BUNDLE_REMOVED, scoutBundle, true);
-        return scoutBundle;
-      }
+    else {
+      // return null if already registered
       return null;
     }
   }
 
-  public ScoutBundle[] getAllBundles() {
-    synchronized (lock) {
-      return m_scoutBundles.values().toArray(new ScoutBundle[m_scoutBundles.size()]);
+  public synchronized ScoutBundle removeWorkspaceProject(String bundleId, ScoutWorkspaceEventList eventCollector) {
+    ScoutBundle scoutBundle = m_scoutBundles.remove(bundleId);
+    if (scoutBundle != null) {
+      m_scoutBundles.remove(bundleId);
+      eventCollector.setEvent(ScoutWorkspaceEvent.TYPE_BUNDLE_REMOVED, scoutBundle, true);
+      return scoutBundle;
     }
+    return null;
+  }
+
+  public synchronized ScoutBundle[] getAllBundles() {
+    return m_scoutBundles.values().toArray(new ScoutBundle[m_scoutBundles.size()]);
   }
 
   public ScoutBundle getScoutBundle(IProject p) {
     return m_scoutBundles.get(p.getName());
   }
 
-  public void buildTree() {
-    synchronized (lock) {
-      m_invisibleRootNode = null;
-      m_nodeLinks.clear();
-      Set<BundleGraphNode> freeNodes = new HashSet<BundleGraphNode>();
-      // add scout bundles
-      IPluginModelBase uiSwtModel = PluginRegistry.findModel(RuntimeClasses.ScoutUiSwtBundleId);
-      if (uiSwtModel != null) {
-        BundleGraphNode swtNode = new BundleGraphNode(uiSwtModel, IScoutElement.BUNDLE_UI_SWT);
-        freeNodes.add(swtNode);
-        m_nodeLinks.put(swtNode.getIdentifier(), swtNode);
-      }
-      IPluginModelBase uiSwingModel = PluginRegistry.findModel(RuntimeClasses.ScoutUiSwingBundleId);
-      if (uiSwingModel != null) {
-        BundleGraphNode swingNode = new BundleGraphNode(uiSwingModel, IScoutElement.BUNDLE_UI_SWING);
-        freeNodes.add(swingNode);
-        m_nodeLinks.put(swingNode.getIdentifier(), swingNode);
-      }
-      IPluginModelBase clientModel = PluginRegistry.findModel(RuntimeClasses.ScoutClientBundleId);
-      if (clientModel != null) {
-        BundleGraphNode clientNode = new BundleGraphNode(clientModel, IScoutElement.BUNDLE_CLIENT);
-        freeNodes.add(clientNode);
-        m_nodeLinks.put(clientNode.getIdentifier(), clientNode);
-      }
-      IPluginModelBase sharedModel = PluginRegistry.findModel(RuntimeClasses.ScoutSharedBundleId);
-      if (sharedModel != null) {
-        BundleGraphNode sharedNode = new BundleGraphNode(sharedModel, IScoutElement.BUNDLE_SHARED);
-        freeNodes.add(sharedNode);
-        m_nodeLinks.put(sharedNode.getIdentifier(), sharedNode);
-      }
-      IPluginModelBase serverModel = PluginRegistry.findModel(RuntimeClasses.ScoutServerBundleId);
-      if (serverModel != null) {
-        BundleGraphNode serverNode = new BundleGraphNode(serverModel, IScoutElement.BUNDLE_SERVER);
-        freeNodes.add(serverNode);
-        m_nodeLinks.put(serverNode.getIdentifier(), serverNode);
-      }
-      // XXX RAP replace by better code
-      IPluginModelBase rapModel = PluginRegistry.findModel("org.eclipse.scout.rt.ui.rap");
-      if (rapModel != null) {
-        BundleGraphNode rapNode = new BundleGraphNode(rapModel, 8);
-        freeNodes.add(rapNode);
-        m_nodeLinks.put(rapNode.getIdentifier(), rapNode);
-      }
-      // XXX
-      HashSet<BundleGraphNode> parentNodes = new HashSet<BundleGraphNode>();
-      m_invisibleRootNode = new P_InvisibleRootNode();
-      parentNodes.add(m_invisibleRootNode);
-      for (ScoutBundle b : m_scoutBundles.values()) {
-        if (b.getProject() != null && b.getProject().exists()) {
-          BundleGraphNode node = createTreeNode(b);
-          if (node != null) {
-            m_nodeLinks.put(b.getBundleName(), node);
-            freeNodes.add(node);
-          }
+  public synchronized void buildTree() {
+    m_invisibleRootNode = null;
+    m_nodeLinks.clear();
+    Set<BundleGraphNode> freeNodes = new HashSet<BundleGraphNode>();
+    // add scout bundles
+    IPluginModelBase uiSwtModel = PluginRegistry.findModel(RuntimeClasses.ScoutUiSwtBundleId);
+    if (uiSwtModel != null) {
+      BundleGraphNode swtNode = new BundleGraphNode(uiSwtModel, IScoutElement.BUNDLE_UI_SWT);
+      freeNodes.add(swtNode);
+      m_nodeLinks.put(swtNode.getIdentifier(), swtNode);
+    }
+    IPluginModelBase uiSwingModel = PluginRegistry.findModel(RuntimeClasses.ScoutUiSwingBundleId);
+    if (uiSwingModel != null) {
+      BundleGraphNode swingNode = new BundleGraphNode(uiSwingModel, IScoutElement.BUNDLE_UI_SWING);
+      freeNodes.add(swingNode);
+      m_nodeLinks.put(swingNode.getIdentifier(), swingNode);
+    }
+    IPluginModelBase clientModel = PluginRegistry.findModel(RuntimeClasses.ScoutClientBundleId);
+    if (clientModel != null) {
+      BundleGraphNode clientNode = new BundleGraphNode(clientModel, IScoutElement.BUNDLE_CLIENT);
+      freeNodes.add(clientNode);
+      m_nodeLinks.put(clientNode.getIdentifier(), clientNode);
+    }
+    IPluginModelBase sharedModel = PluginRegistry.findModel(RuntimeClasses.ScoutSharedBundleId);
+    if (sharedModel != null) {
+      BundleGraphNode sharedNode = new BundleGraphNode(sharedModel, IScoutElement.BUNDLE_SHARED);
+      freeNodes.add(sharedNode);
+      m_nodeLinks.put(sharedNode.getIdentifier(), sharedNode);
+    }
+    IPluginModelBase serverModel = PluginRegistry.findModel(RuntimeClasses.ScoutServerBundleId);
+    if (serverModel != null) {
+      BundleGraphNode serverNode = new BundleGraphNode(serverModel, IScoutElement.BUNDLE_SERVER);
+      freeNodes.add(serverNode);
+      m_nodeLinks.put(serverNode.getIdentifier(), serverNode);
+    }
+    // XXX RAP replace by better code
+    IPluginModelBase rapModel = PluginRegistry.findModel("org.eclipse.scout.rt.ui.rap");
+    if (rapModel != null) {
+      BundleGraphNode rapNode = new BundleGraphNode(rapModel, 8);
+      freeNodes.add(rapNode);
+      m_nodeLinks.put(rapNode.getIdentifier(), rapNode);
+    }
+    // XXX
+    HashSet<BundleGraphNode> parentNodes = new HashSet<BundleGraphNode>();
+    m_invisibleRootNode = new P_InvisibleRootNode();
+    parentNodes.add(m_invisibleRootNode);
+    for (ScoutBundle b : m_scoutBundles.values()) {
+      if (b.getProject() != null && b.getProject().exists()) {
+        BundleGraphNode node = createTreeNode(b);
+        if (node != null) {
+          m_nodeLinks.put(b.getBundleName(), node);
+          freeNodes.add(node);
         }
       }
-      buildTree(parentNodes, freeNodes);
     }
+    buildTree(parentNodes, freeNodes);
   }
 
-  public BundleGraphNode getRootNode() {
-    synchronized (lock) {
-      return m_invisibleRootNode;
-    }
+  public synchronized BundleGraphNode getRootNode() {
+    return m_invisibleRootNode;
   }
 
-  public BundleGraphNode getNode(IScoutBundle bundle) {
-    synchronized (lock) {
-      return m_nodeLinks.get(bundle.getBundleName());
-    }
+  public synchronized BundleGraphNode getNode(IScoutBundle bundle) {
+    return m_nodeLinks.get(bundle.getBundleName());
   }
 
   /**
    * @return
    */
-  public BundleGraphNode[] getWorkspaceNodes() {
-    synchronized (lock) {
-      return m_nodeLinks.values().toArray(new BundleGraphNode[m_nodeLinks.size()]);
-    }
+  public synchronized BundleGraphNode[] getWorkspaceNodes() {
+    return m_nodeLinks.values().toArray(new BundleGraphNode[m_nodeLinks.size()]);
   }
 
   public synchronized void printGraph(PrintStream out) {
-    synchronized (lock) {
-      printNodeRect(out, m_invisibleRootNode, 0);
-    }
+    printNodeRect(out, m_invisibleRootNode, 0);
   }
 
   private void buildTree(Set<BundleGraphNode> parentNodes, Set<BundleGraphNode> freeNodes) {

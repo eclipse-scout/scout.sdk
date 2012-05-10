@@ -260,38 +260,34 @@ public final class ScoutWorkspace implements IScoutWorkspace {
 
   private boolean handleProjectAdded(IProject project) throws CoreException {
     try {
-      if (project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature")) {
-        if (project.isOpen() && project.exists()) {
-          ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
-          boolean result = addProjectNoFire(project, eventCollector);
-          if (result) {
-            rebuildGraphNoFire(eventCollector);
-            fireWorkspaceEvents(eventCollector.getAllEvents());
-          }
-          return result;
+      if (isInterestingProject(project)) {
+        ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
+        boolean result = addProjectNoFire(project, eventCollector);
+        if (result) {
+          rebuildGraphNoFire(eventCollector);
+          fireWorkspaceEvents(eventCollector.getAllEvents());
         }
+        return result;
       }
     }
     catch (Exception e) {
-      e.printStackTrace();
+      ScoutSdk.logError(e);
     }
     return false;
   }
 
   private boolean addProjectNoFire(IProject project, ScoutWorkspaceEventList eventCollector) throws CoreException {
-    if (project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature")) {
-      if (project.isOpen() && project.exists()) {
-        ScoutBundle bundle = m_bundleGraph.addWorkspaceProject(project, eventCollector);
-        if (bundle != null) {
-          return true;
-        }
+    if (isInterestingProject(project)) {
+      ScoutBundle bundle = m_bundleGraph.addWorkspaceProject(project, eventCollector);
+      if (bundle != null) {
+        return true;
       }
     }
     return false;
   }
 
   private void handleProjectChanged(IProject project) throws CoreException {
-    if (project.exists() && project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature")) {
+    if (isInterestingProject(project)) {
       ScoutBundle scoutBundle = m_bundleGraph.getScoutBundle(project);
       if (scoutBundle == null) {
         handleProjectAdded(project);
@@ -302,20 +298,11 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     }
   }
 
-  private boolean handleProjectRemoved(String bundleId) {
-    ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
-    ScoutBundle bundle = m_bundleGraph.removeWorkspaceProject(bundleId, eventCollector);
-    if (bundle != null) {
-      rebuildGraphNoFire(eventCollector);
-      fireWorkspaceEvents(eventCollector.getAllEvents());
-      return true;
-    }
-    return false;
+  private static boolean isInterestingProject(IProject project) throws CoreException {
+    return project != null && project.exists() && project.isOpen() &&
+        project.hasNature(ScoutSdk.NATURE_ID) && project.hasNature("org.eclipse.pde.PluginNature");
   }
 
-  /**
-   *
-   */
   private final class P_PluginModelListener implements IPluginModelListener {
     @Override
     public void modelsChanged(PluginModelDelta delta) {
@@ -340,11 +327,13 @@ public final class ScoutWorkspace implements IScoutWorkspace {
         }
         // removed
         if ((delta.getKind() & PluginModelDelta.REMOVED) != 0) {
+          ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(ScoutWorkspace.this);
           for (ModelEntry e : delta.getRemovedEntries()) {
-            handleProjectRemoved(e.getId());
+            m_bundleGraph.removeWorkspaceProject(e.getId(), eventCollector);
           }
+          rebuildGraphNoFire(eventCollector);
+          fireWorkspaceEvents(eventCollector.getAllEvents());
         }
-
       }
       catch (CoreException e) {
         ScoutSdk.logError("error updating scout workspace.", e);
