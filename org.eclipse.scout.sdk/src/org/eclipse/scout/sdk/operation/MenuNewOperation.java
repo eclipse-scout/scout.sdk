@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
@@ -33,7 +32,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>MenuNewOperation</h3> ...
@@ -90,7 +89,8 @@ public class MenuNewOperation implements IOperation {
       nlsOp.run(monitor, workingCopyManager);
     }
 
-    if (getFormHandler() != null && getFormHandler().getElementName().matches("^New.*")) {
+    boolean isNewFormHandler = getFormHandler() != null && getFormHandler().getElementName().matches("^New.*");
+    if (isNewFormHandler) {
       MethodOverrideOperation getConfiguredEmptySpaceActionOp = new MethodOverrideOperation(getCreatedMenu(), "getConfiguredEmptySpaceAction");
       getConfiguredEmptySpaceActionOp.setSimpleBody("return true;");
       getConfiguredEmptySpaceActionOp.validate();
@@ -101,7 +101,7 @@ public class MenuNewOperation implements IOperation {
       getConfiguredSingleSelectionActionOp.validate();
       getConfiguredSingleSelectionActionOp.run(monitor, workingCopyManager);
     }
-    createExecActionMethod(m_createdMenu, monitor, workingCopyManager);
+    createExecActionMethod(m_createdMenu, isNewFormHandler, monitor, workingCopyManager);
 
     if (isFormatSource()) {
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedMenu(), true);
@@ -110,7 +110,7 @@ public class MenuNewOperation implements IOperation {
     }
   }
 
-  private IMethod createExecActionMethod(IType menu, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  private IMethod createExecActionMethod(IType menu, final boolean isNewFormHandler, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
     IMethod execActionMethod = null;
     if (getFormToOpen() != null) {
       MethodOverrideOperation execActionOp = new MethodOverrideOperation(menu, "execAction", false) {
@@ -123,8 +123,8 @@ public class MenuNewOperation implements IOperation {
           sourceBuilder.append(formTypeName + " " + FORM_NAME + " = new " + formTypeName + "();\n");
           if (getFormHandler() != null) {
             IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy));
-            if (TypeUtility.exists(table)) {
-              createFormParameterSource(getFormToOpen(), getFormHandler(), table, hierarchy, sourceBuilder, validator);
+            if (!isNewFormHandler && TypeUtility.exists(table)) {
+              createFormParameterSource(getFormToOpen(), getFormHandler(), table, sourceBuilder, validator);
             }
             createStartFormSource(getFormToOpen(), getFormHandler(), sourceBuilder, validator);
           }
@@ -146,25 +146,14 @@ public class MenuNewOperation implements IOperation {
     return m_createdMenu;
   }
 
-  private void createFormParameterSource(IType form, IType formHandler, IType table, ITypeHierarchy hierarchy, StringBuilder builder, IImportValidator validator) {
-    IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), hierarchy));
+  private void createFormParameterSource(IType form, IType formHandler, IType table, StringBuilder builder, IImportValidator validator) {
+    IType[] columns = ScoutTypeUtility.getPrimaryKeyColumns(table);
     for (IType col : columns) {
-      try {
-        IMethod primKeyMethod = TypeUtility.getMethod(col, "getConfiguredPrimaryKey");
-        if (TypeUtility.exists(primKeyMethod)) {
-          String isPrimaryKey = PropertyMethodSourceUtility.getMethodReturnValue(primKeyMethod);
-          if (Boolean.valueOf(isPrimaryKey)) {
-            // find method on form
-            String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
-            IMethod writeMethodOnForm = TypeUtility.getMethod(form, "set" + colPropName);
-            if (TypeUtility.exists(writeMethodOnForm)) {
-              builder.append(FORM_NAME + "." + writeMethodOnForm.getElementName() + "(get" + col.getElementName() + "().getSelectedValue());\n");
-            }
-          }
-        }
-      }
-      catch (CoreException e) {
-        ScoutSdk.logError("cold not parse column '" + col.getFullyQualifiedName() + "' for primary key.", e);
+      // find method on form
+      String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
+      IMethod writeMethodOnForm = TypeUtility.getMethod(form, "set" + colPropName);
+      if (TypeUtility.exists(writeMethodOnForm)) {
+        builder.append(FORM_NAME + "." + writeMethodOnForm.getElementName() + "(get" + col.getElementName() + "().getSelectedValue());\n");
       }
     }
   }
