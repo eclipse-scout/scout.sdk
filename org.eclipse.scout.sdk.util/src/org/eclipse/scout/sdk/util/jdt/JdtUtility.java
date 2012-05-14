@@ -141,7 +141,7 @@ public final class JdtUtility {
    * @return the original (un-escaped) string. if it is no valid literal string, null is returned.
    */
   public static String fromStringLiteral(String l) {
-    if (l == null || l.length() < 3 || !l.startsWith(DOUBLE_QUOTES) || !l.endsWith(DOUBLE_QUOTES)) return null;
+    if (l == null || l.length() < 2 || !l.startsWith(DOUBLE_QUOTES) || !l.endsWith(DOUBLE_QUOTES)) return null;
     String inner = l.substring(1, l.length() - 1);
     String ret = inner;
     ret = LIT_ESC_7.matcher(ret).replaceAll(REP_7);

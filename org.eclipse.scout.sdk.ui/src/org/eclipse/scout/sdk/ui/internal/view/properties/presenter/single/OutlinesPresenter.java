@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -27,6 +28,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
+import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.ui.dialog.JavaElementSelectionDialog;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractJavaElementListPresenter;
@@ -37,6 +39,7 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 
@@ -109,6 +112,15 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
         source.append("\n};");
 
         return source.toString();
+      }
+
+      @Override
+      public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+        super.run(monitor, workingCopyManager);
+        AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(getUpdatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true), false);
+        createSuppressWarning.addParameter("\"unchecked\"");
+        createSuppressWarning.validate();
+        createSuppressWarning.run(monitor, workingCopyManager);
       }
     };
     op.setFormatSource(true);

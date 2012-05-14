@@ -55,7 +55,6 @@
             restorable="true">
          </view>
          <view
-             allowMultiple="true"
              class="@@BUNDLE_SWT_NAME@@.views.EastView"
              icon="resources/icons/eclipse_scout.gif"
              id="@@BUNDLE_SWT_NAME@@.views.EastView"

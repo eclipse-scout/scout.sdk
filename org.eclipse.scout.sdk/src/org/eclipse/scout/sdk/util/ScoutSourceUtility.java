@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public class ScoutSourceUtility {
 
-  private static final Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(\\\".*\\\")\\s*\\;", Pattern.DOTALL);
+  private static final Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(.*)\\s*\\;", Pattern.DOTALL);
 
   private ScoutSourceUtility() {
   }
@@ -68,6 +68,9 @@ public class ScoutSourceUtility {
         methodSource = method.getSource();
         if (methodSource == null) {
           return name;
+        }
+        else {
+          methodSource = ScoutUtility.removeComments(methodSource);
         }
       }
       catch (Exception e) {
@@ -133,7 +136,7 @@ public class ScoutSourceUtility {
     }
     IField field = type.getField(name);
     if (TypeUtility.exists(field)) {
-      Matcher matcher = REGEX_FIELD_VALUE.matcher(field.getSource());
+      Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(field.getSource()));
       if (matcher.find()) {
         return matcher.group(1);
       }
@@ -157,7 +160,7 @@ public class ScoutSourceUtility {
       return findFieldValueInDeclaringHierarchy(type.getDeclaringType(), value);
     }
     else {
-      Matcher matcher = REGEX_FIELD_VALUE.matcher(field.getSource());
+      Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(field.getSource()));
       if (matcher.find()) {
         return matcher.group(1);
       }
