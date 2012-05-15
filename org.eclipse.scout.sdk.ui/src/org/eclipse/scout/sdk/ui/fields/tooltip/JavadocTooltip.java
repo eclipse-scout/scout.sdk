@@ -45,12 +45,11 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
-import org.eclipse.swt.browser.LocationAdapter;
-import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.osgi.framework.Bundle;
 
 /**
@@ -64,9 +63,13 @@ import org.osgi.framework.Bundle;
 @SuppressWarnings("restriction")
 public class JavadocTooltip extends AbstractTooltip {
 
+  /** Flags used to render a label in the text widget. */
+  private static final long LABEL_FLAGS = JavaElementLabels.ALL_FULLY_QUALIFIED
+      | JavaElementLabels.M_PRE_RETURNTYPE | JavaElementLabels.M_PARAMETER_TYPES | JavaElementLabels.M_PARAMETER_NAMES | JavaElementLabels.M_EXCEPTIONS
+      | JavaElementLabels.F_PRE_TYPE_SIGNATURE | JavaElementLabels.T_TYPE_PARAMETERS;
+
   private IMember m_member;
   private Browser m_browser;
-
   private String m_javaDoc;
 
   public JavadocTooltip(Control sourceControl) {
@@ -80,9 +83,8 @@ public class JavadocTooltip extends AbstractTooltip {
 
   public void setMember(IMember member) {
     m_member = member;
-    // TODO aho (uninstall tooltip if null is given)
     if (TypeUtility.exists(m_member)) {
-      computJavadoc();
+      computeJavadoc();
     }
   }
 
@@ -92,16 +94,34 @@ public class JavadocTooltip extends AbstractTooltip {
     m_browser.setJavascriptEnabled(true);
     m_browser.setText(m_javaDoc);
     GridData layoutData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
-    layoutData.heightHint = 150;
-    layoutData.widthHint = 500;
+    layoutData.heightHint = 200;
+    layoutData.widthHint = 650;
     m_browser.setLayoutData(layoutData);
-    m_browser.addLocationListener(new LocationAdapter() {
+    m_browser.addLocationListener(JavaElementLinks.createLocationListener(new JavaElementLinks.ILinkHandler() {
       @Override
-      public void changing(LocationEvent event) {
-        // TODO allow navigating
-        event.doit = false;
+      public void handleTextSet() {
       }
-    });
+
+      @Override
+      public void handleJavadocViewLink(IJavaElement target) {
+      }
+
+      @Override
+      public void handleInlineJavadocLink(IJavaElement target) {
+        if (target instanceof IMember) {
+          setMember((IMember) target);
+        }
+      }
+
+      @Override
+      public boolean handleExternalLink(URL url, Display display) {
+        return false;
+      }
+
+      @Override
+      public void handleDeclarationLink(IJavaElement target) {
+      }
+    }));
   }
 
   @Override
@@ -111,7 +131,7 @@ public class JavadocTooltip extends AbstractTooltip {
     }
   }
 
-  private void computJavadoc() {
+  private void computeJavadoc() {
     Job j = new Job("calculating java doc of '" + m_member.getElementName() + "'") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
@@ -123,7 +143,6 @@ public class JavadocTooltip extends AbstractTooltip {
               m_javaDoc = getJavadocHtml(new IJavaElement[]{m_member});
               if (getSourceControl() != null && !getSourceControl().isDisposed()) {
                 getSourceControl().getDisplay().asyncExec(new Runnable() {
-
                   @Override
                   public void run() {
                     if (m_browser != null && !m_browser.isDisposed()) {
@@ -172,22 +191,17 @@ public class JavadocTooltip extends AbstractTooltip {
   private String getJavadocHtml(IJavaElement[] result) {
     StringBuffer buffer = new StringBuffer();
     int nResults = result.length;
-
     if (nResults == 0) return null;
-
     String base = null;
     if (nResults > 1) {
-
       for (int i = 0; i < result.length; i++) {
         HTMLPrinter.startBulletList(buffer);
         IJavaElement curr = result[i];
         if (curr instanceof IMember || curr.getElementType() == IJavaElement.LOCAL_VARIABLE) HTMLPrinter.addBullet(buffer, getInfoText(curr, null, false));
         HTMLPrinter.endBulletList(buffer);
       }
-
     }
     else {
-
       IJavaElement curr = result[0];
       if (curr instanceof IMember) {
         final IMember member = (IMember) curr;
@@ -217,10 +231,8 @@ public class JavadocTooltip extends AbstractTooltip {
           else {
             base = JavaDocLocations.getBaseURL(member);
           }
-
         }
         catch (JavaModelException ex) {
-//       reader = new StringReader(InfoViewMessages.JavadocView_error_gettingJavadoc);
           JavaPlugin.log(ex.getStatus());
         }
         if (reader != null) {
@@ -309,10 +321,4 @@ public class JavadocTooltip extends AbstractTooltip {
       }
     }
   }
-
-  /** Flags used to render a label in the text widget. */
-  private static final long LABEL_FLAGS = JavaElementLabels.ALL_FULLY_QUALIFIED
-      | JavaElementLabels.M_PRE_RETURNTYPE | JavaElementLabels.M_PARAMETER_TYPES | JavaElementLabels.M_PARAMETER_NAMES | JavaElementLabels.M_EXCEPTIONS
-      | JavaElementLabels.F_PRE_TYPE_SIGNATURE | JavaElementLabels.T_TYPE_PARAMETERS;
-
 }
