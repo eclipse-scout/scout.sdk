@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -138,8 +141,16 @@ public class ProjectNodePage extends AbstractPage implements IProjectNodePage {
     catch (Exception e) {
       ScoutSdkUi.logWarning("Error during creating node page for Server Bundle in projct '" + getScoutResource().getProjectName() + "'.", e);
     }
+
     // sub projects
-    for (IScoutProject subProject : getScoutResource().getSubProjects()) {
+    IScoutProject[] subProjects = getScoutResource().getSubProjects();
+    Arrays.<IScoutProject> sort(subProjects, 0, subProjects.length, new Comparator<IScoutProject>() {
+      @Override
+      public int compare(IScoutProject o1, IScoutProject o2) {
+        return o1.getProjectName().compareTo(o2.getProjectName());
+      }
+    });
+    for (IScoutProject subProject : subProjects) {
       try {
         new ProjectNodePage(this, subProject);
       }

@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages;
 
+import java.util.Arrays;
+import java.util.Comparator;
+
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -63,6 +66,13 @@ public class ProjectsTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     IScoutProject[] rootProjects = ScoutSdkCore.getScoutWorkspace().getRootProjects();
+    Arrays.<IScoutProject> sort(rootProjects, 0, rootProjects.length, new Comparator<IScoutProject>() {
+      @Override
+      public int compare(IScoutProject o1, IScoutProject o2) {
+        return o1.getProjectName().compareTo(o2.getProjectName());
+      }
+    });
+
     ScoutSdkUi.logInfo("INVISIBLE ROOT NODE: found " + rootProjects.length + " root projects.");
     for (IScoutProject group : rootProjects) {
       new ProjectNodePage(this, group);
