@@ -158,7 +158,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     }
     for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
       ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
-      if (ext != null) {
+      if (ext != null && node.isEnabled()) {
         node.setText(prefix + ext.getBundleName() + postfix);
       }
     }
