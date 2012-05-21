@@ -85,7 +85,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
           pingStateChanging();
           IWizardPage page = getNextPage();
           if (page == null) {
-            // something must have happend getting the next page
+            // something must have happened getting the next page
             return;
           }
 

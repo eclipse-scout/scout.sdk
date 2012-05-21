@@ -68,22 +68,27 @@ public class JavadocTooltip extends AbstractTooltip {
       | JavaElementLabels.M_PRE_RETURNTYPE | JavaElementLabels.M_PARAMETER_TYPES | JavaElementLabels.M_PARAMETER_NAMES | JavaElementLabels.M_EXCEPTIONS
       | JavaElementLabels.F_PRE_TYPE_SIGNATURE | JavaElementLabels.T_TYPE_PARAMETERS;
 
-  private IMember m_member;
+  private IMember m_originalMember;
+  private IMember m_currentMember;
   private Browser m_browser;
   private String m_javaDoc;
 
   public JavadocTooltip(Control sourceControl) {
-    this(sourceControl, null);
-  }
-
-  public JavadocTooltip(Control sourceControl, IMember element) {
     super(sourceControl);
-    m_member = element;
   }
 
   public void setMember(IMember member) {
-    m_member = member;
-    if (TypeUtility.exists(m_member)) {
+    m_originalMember = member;
+    resetCurrentMember();
+  }
+
+  private void resetCurrentMember() {
+    setCurrentMember(m_originalMember);
+  }
+
+  private void setCurrentMember(IMember member) {
+    if (m_currentMember != member) {
+      m_currentMember = member;
       computeJavadoc();
     }
   }
@@ -109,7 +114,7 @@ public class JavadocTooltip extends AbstractTooltip {
       @Override
       public void handleInlineJavadocLink(IJavaElement target) {
         if (target instanceof IMember) {
-          setMember((IMember) target);
+          setCurrentMember((IMember) target);
         }
       }
 
@@ -126,21 +131,25 @@ public class JavadocTooltip extends AbstractTooltip {
 
   @Override
   protected void show(int x, int y) {
+    resetCurrentMember();
     if (!StringUtility.isNullOrEmpty(m_javaDoc)) {
       super.show(x, y);
     }
   }
 
   private void computeJavadoc() {
-    Job j = new Job("calculating java doc of '" + m_member.getElementName() + "'") {
+    if (!TypeUtility.exists(m_currentMember)) {
+      return;
+    }
+    Job j = new Job("calculating java doc of '" + m_currentMember.getElementName() + "'") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         Reader contentReader = null;
         try {
-          if (TypeUtility.exists(m_member)) {
-            contentReader = JavadocContentAccess.getHTMLContentReader(m_member, true, true);
+          if (TypeUtility.exists(m_currentMember)) {
+            contentReader = JavadocContentAccess.getHTMLContentReader(m_currentMember, true, true);
             if (contentReader != null) {
-              m_javaDoc = getJavadocHtml(new IJavaElement[]{m_member});
+              m_javaDoc = getJavadocHtml(new IJavaElement[]{m_currentMember});
               if (getSourceControl() != null && !getSourceControl().isDisposed()) {
                 getSourceControl().getDisplay().asyncExec(new Runnable() {
                   @Override
