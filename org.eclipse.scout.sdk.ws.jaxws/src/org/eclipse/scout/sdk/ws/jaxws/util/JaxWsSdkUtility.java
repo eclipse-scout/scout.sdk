@@ -1324,7 +1324,6 @@ public final class JaxWsSdkUtility {
       for (XmlResource bindingFileResource : bindingFileResources) {
         ScoutXmlDocument xmlBindingFile = bindingFileResource.loadXml();
 
-        @SuppressWarnings("unchecked")
         List<ScoutXmlElement> candidates = xmlBindingFile.getRoot().getDescendants("*:globalBindings");
         for (ScoutXmlElement candidate : candidates) {
           String prefix = candidate.getNamePrefix();

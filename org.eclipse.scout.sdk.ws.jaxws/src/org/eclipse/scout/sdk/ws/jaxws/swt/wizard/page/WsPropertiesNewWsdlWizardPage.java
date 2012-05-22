@@ -724,8 +724,8 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     Set<String> illegalUrlPatterns = new HashSet<String>();
 
     if (m_sunJaxWsXml != null) {
-      for (Object xmlSunJaxWs : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) xmlSunJaxWs);
+      for (ScoutXmlElement xmlSunJaxWs : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(xmlSunJaxWs);
         illegalAliases.add(sunJaxWsBean.getAlias());
         illegalUrlPatterns.add(sunJaxWsBean.getUrlPattern());
       }

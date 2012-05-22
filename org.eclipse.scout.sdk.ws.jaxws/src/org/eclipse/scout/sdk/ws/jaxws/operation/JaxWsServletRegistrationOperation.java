@@ -153,8 +153,8 @@ public class JaxWsServletRegistrationOperation implements IOperation {
               continue;
             }
             List<String> changedEntries = new ArrayList<String>();
-            for (Object sunJaxWsXmlEntry : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-              SunJaxWsBean sunJaxWsEntryBean = new SunJaxWsBean((ScoutXmlElement) sunJaxWsXmlEntry);
+            for (ScoutXmlElement sunJaxWsXmlEntry : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+              SunJaxWsBean sunJaxWsEntryBean = new SunJaxWsBean(sunJaxWsXmlEntry);
               changedEntries.add(sunJaxWsEntryBean.getAlias());
 
               String endpointPattern = sunJaxWsEntryBean.getUrlPattern();

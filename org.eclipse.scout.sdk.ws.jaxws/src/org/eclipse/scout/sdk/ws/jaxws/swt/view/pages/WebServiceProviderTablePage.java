@@ -142,8 +142,8 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
         return;
       }
 
-      for (Object sunJaxWsXml : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) sunJaxWsXml);
+      for (ScoutXmlElement sunJaxWsXml : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
         BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
 
         if (buildJaxWsBean != null) {

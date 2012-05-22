@@ -80,9 +80,8 @@ public class BuildJaxWsBean {
   public Map<String, List<String>> getPropertiers() {
     Map<String, List<String>> properties = new HashMap<String, List<String>>();
 
-    List children = m_xml.getChildren(XML_PROPERTY);
-    for (Object child : children) {
-      ScoutXmlElement xmlProperty = (ScoutXmlElement) child;
+    List<ScoutXmlElement> children = m_xml.getChildren(XML_PROPERTY);
+    for (ScoutXmlElement xmlProperty : children) {
       String name = xmlProperty.getAttribute(XML_PROPERTY_NAME, null);
       if (!StringUtility.isNullOrEmpty(name)) {
         String value = xmlProperty.getAttribute(XML_PROPERTY_VALUE, null);

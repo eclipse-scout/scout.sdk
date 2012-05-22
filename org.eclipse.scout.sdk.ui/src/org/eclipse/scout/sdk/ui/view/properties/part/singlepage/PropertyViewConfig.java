@@ -155,10 +155,8 @@ public class PropertyViewConfig {
       try {
         is = url.openStream();
         ScoutXmlDocument xmlDoc = parser.parse(is);
-        for (Object o : xmlDoc.getRoot().getChildren(TAG_TYPE)) {
-          if (o instanceof ScoutXmlElement) {
-            loadType((ScoutXmlElement) o);
-          }
+        for (ScoutXmlElement o : xmlDoc.getRoot().getChildren(TAG_TYPE)) {
+          loadType(o);
         }
       }
       finally {
@@ -205,10 +203,8 @@ public class PropertyViewConfig {
     HashMap<String, Config> c = new HashMap<String, Config>(20);
     m_typeConfigs.put(name, c);
 
-    for (Object o : type.getChildren(TAG_CONFIG)) {
-      if (o instanceof ScoutXmlElement) {
-        loadConfig(c, (ScoutXmlElement) o);
-      }
+    for (ScoutXmlElement o : type.getChildren(TAG_CONFIG)) {
+      loadConfig(c, o);
     }
   }
 

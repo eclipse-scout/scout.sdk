@@ -200,6 +200,8 @@ public class BindingFileCreateOperation implements IOperation {
     // do not escape the quotation character because it used to specify XPath node constraint containing the targetNamespace definition
     return xmlDocument.new ScoutXmlElement("bindings") {
 
+      private static final long serialVersionUID = 1L;
+
       @Override
       protected void writeEncoded(BufferedWriter bufferedWriter, String string) throws IOException {
         if (string == null) {

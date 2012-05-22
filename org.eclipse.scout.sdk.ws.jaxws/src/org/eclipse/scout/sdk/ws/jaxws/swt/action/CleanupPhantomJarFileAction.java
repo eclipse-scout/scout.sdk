@@ -130,8 +130,8 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
       return new IFile[0];
     }
 
-    for (Object sunJaxWsXml : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-      SunJaxWsBean sunJaxWsBean = new SunJaxWsBean((ScoutXmlElement) sunJaxWsXml);
+    for (ScoutXmlElement sunJaxWsXml : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+      SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
       BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
       if (buildJaxWsBean == null) {
         // only consider by-contract providers

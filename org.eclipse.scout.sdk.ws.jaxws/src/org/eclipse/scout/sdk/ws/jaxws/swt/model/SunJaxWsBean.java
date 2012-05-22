@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -136,16 +136,14 @@ public class SunJaxWsBean {
       return new ArrayList<ScoutXmlElement>(0);
     }
 
-    List children = xmlChains.getChildren(toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAIN));
+    List<ScoutXmlElement> children = xmlChains.getChildren(toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAIN));
     if (children == null) {
       return new ArrayList<ScoutXmlElement>(0);
     }
 
     List<ScoutXmlElement> chains = new ArrayList<ScoutXmlElement>();
-    for (Object child : children) {
-      if (child instanceof ScoutXmlElement) {
-        chains.add((ScoutXmlElement) child);
-      }
+    for (ScoutXmlElement child : children) {
+      chains.add(child);
     }
     return chains;
   }
@@ -168,16 +166,14 @@ public class SunJaxWsBean {
     String handlerClazzXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
 
     for (ScoutXmlElement xmlHandlerChain : getHandlerChains()) {
-      List children = xmlHandlerChain.getChildren(handlerXmlElementName);
+      List<ScoutXmlElement> children = xmlHandlerChain.getChildren(handlerXmlElementName);
       if (children == null || children.size() == 0) {
         continue;
       }
 
       List<ScoutXmlElement> handlers = new LinkedList<ScoutXmlElement>();
-      for (Object child : children) {
-        if (child instanceof ScoutXmlElement) {
-          handlers.add((ScoutXmlElement) child);
-        }
+      for (ScoutXmlElement child : children) {
+        handlers.add(child);
       }
       for (int i = 0; i < handlers.size(); i++) {
         ScoutXmlElement xmlHandler = handlers.get(i);
@@ -198,16 +194,14 @@ public class SunJaxWsBean {
     String handlerXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER);
     String handlerClazzXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
 
-    List children = xmlHandlerChain.getChildren(handlerXmlElementName);
+    List<ScoutXmlElement> children = xmlHandlerChain.getChildren(handlerXmlElementName);
     if (children == null || children.size() == 0) {
       return;
     }
 
     List<ScoutXmlElement> handlers = new LinkedList<ScoutXmlElement>();
-    for (Object child : children) {
-      if (child instanceof ScoutXmlElement) {
-        handlers.add((ScoutXmlElement) child);
-      }
+    for (ScoutXmlElement child : children) {
+      handlers.add((ScoutXmlElement) child);
     }
     for (int i = 0; i < handlers.size(); i++) {
       ScoutXmlElement xmlHandler = handlers.get(i);
@@ -225,7 +219,7 @@ public class SunJaxWsBean {
 
   public boolean swapHandler(ScoutXmlElement xmlHandlerChain, int oldIndex, int newIndex) {
     String handlerXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER);
-    List handlerChildren = xmlHandlerChain.getChildren(handlerXmlElementName);
+    List<ScoutXmlElement> handlerChildren = xmlHandlerChain.getChildren(handlerXmlElementName);
     try {
       Collections.swap(handlerChildren, oldIndex, newIndex);
 
