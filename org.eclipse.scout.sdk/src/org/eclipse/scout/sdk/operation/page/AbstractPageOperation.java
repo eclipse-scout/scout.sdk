@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -204,7 +203,6 @@ public abstract class AbstractPageOperation implements IOperation {
         }
       }
     }
-    builder.append(ScoutUtility.getCommentBlock("propagate the selected row to the childPage.") + "\n");
   }
 
   public void setHolderType(IType holderType) {
