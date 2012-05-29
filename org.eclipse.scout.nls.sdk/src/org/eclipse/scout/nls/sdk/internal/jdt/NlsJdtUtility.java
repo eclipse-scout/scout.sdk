@@ -105,7 +105,11 @@ public final class NlsJdtUtility {
             continue;
           }
         }
-        filePath = filePath.replace("/", ".").replaceAll(".java", "");
+        String javaFileSuffix = ".java";
+        filePath = filePath.replace("/", ".");
+        if (filePath.toLowerCase().endsWith(javaFileSuffix)) {
+          filePath = filePath.substring(0, filePath.length() - javaFileSuffix.length());
+        }
         IType type = jp.findType(filePath);
 
         if (type == null) {
