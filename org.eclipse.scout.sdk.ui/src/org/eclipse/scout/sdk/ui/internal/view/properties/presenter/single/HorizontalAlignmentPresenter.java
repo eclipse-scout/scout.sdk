@@ -113,7 +113,7 @@ public class HorizontalAlignmentPresenter extends AbstractProposalPresenter<Hori
           break;
       }
       source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
     }
     if (op != null) {
       OperationJob job = new OperationJob(op);

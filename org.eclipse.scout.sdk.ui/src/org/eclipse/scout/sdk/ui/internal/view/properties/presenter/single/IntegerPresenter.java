@@ -88,7 +88,7 @@ public class IntegerPresenter extends AbstractValuePresenter<Integer> {
     }
     else {
       String sourceValue = formatSourceValue(value);
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
     }
     if (op != null) {
       new OperationJob(op).schedule();

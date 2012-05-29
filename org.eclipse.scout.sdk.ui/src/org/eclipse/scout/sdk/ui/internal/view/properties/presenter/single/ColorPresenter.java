@@ -198,7 +198,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
       }
     }
     else {
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + formatSourceValue(value) + ";", false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + formatSourceValue(value) + ";", true);
     }
     if (op != null) {
       new OperationJob(op).schedule();

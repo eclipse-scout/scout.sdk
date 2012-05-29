@@ -91,14 +91,17 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
       switch (value) {
         case Left:
           sourceValue = "-1";
+          break;
         case Center:
           sourceValue = "0";
+          break;
         case Right:
           sourceValue = "1";
+          break;
         default:
           sourceValue = "1000";
       }
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
     }
 
     if (op != null) {

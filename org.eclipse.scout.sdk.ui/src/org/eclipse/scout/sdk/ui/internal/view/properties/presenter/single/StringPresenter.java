@@ -66,7 +66,7 @@ public class StringPresenter extends AbstractValuePresenter<String> {
     }
     else {
       String sourceValue = formatSourceValue(value);
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
     }
     if (op != null) {
       new OperationJob(op).schedule();
