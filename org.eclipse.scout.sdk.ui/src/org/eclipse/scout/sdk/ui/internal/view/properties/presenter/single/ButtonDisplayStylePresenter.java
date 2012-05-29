@@ -109,7 +109,7 @@ public class ButtonDisplayStylePresenter extends AbstractProposalPresenter<Butto
             break;
         }
       }
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
     }
     if (op != null) {
       new OperationJob(op).schedule();

@@ -210,7 +210,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
           break;
       }
       source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
     }
     if (op != null) {
       new OperationJob(op).schedule();

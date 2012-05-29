@@ -116,7 +116,7 @@ public class BooleanPresenter extends AbstractMethodPresenter {
       }
     }
     else {
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", false);
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
     }
     if (op != null) {
       OperationJob job = new OperationJob(op);

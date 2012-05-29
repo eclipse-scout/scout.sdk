@@ -121,7 +121,7 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<LabelPosit
           return;
       }
       source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString());
+      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
     }
     if (op != null) {
       new OperationJob(op).schedule();
