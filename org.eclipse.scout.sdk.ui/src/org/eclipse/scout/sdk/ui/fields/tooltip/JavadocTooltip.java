@@ -44,6 +44,7 @@ import org.eclipse.scout.sdk.compatibility.JavadocHoverUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.layout.GridData;
@@ -95,38 +96,50 @@ public class JavadocTooltip extends AbstractTooltip {
 
   @Override
   protected void createContent(Composite parent) {
-    m_browser = new Browser(parent, SWT.NONE);
-    m_browser.setJavascriptEnabled(true);
-    m_browser.setText(m_javaDoc);
-    GridData layoutData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
-    layoutData.heightHint = 200;
-    layoutData.widthHint = 650;
-    m_browser.setLayoutData(layoutData);
-    m_browser.addLocationListener(JavaElementLinks.createLocationListener(new JavaElementLinks.ILinkHandler() {
-      @Override
-      public void handleTextSet() {
-      }
-
-      @Override
-      public void handleJavadocViewLink(IJavaElement target) {
-      }
-
-      @Override
-      public void handleInlineJavadocLink(IJavaElement target) {
-        if (target instanceof IMember) {
-          setCurrentMember((IMember) target);
+    try {
+      m_browser = new Browser(parent, SWT.NONE);
+      m_browser.setJavascriptEnabled(true);
+      m_browser.setText(m_javaDoc);
+      GridData layoutData = new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH);
+      layoutData.heightHint = 200;
+      layoutData.widthHint = 650;
+      m_browser.setLayoutData(layoutData);
+      m_browser.addLocationListener(JavaElementLinks.createLocationListener(new JavaElementLinks.ILinkHandler() {
+        @Override
+        public void handleTextSet() {
         }
-      }
 
-      @Override
-      public boolean handleExternalLink(URL url, Display display) {
-        return false;
-      }
+        @Override
+        public void handleJavadocViewLink(IJavaElement target) {
+        }
 
-      @Override
-      public void handleDeclarationLink(IJavaElement target) {
+        @Override
+        public void handleInlineJavadocLink(IJavaElement target) {
+          if (target instanceof IMember) {
+            setCurrentMember((IMember) target);
+          }
+        }
+
+        @Override
+        public boolean handleExternalLink(URL url, Display display) {
+          return false;
+        }
+
+        @Override
+        public void handleDeclarationLink(IJavaElement target) {
+        }
+      }));
+    }
+    catch (SWTError swterr) {
+      // can happen if no browser is installed in the OS or if the browser cannot be found (not correctly registered).
+      // see http://www.eclipse.org/swt/faq.php#browserlinuxrcp
+      // and: https://bbs.archlinux.org/viewtopic.php?pid=266262#p266262
+      ScoutSdkUi.logError("Error creating Javadoc Tooltip: " + swterr.getMessage());
+      if (m_browser != null) {
+        m_browser.dispose();
+        m_browser = null;
       }
-    }));
+    }
   }
 
   @Override
