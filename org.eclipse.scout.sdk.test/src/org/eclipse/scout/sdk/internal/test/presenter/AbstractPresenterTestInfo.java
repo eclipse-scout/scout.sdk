@@ -14,6 +14,13 @@ public abstract class AbstractPresenterTestInfo {
   }
 
   /**
+   * used to initialize the presenter test info. the call of this method is not part of the performance testing.
+   */
+  public void init(ConfigurationMethod testMethod) {
+
+  }
+
+  /**
    * Creates and initializes a presenter for the given method.
    * 
    * @param toolkit
@@ -36,7 +43,7 @@ public abstract class AbstractPresenterTestInfo {
    */
   public abstract long getMaxPresenterCreationDuration();
 
-  public String getTestTypeFqn() {
+  public final String getTestTypeFqn() {
     return m_typeFqn;
   }
 }

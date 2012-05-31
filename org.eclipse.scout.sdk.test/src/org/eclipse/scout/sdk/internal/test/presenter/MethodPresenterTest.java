@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Vertic
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
@@ -109,11 +110,15 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
     }
     Assert.assertTrue(implementedMethods.size() == 1);
 
+    ConfigurationMethod testMethod = implementedMethods.get(0);
+
+    testInfo.init(testMethod);
+
     long duration = -1;
     AbstractMethodPresenter presenter = null;
     try {
       TuningUtility.startTimer();
-      presenter = testInfo.createPresenter(default_toolkit, default_parent, implementedMethods.get(0));
+      presenter = testInfo.createPresenter(default_toolkit, default_parent, testMethod);
     }
     finally {
       duration = TuningUtility.stopTimer("", false, false);
@@ -495,6 +500,13 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
   @Test
   public void testNlsTextProposalPresenter() throws Exception {
     doPresenterTest(new AbstractPresenterTestInfo("presenter.test.client.ui.forms.DesktopForm.MainBox.NlsTextProposalPresenterTestField") {
+
+      @Override
+      public void init(ConfigurationMethod testMethod) {
+        // ensure that the NLS project is initialized for the client. this ensures the NLS project creation itself is not part of the
+        // performance tests as this has nothing to do with the presenter and is cached after first retrieval.
+        ScoutTypeUtility.findNlsProject(testMethod.getType());
+      }
 
       @Override
       public long getMaxPresenterCreationDuration() {
