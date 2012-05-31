@@ -26,7 +26,7 @@ public class SdkLogManager {
   }
 
   private LogStatus createLogStatus(int severity, String message, Throwable t) {
-    return new LogStatus(m_plugin.getClass(), IStatus.INFO, m_plugin.getBundle().getSymbolicName(), message, t);
+    return new LogStatus(m_plugin.getClass(), severity, m_plugin.getBundle().getSymbolicName(), message, t);
   }
 
   private LogStatus createLogStatus(IStatus log) {
