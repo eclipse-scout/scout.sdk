@@ -104,7 +104,9 @@ public abstract class AbstractTooltip {
       }
       m_shell.pack();
       m_shell.setBounds(computeBounds(m_shell.getSize()));
-      m_shell.setVisible(true);
+      if (m_shell.getChildren().length > 0) {
+        m_shell.setVisible(true);
+      }
       handleContentListeners(m_shell, true);
       m_shell.getParent().addListener(SWT.Deactivate, m_listener);
     }
