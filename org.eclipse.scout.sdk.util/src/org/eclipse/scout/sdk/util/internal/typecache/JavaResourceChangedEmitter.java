@@ -253,11 +253,19 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
           addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, (collector != null) ? kind : CHANGED_EXTERNAL, e));
         }
     }
-    if (rootEvent.getType() == ElementChangedEvent.POST_RECONCILE && e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+
+    if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
       ICompilationUnit icu = (ICompilationUnit) e;
       try {
-        if (((flags & IJavaElementDelta.F_CHILDREN) == 0) && ((flags & IJavaElementDelta.F_CONTENT) == 0) && !icu.hasUnsavedChanges()) {
-          releaseEventCollector(icu, true);
+        if (!icu.hasUnsavedChanges()) {
+          if (rootEvent.getType() == ElementChangedEvent.POST_RECONCILE) {
+            // the reconcile event is before the post change event. (fast save)
+            releaseEventCollector((ICompilationUnit) e, true);
+          }
+          else if (rootEvent.getType() == ElementChangedEvent.POST_CHANGE && ((flags & IJavaElementDelta.F_CHILDREN) == 0) && ((flags & IJavaElementDelta.F_CONTENT) == 0)) {
+            // normal save
+            releaseEventCollector(icu, true);
+          }
         }
       }
       catch (JavaModelException ex) {
@@ -276,7 +284,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     else {
       fireEvent(event);
     }
-
   }
 
   private JdtEventCollector aquireEventCollector(ICompilationUnit icu) throws JavaModelException {
@@ -286,7 +293,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       collector = new JdtEventCollector(icu);
       m_eventCollectors.put(icu, collector);
       icu.getBuffer().addBufferChangedListener(m_sourceBufferListener);
-
     }
     return collector;
   }
@@ -533,7 +539,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
               }
               return true;
             }
-
           });
         }
       }
@@ -541,7 +546,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         SdkUtilActivator.logWarning(e);
       }
     }
-  } // end class P_ResouceListener
+  } // end class P_ResourceListener
 
   private class P_SourceBufferListener implements IBufferChangedListener {
     @Override
@@ -549,14 +554,14 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       IBuffer buffer = event.getBuffer();
       ICompilationUnit icu = (ICompilationUnit) buffer.getOwner();
       if (!buffer.hasUnsavedChanges() && buffer.isClosed()) {
-        // relese
+        // release
         releaseEventCollector(icu, icu.isWorkingCopy());
         if (!icu.isWorkingCopy()) {
           buffer.removeBufferChangedListener(m_sourceBufferListener);
         }
       }
     }
-  }
+  } // end class P_SourceBufferListener
 
   private class P_JavaElementChangedListener implements IElementChangedListener {
 
@@ -587,7 +592,5 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         handleJdtDelta(rootEvent, delta);
       }
     }
-
-  }
-
+  } // end class P_JavaElementChangedListener
 }
