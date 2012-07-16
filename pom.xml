@@ -43,5 +43,7 @@
     <module>org.eclipse.scout.sdk.rap</module>
     <module>org.eclipse.scout.sdk.rap.ui</module>
     <module>org.eclipse.scout.sdk.test</module>
+
+<!--     <module>org.eclipse.scout.sdk.feature</module> -->
   </modules>
 </project>
