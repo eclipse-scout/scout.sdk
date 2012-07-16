@@ -42,5 +42,6 @@
     <module>org.eclipse.scout.sdk.ws.jaxws</module>
     <module>org.eclipse.scout.sdk.rap</module>
     <module>org.eclipse.scout.sdk.rap.ui</module>
+    <module>org.eclipse.scout.sdk.test</module>
   </modules>
 </project>
