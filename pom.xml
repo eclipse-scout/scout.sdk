@@ -39,5 +39,6 @@
     <module>org.eclipse.scout.sdk.ui</module>
     <module>org.eclipse.scout.sdk.debug</module>
     <module>org.eclipse.scout.sdk.help</module>
+    <module>org.eclipse.scout.sdk.ws.jaxws</module>
   </modules>
 </project>
