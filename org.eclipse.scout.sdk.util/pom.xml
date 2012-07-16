@@ -15,22 +15,11 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.eclipse.scout</groupId>
-    <artifactId>org.eclipse.scout.parent</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.parent</relativePath>
+    <groupId>org.eclipse.scout.sdk</groupId>
+    <artifactId>eclipse.scout.sdk</artifactId>
+    <version>3.9.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.eclipse.scout.sdk</groupId>
-  <artifactId>eclipse.scout.sdk</artifactId>
-  <version>3.9.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-
-  <modules>
-    <module>org.eclipse.scout.sdk.compatibility</module>
-    <module>org.eclipse.scout.sdk.compatibility.v35.fragment</module>
-    <module>org.eclipse.scout.sdk.compatibility.v36v37v41.fragment</module>
-    <module>org.eclipse.scout.sdk.compatibility.v38v42.fragment</module>
-    <module>org.eclipse.scout.sdk.util</module>
-  </modules>
+  <artifactId>org.eclipse.scout.sdk.util</artifactId>
+  <packaging>eclipse-plugin</packaging>
 </project>

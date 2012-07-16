@@ -16,8 +16,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="3.5.0";visibility:=reexport,
  org.eclipse.scout.commons;bundle-version="3.7.0";visibility:=reexport,
  org.eclipse.scout.sdk.compatibility;bundle-version="3.9.0";visibility:=reexport
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.sdk.util,
  org.eclipse.scout.sdk.util.ast,
  org.eclipse.scout.sdk.util.ast.visitor,
@@ -32,3 +30,5 @@ Export-Package: org.eclipse.scout.sdk.util,
  org.eclipse.scout.sdk.util.signature,
  org.eclipse.scout.sdk.util.type,
  org.eclipse.scout.sdk.util.typecache
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
