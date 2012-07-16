@@ -4,10 +4,10 @@ Bundle-Name: Scout SDK Rap
 Bundle-SymbolicName: org.eclipse.scout.sdk.rap;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.rap.ScoutSdkRap
+Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.sdk;bundle-version="3.9.0";visibility:=reexport
-Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.scout.sdk.rap,
  org.eclipse.scout.sdk.rap.operations.project
-Bundle-Vendor: Eclipse Scout Project
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
