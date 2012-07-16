@@ -13,7 +13,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.sdk.util;bundle-version="3.9.0";visibility:=reexport,
  org.eclipse.scout.nls.sdk;bundle-version="3.9.0";visibility:=reexport,
  org.eclipse.jdt.ui;bundle-version="3.5.0"
-Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.icon,
  org.eclipse.scout.sdk.internal;x-friends:="org.eclipse.scout.sdk.test",
@@ -49,5 +48,5 @@ Export-Package: org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.workspace.resource,
  org.eclipse.scout.sdk.workspace.type,
  org.eclipse.scout.sdk.workspace.type.config
-Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
