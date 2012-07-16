@@ -36,5 +36,6 @@
     <module>org.eclipse.scout.nls.sdk.simple</module>
     <module>org.eclipse.scout.nls.sdk.services</module>
     <module>org.eclipse.scout.sdk</module>
+    <module>org.eclipse.scout.sdk.debug</module>
   </modules>
 </project>
