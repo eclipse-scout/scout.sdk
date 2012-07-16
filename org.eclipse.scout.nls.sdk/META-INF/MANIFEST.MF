@@ -20,7 +20,6 @@ Require-Bundle: org.eclipse.scout.sdk.util;bundle-version="3.9.0",
  org.eclipse.ltk.core.refactoring,
  org.eclipse.jface.databinding,
  org.eclipse.jdt.core.manipulation;bundle-version="1.3.0"
-Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.nls.sdk.extension,
  org.eclipse.scout.nls.sdk.internal,
  org.eclipse.scout.nls.sdk.internal.jdt,
@@ -45,4 +44,4 @@ Export-Package: org.eclipse.scout.nls.sdk.extension,
  org.eclipse.scout.nls.sdk.ui.action,
  org.eclipse.scout.nls.sdk.util.concurrent
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: .
+Bundle-ActivationPolicy: lazy
