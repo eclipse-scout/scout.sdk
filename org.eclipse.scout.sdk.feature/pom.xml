@@ -24,6 +24,8 @@
   <artifactId>org.eclipse.scout.sdk</artifactId>
   <packaging>eclipse-feature</packaging>
 
+  <name>Eclipse Scout SDK Feature</name>
+
   <build>
     <plugins>
 <!--       <plugin> -->
