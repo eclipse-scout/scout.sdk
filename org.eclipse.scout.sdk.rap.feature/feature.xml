@@ -6,21 +6,21 @@
       provider-name="%providerName"
       plugin="org.eclipse.scout.sdk.rap">
 
-   <description url="http://www.example.com/description">
-      
+   <description url="http://www.eclipse.org/scout/">
+     %description
    </description>
 
    <copyright>
-      %copyright
+     %copyright
    </copyright>
 
    <license url="%licenseURL">
-      %license
+     %license
    </license>
 
    <url>
-      <update label="Juno" url="http://download.eclipse.org/releases/juno"/>
-      <discovery label="Juno" url="http://download.eclipse.org/releases/juno"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/juno"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/juno"/>
    </url>
 
    <includes

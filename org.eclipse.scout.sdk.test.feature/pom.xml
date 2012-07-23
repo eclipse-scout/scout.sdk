@@ -21,10 +21,10 @@
   </parent>
 
   <groupId>org.eclipse.scout.sdk-feature</groupId>
-  <artifactId>org.eclipse.scout.sdk.feature</artifactId>
+  <artifactId>org.eclipse.scout.sdk.test.feature</artifactId>
   <packaging>eclipse-feature</packaging>
 
-  <name>Eclipse Scout SDK Feature</name>
+  <name>Eclipse Scout SDK Test Feature</name>
 
   <build>
     <plugins>
@@ -38,12 +38,11 @@
             <goals>
               <goal>source-feature</goal>
             </goals>
-            <configuration>
-              <excludes>
-                <plugin id="org.eclipse.scout.sdk.compatibility.v35.fragment" />
-                <plugin id="org.eclipse.scout.sdk.compatibility.v36v37v41.fragment" />
-              </excludes>
-            </configuration>
+<!--             <configuration> -->
+<!--               <excludes> -->
+<!--                 <plugin id="org.eclipse.scout.sdk.feature.about" /> -->
+<!--               </excludes> -->
+<!--             </configuration> -->
           </execution>
         </executions>
       </plugin>

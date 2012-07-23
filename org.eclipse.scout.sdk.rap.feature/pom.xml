@@ -24,27 +24,10 @@
   <artifactId>org.eclipse.scout.sdk.rap</artifactId>
   <packaging>eclipse-feature</packaging>
 
+  <name>Eclipse Scout RAP SDK Feature</name>
+
   <build>
     <plugins>
-<!--       <plugin> -->
-<!--         <groupId>org.eclipse.tycho</groupId> -->
-<!--         <artifactId>tycho-packaging-plugin</artifactId> -->
-<!--         <version>${tycho.version}</version> -->
-<!--         <executions> -->
-<!--         <execution> -->
-<!--               <id>package</id> -->
-<!--               <phase>package-feature</phase> -->
-<!--               <goals> -->
-<!--                 <goal>package-feature</goal> -->
-<!--               </goals> -->
-<!--               <configuration> -->
-<!--                 <excludes> -->
-<!--                   <plugin id="org.eclipse.scout.sdk.compatibility.v35.fragment" /> -->
-<!--                 </excludes> -->
-<!--               </configuration> -->
-<!--             </execution> -->
-<!--         </executions> -->
-<!--       </plugin> -->
       <plugin>
         <groupId>org.eclipse.tycho.extras</groupId>
         <artifactId>tycho-source-feature-plugin</artifactId>
