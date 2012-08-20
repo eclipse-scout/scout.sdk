@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.sdk.rap.feature"
       label="%featureName"
-      version="3.8.0.qualifier"
+      version="3.8.1.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.scout.sdk.rap">
 
@@ -36,8 +36,8 @@ BSI Business Systems Integration AG - initial API and implementation
          optional="true"/>
 
    <requires>
-      <import feature="org.eclipse.scout.sdk.feature" version="3.8.0.qualifier"/>
-      <import feature="org.eclipse.scout.sdk.feature.source" version="3.8.0.qualifier"/>
+      <import feature="org.eclipse.scout.sdk.feature" version="3.8.1.qualifier"/>
+      <import feature="org.eclipse.scout.sdk.feature.source" version="3.8.1.qualifier"/>
    </requires>
 
    <plugin
