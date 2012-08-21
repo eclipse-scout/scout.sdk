@@ -154,8 +154,10 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     if (selectedItem instanceof IType) {
       IType formField = (IType) selectedItem;
       wizard = (AbstractFormFieldWizard) FormFieldExtensionPoint.createNewWizard(formField);
-      wizard.initWizard(m_declaringType);
-      wizard.setSuperType(formField);
+      if (wizard != null) {
+        wizard.initWizard(m_declaringType);
+        wizard.setSuperType(formField);
+      }
     }
     if (wizard != null) {
       m_nextPage = (AbstractScoutWizardPage) wizard.getPages()[0];
