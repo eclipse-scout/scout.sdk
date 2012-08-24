@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.CalendarServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
@@ -50,12 +50,13 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
-  private ServiceNewOperation m_operation = new ServiceNewOperation();
+  private CalendarServiceNewOperation m_operation = new CalendarServiceNewOperation();
 
   public CalendarServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewCalendarService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewCalendarService"), Texts.get("CreateANewCalendarService"), TypeUtility.getType(RuntimeClasses.ICalendarService), SdkProperties.SUFFIX_CALENDAR_SERVICE);
+    m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
