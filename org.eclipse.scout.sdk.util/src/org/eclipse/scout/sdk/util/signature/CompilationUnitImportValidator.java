@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.JavaModelException;
@@ -25,12 +26,22 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 
 public class CompilationUnitImportValidator implements IImportValidator {
 
+  public static enum Status {
+    StatusCollecting,
+    StatusDone
+  }
+
   private final ICompilationUnit m_icu;
-  private final Map<String/* simpleName */, String/* packageName */> m_icuImports;
+  private Map<String/* simpleName */, String/* packageName */> m_icuImports;
   private HashMap<String/* simpleName */, String/* packageName */> m_newImports;
+  private Status m_status;
 
   public CompilationUnitImportValidator(ICompilationUnit icu) {
     m_icu = icu;
+    setup();
+  }
+
+  private void setup() {
     HashMap<String, String> usedImps = new HashMap<String, String>();
     try {
       for (IImportDeclaration imp : m_icu.getImports()) {
@@ -41,7 +52,7 @@ public class CompilationUnitImportValidator implements IImportValidator {
       }
     }
     catch (JavaModelException e) {
-      SdkUtilActivator.logWarning("could not collect imports of compilation unit '" + icu.getElementName() + "'!", e);
+      SdkUtilActivator.logWarning("could not collect imports of compilation unit '" + m_icu.getElementName() + "'!", e);
     }
     m_icuImports = Collections.unmodifiableMap(usedImps);
     m_newImports = new HashMap<String, String>();
@@ -49,9 +60,14 @@ public class CompilationUnitImportValidator implements IImportValidator {
 
   @Override
   public void addImport(String fqn) {
-    String packageName = Signature.getQualifier(fqn);
-    String simpleName = Signature.getSimpleName(fqn);
-    m_newImports.put(simpleName, packageName);
+    if (Status.StatusCollecting.equals(m_status)) {
+      String packageName = Signature.getQualifier(fqn);
+      String simpleName = Signature.getSimpleName(fqn);
+      m_newImports.put(simpleName, packageName);
+    }
+    else {
+      throw new IllegalStateException("Import validator is already ");
+    }
   }
 
   private String findUsedPackageName(String simpleName) {
@@ -103,5 +119,13 @@ public class CompilationUnitImportValidator implements IImportValidator {
       }
     }
     return list.toArray(new String[list.size()]);
+  }
+
+  public void createImports(IProgressMonitor monitor) throws JavaModelException {
+    for (String imp : getImportsToCreate()) {
+      m_icu.createImport(imp, null, monitor);
+    }
+    m_icu.reconcile(ICompilationUnit.NO_AST, false, null, monitor);
+    setup();
   }
 }
