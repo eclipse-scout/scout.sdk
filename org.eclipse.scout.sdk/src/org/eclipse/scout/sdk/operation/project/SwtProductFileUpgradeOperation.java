@@ -95,6 +95,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         "org.w3c.dom.svg",
         "javax.annotation",
         "javax.inject",
+        "javax.xml",
         "org.apache.batik.css",
         "org.apache.batik.util",
         "org.apache.batik.util.gui"
