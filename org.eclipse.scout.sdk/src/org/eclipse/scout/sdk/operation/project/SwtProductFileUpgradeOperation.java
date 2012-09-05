@@ -120,6 +120,8 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         newEntry.append(",");
         newEntry.append(oldEntry.substring(pos));
         pfmh.ConfigurationFile.setOsgiBundlesEntry(newEntry.toString());
+        //clear saved user changes of the ui model before starting
+        pfmh.ConfigurationFile.setEntry("clearPersistedState", "true");
       }
       pfmh.save();
     }
