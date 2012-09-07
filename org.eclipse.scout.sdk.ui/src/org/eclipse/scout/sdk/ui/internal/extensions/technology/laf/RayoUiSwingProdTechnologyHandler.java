@@ -35,6 +35,8 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
 
   private final static String SCOUT_LAF_KEY = "scout.laf";
   private final static String RAYO_LAF_NAME = "com.bsiag.scout.rt.ui.swing.laf.rayo.Rayo";
+  private final static String RAYO_LAF_FRAME_KEY = "scout.laf.useLafFrameAndDialog";
+  private final static String RAYO_LAF_FRAME_NAME = "true";
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -44,9 +46,11 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
       ProductFileModelHelper pfmh = new ProductFileModelHelper(res.getResource());
       if (selected) {
         pfmh.ConfigurationFile.setEntry(SCOUT_LAF_KEY, RAYO_LAF_NAME);
+        pfmh.ConfigurationFile.setEntry(RAYO_LAF_FRAME_KEY, RAYO_LAF_FRAME_NAME);
       }
       else {
         pfmh.ConfigurationFile.removeEntry(SCOUT_LAF_KEY);
+        pfmh.ConfigurationFile.removeEntry(RAYO_LAF_FRAME_KEY);
       }
       pfmh.save();
     }
