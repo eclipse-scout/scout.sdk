@@ -95,6 +95,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         "org.w3c.dom.svg",
         "javax.annotation",
         "javax.inject",
+        "javax.xml",
         "org.apache.batik.css",
         "org.apache.batik.util",
         "org.apache.batik.util.gui"
@@ -119,6 +120,8 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         newEntry.append(",");
         newEntry.append(oldEntry.substring(pos));
         pfmh.ConfigurationFile.setOsgiBundlesEntry(newEntry.toString());
+        //clear saved user changes of the ui model before starting
+        pfmh.ConfigurationFile.setEntry("clearPersistedState", "true");
       }
       pfmh.save();
     }

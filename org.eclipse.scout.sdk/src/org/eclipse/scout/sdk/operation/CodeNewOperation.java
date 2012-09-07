@@ -88,7 +88,8 @@ public class CodeNewOperation implements IOperation {
 
   @SuppressWarnings("unchecked")
   private static void setStaticModifierRec(TypeDeclaration td) {
-    List l = td.modifiers();
+    @SuppressWarnings("rawtypes")
+	List l = td.modifiers();
     Modifier modStatic = td.getAST().newModifier(Modifier.ModifierKeyword.STATIC_KEYWORD);
     boolean isStatic = false;
     for (Object o : l) { // check if a static modifier is already present (contains does not work)
