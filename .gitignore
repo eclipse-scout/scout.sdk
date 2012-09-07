@@ -7,7 +7,8 @@
 *.zip
 
 # Eclipse #
-bin/**
+bin/
+classes/
 
 # Maven #
 target/
