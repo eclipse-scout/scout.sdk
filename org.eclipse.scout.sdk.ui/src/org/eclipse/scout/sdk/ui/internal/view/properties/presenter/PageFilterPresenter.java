@@ -104,10 +104,12 @@ public class PageFilterPresenter extends AbstractPresenter {
     m_regexButton.setLayoutData(data);
 
     //init
-    IPageFilter pageFilter = getPage().getOutlineView().getPageFilter(getPage());
-    if (pageFilter != null && pageFilter instanceof PageFilter) {
-      m_filterExpressionField.setText(pageFilter.getFilterExpression());
-      m_regexButton.setSelection(((PageFilter) pageFilter).isRegExFilter());
+    if (getPage() != null && getPage().getOutlineView() != null) {
+      IPageFilter pageFilter = getPage().getOutlineView().getPageFilter(getPage());
+      if (pageFilter != null && pageFilter instanceof PageFilter) {
+        m_filterExpressionField.setText(pageFilter.getFilterExpression());
+        m_regexButton.setSelection(((PageFilter) pageFilter).isRegExFilter());
+      }
     }
   }
 
