@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout SDK Compatibility Fragment for Eclipse Helios & Indigo
-Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility.v36v37v41.fragment;singleton:=true
+Bundle-Name: Scout SDK Compatibility Fragment for Eclipse Helios
+Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility.v36.fragment;singleton:=true
 Bundle-Version: 3.8.1.qualifier
 Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="3.8.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

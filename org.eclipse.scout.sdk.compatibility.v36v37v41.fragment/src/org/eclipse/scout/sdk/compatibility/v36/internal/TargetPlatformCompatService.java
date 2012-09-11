@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.compatibility.v36v37v41.internal;
+package org.eclipse.scout.sdk.compatibility.v36.internal;
 
 import java.net.URI;
 import java.net.URISyntaxException;
