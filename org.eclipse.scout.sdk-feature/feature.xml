@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.scout.sdk.feature"
+      id="org.eclipse.scout.sdk"
       label="%featureName"
       version="3.9.0.qualifier"
       provider-name="%providerName"
@@ -27,8 +27,8 @@
       <import feature="org.eclipse.pde" version="3.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="3.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.jdt" version="3.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.scout.rt.feature" version="3.5.5" match="greaterOrEqual"/>
-      <import feature="org.eclipse.scout.rt.feature.source" version="3.5.5" match="greaterOrEqual"/>
+      <import feature="org.eclipse.scout.rt" version="3.9.0.qualifier"/>
+      <import feature="org.eclipse.scout.rt.source" version="3.9.0.qualifier"/>
    </requires>
 
    <plugin

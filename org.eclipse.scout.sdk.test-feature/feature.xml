@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="org.eclipse.scout.sdk.rap.feature"
+      id="org.eclipse.scout.sdk.test"
       label="%featureName"
       version="3.9.0.qualifier"
-      provider-name="%providerName"
-      plugin="org.eclipse.scout.sdk.rap">
+      provider-name="%providerName">
 
    <description url="http://www.eclipse.org/scout/">
-     %description
+      %description
    </description>
 
    <copyright>
-     %copyright
+      %copyright
    </copyright>
 
    <license url="%licenseURL">
-     %license
+      %license
    </license>
 
    <url>
@@ -23,25 +22,20 @@
       <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/juno"/>
    </url>
 
-   <includes
-         id="org.eclipse.scout.sdk.rap.feature.source"
-         version="0.0.0"
-         optional="true"/>
-
    <requires>
-      <import feature="org.eclipse.scout.sdk.feature" version="3.9.0.qualifier"/>
-      <import feature="org.eclipse.scout.sdk.feature.source" version="3.9.0.qualifier"/>
+      <import feature="org.eclipse.scout.sdk" version="3.9.0" match="compatible"/>
+      <import feature="org.eclipse.scout.sdk.source" version="3.9.0" match="compatible"/>
    </requires>
 
    <plugin
-         id="org.eclipse.scout.sdk.rap"
+         id="org.eclipse.scout.sdk.test"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.sdk.rap.ui"
+         id="org.eclipse.scout.rt.testing.shared"
          download-size="0"
          install-size="0"
          version="0.0.0"

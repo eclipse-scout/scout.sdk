@@ -20,7 +20,7 @@
     <version>3.9.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>org.eclipse.scout.sdk-feature</groupId>
+  <groupId>org.eclipse.scout.sdk.feature</groupId>
   <artifactId>org.eclipse.scout.sdk.rap</artifactId>
   <packaging>eclipse-feature</packaging>
 
