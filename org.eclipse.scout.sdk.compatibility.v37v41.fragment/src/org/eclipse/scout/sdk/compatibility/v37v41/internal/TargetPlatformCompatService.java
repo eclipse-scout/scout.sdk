@@ -99,7 +99,8 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
       }
     }
     for (int i = 0; i < unitIds.length; i++) {
-      IUBundleContainer group = (IUBundleContainer) svc.newIUContainer(new String[]{unitIds[i]}, new String[]{versions[i]}, new URI[]{uris[i]}, IUBundleContainer.INCLUDE_SOURCE);
+      IUBundleContainer group = (IUBundleContainer) svc.newIUContainer(new String[]{unitIds[i]}, new String[]{versions[i]}, new URI[]{uris[i]},
+    		  IUBundleContainer.INCLUDE_SOURCE);
       newList.add(group);
     }
     td.setBundleContainers(newList.toArray(new IBundleContainer[newList.size()]));
