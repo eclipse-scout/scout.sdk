@@ -25,16 +25,9 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 
 public class CompilationUnitImportValidator implements IImportValidator {
-
-  public static enum Status {
-    StatusCollecting,
-    StatusDone
-  }
-
   private final ICompilationUnit m_icu;
   private Map<String/* simpleName */, String/* packageName */> m_icuImports;
   private HashMap<String/* simpleName */, String/* packageName */> m_newImports;
-  private Status m_status;
 
   public CompilationUnitImportValidator(ICompilationUnit icu) {
     m_icu = icu;
@@ -60,14 +53,9 @@ public class CompilationUnitImportValidator implements IImportValidator {
 
   @Override
   public void addImport(String fqn) {
-    if (Status.StatusCollecting.equals(m_status)) {
-      String packageName = Signature.getQualifier(fqn);
-      String simpleName = Signature.getSimpleName(fqn);
-      m_newImports.put(simpleName, packageName);
-    }
-    else {
-      throw new IllegalStateException("Import validator is already ");
-    }
+    String packageName = Signature.getQualifier(fqn);
+    String simpleName = Signature.getSimpleName(fqn);
+    m_newImports.put(simpleName, packageName);
   }
 
   private String findUsedPackageName(String simpleName) {
