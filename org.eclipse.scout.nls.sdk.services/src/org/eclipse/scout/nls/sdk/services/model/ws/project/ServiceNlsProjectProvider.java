@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -26,6 +27,7 @@ import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -104,7 +106,20 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     IType superType = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
     if (superType == null) return null;
 
-    IType[] serviceImpls = TypeCacheAccessor.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType);
+    IType[] serviceImpls = TypeCacheAccessor.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
+      @Override
+      public boolean accept(IType type) {
+        try {
+          // only accept nls providers where source code is available. otherwise we cannot parse it anyway.
+          return SourceRange.isAvailable(type.getSourceRange());
+        }
+        catch (JavaModelException e) {
+          // this element seems to be corrupt -> ignore
+          NlsCore.logWarning("Attempt to access source range of type '" + type.getFullyQualifiedName() + "' failed. Type will be skipped.", e);
+          return false;
+        }
+      }
+    });
     HashMap<String, IType> typeMap = new HashMap<String, IType>(serviceImpls.length);
     for (IType t : serviceImpls) {
       typeMap.put(t.getFullyQualifiedName(), t);
