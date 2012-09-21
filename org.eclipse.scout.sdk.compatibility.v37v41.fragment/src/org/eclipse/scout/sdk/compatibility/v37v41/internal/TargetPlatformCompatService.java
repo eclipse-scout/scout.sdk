@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.compatibility.v36v37v41.internal;
+package org.eclipse.scout.sdk.compatibility.v37v41.internal;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,7 +46,7 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
       for (IBundleContainer container : features) {
         if (container instanceof IUBundleContainer) {
           IUBundleContainer iuContainer = (IUBundleContainer) container;
-          IInstallableUnit[] units = iuContainer.getInstallableUnits(td.getProfile());
+          IInstallableUnit[] units = iuContainer.getInstallableUnits();
           for (IInstallableUnit unit : units) {
             if (!isInList(unit.getId(), unitIds)) {
               newList.add(container);
@@ -99,9 +99,8 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
       }
     }
     for (int i = 0; i < unitIds.length; i++) {
-      IUBundleContainer group = (IUBundleContainer) svc.newIUContainer(new String[]{unitIds[i]}, new String[]{versions[i]}, new URI[]{uris[i]});
-      group.setIncludeAllEnvironments(false, td);
-      group.setIncludeAllRequired(false, td);
+      IUBundleContainer group = (IUBundleContainer) svc.newIUContainer(new String[]{unitIds[i]}, new String[]{versions[i]}, new URI[]{uris[i]},
+    		  IUBundleContainer.INCLUDE_SOURCE);
       newList.add(group);
     }
     td.setBundleContainers(newList.toArray(new IBundleContainer[newList.size()]));

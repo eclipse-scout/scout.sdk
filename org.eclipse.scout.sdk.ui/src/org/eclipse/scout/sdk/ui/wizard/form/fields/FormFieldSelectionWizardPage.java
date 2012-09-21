@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
-  private IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
   private final IType m_declaringType;
   private AbstractScoutWizardPage m_nextPage;
@@ -75,7 +75,6 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
     setTitle(Texts.get("FormField"));
     setDescription(Texts.get("FormFieldDesc"));
-
   }
 
   @Override
@@ -149,7 +148,6 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   private void handleSelection(Object selectedItem) {
-
     AbstractFormFieldWizard wizard = null;
     if (selectedItem instanceof IType) {
       IType formField = (IType) selectedItem;

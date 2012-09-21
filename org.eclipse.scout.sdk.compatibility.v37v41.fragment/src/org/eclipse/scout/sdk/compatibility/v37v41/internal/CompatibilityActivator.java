@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.compatibility.v36v37v41.internal;
+package org.eclipse.scout.sdk.compatibility.v37v41.internal;
 
 import org.eclipse.scout.sdk.compatibility.internal.AbstractCompatibilityActivator;
 import org.eclipse.scout.sdk.compatibility.internal.service.IJavadocHoverCompatService;

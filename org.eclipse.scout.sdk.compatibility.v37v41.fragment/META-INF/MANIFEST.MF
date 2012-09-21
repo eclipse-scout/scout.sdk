@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Scout SDK Compatibility Fragment for Eclipse Helios & Indigo
-Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility.v36v37v41.fragment;singleton:=true
-Bundle-Version: 3.9.0.qualifier
-Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="3.9.0"
+Bundle-Name: Scout SDK Compatibility Fragment for Eclipse Indigo
+Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility.v37v41.fragment;singleton:=true
+Bundle-Version: 3.8.1.qualifier
+Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="3.8.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.jdt.core,
@@ -20,3 +20,4 @@ Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.swt,
  org.eclipse.equinox.frameworkadmin,
  org.eclipse.equinox.p2.engine
+

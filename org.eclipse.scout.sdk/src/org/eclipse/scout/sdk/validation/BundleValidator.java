@@ -33,26 +33,35 @@ public final class BundleValidator {
     }
     // no double points
     if (bundleName.contains("..")) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Project name is not valid. Valid project names are similar to 'org.eclipse.testapp'.");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ProjectNameIsNotValid"));
     }
     // invalid characters
     if (!bundleName.matches("^[0-9a-zA-Z\\.\\_]*$")) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "The bundle name contains invalid characters. Valid bundle names are similar to (e.g. 'org.eclipse.testapp').");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheBundleNameContainsInvalidCharacters"));
     }
     // no start and end with number or special characters
     if (bundleName.matches("^[0-9\\_]{1}.*$") || bundleName.matches("^.*[\\_0-9]{1}$")) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Bundle name can not start or end with special characters or digits. Valid project names are similar to (e.g. 'org.eclipse.testapp').");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("BundleNameCanNotStartOrEndWithSpecialCharactersOrDigits"));
+    }
+    // reserved java keywords
+    String[] javaKeyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum",
+        "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected",
+        "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
+    for (String keyWord : javaKeyWords) {
+      if (bundleName.startsWith(keyWord + ".") || bundleName.endsWith("." + keyWord) || bundleName.contains("." + keyWord + ".")) {
+        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheProjectNameMayNotContainAReservedJavaKeyword", keyWord));
+      }
     }
     // already existing bundle name
     if (Platform.getBundle(bundleName) != null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Bundle '" + bundleName + "' already exists.");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("BundleAlreadyExists", bundleName));
     }
     if (ResourcesPlugin.getWorkspace().getRoot().getProject(bundleName).exists()) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Bundle '" + bundleName + "' already exists.");
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("BundleAlreadyExists", bundleName));
     }
     // warn containing upper case characters
     if (bundleName.matches(".*[A-Z].*")) {
-      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, "Project name should contain only lower case characters (e.g. 'org.eclipse.testapp').");
+      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("ProjectNameShouldContainOnlyLowerCaseCharacters"));
     }
     return Status.OK_STATUS;
   }

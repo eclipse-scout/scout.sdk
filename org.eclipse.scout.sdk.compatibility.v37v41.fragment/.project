@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.scout.sdk.compatibility.v36v37v41.fragment</name>
+	<name>org.eclipse.scout.sdk.compatibility.v37v41.fragment</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -25,11 +25,4 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>.settings</name>
-			<type>2</type>
-			<locationURI>WORKSPACE_LOC/org.eclipse.scout.sdk.feature/.settings</locationURI>
-		</link>
-	</linkedResources>
 </projectDescription>

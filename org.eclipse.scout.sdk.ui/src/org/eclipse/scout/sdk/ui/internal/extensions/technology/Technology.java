@@ -86,7 +86,7 @@ public class Technology implements Comparable<Technology> {
 
     // create selection dialog
     final CheckableTreeSelectionDialog dialog = new CheckableTreeSelectionDialog(Display.getDefault().getActiveShell(), changesTree,
-          Texts.get("ChangeTechnology"), Texts.get("TechnologyResourcesToModifyDesc"));
+        Texts.get("ChangeTechnology"), Texts.get("TechnologyResourcesToModifyDesc"));
     dialog.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
@@ -248,10 +248,12 @@ public class Technology implements Comparable<Technology> {
   private class P_ChangeSelectionOperation implements IOperation {
     private final ITreeNode[] m_selectedNodes;
     private final boolean m_newSelection;
+    private boolean success;
 
     private P_ChangeSelectionOperation(ITreeNode[] selectedNodes, boolean newSelection) {
       m_selectedNodes = selectedNodes;
       m_newSelection = newSelection;
+      success = false; // nothing done yet
     }
 
     @Override
@@ -305,12 +307,16 @@ public class Technology implements Comparable<Technology> {
             return; // cancel further processing
           }
         }
+
+        success = true;
       }
       finally {
+        final boolean wasSuccessful = success;
         ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
           @Override
           public void run() {
-            fireSelectionChanged(m_newSelection);
+            // only change the selection if it was successful. otherwise the selection keeps the old value
+            fireSelectionChanged(wasSuccessful == m_newSelection);
           }
         });
       }
