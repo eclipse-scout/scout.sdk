@@ -54,6 +54,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
       String processingExceptionRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
 
       StringBuilder methodSource = new StringBuilder();
+      methodSource.append("@Override\n");
       methodSource.append("public ");
       methodSource.append(lookupRowRef + "[] ");
       methodSource.append("getDataByAll(");
@@ -65,6 +66,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
       serviceImplementation.createMethod(methodSource.toString(), null, true, monitor);
 
       methodSource = new StringBuilder();
+      methodSource.append("@Override\n");
       methodSource.append("public " + lookupRowRef + "[] getDataByKey(" + lookupCallRef + " call) throws " + processingExceptionRef + "{\n");
       methodSource.append(SdkProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
       methodSource.append(SdkProperties.TAB + "return null;\n");
@@ -72,6 +74,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
       serviceImplementation.createMethod(methodSource.toString(), null, true, monitor);
 
       methodSource = new StringBuilder();
+      methodSource.append("@Override\n");
       methodSource.append("public " + lookupRowRef + "[] getDataByRec(" + lookupCallRef + " call) throws " + processingExceptionRef + "{\n");
       methodSource.append(SdkProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
       methodSource.append(SdkProperties.TAB + "return null;\n");
@@ -79,6 +82,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
       serviceImplementation.createMethod(methodSource.toString(), null, true, monitor);
 
       methodSource = new StringBuilder();
+      methodSource.append("@Override\n");
       methodSource.append("public " + lookupRowRef + "[] getDataByText(" + lookupCallRef + " call) throws " + processingExceptionRef + "{\n");
       methodSource.append(SdkProperties.TAB + ScoutUtility.getCommentBlock("Auto-generated method stub\n"));
       methodSource.append(SdkProperties.TAB + "return null;\n");
