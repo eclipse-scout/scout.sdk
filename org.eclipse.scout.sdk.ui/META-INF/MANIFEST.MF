@@ -4,6 +4,7 @@ Bundle-Name: Scout SDK UI
 Bundle-SymbolicName: org.eclipse.scout.sdk.ui;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.ui.internal.ScoutSdkUi
+Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.equinox.launcher,
  org.eclipse.ui,
@@ -17,8 +18,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.editors;bundle-version="3.5.0";visibility:=reexport,
  org.eclipse.ui.forms;bundle-version="3.4.0";visibility:=reexport,
  org.eclipse.scout.sdk;bundle-version="3.9.0"
-Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.eclipse.scout.sdk.ui,
  org.eclipse.scout.sdk.ui.action,
  org.eclipse.scout.sdk.ui.action.create,
@@ -137,4 +136,5 @@ Export-Package: org.eclipse.scout.sdk.ui,
  org.eclipse.scout.sdk.ui.wizard.toolbutton,
  org.eclipse.scout.sdk.ui.wizard.wizard,
  org.eclipse.scout.sdk.ui.wizard.wizard.step
-Bundle-Vendor: Eclipse Scout Project
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

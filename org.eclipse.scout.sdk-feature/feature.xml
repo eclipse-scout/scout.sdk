@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="org.eclipse.scout.sdk"
+      label="%featureName"
+      version="3.9.0.qualifier"
+      provider-name="%providerName"
+      plugin="org.eclipse.scout.sdk">
+
+   <description url="http://www.eclipse.org/scout/">
+      %description
+   </description>
+
+   <copyright>
+      %copyright
+   </copyright>
+
+   <license url="%licenseURL">
+      %license
+   </license>
+
+   <url>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/juno"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/juno"/>
+   </url>
+
+   <requires>
+      <import feature="org.eclipse.pde" version="3.5.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="3.5.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.jdt" version="3.5.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.scout.rt" version="3.9.0.qualifier"/>
+      <import feature="org.eclipse.scout.rt.source" version="3.9.0.qualifier"/>
+   </requires>
+
+   <plugin
+         id="org.eclipse.scout.nls.sdk"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.ui"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.nls.sdk.services"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.nls.sdk.simple"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.util"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.ws.jaxws"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.compatibility"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.compatibility.v35.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.compatibility.v36.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.compatibility.v37v41.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.compatibility.v38v42.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+</feature>

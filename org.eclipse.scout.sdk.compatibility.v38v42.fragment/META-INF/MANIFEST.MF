@@ -3,9 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK Compatibility Fragment for Eclipse Juno
 Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility.v38v42.fragment;singleton:=true
 Bundle-Version: 3.9.0.qualifier
-Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="3.9.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Scout Project
+Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="3.9.0"
 Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.jdt.ui,
  org.eclipse.jface.text,
@@ -17,3 +16,4 @@ Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.equinox.p2.repository,
  org.eclipse.equinox.p2.ui,
  org.eclipse.equinox.p2.operations;resolution:=optional
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

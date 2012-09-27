@@ -4,12 +4,12 @@ Bundle-Name: Scout SDK Compatibility Layer
 Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility;singleton:=true
 Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.compatibility.internal.ScoutCompatibilityActivator
+Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core,
  org.eclipse.core.resources
-Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-Vendor: Eclipse Scout Project
 Export-Package: org.eclipse.scout.sdk.compatibility,
  org.eclipse.scout.sdk.compatibility.internal,
  org.eclipse.scout.sdk.compatibility.internal.service
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
