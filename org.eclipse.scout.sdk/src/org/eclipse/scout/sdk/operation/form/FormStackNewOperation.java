@@ -64,6 +64,7 @@ public class FormStackNewOperation implements IOperation {
   private IType m_outProcessServiceInterface;
   private IType m_outFormData;
   private IType m_outForm;
+  private IType m_outMainBox;
   private IType m_outReadPermission;
   private IType m_outCreatePermission;
   private IType m_outUpdatePermission;
@@ -121,6 +122,7 @@ public class FormStackNewOperation implements IOperation {
     formOp.validate();
     formOp.run(monitor, workingCopyManager);
     m_outForm = formOp.getCreatedFormType();
+    m_outMainBox = formOp.getCreatedMainBox();
     m_outForm.getCompilationUnit().reconcile(ICompilationUnit.NO_AST, false, null, monitor);
     if (isCreateIdProperty()) {
       BeanPropertyNewOperation beanPropOp = new BeanPropertyNewOperation(getOutForm(), getFormIdName(), Signature.createTypeSignature(Long.class.getName(), true), Flags.AccPublic);
@@ -570,6 +572,15 @@ public class FormStackNewOperation implements IOperation {
    */
   public IType getOutForm() {
     return m_outForm;
+  }
+
+  /**
+   * gets the mainbox that was created.
+   * 
+   * @return
+   */
+  public IType getOutMainBox() {
+    return m_outMainBox;
   }
 
   /**
