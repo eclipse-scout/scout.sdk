@@ -10,31 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.field;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.eclipse.text.edits.InsertEdit;
 
 /**
  * <h3> {@link TreeFieldNewOperation}</h3> ...
@@ -90,7 +81,7 @@ public class TreeFieldNewOperation implements IOperation {
     m_createdTree = createTree(monitor, workingCopyManager);
 
     // generic type
-    Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
+    /*Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
     Matcher matcher = p.matcher(getCreatedField().getSource());
     if (matcher.find()) {
       Document doc = new Document(getCreatedField().getSource());
@@ -102,7 +93,7 @@ public class TreeFieldNewOperation implements IOperation {
       catch (Exception e) {
         ScoutSdk.logWarning("could not set the generic type of the tree field.", e);
       }
-    }
+    }*/
     if (isFormatSource()) {
       // format
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedField(), true);
