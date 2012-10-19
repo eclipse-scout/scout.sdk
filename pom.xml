@@ -26,6 +26,10 @@
   <version>3.9.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <properties>
+    <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</tycho.scmUrl>
+  </properties>
+
   <modules>
     <module>org.eclipse.scout.sdk.compatibility</module>
     <module>org.eclipse.scout.sdk.compatibility.v35.fragment</module>
