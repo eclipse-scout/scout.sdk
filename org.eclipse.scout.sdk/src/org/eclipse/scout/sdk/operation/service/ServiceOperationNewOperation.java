@@ -31,6 +31,7 @@ public class ServiceOperationNewOperation implements IOperation {
   private String m_methodName;
   private IType m_serviceInterface;
   private IType[] m_serviceImplementations;
+  private IMethod m_createdImplementationMethod;
 
   @Override
   public String getOperationName() {
@@ -87,11 +88,17 @@ public class ServiceOperationNewOperation implements IOperation {
     methodBody.insert(0, "@" + Override.class.getSimpleName() + "\n");
     String defaultVal = ScoutUtility.getDefaultValueOf(method.getReturnType());
     methodBody.append("{\n" + SdkProperties.TAB);
-    if (defaultVal != null) {
-      methodBody.append("return " + defaultVal + ";\n");
+    String body = createMethodBody(validator);
+    if (body == null) {
+      if (defaultVal != null) {
+        methodBody.append("return " + defaultVal + ";\n");
+      }
+      else {
+        methodBody.append("\n");
+      }
     }
     else {
-      methodBody.append("\n");
+      methodBody.append(body);
     }
     methodBody.append("}");
 
@@ -110,13 +117,17 @@ public class ServiceOperationNewOperation implements IOperation {
       }
 
       workingCopyManager.register(implType.getCompilationUnit(), monitor);
-      implType.createMethod(methodBody.toString(), null, false, monitor);
+      IMethod createdImplementationMethod = implType.createMethod(methodBody.toString(), null, false, monitor);
+      setCreatedImplementationMethod(createdImplementationMethod);
       for (String imp : impValidator.getImportsToCreate()) {
         implType.getCompilationUnit().createImport(imp, null, monitor);
       }
       implType.getCompilationUnit().createImport(RuntimeClasses.ProcessingException, null, monitor);
     }
+  }
 
+  protected String createMethodBody(IImportValidator validator) {
+    return null;
   }
 
   public ParameterArgument[] getArguments() {
@@ -157,6 +168,14 @@ public class ServiceOperationNewOperation implements IOperation {
 
   public void setServiceImplementations(IType[] serviceImplementations) {
     m_serviceImplementations = serviceImplementations;
+  }
+
+  public IMethod getCreatedImplementationMethod() {
+    return m_createdImplementationMethod;
+  }
+
+  public void setCreatedImplementationMethod(IMethod createdImplementationMethod) {
+    m_createdImplementationMethod = createdImplementationMethod;
   }
 
 }

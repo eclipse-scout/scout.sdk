@@ -68,8 +68,10 @@ import org.eclipse.text.edits.TextEdit;
  *
  */
 public class CreateTemplateOperation implements IOperation {
-  private IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
-  private IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
+  private final static Pattern SUPER_CLASS_PATTERN = Pattern.compile("\\sextends\\s*(" + Regex.REGEX_JAVAFIELD + "(\\<[^{]*\\>)?)", Pattern.MULTILINE);
+
   private String m_templateName;
   private String m_packageName;
   private boolean m_replaceFieldWithTemplate;
@@ -135,7 +137,7 @@ public class CreateTemplateOperation implements IOperation {
     };
 
     String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
-    if (!StringUtility.isNullOrEmpty(superclassTypeSignature)) {
+    /*if (!StringUtility.isNullOrEmpty(superclassTypeSignature)) {
       StringBuilder superclassSignatureBuilder = new StringBuilder(Signature.getTypeErasure(superclassTypeSignature));
       String[] typeParameters = Signature.getTypeArguments(superclassTypeSignature);
       if (typeParameters.length > 0) {
@@ -150,9 +152,9 @@ public class CreateTemplateOperation implements IOperation {
           }
         }
         superclassSignatureBuilder.append(">;");
-      }
-      op.setSuperTypeSignature(superclassSignatureBuilder.toString());
-    }
+      }*/
+    op.setSuperTypeSignature(superclassTypeSignature);
+    //}
     op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
     IScoutBundle sharedBundle = findFormDataBundle(getTemplateBundle().getScoutProject());
     if (isCreateExternalFormData() && sharedBundle != null) {
@@ -208,7 +210,7 @@ public class CreateTemplateOperation implements IOperation {
         edit.addChild(new DeleteEdit(start, end - start));
       }
       // extends
-      Matcher superClassMatcher = Pattern.compile("\\sextends\\s*(" + Regex.REGEX_JAVAFIELD + "(\\<[^>]*\\>)?)", Pattern.MULTILINE).matcher(getFormField().getSource());
+      Matcher superClassMatcher = SUPER_CLASS_PATTERN.matcher(getFormField().getSource());
       if (superClassMatcher.find()) {
         edit.addChild(new ReplaceEdit(getFormField().getSourceRange().getOffset() + superClassMatcher.start(1), superClassMatcher.end(1) - superClassMatcher.start(1),
             validator.getTypeName(Signature.createTypeSignature(templateType.getFullyQualifiedName(), true))));

@@ -31,6 +31,7 @@ public class MethodOverrideOperation extends MethodCreateOperation {
   // operation member
   private IMethod m_methodToOverride;
   private String m_genericWildcardReplacement;
+  private ITypeHierarchy m_superTypeHierarchy;
 
   public MethodOverrideOperation(IType declaringType, String methodName) throws JavaModelException {
     this(declaringType, methodName, true);
@@ -48,7 +49,11 @@ public class MethodOverrideOperation extends MethodCreateOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find super method
-    ITypeHierarchy superTypeHierarchy = getDeclaringType().newSupertypeHierarchy(monitor);
+    ITypeHierarchy superTypeHierarchy = getSuperTypeHierarchy();
+    if (superTypeHierarchy == null) {
+      superTypeHierarchy = getDeclaringType().newSupertypeHierarchy(monitor);
+      setSuperTypeHierarchy(superTypeHierarchy);
+    }
     IType superType = superTypeHierarchy.getSuperclass(getDeclaringType());
     m_methodToOverride = findMethodToOverride(superType, getMethodName(), superTypeHierarchy);
     if (m_methodToOverride == null) {
@@ -113,5 +118,13 @@ public class MethodOverrideOperation extends MethodCreateOperation {
 
   public void setGenericWildcardReplacement(String genericWildcardReplacement) {
     m_genericWildcardReplacement = genericWildcardReplacement;
+  }
+
+  public ITypeHierarchy getSuperTypeHierarchy() {
+    return m_superTypeHierarchy;
+  }
+
+  public void setSuperTypeHierarchy(ITypeHierarchy superTypeHierarchy) {
+    m_superTypeHierarchy = superTypeHierarchy;
   }
 }

@@ -41,7 +41,6 @@ public class ServiceDeleteAction extends AbstractScoutHandler {
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     m_confirmDialog = new MemberSelectionDialog(shell, getLabel());
-//    m_serviceInterface = findServiceInterface();
     ArrayList<IMember> members = new ArrayList<IMember>();
     if (TypeUtility.exists(m_serviceInterface)) {
       members.add(m_serviceInterface);

@@ -55,6 +55,7 @@ public class LookupServiceNodePage extends AbstractServiceNodePage {
     if (menu instanceof ServiceDeleteAction) {
       ServiceDeleteAction action = (ServiceDeleteAction) menu;
       action.setServiceImplementation(getType());
+      action.setServiceInterface(getInterfaceType());
     }
   }
 }
