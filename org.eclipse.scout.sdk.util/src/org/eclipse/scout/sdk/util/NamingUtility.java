@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.util;
 
 import java.text.ParseException;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
 
@@ -21,6 +22,8 @@ import org.eclipse.scout.commons.StringUtility;
  * @since 1.0.8 24.11.2010
  */
 public final class NamingUtility {
+
+  private final static Pattern CAMEL_CASE_PATTERN = Pattern.compile("[^abcdefghijklmnopqrstuvwxyz0123456789]");
 
   private NamingUtility() {
   }
@@ -85,4 +88,36 @@ public final class NamingUtility {
     return Character.toUpperCase(javaName.charAt(0)) + javaName.substring(1);
   }
 
+  public static String toJavaCamelCase(String input) {
+    return toJavaCamelCase(input, true);
+  }
+
+  /**
+   * converts the given input string into a valid java camel case name.<br>
+   * 
+   * @param input
+   * @param lowerCaseFirstToken
+   *          if true, the first token uses lower case as e.g. used for method names.
+   * @return the camel case string.
+   */
+  public static String toJavaCamelCase(String input, boolean lowerCaseFirstToken) {
+    if (!StringUtility.hasText(input)) {
+      return null;
+    }
+    StringBuilder camel = new StringBuilder(input.length());
+    String[] tokens = CAMEL_CASE_PATTERN.split(input.toLowerCase());
+    for (int i = 0; i < tokens.length; i++) {
+      String t = tokens[i];
+      if (StringUtility.hasText(t)) {
+        if (i == 0 && lowerCaseFirstToken) {
+          camel.append(t);
+        }
+        else {
+          camel.append(Character.toUpperCase(t.charAt(0)));
+          camel.append(t.substring(1));
+        }
+      }
+    }
+    return camel.toString();
+  }
 }
