@@ -28,7 +28,7 @@
 
   <scm>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
-    <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
+    <connection>${tycho.scmUrl}</connection>
   </scm>
 
   <properties>
@@ -36,28 +36,6 @@
   </properties>
 
   <modules>
-    <module>org.eclipse.scout.sdk.compatibility</module>
-    <module>org.eclipse.scout.sdk.compatibility.v35.fragment</module>
-    <module>org.eclipse.scout.sdk.compatibility.v36.fragment</module>
-    <module>org.eclipse.scout.sdk.compatibility.v37v41.fragment</module>
-    <module>org.eclipse.scout.sdk.compatibility.v38v42.fragment</module>
-    <module>org.eclipse.scout.sdk.util</module>
-    <module>org.eclipse.scout.nls.sdk</module>
-    <module>org.eclipse.scout.nls.sdk.simple</module>
-    <module>org.eclipse.scout.nls.sdk.services</module>
-    <module>org.eclipse.scout.sdk</module>
-    <module>org.eclipse.scout.sdk.ui</module>
-    <module>org.eclipse.scout.sdk.debug</module>
-    <module>org.eclipse.scout.sdk.help</module>
-    <module>org.eclipse.scout.sdk.ws.jaxws</module>
-    <module>org.eclipse.scout.sdk.rap</module>
-    <module>org.eclipse.scout.sdk.rap.ui</module>
-    <module>org.eclipse.scout.sdk.test</module>
-
-    <module>org.eclipse.scout.sdk-feature</module>
-    <module>org.eclipse.scout.sdk.test-feature</module>
-    <module>org.eclipse.scout.sdk.rap-feature</module>
-
-    <module>org.eclipse.scout.sdk-repository</module>
+    <module>org.eclipse.scout.sdk.parent</module>
   </modules>
 </project>
