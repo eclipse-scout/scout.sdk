@@ -16,8 +16,9 @@
 
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
-    <artifactId>eclipse.scout.sdk</artifactId>
+    <artifactId>org.eclipse.scout.sdk.parent</artifactId>
     <version>3.9.0-SNAPSHOT</version>
+    <relativePath>../org.eclipse.scout.sdk.parent</relativePath>
   </parent>
 
   <artifactId>org.eclipse.scout.sdk.ws.jaxws</artifactId>
