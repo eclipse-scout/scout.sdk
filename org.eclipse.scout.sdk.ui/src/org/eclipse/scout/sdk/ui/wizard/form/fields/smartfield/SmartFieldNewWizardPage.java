@@ -23,6 +23,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.SmartFieldNewOperation;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -62,6 +63,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_codeType;
   private IType m_lookupCall;
   private SiblingProposal m_sibling;
+  private boolean m_codeTypeDefinesGenericType;
 
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
@@ -81,6 +83,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setSuperType(abstractSmartField);
     m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
     m_sibling = SiblingProposal.SIBLING_END;
+    m_codeTypeDefinesGenericType = false;
   }
 
   @Override
@@ -145,6 +148,21 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
           m_codeType = (IType) event.proposal;
           m_lookupCallField.acceptProposal(null);
           m_lookupCallField.setEnabled(m_codeType == null);
+          m_codeTypeDefinesGenericType = false;
+          if (TypeUtility.exists(m_codeType)) {
+            String s;
+            try {
+              s = FormDataUtility.computeFormFieldGenericType(m_codeType, TypeUtility.getSuperTypeHierarchy(m_codeType));
+              if (s != null) {
+                m_codeTypeDefinesGenericType = true;
+                m_genericSignature = s;
+                m_genericTypeField.acceptProposal(getGenericSignature());
+              }
+            }
+            catch (JavaModelException e) {
+              ScoutSdkUi.logError("failed to get generic type of code type '" + m_codeType.getElementName() + "'.", e);
+            }
+          }
         }
         finally {
           setStateChanging(false);
@@ -237,7 +255,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusGenericType());
       if (isControlCreated()) {
-        m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
+        m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()) && !m_codeTypeDefinesGenericType);
       }
     }
     catch (JavaModelException e) {
