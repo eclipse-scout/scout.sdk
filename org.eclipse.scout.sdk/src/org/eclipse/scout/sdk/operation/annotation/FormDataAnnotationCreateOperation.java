@@ -30,7 +30,7 @@ public class FormDataAnnotationCreateOperation extends AnnotationCreateOperation
   private String m_formDataSignature;
 
   public FormDataAnnotationCreateOperation(IType type) {
-    super(type, Signature.createTypeSignature(RuntimeClasses.FormData, true), true);
+    super(type, Signature.createTypeSignature(RuntimeClasses.FormData, true));
   }
 
   @Override

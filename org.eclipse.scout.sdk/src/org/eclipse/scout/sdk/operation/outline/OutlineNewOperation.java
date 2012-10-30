@@ -195,7 +195,7 @@ public class OutlineNewOperation implements IOperation {
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
 
-      AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(overrideOp.getCreatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true), false);
+      AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(overrideOp.getCreatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true));
       createSuppressWarning.addParameter("\"unchecked\"");
       createSuppressWarning.validate();
       createSuppressWarning.run(monitor, workingCopyManager);

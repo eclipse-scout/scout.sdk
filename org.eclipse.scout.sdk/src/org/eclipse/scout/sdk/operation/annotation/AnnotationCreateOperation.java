@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.annotation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -30,10 +29,10 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.form.formdata.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -44,20 +43,14 @@ import org.eclipse.text.edits.TextEdit;
 public class AnnotationCreateOperation implements IOperation {
 
   public static final AnnotationCreateOperation OVERRIDE_OPERATION = new AnnotationCreateOperation(null, Signature.createTypeSignature(Override.class.getName(), true));
+  private static final Pattern PATTERN = Pattern.compile("\\s*");
 
-  private final String m_signature;
+  private final AnnotationSourceBuilder m_builder;
   private final IMember m_annotationOwner;
-  private List<String> m_parameters = new ArrayList<String>();
-  private final boolean m_replaceExisting;
 
   public AnnotationCreateOperation(IMember annotationOwner, String signature) {
-    this(annotationOwner, signature, true);
-  }
-
-  public AnnotationCreateOperation(IMember annotationOwner, String signature, boolean replaceExisting) {
     m_annotationOwner = annotationOwner;
-    m_signature = signature;
-    m_replaceExisting = replaceExisting;
+    m_builder = new AnnotationSourceBuilder(signature);
   }
 
   @Override
@@ -113,21 +106,20 @@ public class AnnotationCreateOperation implements IOperation {
       char[] characters = getAnnotationOwner().getCompilationUnit().getBuffer().getCharacters();
       if (replaceRange.getOffset() >= 0 && replaceRange.getOffset() <= characters.length
           && replaceRange.getOffset() + replaceRange.getLength() >= 0 && replaceRange.getOffset() + replaceRange.getLength() <= characters.length) {
-        StringBuilder builder = new StringBuilder();
-        builder.append(createSource(validator, NL));
+        StringBuilder builder = new StringBuilder(createSource(validator, NL));
         Document sourceDocument = new Document(getAnnotationOwner().getCompilationUnit().getSource());
         IRegion lineInfo = sourceDocument.getLineInformationOfOffset(replaceRange.getOffset());
         String line = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
         String prefix = line.substring(0, replaceRange.getOffset() - lineInfo.getOffset());
         String postfix = line.substring(replaceRange.getOffset() - lineInfo.getOffset() + replaceRange.getLength(), line.length());
         CodeFormatter formatter = ToolFactory.createCodeFormatter(getAnnotationOwner().getJavaProject().getOptions(false));
-        if (prefix.matches("\\s*") && postfix.matches("\\s*")) {
+        if (PATTERN.matcher(prefix).matches() && PATTERN.matcher(postfix).matches()) {
           // void
         }
-        else if (prefix.matches("\\s*")) {
+        else if (PATTERN.matcher(prefix).matches()) {
           builder.append(NL + formatter.createIndentationString(1));
         }
-        else if (postfix.matches("\\s*")) {
+        else if (PATTERN.matcher(postfix).matches()) {
           builder.insert(0, NL + formatter.createIndentationString(1));
         }
         return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());
@@ -144,24 +136,11 @@ public class AnnotationCreateOperation implements IOperation {
   }
 
   public String createSource(IImportValidator validator, String NL) throws JavaModelException {
-    StringBuilder source = new StringBuilder();
-    source.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
-    String[] params = getParameters();
-    if (params != null && params.length > 0) {
-      source.append("(");
-      for (int i = 0; i < params.length; i++) {
-        source.append(params[i]);
-        if (i < (params.length - 1)) {
-          source.append(",");
-        }
-      }
-      source.append(")");
-    }
-    return source.toString();
+    return m_builder.createSource(validator);
   }
 
   public String getSignature() {
-    return m_signature;
+    return m_builder.getAnnotationSignature();
   }
 
   public IMember getAnnotationOwner() {
@@ -169,15 +148,11 @@ public class AnnotationCreateOperation implements IOperation {
   }
 
   public void addParameter(String parameter) {
-    m_parameters.add(parameter);
+    m_builder.addParameter(parameter);
   }
 
   public String[] getParameters() {
-    return m_parameters.toArray(new String[m_parameters.size()]);
-  }
-
-  public boolean isReplaceExisting() {
-    return m_replaceExisting;
+    return m_builder.getParameters();
   }
 
   private IAnnotation[] getExistingAnnotations() throws JavaModelException {

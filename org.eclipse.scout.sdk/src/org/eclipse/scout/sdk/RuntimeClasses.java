@@ -229,6 +229,8 @@ public final class RuntimeClasses {
   public static final String IDocumentationTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.IDocumentationTextProviderService"; // NO_UCD
   public static final String ProcessingException = "org.eclipse.scout.commons.exception.ProcessingException"; // NO_UCD
   public static final String ValidationRule = "org.eclipse.scout.rt.shared.data.form.ValidationRule"; // NO_UCD
+  public static final String InputValidation = "org.eclipse.scout.rt.shared.validate.InputValidation"; // NO_UCD
+  public static final String IValidationStrategy = "org.eclipse.scout.rt.shared.validate.IValidationStrategy"; // NO_UCD
   public static final String VetoException = "org.eclipse.scout.commons.exception.VetoException"; // NO_UCD
 
   public static final String IBigDecimalColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn"; // NO_UCD

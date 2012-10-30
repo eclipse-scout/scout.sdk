@@ -117,7 +117,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
       @Override
       public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
         super.run(monitor, workingCopyManager);
-        AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(getUpdatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true), false);
+        AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(getUpdatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true));
         createSuppressWarning.addParameter("\"unchecked\"");
         createSuppressWarning.validate();
         createSuppressWarning.run(monitor, workingCopyManager);
