@@ -111,6 +111,7 @@ public class FormStackNewOperation implements IOperation {
     // form
     FormNewOperation formOp = new FormNewOperation();
     formOp.setClientBundle(getFormBundle());
+    formOp.setFormatSource(m_formatSource);
     // write back members
     formOp.setNlsEntry(getNlsEntry());
     formOp.setTypeName(getFormName());

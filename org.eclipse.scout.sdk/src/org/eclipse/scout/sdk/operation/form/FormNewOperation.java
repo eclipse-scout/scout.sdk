@@ -36,9 +36,8 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link FormNewOperation}</h3>
- * To create a new form. A form is either a view, editor or a dialog.
- *
+ * <h3>{@link FormNewOperation}</h3> To create a new form. A form is either a view, editor or a dialog.
+ * 
  * @author Andreas Hoegger
  * @since 1.0.0 2008
  */
@@ -50,6 +49,7 @@ public class FormNewOperation implements IOperation {
   private String m_formDataSignature;
   private boolean m_createButtonOk;
   private boolean m_createButtonCancel;
+  private boolean m_formatSource;
   private IScoutBundle m_clientBundle;
 
   private IType m_createdFormType;
@@ -60,6 +60,7 @@ public class FormNewOperation implements IOperation {
   public FormNewOperation() {
     // defaults
     m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractForm, true);
+    setFormatSource(true);
   }
 
   @Override
@@ -138,10 +139,12 @@ public class FormNewOperation implements IOperation {
       cancelButtonOp.run(monitor, workingCopyManager);
     }
     m_createdMainBoxGetter = mainBoxOp.getCreatedFieldGetterMethod();
-    // format source
-    JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedFormType(), true);
-    formatOp.validate();
-    formatOp.run(monitor, workingCopyManager);
+    if (isFormatSource()) {
+      // format source
+      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedFormType(), true);
+      formatOp.validate();
+      formatOp.run(monitor, workingCopyManager);
+    }
   }
 
   public IType getCreatedFormType() {
@@ -221,5 +224,13 @@ public class FormNewOperation implements IOperation {
 
   public void setClientBundle(IScoutBundle clientBundle) {
     m_clientBundle = clientBundle;
+  }
+
+  public boolean isFormatSource() {
+    return m_formatSource;
+  }
+
+  public void setFormatSource(boolean formatSource) {
+    m_formatSource = formatSource;
   }
 }
