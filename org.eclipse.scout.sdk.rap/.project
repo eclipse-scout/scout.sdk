@@ -35,7 +35,7 @@
 		<link>
 			<name>.settings</name>
 			<type>2</type>
-			<locationURI>WORKSPACE_LOC/org.eclipse.scout.sdk.rap.feature/.settings</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.sdk.rap-feature/.settings</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

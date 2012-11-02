@@ -10,6 +10,11 @@ public final class JavadocHoverUtility {
 
   public static String addImageAndLabel(IJavaElement member, String imageName, String label) {
     IJavadocHoverCompatService svc = ScoutCompatibilityActivator.getDefault().acquireCompatibilityService(IJavadocHoverCompatService.class);
+    if(svc != null){
     return svc.addImageAndLabel(member, imageName, label);
+    }else{
+    	return null;
+
+    }
   }
 }
