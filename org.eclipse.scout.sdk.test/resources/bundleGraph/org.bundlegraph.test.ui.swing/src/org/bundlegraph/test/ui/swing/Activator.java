@@ -8,14 +8,30 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.internal.test.workspace;
+package org.bundlegraph.test.ui.swing;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.osgi.framework.BundleActivator;
+import org.osgi.framework.BundleContext;
 
-@RunWith(Suite.class)
-@SuiteClasses({TestWorkingCopyManager.class, TestBundleGraph.class})
-public class _SuiteWorkspaceTest {
+public class Activator implements BundleActivator{
+
+  public static String PLUGIN_ID="org.bundlegraph.test.ui.swing";
+
+  private static Activator plugin;
+
+  public static Activator getDefault(){
+    return plugin;
+  }
+
+  @Override
+  public void start(BundleContext context) throws Exception{
+    plugin=this;
+  }
+
+  @Override
+  public void stop(BundleContext context) throws Exception{
+    plugin=null;
+  }
 
 }
+
