@@ -41,6 +41,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class FormDataAutoUpdater {
   public static final String PROP_FORMDATA_AUTO_UPDATE = ScoutSdk.PLUGIN_ID + ".propFormdataAutoUpdate";
+  public static final String AUTO_UPDATE_JOB_FAMILY = "AUTO_UPDATE_JOB_FAMILY";
 
   private P_ResourceChangedListener m_resourceChangedListener;
 
@@ -132,6 +133,11 @@ public class FormDataAutoUpdater {
     public P_UpdateFormDataJob() {
       super("Updating form data");
       setPriority(Job.DECORATE);
+    }
+
+    @Override
+    public boolean belongsTo(Object family) {
+      return AUTO_UPDATE_JOB_FAMILY.equals(family);
     }
 
     @Override

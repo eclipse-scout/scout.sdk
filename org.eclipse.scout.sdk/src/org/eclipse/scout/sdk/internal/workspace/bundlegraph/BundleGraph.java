@@ -15,7 +15,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.osgi.service.resolver.BundleDescription;
@@ -23,6 +25,7 @@ import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -216,10 +219,8 @@ public class BundleGraph {
 
   private BundleGraphNode createTreeNode(ScoutBundle scoutBundle) {
     IPluginModelBase pluginModel = PluginRegistry.findModel(scoutBundle.getProject());
-    HashMap<String, BundleDescription> requiredBundles = new HashMap<String, BundleDescription>();
-    requiredBundles.put(pluginModel.getBundleDescription().getName(), pluginModel.getBundleDescription());
     BundleGraphNode node = null;
-    int pluginType = getBundleIdRec(requiredBundles);
+    int pluginType = getBundleIdRec(pluginModel.getBundleDescription(), new Stack<String>());
     if (pluginType > 0) {
       node = new BundleGraphNode(scoutBundle, pluginType);
     }
@@ -229,40 +230,119 @@ public class BundleGraph {
     return node;
   }
 
-  private int getBundleIdRec(HashMap<String, BundleDescription> requiredDescs) {
+  private int getBundleIdRec(BundleDescription bd, Stack<String> dependencyStack) {
     int id = -1;
-    if (requiredDescs.containsKey(RuntimeClasses.ScoutUiSwingBundleId)) {
-      id = IScoutElement.BUNDLE_UI_SWING;
-    }
-    else if (requiredDescs.containsKey(RuntimeClasses.ScoutUiSwtBundleId)) {
-      id = IScoutElement.BUNDLE_UI_SWT;
-    }
-    // XXX to code in a better way
-    else if (requiredDescs.containsKey("org.eclipse.scout.rt.ui.rap")) {
-      id = 8;
-    }
-    // XXX end do
-    else if (requiredDescs.containsKey(RuntimeClasses.ScoutClientBundleId)) {
-      id = IScoutElement.BUNDLE_CLIENT;
-    }
-    else if (requiredDescs.containsKey(RuntimeClasses.ScoutServerBundleId)) {
-      id = IScoutElement.BUNDLE_SERVER;
-    }
-    else if (requiredDescs.containsKey(RuntimeClasses.ScoutSharedBundleId)) {
-      id = IScoutElement.BUNDLE_SHARED;
-    }
-    else {
-      HashMap<String, BundleDescription> requiredBundles = new HashMap<String, BundleDescription>();
-      for (BundleDescription reqiredDesc : requiredDescs.values()) {
-        for (BundleDescription d : reqiredDesc.getResolvedRequires()) {
-          requiredBundles.put(d.getName(), d);
+    String name = bd.getName();
+    try {
+      dependencyStack.push(name);
+      if (RuntimeClasses.ScoutUiSwingBundleId.equals(name)) {
+        id = IScoutElement.BUNDLE_UI_SWING;
+      }
+      else if (RuntimeClasses.ScoutUiSwtBundleId.equals(name)) {
+        id = IScoutElement.BUNDLE_UI_SWT;
+      }
+      // XXX to code in a better way
+      else if ("org.eclipse.scout.rt.ui.rap".equals(name)) {
+        id = 8;
+      }
+      // XXX end do
+      else if (RuntimeClasses.ScoutClientBundleId.equals(name)) {
+        id = IScoutElement.BUNDLE_CLIENT;
+      }
+      else if (RuntimeClasses.ScoutServerBundleId.equals(name)) {
+        id = IScoutElement.BUNDLE_SERVER;
+      }
+      else if (RuntimeClasses.ScoutSharedBundleId.equals(name)) {
+        id = IScoutElement.BUNDLE_SHARED;
+      }
+      else {
+        for (BundleDescription reqiredDesc : getDirectDependencies(bd)) {
+          if (dependencyStack.contains(reqiredDesc.getName())) {
+            // a dependency loop was detected: log the loop and stop processing of this part of the dependency graph
+            StringBuilder loopMsg = new StringBuilder(Texts.get("DependencyLoopDetected"));
+            loopMsg.append(":\n");
+            for (String s : dependencyStack) {
+              loopMsg.append(s);
+              loopMsg.append("\n");
+            }
+            loopMsg.append(reqiredDesc.getName());
+            ScoutSdk.logError(loopMsg.toString());
+          }
+          else {
+            int ret = getBundleIdRec(reqiredDesc, dependencyStack);
+            if (getBundleIdPrio(ret) > getBundleIdPrio(id)) {
+              // if prio of the plugin-type is higher: remember
+              id = ret;
+            }
+          }
         }
       }
-      if (!requiredBundles.isEmpty()) {
-        return getBundleIdRec(requiredBundles);
+      return id;
+    }
+    finally {
+      dependencyStack.pop();
+    }
+  }
+
+  /**
+   * gets the prio of a bundle id. this prio describes how specific or determinant a bundle id is.<br>
+   * higher prio means more specific plugin.<br>
+   * example: a plugin with shared & client dependency: is of type client -> client has higher prio!
+   * 
+   * @param a
+   *          the bundle id to check. must be one of the IScoutElement.BUNDLE_* constants.
+   * @return the priority of the given id.
+   * @see IScoutElement
+   */
+  private int getBundleIdPrio(int a) {
+    switch (a) {
+      case IScoutElement.BUNDLE_SHARED: {
+        return 10;
+      }
+      case IScoutElement.BUNDLE_CLIENT: {
+        return 20;
+      }
+      case IScoutElement.BUNDLE_SERVER: {
+        return 30;
+      }
+      case IScoutElement.BUNDLE_UI_SWING: {
+        return 40;
+      }
+      case IScoutElement.BUNDLE_UI_SWT: {
+        return 50;
+      }
+      case 8 /* TODO 8=RAP Bundle, see org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory */: {
+        return 60;
+      }
+      default: {
+        return -10;
       }
     }
-    return id;
+  }
+
+  /**
+   * gets all resolved direct dependencies of the given bundle.<br>
+   * if the given bundle is host for fragments, the dependencies added by these
+   * fragments are not part of the return list!
+   * 
+   * @param bundle
+   *          the bundle for which the dependencies should be returned.
+   * @return all resolved direct dependencies of the given bundle.
+   */
+  private List<BundleDescription> getDirectDependencies(BundleDescription bundle) {
+    BundleSpecification[] reqSpec = bundle.getRequiredBundles();
+    HashSet<String> directDependencies = new HashSet<String>(reqSpec.length);
+    for (BundleSpecification bs : reqSpec) {
+      directDependencies.add(bs.getName());
+    }
+
+    ArrayList<BundleDescription> bd = new ArrayList<BundleDescription>(directDependencies.size());
+    for (BundleDescription d : bundle.getResolvedRequires()) {
+      if (directDependencies.contains(d.getName())) {
+        bd.add(d);
+      }
+    }
+    return bd;
   }
 
   BundleGraphNode findNode(String identifier) {
