@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -109,10 +108,10 @@ public class FormFieldNewOperation implements IOperation {
 
   protected void updateOrderNumbers(IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
     m_orderNr = -1.0;
-    IPrimaryTypeTypeHierarchy primaryHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
 
-    ITypeHierarchy localHierarchy = primaryHierarchy.combinedTypeHierarchy(getDeclaringType());
-    IType[] innerTypes = localHierarchy.getAllSubtypes(iFormField, TypeFilters.getInnerClasses(getDeclaringType()), ScoutTypeComparators.getOrderAnnotationComparator());
+    ITypeHierarchy h = TypeUtility.getLocalTypeHierarchy(getDeclaringType());
+    IType[] innerTypes = TypeUtility.getInnerTypes(getDeclaringType(), TypeFilters.getSubtypeFilter(iFormField, h), ScoutTypeComparators.getOrderAnnotationComparator());
+
     OrderAnnotationsUpdateOperation orderAnnotationOp = new OrderAnnotationsUpdateOperation(getDeclaringType());
     double tempOrderNr = 10.0;
     for (IType innerType : innerTypes) {
