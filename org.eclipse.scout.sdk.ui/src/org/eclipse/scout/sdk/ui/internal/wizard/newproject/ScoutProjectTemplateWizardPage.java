@@ -105,7 +105,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
   @Override
   public void performHelp() {
     //TODO: remove external link and use eclipse help instead
-    ResourceUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.8/Create_a_new_project#Step_2");
+    ResourceUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.9/Create_a_new_project#Step_2");
   }
 
   @Override

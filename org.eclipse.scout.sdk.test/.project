@@ -31,12 +31,11 @@
 		<nature>org.eclipse.pde.PluginNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-		<linkedResources>
+	<linkedResources>
 		<link>
 			<name>.settings</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.sdk.test-feature/.settings
-			</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.sdk.test-feature/.settings</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

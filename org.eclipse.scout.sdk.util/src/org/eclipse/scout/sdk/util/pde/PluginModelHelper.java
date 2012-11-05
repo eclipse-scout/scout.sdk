@@ -199,9 +199,18 @@ public class PluginModelHelper {
       }
     }
 
+    private String getHeaderValue(IManifestHeader header) {
+      if (header == null || header.getValue() == null) {
+        return "";
+      }
+      else {
+        return header.getValue();
+      }
+    }
+
     private RequireBundleHeader getRequireBundleHeader() {
       IManifestHeader header = m_model.getBundle().getManifestHeader(Constants.REQUIRE_BUNDLE);
-      return (RequireBundleHeader) m_model.getBundleModel().getFactory().createHeader(Constants.REQUIRE_BUNDLE, header.getValue() == null ? "" : header.getValue());
+      return (RequireBundleHeader) m_model.getBundleModel().getFactory().createHeader(Constants.REQUIRE_BUNDLE, getHeaderValue(header));
     }
 
     /**
@@ -322,12 +331,12 @@ public class PluginModelHelper {
 
     private ExportPackageHeader getExportPackageHeader() {
       IManifestHeader header = m_model.getBundle().getManifestHeader(Constants.EXPORT_PACKAGE);
-      return (ExportPackageHeader) m_model.getBundleModel().getFactory().createHeader(Constants.EXPORT_PACKAGE, header.getValue() == null ? "" : header.getValue());
+      return (ExportPackageHeader) m_model.getBundleModel().getFactory().createHeader(Constants.EXPORT_PACKAGE, getHeaderValue(header));
     }
 
     private BundleClasspathHeader getBundleClasspathHeader() {
       IManifestHeader header = m_model.getBundle().getManifestHeader(Constants.BUNDLE_CLASSPATH);
-      return (BundleClasspathHeader) m_model.getBundleModel().getFactory().createHeader(Constants.BUNDLE_CLASSPATH, header.getValue() == null ? "" : header.getValue());
+      return (BundleClasspathHeader) m_model.getBundleModel().getFactory().createHeader(Constants.BUNDLE_CLASSPATH, getHeaderValue(header));
     }
 
     /**
