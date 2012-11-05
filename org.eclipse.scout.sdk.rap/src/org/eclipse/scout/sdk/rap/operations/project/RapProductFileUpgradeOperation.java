@@ -16,7 +16,7 @@ public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
 
   @Override
   public boolean isRelevant() {
-    return PlatformVersionUtility.isJuno(getTargetPlatformVersion()) && isNodeChecked(CreateUiRapPluginOperation.BUNDLE_ID);
+    return PlatformVersionUtility.isJunoOrLater(getTargetPlatformVersion()) && isNodeChecked(CreateUiRapPluginOperation.BUNDLE_ID);
   }
 
   @Override
