@@ -129,6 +129,9 @@ public class AbstractWorkspaceWizard extends AbstractWizard {
       }
       catch (Exception e) {
         ScoutSdkUi.logError("exception during perfoming finish on wizard page '" + AbstractWorkspaceWizard.this.getClass().getName() + "'.", e);
+        if (e instanceof CoreException) {
+          throw (CoreException) e;
+        }
       }
     }
   } // end class P_PerformFinishOperation

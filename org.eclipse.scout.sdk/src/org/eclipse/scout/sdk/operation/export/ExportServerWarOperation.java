@@ -85,17 +85,34 @@ public class ExportServerWarOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    IStatus result = null;
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("warExportBuildDir");
       buildClientProduct(monitor, workingCopyManager);
-      buildServerProduct(monitor);
-      installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/servletbridge.jar"), WEB_INF + "/lib/servletbridge.jar");
-      installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/web.xml"), WEB_INF + "/web.xml");
-      installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/eclipse/launch.ini"), WEB_INF + "/eclipse/launch.ini");
-      m_resultingWarFile = packWar();
+      result = buildServerProduct(monitor);
+      if (result.isOK()) {
+        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/servletbridge.jar"), WEB_INF + "/lib/servletbridge.jar");
+        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/web.xml"), WEB_INF + "/web.xml");
+        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/eclipse/launch.ini"), WEB_INF + "/eclipse/launch.ini");
+        m_resultingWarFile = packWar();
+
+        if (m_clientZipFile != null && m_clientZipFile.exists()) {
+          m_clientZipFile.delete(true, monitor);
+          getHtmlFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        }
+
+        try {
+          IOUtility.deleteDirectory(m_tempBuildDir);
+        }
+        catch (Exception e) {
+          // nop
+        }
+      }
+      else {
+        throw new CoreException(result);
+      }
     }
     catch (Exception e) {
-
       if (e instanceof CoreException) {
         throw (CoreException) e;
       }
@@ -103,80 +120,49 @@ public class ExportServerWarOperation implements IOperation {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not create 'servletbridge.jar' in temp folder", e));
       }
     }
-    finally {
-      if (m_clientZipFile != null && m_clientZipFile.exists()) {
-        m_clientZipFile.delete(true, monitor);
-        getHtmlFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
-      }
-      try {
-        IOUtility.deleteDirectory(m_tempBuildDir);
-      }
-      catch (Exception e) {
-        // nop
-      }
-    }
   }
 
   private void buildClientProduct(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getClientProduct() == null) return;
-    try {
-      ExportClientZipOperation exportClient = new ExportClientZipOperation(getClientProduct());
-      exportClient.setHtmlFolder(getHtmlFolder());
-      exportClient.setTargetDirectory(getHtmlFolder().getLocation().toOSString());
-      exportClient.validate();
-      exportClient.run(monitor, workingCopyManager);
+    ExportClientZipOperation exportClient = new ExportClientZipOperation(getClientProduct());
+    exportClient.setHtmlFolder(getHtmlFolder());
+    exportClient.setTargetDirectory(getHtmlFolder().getLocation().toOSString());
+    exportClient.validate();
+    exportClient.run(monitor, workingCopyManager);
 
-      // zip has directly been exported into the html folder -> refresh and remember the file
-      getHtmlFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
-      m_clientZipFile = getHtmlFolder().getFile(exportClient.getZipName());
-    }
-    catch (Exception e) {
-      if (e instanceof CoreException) {
-        throw (CoreException) e;
-      }
-      else {
-        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Error during product export.", e));
-      }
-    }
-    finally {
-      IOUtility.deleteDirectory(new File(m_tempBuildDir.getAbsolutePath() + "/client"));
-    }
+    // zip has directly been exported into the html folder -> refresh and remember the file
+    getHtmlFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+    m_clientZipFile = getHtmlFolder().getFile(exportClient.getZipName());
+
+    IOUtility.deleteDirectory(new File(m_tempBuildDir.getAbsolutePath() + "/client"));
   }
 
-  private void buildServerProduct(IProgressMonitor monitor) throws CoreException {
+  private IStatus buildServerProduct(IProgressMonitor monitor) throws Exception {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(getServerProduct());
-    try {
-      FeatureExportInfo featureInfo = new FeatureExportInfo();
-      featureInfo.toDirectory = true;
-      featureInfo.exportSource = false;
-      featureInfo.exportSourceBundle = false;
-      featureInfo.allowBinaryCycles = true;
-      featureInfo.exportMetadata = false;
-      featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/" + WEB_INF + "/eclipse";
-      featureInfo.zipFileName = "export.zip";
-      featureInfo.items = pfmh.ProductFile.getPluginModels();
+    FeatureExportInfo featureInfo = new FeatureExportInfo();
+    featureInfo.toDirectory = true;
+    featureInfo.exportSource = false;
+    featureInfo.exportSourceBundle = false;
+    featureInfo.allowBinaryCycles = true;
+    featureInfo.exportMetadata = false;
+    featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/" + WEB_INF + "/eclipse";
+    featureInfo.zipFileName = "export.zip";
+    featureInfo.items = pfmh.ProductFile.getPluginModels();
 
-      IProduct prod = pfmh.ProductFile.getProduct();
-      ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + prod.getName() + "'...", prod, ".");
-      productExportOp.schedule();
-      productExportOp.join();
-      IStatus result = productExportOp.getResult();
-      if (!result.isOK()) {
-        throw new CoreException(result);
-      }
-      // clean up
-      deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "config.ini");
-      deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "eclipse.exe");
-      deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "eclipse.ini");
+    IProduct prod = pfmh.ProductFile.getProduct();
+    ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + prod.getName() + "'...", prod, ".");
+    productExportOp.schedule();
+    productExportOp.join();
+    IStatus result = productExportOp.getResult();
+    if (!result.isOK()) {
+      return result;
     }
-    catch (Exception e) {
-      if (e instanceof CoreException) {
-        throw (CoreException) e;
-      }
-      else {
-        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Error during product export.", e));
-      }
-    }
+    // clean up
+    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "config.ini");
+    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "eclipse.exe");
+    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "eclipse.ini");
+
+    return Status.OK_STATUS;
   }
 
   private File packWar() throws FileNotFoundException, IOException {

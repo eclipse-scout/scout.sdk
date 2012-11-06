@@ -78,6 +78,10 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
           }
         }
       }
+
+      for (File artifact : artifacts) {
+        artifact.getParentFile().delete();
+      }
     }
     return true;
   }

@@ -75,60 +75,18 @@ public class ExportClientZipOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("clientZipExportBuildDir");
-      buildClientProduct(monitor);
-    }
-    catch (Exception e) {
-      if (e instanceof CoreException) {
-        throw (CoreException) e;
+      IStatus result = buildClientProduct(monitor);
+      if (result.isOK()) {
+        try {
+          IOUtility.deleteDirectory(m_tempBuildDir);
+        }
+        catch (Exception e) {
+          // nop
+        }
       }
       else {
-        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not create 'servletbridge.jar' in temp folder", e));
-      }
-    }
-    finally {
-      try {
-        IOUtility.deleteDirectory(m_tempBuildDir);
-      }
-      catch (Exception e) {
-        // nop
-      }
-    }
-  }
-
-  private void buildClientProduct(IProgressMonitor monitor) throws CoreException {
-    ProductFileModelHelper pfmh = new ProductFileModelHelper(getClientProduct());
-    try {
-      m_zipName = getZipName(getHtmlFolder(), pfmh) + ".zip";
-
-      FeatureExportInfo featureInfo = new FeatureExportInfo();
-      featureInfo.toDirectory = true;
-      featureInfo.exportSource = false;
-      featureInfo.exportSourceBundle = false;
-      featureInfo.allowBinaryCycles = true;
-      featureInfo.exportMetadata = false;
-      featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/client/buildDir/" + getZipName();
-      featureInfo.items = pfmh.ProductFile.getPluginModels();
-
-      ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + getZipName() + "'...", pfmh.ProductFile.getProduct(), ".");
-      productExportOp.schedule();
-      productExportOp.join();
-
-      IStatus result = productExportOp.getResult();
-      if (!result.isOK()) {
         throw new CoreException(result);
       }
-
-      // create zip file
-      m_clientZipFile = new File(getTargetDirectory(), getZipName());
-      if (!m_clientZipFile.exists()) {
-        m_clientZipFile.getParentFile().mkdirs();
-      }
-
-      ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(m_clientZipFile));
-      File baseDir = new File(m_tempBuildDir.getAbsolutePath(), "client/buildDir/" + getZipName());
-      ResourceUtility.addFolderToZip(baseDir, zipOut);
-      zipOut.flush();
-      zipOut.close();
     }
     catch (Exception e) {
       if (e instanceof CoreException) {
@@ -138,6 +96,43 @@ public class ExportClientZipOperation implements IOperation {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Error during product export.", e));
       }
     }
+  }
+
+  private IStatus buildClientProduct(IProgressMonitor monitor) throws Exception {
+    ProductFileModelHelper pfmh = new ProductFileModelHelper(getClientProduct());
+    m_zipName = getZipName(getHtmlFolder(), pfmh) + ".zip";
+
+    FeatureExportInfo featureInfo = new FeatureExportInfo();
+    featureInfo.toDirectory = true;
+    featureInfo.exportSource = false;
+    featureInfo.exportSourceBundle = false;
+    featureInfo.allowBinaryCycles = true;
+    featureInfo.exportMetadata = false;
+    featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/client/buildDir/" + getZipName();
+    featureInfo.items = pfmh.ProductFile.getPluginModels();
+
+    ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + getZipName() + "'...", pfmh.ProductFile.getProduct(), ".");
+    productExportOp.schedule();
+    productExportOp.join();
+
+    IStatus result = productExportOp.getResult();
+    if (!result.isOK()) {
+      return result;
+    }
+
+    // create zip file
+    m_clientZipFile = new File(getTargetDirectory(), getZipName());
+    if (!m_clientZipFile.exists()) {
+      m_clientZipFile.getParentFile().mkdirs();
+    }
+
+    ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(m_clientZipFile));
+    File baseDir = new File(m_tempBuildDir.getAbsolutePath(), "client/buildDir/" + getZipName());
+    ResourceUtility.addFolderToZip(baseDir, zipOut);
+    zipOut.flush();
+    zipOut.close();
+
+    return Status.OK_STATUS;
   }
 
   private String getZipName(IFolder destinationFolder, ProductFileModelHelper clientModel) throws CoreException {
