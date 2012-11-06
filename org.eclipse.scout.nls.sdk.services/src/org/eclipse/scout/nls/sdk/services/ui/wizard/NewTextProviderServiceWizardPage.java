@@ -250,7 +250,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     Group group = new Group(parent, SWT.NONE);
     group.setText("Languages");
 
-    String[][] langs = {{"Default (English)", null}, {"German", "de"}, {"French", "fr"}, {"Italian", "it"}, {"Spanish", "es"}};
+    String[][] langs = {{"default", null}, {"German", "de"}, {"French", "fr"}, {"Italian", "it"}, {"Spanish", "es"}};
 
     for (final String[] entry : langs) {
       final Button chk = new Button(group, SWT.CHECK);

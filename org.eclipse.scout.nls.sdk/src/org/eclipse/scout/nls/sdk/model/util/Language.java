@@ -36,7 +36,7 @@ public class Language {
 
   public String getDispalyName() {
     if (m_locale == LANGUAGE_DEFAULT.getLocale()) {
-      return "default (English)";
+      return "default";
     }
     return m_locale.getDisplayName();
   }
