@@ -99,10 +99,10 @@ public class ButtonDisplayStylePresenter extends AbstractProposalPresenter<Butto
             sourceValue = "DISPLAY_STYLE_DEFAULT";
             break;
           case Toggle:
-            sourceValue = "DISPLAY_STYLE_RADIO";
+            sourceValue = "DISPLAY_STYLE_TOGGLE";
             break;
           case Radio:
-            sourceValue = "DISPLAY_STYLE_TOGGLE";
+            sourceValue = "DISPLAY_STYLE_RADIO";
             break;
           case Link:
             sourceValue = "DISPLAY_STYLE_LINK";
