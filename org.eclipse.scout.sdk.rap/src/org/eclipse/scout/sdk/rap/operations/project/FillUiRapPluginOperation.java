@@ -21,6 +21,7 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
     STRATEGY_LATER
   }
 
+  //TODO [mvi] [kepler]: move URLs to Kepler as soon as RAP 2.0 is supported by Scout!
   public static final String JUNO_UPDATE_SITE_URL = "http://download.eclipse.org/releases/juno";
   public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.feature.feature.group";
   public static final String SCOUT_RT_FEATURE = "org.eclipse.scout.rt.feature.feature.group";

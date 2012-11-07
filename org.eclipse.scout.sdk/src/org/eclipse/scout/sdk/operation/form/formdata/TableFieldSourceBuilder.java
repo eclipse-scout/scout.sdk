@@ -35,8 +35,11 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
  */
 public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
   private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
+  private static final String OBJECT_SIG = Signature.createTypeSignature(Object.class.getName(), true); // Ljava.lang.Object;
+
   private final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
   private final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
+
   private final IType m_tableField;
 
   public TableFieldSourceBuilder(IType tableField, ITypeHierarchy hierarchy) {
@@ -104,12 +107,28 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         // getter
         final String finalColumnName = getColumnConstantName(i, columnIdMap);
         MethodSourceBuilder columnGetter = new MethodSourceBuilder(NL) {
+          private String simpleRef = null;
+
+          @Override
+          public String createSource(IImportValidator validator) throws JavaModelException {
+            boolean addSuppressUncheckedWarning = false;
+            if (!OBJECT_SIG.equals(colSignature)) {
+              simpleRef = SignatureUtility.getTypeReference(colSignature, validator);
+              if (SignatureUtility.isGenericSignature(colSignature)) {
+                addSuppressUncheckedWarning = true;
+              }
+            }
+            if (addSuppressUncheckedWarning) {
+              addAnnotation(getSuppressUncheckedWarningBuilder());
+            }
+            return super.createSource(validator);
+          }
+
           @Override
           protected String createMethodBody(IImportValidator validator) throws JavaModelException {
             StringBuilder getterBody = new StringBuilder();
             getterBody.append("return ");
-            if (!colSignature.equals("Ljava.lang.Object;")) {
-              String simpleRef = SignatureUtility.getTypeReference(colSignature, validator);
+            if (simpleRef != null) {
               getterBody.append("(" + simpleRef + ") ");
             }
             getterBody.append("getValueInternal(row, " + finalColumnName + ");");
@@ -150,8 +169,28 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       globalGetter.setReturnSignature(Signature.createTypeSignature(Object.class.getName(), true));
       addBuilder(globalGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, globalGetter.getElementName(), globalGetter));
 
-      // gobal setter
+      // global setter
       MethodSourceBuilder globalSetter = new MethodSourceBuilder(NL) {
+        private String[] simpleRefs = new String[columns.length];
+
+        @Override
+        public String createSource(IImportValidator validator) throws JavaModelException {
+          boolean addSuppressUncheckedWarning = false;
+          // pre-calculate simple refs
+          for (int i = 0; i < simpleRefs.length; i++) {
+            if (!OBJECT_SIG.equals(colunmSignatures[i])) {
+              simpleRefs[i] = SignatureUtility.getTypeReference(colunmSignatures[i], validator);
+              if (!addSuppressUncheckedWarning && SignatureUtility.isGenericSignature(colunmSignatures[i])) {
+                addSuppressUncheckedWarning = true;
+              }
+            }
+          }
+          if (addSuppressUncheckedWarning) {
+            addAnnotation(getSuppressUncheckedWarningBuilder());
+          }
+          return super.createSource(validator);
+        }
+
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder builder = new StringBuilder();
@@ -160,9 +199,8 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
             builder.append("    case " + getColumnConstantName(i, columnIdMap) + ": set");
             builder.append(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(columns[i].getElementName()), true));
             builder.append("(row,");
-            if (!colunmSignatures[i].equals("Ljava.lang.Object;")) {
-              String simpleRef = SignatureUtility.getTypeReference(colunmSignatures[i], validator);
-              builder.append("(" + simpleRef + ") ");
+            if (simpleRefs[i] != null) {
+              builder.append("(" + simpleRefs[i] + ") ");
             }
             builder.append("value); break;\n");
           }
@@ -185,6 +223,12 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
       columnCount.setSimpleBody("return " + columns.length + ";");
       addBuilder(columnCount, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, columnCount.getElementName(), columnCount));
     }
+  }
+
+  private static AnnotationSourceBuilder getSuppressUncheckedWarningBuilder() {
+    AnnotationSourceBuilder suppressUnchecked = new AnnotationSourceBuilder(Signature.createTypeSignature(SuppressWarnings.class.getName(), true));
+    suppressUnchecked.addParameter("\"unchecked\"");
+    return suppressUnchecked;
   }
 
   private String getColumnConstantName(int i, Map<Integer, String> map) {

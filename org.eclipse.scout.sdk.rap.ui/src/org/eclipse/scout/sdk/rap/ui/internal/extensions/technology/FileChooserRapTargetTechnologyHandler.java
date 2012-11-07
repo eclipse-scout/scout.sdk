@@ -50,6 +50,7 @@ import org.osgi.framework.Version;
  */
 public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnologyHandler {
 
+  //TODO [mvi] [kepler]: move URLs to Kepler as soon as RAP 2.0 is supported by Scout!
   private final static String RAP_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/rt/rap/1.5/incubator";
   private final static String RAP_INCUBATOR_FEATURE_NAME = "org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group";
   private final static Version RAP_INCUBATOR_FEATURE_VERSION = new Version(1, 5, 0, "20120220-1720"); // the supported version. must be present at the update site
@@ -98,9 +99,9 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
     for (IScoutTechnologyResource r : resources) {
       if (selected) {
         TargetPlatformUtility.addInstallableUnitsToTarget(r.getResource(),
-              new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME},
-              new String[]{RAP_INCUBATOR_FEATURE_VERSION.toString(), scoutIncubVersion},
-              new String[]{RAP_INCUBATOR_UPDATE_SITE_URL, SCOUT_INCUBATOR_UPDATE_SITE_URL});
+            new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME},
+            new String[]{RAP_INCUBATOR_FEATURE_VERSION.toString(), scoutIncubVersion},
+            new String[]{RAP_INCUBATOR_UPDATE_SITE_URL, SCOUT_INCUBATOR_UPDATE_SITE_URL});
       }
       else {
         TargetPlatformUtility.removeInstallableUnitsFromTarget(r.getResource(), new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME});

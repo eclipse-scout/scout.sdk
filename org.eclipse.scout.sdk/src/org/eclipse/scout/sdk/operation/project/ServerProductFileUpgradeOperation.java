@@ -15,7 +15,7 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
 
   @Override
   public boolean isRelevant() {
-    return PlatformVersionUtility.isJuno(getTargetPlatformVersion()) && isNodeChecked(CreateServerPluginOperation.BUNDLE_ID);
+    return PlatformVersionUtility.isJunoOrLater(getTargetPlatformVersion()) && isNodeChecked(CreateServerPluginOperation.BUNDLE_ID);
   }
 
   @Override

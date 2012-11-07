@@ -7,6 +7,32 @@ public final class PlatformVersionUtility {
 
   private static Version platformVersion = null;
 
+  /**
+   * points to the newest supported version.
+   * 
+   * @return
+   */
+  public static boolean isLatest() {
+    return isKepler();
+  }
+
+  public static boolean isKepler() {
+    return isKepler(getPlatformVersion());
+  }
+
+  public static boolean isKepler(Version v) {
+    return v.getMajor() == 4 && v.getMinor() == 3;
+  }
+
+  public static boolean isJunoOrLater() {
+    return isJunoOrLater(getPlatformVersion());
+  }
+
+  public static boolean isJunoOrLater(Version v) {
+    return (v.getMajor() == 3 && v.getMinor() == 8) ||
+        (v.getMajor() == 4 && v.getMinor() >= 2);
+  }
+
   public static boolean isJuno() {
     return isJuno(getPlatformVersion());
   }

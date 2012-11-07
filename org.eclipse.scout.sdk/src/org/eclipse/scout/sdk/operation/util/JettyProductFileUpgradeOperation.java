@@ -34,19 +34,19 @@ public class JettyProductFileUpgradeOperation implements IOperation {
     // see http://wiki.eclipse.org/Jetty/Getting_Started/Porting_to_Jetty_7/Refactoring
     // eclipse 3.8 and 4.2 uses jetty >= 7 -> rename jetty plugins
     final String[] oldPluginsToRemove = new String[]{
-            "org.mortbay.jetty.server",
-            "org.mortbay.jetty.util"
-        };
+        "org.mortbay.jetty.server",
+        "org.mortbay.jetty.util"
+    };
 
-    final String[] additionalJunoPlugins = new String[]{
-            "org.eclipse.jetty.continuation",
-            "org.eclipse.jetty.http",
-            "org.eclipse.jetty.io",
-            "org.eclipse.jetty.security",
-            "org.eclipse.jetty.server",
-            "org.eclipse.jetty.servlet",
-            "org.eclipse.jetty.util"
-        };
+    final String[] additionalPlugins = new String[]{
+        "org.eclipse.jetty.continuation",
+        "org.eclipse.jetty.http",
+        "org.eclipse.jetty.io",
+        "org.eclipse.jetty.security",
+        "org.eclipse.jetty.server",
+        "org.eclipse.jetty.servlet",
+        "org.eclipse.jetty.util"
+    };
 
     for (IFile prodFile : m_prodFiles) {
       ProductFileModelHelper pfmh = new ProductFileModelHelper(prodFile);
@@ -54,7 +54,7 @@ public class JettyProductFileUpgradeOperation implements IOperation {
         pfmh.ProductFile.removeDependency(plugin);
       }
 
-      for (String plugin : additionalJunoPlugins) {
+      for (String plugin : additionalPlugins) {
         pfmh.ProductFile.addDependency(plugin);
       }
       pfmh.save();

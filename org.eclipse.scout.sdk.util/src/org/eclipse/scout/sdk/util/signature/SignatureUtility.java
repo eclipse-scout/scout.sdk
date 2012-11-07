@@ -482,7 +482,11 @@ public final class SignatureUtility {
       }
     }
     return null;
+  }
 
+  public static boolean isGenericSignature(String sig) {
+    String[] params = Signature.getTypeArguments(sig);
+    return params != null && params.length > 0;
   }
 
   public static String getQuallifiedSignature(String signature, IType jdtType) throws JavaModelException {

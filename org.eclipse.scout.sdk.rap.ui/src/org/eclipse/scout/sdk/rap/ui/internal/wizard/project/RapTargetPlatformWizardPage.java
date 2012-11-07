@@ -230,7 +230,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     m_includeRemoteRequirementsButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        if (m_includeRemoteRequirementsButton.getSelection() && !m_messageShown && !PlatformVersionUtility.isJuno()) {
+        if (m_includeRemoteRequirementsButton.getSelection() && !m_messageShown && !PlatformVersionUtility.isLatest()) {
           MessageBox msgBox = new MessageBox(m_includeRemoteRequirementsButton.getShell(), SWT.OK | SWT.ICON_WARNING);
           msgBox.setMessage(Texts.get("RapTargetInfoMessage"));
           msgBox.open();
@@ -328,7 +328,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   @Override
   public void performHelp() {
     //TODO: remove external link and use eclipse help instead
-    ResourceUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.8/Create_a_new_project#Step_3_.28Optional.29");
+    ResourceUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.9/Create_a_new_project#Step_3_.28Optional.29");
   }
 
   private Version getRemotePlatformVersion() {
@@ -457,7 +457,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   }
 
   private static boolean checkIfRapTargetPluginCanBeUsed() {
-    return PlatformVersionUtility.isJuno() && Platform.getBundle(RapRuntimeClasses.ScoutRapTargetPlugin) != null;
+    return PlatformVersionUtility.isLatest() && Platform.getBundle(RapRuntimeClasses.ScoutRapTargetPlugin) != null;
   }
 
   private IStatus getStatusStrategy() {
@@ -523,7 +523,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     else if (TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy())) {
       if (isDownloadEclipsePlatform()) {
         int severity = IStatus.INFO;
-        if (!PlatformVersionUtility.isJuno()) {
+        if (!PlatformVersionUtility.isLatest()) {
           severity = IStatus.WARNING;
         }
         return new Status(severity, ScoutSdkRapUI.PLUGIN_ID, Texts.get("RapTargetAndEclipseDownload"));

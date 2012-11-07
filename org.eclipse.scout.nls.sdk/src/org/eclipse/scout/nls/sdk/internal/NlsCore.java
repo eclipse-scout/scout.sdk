@@ -63,14 +63,16 @@ public class NlsCore extends AbstractUIPlugin implements INlsIcons {
   public void start(BundleContext context) throws Exception {
     super.start(context);
 
-    m_colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
-    m_colorRegistry.put(COLOR_NLS_ROW_INACTIVE_FOREGROUND, new RGB(178, 178, 178));
-    m_colorRegistry.put(COLOR_TABLE_CURSOR_INACTIVE_BACKGROUND, new RGB(255, 255, 255));
-    m_colorRegistry.put(COLOR_TABLE_CURSOR_BACKGROUND, new RGB(13, 58, 161));
-    m_colorRegistry.put(COLOR_TABLE_CURSOR_FOREGROUND, new RGB(255, 255, 255));
-    m_colorRegistry.put(COLOR_TABLE_CURSOR_INACTIVE_FOREGROUND, new RGB(0, 0, 0));
-    m_nlsWorkspace = new NlsWorkspace();
+    if (PlatformUI.isWorkbenchRunning()) {
+      m_colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+      m_colorRegistry.put(COLOR_NLS_ROW_INACTIVE_FOREGROUND, new RGB(178, 178, 178));
+      m_colorRegistry.put(COLOR_TABLE_CURSOR_INACTIVE_BACKGROUND, new RGB(255, 255, 255));
+      m_colorRegistry.put(COLOR_TABLE_CURSOR_BACKGROUND, new RGB(13, 58, 161));
+      m_colorRegistry.put(COLOR_TABLE_CURSOR_FOREGROUND, new RGB(255, 255, 255));
+      m_colorRegistry.put(COLOR_TABLE_CURSOR_INACTIVE_FOREGROUND, new RGB(0, 0, 0));
+    }
 
+    m_nlsWorkspace = new NlsWorkspace();
     plugin = this;
     logManager = new SdkLogManager(this);
   }

@@ -35,8 +35,7 @@
 		<link>
 			<name>.settings</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.sdk-feature/.settings
-			</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.sdk-feature/.settings</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
