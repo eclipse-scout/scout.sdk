@@ -185,7 +185,7 @@ public class IconPresenter extends AbstractMethodPresenter {
           StringBuilder source = new StringBuilder();
           source.append("return ");
           if (value != null) {
-            String iconTypeSig = Signature.createTypeSignature(value.getConstantField().getDeclaringType().getFullyQualifiedName(), false);
+            String iconTypeSig = Signature.createTypeSignature(value.getConstantField().getDeclaringType().getFullyQualifiedName(), true);
             source.append("  " + SignatureUtility.getTypeReference(iconTypeSig, validator) + "." + value.getConstantField().getElementName());
             source.append(";");
           }
