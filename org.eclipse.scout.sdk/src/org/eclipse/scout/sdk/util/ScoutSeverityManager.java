@@ -208,15 +208,11 @@ public final class ScoutSeverityManager {
 
     switch (severity) {
       case IMarker.SEVERITY_INFO:
-        ScoutSdk.logInfo("INFO ");
         break;
       case IMarker.SEVERITY_WARNING:
-        ScoutSdk.logInfo("WARNING ");
         break;
       case IMarker.SEVERITY_ERROR:
-        ScoutSdk.logInfo("ERROR ");
         break;
-
       default:
         ScoutSdk.logInfo("UNDEFINED LEVEL ");
         break;
