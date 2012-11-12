@@ -172,17 +172,20 @@ public class CreateTemplateOperation implements IOperation {
     op.validate();
     op.run(monitor, workingCopyManager);
     IType templateType = op.getCreatedType();
-    if (isCreateExternalFormData() && sharedBundle != null) {
-      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType);
-      formDataUpdateOp.run(monitor, workingCopyManager);
-    }
+
     JavaElementFormatOperation formatOp = new JavaElementFormatOperation(templateType, true);
     formatOp.validate();
     formatOp.run(monitor, workingCopyManager);
     workingCopyManager.reconcile(templateType.getCompilationUnit(), monitor);
+    
+    // form data
+    if (isCreateExternalFormData() && sharedBundle != null) {
+    	FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType);
+    	formDataUpdateOp.run(monitor, workingCopyManager);
+    }
+    
     // getter fields
     org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(templateType);
-
     IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(templateType);
     TreeMap<CompositeObject, IJavaElement> siblings = new TreeMap<CompositeObject, IJavaElement>();
     IJavaElement sibling = structuredForm.getSibling(CATEGORIES.METHOD_INNER_TYPE_GETTER);
@@ -191,6 +194,7 @@ public class CreateTemplateOperation implements IOperation {
     for (IType t : templateType.getTypes()) {
       createFormFieldGetter(t, templateType, siblings, newFormFields, hierarchy, monitor, workingCopyManager);
     }
+    
     if (isReplaceFieldWithTemplate()) {
       workingCopyManager.register(getFormField().getCompilationUnit(), monitor);
       IImportValidator validator = new CompilationUnitImportValidator(getFormField().getCompilationUnit());
