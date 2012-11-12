@@ -355,7 +355,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
           ILaunchManager lm = DebugPlugin.getDefault().getLaunchManager();
           for (ILaunch l : lm.getLaunches()) {
             ILaunchConfiguration lc = l.getLaunchConfiguration();
-            if (getProductFile().getName().equals(lc.getName())) {
+            if (lc != null && getProductFile().getName().equals(lc.getName())) {
               l.terminate();
               for (int i = 0; i < 50; i++) {
                 if (l.isTerminated()) {
@@ -400,7 +400,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
         public void run() {
           ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
           for (ILaunch l : launches) {
-            if (l.getLaunchConfiguration().getName().equals(getProductFile().getName())) {
+            if (l.getLaunchConfiguration() != null && l.getLaunchConfiguration().getName().equals(getProductFile().getName())) {
               if (!m_stopLink.isDisposed() && !m_mainGroup.isDisposed()) {
                 if (l.isTerminated()) {
                   m_stopLink.setEnabled(false);
