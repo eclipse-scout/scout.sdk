@@ -50,12 +50,13 @@ import org.osgi.framework.Version;
  */
 public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  //TODO [mvi] [kepler]: move URLs to Kepler as soon as RAP 2.0 is supported by Scout!
+  //TODO [mvi] [kepler]: move URLs as soon as RAP 2.0 is supported by Scout!
   private final static String RAP_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/rt/rap/1.5/incubator";
   private final static String RAP_INCUBATOR_FEATURE_NAME = "org.eclipse.rap.incubator.supplemental.fileupload.feature.feature.group";
   private final static Version RAP_INCUBATOR_FEATURE_VERSION = new Version(1, 5, 0, "20120220-1720"); // the supported version. must be present at the update site
-  private final static String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.feature.group";
-  private final static String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/3.8";
+
+  private final static String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.feature.group";
+  private final static String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/3.9";
 
   @Override
   public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {

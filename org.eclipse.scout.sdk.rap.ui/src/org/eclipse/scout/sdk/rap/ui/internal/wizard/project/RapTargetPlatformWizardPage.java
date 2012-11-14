@@ -334,7 +334,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   private Version getRemotePlatformVersion() {
     try {
       String version = P2Utility.getLatestVersion(FillUiRapPluginOperation.ECLIPSE_PLATFORM_FEATURE,
-          new URI(FillUiRapPluginOperation.JUNO_UPDATE_SITE_URL), new NullProgressMonitor());
+          new URI(FillUiRapPluginOperation.UPDATE_SITE_URL), new NullProgressMonitor());
       return new Version(version);
     }
     catch (Exception e) {
