@@ -32,11 +32,23 @@
 
   <properties>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</tycho.scmUrl>
-	
-    <compiler.properties.location>${project.basedir}/../org.eclipse.scout.sdk-feature/.settings/org.eclipse.jdt.core.prefs</compiler.properties.location>
   </properties>
 
   <modules>
     <module>org.eclipse.scout.sdk.parent</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-compiler-plugin</artifactId>
+        <configuration>
+          <compilerArguments>
+            <properties>${project.basedir}/../org.eclipse.scout.sdk-feature/.settings/org.eclipse.jdt.core.prefs</properties>
+          </compilerArguments>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
