@@ -132,7 +132,10 @@ public class ScoutTypeUtility extends TypeUtility {
 
   public static IType[] getTypeOccurenceInMethod(IMethod method) {
     try {
-      return getTypeOccurenceInSnippet(method, method.getSource());
+      String source = method.getSource();
+      if (source != null) {
+        return getTypeOccurenceInSnippet(method, source);
+      }
     }
     catch (JavaModelException e) {
       ScoutSdk.logWarning("could not get source of method '" + method.getElementName() + "'.", e);

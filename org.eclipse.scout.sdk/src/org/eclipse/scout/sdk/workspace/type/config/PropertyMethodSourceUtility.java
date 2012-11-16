@@ -16,11 +16,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutSourceUtility;
@@ -67,6 +70,14 @@ public final class PropertyMethodSourceUtility {
   private PropertyMethodSourceUtility() {
   }
 
+  public static class CustomImplementationException extends CoreException {
+    private static final long serialVersionUID = -2524492192516521856L;
+
+    public CustomImplementationException() {
+      super(new ScoutStatus(Status.INFO, Texts.get("CustomImplementation"), null));
+    }
+  }
+
   /**
    * <xmp>
    * String methodA(){
@@ -83,18 +94,22 @@ public final class PropertyMethodSourceUtility {
    */
   public static String getMethodReturnValue(IMethod method) throws CoreException {
     try {
-      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(method.getSource());
+      String source = method.getSource();
+      if (source == null) {
+        throw new CoreException(new ScoutStatus(Status.ERROR, "No source for method '" + method.getElementName() + "' found.", null));
+      }
+      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(source);
       if (m.find()) {
         return m.group(1).trim();
       }
       else {
         ScoutSdk.logInfo("could not find return value of method: " + method.getElementName());
-        throw new CoreException(new ScoutStatus(method.getElementName()));
+        throw new CustomImplementationException();
       }
     }
     catch (JavaModelException e) {
       ScoutSdk.logInfo("could not find return value of method: " + method.getElementName());
-      throw new CoreException(new ScoutStatus(method.getElementName()));
+      throw new CoreException(new ScoutStatus("Error parsing the return value of method '" + method.getElementName() + "'.", e));
     }
   }
 
@@ -127,7 +142,7 @@ public final class PropertyMethodSourceUtility {
         }
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   /**
@@ -168,7 +183,7 @@ public final class PropertyMethodSourceUtility {
         return DecimalFormat.getInstance().parse(parameter).doubleValue();
       }
       catch (ParseException e) {
-        throw new CoreException(new ScoutStatus(parameter, e));
+        throw new CoreException(new ScoutStatus("Error parsing parameter '" + parameter + "' to a decimal.", e));
       }
     }
     String prefix = "";
@@ -186,11 +201,11 @@ public final class PropertyMethodSourceUtility {
           return DecimalFormat.getInstance().parse(prefix + referencedValue).doubleValue();
         }
         catch (ParseException e) {
-          throw new CoreException(new ScoutStatus(prefix + referencedValue, e));
+          throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
         }
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   /**
@@ -221,11 +236,11 @@ public final class PropertyMethodSourceUtility {
           return DecimalFormat.getInstance().parse(prefix + referencedValue).intValue();
         }
         catch (ParseException e) {
-          throw new CoreException(new ScoutStatus(prefix + referencedValue, e));
+          throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
         }
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   public static Integer parseReturnParameterInteger(String parameter) throws CoreException {
@@ -255,10 +270,10 @@ public final class PropertyMethodSourceUtility {
         return DecimalFormat.getIntegerInstance().parse(parameter).intValue();
       }
       catch (ParseException e) {
-        throw new CoreException(new ScoutStatus(parameter, e));
+        throw new CoreException(new ScoutStatus("Error parsing parameter '" + parameter + "' to a decimal.", e));
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   /**
@@ -290,11 +305,11 @@ public final class PropertyMethodSourceUtility {
           return DecimalFormat.getNumberInstance().parse(prefix + referencedValue).longValue();
         }
         catch (ParseException e) {
-          throw new CoreException(new ScoutStatus(prefix + referencedValue, e));
+          throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
         }
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   public static Long parseReturnParameterLong(String parameter) throws CoreException {
@@ -325,10 +340,10 @@ public final class PropertyMethodSourceUtility {
         return DecimalFormat.getNumberInstance().parse(parameter).longValue();
       }
       catch (ParseException e) {
-        throw new CoreException(new ScoutStatus(parameter, e));
+        throw new CoreException(new ScoutStatus("Error parsing parameter '" + parameter + "' to a decimal.", e));
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   public static boolean parseReturnParameterBoolean(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
@@ -343,7 +358,7 @@ public final class PropertyMethodSourceUtility {
         return Boolean.parseBoolean(referencedValue);
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   /**
@@ -364,17 +379,16 @@ public final class PropertyMethodSourceUtility {
         IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), className);
         if (referencedType == null) {
           ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-          throw new CoreException(new ScoutStatus(parameter));
+          throw new CoreException(new ScoutStatus(Status.WARNING, "Referenced type '" + parameter + "' could not be found.", null));
         }
         return referencedType;
       }
     }
     catch (JavaModelException e) {
       ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-      throw new CoreException(new ScoutStatus(parameter));
+      throw new CoreException(new ScoutStatus("Error parsing the return parameter type.", e));
     }
-
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   private static String findReferencedValue(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
@@ -387,7 +401,7 @@ public final class PropertyMethodSourceUtility {
           IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
           if (referencedType == null) {
             ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-            throw new CoreException(new ScoutStatus(parameter));
+            throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
           }
           String fieldValue = ScoutSourceUtility.findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
           return fieldValue;
@@ -399,10 +413,10 @@ public final class PropertyMethodSourceUtility {
       }
       catch (JavaModelException e) {
         ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'", e);
-        throw new CoreException(new ScoutStatus(parameter));
+        throw new CoreException(new ScoutStatus("Error parsing the return parameter.", e));
       }
     }
-    throw new CoreException(new ScoutStatus(parameter));
+    throw new CustomImplementationException();
   }
 
   public static String parseReturnParameterIcon(String input, IMethod method) throws CoreException {
@@ -435,10 +449,10 @@ public final class PropertyMethodSourceUtility {
       }
       catch (JavaModelException e) {
         ScoutSdk.logWarning("referenced icon could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-        throw new CoreException(new ScoutStatus(input));
+        throw new CoreException(new ScoutStatus("Could not find icon for input '" + input + "'.", e));
       }
     }
-    throw new CoreException(new ScoutStatus("unexpected icon expression: " + input));
+    throw new CustomImplementationException();
   }
 
   /**
@@ -463,6 +477,11 @@ public final class PropertyMethodSourceUtility {
    * @throws JavaModelException
    */
   public static String parseReturnParameterNlsKey(String input) throws CoreException {
+    return parseReturnParameterNlsKey(input, new BooleanHolder());
+  }
+
+  public static String parseReturnParameterNlsKey(String input, BooleanHolder isNlsText) throws CoreException {
+    isNlsText.setValue(false);
     if (input == null || input.trim().equals("null")) {
       return null;
     }
@@ -474,8 +493,9 @@ public final class PropertyMethodSourceUtility {
     m = REGEX_METHOD_RETURN_NLS_TEXT.matcher(input);
     if (m.matches()) {
       String key = m.group(1);
+      isNlsText.setValue(true);
       return key;
     }
-    return null;
+    throw new CustomImplementationException();
   }
 }

@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.view.properties.presenter.util;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
@@ -52,13 +51,11 @@ public class MethodErrorPresenterContent extends Composite {
   private Label m_statusIcon;
   private ImageHyperlink m_deleteButton;
   private ConfigurationMethod m_configurationMethod;
-  private String m_presenterText;
   private CustomTooltip m_customTooltip;
 
   public MethodErrorPresenterContent(Composite parent, FormToolkit toolkit) {
     super(parent, SWT.NONE);
     m_toolkit = toolkit;
-    setPresenterText(Texts.get("CustomImplementation"));
     createContent(this);
   }
 
@@ -139,11 +136,10 @@ public class MethodErrorPresenterContent extends Composite {
     try {
       m_customTooltip.setText(wellFormMethod());
     }
-    catch (JavaModelException e1) {
+    catch (Exception e1) {
       ScoutSdkUi.logWarning("could not create tooltip for '" + method.getMethodName() + "'", e1);
     }
     m_deleteButton.setEnabled(method.isImplemented());
-    setStatus(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, getPresenterText()));
     m_deleteButton.setToolTipText(Texts.get("RemoveXinY", getMethod().getMethodName(), getMethod().getType().getElementName()));
   }
 
@@ -191,6 +187,9 @@ public class MethodErrorPresenterContent extends Composite {
 
   private String wellFormMethod() throws JavaModelException {
     String methodBody = getMethod().peekMethod().getSource();
+    if (methodBody == null) {
+      return null;
+    }
     String newBody = ScoutSourceUtility.removeLeadingCommentAndAnnotationLines(methodBody);
     String newLine = ResourceUtility.getLineSeparator(getMethod().getType().getCompilationUnit());
     newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody, newLine);
@@ -205,13 +204,5 @@ public class MethodErrorPresenterContent extends Composite {
     else {
       return PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry().get(symbolicName);
     }
-  }
-
-  public void setPresenterText(String presenterText) {
-    m_presenterText = presenterText;
-  }
-
-  public String getPresenterText() {
-    return m_presenterText;
   }
 }

@@ -11,9 +11,11 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -98,16 +100,22 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
       m_proposalField.setEnabled(getNlsProject() != null);
     }
 
-    String currentSourceValueKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeValue());
+    BooleanHolder isNlsText = new BooleanHolder();
+    String currentSourceValueKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeValue(), isNlsText);
     try {
       storeValueLock.acquire();
       if (currentSourceValueKey != null) {
-        m_currentSourceTuple = getNlsProject().getEntry(currentSourceValueKey);
-        if (m_currentSourceTuple == null) {
-          throw new MethodErrorPresenterException(new ScoutStatus("Key '" + currentSourceValueKey + "' not found!"));
+        if (isNlsText.getValue()) {
+          m_currentSourceTuple = getNlsProject().getEntry(currentSourceValueKey);
+          if (m_currentSourceTuple == null) {
+            throw new CoreException(new ScoutStatus(Status.WARNING, "Key '" + currentSourceValueKey + "' not found!", null));
+          }
+          else {
+            m_proposalField.acceptProposal(m_currentSourceTuple);
+          }
         }
         else {
-          m_proposalField.acceptProposal(m_currentSourceTuple);
+          throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + currentSourceValueKey + "'.", null));
         }
       }
       else {

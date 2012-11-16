@@ -82,14 +82,9 @@ public class ConfigurationMethod {
     return m_source;
   }
 
-  public String computeDefaultValue() {
+  public String computeDefaultValue() throws CoreException {
     if (getMethodType() == PROPERTY_METHOD) {
-      try {
-        return PropertyMethodSourceUtility.getMethodReturnValue(getDefaultMethod());
-      }
-      catch (CoreException e) {
-        ScoutSdk.logError("could not parse default value of method '" + getDefaultMethod().getElementName() + "' in type '" + getType().getFullyQualifiedName() + "'.", e);
-      }
+      return PropertyMethodSourceUtility.getMethodReturnValue(getDefaultMethod());
     }
     return null;
   }

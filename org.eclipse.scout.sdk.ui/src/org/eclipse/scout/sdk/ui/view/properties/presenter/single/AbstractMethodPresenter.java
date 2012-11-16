@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.JFaceResources;
@@ -183,9 +182,7 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
           m_errorContent = new MethodErrorPresenterContent(getContainer(), getToolkit());
           m_errorContent.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
         }
-        if (e instanceof MethodErrorPresenterException) {
-          m_errorContent.setPresenterText(e.getMessage());
-        }
+        m_errorContent.setStatus(e.getStatus());
         m_errorContent.setMethod(configurationMethod);
         setErrorPresenterVisible(true);
       }
@@ -270,14 +267,6 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     catch (JavaModelException e) {
       ScoutSdkUi.logError(e);
       return null;
-    }
-  }
-
-  protected static class MethodErrorPresenterException extends CoreException {
-    private static final long serialVersionUID = 1L;
-
-    public MethodErrorPresenterException(IStatus status) {
-      super(status);
     }
   }
 }
