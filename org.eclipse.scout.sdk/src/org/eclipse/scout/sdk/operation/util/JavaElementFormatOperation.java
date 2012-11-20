@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
@@ -24,7 +25,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class JavaElementFormatOperation extends SourceFormatOperation {
 
-  private final IMember m_javaMember;
+  private final ICompilationUnit m_icu;
   private final boolean m_organizeImports;
 
   /**
@@ -34,17 +35,17 @@ public class JavaElementFormatOperation extends SourceFormatOperation {
    * @throws JavaModelException
    */
   public JavaElementFormatOperation(IMember element, boolean organizeImports) throws JavaModelException {
-    super(element.getJavaProject());
-    m_organizeImports = organizeImports;
-    m_javaMember = element;
-    setDocument(new Document(m_javaMember.getCompilationUnit().getSource()));
-    SourceRange range = new SourceRange(element.getSourceRange().getOffset(), element.getSourceRange().getLength());
-    setRange(range);
+    this(element.getCompilationUnit(), organizeImports);
   }
 
-  @Override
-  public String getOperationName() {
-    return "Format source of '" + getJavaMember().getElementName() + "'...";
+  public JavaElementFormatOperation(ICompilationUnit icu, boolean organizeImports) throws JavaModelException {
+    super(icu.getJavaProject());
+    m_organizeImports = organizeImports;
+    m_icu = icu;
+    setDocument(new Document(icu.getSource()));
+
+    ISourceRange sourceRange = icu.getSourceRange();
+    setRange(new SourceRange(sourceRange.getOffset(), sourceRange.getLength()));
   }
 
   @Override
@@ -54,19 +55,14 @@ public class JavaElementFormatOperation extends SourceFormatOperation {
     }
     super.run(monitor, workingCopyManager);
     // set source back to icu
-    ICompilationUnit icu = getJavaMember().getCompilationUnit();
-    workingCopyManager.register(icu, monitor);
-    icu.getBuffer().setContents(getDocument().get());
+    workingCopyManager.register(m_icu, monitor);
+    m_icu.getBuffer().setContents(getDocument().get());
     if (isOrganizeImports()) {
       // organize imports
-      OrganizeImportOperation op = new OrganizeImportOperation(icu);
+      OrganizeImportOperation op = new OrganizeImportOperation(m_icu);
       op.validate();
       op.run(monitor, workingCopyManager);
     }
-  }
-
-  public IMember getJavaMember() {
-    return m_javaMember;
   }
 
   public boolean isOrganizeImports() {

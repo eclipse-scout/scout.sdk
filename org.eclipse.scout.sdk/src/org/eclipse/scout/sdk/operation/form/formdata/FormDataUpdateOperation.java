@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
+import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -312,8 +313,18 @@ public class FormDataUpdateOperation implements IOperation {
       if (icu != null) {
         try {
           icu.becomeWorkingCopy(monitor);
+
+          // store new formdata content to buffer
           icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(m_icuSource, icu));
+
+          // format buffer & organize imports
+          JavaElementFormatOperation formatOp = new JavaElementFormatOperation(icu, true);
+          formatOp.validate();
+          formatOp.run(monitor, workingCopyManager);
+
+          // save buffer
           icu.getBuffer().save(monitor, true);
+
           icu.commitWorkingCopy(true, monitor);
         }
         catch (Exception e) {
@@ -323,8 +334,6 @@ public class FormDataUpdateOperation implements IOperation {
           icu.discardWorkingCopy();
         }
       }
-
     }
   }
-
 }
