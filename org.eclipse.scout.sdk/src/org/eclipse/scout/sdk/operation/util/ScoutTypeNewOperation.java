@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util;
 
+import java.util.regex.Pattern;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,9 +36,12 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
 
+  private final static Pattern JAVA_LANG_REGEX = Pattern.compile("^java\\.lang\\.[^.]*$");
+
   private final String m_implementationPackageName;
-  private IType m_createdType;
   private final IScoutBundle m_scoutBundle;
+
+  private IType m_createdType;
 
   /**
    * @param name
@@ -96,10 +101,10 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
     icu.createPackageDeclaration(pck.getElementName(), monitor);
     SimpleImportValidator validator = new SimpleImportValidator(getImplementationPackageName());
     String content = createSource(validator);
+
     // imports
-    String javaLangRegex = "^java\\.lang\\.[^.]*$";
     for (String imp : validator.getImportsToCreate()) {
-      if (!imp.matches(javaLangRegex)) {
+      if (!JAVA_LANG_REGEX.matcher(imp).matches()) {
         icu.createImport(imp, null, monitor);
       }
     }

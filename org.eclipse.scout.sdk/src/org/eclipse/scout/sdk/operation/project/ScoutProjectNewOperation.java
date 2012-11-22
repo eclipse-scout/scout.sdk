@@ -19,9 +19,12 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 @SuppressWarnings("restriction")
@@ -112,6 +115,27 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
 
     // execute the operations
     execOperations(monitor, workingCopyManager, collector.toArray(new P_OperationElement[collector.size()]));
+
+    // format all projects so that they match the workspace settings
+    for (IJavaProject jp : getCreatedBundlesList()) {
+      formatProject(monitor, workingCopyManager, jp);
+    }
+  }
+
+  private static void formatProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaProject p) throws CoreException {
+    for (IPackageFragment pck : p.getPackageFragments()) {
+      for (ICompilationUnit u : pck.getCompilationUnits()) {
+        if (u.isWorkingCopy()) {
+          workingCopyManager.reconcile(u, monitor);
+        }
+        else {
+          workingCopyManager.register(u, monitor);
+        }
+        JavaElementFormatOperation fo = new JavaElementFormatOperation(u, false);
+        fo.validate();
+        fo.run(monitor, workingCopyManager);
+      }
+    }
   }
 
   private Collection<P_OperationElement> getRootOperations(Collection<P_OperationElement> nodes) {

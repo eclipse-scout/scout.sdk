@@ -51,7 +51,7 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
   }
 
   @SuppressWarnings("unchecked")
-  private List<IJavaProject> getCreatedBundlesList() {
+  protected List<IJavaProject> getCreatedBundlesList() {
     return getProperties().getProperty(PROP_CREATED_BUNDLES, List.class);
   }
 

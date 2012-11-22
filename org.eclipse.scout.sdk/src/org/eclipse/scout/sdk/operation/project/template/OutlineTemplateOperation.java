@@ -71,7 +71,7 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
     ResourcesPlugin.getWorkspace().checkpoint(false);
     IType desktopType = TypeUtility.getType(m_scoutProject.getClientBundle().getBundleName() + IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP + ".Desktop");
     if (TypeUtility.exists(desktopType)) {
-      MethodOverrideOperation execOpenOp = new MethodOverrideOperation(desktopType, "execOpened") {
+      MethodOverrideOperation execOpenOp = new MethodOverrideOperation(desktopType, "execOpened", false) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
@@ -102,7 +102,6 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         }
       };
       execOpenOp.setSibling(desktopType.getType("FileMenu"));
-      execOpenOp.setFormatSource(true);
       execOpenOp.validate();
       execOpenOp.run(monitor, workingCopyManager);
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
@@ -117,11 +116,12 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
       outlineOp.setAddToDesktop(true);
       outlineOp.setClientBundle(getScoutProject().getClientBundle());
       outlineOp.setDesktopType(desktopType);
-      outlineOp.setFormatSource(true);
+      outlineOp.setFormatSource(false);
       outlineOp.setTypeName(name);
       outlineOp.setNlsEntry(entry);
       outlineOp.run(monitor, workingCopyManager);
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
+
       if (getScoutProject().getServerBundle() != null && getScoutProject().getSharedBundle() != null) {
         // create outline service
         ServiceNewOperation outlineServiceOp = new ServiceNewOperation();

@@ -90,13 +90,41 @@ public class AnnotationCreateOperation implements IOperation {
         return existingRange;
       }
     }
+
     ISourceRange sourceRange = getAnnotationOwner().getSourceRange();
     int insertPos = sourceRange.getOffset();
     ISourceRange javadocRange = getAnnotationOwner().getJavadocRange();
     if (javadocRange != null) {
       insertPos = javadocRange.getOffset() + javadocRange.getLength();
     }
-    return new SourceRange(insertPos, 0);
+    return new SourceRange(insertPos + getJdtAnnotationOffsetFix(), 0);
+  }
+
+  private int getJdtAnnotationOffsetFix() throws JavaModelException {
+    // Fix for JDT bug with annotation creation and source ranges not updated properly
+    String annotationStart = "@";
+    IAnnotation[] existings = getExistingAnnotations();
+    for (IAnnotation sample : existings) {
+      String src = sample.getSource();
+      if (!src.startsWith(annotationStart)) {
+        String ownerSrc = getAnnotationOwner().getSource();
+        int fixCandidate = ownerSrc.indexOf(annotationStart);
+        if (fixCandidate > 0) {
+          ISourceRange annoRange = sample.getSourceRange();
+          SourceRange r = new SourceRange(fixCandidate, annoRange.getLength());
+
+          int start = r.getOffset() + annotationStart.length();
+          int end = r.getOffset() + r.getLength();
+          if (start >= 0 && start < ownerSrc.length() && end > start && end < ownerSrc.length()) {
+            String check = ownerSrc.substring(start, end);
+            if (check.startsWith(sample.getElementName())) {
+              return fixCandidate;
+            }
+          }
+        }
+      }
+    }
+    return 0;
   }
 
   public TextEdit createEdit(IImportValidator validator, String NL) throws CoreException {

@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
-import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -84,10 +83,6 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
     entries[1] = createJREEntry(m_execEnvId);
     entries[2] = createContainerEntry();
     m_javaProject.setRawClasspath(entries, null);
-
-    // files
-    new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.core.prefs", ".settings/org.eclipse.jdt.core.prefs", project).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.ui.prefs", ".settings/org.eclipse.jdt.ui.prefs", project).run(monitor, workingCopyManager);
 
     addCreatedBundle(getJavaProject());
   }

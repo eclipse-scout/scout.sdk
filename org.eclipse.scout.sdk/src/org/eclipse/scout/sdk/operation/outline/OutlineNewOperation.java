@@ -183,7 +183,8 @@ public class OutlineNewOperation implements IOperation {
           StringBuilder builder = new StringBuilder();
           String arrayListRef = validator.getTypeName(Signature.createTypeSignature(ArrayList.class.getName(), true));
           String outlineRef = validator.getTypeName(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true));
-          builder.append(arrayListRef + "<Class> outlines = new " + arrayListRef + "<Class>();\n");
+          String iOutlineRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.IOutline, true));
+          builder.append(arrayListRef + "<Class<? extends " + iOutlineRef + ">> outlines = new " + arrayListRef + "<Class<? extends " + iOutlineRef + ">>();\n");
           builder.append("outlines.add(" + outlineRef + ".class);\n");
           builder.append("return outlines.toArray(new Class[outlines.size()]);");
           return builder.toString();

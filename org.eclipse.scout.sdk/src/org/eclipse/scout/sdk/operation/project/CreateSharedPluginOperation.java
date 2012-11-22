@@ -49,8 +49,5 @@ public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperat
     new InstallTextFileOperation("templates/shared/build.properties", "build.properties", project, props).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/plugin.xml", "plugin.xml", project, props).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/resources/texts/Texts.properties", "resources/texts/Texts.properties", project, props).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/resources/texts/Texts_de.properties", "resources/texts/Texts_de.properties", project, props).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/resources/texts/Texts_fr.properties", "resources/texts/Texts_fr.properties", project, props).run(monitor, workingCopyManager);
-    new InstallTextFileOperation("templates/shared/resources/texts/Texts_it.properties", "resources/texts/Texts_it.properties", project, props).run(monitor, workingCopyManager);
   }
 }

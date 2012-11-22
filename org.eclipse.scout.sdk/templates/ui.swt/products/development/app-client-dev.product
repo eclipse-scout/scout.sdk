@@ -21,11 +21,6 @@
    <splash
       location="@@BUNDLE_SWT_NAME@@" />
    <launcher name="@@ALIAS@@">
-      <solaris/>
-      <win useIco="true">
-         <ico path="/@@BUNDLE_SWT_NAME@@/icons/bsi.ico"/>
-         <bmp/>
-      </win>
    </launcher>
 
    <vm>
