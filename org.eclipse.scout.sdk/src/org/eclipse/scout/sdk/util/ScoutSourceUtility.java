@@ -136,7 +136,11 @@ public class ScoutSourceUtility {
     }
     IField field = type.getField(name);
     if (TypeUtility.exists(field)) {
-      Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(field.getSource()));
+      String source = field.getSource();
+      if (source == null) {
+        throw new NoSourceException(type.getElementName());
+      }
+      Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(source));
       if (matcher.find()) {
         return matcher.group(1);
       }

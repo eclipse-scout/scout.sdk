@@ -102,27 +102,32 @@ public class AnnotationCreateOperation implements IOperation {
 
   private int getJdtAnnotationOffsetFix() throws JavaModelException {
     // Fix for JDT bug with annotation creation and source ranges not updated properly
-    String annotationStart = "@";
-    IAnnotation[] existings = getExistingAnnotations();
-    for (IAnnotation sample : existings) {
-      String src = sample.getSource();
-      if (!src.startsWith(annotationStart)) {
-        String ownerSrc = getAnnotationOwner().getSource();
-        int fixCandidate = ownerSrc.indexOf(annotationStart);
-        if (fixCandidate > 0) {
-          ISourceRange annoRange = sample.getSourceRange();
-          SourceRange r = new SourceRange(fixCandidate, annoRange.getLength());
+    try {
+      String annotationStart = "@";
+      IAnnotation[] existings = getExistingAnnotations();
+      for (IAnnotation sample : existings) {
+        String src = sample.getSource();
+        if (!src.startsWith(annotationStart)) {
+          String ownerSrc = getAnnotationOwner().getSource();
+          int fixCandidate = ownerSrc.indexOf(annotationStart);
+          if (fixCandidate > 0) {
+            ISourceRange annoRange = sample.getSourceRange();
+            SourceRange r = new SourceRange(fixCandidate, annoRange.getLength());
 
-          int start = r.getOffset() + annotationStart.length();
-          int end = r.getOffset() + r.getLength();
-          if (start >= 0 && start < ownerSrc.length() && end > start && end < ownerSrc.length()) {
-            String check = ownerSrc.substring(start, end);
-            if (check.startsWith(sample.getElementName())) {
-              return fixCandidate;
+            int start = r.getOffset() + annotationStart.length();
+            int end = r.getOffset() + r.getLength();
+            if (start >= 0 && start < ownerSrc.length() && end > start && end < ownerSrc.length()) {
+              String check = ownerSrc.substring(start, end);
+              if (check.startsWith(sample.getElementName())) {
+                return fixCandidate;
+              }
             }
           }
         }
       }
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning(e);
     }
     return 0;
   }

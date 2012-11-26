@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.JFaceResources;
@@ -171,18 +172,28 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   public final void setMethod(ConfigurationMethod configurationMethod) {
     try {
       getContainer().setRedraw(false);
-
       m_configurationMethod = configurationMethod;
       try {
         init(configurationMethod);
         setErrorPresenterVisible(false);
       }
-      catch (CoreException e) {
+      catch (Exception e) {
         if (m_errorContent == null) {
           m_errorContent = new MethodErrorPresenterContent(getContainer(), getToolkit());
           m_errorContent.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
         }
-        m_errorContent.setStatus(e.getStatus());
+        if (e instanceof CoreException) {
+          m_errorContent.setStatus(((CoreException) e).getStatus());
+        }
+        else {
+          ScoutSdkUi.logError(e);
+          if (e.getMessage() != null) {
+            m_errorContent.setStatus(new ScoutStatus(Status.ERROR, e.getMessage(), e));
+          }
+          else {
+            m_errorContent.setStatus(new ScoutStatus(Status.ERROR, e.getClass().getSimpleName(), e));
+          }
+        }
         m_errorContent.setMethod(configurationMethod);
         setErrorPresenterVisible(true);
       }

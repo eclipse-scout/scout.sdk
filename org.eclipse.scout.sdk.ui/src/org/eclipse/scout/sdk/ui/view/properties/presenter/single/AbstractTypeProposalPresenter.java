@@ -43,7 +43,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
   }
 
   @Override
-  protected synchronized void storeValue(final IType value) {
+  protected synchronized void storeValue(final IType value) throws CoreException {
     IOperation op = null;
     if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {

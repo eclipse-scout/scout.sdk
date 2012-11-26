@@ -74,7 +74,7 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
   }
 
   @Override
-  protected void storeValue(HorizontalAlignment value) {
+  protected void storeValue(HorizontalAlignment value) throws CoreException {
     if (value == null) {
       // set to default
       getProposalField().acceptProposal(getDefaultValue());

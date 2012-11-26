@@ -75,7 +75,7 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<DisplayH
   }
 
   @Override
-  protected synchronized void storeValue(DisplayHint value) {
+  protected synchronized void storeValue(DisplayHint value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();

@@ -86,7 +86,7 @@ public class HorizontalAlignmentPresenter extends AbstractProposalPresenter<Hori
   }
 
   @Override
-  protected synchronized void storeValue(HorizontalAlignment value) {
+  protected synchronized void storeValue(HorizontalAlignment value) throws CoreException {
     if (value == null) {
       // set to default
       getProposalField().acceptProposal(getDefaultValue());

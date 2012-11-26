@@ -87,7 +87,7 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<LabelPosit
   }
 
   @Override
-  protected void storeValue(LabelPosition value) {
+  protected void storeValue(LabelPosition value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();

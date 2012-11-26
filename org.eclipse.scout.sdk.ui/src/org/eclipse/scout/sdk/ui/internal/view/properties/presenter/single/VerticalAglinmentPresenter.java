@@ -86,7 +86,7 @@ public class VerticalAglinmentPresenter extends AbstractProposalPresenter<Vertic
   }
 
   @Override
-  protected synchronized void storeValue(VerticalAlignment value) {
+  protected synchronized void storeValue(VerticalAlignment value) throws CoreException {
     if (value == null) {
       // set to default
       getProposalField().acceptProposal(getDefaultValue());

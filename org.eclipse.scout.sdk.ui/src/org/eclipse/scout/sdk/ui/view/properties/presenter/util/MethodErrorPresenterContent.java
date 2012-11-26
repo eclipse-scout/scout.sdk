@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -47,11 +48,13 @@ public class MethodErrorPresenterContent extends Composite {
 
   private final FormToolkit m_toolkit;
   private Hyperlink m_labelLink;
+  private Label m_label;
   private Label m_statusLabel;
   private Label m_statusIcon;
   private ImageHyperlink m_deleteButton;
   private ConfigurationMethod m_configurationMethod;
   private CustomTooltip m_customTooltip;
+  private Composite m_linkComposite;
 
   public MethodErrorPresenterContent(Composite parent, FormToolkit toolkit) {
     super(parent, SWT.NONE);
@@ -60,7 +63,13 @@ public class MethodErrorPresenterContent extends Composite {
   }
 
   private void createContent(Composite parent) {
-    createLabelArea(parent);
+    m_linkComposite = getToolkit().createComposite(parent);
+    GridData linkCompData = new GridData();
+    linkCompData.widthHint = 180;
+    m_linkComposite.setLayoutData(linkCompData);
+    m_linkComposite.setLayout(new GridLayout(1, true));
+
+    createLabelArea(m_linkComposite);
     createBodyArea(parent);
 
     // layout
@@ -103,25 +112,33 @@ public class MethodErrorPresenterContent extends Composite {
   }
 
   private void createLabelArea(Composite parent) {
-    Composite linkComposite = getToolkit().createComposite(parent);
-    m_labelLink = getToolkit().createHyperlink(linkComposite, "", SWT.NONE);
-    m_customTooltip = new CustomTooltip(m_labelLink, true);
+    if (m_labelLink != null) {
+      m_labelLink.dispose();
+    }
+    if (m_label != null) {
+      m_label.dispose();
+    }
 
-    m_labelLink.addHyperlinkListener(new HyperlinkAdapter() {
-      @Override
-      public void linkActivated(HyperlinkEvent e) {
-        showMethodInEditor(m_configurationMethod.peekMethod());
-      }
-    });
-    m_labelLink.setEnabled(false);
+    GridData gd = new GridData(SWT.RIGHT, SWT.TOP, true, false);
+    if (getMethod() != null && getMethod().isImplemented()) {
+      m_labelLink = getToolkit().createHyperlink(parent, "", SWT.NONE);
+      m_labelLink.addHyperlinkListener(new HyperlinkAdapter() {
+        @Override
+        public void linkActivated(HyperlinkEvent e) {
+          showMethodInEditor(getMethod().peekMethod());
+        }
+      });
+      m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, true));
+      m_labelLink.setLayoutData(gd);
+      m_customTooltip = new CustomTooltip(m_labelLink, true);
+    }
+    else {
+      m_label = getToolkit().createLabel(parent, "");
+      m_label.setForeground(new Color(parent.getDisplay(), 0, 0, 128));
+      m_label.setLayoutData(gd);
+      m_customTooltip = new CustomTooltip(m_label, true);
+    }
 
-    // layout
-    GridData linkCompData = new GridData();
-    linkCompData.widthHint = 180;
-    linkComposite.setLayoutData(linkCompData);
-    linkComposite.setLayout(new GridLayout(1, true));
-
-    m_labelLink.setLayoutData(new GridData(SWT.RIGHT, SWT.TOP, true, false));
   }
 
   public ConfigurationMethod getMethod() {
@@ -130,17 +147,28 @@ public class MethodErrorPresenterContent extends Composite {
 
   public void setMethod(ConfigurationMethod method) {
     m_configurationMethod = method;
-    m_labelLink.setText(SdkProperties.getMethodPresenterName(method.peekMethod()));
-    m_labelLink.setEnabled(true);
-    m_labelLink.setFont(getFont(JFaceResources.DIALOG_FONT, getMethod().isImplemented()));
     try {
-      m_customTooltip.setText(wellFormMethod());
+      this.setRedraw(false);
+      createLabelArea(m_linkComposite);
+      if (m_configurationMethod != null && m_configurationMethod.isImplemented()) {
+        m_labelLink.setText(SdkProperties.getMethodPresenterName(method.peekMethod()));
+      }
+      else {
+        m_label.setText(SdkProperties.getMethodPresenterName(getMethod().peekMethod()));
+      }
+      try {
+        m_customTooltip.setText(wellFormMethod());
+      }
+      catch (Exception e1) {
+        ScoutSdkUi.logWarning("could not create tooltip for '" + method.getMethodName() + "'", e1);
+      }
+      m_deleteButton.setEnabled(method.isImplemented());
+      m_deleteButton.setToolTipText(Texts.get("RemoveXinY", getMethod().getMethodName(), getMethod().getType().getElementName()));
     }
-    catch (Exception e1) {
-      ScoutSdkUi.logWarning("could not create tooltip for '" + method.getMethodName() + "'", e1);
+    finally {
+      this.setRedraw(true);
+      this.layout(true, true);
     }
-    m_deleteButton.setEnabled(method.isImplemented());
-    m_deleteButton.setToolTipText(Texts.get("RemoveXinY", getMethod().getMethodName(), getMethod().getType().getElementName()));
   }
 
   public void setStatus(IStatus status) {

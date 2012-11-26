@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.NoSourceException;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -93,23 +94,18 @@ public final class PropertyMethodSourceUtility {
    * @throws CoreException
    */
   public static String getMethodReturnValue(IMethod method) throws CoreException {
-    try {
-      String source = method.getSource();
-      if (source == null) {
-        throw new CoreException(new ScoutStatus(Status.ERROR, "No source for method '" + method.getElementName() + "' found.", null));
-      }
-      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(source);
-      if (m.find()) {
-        return m.group(1).trim();
-      }
-      else {
-        ScoutSdk.logInfo("could not find return value of method: " + method.getElementName());
-        throw new CustomImplementationException();
-      }
+    String source = method.getSource();
+    if (source == null) {
+      String type = method.getDeclaringType().getElementName();
+      throw new NoSourceException(type);
     }
-    catch (JavaModelException e) {
+    Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(source);
+    if (m.find()) {
+      return m.group(1).trim();
+    }
+    else {
       ScoutSdk.logInfo("could not find return value of method: " + method.getElementName());
-      throw new CoreException(new ScoutStatus("Error parsing the return value of method '" + method.getElementName() + "'.", e));
+      throw new CustomImplementationException();
     }
   }
 
@@ -368,25 +364,19 @@ public final class PropertyMethodSourceUtility {
    * @throws CoreException
    */
   public static IType parseReturnParameterClass(String parameter, IMethod method) throws CoreException {
-    try {
-      if (REGEX_NULL.matcher(parameter).matches()) {
-        return null;
-      }
-      Matcher matcher = REGEX_CLASS_REFERENCE.matcher(parameter);
-      if (matcher.find()) {
-        String className = matcher.group(1);
-        className = className.substring(0, className.length() - 1);
-        IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), className);
-        if (referencedType == null) {
-          ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-          throw new CoreException(new ScoutStatus(Status.WARNING, "Referenced type '" + parameter + "' could not be found.", null));
-        }
-        return referencedType;
-      }
+    if (REGEX_NULL.matcher(parameter).matches()) {
+      return null;
     }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-      throw new CoreException(new ScoutStatus("Error parsing the return parameter type.", e));
+    Matcher matcher = REGEX_CLASS_REFERENCE.matcher(parameter);
+    if (matcher.find()) {
+      String className = matcher.group(1);
+      className = className.substring(0, className.length() - 1);
+      IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), className);
+      if (referencedType == null) {
+        ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
+        throw new CoreException(new ScoutStatus(Status.WARNING, "Referenced type '" + parameter + "' could not be found.", null));
+      }
+      return referencedType;
     }
     throw new CustomImplementationException();
   }
@@ -394,26 +384,20 @@ public final class PropertyMethodSourceUtility {
   private static String findReferencedValue(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
     Matcher matcher = REGEX_FIELD_NEW.matcher(parameter);
     if (matcher.find()) {
-      try {
-        if (matcher.group(2) != null) {
-          String typeName = matcher.group(1);
-          typeName = typeName.substring(0, typeName.length() - 1);
-          IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
-          if (referencedType == null) {
-            ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-            throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
-          }
-          String fieldValue = ScoutSourceUtility.findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
-          return fieldValue;
+      if (matcher.group(2) != null) {
+        String typeName = matcher.group(1);
+        typeName = typeName.substring(0, typeName.length() - 1);
+        IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
+        if (referencedType == null) {
+          ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
+          throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
         }
-        else {
-          String fieldValue = ScoutSourceUtility.findReferencedFieldValue(method.getDeclaringType(), matcher.group(3), superTypeHierarchy);
-          return fieldValue;
-        }
+        String fieldValue = ScoutSourceUtility.findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
+        return fieldValue;
       }
-      catch (JavaModelException e) {
-        ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'", e);
-        throw new CoreException(new ScoutStatus("Error parsing the return parameter.", e));
+      else {
+        String fieldValue = ScoutSourceUtility.findReferencedFieldValue(method.getDeclaringType(), matcher.group(3), superTypeHierarchy);
+        return fieldValue;
       }
     }
     throw new CustomImplementationException();
@@ -425,31 +409,25 @@ public final class PropertyMethodSourceUtility {
     }
     Matcher matcher = REGEX_FIELD_NEW.matcher(input);
     if (matcher.find()) {
-      try {
-        if (matcher.group(2) != null) {
-          String typeName = matcher.group(1);
-          String fieldName = matcher.group(3);
-          typeName = typeName.substring(0, typeName.length() - 1);
-          IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName);
-          // if(iconsType==null){
-          // iconsType = ScoutTypes.getType(method.findBestMatchSharedBundle().getPackageNameIconConstant() + ".Icons");
-          // }
-          if (TypeUtility.exists(iconsType)) {
-            ITypeHierarchy iconsSuperTypeHierarchy = iconsType.newSupertypeHierarchy(null);
-            while (TypeUtility.exists(iconsType)) {
-              IField field = iconsType.getField(fieldName);
-              if (TypeUtility.exists(field)) {
-                String source = field.getSource();
-                return Regex.getIconSimpleNameFromFieldSource(source);
-              }
-              iconsType = iconsSuperTypeHierarchy.getSuperclass(iconsType);
+      if (matcher.group(2) != null) {
+        String typeName = matcher.group(1);
+        String fieldName = matcher.group(3);
+        typeName = typeName.substring(0, typeName.length() - 1);
+        IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName);
+        // if(iconsType==null){
+        // iconsType = ScoutTypes.getType(method.findBestMatchSharedBundle().getPackageNameIconConstant() + ".Icons");
+        // }
+        if (TypeUtility.exists(iconsType)) {
+          ITypeHierarchy iconsSuperTypeHierarchy = iconsType.newSupertypeHierarchy(null);
+          while (TypeUtility.exists(iconsType)) {
+            IField field = iconsType.getField(fieldName);
+            if (TypeUtility.exists(field)) {
+              String source = field.getSource();
+              return Regex.getIconSimpleNameFromFieldSource(source);
             }
+            iconsType = iconsSuperTypeHierarchy.getSuperclass(iconsType);
           }
         }
-      }
-      catch (JavaModelException e) {
-        ScoutSdk.logWarning("referenced icon could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
-        throw new CoreException(new ScoutStatus("Could not find icon for input '" + input + "'.", e));
       }
     }
     throw new CustomImplementationException();

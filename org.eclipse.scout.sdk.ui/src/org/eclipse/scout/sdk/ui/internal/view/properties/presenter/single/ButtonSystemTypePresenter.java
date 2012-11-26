@@ -95,7 +95,7 @@ public class ButtonSystemTypePresenter extends AbstractProposalPresenter<SystemT
   }
 
   @Override
-  protected synchronized void storeValue(SystemType value) {
+  protected synchronized void storeValue(SystemType value) throws CoreException {
     IOperation op = null;
     if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {

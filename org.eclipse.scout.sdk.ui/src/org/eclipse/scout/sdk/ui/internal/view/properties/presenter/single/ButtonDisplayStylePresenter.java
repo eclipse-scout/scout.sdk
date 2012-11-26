@@ -80,7 +80,7 @@ public class ButtonDisplayStylePresenter extends AbstractProposalPresenter<Butto
   }
 
   @Override
-  protected synchronized void storeValue(ButtonStyle value) {
+  protected synchronized void storeValue(ButtonStyle value) throws CoreException {
     IOperation op = null;
     if (UiUtility.equals(getDefaultValue(), value)) {
       if (getMethod().isImplemented()) {

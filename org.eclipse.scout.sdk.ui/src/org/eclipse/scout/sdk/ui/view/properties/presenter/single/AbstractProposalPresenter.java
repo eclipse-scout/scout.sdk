@@ -37,10 +37,12 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
   private ProposalTextField m_proposalField;
   private T m_currentSourceValue;
   private T m_defaultValue;
+  private boolean m_defaultValueInitialized;
   private OptimisticLock storeValueLock = new OptimisticLock();
 
   public AbstractProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_defaultValueInitialized = false;
   }
 
   @Override
@@ -87,7 +89,6 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     super.init(method);
-    m_defaultValue = parseInput(getMethod().computeDefaultValue());
     setCurrentSourceValue(parseInput(getMethod().computeValue()));
     try {
       storeValueLock.acquire();
@@ -119,7 +120,7 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
    * @param value
    *          can be null
    */
-  protected abstract void storeValue(T value);
+  protected abstract void storeValue(T value) throws CoreException;
 
   public T getCurrentSourceValue() {
     return m_currentSourceValue;
@@ -129,7 +130,11 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
     m_currentSourceValue = value;
   }
 
-  public T getDefaultValue() {
+  public T getDefaultValue() throws CoreException {
+    if (!m_defaultValueInitialized) {
+      m_defaultValue = parseInput(getMethod().computeDefaultValue());
+      m_defaultValueInitialized = true;
+    }
     return m_defaultValue;
   }
 
@@ -150,7 +155,12 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
       setCurrentSourceValue((T) event.proposal);
       try {
         if (storeValueLock.acquire()) {
-          storeValue(getCurrentSourceValue());
+          try {
+            storeValue(getCurrentSourceValue());
+          }
+          catch (CoreException e) {
+            ScoutSdkUi.logError("Error changing the property value.", e);
+          }
         }
       }
       finally {

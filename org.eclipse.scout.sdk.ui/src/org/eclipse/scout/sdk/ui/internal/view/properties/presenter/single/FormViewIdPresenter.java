@@ -63,25 +63,25 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
         ViewId value = (ViewId) element;
         switch (value) {
           case OutlineSelector:
-        return "Outline Selector";
-      case PageTable:
-        return "Page Table";
-      case PageDetail:
-        return "Page Detail";
-      case PageSearch:
-        return "Page Search";
-      case NorthEast:
-        return "Noth-East";
-      case SouthEast:
-        return "South-East";
-      case SouthWest:
-        return "South-West";
-      case NothWest:
-        return "Noth-West";
-      default:
-        return value.toString();
-    }
-  }
+            return "Outline Selector";
+          case PageTable:
+            return "Page Table";
+          case PageDetail:
+            return "Page Detail";
+          case PageSearch:
+            return "Page Search";
+          case NorthEast:
+            return "Noth-East";
+          case SouthEast:
+            return "South-East";
+          case SouthWest:
+            return "South-West";
+          case NothWest:
+            return "Noth-West";
+          default:
+            return value.toString();
+        }
+      }
 
       @Override
       public Image getImage(Object element) {
@@ -149,7 +149,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
   }
 
   @Override
-  protected synchronized void storeValue(ViewId value) {
+  protected synchronized void storeValue(ViewId value) throws CoreException {
     if (value == null) {
       value = getDefaultValue();
       getProposalField().acceptProposal(value);
