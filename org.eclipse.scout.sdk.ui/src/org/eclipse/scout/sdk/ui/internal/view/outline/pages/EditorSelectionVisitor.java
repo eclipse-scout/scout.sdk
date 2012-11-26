@@ -511,7 +511,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
   protected int visitBeanPropertyTablePage(BeanPropertyTablePage page) {
     if (getCurrentElement().getElementType() == IJavaElement.METHOD) {
       IMethod method = (IMethod) getCurrentElement();
-      if (TypeUtility.exists(method.getAnnotation(NamingUtility.getSimpleName(RuntimeClasses.ConfigPropertyValue)))) {
+      if (TypeUtility.exists(method.getAnnotation(NamingUtility.getSimpleName(RuntimeClasses.ConfigProperty)))) {
         return CONTINUE_BRANCH;
       }
     }

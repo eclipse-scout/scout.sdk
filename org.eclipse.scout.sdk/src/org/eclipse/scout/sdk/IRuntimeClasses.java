@@ -37,7 +37,6 @@ interface IRuntimeClasses {
   String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD
   String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty"; // NO_UCD
   String ConfigOperation = "org.eclipse.scout.commons.annotations.ConfigOperation"; // NO_UCD
-  String ConfigPropertyValue = "org.eclipse.scout.commons.annotations.ConfigPropertyValue"; // NO_UCD
   String DefaultOutlineTableForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm"; // NO_UCD
   String DefaultOutlineTreeForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm"; // NO_UCD
   String DefaultServiceFactory = "org.eclipse.scout.service.DefaultServiceFactory"; // NO_UCD
