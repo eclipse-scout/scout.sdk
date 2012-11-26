@@ -190,6 +190,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_descriptionSessionFactory = new Text(parent, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionSessionFactory.setEnabled(false);
     m_descriptionSessionFactory.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionSessionFactory.setText(Texts.get("DescriptionHandlerSession"));
 

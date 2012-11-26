@@ -83,6 +83,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
     // WSDL folder
     m_descriptionField = new Text(parent, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionField.setEnabled(false);
     m_descriptionField.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionField.setText(Texts.get("ChooseFolderForWsdlFileAndArtefacts"));
 
@@ -98,12 +99,12 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
-                            m_bundle,
-                            new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
-                            Texts.get("WsdlFolder"),
-                            Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
-                            m_rootWsdlFolder, // root folder
-                            getWsdlFolder());
+            m_bundle,
+            new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
+            Texts.get("WsdlFolder"),
+            Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
+            m_rootWsdlFolder, // root folder
+            getWsdlFolder());
         if (folder != null) {
           setWsdlFolder(folder);
         }

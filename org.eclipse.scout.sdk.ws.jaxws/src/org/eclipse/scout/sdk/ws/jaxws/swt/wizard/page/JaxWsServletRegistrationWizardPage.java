@@ -135,6 +135,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     // description
     m_descriptionContainer = new Composite(parent, SWT.NONE);
     m_descriptionField = new Text(m_descriptionContainer, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionField.setEnabled(false);
     m_descriptionField.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionField.setText(Texts.get("DescriptionChangeJaxWsServletAlias"));
 

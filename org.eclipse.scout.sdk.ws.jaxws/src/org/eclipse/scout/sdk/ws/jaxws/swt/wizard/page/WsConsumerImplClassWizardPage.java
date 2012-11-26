@@ -162,6 +162,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     m_containerAnnotation = new Composite(parent, SWT.NONE);
 
     m_descriptionScoutAnnotation = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionScoutAnnotation.setEnabled(false);
     m_descriptionScoutAnnotation.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionScoutAnnotation.setText(Texts.get("DescriptionScoutWebServiceClientAnnotation", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient).getElementName()));
 

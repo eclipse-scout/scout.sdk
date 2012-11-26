@@ -168,10 +168,12 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     m_containerAnnotation = new Composite(parent, SWT.NONE);
 
     m_descriptionScoutAnnotation = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionScoutAnnotation.setEnabled(false);
     m_descriptionScoutAnnotation.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionScoutAnnotation.setText(Texts.get("DescriptionScoutWebServiceAnnotation", TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName()));
 
     m_descriptionSessionFactory = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionSessionFactory.setEnabled(false);
     m_descriptionSessionFactory.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionSessionFactory.setText(Texts.get("DescriptionSessionFactory"));
 
@@ -213,6 +215,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_descriptionAuthenticationHandler = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionAuthenticationHandler.setEnabled(false);
     m_descriptionAuthenticationHandler.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionAuthenticationHandler.setText(Texts.get("DescriptionAuthenticationMechanism"));
 
@@ -255,6 +258,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_descriptionCredentialValidationStrategy = new Text(m_containerAnnotation, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
+    m_descriptionCredentialValidationStrategy.setEnabled(false);
     m_descriptionCredentialValidationStrategy.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
     m_descriptionCredentialValidationStrategy.setText(Texts.get("DescriptionCredentialValidationValidation"));
 
