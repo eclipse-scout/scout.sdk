@@ -31,6 +31,8 @@ import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.ui.extensions.preferences.SuperTypePreferenceScrolledContent.IModelLoadProgressObserver;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -39,6 +41,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -51,6 +54,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 public class SuperTypesPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
   private Combo m_projectCombo;
+  private Text m_searchFilter;
   private SuperTypePreferenceScrolledContent m_currentProjectSetting;
   private Composite m_container;
 
@@ -155,7 +159,7 @@ public class SuperTypesPreferencePage extends PreferencePage implements IWorkben
                       parent.getShell().setRedraw(false);
                       indicator.dispose();
 
-                      createProjectComposite(m_container);
+                      createHeader(m_container);
                       createSettingsLists(m_container);
                       initializeValues();
                     }
@@ -179,16 +183,21 @@ public class SuperTypesPreferencePage extends PreferencePage implements IWorkben
     return m_container;
   }
 
-  private void createProjectComposite(Composite parent) {
+  private void createHeader(Composite parent) {
     Composite headerComposite = new Composite(parent, SWT.NONE);
+    headerComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     GridLayout gl = new GridLayout(2, false);
     gl.marginHeight = 0;
     gl.marginWidth = 0;
-    gl.marginBottom = 10;
+    gl.marginBottom = 8;
     headerComposite.setLayout(gl);
 
     Label projectLabel = new Label(headerComposite, SWT.NONE);
     projectLabel.setText(Texts.get("ScoutProjectLabel"));
+
+    GridData labelGridData = new GridData();
+    labelGridData.verticalIndent = 10;
+    projectLabel.setLayoutData(labelGridData);
 
     m_projectCombo = new Combo(headerComposite, SWT.READ_ONLY | SWT.DROP_DOWN);
     m_projectCombo.addSelectionListener(new SelectionAdapter() {
@@ -198,11 +207,44 @@ public class SuperTypesPreferencePage extends PreferencePage implements IWorkben
         projectChanged(selectedName);
       }
     });
+
+    GridData comboGridData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    comboGridData.verticalIndent = 10;
+    m_projectCombo.setLayoutData(comboGridData);
+
+    m_searchFilter = new Text(headerComposite, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.ICON_CANCEL);
+    m_searchFilter.setMessage("type filter text");//TODO nls
+    m_searchFilter.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        applySearchPattern(m_searchFilter.getText());
+      }
+    });
+    GridData filterGridData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    filterGridData.horizontalSpan = 2;
+    filterGridData.verticalIndent = 10;
+    m_searchFilter.setLayoutData(filterGridData);
   }
 
   private void createSettingsLists(final Composite parent) {
     for (Entry<IScoutProject, SuperTypePreferenceScrolledContent> e : m_projectSettings.entrySet()) {
       e.getValue().createContent(parent);
+    }
+  }
+
+  private void applySearchPattern(String pattern) {
+    try {
+      m_container.setRedraw(false);
+      pattern = "*" + pattern.trim() + "*";
+      for (SuperTypePreferenceScrolledContent scrolledArea : m_projectSettings.values()) {
+        scrolledArea.setSearchPattern(pattern);
+        scrolledArea.reflow();
+      }
+    }
+    finally {
+      m_container.setRedraw(true);
+      m_container.layout(true, true);
+      m_container.redraw();
     }
   }
 

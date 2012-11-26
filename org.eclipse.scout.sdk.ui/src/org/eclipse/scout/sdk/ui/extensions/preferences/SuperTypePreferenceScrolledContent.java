@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -37,12 +38,14 @@ import org.osgi.service.prefs.BackingStoreException;
 public class SuperTypePreferenceScrolledContent {
 
   private final List<Combo> m_allSuperTypeCombos;
+  private final List<Label> m_allLabels;
 
   private List<DefaultSuperClassModel> m_entries;
   private SimpleScrolledComposite m_scrollArea;
 
   public SuperTypePreferenceScrolledContent() {
     m_allSuperTypeCombos = new ArrayList<Combo>();
+    m_allLabels = new ArrayList<Label>();
   }
 
   public void loadModel(List<DefaultSuperClassModel> entries, IModelLoadProgressObserver observer) {
@@ -56,9 +59,8 @@ public class SuperTypePreferenceScrolledContent {
   }
 
   public void createContent(Composite parent) {
-
     m_scrollArea = new SimpleScrolledComposite(parent);
-    GridData dd = new GridData();
+    GridData dd = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
     dd.exclude = true;
     dd.heightHint = getNextParentSize(parent);
     m_scrollArea.setLayoutData(dd);
@@ -76,6 +78,8 @@ public class SuperTypePreferenceScrolledContent {
       Label l = new Label(c, SWT.NONE);
       l.setToolTipText(entry.interfaceFqn);
       l.setText(entry.label + ": ");
+      l.setLayoutData(new GridData());
+      m_allLabels.add(l);
 
       final DefaultSuperClassModel model = entry;
       final Combo co = new Combo(c, SWT.READ_ONLY | SWT.DROP_DOWN);
@@ -145,14 +149,44 @@ public class SuperTypePreferenceScrolledContent {
     m_scrollArea.reflow(true);
   }
 
+  public void reflow() {
+    m_scrollArea.reflow(true);
+  }
+
+  public void setSearchPattern(String pattern) {
+    char[] searchPatternArray = pattern.toCharArray();
+    for (int i = 0; i < m_allSuperTypeCombos.size(); i++) {
+      Combo cbo = m_allSuperTypeCombos.get(i);
+      Label lbl = m_allLabels.get(i);
+      DefaultSuperClassModel model = m_entries.get(i);
+
+      boolean visible = CharOperation.match(searchPatternArray, model.interfaceFqn.toCharArray(), false) ||
+          CharOperation.match(searchPatternArray, model.label.toCharArray(), false);
+      if (!visible) {
+        for (String s : model.getProposals()) {
+          boolean matches = CharOperation.match(searchPatternArray, s.toCharArray(), false);
+          if (matches) {
+            visible = matches;
+            break;
+          }
+        }
+      }
+
+      cbo.setVisible(visible);
+      ((GridData) cbo.getLayoutData()).exclude = !visible;
+      lbl.setVisible(visible);
+      ((GridData) lbl.getLayoutData()).exclude = !visible;
+    }
+  }
+
   private static int getNextParentSize(Composite container) {
     Composite parent = container;
     while ((parent = parent.getParent()) != null) {
       if (parent.getSize().y > 0) {
-        return parent.getSize().y - 100;
+        return parent.getSize().y - 140;
       }
     }
-    return 520;
+    return 480;
   }
 
   public interface IModelLoadProgressObserver {
@@ -165,7 +199,7 @@ public class SuperTypePreferenceScrolledContent {
 
   private static class SimpleScrolledComposite extends SharedScrolledComposite {
     private SimpleScrolledComposite(Composite parent) {
-      super(parent, SWT.V_SCROLL | SWT.NONE);
+      super(parent, SWT.V_SCROLL);
       setFont(parent.getFont());
       setExpandHorizontal(true);
       setExpandVertical(true);
