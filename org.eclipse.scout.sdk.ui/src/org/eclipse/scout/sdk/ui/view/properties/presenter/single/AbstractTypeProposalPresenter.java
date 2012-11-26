@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.sdk.Texts;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -57,7 +57,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
           StringBuilder source = new StringBuilder();
           source.append("  return ");
           if (value != null) {
-            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(value.getFullyQualifiedName(), true), validator) + ".class;");
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(value.getFullyQualifiedName()), validator) + ".class;");
           }
           else {
             source.append("null;");

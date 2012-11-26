@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -32,8 +31,8 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -67,7 +66,7 @@ public class HtmlFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewHTMLField"));
     setDescription(Texts.get("CreateANewHTMLField"));
     m_declaringType = declaringType;
-    setSuperType(TypeUtility.getType(RuntimeClasses.AbstractHtmlField));
+    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IHtmlField, m_declaringType.getJavaProject()));
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -134,7 +133,7 @@ public class HtmlFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);

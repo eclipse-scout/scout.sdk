@@ -30,6 +30,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -250,7 +251,7 @@ public final class ScoutUtility {
         fqnBuilder.append(resolvedTypeName[0][0] + ".");
       }
       fqnBuilder.append(resolvedTypeName[0][1]);
-      return Signature.createTypeSignature(fqnBuilder.toString(), true);
+      return SignatureCache.createTypeSignature(fqnBuilder.toString());
     }
     return null;
   }

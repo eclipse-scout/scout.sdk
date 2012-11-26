@@ -48,16 +48,12 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  /** {@link String} **/
-  public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link ITypeProposal} **/
-  public static final String PROP_SUPER_TYPE = "superType";
-  /** {@link ITypeProposal} **/
-  public static final String PROP_FORM_DATA_TYPE = "formDataType";
+  private static final String PROP_TYPE_NAME = "typeName";
+  private static final String PROP_SUPER_TYPE = "superType";
+  private static final String PROP_FORM_DATA_TYPE = "formDataType";
 
-  final IType abstractService = TypeUtility.getType(RuntimeClasses.AbstractService);
-  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-  final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
+  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+  private final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
 
   // ui fields
   private StyledTextField m_typeNameField;
@@ -86,6 +82,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    IType abstractService = RuntimeClasses.getSuperType(RuntimeClasses.IService, getServerBundle().getJavaProject());
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
         new JavaElementAbstractTypeContentProvider(iService, getServerBundle().getJavaProject(), abstractService));
     m_superTypeField.acceptProposal(getSuperType());

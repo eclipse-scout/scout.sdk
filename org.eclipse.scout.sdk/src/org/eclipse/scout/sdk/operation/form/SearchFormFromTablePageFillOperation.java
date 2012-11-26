@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
@@ -42,6 +41,7 @@ import org.eclipse.scout.sdk.operation.template.sequencebox.LongFromToTemplate;
 import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -57,6 +57,8 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
  */
 public class SearchFormFromTablePageFillOperation implements IOperation {
 
+  private static final String TYPE_NAME_TAB_BOX = "TabBox";
+
   final IType iService = TypeUtility.getType(RuntimeClasses.IService);
   final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
   final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
@@ -69,13 +71,6 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
   final IType iSmartColumn = TypeUtility.getType(RuntimeClasses.ISmartColumn);
   final IType iStringColumn = TypeUtility.getType(RuntimeClasses.IStringColumn);
   final IType iTimeColumn = TypeUtility.getType(RuntimeClasses.ITimeColumn);
-
-  final IType abstractDateColumn = TypeUtility.getType(RuntimeClasses.AbstractDateColumn);
-  final IType abstractStringColumn = TypeUtility.getType(RuntimeClasses.AbstractStringColumn);
-  final IType abstractSmartColumn = TypeUtility.getType(RuntimeClasses.AbstractSmartColumn);
-  final IType abstractDoubleColumn = TypeUtility.getType(RuntimeClasses.AbstractDoubleColumn);
-  final IType abstractLongColumn = TypeUtility.getType(RuntimeClasses.AbstractLongColumn);
-  final IType abstractBigDecimalColumn = TypeUtility.getType(RuntimeClasses.AbstractBigDecimalColumn);
 
   private static final String NLS_KEY_SEARCH_CRITERIA = "searchCriteria";
   private IType m_tablePageType;
@@ -110,10 +105,10 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
       StringBuilder content = new StringBuilder();
       content.append("@Override\n");
       content.append("protected void execResetSearchFilter(");
-      content.append(icuvalidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.SearchFilter, true)) + " searchFilter) ");
-      content.append("throws " + icuvalidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)) + "{\n");
+      content.append(icuvalidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SearchFilter)) + " searchFilter) ");
+      content.append("throws " + icuvalidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException)) + "{\n");
       content.append(SdkProperties.TAB + "super.execResetSearchFilter(searchFilter);\n");
-      String simpleFormDataName = icuvalidator.getTypeName(Signature.createTypeSignature(m_formDataType.getFullyQualifiedName(), true));
+      String simpleFormDataName = icuvalidator.getTypeName(SignatureCache.createTypeSignature(m_formDataType.getFullyQualifiedName()));
       content.append(SdkProperties.TAB + simpleFormDataName + " formData = new " + simpleFormDataName + "();\n");
       content.append(SdkProperties.TAB + "exportFormData(formData);\n");
       content.append(SdkProperties.TAB + "searchFilter.setFormData(formData);\n");
@@ -126,28 +121,26 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
     /* main box */
     GroupBoxNewOperation mainBoxOp = new GroupBoxNewOperation(getSearchFormType());
     mainBoxOp.setTypeName(SdkProperties.TYPE_NAME_MAIN_BOX);
-    mainBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
     mainBoxOp.run(monitor, workingCopyManager);
     IType mainBox = mainBoxOp.getCreatedField();
     // tab box
     TabBoxNewOperation tabBoxOp = new TabBoxNewOperation(mainBox);
-    tabBoxOp.setTypeName(SdkProperties.TYPE_NAME_TAB_BOX);
+    tabBoxOp.setTypeName(TYPE_NAME_TAB_BOX);
     tabBoxOp.run(monitor, workingCopyManager);
     IType tabBox = tabBoxOp.getCreatedField();
     // button reset
     ButtonFieldNewOperation resetButtonOp = new ButtonFieldNewOperation(mainBox);
     resetButtonOp.setTypeName("Reset" + SdkProperties.SUFFIX_BUTTON);
-    resetButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractResetButton, true));
+    resetButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractResetButton, mainBox.getJavaProject()));
     resetButtonOp.run(monitor, workingCopyManager);
     // button search
     ButtonFieldNewOperation searchButtonOp = new ButtonFieldNewOperation(mainBox);
     searchButtonOp.setTypeName("Search" + SdkProperties.SUFFIX_BUTTON);
-    searchButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSearchButton, true));
+    searchButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractSearchButton, mainBox.getJavaProject()));
     searchButtonOp.run(monitor, workingCopyManager);
     // field box
     GroupBoxNewOperation fieldBoxOp = new GroupBoxNewOperation(tabBox);
     fieldBoxOp.setTypeName("Field" + SdkProperties.SUFFIX_GROUP_BOX);
-    fieldBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
     fieldBoxOp.run(monitor, workingCopyManager);
     IType fieldBox = fieldBoxOp.getCreatedField();
     INlsEntry searchCriteriaEntry = null;
@@ -194,7 +187,6 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
 
     /* search handler */
     FormHandlerNewOperation formHandlerOp = new FormHandlerNewOperation(getSearchFormType());
-    formHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
     formHandlerOp.setTypeName(SdkProperties.TYPE_NAME_SEARCH_HANDLER);
     formHandlerOp.setStartMethodSibling(ScoutTypeUtility.createStructuredForm(getSearchFormType()).getSiblingMethodStartHandler(formHandlerOp.getStartMethodName()));
     formHandlerOp.run(monitor, workingCopyManager);
@@ -287,7 +279,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
           MethodOverrideOperation codeTypeOp = new MethodOverrideOperation(createdField, "getConfiguredCodeType") {
             @Override
             protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-              String typeRef = validator.getTypeName(Signature.createTypeSignature(codeType.getFullyQualifiedName(), true));
+              String typeRef = validator.getTypeName(SignatureCache.createTypeSignature(codeType.getFullyQualifiedName()));
               return "return " + typeRef + ".class;";
             }
           };
@@ -310,7 +302,7 @@ public class SearchFormFromTablePageFillOperation implements IOperation {
             MethodOverrideOperation lookupCallOp = new MethodOverrideOperation(createdField, "getConfiguredLookupCall") {
               @Override
               protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-                String typeRef = validator.getTypeName(Signature.createTypeSignature(lookupCall.getFullyQualifiedName(), true));
+                String typeRef = validator.getTypeName(SignatureCache.createTypeSignature(lookupCall.getFullyQualifiedName()));
                 return "return " + typeRef + ".class;";
               }
             };

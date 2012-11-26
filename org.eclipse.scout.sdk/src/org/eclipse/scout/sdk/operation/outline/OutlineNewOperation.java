@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -37,6 +36,7 @@ import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -61,8 +61,6 @@ public class OutlineNewOperation implements IOperation {
   private IType m_createdOutline;
 
   public OutlineNewOperation() {
-    // defaults
-    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractOutline, true);
   }
 
   @Override
@@ -80,6 +78,9 @@ public class OutlineNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES), getClientBundle());
+    if (getSuperTypeSignature() == null) {
+      setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IOutline, getClientBundle().getJavaProject()));
+    }
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
@@ -135,7 +136,7 @@ public class OutlineNewOperation implements IOperation {
             listName = matcher.group(1);
           }
           if (index > 0) {
-            String addSource = listName + ".add(" + validator.getTypeName(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class);";
+            String addSource = listName + ".add(" + validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName())) + ".class);";
             if (methodBody.get().contains(addSource)) {
               return;
             }
@@ -154,7 +155,7 @@ public class OutlineNewOperation implements IOperation {
               String list = matcher.group(1).trim();
               boolean appendComma = !list.endsWith(",");
               int pos = matcher.end(1);
-              String addSource = validator.getTypeName(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true)) + ".class";
+              String addSource = validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName())) + ".class";
               if (methodBody.get().contains(addSource)) {
                 return;
               }
@@ -181,9 +182,9 @@ public class OutlineNewOperation implements IOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder builder = new StringBuilder();
-          String arrayListRef = validator.getTypeName(Signature.createTypeSignature(ArrayList.class.getName(), true));
-          String outlineRef = validator.getTypeName(Signature.createTypeSignature(outlineType.getFullyQualifiedName(), true));
-          String iOutlineRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.IOutline, true));
+          String arrayListRef = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
+          String outlineRef = validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName()));
+          String iOutlineRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.IOutline));
           builder.append(arrayListRef + "<Class<? extends " + iOutlineRef + ">> outlines = new " + arrayListRef + "<Class<? extends " + iOutlineRef + ">>();\n");
           builder.append("outlines.add(" + outlineRef + ".class);\n");
           builder.append("return outlines.toArray(new Class[outlines.size()]);");
@@ -196,7 +197,7 @@ public class OutlineNewOperation implements IOperation {
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
 
-      AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(overrideOp.getCreatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true));
+      AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(overrideOp.getCreatedMethod(), SignatureCache.createTypeSignature(SuppressWarnings.class.getName()));
       createSuppressWarning.addParameter("\"unchecked\"");
       createSuppressWarning.validate();
       createSuppressWarning.run(monitor, workingCopyManager);
@@ -218,12 +219,12 @@ public class OutlineNewOperation implements IOperation {
         source.append("public ");
         source.append(className);
         source.append("() { super(Desktop.this, ");
-        source.append(validator.getTypeName(Signature.createTypeSignature(OutlineNewOperation.this.getTypeName(), true)));
+        source.append(validator.getTypeName(SignatureCache.createTypeSignature(OutlineNewOperation.this.getTypeName())));
         source.append(".class); }");
       }
     };
     outlineButtonOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IViewButton));
-    outlineButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractOutlineViewButton, true));
+    outlineButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOutlineViewButton, getDesktopType().getJavaProject()));
     outlineButtonOp.setTypeModifiers(Flags.AccPublic);
     outlineButtonOp.validate();
     outlineButtonOp.run(monitor, workingCopyManager);

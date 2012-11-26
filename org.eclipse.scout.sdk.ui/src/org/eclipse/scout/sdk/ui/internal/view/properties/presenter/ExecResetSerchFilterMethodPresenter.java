@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
@@ -89,7 +89,7 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
       if (m_formDataType != null && m_formType != null) {
         StringBuilder content = new StringBuilder();
         content.append("super.execResetSearchFilter(searchFilter);\n");
-        String simpleFormDataName = validator.getTypeName(Signature.createTypeSignature(m_formDataType.getFullyQualifiedName(), true));
+        String simpleFormDataName = validator.getTypeName(SignatureCache.createTypeSignature(m_formDataType.getFullyQualifiedName()));
         content.append(simpleFormDataName + " formData = new " + simpleFormDataName + "();\n");
         content.append("exportFormData(formData);\n");
         content.append("searchFilter.setFormData(formData);");

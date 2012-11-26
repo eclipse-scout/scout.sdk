@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
@@ -36,6 +35,7 @@ import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.ui.wizard.services.ServiceNewWizardPage;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -116,7 +116,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
     m_operation.setNlsEntry(m_page1.getNlsName());
     IType superTypeProp = m_page1.getSuperType();
     if (superTypeProp != null) {
-      m_operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
     m_operation.setTablePage(m_page1.getTablePageType());
     m_operation.setCreateSearchHandler(m_page2.getTreeNode(TYPE_HANDLER_SEARCH, true, true) != null);

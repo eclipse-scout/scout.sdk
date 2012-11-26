@@ -99,7 +99,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   @Override
-  public ScoutProject[] getRootProjects() {
+  public IScoutProject[] getRootProjects() {
     return m_projectGraph.getRootProjects();
   }
 
@@ -110,6 +110,11 @@ public final class ScoutWorkspace implements IScoutWorkspace {
       return node.getScoutProject();
     }
     return null;
+  }
+
+  @Override
+  public IScoutProject getScoutProject(IProject p) {
+    return m_bundleGraph.getScoutBundle(p).getScoutProject();
   }
 
   @Override

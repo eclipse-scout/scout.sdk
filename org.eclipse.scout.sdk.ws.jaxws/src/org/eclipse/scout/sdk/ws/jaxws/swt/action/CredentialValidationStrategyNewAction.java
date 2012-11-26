@@ -16,7 +16,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -34,7 +34,7 @@ public class CredentialValidationStrategyNewAction extends TypeNewAction {
     super.init(bundle);
     setPackageFragment(JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(bundle), true);
     List<String> interfaceTypeSignatures = new ArrayList<String>();
-    interfaceTypeSignatures.add(Signature.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy).getFullyQualifiedName(), true));
+    interfaceTypeSignatures.add(SignatureCache.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy).getFullyQualifiedName()));
     setInterfaceTypeSignatures(interfaceTypeSignatures, false);
     setSuperTypeSignature(null, false);
     setTypeName("CredentialValidationStrategy");

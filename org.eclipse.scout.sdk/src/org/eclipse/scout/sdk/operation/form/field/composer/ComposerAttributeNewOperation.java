@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -51,7 +50,7 @@ public class ComposerAttributeNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default values
-    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractComposerAttribute, true);
+    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IComposerAttribute, getDeclaringType().getJavaProject());
   }
 
   @Override

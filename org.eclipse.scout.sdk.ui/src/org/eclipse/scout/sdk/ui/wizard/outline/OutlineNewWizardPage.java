@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -49,8 +49,7 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>OutlineNewWizardPage</h3> ...
  */
 public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
-  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
-  final IType abstractOutline = TypeUtility.getType(RuntimeClasses.AbstractOutline);
+  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -64,6 +63,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   private Button m_addToDesktopField;
 
   // process members
+  private final IType m_abstractOutline;
   private OutlineNewOperation m_operation;
   private final IScoutBundle m_clientBundle;
 
@@ -73,7 +73,8 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("New Outline"));
     setDescription(Texts.get("CreateANewOutline"));
     // default values
-    m_superType = abstractOutline;
+    m_abstractOutline = RuntimeClasses.getSuperType(RuntimeClasses.IOutline, m_clientBundle.getJavaProject());
+    m_superType = m_abstractOutline;
     setAddToDesktopEnabled(false);
     setOperation(new OutlineNewOperation());
   }
@@ -114,7 +115,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iOutline, getClientBundle().getJavaProject(), abstractOutline));
+        new JavaElementAbstractTypeContentProvider(iOutline, getClientBundle().getJavaProject(), m_abstractOutline));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -157,7 +158,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     getOperation().setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      getOperation().setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      getOperation().setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
     getOperation().setAddToDesktop(isAddToDesktop());
 

@@ -17,9 +17,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.internal.ui.action.NlsProposal;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -33,6 +31,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -52,14 +51,9 @@ import org.eclipse.swt.widgets.Composite;
 public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
 
   final IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
-  final IType abstractComposerEntity = TypeUtility.getType(RuntimeClasses.AbstractComposerEntity);
 
-  /** {@link NlsProposal} **/
   public static final String PROP_NLS_NAME = "nlsName";
-
-  /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link IType} **/
   public static final String PROP_SUPER_TYPE = "superType";
 
   private ProposalTextField m_nlsNameField;
@@ -68,6 +62,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
+  private final IType m_abstractComposerEntity;
   private IType m_createdEntity;
 
   public EntityNewWizardPage(IType declaringType) {
@@ -77,11 +72,8 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    IType superType = getSuperType();
-    if (superType == null) {
-      superType = abstractComposerEntity;
-    }
-    setSuperTypeInternal(superType);
+    m_abstractComposerEntity = RuntimeClasses.getSuperType(RuntimeClasses.IComposerEntity, m_declaringType.getJavaProject());
+    setSuperTypeInternal(m_abstractComposerEntity);
   }
 
   @Override
@@ -121,7 +113,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iComposerEntity, m_declaringType.getJavaProject(), abstractComposerEntity));
+        new JavaElementAbstractTypeContentProvider(iComposerEntity, m_declaringType.getJavaProject(), m_abstractComposerEntity));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -147,7 +139,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setNlsEntry(getNlsName());
     operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }
     IStructuredType structuredType = ScoutTypeUtility.createStructuredComposer(m_declaringType);
     operation.setSibling(structuredType.getSiblingComposerEntity(getTypeName()));

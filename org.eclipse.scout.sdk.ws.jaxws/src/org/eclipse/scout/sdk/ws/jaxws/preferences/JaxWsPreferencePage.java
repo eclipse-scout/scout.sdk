@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ws.jaxws.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.ui.IWorkbench;
@@ -28,9 +27,6 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * </p>
  */
 public class JaxWsPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
-
-  private BooleanFieldEditor refreshLocalJobField;
-  private IntegerFieldEditor pollingIntervalField;
 
   public JaxWsPreferencePage() {
     super(GRID);

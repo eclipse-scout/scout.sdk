@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -84,7 +84,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewPage"));
     setDescription(Texts.get("CreateANewPage"));
     m_nameSuffix = "";
-    setSuperType(TypeUtility.getType(RuntimeClasses.AbstractPageWithNodes));
+    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IPageWithNodes, m_clientBundle.getJavaProject()));
     setOperation(new PageNewOperation(true));
   }
 
@@ -173,7 +173,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     getOperation().setTypeName(getTypeName());
     IType superType = getSuperType();
     if (superType != null) {
-      getOperation().setSuperTypeSignature(Signature.createTypeSignature(superType.getFullyQualifiedName(), true));
+      getOperation().setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     getOperation().setHolderType(getHolderType());
 

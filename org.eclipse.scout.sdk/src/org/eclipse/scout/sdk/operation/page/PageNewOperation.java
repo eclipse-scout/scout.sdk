@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -95,7 +94,7 @@ public class PageNewOperation extends AbstractPageOperation {
       // create table
       InnerTypeNewOperation tableOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE, getCreatedPage());
       tableOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
-      tableOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTable, true));
+      tableOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getCreatedPage().getJavaProject()));
       tableOp.run(monitor, workingCopyManager);
 
       // generic type

@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -92,7 +93,7 @@ public class CodeTypeNewOperation implements IOperation {
 
     // constructor
     ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(getCreatedType(), false);
-    constructorOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+    constructorOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     constructorOp.setMethodFlags(Flags.AccPublic);
     constructorOp.setSimpleBody("super();");
     constructorOp.validate();

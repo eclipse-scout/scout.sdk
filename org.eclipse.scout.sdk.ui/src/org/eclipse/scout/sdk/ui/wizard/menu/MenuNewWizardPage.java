@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -58,13 +58,12 @@ import org.eclipse.swt.widgets.Group;
  */
 public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  static final String PROP_SIBLING = "sibling";
-  static final String PROP_FORM_TO_OPEN = "formToOpen";
-  static final String PROP_FORM_HANDLER = "formHandler";
+  private static final String PROP_SIBLING = "sibling";
+  private static final String PROP_FORM_TO_OPEN = "formToOpen";
+  private static final String PROP_FORM_HANDLER = "formHandler";
 
-  protected final IType abstractMenuType = TypeUtility.getType(RuntimeClasses.AbstractMenu);
-  protected final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
-  protected final IType iformType = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
+  private final IType iformType = TypeUtility.getType(RuntimeClasses.IForm);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -79,6 +78,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
+  private final IType m_abstractMenuType;
   private IType m_createdMenu;
 
   public MenuNewWizardPage(IType declaringType) {
@@ -86,7 +86,8 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewMenu"));
     setDescription(Texts.get("CreateANewMenu"));
     m_declaringType = declaringType;
-    m_superType = abstractMenuType;
+    m_abstractMenuType = RuntimeClasses.getSuperType(RuntimeClasses.IMenu, m_declaringType.getJavaProject());
+    m_superType = m_abstractMenuType;
     setSiblingInternal(SiblingProposal.SIBLING_END);
 
   }
@@ -127,7 +128,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iMenuType, getDeclaringType().getJavaProject(), abstractMenuType));
+        new JavaElementAbstractTypeContentProvider(iMenuType, getDeclaringType().getJavaProject(), m_abstractMenuType));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -236,7 +237,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setTypeName(getTypeName());
     IType superType = getSuperType();
     if (superType != null) {
-      String signature = Signature.createTypeSignature(superType.getFullyQualifiedName(), true);
+      String signature = SignatureCache.createTypeSignature(superType.getFullyQualifiedName());
       operation.setSuperTypeSignature(signature);
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {

@@ -15,9 +15,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.internal.ui.action.NlsProposal;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -32,6 +30,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -51,20 +50,16 @@ import org.eclipse.swt.widgets.Label;
  */
 public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  /** {@link NlsProposal} **/
-  public static final String PROP_NLS_NAME = "nlsName";
-  /** {@link String} **/
-  public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link IType} **/
-  public static final String PROP_SUPER_TYPE = "superType";
-  /** {@link IType} **/
-  public static final String PROP_TABLE_PAGE = "tablePage";
+  private static final String PROP_NLS_NAME = "nlsName";
+  private static final String PROP_TYPE_NAME = "typeName";
+  private static final String PROP_SUPER_TYPE = "superType";
+  private static final String PROP_TABLE_PAGE = "tablePage";
 
-  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
-  final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
-  final IType abstractSearchForm = TypeUtility.getType(RuntimeClasses.AbstractSearchForm);
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
-  final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+  private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
+  private final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+  private final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+
   // ui fields
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
@@ -73,13 +68,15 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IScoutBundle m_clientBundle;
+  private final IType m_abstractSearchForm;
 
   public SearchFormNewWizardPage(IScoutBundle clientBundle) {
     super(SearchFormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
+    m_abstractSearchForm = RuntimeClasses.getSuperType(RuntimeClasses.ISearchForm, clientBundle.getJavaProject());
     setTitle(Texts.get("SearchForm2"));
     setDescription(Texts.get("CreateANewSearchForm"));
-    setSuperTypeInternal(abstractSearchForm);
+    setSuperTypeInternal(m_abstractSearchForm);
   }
 
   @Override
@@ -120,7 +117,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iSearchForm, getClientBundle().getJavaProject(), abstractSearchForm));
+        new JavaElementAbstractTypeContentProvider(iSearchForm, getClientBundle().getJavaProject(), m_abstractSearchForm));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -187,7 +184,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      operation.setFormSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      operation.setFormSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
   }
 

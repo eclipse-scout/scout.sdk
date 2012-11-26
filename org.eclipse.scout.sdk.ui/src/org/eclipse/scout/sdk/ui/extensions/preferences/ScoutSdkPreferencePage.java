@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions.preferences;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -23,14 +26,14 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * plug-in class. That way, preferences can be accessed directly via the preference store.
  */
 
-public class ScoutSdkPreferencePage
-    extends FieldEditorPreferencePage
-    implements IWorkbenchPreferencePage {
+public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+  private BooleanFieldEditor m_updateFormDataAutomaticallyField;
 
   public ScoutSdkPreferencePage() {
     super(GRID);
     setPreferenceStore(ScoutSdkUi.getDefault().getPreferenceStore());
-    setDescription("Scout SDK Preferences");
+    setDescription(Texts.get("ScoutSDKPreferences"));
   }
 
   /**
@@ -41,6 +44,8 @@ public class ScoutSdkPreferencePage
    */
   @Override
   public void createFieldEditors() {
+    m_updateFormDataAutomaticallyField = new BooleanFieldEditor(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE, Texts.get("UpdateFormDataAutomatically"), getFieldEditorParent());
+    addField(m_updateFormDataAutomaticallyField);
   }
 
   @Override

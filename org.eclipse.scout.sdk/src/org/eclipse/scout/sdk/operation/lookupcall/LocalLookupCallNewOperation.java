@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -66,8 +67,8 @@ public class LocalLookupCallNewOperation implements IOperation {
     MethodOverrideOperation execCreateLookupRowsMethodOp = new MethodOverrideOperation(m_outLookupCall, "execCreateLookupRows", false) {
       @Override
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        String refLookupRow = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.LookupRow, true));
-        String refArrayList = validator.getTypeName(Signature.createTypeSignature(ArrayList.class.getName(), true));
+        String refLookupRow = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.LookupRow));
+        String refArrayList = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
         StringBuilder body = new StringBuilder();
         body.append(refArrayList + "<" + refLookupRow + "> rows = new " + refArrayList + "<" + refLookupRow + ">();\n");
         body.append("  " + ScoutUtility.getCommentBlock("create lookup rows here.") + "\n");

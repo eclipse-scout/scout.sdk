@@ -50,6 +50,7 @@ import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
@@ -568,7 +569,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
     if (TypeUtility.exists(form)) {
 
-      final String formFieldSignature = Signature.createTypeSignature(formField.getFullyQualifiedName(), true);
+      final String formFieldSignature = SignatureCache.createTypeSignature(formField.getFullyQualifiedName());
       final String regex = "^get" + formField.getElementName();
       IMethod method = TypeUtility.getFirstMethod(form, new IMethodFilter() {
         @Override
@@ -594,7 +595,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   public static IMethod getColumnGetterMethod(IType column) {
     IType table = column.getDeclaringType();
-    final String formFieldSignature = Signature.createTypeSignature(column.getFullyQualifiedName(), true).replaceAll("\\$", ".");
+    final String formFieldSignature = SignatureCache.createTypeSignature(column.getFullyQualifiedName()).replaceAll("\\$", ".");
 
     final String regex = "^get" + column.getElementName();
     IMethod method = TypeUtility.getFirstMethod(table, new IMethodFilter() {
@@ -619,7 +620,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   public static IMethod getWizardStepGetterMethod(IType wizardStep) {
     IType wizard = wizardStep.getDeclaringType();
-    final String formFieldSignature = Signature.createTypeSignature(wizardStep.getFullyQualifiedName(), true);
+    final String formFieldSignature = SignatureCache.createTypeSignature(wizardStep.getFullyQualifiedName());
     final String regex = "^get" + wizardStep.getElementName();
     IMethod method = TypeUtility.getFirstMethod(wizard, new IMethodFilter() {
       @Override

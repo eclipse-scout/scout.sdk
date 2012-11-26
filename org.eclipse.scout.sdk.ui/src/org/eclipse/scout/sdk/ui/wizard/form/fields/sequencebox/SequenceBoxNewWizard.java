@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields.sequencebox;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.SequenceBoxNewOperation;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -58,7 +58,7 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
     }
     m_operation.setTypeName(m_page1.getTypeName());
     if (m_page1.getSuperType() != null) {
-      m_operation.setSuperTypeSignature(Signature.createTypeSignature(m_page1.getSuperType().getFullyQualifiedName(), true));
+      m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(m_page1.getSuperType().getFullyQualifiedName()));
     }
     if (m_page1.getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(getDeclaringType());

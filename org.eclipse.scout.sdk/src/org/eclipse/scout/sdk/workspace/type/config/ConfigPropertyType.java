@@ -30,14 +30,15 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  *
  */
 public class ConfigPropertyType {
-  private final static Pattern CONFIG_PROPERTY_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigProperty.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(Signature.createTypeSignature(RuntimeClasses.ConfigProperty, true)) + ")$");
-  private final static Pattern CONFIG_OPERATION_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigOperation.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(Signature.createTypeSignature(RuntimeClasses.ConfigOperation, true)) + ")$");
+  private final static Pattern CONFIG_PROPERTY_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigProperty.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(SignatureCache.createTypeSignature(RuntimeClasses.ConfigProperty)) + ")$");
+  private final static Pattern CONFIG_OPERATION_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigOperation.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(SignatureCache.createTypeSignature(RuntimeClasses.ConfigOperation)) + ")$");
 
   private final IType m_type;
   private TreeMap<String, ConfigurationMethod> m_configurationMethods;

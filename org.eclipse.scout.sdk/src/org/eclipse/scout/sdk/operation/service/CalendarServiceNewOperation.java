@@ -15,10 +15,10 @@ import java.util.Date;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class CalendarServiceNewOperation extends ServiceNewOperation {
 
   final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-  final IType abstractSqlLookupService = TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService);
 
   @Override
   public String getOperationName() {
@@ -41,14 +40,14 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
       CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(serviceInterface.getCompilationUnit());
       // getItems
       StringBuilder methodBuilder = new StringBuilder();
-      String calendarItemSimpleName = importValidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ICalendarItem, true));
+      String calendarItemSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem));
       methodBuilder.append(calendarItemSimpleName);
       methodBuilder.append("[] getItems(");
-      methodBuilder.append(importValidator.getTypeName(Signature.createTypeSignature(Date.class.getName(), true)));
+      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
       methodBuilder.append(" minDate, ");
-      methodBuilder.append(importValidator.getTypeName(Signature.createTypeSignature(Date.class.getName(), true)));
+      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
       methodBuilder.append(" maxDate) throws ");
-      String processingExceptionSimpleName = importValidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+      String processingExceptionSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
       methodBuilder.append(processingExceptionSimpleName);
       methodBuilder.append(";");
       serviceInterface.createMethod(methodBuilder.toString(), null, true, monitor);
@@ -65,17 +64,17 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     if (TypeUtility.exists(serviceImplementation)) {
       CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(serviceImplementation.getCompilationUnit());
       StringBuilder methodBuilder = new StringBuilder();
-      String overrideSimpleName = importValidator.getTypeName(Signature.createTypeSignature(Override.class.getName(), true));
+      String overrideSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(Override.class.getName()));
       methodBuilder.append("@").append(overrideSimpleName).append("\n");
       methodBuilder.append("public ");
-      String calendarItemSimpleName = importValidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ICalendarItem, true));
+      String calendarItemSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem));
       methodBuilder.append(calendarItemSimpleName);
       methodBuilder.append("[] getItems(");
-      methodBuilder.append(importValidator.getTypeName(Signature.createTypeSignature(Date.class.getName(), true)));
+      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
       methodBuilder.append(" minDate, ");
-      methodBuilder.append(importValidator.getTypeName(Signature.createTypeSignature(Date.class.getName(), true)));
+      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
       methodBuilder.append(" maxDate) throws ");
-      String processingExceptionSimpleName = importValidator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+      String processingExceptionSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
       methodBuilder.append(processingExceptionSimpleName);
       methodBuilder.append(" {\n");
       methodBuilder.append(ScoutUtility.getCommentBlock("business logic here.")).append("\n");

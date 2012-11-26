@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -33,6 +32,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -136,7 +136,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
 
     ToolbuttonNewWizardPage1 previousPage = (ToolbuttonNewWizardPage1) getWizard().getPage(ToolbuttonNewWizardPage1.class.getName());
     if (previousPage.getSuperType() != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(previousPage.getSuperType().getFullyQualifiedName(), true));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(previousPage.getSuperType().getFullyQualifiedName()));
     }
     if (getOutline() != null) {
       operation.setOutlineType(getOutline());

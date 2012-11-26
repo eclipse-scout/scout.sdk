@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -27,6 +26,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -74,7 +74,7 @@ public abstract class AbstractPageOperation implements IOperation {
             listName = matcher.group(1);
           }
           if (index > 0) {
-            InsertEdit edit = new InsertEdit(index, "\n" + listName + ".add(new " + validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true)) + "());");
+            InsertEdit edit = new InsertEdit(index, "\n" + listName + ".add(new " + validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName())) + "());");
             try {
               edit.apply(methodBody);
             }
@@ -94,7 +94,7 @@ public abstract class AbstractPageOperation implements IOperation {
       MethodOverrideOperation overrideOp = new MethodOverrideOperation(outlineType, methodName) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String pageRef = validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
+          String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
           StringBuilder bodyBuilder = new StringBuilder();
           bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
@@ -117,7 +117,7 @@ public abstract class AbstractPageOperation implements IOperation {
         @Override
         protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder(originalBody);
-          String pageRef = validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
+          String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
           sourceBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
           return sourceBuilder.toString();
@@ -131,7 +131,7 @@ public abstract class AbstractPageOperation implements IOperation {
       MethodOverrideOperation overrideOp = new MethodOverrideOperation(pageWithNodes, methodName) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String pageRef = validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
+          String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
           StringBuilder bodyBuilder = new StringBuilder();
           bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
@@ -153,7 +153,7 @@ public abstract class AbstractPageOperation implements IOperation {
         @Override
         protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
           StringBuilder b = new StringBuilder();
-          String pageRef = validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
+          String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
           b.append(pageRef + " " + CHILD_PAGE_VAR_NAME + "=new " + pageRef + "();\n");
           createPageParameterSource(pageType, pageWithTable, validator, b);
           b.append("return " + CHILD_PAGE_VAR_NAME + ";");
@@ -168,7 +168,7 @@ public abstract class AbstractPageOperation implements IOperation {
       MethodOverrideOperation overrideOp = new MethodOverrideOperation(pageWithTable, methodName) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String pageRef = validator.getTypeName(Signature.createTypeSignature(pageType.getFullyQualifiedName(), true));
+          String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
           StringBuilder b = new StringBuilder();
           b.append(pageRef + " " + CHILD_PAGE_VAR_NAME + "=new " + pageRef + "();\n");
           createPageParameterSource(pageType, pageWithTable, validator, b);

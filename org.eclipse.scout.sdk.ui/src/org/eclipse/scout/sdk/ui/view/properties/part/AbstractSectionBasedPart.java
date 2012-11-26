@@ -104,8 +104,12 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
   @Override
   public final void dispose() {
     cleanup();
-    getFormToolkit().dispose();
-    getForm().dispose();
+    if (getFormToolkit() != null) {
+      getFormToolkit().dispose();
+    }
+    if (getForm() != null) {
+      getForm().dispose();
+    }
   }
 
   private void createHeadInternal(ScrolledForm form) {
@@ -155,6 +159,9 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
   }
 
   protected final Section[] getSections() {
+    if (m_sections == null) {
+      return new Section[]{};
+    }
     return m_sections.values().toArray(new Section[m_sections.values().size()]);
   }
 

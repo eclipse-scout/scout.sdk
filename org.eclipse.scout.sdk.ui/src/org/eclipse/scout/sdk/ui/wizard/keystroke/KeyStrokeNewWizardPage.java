@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -31,6 +30,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -46,8 +46,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iKeyStroke = TypeUtility.getType(RuntimeClasses.IKeyStroke);
-  final IType abstractKeyStroke = TypeUtility.getType(RuntimeClasses.AbstractKeyStroke);
+  private final IType iKeyStroke = TypeUtility.getType(RuntimeClasses.IKeyStroke);
 
   private String m_typeName;
   private IType m_superType;
@@ -61,6 +60,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   // process members
   private final IType m_declaringType;
   private IType m_createdKeystroke;
+  private final IType m_abstractKeyStroke;
 
   public KeyStrokeNewWizardPage(IType declaringType) {
     super(KeyStrokeNewWizardPage.class.getName());
@@ -68,7 +68,8 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewKeyStroke"));
     // default
     m_declaringType = declaringType;
-    m_superType = abstractKeyStroke;
+    m_abstractKeyStroke = RuntimeClasses.getSuperType(RuntimeClasses.IKeyStroke, m_declaringType.getJavaProject());
+    m_superType = m_abstractKeyStroke;
     setOperation(new KeyStrokeNewOperation(m_declaringType));
   }
 
@@ -87,7 +88,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iKeyStroke, m_declaringType.getJavaProject(), abstractKeyStroke));
+        new JavaElementAbstractTypeContentProvider(iKeyStroke, m_declaringType.getJavaProject(), m_abstractKeyStroke));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -121,7 +122,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_operation.setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      m_operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
     m_operation.setKeyStroke(getKeyStroke());
     // sibling

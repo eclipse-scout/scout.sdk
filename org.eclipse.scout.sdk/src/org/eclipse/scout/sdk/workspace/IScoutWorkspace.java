@@ -60,4 +60,10 @@ public interface IScoutWorkspace {
    */
   IScoutProject findScoutProject(String projectName);
 
+  /**
+   * @param p
+   * @return
+   */
+  IScoutProject getScoutProject(IProject p);
+
 }

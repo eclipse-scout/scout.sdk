@@ -33,6 +33,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -50,8 +51,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
-  final IType abstractRadioButtonGroup = TypeUtility.getType(RuntimeClasses.AbstractRadioButtonGroup);
+  private final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -66,6 +66,7 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
 
   // process members
   private final IType m_declaringType;
+  private final IType m_abstractRadioButtonGroup;
   private IType m_createdField;
 
   public RadioButtonGroupFieldNewWizardPage(IType declaringType) {
@@ -74,8 +75,9 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     setDescription(Texts.get("CreateANewRadioButtonGroup"));
     m_declaringType = declaringType;
     // default
-    setSuperType(abstractRadioButtonGroup);
-    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
+    m_abstractRadioButtonGroup = RuntimeClasses.getSuperType(RuntimeClasses.IRadioButtonGroup, m_declaringType.getJavaProject());
+    setSuperType(m_abstractRadioButtonGroup);
+    m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -157,10 +159,10 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
       }
       else {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true);
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName());
       }
       operation.setSuperTypeSignature(sig);
     }

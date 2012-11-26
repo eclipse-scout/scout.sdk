@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -39,7 +38,7 @@ public class TabBoxNewOperation implements IOperation {
   public TabBoxNewOperation(IType declaringType) {
     m_declaringType = declaringType;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTabBox, true));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITabBox, getDeclaringType().getJavaProject()));
   }
 
   @Override

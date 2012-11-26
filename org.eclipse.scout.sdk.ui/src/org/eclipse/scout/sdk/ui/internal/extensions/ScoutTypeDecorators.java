@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -165,7 +165,6 @@
 //    list.add(new ScoutTypeDecorator(INDEX_LABEL_FIELD, RuntimeClasses.AbstractLabelField, "Label Field"));
 //    list.add(new ScoutTypeDecorator(INDEX_LIST_BOX, RuntimeClasses.AbstractListBox, "List Box"));
 //    list.add(new ScoutTypeDecorator(INDEX_LONG_FIELD, RuntimeClasses.AbstractLongField, "Long Field"));
-//    list.add(new ScoutTypeDecorator(INDEX_MATRIX_FIELD, RuntimeClasses.AbstractMatrixField, "Matrix Field"));
 //    list.add(new ScoutTypeDecorator(INDEX_OUTLINE, RuntimeClasses.AbstractOutline, "Outline"));
 //    list.add(new ScoutTypeDecorator(INDEX_PAGE_WITH_NODES, RuntimeClasses.AbstractPageWithNodes, "Page with Nodes"));
 //    list.add(new ScoutTypeDecorator(INDEX_PAGE_WITH_TABLE, RuntimeClasses.AbstractPageWithTable, "Page with Table"));

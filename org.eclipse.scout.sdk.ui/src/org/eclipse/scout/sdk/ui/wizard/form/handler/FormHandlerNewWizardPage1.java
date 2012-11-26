@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -80,9 +81,10 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     });
     List<HandlerTemplate> templates = new ArrayList<HandlerTemplate>();
-    templates.add(new HandlerTemplate(Texts.get("FormHandlerNEW"), TypeUtility.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_NEW));
-    templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), TypeUtility.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_MODIFY));
-    templates.add(new HandlerTemplate(Texts.get("FormHandler"), TypeUtility.getType(RuntimeClasses.AbstractFormHandler), HandlerTemplate.ID_CUSTOM));
+    IType formHandler = RuntimeClasses.getSuperType(RuntimeClasses.IFormHandler, m_declaringType.getJavaProject());
+    templates.add(new HandlerTemplate(Texts.get("FormHandlerNEW"), formHandler, HandlerTemplate.ID_NEW));
+    templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), formHandler, HandlerTemplate.ID_MODIFY));
+    templates.add(new HandlerTemplate(Texts.get("FormHandler"), formHandler, HandlerTemplate.ID_CUSTOM));
 
     IType[] abstractFormHandlers = TypeUtility.getPrimaryTypeHierarchy(iFormHandler).getAllSubtypes(iFormHandler, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType t : abstractFormHandlers) {
@@ -124,10 +126,10 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
     else {
       switch (m_selectedTemplate.getId()) {
         case HandlerTemplate.ID_MODIFY:
-          nextPage.setTypeName("Modify");
+          nextPage.setTypeName(SdkProperties.TYPE_NAME_MODIFY_HANDLER_PREFIX);
           break;
         case HandlerTemplate.ID_NEW:
-          nextPage.setTypeName("New");
+          nextPage.setTypeName(SdkProperties.TYPE_NAME_NEW_HANDLER_PREFIX);
           break;
       }
     }

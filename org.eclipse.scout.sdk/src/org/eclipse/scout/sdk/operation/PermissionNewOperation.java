@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -44,7 +45,7 @@ public class PermissionNewOperation implements IOperation {
 
   public PermissionNewOperation(boolean formatSource) {
     m_formatSource = formatSource;
-    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.BasicPermission, true);
+    m_superTypeSignature = SignatureCache.createTypeSignature(RuntimeClasses.BasicPermission);
   }
 
   @Override

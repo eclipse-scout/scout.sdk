@@ -16,11 +16,11 @@ package org.eclipse.scout.sdk.operation.service;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -108,15 +108,15 @@ public class ProcessServiceNewOperation implements IOperation {
         serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
         serviceOp.setServiceInterfaceName(getServiceInterfaceName());
         serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS));
-        serviceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.IService, true));
+        serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
       }
-      serviceOp.setServiceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractService, true));
+      serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServiceImplementationBundle().getJavaProject()));
       serviceOp.run(monitor, workingCopyManager);
       m_createdServiceInterface = serviceOp.getCreatedServiceInterface();
       m_createdServiceImplementation = serviceOp.getCreatedServiceImplementation();
 
       // input validation annotation for process services
-      AnnotationCreateOperation valStratOp = new AnnotationCreateOperation(m_createdServiceInterface, Signature.createTypeSignature(RuntimeClasses.InputValidation, true)) {
+      AnnotationCreateOperation valStratOp = new AnnotationCreateOperation(m_createdServiceInterface, SignatureCache.createTypeSignature(RuntimeClasses.InputValidation)) {
         @Override
         public TextEdit createEdit(IImportValidator validator, String NL) throws CoreException {
           validator.addImport(RuntimeClasses.InputValidation);

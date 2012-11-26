@@ -15,9 +15,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.internal.ui.action.NlsProposal;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -31,6 +29,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
@@ -54,17 +53,11 @@ import org.eclipse.swt.widgets.Group;
 public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
-  final IType abstractForm = TypeUtility.getType(RuntimeClasses.AbstractForm);
 
-  /** {@link NlsProposal} **/
   public static final String PROP_NLS_NAME = "nlsName";
-  /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link IType} **/
   public static final String PROP_SUPER_TYPE = "superType";
-  /** {@link Boolean} **/
   public static final String PROP_CREATE_FORM_ID = "createFormId";
-  /** {@link String} **/
   public static final String PROP_FORM_ID_NAME = "formIdName";
 
   // ui fields
@@ -73,6 +66,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_superTypeField;
   private Button m_createFormIdField;
   private StyledTextField m_formIdField;
+  private final IType m_abstractForm;
 
   // process members
   private final IScoutBundle m_clientBundle;
@@ -80,9 +74,12 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   public FormNewWizardPage(IScoutBundle clientBundle) {
     super(FormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
+    m_abstractForm = RuntimeClasses.getSuperType(RuntimeClasses.IForm, m_clientBundle.getJavaProject());
+
     setTitle(Texts.get("Form"));
     setDescription(Texts.get("CreateANewForm"));
-    setSuperTypeInternal(abstractForm);
+
+    setSuperTypeInternal(m_abstractForm);
     setCreateFormId(true);
   }
 
@@ -129,7 +126,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iForm, getClientBundle().getJavaProject(), abstractForm));
+        new JavaElementAbstractTypeContentProvider(iForm, getClientBundle().getJavaProject(), m_abstractForm));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -194,7 +191,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      operation.setFormSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      operation.setFormSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
   }
 

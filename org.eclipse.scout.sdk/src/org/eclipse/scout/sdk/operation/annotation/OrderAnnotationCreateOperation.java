@@ -11,15 +11,15 @@
 package org.eclipse.scout.sdk.operation.annotation;
 
 import org.eclipse.jdt.core.IMember;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 
 /**
  *
  */
 public class OrderAnnotationCreateOperation extends AnnotationCreateOperation {
   public OrderAnnotationCreateOperation(IMember annotationOwner, double orderNr) {
-    super(annotationOwner, Signature.createTypeSignature(RuntimeClasses.Order, true));
+    super(annotationOwner, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     addParameter("" + orderNr);
   }
 }

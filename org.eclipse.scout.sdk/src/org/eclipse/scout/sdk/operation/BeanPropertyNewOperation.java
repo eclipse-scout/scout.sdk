@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -128,7 +129,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
       getterOp.setReturnTypeSignature(getBeanTypeSignature());
       getterOp.setMethodFlags(Flags.AccPublic);
       if (m_createFormDataAnnotation) {
-        getterOp.addAnnotation(new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.FormData, true)));
+        getterOp.addAnnotation(new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.FormData)));
       }
       getterOp.setSibling(getSiblingMethods());
       getterOp.setFormatSource(true);
@@ -161,7 +162,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
       setterOp.setParameterSignatures(new String[]{getBeanTypeSignature()});
       setterOp.setParameterNames(new String[]{parameterName});
       if (m_createFormDataAnnotation) {
-        setterOp.addAnnotation(new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.FormData, true)));
+        setterOp.addAnnotation(new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.FormData)));
       }
       setterOp.setSibling(getSiblingMethods());
       setterOp.setFormatSource(true);

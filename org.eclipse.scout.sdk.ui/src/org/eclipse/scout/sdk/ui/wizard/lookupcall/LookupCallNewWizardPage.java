@@ -60,17 +60,12 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     CREATE_NEW, USE_EXISTING, NO_SERVICE
   }
 
-  protected final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
-  protected final IType abstractSqlLookupService = TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService);
-  protected final IType abstractLookupService = TypeUtility.getType(RuntimeClasses.AbstractLookupService);
+  private final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
+  private final IType abstractLookupService = TypeUtility.getType(RuntimeClasses.AbstractLookupService);
 
-  /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link ITypeProposal} **/
   public static final String PROP_SERVICE_SUPER_TYPE = "serviceSuperType";
-  /** {@link ITypeProposal} **/
   public static final String PROP_LOOKUP_SERVICE = "lookupService";
-  /** {@link LOOKUP_SERVICE_STRATEGY} **/
   public static final String PROP_LOOKUP_SERVICE_STRATEGY = "lookupServiceStrategy";
 
   // ui fields
@@ -82,6 +77,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_lookupServiceTypeField;
 
   // process members
+  private final IType m_abstractSqlLookupService;
   private final IScoutBundle m_sharedBundle;
   private final IScoutBundle m_serverBundle;
 
@@ -89,16 +85,15 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     super(LookupCallNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
     m_serverBundle = serverBundle;
+    m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.AbstractSqlLookupService, sharedBundle.getJavaProject());
     setTitle(Texts.get("NewLookupCall"));
     setDescription(Texts.get("CreateANewLookupCall"));
     setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
-    setServiceSuperTypeInternal(abstractSqlLookupService);
-
+    setServiceSuperTypeInternal(m_abstractSqlLookupService);
   }
 
   @Override
   protected void createContent(Composite parent) {
-
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
@@ -145,7 +140,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         protected Object[][] computeProposals() {
           List<Object> proposals = new ArrayList<Object>();
           proposals.add(abstractLookupService);
-          proposals.add(abstractSqlLookupService);
+          proposals.add(m_abstractSqlLookupService);
           proposals.add(MoreElementsProposal.INSTANCE);
           ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
           IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());

@@ -20,6 +20,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -35,7 +36,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
  */
 public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
   private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
-  private static final String OBJECT_SIG = Signature.createTypeSignature(Object.class.getName(), true); // Ljava.lang.Object;
+  private static final String OBJECT_SIG = SignatureCache.createTypeSignature(Object.class.getName()); // Ljava.lang.Object;
 
   private final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
   private final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
@@ -163,10 +164,10 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         }
       };
       globalGetter.setElementName("getValueAt");
-      globalGetter.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
+      globalGetter.addAnnotation(new AnnotationSourceBuilder(SignatureCache.createTypeSignature(Override.class.getName())));
       globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
       globalGetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
-      globalGetter.setReturnSignature(Signature.createTypeSignature(Object.class.getName(), true));
+      globalGetter.setReturnSignature(SignatureCache.createTypeSignature(Object.class.getName()));
       addBuilder(globalGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, globalGetter.getElementName(), globalGetter));
 
       // global setter
@@ -209,16 +210,16 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
         }
       };
       globalSetter.setElementName("setValueAt");
-      globalSetter.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
+      globalSetter.addAnnotation(new AnnotationSourceBuilder(SignatureCache.createTypeSignature(Override.class.getName())));
       globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "row"));
       globalSetter.addParameter(new MethodParameter(Signature.SIG_INT, "column"));
-      globalSetter.addParameter(new MethodParameter(Signature.createTypeSignature(Object.class.getName(), true), "value"));
+      globalSetter.addParameter(new MethodParameter(SignatureCache.createTypeSignature(Object.class.getName()), "value"));
       addBuilder(globalSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, globalSetter.getElementName(), globalSetter));
 
       // column count
       MethodSourceBuilder columnCount = new MethodSourceBuilder(NL);
       columnCount.setElementName("getColumnCount");
-      columnCount.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
+      columnCount.addAnnotation(new AnnotationSourceBuilder(SignatureCache.createTypeSignature(Override.class.getName())));
       columnCount.setReturnSignature(Signature.SIG_INT);
       columnCount.setSimpleBody("return " + columns.length + ";");
       addBuilder(columnCount, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, columnCount.getElementName(), columnCount));
@@ -226,7 +227,7 @@ public class TableFieldSourceBuilder extends SourceBuilderWithProperties {
   }
 
   private static AnnotationSourceBuilder getSuppressUncheckedWarningBuilder() {
-    AnnotationSourceBuilder suppressUnchecked = new AnnotationSourceBuilder(Signature.createTypeSignature(SuppressWarnings.class.getName(), true));
+    AnnotationSourceBuilder suppressUnchecked = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(SuppressWarnings.class.getName()));
     suppressUnchecked.addParameter("\"unchecked\"");
     return suppressUnchecked;
   }

@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.ast.VariableType;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -128,7 +129,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
         }
         else if (segments.size() == 1) {
           IType declaringType = JdtUtility.findDeclaringType(m_containerElement);
-          String resolveReturnValueSignature = AstUtility.resolveReturnValueSignature(Signature.createTypeSignature(declaringType.getFullyQualifiedName(), true), node.getName().getFullyQualifiedName());
+          String resolveReturnValueSignature = AstUtility.resolveReturnValueSignature(SignatureCache.createTypeSignature(declaringType.getFullyQualifiedName()), node.getName().getFullyQualifiedName());
           m_typeSignature = resolveReturnValueSignature;
         }
         m_assignedSignatures.addAll(fqSignatures);
@@ -182,7 +183,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
         }
 //        if (m_typeSignature == null) {
 //          IType declaringType = JdtUtility.findDeclaringType(m_containerElement);
-//          String resolveReturnValueSignature = AstUtility.resolveReturnValueSignature(Signature.createTypeSignature(declaringType.getFullyQualifiedName(), true), node.getFullyQualifiedName());
+//          String resolveReturnValueSignature = AstUtility.resolveReturnValueSignature(SignatureCache.createTypeSignature(declaringType.getFullyQualifiedName()), node.getFullyQualifiedName());
 //          m_typeSignature = resolveReturnValueSignature;
 //        }
 //        else {

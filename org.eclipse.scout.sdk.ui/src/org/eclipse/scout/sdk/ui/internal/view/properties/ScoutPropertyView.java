@@ -57,7 +57,7 @@ public class ScoutPropertyView extends ViewPart {
       m_selectionListener = new P_SelectionListener();
     }
 
- // TODO [mvi] maybe revert to postSelection again when bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=319381 is fixed?
+    // TODO [mvi] maybe revert to postSelection again when bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=319381 is fixed?
     getSite().getWorkbenchWindow().getSelectionService().addSelectionListener(IScoutConstants.SCOUT_EXPLORER_VIEW, m_selectionListener);
   }
 
@@ -69,7 +69,7 @@ public class ScoutPropertyView extends ViewPart {
     if (m_currentPart != null) {
       m_currentPart.save(m_memento);
     }
-    getSite().getWorkbenchWindow().getSelectionService().removePostSelectionListener(IScoutConstants.SCOUT_EXPLORER_VIEW, m_selectionListener);
+    getSite().getWorkbenchWindow().getSelectionService().removeSelectionListener(IScoutConstants.SCOUT_EXPLORER_VIEW, m_selectionListener);
     m_selectionListener = null;
     super.dispose();
   }

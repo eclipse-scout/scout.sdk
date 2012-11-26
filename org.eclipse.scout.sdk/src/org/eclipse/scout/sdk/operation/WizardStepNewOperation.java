@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -53,7 +53,7 @@ public class WizardStepNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default values
-    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractWizardStep, true);
+    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IWizardStep, getDeclaringType().getJavaProject());
   }
 
   @Override
@@ -85,7 +85,7 @@ public class WizardStepNewOperation implements IOperation {
     InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedWizardStep(), getDeclaringType(), true) {
       @Override
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        String wizardStepRef = validator.getTypeName(Signature.createTypeSignature(getField().getFullyQualifiedName(), true));
+        String wizardStepRef = validator.getTypeName(SignatureCache.createTypeSignature(getField().getFullyQualifiedName()));
         StringBuilder source = new StringBuilder();
         source.append("return getStep(" + wizardStepRef + ".class);");
         return source.toString();

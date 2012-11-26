@@ -87,6 +87,7 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
@@ -337,7 +338,7 @@ public final class JaxWsSdkUtility {
   }
 
   public static String getFullyQualifiedSignature(IType declaringType, String signature) {
-    return Signature.createTypeSignature(JaxWsSdkUtility.getFullyQualifiedNameFromSignature(declaringType, signature), true);
+    return SignatureCache.createTypeSignature(JaxWsSdkUtility.getFullyQualifiedNameFromSignature(declaringType, signature));
   }
 
   public static void organizeImports(IType type) {
@@ -1199,7 +1200,7 @@ public final class JaxWsSdkUtility {
     try {
       for (IMemberValuePair pair : annotation.getMemberValuePairs()) {
         if (pair.getMemberName().equals(property)) {
-          String propertySignature = Signature.createTypeSignature((String) pair.getValue(), true);
+          String propertySignature = SignatureCache.createTypeSignature((String) pair.getValue());
           String fullyQualifiedName = JaxWsSdkUtility.getFullyQualifiedNameFromSignature(declaringType, propertySignature);
 
           propertyValue.setInherited(false);
@@ -1296,7 +1297,7 @@ public final class JaxWsSdkUtility {
   }
 
   public static String resolveTypeName(IType declaringType, IType typeToBeResolved) throws JavaModelException {
-    String typeSignature = Signature.createTypeSignature(typeToBeResolved.getFullyQualifiedName(), true);
+    String typeSignature = SignatureCache.createTypeSignature(typeToBeResolved.getFullyQualifiedName());
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(declaringType.getCompilationUnit());
     return SignatureUtility.getTypeReference(typeSignature, declaringType, validator);
   }

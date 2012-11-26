@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -34,6 +33,7 @@ import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -70,9 +70,9 @@ public class SearchFormNewOperation implements IOperation {
     String formDataSignature = null;
     if (getSearchFormDataLocationBundle() != null) {
       ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTypeName() + "Data", getSearchFormDataLocationBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), getSearchFormDataLocationBundle());
-      formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
+      formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
-      formDataSignature = Signature.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName(), true);
+      formDataSignature = SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName());
       // exported form type
       ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{formDataOp.getCreatedType().getPackageFragment()}, true);
       manifestOp.run(monitor, workingCopyManager);
@@ -104,7 +104,7 @@ public class SearchFormNewOperation implements IOperation {
     // create constructor
     ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(m_createdFormType);
     constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+    constructorOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     constructorOp.setSimpleBody("  super();");
     constructorOp.validate();
     constructorOp.run(monitor, workingCopyManager);
@@ -135,7 +135,7 @@ public class SearchFormNewOperation implements IOperation {
       MethodOverrideOperation overrideOp = new MethodOverrideOperation(getTablePage(), "getConfiguredSearchForm") {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String simpleRef = validator.getTypeName(Signature.createTypeSignature(getCreatedFormType().getFullyQualifiedName(), true));
+          String simpleRef = validator.getTypeName(SignatureCache.createTypeSignature(getCreatedFormType().getFullyQualifiedName()));
           return "return " + simpleRef + ".class;";
         }
       };
@@ -145,7 +145,7 @@ public class SearchFormNewOperation implements IOperation {
     else {
       // main box
       FormFieldNewOperation mainBoxOp = new FormFieldNewOperation(getCreatedFormType());
-      mainBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
+      mainBoxOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, getCreatedFormType().getJavaProject()));
       mainBoxOp.setTypeName(SdkProperties.TYPE_NAME_MAIN_BOX);
       mainBoxOp.validate();
       mainBoxOp.run(monitor, workingCopyManager);
@@ -153,7 +153,6 @@ public class SearchFormNewOperation implements IOperation {
         FormHandlerNewOperation searchHandlerOp = new FormHandlerNewOperation(getCreatedFormType());
         searchHandlerOp.setTypeName(SdkProperties.TYPE_NAME_SEARCH_HANDLER);
         searchHandlerOp.setStartMethodSibling(ScoutTypeUtility.createStructuredForm(getCreatedFormType()).getSiblingMethodStartHandler(searchHandlerOp.getStartMethodName()));
-        searchHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
         searchHandlerOp.run(monitor, workingCopyManager);
         m_createdSearchHandler = searchHandlerOp.getCreatedHandler();
       }

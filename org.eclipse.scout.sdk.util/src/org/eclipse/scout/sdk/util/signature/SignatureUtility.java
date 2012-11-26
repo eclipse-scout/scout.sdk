@@ -13,6 +13,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 
 public final class SignatureUtility {
 
@@ -20,8 +21,6 @@ public final class SignatureUtility {
   private final static Pattern SIG_REPLACEMENT_REGEX = Pattern.compile("[\\.\\$]{1}");
   private final static Pattern DOL_REPLACEMENT_REGEX = Pattern.compile("\\$");
   private final static Pattern PARAM_SIG_REPLACEMENT_REGEX = Pattern.compile("^([^\\:]*)\\:(.*)$");
-
-  //public final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
 
   /**
    * Character constant indicating an arbitrary array type in a signature.
@@ -127,7 +126,7 @@ public final class SignatureUtility {
               fqName = fqName + ".";
             }
             fqName = fqName + resolvedTypeName[0][1];
-            signature = Signature.createTypeSignature(fqName, true);
+            signature = SignatureCache.createTypeSignature(fqName);
           }
         }
         if (signature.endsWith(";")) {
@@ -174,7 +173,7 @@ public final class SignatureUtility {
    * @see ScoutSdkUtility#getSimpleTypeRefName(String, IImportValidator)
    */
   public static String getTypeReferenceFromFqn(String fullyQualifiedTypeName, IImportValidator importValidator) throws JavaModelException {
-    return getTypeReference(Signature.createTypeSignature(fullyQualifiedTypeName, true), importValidator);
+    return getTypeReference(SignatureCache.createTypeSignature(fullyQualifiedTypeName), importValidator);
   }
 
   /**
@@ -276,7 +275,7 @@ public final class SignatureUtility {
                 fqName = fqName + ".";
               }
               fqName = fqName + resolvedTypeName[0][1];
-              sigBuilder.append(validator.getTypeName(Signature.createTypeSignature(fqName, true)));
+              sigBuilder.append(validator.getTypeName(SignatureCache.createTypeSignature(fqName)));
             }
           }
           else {
@@ -463,16 +462,16 @@ public final class SignatureUtility {
       }
     }
     if (parameterIndex < 0) {
-      return Signature.createTypeSignature(Object.class.getName(), true);
+      return SignatureCache.createTypeSignature(Object.class.getName());
     }
     for (IType hType : hierarchyList) {
       String superClassSignature = hType.getSuperclassTypeSignature();
       if (StringUtility.isNullOrEmpty(superClassSignature)) {
-        return Signature.createTypeSignature(Object.class.getName(), true);
+        return SignatureCache.createTypeSignature(Object.class.getName());
       }
       String[] superClassParameterSignatures = Signature.getTypeArguments(superClassSignature);
       if (superClassParameterSignatures.length < parameterIndex + 1) {
-        return Signature.createTypeSignature(Object.class.getName(), true);
+        return SignatureCache.createTypeSignature(Object.class.getName());
         // throw new IllegalArgumentException("Lost parameter '" + typeParameterSignature + "' in hierarchy at '" + hType.getFullyQualifiedName() + "'.");
       }
       else {
@@ -507,7 +506,7 @@ public final class SignatureUtility {
               fqName = fqName + ".";
             }
             fqName = fqName + resolvedTypeName[0][1];
-            simpleSignature = Signature.createTypeSignature(fqName, true).replaceAll("(^.*)\\;$", "$1");
+            simpleSignature = SignatureCache.createTypeSignature(fqName).replaceAll("(^.*)\\;$", "$1");
             signature = prefix + simpleSignature + postfix;
           }
         }

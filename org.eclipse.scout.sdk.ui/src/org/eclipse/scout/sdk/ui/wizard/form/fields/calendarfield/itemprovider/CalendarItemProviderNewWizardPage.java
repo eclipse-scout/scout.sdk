@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -48,11 +48,11 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
-  final IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
-  final IType abstractCalendarItemProvider = TypeUtility.getType(RuntimeClasses.AbstractCalendarItemProvider);
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
 
   private String m_typeName;
+  private IType m_defaultCalendarItemProvider;
   private IType m_superType;
   private SiblingProposal m_sibling;
 
@@ -69,12 +69,8 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     setTitle(Texts.get("NewCalendarItemProvider"));
     setDescription(Texts.get("CreateANewCalendarItemProvider"));
     m_declaringType = declaringType;
-
-    IType superType = getSuperType();
-    if (superType == null) {
-      superType = abstractCalendarItemProvider;
-    }
-    m_superType = superType;
+    m_defaultCalendarItemProvider = RuntimeClasses.getSuperType(RuntimeClasses.ICalendarItemProvider, m_declaringType.getJavaProject());
+    m_superType = m_defaultCalendarItemProvider;
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -93,7 +89,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iCalendarItemProvider, m_declaringType.getJavaProject(), abstractCalendarItemProvider));
+        new JavaElementAbstractTypeContentProvider(iCalendarItemProvider, m_declaringType.getJavaProject(), m_defaultCalendarItemProvider));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -129,7 +125,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     operation.setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
 
     if (getSibling() == SiblingProposal.SIBLING_END) {

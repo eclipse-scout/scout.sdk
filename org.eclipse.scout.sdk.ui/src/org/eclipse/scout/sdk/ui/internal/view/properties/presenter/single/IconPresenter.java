@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
@@ -37,6 +36,7 @@ import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -185,7 +185,7 @@ public class IconPresenter extends AbstractMethodPresenter {
           StringBuilder source = new StringBuilder();
           source.append("return ");
           if (value != null) {
-            String iconTypeSig = Signature.createTypeSignature(value.getConstantField().getDeclaringType().getFullyQualifiedName(), true);
+            String iconTypeSig = SignatureCache.createTypeSignature(value.getConstantField().getDeclaringType().getFullyQualifiedName());
             source.append("  " + SignatureUtility.getTypeReference(iconTypeSig, validator) + "." + value.getConstantField().getElementName());
             source.append(";");
           }

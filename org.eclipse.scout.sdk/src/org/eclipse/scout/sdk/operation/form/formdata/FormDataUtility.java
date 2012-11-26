@@ -29,6 +29,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -188,28 +189,28 @@ public class FormDataUtility {
   public static String unboxPrimitiveSignature(String signature) {
     if (Signature.getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE) {
       if (Signature.SIG_BOOLEAN.equals(signature)) {
-        signature = Signature.createTypeSignature(Boolean.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Boolean.class.getName());
       }
       else if (Signature.SIG_BYTE.equals(signature)) {
-        signature = Signature.createTypeSignature(Byte.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Byte.class.getName());
       }
       else if (Signature.SIG_CHAR.equals(signature)) {
-        signature = Signature.createTypeSignature(Character.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Character.class.getName());
       }
       else if (Signature.SIG_DOUBLE.equals(signature)) {
-        signature = Signature.createTypeSignature(Double.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Double.class.getName());
       }
       else if (Signature.SIG_FLOAT.equals(signature)) {
-        signature = Signature.createTypeSignature(Float.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Float.class.getName());
       }
       else if (Signature.SIG_INT.equals(signature)) {
-        signature = Signature.createTypeSignature(Integer.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Integer.class.getName());
       }
       else if (Signature.SIG_LONG.equals(signature)) {
-        signature = Signature.createTypeSignature(Long.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Long.class.getName());
       }
       else if (Signature.SIG_SHORT.equals(signature)) {
-        signature = Signature.createTypeSignature(Short.class.getName(), true);
+        signature = SignatureCache.createTypeSignature(Short.class.getName());
       }
     }
     return signature;
@@ -317,7 +318,7 @@ public class FormDataUtility {
             fqName = fqName + ".";
           }
           fqName = fqName + resolvedTypeName[0][1];
-          workingSig = Signature.createTypeSignature(fqName, true);
+          workingSig = SignatureCache.createTypeSignature(fqName);
         }
       }
       workingSig = SUFF_REGEX.matcher(workingSig).replaceAll("$1");

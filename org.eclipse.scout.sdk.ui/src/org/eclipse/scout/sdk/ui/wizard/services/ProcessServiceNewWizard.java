@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -34,22 +33,19 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.dnd.DND;
 
 public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
-  public static final int TYPE_PERMISSION_CREATE = 104;
-  public static final int TYPE_PERMISSION_READ = 105;
-  public static final int TYPE_PERMISSION_UPDATE = 106;
-  public static final int TYPE_SERVICE_INTERFACE = 107;
-  public static final int TYPE_SERVICE_IMPLEMENTATION = 108;
-  public static final int TYPE_SERVICE_REG_CLIENT = 109;
-  public static final int TYPE_SERVICE_REG_SERVER = 110;
-
-  final IType abstractService = TypeUtility.getType(RuntimeClasses.AbstractService);
+  private static final int TYPE_PERMISSION_CREATE = 104;
+  private static final int TYPE_PERMISSION_READ = 105;
+  private static final int TYPE_PERMISSION_UPDATE = 106;
+  private static final int TYPE_SERVICE_INTERFACE = 107;
+  private static final int TYPE_SERVICE_IMPLEMENTATION = 108;
+  private static final int TYPE_SERVICE_REG_CLIENT = 109;
+  private static final int TYPE_SERVICE_REG_SERVER = 110;
 
   private BundleTreeWizardPage m_locationWizardPage;
   private ProcessServiceNewWizardPage m_serviceNewWizardPage;
@@ -69,7 +65,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
     addPage(m_locationWizardPage);
     // init
-    m_serviceNewWizardPage.setSuperType(abstractService);
+    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, serverBundle.getJavaProject()));
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {

@@ -14,9 +14,9 @@ import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -30,7 +30,7 @@ public class FormDataAnnotationCreateOperation extends AnnotationCreateOperation
   private String m_formDataSignature;
 
   public FormDataAnnotationCreateOperation(IType type) {
-    super(type, Signature.createTypeSignature(RuntimeClasses.FormData, true));
+    super(type, SignatureCache.createTypeSignature(RuntimeClasses.FormData));
   }
 
   @Override
@@ -44,13 +44,13 @@ public class FormDataAnnotationCreateOperation extends AnnotationCreateOperation
       }
       if (getSdkCommand() != null) {
         StringBuilder b = new StringBuilder();
-        b.append("sdkCommand = " + SignatureUtility.getTypeReference(Signature.createTypeSignature(getSdkCommand().getDeclaringClass().getName(), true), validator));
+        b.append("sdkCommand = " + SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getSdkCommand().getDeclaringClass().getName()), validator));
         b.append("." + getSdkCommand().name());
         args.add(b.toString());
       }
       if (getDefaultSubtypeCommand() != null) {
         StringBuilder b = new StringBuilder();
-        b.append("defaultSubtypeSdkCommand = " + SignatureUtility.getTypeReference(Signature.createTypeSignature(getDefaultSubtypeCommand().getDeclaringClass().getName(), true), validator));
+        b.append("defaultSubtypeSdkCommand = " + SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getDefaultSubtypeCommand().getDeclaringClass().getName()), validator));
         b.append("." + getDefaultSubtypeCommand().name());
         args.add(b.toString());
       }

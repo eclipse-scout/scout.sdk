@@ -79,7 +79,6 @@ public abstract interface IScoutPageConstants {
   public static final String LOOKUP_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.LookupServiceTablePage";
   public static final String MAIL_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.MailFieldNodePage";
   public static final String MAIN_BOX_NODE_PAGE = "org.eclipse.scout.sdk.page.MainBoxNodePage";
-  public static final String MATRIX_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.MatrixFieldNodePage";
   public static final String MENU_NODE_PAGE = "org.eclipse.scout.sdk.page.MenuNodePage";
   public static final String MENU_TABLE_PAGE = "org.eclipse.scout.sdk.page.MenuTablePage";
   public static final String NODE_PAGE_CHILD_PAGE_TABLE_PAGE = "org.eclipse.scout.sdk.page. NodePageChildPageTablePage";

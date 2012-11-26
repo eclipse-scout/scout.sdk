@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
@@ -64,7 +63,7 @@ public class KeyStrokeNewOperation implements IOperation {
     OrderedInnerTypeNewOperation keyStrokeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     keyStrokeOp.setOrderDefinitionType(iKeyStroke);
     keyStrokeOp.setSibling(getSibling());
-    keyStrokeOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractKeyStroke, true));
+    keyStrokeOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IKeyStroke, getDeclaringType().getJavaProject()));
     keyStrokeOp.setTypeModifiers(Flags.AccPublic);
     keyStrokeOp.validate();
     keyStrokeOp.run(monitor, workingCopyManager);

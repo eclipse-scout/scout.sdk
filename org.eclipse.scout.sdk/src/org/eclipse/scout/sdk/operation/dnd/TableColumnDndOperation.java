@@ -16,10 +16,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -54,7 +54,7 @@ public class TableColumnDndOperation extends AbstractTypeDndOperation {
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         StringBuilder methodSource = new StringBuilder();
         methodSource.append("return getColumnSet().getColumnByClass(");
-        methodSource.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getField().getFullyQualifiedName(), true), getDeclaringType(), validator) + ".class");
+        methodSource.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getField().getFullyQualifiedName()), getDeclaringType(), validator) + ".class");
         methodSource.append(");");
         return methodSource.toString();
       }

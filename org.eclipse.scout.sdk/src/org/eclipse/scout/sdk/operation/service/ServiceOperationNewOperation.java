@@ -14,12 +14,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -76,7 +76,7 @@ public class ServiceOperationNewOperation implements IOperation {
         }
       }
     }
-    methodBody.append(") throws " + validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true)));
+    methodBody.append(") throws " + validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException)));
 
     // interface
     workingCopyManager.register(m_serviceInterface.getCompilationUnit(), monitor);

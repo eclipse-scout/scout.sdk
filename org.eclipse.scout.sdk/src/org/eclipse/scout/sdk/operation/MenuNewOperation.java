@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -26,6 +25,7 @@ import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -119,7 +119,7 @@ public class MenuNewOperation implements IOperation {
           ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getCreatedMenu().getCompilationUnit());
 
           StringBuilder sourceBuilder = new StringBuilder();
-          String formTypeName = SignatureUtility.getTypeReference(Signature.createTypeSignature(getFormToOpen().getFullyQualifiedName(), true), getDeclaringType(), validator);
+          String formTypeName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getFormToOpen().getFullyQualifiedName()), getDeclaringType(), validator);
           sourceBuilder.append(formTypeName + " " + FORM_NAME + " = new " + formTypeName + "();\n");
           if (getFormHandler() != null) {
             IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy));

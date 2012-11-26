@@ -22,7 +22,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.ui.dialog.JavaElementSelectionDialog;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractJavaElementListPresenter;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -103,7 +103,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
         source.append("new Class[]{");
         if (proposals.length > 0) {
           for (int i = 0; i < proposals.length; i++) {
-            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(((IType) proposals[i]).getFullyQualifiedName(), true), validator) + ".class");
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(((IType) proposals[i]).getFullyQualifiedName()), validator) + ".class");
             if (i < (proposals.length - 1)) {
               source.append(",\n  ");
             }
@@ -117,7 +117,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
       @Override
       public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
         super.run(monitor, workingCopyManager);
-        AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(getUpdatedMethod(), Signature.createTypeSignature(SuppressWarnings.class.getName(), true));
+        AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(getUpdatedMethod(), SignatureCache.createTypeSignature(SuppressWarnings.class.getName()));
         createSuppressWarning.addParameter("\"unchecked\"");
         createSuppressWarning.validate();
         createSuppressWarning.run(monitor, workingCopyManager);

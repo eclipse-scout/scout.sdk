@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -55,7 +55,7 @@ public class TableColumnNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default values
-    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractColumn, true);
+    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IColumn, getDeclaringType().getJavaProject());
   }
 
   @Override
@@ -90,7 +90,7 @@ public class TableColumnNewOperation implements IOperation {
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         StringBuilder source = new StringBuilder();
         source.append("return getColumnSet().getColumnByClass(");
-        source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getField().getFullyQualifiedName(), true), getDeclaringType(), validator) + ".class");
+        source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getField().getFullyQualifiedName()), getDeclaringType(), validator) + ".class");
         source.append(");");
         return source.toString();
       }

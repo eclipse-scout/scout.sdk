@@ -41,7 +41,7 @@ public class RadioButtonGroupFieldNewOperation implements IOperation {
   public RadioButtonGroupFieldNewOperation(IType declaringType) {
     m_declaringType = declaringType;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractRadioButtonGroup, true));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IRadioButtonGroup, getDeclaringType().getJavaProject()));
   }
 
   @Override

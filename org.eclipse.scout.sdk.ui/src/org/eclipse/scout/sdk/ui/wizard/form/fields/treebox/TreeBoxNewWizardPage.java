@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -49,7 +49,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
   final IType iTreeBox = TypeUtility.getType(RuntimeClasses.ITreeBox);
-  final IType abstractTreeBox = TypeUtility.getType(RuntimeClasses.AbstractTreeBox);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -69,7 +68,7 @@ public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewTreeBox"));
     setDescription(Texts.get("CreateANewTreeBox"));
     m_declaringType = declaringType;
-    setSuperType(abstractTreeBox);
+    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.ITreeBox, m_declaringType.getJavaProject()));
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -139,7 +138,7 @@ public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.isGenericType(getSuperType())) {
         superTypeName += "<" + Long.class.getName() + ">";
       }
-      operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeName, true));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName));
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);

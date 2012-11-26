@@ -106,7 +106,13 @@
       <page
             class="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkPreferencePage"
             id="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkPreferencePage"
-            name="Scout SDK">
+            name="Scout">
+      </page>
+      <page
+            category="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkPreferencePage"
+            class="org.eclipse.scout.sdk.ui.extensions.preferences.SuperTypesPreferencePage"
+            id="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkSuperTypesPreferencePage"
+            name="Default Super Classes">
       </page>
    </extension>
    <extension
@@ -315,18 +321,6 @@
          </newWizard>
          <nodePage
                nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.LongFieldNodePage">
-         </nodePage>
-      </FormField>
-      <FormField
-            active="true"
-            model="org.eclipse.scout.rt.client.ui.form.fields.matrixfield.IMatrixField"
-            name="Matrix Field">
-         <newWizard
-               inShortList="false"
-               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.matrixfield.MatrixFieldNewWizard">
-         </newWizard>
-         <nodePage
-               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.MatrixFieldNodePage">
          </nodePage>
       </FormField>
       <FormField
@@ -678,17 +672,6 @@
    </extension>
    <extension
          point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:org.eclipse.ui.main.menu?after=additions">
-         <menu
-               id="org.eclipse.scout.sdk.menu"
-               label="Scout">
-            <dynamic
-                  class="org.eclipse.scout.sdk.ui.menu.FormDataUpdateContributionItem"
-                  id="org.eclipse.scout.sdk.ui.menu.updateFormdataAutomatically">
-            </dynamic>
-         </menu>
-      </menuContribution>
       <menuContribution
             allPopups="false"
             class="org.eclipse.scout.sdk.ui.menu.ScoutMenuContributionItemFactory"

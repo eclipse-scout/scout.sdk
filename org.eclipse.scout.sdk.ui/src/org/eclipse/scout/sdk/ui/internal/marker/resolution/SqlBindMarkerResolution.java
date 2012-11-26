@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.annotations.SqlBindingIgnoreValidation;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.operation.annotation.IgnoreSqlBindingAnnotationCrea
 import org.eclipse.scout.sdk.sql.binding.SqlBindingMarkers;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.ui.IMarkerResolution;
 
@@ -68,7 +68,7 @@ public class SqlBindMarkerResolution implements IMarkerResolution {
           }
         }
         if (TypeUtility.exists(element) && element.getElementType() == IJavaElement.METHOD) {
-          IgnoreSqlBindingAnnotationCreateOperation op = new IgnoreSqlBindingAnnotationCreateOperation((IMethod) element, Signature.createTypeSignature(SqlBindingIgnoreValidation.class.getName(), true), m_bindings);
+          IgnoreSqlBindingAnnotationCreateOperation op = new IgnoreSqlBindingAnnotationCreateOperation((IMethod) element, SignatureCache.createTypeSignature(SqlBindingIgnoreValidation.class.getName()), m_bindings);
           OperationJob job = new OperationJob(op);
           job.schedule();
           job.join();

@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -76,21 +76,21 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
           sourceBuilder.append("// outline tree\n");
-          String treeFormRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.DefaultOutlineTreeForm, true));
+          String treeFormRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.DefaultOutlineTreeForm));
           sourceBuilder.append(treeFormRef + " treeForm = new " + treeFormRef + "();\n");
           ScoutIconDesc icon = m_scoutProject.getIconProvider().getIcon("eclipse_scout");
           if (icon != null) {
-            String iconsRef = validator.getTypeName(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
+            String iconsRef = validator.getTypeName(SignatureCache.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName()));
             sourceBuilder.append("treeForm.setIconId(" + iconsRef + "." + icon.getConstantField().getElementName() + ");\n");
           }
           sourceBuilder.append("treeForm.startView();\n");
           sourceBuilder.append("\n");
           // tree form
           sourceBuilder.append("//outline table\n");
-          String tableFormRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.DefaultOutlineTableForm, true));
+          String tableFormRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.DefaultOutlineTableForm));
           sourceBuilder.append(tableFormRef + " tableForm=new " + tableFormRef + "();\n");
           if (icon != null) {
-            String iconsRef = validator.getTypeName(Signature.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName(), true));
+            String iconsRef = validator.getTypeName(SignatureCache.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName()));
             sourceBuilder.append("tableForm.setIconId(" + iconsRef + "." + icon.getConstantField().getElementName() + ");\n");
           }
           sourceBuilder.append("tableForm.startView();\n");
@@ -131,10 +131,10 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         outlineServiceOp.setInterfaceBundle(getScoutProject().getSharedBundle());
         outlineServiceOp.setServiceInterfaceName("IStandardOutlineService");
         outlineServiceOp.setServiceInterfacePackageName(getScoutProject().getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_OUTLINE));
-        outlineServiceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.IService2, true));
+        outlineServiceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
         outlineServiceOp.setServiceName("StandardOutlineService");
         outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_OUTLINE));
-        outlineServiceOp.setServiceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractService, true));
+        outlineServiceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getScoutProject().getServerBundle().getJavaProject()));
         outlineServiceOp.run(monitor, workingCopyManager);
       }
     }

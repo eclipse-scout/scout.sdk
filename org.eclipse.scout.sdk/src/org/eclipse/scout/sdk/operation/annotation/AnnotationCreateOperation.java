@@ -30,6 +30,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.AnnotationSourceBuilder;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -42,7 +43,7 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class AnnotationCreateOperation implements IOperation {
 
-  public static final AnnotationCreateOperation OVERRIDE_OPERATION = new AnnotationCreateOperation(null, Signature.createTypeSignature(Override.class.getName(), true));
+  public static final AnnotationCreateOperation OVERRIDE_OPERATION = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(Override.class.getName()));
   private static final Pattern PATTERN = Pattern.compile("\\s*");
 
   private final AnnotationSourceBuilder m_builder;

@@ -17,9 +17,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.internal.ui.action.NlsProposal;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -34,6 +32,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -53,19 +52,12 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
-  final IType abstractWizardStep = TypeUtility.getType(RuntimeClasses.AbstractWizardStep);
+  private final IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
 
-  /** {@link NlsProposal} **/
-  public static final String PROP_NLS_NAME = "nlsName";
-
-  /** {@link String} **/
-  public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link ITypeProposal} **/
-  public static final String PROP_SUPER_TYPE = "superType";
-
-  /** {@link ITypeProposal} **/
-  public static final String PROP_SIBLING = "sibling";
+  private static final String PROP_NLS_NAME = "nlsName";
+  private static final String PROP_TYPE_NAME = "typeName";
+  private static final String PROP_SUPER_TYPE = "superType";
+  private static final String PROP_SIBLING = "sibling";
 
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
@@ -73,6 +65,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_siblingField;
 
   // process members
+  private final IType m_abstractWizardStep;
   private final IType m_declaringType;
   private IType m_createdWizardStep;
 
@@ -81,13 +74,9 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewWizardStep"));
     setDescription(Texts.get("CreateANewWizardStep"));
     m_declaringType = declaringType;
-
+    m_abstractWizardStep = RuntimeClasses.getSuperType(RuntimeClasses.IWizardStep, m_declaringType.getJavaProject());
     // default values
-    IType superType = getSuperType();
-    if (superType == null) {
-      superType = abstractWizardStep;
-    }
-    setSuperTypeInternal(superType);
+    setSuperTypeInternal(m_abstractWizardStep);
     setSibling(SiblingProposal.SIBLING_END);
   }
 
@@ -128,7 +117,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iWizardStep, m_declaringType.getJavaProject(), abstractWizardStep));
+        new JavaElementAbstractTypeContentProvider(iWizardStep, m_declaringType.getJavaProject(), m_abstractWizardStep));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -168,7 +157,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredWizard(m_declaringType);

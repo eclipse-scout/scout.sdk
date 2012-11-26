@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.internal.test.operation;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.junit.Assert;
@@ -42,7 +42,7 @@ public class AnnotationTest extends AbstractScoutSdkTest {
     IMethod method = TypeUtility.getMethod(testForm, "getStringMember");
     Assert.assertTrue(TypeUtility.exists(method));
 
-    AnnotationCreateOperation op = new AnnotationCreateOperation(method, Signature.createTypeSignature(FormData.class.getName(), true));
+    AnnotationCreateOperation op = new AnnotationCreateOperation(method, SignatureCache.createTypeSignature(FormData.class.getName()));
     OperationJob job = new OperationJob(op);
     job.schedule();
     job.join();
@@ -58,7 +58,7 @@ public class AnnotationTest extends AbstractScoutSdkTest {
     IMethod method = TypeUtility.getMethod(testForm, "setStringMember");
     Assert.assertTrue(TypeUtility.exists(method));
 
-    AnnotationCreateOperation op = new AnnotationCreateOperation(method, Signature.createTypeSignature(FormData.class.getName(), true));
+    AnnotationCreateOperation op = new AnnotationCreateOperation(method, SignatureCache.createTypeSignature(FormData.class.getName()));
     OperationJob job = new OperationJob(op);
     job.schedule();
     job.join();

@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Composite;
 public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
-  final IType abstractOutlineToolButton = TypeUtility.getType(RuntimeClasses.AbstractOutlineToolButton);
+  final IType abstractOutlineViewButton = TypeUtility.getType(RuntimeClasses.AbstractOutlineViewButton);
 
   private IType m_declaringType;
   private FilteredTable m_filteredTable;
@@ -92,7 +92,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
       catch (JavaModelException e) {
         ScoutSdkUi.logError("could not build super type hierarchy of '" + getSuperType().getFullyQualifiedName() + "'.", e);
       }
-      if (superTypeHierarchy != null && superTypeHierarchy.contains(abstractOutlineToolButton)) {
+      if (superTypeHierarchy != null && superTypeHierarchy.contains(abstractOutlineViewButton)) {
         m_nextPage = getWizard().getPage(OutlineToolbuttonNewWizardPage.class.getName());
       }
       else {

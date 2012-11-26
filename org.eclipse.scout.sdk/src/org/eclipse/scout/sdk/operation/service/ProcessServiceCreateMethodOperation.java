@@ -31,6 +31,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class ProcessServiceCreateMethodOperation implements IOperation {
+
+  private static final String TEXT_AUTHORIZATION_FAILED = "AuthorizationFailed";
+
   private boolean m_createPrepareCreateMethod = false;
   private boolean m_createCreateMethod = false;
   private boolean m_createLoadMethod = false;
@@ -142,7 +145,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getCreatePermission() != null) {
         builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here.") + "\n");
@@ -174,7 +177,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getReadPermission() != null) {
         builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getReadPermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");
@@ -206,7 +209,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getCreatePermission() != null) {
         builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getCreatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");
@@ -238,7 +241,7 @@ public class ProcessServiceCreateMethodOperation implements IOperation {
       builder.append("{\n");
       if (getUpdatePermission() != null) {
         builder.append(TAB + "if(!" + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, impValidator) + ".check(new " + SignatureUtility.getTypeReferenceFromFqn(getUpdatePermission().getFullyQualifiedName(), impValidator) + "())){\n");
-        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + SdkProperties.TEXT_AUTHORIZATION_FAILED + "\"));\n");
+        builder.append(TAB + TAB + "throw new " + SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, impValidator) + "(" + SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), impValidator) + ".get(\"" + TEXT_AUTHORIZATION_FAILED + "\"));\n");
         builder.append(TAB + "}\n");
       }
       builder.append(TAB + ScoutUtility.getCommentBlock("business logic here") + "\n");

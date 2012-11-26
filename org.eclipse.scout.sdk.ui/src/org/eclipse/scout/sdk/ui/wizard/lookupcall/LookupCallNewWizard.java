@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.lookupcall.LookupCallNewOperation;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.ui.wizard.lookupcall.LookupCallNewWizardPage.LOOKUP_SERVICE_STRATEGY;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -136,7 +136,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
       case CREATE_NEW:
         IType superTypeProp = m_page1.getServiceSuperType();
         if (superTypeProp != null) {
-          m_operation.setServiceSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+          m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
         }
         break;
       case USE_EXISTING:

@@ -27,7 +27,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
@@ -44,6 +43,7 @@ import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.javadoc.JavaDoc;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
@@ -160,13 +160,13 @@ public class CreateTemplateOperation implements IOperation {
     if (isCreateExternalFormData() && sharedBundle != null) {
       ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
       formDataOp.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
-      formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
+      formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
 
       FormDataAnnotationCreateOperation formDataAnnotationOp = new FormDataAnnotationCreateOperation(null);
       formDataAnnotationOp.setSdkCommand(SdkCommand.CREATE);
       formDataAnnotationOp.setDefaultSubtypeCommand(DefaultSubtypeSdkCommand.CREATE);
-      formDataAnnotationOp.setFormDataSignature(Signature.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName(), true));
+      formDataAnnotationOp.setFormDataSignature(SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName()));
       op.addAnnotation(formDataAnnotationOp);
     }
     op.validate();
@@ -217,7 +217,7 @@ public class CreateTemplateOperation implements IOperation {
       Matcher superClassMatcher = SUPER_CLASS_PATTERN.matcher(getFormField().getSource());
       if (superClassMatcher.find()) {
         edit.addChild(new ReplaceEdit(getFormField().getSourceRange().getOffset() + superClassMatcher.start(1), superClassMatcher.end(1) - superClassMatcher.start(1),
-            validator.getTypeName(Signature.createTypeSignature(templateType.getFullyQualifiedName(), true))));
+            validator.getTypeName(SignatureCache.createTypeSignature(templateType.getFullyQualifiedName()))));
       }
       IMethod templateFieldGetter = ScoutTypeUtility.getFormFieldGetterMethod(getFormField(), hierarchy);
       if (TypeUtility.exists(templateFieldGetter)) {
@@ -277,7 +277,7 @@ public class CreateTemplateOperation implements IOperation {
         }
         Matcher deprecatedMatcher = Pattern.compile("(public|protected|private)\\s*(" + formField.getElementName() + "|" + fqFormFieldName + ")", Pattern.MULTILINE).matcher(methodSource);
         if (deprecatedMatcher.find()) {
-          edit.addChild(new InsertEdit(getterMethod.getSourceRange().getOffset() + deprecatedMatcher.start(), "@" + validator.getTypeName(Signature.createTypeSignature(Deprecated.class.getName(), true)) + NL));
+          edit.addChild(new InsertEdit(getterMethod.getSourceRange().getOffset() + deprecatedMatcher.start(), "@" + validator.getTypeName(SignatureCache.createTypeSignature(Deprecated.class.getName())) + NL));
         }
         Matcher returnMatcher = Pattern.compile("(\\s*return\\s*)getFieldByClass\\([^;]*\\;", Pattern.MULTILINE).matcher(methodSource);
         if (returnMatcher.find()) {

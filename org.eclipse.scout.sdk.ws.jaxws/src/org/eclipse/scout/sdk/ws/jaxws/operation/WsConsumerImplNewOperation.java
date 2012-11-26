@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -63,11 +64,11 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
     }
 
     String superTypeSignature = "<";
-    superTypeSignature += Signature.toString(Signature.createTypeSignature(jaxWsServiceType.getFullyQualifiedName(), true));
+    superTypeSignature += Signature.toString(SignatureCache.createTypeSignature(jaxWsServiceType.getFullyQualifiedName()));
     superTypeSignature += ", ";
-    superTypeSignature += Signature.toString(Signature.createTypeSignature(jaxWsPortType.getFullyQualifiedName(), true));
+    superTypeSignature += Signature.toString(SignatureCache.createTypeSignature(jaxWsPortType.getFullyQualifiedName()));
     superTypeSignature += ">";
-    superTypeSignature = Signature.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getFullyQualifiedName() + superTypeSignature, true);
+    superTypeSignature = SignatureCache.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getFullyQualifiedName() + superTypeSignature);
     setServiceSuperTypeSignature(superTypeSignature);
     super.run(monitor, workingCopyManager);
 
@@ -118,7 +119,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
       ScoutTypeNewOperation newTypeOp = new ScoutTypeNewOperation(typeName, packageName, getImplementationBundle());
-      newTypeOp.addInterfaceSignature(Signature.createTypeSignature(interfaceType.getFullyQualifiedName(), true));
+      newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();
       workingCopyManager.register(type.getCompilationUnit(), monitor);

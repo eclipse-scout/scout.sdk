@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -51,6 +51,7 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
 
   public SqlServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewSQLService"));
+    IType serviceSuperType = RuntimeClasses.getSuperType(RuntimeClasses.ISqlService, serverBundle.getJavaProject());
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 
     m_locationWizardPageRoot = createTree(serverBundle);
@@ -61,14 +62,14 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSQLService"), Texts.get("CreateANewSQLService"), TypeUtility.getType(RuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
-    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.AbstractSqlService));
+    m_serviceNewWizardPage.setSuperType(serviceSuperType);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
 
     addPage(m_serviceNewWizardPage);
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.AbstractSqlService));
+    m_serviceNewWizardPage.setSuperType(serviceSuperType);
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
@@ -88,7 +89,7 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
   protected boolean beforeFinish() throws CoreException {
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
-      m_operation.setServiceSuperTypeSignature(Signature.createTypeSignature(superType.getFullyQualifiedName(), true));
+      m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {

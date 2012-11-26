@@ -16,12 +16,10 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
@@ -32,6 +30,7 @@ import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -58,8 +57,6 @@ public class FormNewOperation implements IOperation {
   private IMethod m_createdMainBoxGetter;
 
   public FormNewOperation() {
-    // defaults
-    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractForm, true);
     setFormatSource(true);
   }
 
@@ -76,15 +73,17 @@ public class FormNewOperation implements IOperation {
     if (getClientBundle() == null) {
       throw new IllegalArgumentException("client boundle missing.");
     }
-    if (StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
-      ScoutSdk.logWarning("Create a form '" + getTypeName() + "' without a super type.");
-    }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS), getClientBundle());
-    newOp.setSuperTypeSignature(getSuperTypeSignature());
+    if (getSuperTypeSignature() != null) {
+      newOp.setSuperTypeSignature(getSuperTypeSignature());
+    }
+    else {
+      newOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, getClientBundle().getJavaProject()));
+    }
     if (!StringUtility.isNullOrEmpty(getFormDataSignature())) {
       FormDataAnnotationCreateOperation annotOp = new FormDataAnnotationCreateOperation(null);
       annotOp.setSdkCommand(SdkCommand.CREATE);
@@ -98,7 +97,7 @@ public class FormNewOperation implements IOperation {
     // create constructor
     ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(getCreatedFormType(), false);
     constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+    constructorOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     constructorOp.setSimpleBody("  super();");
     constructorOp.validate();
     constructorOp.run(monitor, workingCopyManager);
@@ -117,7 +116,7 @@ public class FormNewOperation implements IOperation {
 
     // main box
     FormFieldNewOperation mainBoxOp = new FormFieldNewOperation(getCreatedFormType());
-    mainBoxOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractGroupBox, true));
+    mainBoxOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, getCreatedFormType().getJavaProject()));
     mainBoxOp.setTypeName(SdkProperties.TYPE_NAME_MAIN_BOX);
     mainBoxOp.validate();
     mainBoxOp.run(monitor, workingCopyManager);
@@ -125,7 +124,7 @@ public class FormNewOperation implements IOperation {
     // buttons
     if (isCreateButtonOk()) {
       ButtonFieldNewOperation okOp = new ButtonFieldNewOperation(m_createdMainBox, false);
-      okOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractOkButton, true));
+      okOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOkButton, getCreatedFormType().getJavaProject()));
       okOp.setTypeName("OkButton");
       okOp.validate();
       okOp.run(monitor, workingCopyManager);
@@ -133,7 +132,7 @@ public class FormNewOperation implements IOperation {
 
     if (isCreateButtonCancel()) {
       ButtonFieldNewOperation cancelButtonOp = new ButtonFieldNewOperation(m_createdMainBox, false);
-      cancelButtonOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCancelButton, true));
+      cancelButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractCancelButton, getCreatedFormType().getJavaProject()));
       cancelButtonOp.setTypeName("CancelButton");
       cancelButtonOp.validate();
       cancelButtonOp.run(monitor, workingCopyManager);
@@ -175,7 +174,7 @@ public class FormNewOperation implements IOperation {
     return m_superTypeSignature;
   }
 
-  public void setSuperType(String superTypeSignature) {
+  public void setSuperTypeSignature(String superTypeSignature) {
     m_superTypeSignature = superTypeSignature;
   }
 

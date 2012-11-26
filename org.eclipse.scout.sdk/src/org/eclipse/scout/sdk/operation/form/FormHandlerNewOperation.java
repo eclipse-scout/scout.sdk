@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -62,7 +63,7 @@ public class FormHandlerNewOperation implements IOperation {
   public FormHandlerNewOperation(IType declaringType, boolean formatSource) {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
-    m_superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true);
+    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getDeclaringType().getJavaProject());
   }
 
   @Override
@@ -85,7 +86,7 @@ public class FormHandlerNewOperation implements IOperation {
     workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
     // create handler
     InnerTypeNewOperation formHandlerOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType());
-    formHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
+    formHandlerOp.setSuperTypeSignature(getSuperTypeSignature());
     formHandlerOp.setTypeModifiers(Flags.AccPublic);
     formHandlerOp.setSibling(m_sibling);
     formHandlerOp.validate();
@@ -110,7 +111,7 @@ public class FormHandlerNewOperation implements IOperation {
           protected String createMethodBody(IImportValidator validator) throws JavaModelException {
             StringBuilder source = new StringBuilder();
             source.append("startInternal(new ");
-            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getCreatedHandler().getFullyQualifiedName(), true), validator));
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCreatedHandler().getFullyQualifiedName()), validator));
             source.append("());");
             return source.toString();
           }
@@ -125,14 +126,14 @@ public class FormHandlerNewOperation implements IOperation {
           protected String createMethodBody(IImportValidator validator) throws JavaModelException {
             StringBuilder source = new StringBuilder();
             source.append("startInternal(new ");
-            source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getCreatedHandler().getFullyQualifiedName(), true), validator));
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCreatedHandler().getFullyQualifiedName()), validator));
             source.append("());");
             return source.toString();
           }
         };
         startMethodOp.setFormatSource(true);
         startMethodOp.setReturnTypeSignature(Signature.SIG_VOID);
-        startMethodOp.addExceptionSignature(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+        startMethodOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
         startMethodOp.setSibling(getStartMethodSibling());
 
         startMethodOp.validate();

@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.LookupServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -64,7 +65,7 @@ public class LookupCallNewOperation implements IOperation {
         serviceOp.setServiceName(namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
         serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
         serviceOp.setServiceInterfaceName("I" + namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
-        serviceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.ILookupService, true));
+        serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
         serviceOp.setServiceSuperTypeSignature(getServiceSuperTypeSignature());
         serviceOp.addServiceRegistrationBundle(getImplementationRegistrationBundle());
         serviceOp.validate();
@@ -74,7 +75,7 @@ public class LookupCallNewOperation implements IOperation {
     }
     // lookup call
     ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP), getBundle());
-    lookupCallOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.LookupCall, true));
+    lookupCallOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.LookupCall));
     lookupCallOp.validate();
     lookupCallOp.run(monitor, workingCopyManager);
     m_outLookupCall = lookupCallOp.getCreatedType();
@@ -89,7 +90,7 @@ public class LookupCallNewOperation implements IOperation {
       MethodOverrideOperation lookupServiceMethodOp = new MethodOverrideOperation(m_outLookupCall, "getConfiguredService", false) {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String serviceTypeRef = validator.getTypeName(Signature.createTypeSignature(finalService.getFullyQualifiedName(), true));
+          String serviceTypeRef = validator.getTypeName(SignatureCache.createTypeSignature(finalService.getFullyQualifiedName()));
           return "  return " + serviceTypeRef + ".class;";
         }
       };

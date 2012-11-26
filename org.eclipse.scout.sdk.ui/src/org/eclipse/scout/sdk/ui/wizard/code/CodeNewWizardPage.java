@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.ui.internal.fields.code.CodeIdField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -55,7 +56,6 @@ import org.eclipse.swt.widgets.Composite;
 public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
-  final IType abstractCode = TypeUtility.getType(RuntimeClasses.AbstractCode);
 
   private String m_nextCodeId;
   private String m_nextCodeIdSource;
@@ -81,8 +81,8 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewCode"));
     setDescription(Texts.get("CreateANewCode"));
     m_declaringType = declaringType;
-    m_superType = abstractCode;
-    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
+    m_superType = RuntimeClasses.getSuperType(RuntimeClasses.ICode, m_declaringType.getJavaProject());
+    m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -217,10 +217,10 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     if (superTypeProp != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
+        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
       }
       else {
-        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true);
+        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName());
       }
       op.setSuperTypeSignature(sig);
     }

@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -51,8 +52,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType abstractFormField = TypeUtility.getType(RuntimeClasses.AbstractFormField);
-  final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -68,12 +68,14 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
+  private final IType m_abstractFormField;
   private IType m_createdField;
 
   public DefaultFormFieldNewWizardPage(IType declaringType) {
     super(DefaultFormFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
-    m_superType = abstractFormField;
+    m_abstractFormField = RuntimeClasses.getSuperType(RuntimeClasses.IFormField, m_declaringType.getJavaProject());
+    m_superType = m_abstractFormField;
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -115,7 +117,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iFormField, m_declaringType.getJavaProject(), abstractFormField));
+        new JavaElementAbstractTypeContentProvider(iFormField, m_declaringType.getJavaProject(), m_abstractFormField));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -177,10 +179,10 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
       }
       else {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true);
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName());
       }
       operation.setSuperTypeSignature(sig);
     }

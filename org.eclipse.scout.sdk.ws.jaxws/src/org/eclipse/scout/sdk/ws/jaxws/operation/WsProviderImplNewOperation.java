@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -64,7 +65,7 @@ public class WsProviderImplNewOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutTypeNewOperation implNewTypeOp = new ScoutTypeNewOperation(m_typeName, m_packageName, m_bundle);
     if (TypeUtility.exists(m_portTypeInterfaceType)) {
-      implNewTypeOp.addInterfaceSignature(Signature.createTypeSignature(m_portTypeInterfaceType.getFullyQualifiedName(), true));
+      implNewTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(m_portTypeInterfaceType.getFullyQualifiedName()));
     }
     else {
       JaxWsSdk.logError("Could not link webservice provider to port type as port type could not be found");
@@ -82,7 +83,7 @@ public class WsProviderImplNewOperation implements IOperation {
         String[] paramNames = method.getParameterNames();
         op.setParameterNames(paramNames);
         op.setParameterSignatures(SignatureUtility.getMethodParameterSignatureResolved(method, m_portTypeInterfaceType));
-        op.addAnnotation(new AnnotationCreateOperation(null, Signature.createTypeSignature(Override.class.getName(), true)));
+        op.addAnnotation(new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(Override.class.getName())));
         op.run(monitor, workingCopyManager);
 
         JavaElementFormatOperation wellFormOp = new JavaElementFormatOperation(op.getCreatedMethod(), true);
@@ -153,7 +154,7 @@ public class WsProviderImplNewOperation implements IOperation {
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
       ScoutTypeNewOperation newTypeOp = new ScoutTypeNewOperation(typeName, packageName, m_bundle);
-      newTypeOp.addInterfaceSignature(Signature.createTypeSignature(interfaceType.getFullyQualifiedName(), true));
+      newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();
       workingCopyManager.register(type.getCompilationUnit(), monitor);

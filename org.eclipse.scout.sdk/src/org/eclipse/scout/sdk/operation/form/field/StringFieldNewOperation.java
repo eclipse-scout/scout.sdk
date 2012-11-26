@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -44,8 +43,7 @@ public class StringFieldNewOperation implements IOperation {
   public StringFieldNewOperation(IType declaringType, boolean formatSource) {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
-    // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractStringField, true));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringField, m_declaringType.getJavaProject()));
   }
 
   @Override

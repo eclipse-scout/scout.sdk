@@ -201,7 +201,6 @@ public class ProposalTextField extends TextField {
 
   public void removeProposalAdapterListener(IProposalAdapterListener listener) {
     m_eventListeners.remove(IProposalAdapterListener.class, listener);
-
   }
 
   @Override

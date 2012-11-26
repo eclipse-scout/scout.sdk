@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -51,9 +51,10 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
 
   public SmtpServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewSmtpService"));
+    IType smtpServiceType = RuntimeClasses.getSuperType(RuntimeClasses.ISMTPService, serverBundle.getJavaProject());
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSmtpService"), Texts.get("CreateANewSMTPService"), TypeUtility.getType(RuntimeClasses.ISMTPService), SdkProperties.SUFFIX_SMTP_SERVICE);
-    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.AbstractSMTPService));
+    m_serviceNewWizardPage.setSuperType(smtpServiceType);
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -66,7 +67,7 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.AbstractSMTPService));
+    m_serviceNewWizardPage.setSuperType(smtpServiceType);
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
@@ -85,10 +86,10 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
-    m_operation.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.ISMTPService, true));
+    m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ISMTPService));
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
-      m_operation.setServiceSuperTypeSignature(Signature.createTypeSignature(superType.getFullyQualifiedName(), true));
+      m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
@@ -100,7 +101,7 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
     for (IScoutBundle sb : serverRegBundles) {
       m_operation.addServiceRegistrationBundle(sb);
     }
-    m_operation.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.ISMTPService, true));
+    m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ISMTPService));
     return true;
   }
 

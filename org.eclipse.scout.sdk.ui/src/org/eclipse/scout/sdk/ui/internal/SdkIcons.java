@@ -308,9 +308,6 @@ public interface SdkIcons {
   String MailField = FormField; // TODO
   String MailFieldAdd = ToolAdd; // TODO
   String MailFieldRemove = ToolRemove; // TODO
-  String MatrixField = FormField; // TODO
-  String MatrixFieldAdd = ToolAdd; // TODO
-  String MatrixFieldRemove = ToolRemove; // TODO
   String PlannerField = FormField; // TODO
   String PlannerFieldAdd = ToolAdd; // TODO
   String PlannerFieldRemove = ToolRemove; // TODO

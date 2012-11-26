@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.operation.template.sequencebox;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -34,7 +33,7 @@ public class LongFromToTemplate implements IContentTemplate {
   public void apply(IType type, IWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
     monitor.beginTask("apply " + getName() + " template.", IProgressMonitor.UNKNOWN);
 
-    String superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractLongField, true);
+    String superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ILongField, type.getJavaProject());
 
     String parentName = type.getElementName();
     int lastBoxIndex = parentName.lastIndexOf(SdkProperties.SUFFIX_BOX);

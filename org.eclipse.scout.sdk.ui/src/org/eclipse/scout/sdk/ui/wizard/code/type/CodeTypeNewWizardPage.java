@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.fields.code.CodeIdField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -48,14 +49,14 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
-  final IType abstractCodeType = TypeUtility.getType(RuntimeClasses.AbstractCodeType);
+  private final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
 
   private String m_nextCodeId;
   private String m_nextCodeIdSource;
   private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
+  private IType m_defaultCodeType;
   private String m_genericSignature;
 
   private CodeIdField m_nextCodeIdField;
@@ -73,8 +74,9 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewCodeType"));
     setDescription(Texts.get("CreateANewCodeType"));
-    m_superType = abstractCodeType;
-    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
+    m_defaultCodeType = RuntimeClasses.getSuperType(RuntimeClasses.ICodeType, m_sharedBundle.getJavaProject());
+    m_superType = m_defaultCodeType;
+    m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
   }
 
   @Override
@@ -127,7 +129,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iCodeType, getSharedBundle().getJavaProject(), abstractCodeType));
+        new JavaElementAbstractTypeContentProvider(iCodeType, getSharedBundle().getJavaProject(), m_defaultCodeType));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -191,10 +193,10 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     if (superTypeProp != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
+        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
       }
       else {
-        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true);
+        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName());
       }
       op.setSuperTypeSignature(sig);
     }

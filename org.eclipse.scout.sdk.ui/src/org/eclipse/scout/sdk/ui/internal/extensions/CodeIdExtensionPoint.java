@@ -18,11 +18,11 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.ui.extensions.ICodeIdParser;
 import org.eclipse.scout.sdk.ui.extensions.ICodeIdProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 public final class CodeIdExtensionPoint {
@@ -102,7 +102,7 @@ public final class CodeIdExtensionPoint {
             IConfigurationElement parserElememt = codeIdElements[i];
             if (CODE_ID_PARSER_EXT_NAME.equals(parserElememt.getName())) {
               String className = parserElememt.getAttribute(ATTRIB_CLASS);
-              String genericTypeSignature = Signature.createTypeSignature(parserElememt.getAttribute(ATTRIB_GENERIC_TYPE), true);
+              String genericTypeSignature = SignatureCache.createTypeSignature(parserElememt.getAttribute(ATTRIB_GENERIC_TYPE));
               int prio = getPriority(parserElememt);
               ScoutSdkUi.logInfo("found code id parser: " + className);
 

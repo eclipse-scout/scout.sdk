@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -23,11 +25,13 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.resources.ObservablePreferences;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.IScoutElement;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.osgi.service.prefs.Preferences;
 
 public class ScoutProject implements IScoutProject {
 
@@ -39,6 +43,7 @@ public class ScoutProject implements IScoutProject {
   private IIconProvider m_iconProvider;
   private final ScoutWorkspace m_scoutWorkspace;
   private boolean m_docsNlsProjectInitialized;
+  private ObservablePreferences m_projectPreferences;
 
   public ScoutProject(String projectName, ScoutWorkspace scoutWorkspace) {
     m_projectName = projectName;
@@ -279,15 +284,15 @@ public class ScoutProject implements IScoutProject {
       m_iconProvider = new ScoutProjectIcons(this);
     }
     return m_iconProvider;
-
-//    if (m_iconProvider == null && getSharedBundle() != null) {
-//      IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
-//      ICachedTypeHierarchy iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
-//      IType[] allIconTypes = iconsHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getClassesInProject(getSharedBundle().getJavaProject()), null);
-//      if (allIconTypes != null && allIconTypes.length > 0) {
-//      }
-//    }
-//    return m_iconProvider;
   }
 
+  @Override
+  public synchronized ObservablePreferences getPreferences() {
+    if (m_projectPreferences == null) {
+      IScopeContext prefScope = new ProjectScope(getSharedBundle().getProject());
+      Preferences prefs = prefScope.getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
+      m_projectPreferences = new ObservablePreferences(prefs);
+    }
+    return m_projectPreferences;
+  }
 }

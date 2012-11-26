@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -46,7 +45,7 @@ public class SequenceBoxNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSequenceBox, true));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ISequenceBox, getDeclaringType().getJavaProject()));
   }
 
   @Override

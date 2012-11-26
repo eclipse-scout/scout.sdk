@@ -153,7 +153,7 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
   }
 
   private IType[] getSwingEnvironments(IScoutBundle bundle) {
-    IType baseType = TypeUtility.getType(RuntimeClasses.AbstractSwingEnvironment);
+    IType baseType = TypeUtility.getType(RuntimeClasses.ISwingEnvironment);
     if (TypeUtility.exists(baseType)) {
       IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(baseType);
       return hierarchy.getAllSubtypes(baseType, TypeFilters.getClassesInProject(bundle.getJavaProject()));

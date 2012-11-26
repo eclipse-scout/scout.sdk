@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.ui.wizard.menu;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -67,7 +67,7 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
     m_operation.setTypeName(m_page1.getTypeName());
     IType superTypeProp = m_page1.getSuperType();
     if (superTypeProp != null) {
-      String signature = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true);
+      String signature = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName());
       m_operation.setSuperTypeSignature(signature);
     }
     if (m_page1.getSibling() == SiblingProposal.SIBLING_END) {

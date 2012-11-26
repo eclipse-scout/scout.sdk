@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -33,8 +32,8 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -50,8 +49,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType abstractRadioButton = TypeUtility.getType(RuntimeClasses.AbstractRadioButton);
-
   private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
@@ -64,6 +61,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
+  private final IType m_abstractRadioButton;
   private IType m_createdRadioButton;
 
   public RadioButtonNewWizardPage(IType declaringType) {
@@ -73,11 +71,8 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    IType superType = getSuperType();
-    if (superType == null) {
-      superType = abstractRadioButton;
-    }
-    m_superType = superType;
+    m_abstractRadioButton = RuntimeClasses.getSuperType(RuntimeClasses.AbstractRadioButton, m_declaringType.getJavaProject());
+    m_superType = m_abstractRadioButton;
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -117,7 +112,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(abstractRadioButton, m_declaringType.getJavaProject(), abstractRadioButton));
+        new JavaElementAbstractTypeContentProvider(m_abstractRadioButton, m_declaringType.getJavaProject(), m_abstractRadioButton));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -155,7 +150,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      op.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
     SiblingProposal siblingProposal = getSibling();
     if (siblingProposal == SiblingProposal.SIBLING_END) {

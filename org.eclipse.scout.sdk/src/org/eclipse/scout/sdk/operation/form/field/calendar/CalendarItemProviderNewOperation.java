@@ -15,13 +15,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -63,9 +63,9 @@ public class CalendarItemProviderNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
-    tableNewOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCalendarItemProvider, true));
+    tableNewOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendarItemProvider, getDeclaringType().getJavaProject()));
     tableNewOp.addTypeModifier(Flags.AccPublic);
-    AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));
+    AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     orderAnnotOp.addParameter("10.0");
     tableNewOp.addAnnotation(orderAnnotOp);
     tableNewOp.validate();

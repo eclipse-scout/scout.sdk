@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -46,8 +46,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iWizard = TypeUtility.getType(RuntimeClasses.IWizard);
-  final IType abstractWizard = TypeUtility.getType(RuntimeClasses.AbstractWizard);
+  private final IType iWizard = TypeUtility.getType(RuntimeClasses.IWizard);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -59,13 +58,15 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IScoutBundle m_clientBundle;
+  private final IType m_abstractWizard;
 
   public WizardNewWizardPage(IScoutBundle clientBundle) {
     super(WizardNewWizardPage.class.getName());
     setTitle(Texts.get("NewWizard"));
     setDescription(Texts.get("CreateANewWizard"));
     m_clientBundle = clientBundle;
-    m_superType = abstractWizard;
+    m_abstractWizard = RuntimeClasses.getSuperType(RuntimeClasses.IWizard, clientBundle.getJavaProject());
+    m_superType = m_abstractWizard;
   }
 
   @Override
@@ -103,7 +104,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iWizard, getClientBundle().getJavaProject(), abstractWizard));
+        new JavaElementAbstractTypeContentProvider(iWizard, getClientBundle().getJavaProject(), m_abstractWizard));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -133,7 +134,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     m_operation.setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      m_operation.setSuperTypeSignature(Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true));
+      m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
 
     m_operation.run(monitor, workingCopyManager);

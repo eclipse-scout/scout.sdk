@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -51,11 +52,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iListBox = TypeUtility.getType(RuntimeClasses.IListBox);
-  final IType abstractListBox = TypeUtility.getType(RuntimeClasses.AbstractListBox);
-
-  final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
-  final IType abstractCodeType = TypeUtility.getType(RuntimeClasses.AbstractCodeType);
+  private final IType iListBox = TypeUtility.getType(RuntimeClasses.IListBox);
+  private final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -80,8 +78,8 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewListBoxField"));
     m_declaringType = declaringType;
     // default
-    m_superType = abstractListBox;
-    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
+    m_superType = RuntimeClasses.getSuperType(RuntimeClasses.IListBox, m_declaringType.getJavaProject());
+    m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -178,10 +176,10 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
       }
       else {
-        sig = Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true);
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName());
       }
       operation.setSuperTypeSignature(sig);
     }

@@ -14,10 +14,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -49,9 +49,9 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
     }
     else {
       IImportValidator validator = new CompilationUnitImportValidator(serviceImplementation.getCompilationUnit());
-      String lookupRowRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.LookupRow, true));
-      String lookupCallRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.LookupCall, true));
-      String processingExceptionRef = validator.getTypeName(Signature.createTypeSignature(RuntimeClasses.ProcessingException, true));
+      String lookupRowRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.LookupRow));
+      String lookupCallRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.LookupCall));
+      String processingExceptionRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
 
       StringBuilder methodSource = new StringBuilder();
       methodSource.append("@Override\n");

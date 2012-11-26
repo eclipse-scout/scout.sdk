@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationsUpdateOperatio
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -89,7 +89,7 @@ public class FormFieldNewOperation implements IOperation {
     // sibling
     createInnerTypeOp.setSibling(getSiblingField());
     createInnerTypeOp.setSuperTypeSignature(getSuperTypeSignature());
-    AnnotationCreateOperation orderAnnotation = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));
+    AnnotationCreateOperation orderAnnotation = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     orderAnnotation.addParameter("" + getOrderNr());
     createInnerTypeOp.addAnnotation(orderAnnotation);
     createInnerTypeOp.validate();

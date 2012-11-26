@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -30,6 +29,7 @@ import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -57,7 +57,7 @@ public class CalendarFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = fomatSource;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCalendarField, true));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendarField, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -95,8 +95,8 @@ public class CalendarFieldNewOperation implements IOperation {
     InnerTypeNewOperation calendarOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR, getCreatedCalendarField());
     calendarOp.setTypeModifiers(Flags.AccPublic);
     calendarOp.setSibling(null);
-    calendarOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractCalendar, true));
-    AnnotationCreateOperation calendarAnnotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));
+    calendarOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendar, getDeclaringType().getJavaProject()));
+    AnnotationCreateOperation calendarAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     calendarAnnotOp.addParameter("10.0");
     calendarOp.addAnnotation(calendarAnnotOp);
     calendarOp.validate();

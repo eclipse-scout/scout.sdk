@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -28,6 +27,7 @@ import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -77,8 +77,6 @@ public class FormStackNewOperation implements IOperation {
 
   public FormStackNewOperation(boolean formatSource) {
     m_formatSource = formatSource;
-    // defaults
-    m_formSuperTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractForm, true);
   }
 
   @Override
@@ -103,10 +101,10 @@ public class FormStackNewOperation implements IOperation {
     String formDataSignature = null;
     if (getFormDataBundle() != null) {
       ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getFormName() + "Data", getFormDataBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), getFormDataBundle());
-      formDataOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormData, true));
+      formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
       m_outFormData = formDataOp.getCreatedType();
-      formDataSignature = Signature.createTypeSignature(m_outFormData.getFullyQualifiedName(), true);
+      formDataSignature = SignatureCache.createTypeSignature(m_outFormData.getFullyQualifiedName());
     }
     // form
     FormNewOperation formOp = new FormNewOperation();
@@ -115,7 +113,9 @@ public class FormStackNewOperation implements IOperation {
     // write back members
     formOp.setNlsEntry(getNlsEntry());
     formOp.setTypeName(getFormName());
-    formOp.setSuperType(getFormSuperTypeSignature());
+    if (getFormSuperTypeSignature() != null) {
+      formOp.setSuperTypeSignature(getFormSuperTypeSignature());
+    }
     formOp.setFormDataSignature(formDataSignature);
 
     formOp.setCreateButtonOk(isCreateButtonOk());
@@ -126,7 +126,7 @@ public class FormStackNewOperation implements IOperation {
     m_outMainBox = formOp.getCreatedMainBox();
     m_outForm.getCompilationUnit().reconcile(ICompilationUnit.NO_AST, false, null, monitor);
     if (isCreateIdProperty()) {
-      BeanPropertyNewOperation beanPropOp = new BeanPropertyNewOperation(getOutForm(), getFormIdName(), Signature.createTypeSignature(Long.class.getName(), true), Flags.AccPublic);
+      BeanPropertyNewOperation beanPropOp = new BeanPropertyNewOperation(getOutForm(), getFormIdName(), SignatureCache.createTypeSignature(Long.class.getName()), Flags.AccPublic);
       beanPropOp.setCreateFormDataAnnotation(true);
       beanPropOp.setSiblingMethods(formOp.getCreatedMainBoxGetter());
       beanPropOp.setSiblingField(null);
@@ -178,10 +178,10 @@ public class FormStackNewOperation implements IOperation {
       serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
       serviceOp.setServiceInterfaceName(getServiceInterfaceName());
       serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS));
-      serviceOp.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.IService, true));
+      serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
       serviceOp.setServiceName(getServiceImplementationName());
       serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS));
-      serviceOp.setServiceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractService, true));
+      serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServiceImplementationBundle().getJavaProject()));
       serviceOp.run(monitor, workingCopyManager);
       m_outProcessService = serviceOp.getCreatedServiceImplementation();
       m_outProcessServiceInterface = serviceOp.getCreatedServiceInterface();
@@ -216,10 +216,8 @@ public class FormStackNewOperation implements IOperation {
     // fill form
     if (isCreateModifyHandler()) {
       FormHandlerNewOperation modifyHandlerOp = new FormHandlerNewOperation(getOutForm());
-      modifyHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
-
       modifyHandlerOp.setStartMethodSibling(formOp.getCreatedMainBoxGetter());
-      modifyHandlerOp.setTypeName("Modify" + SdkProperties.SUFFIX_FORM_HANDLER);
+      modifyHandlerOp.setTypeName(SdkProperties.TYPE_NAME_MODIFY_HANDLER);
       modifyHandlerOp.run(monitor, workingCopyManager);
       m_outNewHandler = modifyHandlerOp.getCreatedHandler();
       if (getOutProcessServiceInterface() != null) {
@@ -237,10 +235,8 @@ public class FormStackNewOperation implements IOperation {
     // fill form
     if (isCreateNewHandler()) {
       FormHandlerNewOperation newHandlerOp = new FormHandlerNewOperation(getOutForm());
-
-      newHandlerOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractFormHandler, true));
       newHandlerOp.setStartMethodSibling(formOp.getCreatedMainBoxGetter());
-      newHandlerOp.setTypeName("New" + SdkProperties.SUFFIX_FORM_HANDLER);
+      newHandlerOp.setTypeName(SdkProperties.TYPE_NAME_NEW_HANDLER);
       newHandlerOp.run(monitor, workingCopyManager);
       m_outNewHandler = newHandlerOp.getCreatedHandler();
       NewHandlerCreateMethodsOperation fillOp = new NewHandlerCreateMethodsOperation();

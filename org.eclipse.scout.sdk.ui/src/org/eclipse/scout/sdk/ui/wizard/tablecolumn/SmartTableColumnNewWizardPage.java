@@ -40,6 +40,7 @@ import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -89,7 +90,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewSmartTableColumn"));
     m_declaringType = declaringType;
     // default values
-    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
+    m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
     m_continueOperation = op;
   }
@@ -258,10 +259,10 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     if (superType != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(superType.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
+        sig = SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
       }
       else {
-        sig = Signature.createTypeSignature(superType.getFullyQualifiedName(), true);
+        sig = SignatureCache.createTypeSignature(superType.getFullyQualifiedName());
       }
       operation.setSuperTypeSignature(sig);
     }

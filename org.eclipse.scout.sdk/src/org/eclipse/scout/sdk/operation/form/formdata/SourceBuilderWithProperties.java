@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -69,7 +70,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
               TypeSourceBuilder propertyBuilder = new TypeSourceBuilder(NL);
               propertyBuilder.setElementName(propName);
 
-              String superTypeSig = Signature.createTypeSignature(RuntimeClasses.AbstractPropertyData, true);
+              String superTypeSig = SignatureCache.createTypeSignature(RuntimeClasses.AbstractPropertyData);
               superTypeSig = superTypeSig.replaceAll("\\;$", "<" + unboxedSignature + ">;");
               propertyBuilder.setSuperTypeSignature(superTypeSig);
               addBuilder(propertyBuilder, CATEGORY_TYPE_PROPERTY);

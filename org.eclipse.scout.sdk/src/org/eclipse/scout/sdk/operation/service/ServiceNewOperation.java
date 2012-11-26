@@ -21,13 +21,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -112,9 +112,9 @@ public class ServiceNewOperation implements IOperation {
       }
     }
     if (getImplementationBundle() != null) {
-      String intSig = Signature.createTypeSignature(RuntimeClasses.IService2, true);
+      String intSig = SignatureCache.createTypeSignature(RuntimeClasses.IService2);
       if (getCreatedServiceInterface() != null) {
-        intSig = Signature.createTypeSignature(getCreatedServiceInterface().getFullyQualifiedName(), true);
+        intSig = SignatureCache.createTypeSignature(getCreatedServiceInterface().getFullyQualifiedName());
       }
       ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getServiceName(), getServicePackageName(), getImplementationBundle());
       newOp.setSuperTypeSignature(getServiceSuperTypeSignature());

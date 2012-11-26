@@ -15,10 +15,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -53,7 +53,7 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String outlineRef = validator.getTypeName(Signature.createTypeSignature(getOutlineType().getFullyQualifiedName(), true));
+          String outlineRef = validator.getTypeName(SignatureCache.createTypeSignature(getOutlineType().getFullyQualifiedName()));
           sourceBuilder.append("super(Desktop.this, " + outlineRef + ".class);");
           return sourceBuilder.toString();
         }

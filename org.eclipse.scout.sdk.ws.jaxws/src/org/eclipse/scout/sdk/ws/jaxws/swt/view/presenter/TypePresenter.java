@@ -40,6 +40,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 import org.eclipse.scout.sdk.util.ScoutSeverityManager;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -215,7 +216,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
   public void setInterfaceTypes(IType[] interfaceTypes) {
     List<String> signatures = new ArrayList<String>();
     for (IType type : interfaceTypes) {
-      signatures.add(Signature.createTypeSignature(type.getFullyQualifiedName(), true));
+      signatures.add(SignatureCache.createTypeSignature(type.getFullyQualifiedName()));
     }
     setInterfaceSignatures(signatures.toArray(new String[signatures.size()]));
   }

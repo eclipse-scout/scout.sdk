@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -27,6 +26,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -88,7 +88,7 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
     operation.setTypeName(getTypeName());
     FormHandlerNewWizardPage1 previousPage = (FormHandlerNewWizardPage1) getWizard().getPreviousPage(this);
     if (previousPage.getSelectedSuperType() != null) {
-      operation.setSuperTypeSignature(Signature.createTypeSignature(previousPage.getSelectedSuperType().getFullyQualifiedName(), true));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(previousPage.getSelectedSuperType().getFullyQualifiedName()));
     }
 
     IStructuredType structuredType = ScoutTypeUtility.createStructuredForm(m_declaringType);

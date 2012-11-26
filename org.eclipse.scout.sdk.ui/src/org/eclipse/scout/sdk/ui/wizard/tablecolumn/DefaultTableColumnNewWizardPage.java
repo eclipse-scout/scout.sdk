@@ -39,6 +39,7 @@ import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -78,7 +79,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     setTitle(Texts.get("NewTableColumn"));
     setDescription(Texts.get("CreateANewTableColumn"));
     // default values
-    m_genericSignature = Signature.createTypeSignature(Long.class.getName(), true);
+    m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_declaringType = declaringType;
     m_sibling = SiblingProposal.SIBLING_END;
     m_continueOperation = op;
@@ -201,10 +202,10 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     if (superTypeProp != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">", true);
+        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
       }
       else {
-        sig = Signature.createTypeSignature(superTypeProp.getFullyQualifiedName(), true);
+        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName());
       }
       operation.setSuperTypeSignature(sig);
     }
@@ -276,7 +277,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     try {
       setStateChanging(true);
       if (TypeUtility.isGenericType(getSuperType())) {
-        setGenericSignature(Signature.createTypeSignature(Long.class.getName(), true));
+        setGenericSignature(SignatureCache.createTypeSignature(Long.class.getName()));
       }
       else {
         setGenericSignature(null);

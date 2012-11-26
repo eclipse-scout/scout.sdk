@@ -15,6 +15,7 @@ import java.util.HashMap;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -112,16 +113,24 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     });
 
     HashMap<String, P_BCTypeTemplate> templates = new HashMap<String, P_BCTypeTemplate>();
-    templates.put(RuntimeClasses.AbstractStringColumn, new P_BCTypeTemplate(Texts.get("StringColumn"), TypeUtility.getType(RuntimeClasses.AbstractStringColumn)));
-    templates.put(RuntimeClasses.AbstractBooleanColumn, new P_BCTypeTemplate(Texts.get("BooleanColumn"), TypeUtility.getType(RuntimeClasses.AbstractBooleanColumn)));
-    templates.put(RuntimeClasses.AbstractDateColumn, new P_BCTypeTemplate(Texts.get("DateColumn"), TypeUtility.getType(RuntimeClasses.AbstractDateColumn)));
-    templates.put(RuntimeClasses.AbstractDoubleColumn, new P_BCTypeTemplate(Texts.get("DoubleColumn"), TypeUtility.getType(RuntimeClasses.AbstractDoubleColumn)));
-    templates.put(RuntimeClasses.AbstractIntegerColumn, new P_BCTypeTemplate(Texts.get("IntegerColumn"), TypeUtility.getType(RuntimeClasses.AbstractIntegerColumn)));
-    templates.put(RuntimeClasses.AbstractLongColumn, new P_BCTypeTemplate(Texts.get("LongColumn"), TypeUtility.getType(RuntimeClasses.AbstractLongColumn)));
-    templates.put(RuntimeClasses.AbstractSmartColumn, new P_BCTypeTemplate(Texts.get("SmartColumn"), TypeUtility.getType(RuntimeClasses.AbstractSmartColumn)));
+    IJavaProject javaProject = m_declaringType.getJavaProject();
+    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IStringColumn, javaProject),
+        new P_BCTypeTemplate(Texts.get("StringColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IStringColumn, javaProject)));
+    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IBooleanColumn, javaProject),
+        new P_BCTypeTemplate(Texts.get("BooleanColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IBooleanColumn, javaProject)));
+    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IDateColumn, javaProject),
+        new P_BCTypeTemplate(Texts.get("DateColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IDateColumn, javaProject)));
+    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IDoubleColumn, javaProject),
+        new P_BCTypeTemplate(Texts.get("DoubleColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IDoubleColumn, javaProject)));
+    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IIntegerColumn, javaProject),
+        new P_BCTypeTemplate(Texts.get("IntegerColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IIntegerColumn, javaProject)));
+    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.ILongColumn, javaProject),
+        new P_BCTypeTemplate(Texts.get("LongColumn"), RuntimeClasses.getSuperType(RuntimeClasses.ILongColumn, javaProject)));
+    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.ISmartColumn, javaProject),
+        new P_BCTypeTemplate(Texts.get("SmartColumn"), RuntimeClasses.getSuperType(RuntimeClasses.ISmartColumn, javaProject)));
 
     ITypeHierarchy columnHierarchy = TypeUtility.getPrimaryTypeHierarchy(iColumn);
-    for (IType t : columnHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()))) {
+    for (IType t : columnHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(javaProject))) {
       if (!templates.containsKey(t.getFullyQualifiedName())) {
         templates.put(t.getFullyQualifiedName(), new P_BCTypeTemplate(null, t));
       }

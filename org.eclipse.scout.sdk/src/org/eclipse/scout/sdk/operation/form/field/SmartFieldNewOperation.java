@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -24,6 +23,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -52,7 +52,8 @@ public class SmartFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractSmartField + "<" + Long.class.getName() + ">", true));
+    String superTypeName = RuntimeClasses.getSuperTypeName(RuntimeClasses.ISmartField, getDeclaringType().getJavaProject());
+    setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName + "<" + Long.class.getName() + ">"));
   }
 
   @Override
@@ -93,12 +94,12 @@ public class SmartFieldNewOperation implements IOperation {
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder source = new StringBuilder();
           source.append("return ");
-          source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getCodeType().getFullyQualifiedName(), true), validator));
+          source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCodeType().getFullyQualifiedName()), validator));
           source.append(".class;");
           return source.toString();
         }
       };
-      codetypeOp.setGenericWildcardReplacement(Signature.createTypeSignature("?", true));
+      codetypeOp.setGenericWildcardReplacement(SignatureCache.createTypeSignature("?"));
       codetypeOp.validate();
       codetypeOp.run(monitor, workingCopyManager);
 
@@ -108,7 +109,7 @@ public class SmartFieldNewOperation implements IOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String lookupCallRef = validator.getTypeName(Signature.createTypeSignature(getLookupCall().getFullyQualifiedName(), true));
+          String lookupCallRef = validator.getTypeName(SignatureCache.createTypeSignature(getLookupCall().getFullyQualifiedName()));
           sourceBuilder.append("return " + lookupCallRef + ".class;\n");
           return sourceBuilder.toString();
         }

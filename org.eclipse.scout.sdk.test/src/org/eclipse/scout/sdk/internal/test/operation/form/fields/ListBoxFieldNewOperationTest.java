@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.internal.test.operation.form.fields;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.form.field.ListBoxFieldNewOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class ListBoxFieldNewOperationTest extends AbstractFieldNewOperationTest 
     m_operation = new ListBoxFieldNewOperation(declaringType);
     m_operation.setFormatSource(true);
     m_operation.setTypeName("TestListboxField");
-    m_operation.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox<java.lang.Long>", true));
+    m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox<java.lang.Long>"));
     m_operation.setCodeType(getTestCodeType());
     m_operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     return m_operation;

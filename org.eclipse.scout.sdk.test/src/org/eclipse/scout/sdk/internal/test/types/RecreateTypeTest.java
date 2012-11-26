@@ -8,7 +8,6 @@ import junit.framework.Assert;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -63,7 +62,7 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
     // create new MyAbstractFormField
     ScoutTypeNewOperation op = new ScoutTypeNewOperation(typeName, packageName, bundle);
     op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
-    op.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractStringField, true));
+    op.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringField, bundle.getJavaProject()));
     OperationJob job = new OperationJob(op);
     job.schedule();
     job.join();

@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -58,7 +58,7 @@ public class OrderAnnotationsUpdateOperation implements IOperation {
     IImportValidator validator = new CompilationUnitImportValidator(getDeclaringType().getCompilationUnit());
     for (OrderAnnotation orderAnnotation : m_orderAnnotations.values()) {
       if (orderAnnotation.getType() != null) {
-        String orderSignature = Signature.createTypeSignature(RuntimeClasses.Order, true);
+        String orderSignature = SignatureCache.createTypeSignature(RuntimeClasses.Order);
         AnnotationCreateOperation op = new AnnotationCreateOperation(orderAnnotation.getType(), orderSignature);
         op.addParameter("" + orderAnnotation.getOrderNr());
         TextEdit edit = op.createEdit(validator, sourceDoc.getDefaultLineDelimiter());

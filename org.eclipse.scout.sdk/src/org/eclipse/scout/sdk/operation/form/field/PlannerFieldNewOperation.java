@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -31,6 +30,7 @@ import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -55,7 +55,7 @@ public class PlannerFieldNewOperation implements IOperation {
   public PlannerFieldNewOperation(IType declaringType) {
     m_declaringType = declaringType;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractPlannerField, true));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IPlannerField, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -116,8 +116,8 @@ public class PlannerFieldNewOperation implements IOperation {
     InnerTypeNewOperation plannerTableOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE, getCreatedField(), false);
     plannerTableOp.setTypeModifiers(Flags.AccPublic);
     plannerTableOp.setSibling(null);
-    plannerTableOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTable, true));
-    AnnotationCreateOperation calendarAnnotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));
+    plannerTableOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
+    AnnotationCreateOperation calendarAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     calendarAnnotOp.addParameter("10.0");
     plannerTableOp.addAnnotation(calendarAnnotOp);
     plannerTableOp.validate();
@@ -139,8 +139,8 @@ public class PlannerFieldNewOperation implements IOperation {
     InnerTypeNewOperation activityMapOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP, getCreatedField(), false);
     activityMapOp.setTypeModifiers(Flags.AccPublic);
     activityMapOp.setSibling(null);
-    activityMapOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractActivityMap, true));
-    AnnotationCreateOperation activityMapOrderOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));
+    activityMapOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IActivityMap, getDeclaringType().getJavaProject()));
+    AnnotationCreateOperation activityMapOrderOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     activityMapOrderOp.addParameter("10.0");
     activityMapOp.addAnnotation(activityMapOrderOp);
     activityMapOp.validate();

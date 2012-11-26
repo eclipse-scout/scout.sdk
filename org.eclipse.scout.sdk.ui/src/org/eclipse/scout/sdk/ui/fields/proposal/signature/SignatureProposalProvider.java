@@ -41,6 +41,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 
 public class SignatureProposalProvider extends ContentProposalProvider {
 
@@ -55,26 +56,26 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       Signature.SIG_SHORT};
 
   public static final String[] DEFAULT_MOST_USED = new String[]{
-      Signature.createTypeSignature(ArrayList.class.getName(), true),
-      Signature.createTypeSignature(java.lang.Boolean.class.getName(), true),
-      Signature.createTypeSignature(Collection.class.getName(), true),
-      Signature.createTypeSignature(Date.class.getName(), true),
-      Signature.createTypeSignature(Double.class.getName(), true),
-      Signature.createTypeSignature(java.util.Enumeration.class.getName(), true),
-      Signature.createTypeSignature(java.lang.Float.class.getName(), true),
-      Signature.createTypeSignature(HashMap.class.getName(), true),
-      Signature.createTypeSignature(Integer.class.getName(), true),
-      Signature.createTypeSignature(List.class.getName(), true),
-      Signature.createTypeSignature(Long.class.getName(), true),
-      Signature.createTypeSignature(Map.class.getName(), true),
-      Signature.createTypeSignature(java.lang.Number.class.getName(), true),
-      Signature.createTypeSignature(Object.class.getName(), true),
-      Signature.createTypeSignature(java.lang.Runnable.class.getName(), true),
-      Signature.createTypeSignature(Set.class.getName(), true),
-      Signature.createTypeSignature(String.class.getName(), true),
-      Signature.createTypeSignature(TreeMap.class.getName(), true),
-      Signature.createTypeSignature(TreeSet.class.getName(), true),
-      Signature.createTypeSignature(java.util.Vector.class.getName(), true)
+      SignatureCache.createTypeSignature(ArrayList.class.getName()),
+      SignatureCache.createTypeSignature(java.lang.Boolean.class.getName()),
+      SignatureCache.createTypeSignature(Collection.class.getName()),
+      SignatureCache.createTypeSignature(Date.class.getName()),
+      SignatureCache.createTypeSignature(Double.class.getName()),
+      SignatureCache.createTypeSignature(java.util.Enumeration.class.getName()),
+      SignatureCache.createTypeSignature(java.lang.Float.class.getName()),
+      SignatureCache.createTypeSignature(HashMap.class.getName()),
+      SignatureCache.createTypeSignature(Integer.class.getName()),
+      SignatureCache.createTypeSignature(List.class.getName()),
+      SignatureCache.createTypeSignature(Long.class.getName()),
+      SignatureCache.createTypeSignature(Map.class.getName()),
+      SignatureCache.createTypeSignature(java.lang.Number.class.getName()),
+      SignatureCache.createTypeSignature(Object.class.getName()),
+      SignatureCache.createTypeSignature(java.lang.Runnable.class.getName()),
+      SignatureCache.createTypeSignature(Set.class.getName()),
+      SignatureCache.createTypeSignature(String.class.getName()),
+      SignatureCache.createTypeSignature(TreeMap.class.getName()),
+      SignatureCache.createTypeSignature(TreeSet.class.getName()),
+      SignatureCache.createTypeSignature(java.util.Vector.class.getName())
   };
 
   private SearchEngine m_searchEngine;
@@ -219,7 +220,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
         if (!m_supportsGenerics && (type.getTypeParameters().length > 0)) {
           return;
         }
-        m_foundTypes.put(new CompositeObject("A", type.getElementName(), type.getFullyQualifiedName()), Signature.createTypeSignature(type.getFullyQualifiedName(), true));
+        m_foundTypes.put(new CompositeObject("A", type.getElementName(), type.getFullyQualifiedName()), SignatureCache.createTypeSignature(type.getFullyQualifiedName()));
         if (--m_requestedDecrementCounter <= 0) {
           throw new CoreException(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "stopped after " + getMaxProposalAmount() + ""));
         }

@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -69,7 +69,7 @@ public class OutlineServiceNewWizard extends AbstractWorkspaceWizard {
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.AbstractService));
+    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, serverBundle.getJavaProject()));
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
@@ -107,7 +107,7 @@ public class OutlineServiceNewWizard extends AbstractWorkspaceWizard {
   protected boolean beforeFinish() throws CoreException {
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
-      m_operation.setServiceSuperTypeSignature(Signature.createTypeSignature(superType.getFullyQualifiedName(), true));
+      m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
@@ -129,7 +129,7 @@ public class OutlineServiceNewWizard extends AbstractWorkspaceWizard {
       m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_OUTLINE));
     }
     m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
-    m_operation.setServiceInterfaceSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.IService, true));
+    m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
     return true;
   }
 

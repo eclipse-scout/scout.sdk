@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -73,7 +74,7 @@ public class HandlerNewOperation implements IOperation {
       superTypeSignature = Signature.createTypeSignature(SOAPHandler.class.getName() + "<" + SOAPMessageContext.class.getName() + ">", false);
     }
     else {
-      superTypeSignature = Signature.createTypeSignature(m_superType.getFullyQualifiedName(), true);
+      superTypeSignature = SignatureCache.createTypeSignature(m_superType.getFullyQualifiedName());
     }
     if (m_superType.isInterface()) {
       opType.addInterfaceSignature(superTypeSignature);
@@ -126,7 +127,7 @@ public class HandlerNewOperation implements IOperation {
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
       ScoutTypeNewOperation newTypeOp = new ScoutTypeNewOperation(typeName, packageName, m_bundle);
-      newTypeOp.addInterfaceSignature(Signature.createTypeSignature(interfaceType.getFullyQualifiedName(), true));
+      newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();
       workingCopyManager.register(type.getCompilationUnit(), monitor);

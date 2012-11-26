@@ -66,7 +66,6 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
   // base interface
   private final IType iTextProviderService = TypeUtility.getType(RuntimeClasses.ITextProviderService);
-  private final IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
 
   // properties
   private static final String PROP_TRANSLATION_FOLDER = "translationFolder";
@@ -93,7 +92,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_bundle = bundle;
     m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
-    m_defaultProposal = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+    m_defaultProposal = RuntimeClasses.getSuperType(RuntimeClasses.ITextProviderService, bundle.getJavaProject());
   }
 
   private NlsServiceType[] getTextProviderServicesInSamePlugin() {
@@ -141,7 +140,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     group.setText("Text Provider Service Class");
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, "Super Class",
-        new JavaElementAbstractTypeContentProvider(iTextProviderService, m_bundle.getJavaProject(), abstractDynamicNlsTextProviderService));
+        new JavaElementAbstractTypeContentProvider(iTextProviderService, m_bundle.getJavaProject(), m_defaultProposal));
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {

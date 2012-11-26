@@ -14,9 +14,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -52,7 +52,7 @@ public class SmartTableColumnNewOperation extends TableColumnNewOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String codeTypeRef = validator.getTypeName(Signature.createTypeSignature(getCodeType().getFullyQualifiedName(), true));
+          String codeTypeRef = validator.getTypeName(SignatureCache.createTypeSignature(getCodeType().getFullyQualifiedName()));
           sourceBuilder.append("return " + codeTypeRef + ".class;\n");
           return sourceBuilder.toString();
         }
@@ -65,7 +65,7 @@ public class SmartTableColumnNewOperation extends TableColumnNewOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          String lookupCallRef = validator.getTypeName(Signature.createTypeSignature(getLookupCall().getFullyQualifiedName(), true));
+          String lookupCallRef = validator.getTypeName(SignatureCache.createTypeSignature(getLookupCall().getFullyQualifiedName()));
           sourceBuilder.append("return " + lookupCallRef + ".class;\n");
           return sourceBuilder.toString();
         }

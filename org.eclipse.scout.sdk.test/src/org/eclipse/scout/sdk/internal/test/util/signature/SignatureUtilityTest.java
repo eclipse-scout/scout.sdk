@@ -11,6 +11,7 @@ import junit.framework.Assert;
 
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.FullyQuallifiedValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -25,7 +26,7 @@ import org.junit.Test;
  */
 public class SignatureUtilityTest {
 
-  private static final String LONG_SIGNATURE = Signature.createTypeSignature("java.lang.Long", true);
+  private static final String LONG_SIGNATURE = SignatureCache.createTypeSignature("java.lang.Long");
 
   @Test
   public void testSimpleSignature() throws Exception {
@@ -50,7 +51,7 @@ public class SignatureUtilityTest {
   @Test
   public void testGetSimpleTypeSignature_ArrayOfStringSets() throws Exception {
     SimpleImportValidator importValidator = new SimpleImportValidator();
-    String signature = Signature.createTypeSignature("java.util.Set<java.lang.String>[]", true);
+    String signature = SignatureCache.createTypeSignature("java.util.Set<java.lang.String>[]");
     Assert.assertEquals("Set<String>[]", SignatureUtility.getTypeReference(signature, importValidator));
     List<String> imports = Arrays.asList(importValidator.getImportsToCreate());
     Assert.assertTrue(imports.contains("java.util.Set"));
@@ -73,7 +74,7 @@ public class SignatureUtilityTest {
   @Test
   public void testGetSimpleTypeSignature_3dimArrayOfLongArrayOfObjectListsArrayMapSets() throws Exception {
     SimpleImportValidator importValidator = new SimpleImportValidator();
-    String signature = Signature.createTypeSignature("java.util.Set<java.util.HashMap<java.lang.Long, java.util.List<java.lang.Object>[]>>[][][]", true);
+    String signature = SignatureCache.createTypeSignature("java.util.Set<java.util.HashMap<java.lang.Long, java.util.List<java.lang.Object>[]>>[][][]");
     Assert.assertEquals("Set<HashMap<Long, List<Object>[]>>[][][]", SignatureUtility.getTypeReference(signature, importValidator));
     List<String> imports = Arrays.asList(importValidator.getImportsToCreate());
     Assert.assertTrue(imports.contains("java.util.Set"));

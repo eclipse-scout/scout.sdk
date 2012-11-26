@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -50,7 +51,7 @@ public class ListBoxFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractListBox + "<" + Long.class.getName() + ">", true));
+    setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(RuntimeClasses.IListBox, getDeclaringType().getJavaProject()) + "<" + Long.class.getName() + ">"));
   }
 
   @Override
@@ -90,7 +91,7 @@ public class ListBoxFieldNewOperation implements IOperation {
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder source = new StringBuilder();
           source.append("return ");
-          source.append(SignatureUtility.getTypeReference(Signature.createTypeSignature(getCodeType().getFullyQualifiedName(), true), validator));
+          source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCodeType().getFullyQualifiedName()), validator));
           source.append(".class;");
           return source.toString();
         }

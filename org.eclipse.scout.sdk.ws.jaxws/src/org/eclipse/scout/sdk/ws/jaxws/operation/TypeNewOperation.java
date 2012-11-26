@@ -14,12 +14,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -51,10 +51,10 @@ public class TypeNewOperation implements IOperation {
     ScoutTypeNewOperation opType = new ScoutTypeNewOperation(m_typeName, m_packageName, m_bundle);
 
     if (m_superType != null) {
-      opType.setSuperTypeSignature(Signature.createTypeSignature(m_superType.getFullyQualifiedName(), true));
+      opType.setSuperTypeSignature(SignatureCache.createTypeSignature(m_superType.getFullyQualifiedName()));
     }
     if (m_interfaceType != null) {
-      opType.addInterfaceSignature(Signature.createTypeSignature(m_interfaceType.getFullyQualifiedName(), true));
+      opType.addInterfaceSignature(SignatureCache.createTypeSignature(m_interfaceType.getFullyQualifiedName()));
     }
     opType.run(monitor, workingCopyManager);
     m_createdType = opType.getCreatedType();

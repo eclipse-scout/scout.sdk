@@ -14,7 +14,6 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.RuntimeConstants;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
@@ -33,6 +32,7 @@ import org.eclipse.swt.widgets.Shell;
 
 public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
+  private static final String TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER = "COLUMN_COPY_CLIPBOARD_IDENTIFIER";
   private static final String COLUMN_WIDTH_METHOD_NAME = "getConfiguredWidth";
 
   public TableColumnWidthsPasteAction() {
@@ -64,7 +64,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private boolean fastDetection(String content) {
     try {
-      String identifier = (String) TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(RuntimeConstants.TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER).getConstant();
+      String identifier = (String) TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER).getConstant();
       if (identifier != null && identifier.startsWith("\"") && identifier.endsWith("\"")) {
         // when scout runtime sources are present in the workspace -> field value is returned with double quotes
         identifier = identifier.substring(1, identifier.length() - 1);

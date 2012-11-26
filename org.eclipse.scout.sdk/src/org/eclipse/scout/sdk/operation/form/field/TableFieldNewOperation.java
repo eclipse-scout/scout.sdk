@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -30,6 +29,7 @@ import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -53,7 +53,7 @@ public class TableFieldNewOperation implements IOperation {
   public TableFieldNewOperation(IType declaringType) {
     m_declaringType = declaringType;
     // default
-    setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTableField, true));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITableField, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -108,9 +108,9 @@ public class TableFieldNewOperation implements IOperation {
 
   private IType createTable(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE, getCreatedField(), false);
-    tableNewOp.setSuperTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTable, true));
+    tableNewOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
     tableNewOp.addTypeModifier(Flags.AccPublic);
-    AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.Order, true));
+    AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     orderAnnotOp.addParameter("10.0");
     tableNewOp.addAnnotation(orderAnnotOp);
     tableNewOp.validate();

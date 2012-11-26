@@ -15,7 +15,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
@@ -23,6 +22,7 @@ import org.eclipse.scout.nls.sdk.simple.operations.CreateSimpleNlsProjectOperati
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -86,7 +86,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     serviceOp.setImplementationBundle(getBundle());
     serviceOp.setServiceName(getServiceName());
     serviceOp.setServicePackageName(getBundle().getProject().getName() + NlsSdkService.TEXT_SERVICE_PACKAGE_SUFFIX);
-    serviceOp.setServiceSuperTypeSignature(Signature.createTypeSignature(getSuperType().getFullyQualifiedName(), true));
+    serviceOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     serviceOp.validate();
     serviceOp.run(monitor, workingCopyManager);
 
