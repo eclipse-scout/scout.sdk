@@ -71,7 +71,7 @@ public interface SdkIcons {
    */
   String CheckboxNoDisabled = "output_no_disabled";
   String ButtonStyle = Default; // TODO
-  String ContentAssist = "content_assist_clu.gif";
+  String ContentAssist = "content_assist_cue.gif";
   String Separator = "type_separator.gif";
 
   String Button = "button.png";

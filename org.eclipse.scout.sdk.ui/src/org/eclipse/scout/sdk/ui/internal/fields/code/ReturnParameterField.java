@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -51,6 +51,7 @@ public class ReturnParameterField extends Composite {
 
   protected void createContent(Composite parent, ParameterArgument a) {
     m_labelType = new Label(parent, SWT.NONE);
+    m_labelType.setAlignment(SWT.RIGHT);
     m_parameterType = new JavaCodeField(parent, m_scope);
     if (a != null) {
       m_parameterType.setText(a.getType());
@@ -67,7 +68,7 @@ public class ReturnParameterField extends Composite {
     // layout
     parent.setLayout(new FormLayout());
     FormData data = new FormData();
-    data.top = new FormAttachment(0, 0);
+    data.top = new FormAttachment(0, 4);
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(m_labelProcentage, 0);
     data.bottom = new FormAttachment(100, 0);

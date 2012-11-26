@@ -63,7 +63,11 @@ public class ProposalTextField extends TextField {
   }
 
   public ProposalTextField(Composite parent, int style) {
-    super(parent);
+    this(parent, style, DEFAULT_LABEL_PERCENTAGE);
+  }
+
+  public ProposalTextField(Composite parent, int style, int labelPercentage) {
+    super(parent, labelPercentage);
     addDisposeListener(new DisposeListener() {
       @Override
       public void widgetDisposed(DisposeEvent e) {
@@ -175,9 +179,9 @@ public class ProposalTextField extends TextField {
     // layout
     parent.setLayout(new FormLayout());
     FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 0);
+    labelData.top = new FormAttachment(0, 4);
     labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(40, 0);
+    labelData.right = new FormAttachment(getLabelPercentage(), 0);
     labelData.bottom = new FormAttachment(100, 0);
     label.setLayoutData(labelData);
 

@@ -39,11 +39,15 @@ public class StyledTextField extends TextField {
    *          of the text field
    */
   public StyledTextField(Composite parent) {
-    this(parent, "");
+    super(parent);
   }
 
   public StyledTextField(Composite parent, String labelName) {
     super(parent, labelName);
+  }
+
+  public StyledTextField(Composite parent, String labelName, int labelPercentage) {
+    super(parent, labelName, labelPercentage);
   }
 
   public String getReadOnlySuffix() {

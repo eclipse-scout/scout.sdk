@@ -107,7 +107,7 @@ public class FileSelectionField extends TextField {
     // layout
     parent.setLayout(new FormLayout());
     FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 0);
+    labelData.top = new FormAttachment(0, 4);
     labelData.left = new FormAttachment(0, 0);
     labelData.right = new FormAttachment(40, 0);
     labelData.bottom = new FormAttachment(100, 0);

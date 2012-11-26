@@ -45,6 +45,7 @@ public class ParameterField extends Composite {
 
   protected void createContent(Composite parent, ParameterArgument a) {
     m_label = new Label(parent, SWT.NONE);
+    m_label.setAlignment(SWT.RIGHT);
     m_parameterName = new Text(parent, SWT.BORDER);
     if (a != null) {
       m_parameterName.setText(a.getName());
@@ -58,6 +59,7 @@ public class ParameterField extends Composite {
       }
     });
     m_labelType = new Label(parent, SWT.NONE);
+    m_labelType.setAlignment(SWT.RIGHT);
     m_parameterType = new JavaCodeField(parent, m_scope);
     if (a != null) {
       m_parameterType.setText(a.getType());
@@ -74,7 +76,7 @@ public class ParameterField extends Composite {
     // layout
     parent.setLayout(new FormLayout());
     FormData data = new FormData();
-    data.top = new FormAttachment(0, 0);
+    data.top = new FormAttachment(0, 4);
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(20, 0);
     data.bottom = new FormAttachment(100, 0);
@@ -88,7 +90,7 @@ public class ParameterField extends Composite {
     m_parameterName.setLayoutData(data);
 
     data = new FormData();
-    data.top = new FormAttachment(0, 0);
+    data.top = new FormAttachment(0, 4);
     data.left = new FormAttachment(m_parameterName, 5);
     data.right = new FormAttachment(65, 0);
     data.bottom = new FormAttachment(100, 0);

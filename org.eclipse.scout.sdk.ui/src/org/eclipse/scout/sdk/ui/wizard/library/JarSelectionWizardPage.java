@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.proposal.resources.IoFileLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.resources.ResourcesContentProvider;
 import org.eclipse.scout.sdk.ui.fields.table.AutoResizeColumnTable;
@@ -63,8 +64,7 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
    */
   public JarSelectionWizardPage() {
     super(JarSelectionWizardPage.class.getName());
-    setTitle("New Library Bundle");
-    setDescription("TODO ");
+    setTitle(Texts.get("NewLibraryBundle"));
     setJarFilesInternal(new TreeSet<File>(new P_FileComparator()));
   }
 
@@ -73,10 +73,10 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
     AutoResizeColumnTable table = new AutoResizeColumnTable(parent, SWT.SINGLE | SWT.FULL_SELECTION);
     table.setHeaderVisible(true);
     TableColumn fileNameCol = new TableColumn(table, SWT.LEFT);
-    fileNameCol.setText("Name");
+    fileNameCol.setText(Texts.get("Name"));
     fileNameCol.setWidth(100);
     TableColumn pathColumn = new TableColumn(table, SWT.LEFT);
-    pathColumn.setText("Path");
+    pathColumn.setText(Texts.get("Path"));
     pathColumn.setWidth(200);
 
     m_jarViewer = new TableViewer(table);
@@ -93,7 +93,7 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
     Composite buttonList = new Composite(parent, SWT.NONE);
     m_addButton = new Button(buttonList, SWT.PUSH | SWT.FLAT);
-    m_addButton.setText("Add...");
+    m_addButton.setText(Texts.get("Add"));
     m_addButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -102,7 +102,7 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
     });
     m_removeButton = new Button(buttonList, SWT.PUSH | SWT.FLAT);
     m_removeButton.setEnabled(false);
-    m_removeButton.setText("remove");
+    m_removeButton.setText(Texts.get("Remove"));
     m_removeButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -129,7 +129,7 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
     IDialogSettings prefs = ScoutSdkUi.getDefault().getDialogSettingsSection(JarSelectionWizardPage.class.getName() + ".FileDialog", true);
     FileDialog dialog = new FileDialog(getShell());
     dialog.setFilterExtensions(new String[]{"*.jar"});
-    dialog.setText("JAR file selection");
+    dialog.setText(Texts.get("JARFileSelection"));
     String filterPath = prefs.get(PREF_FILE_DIALOG_PATH);
     if (StringUtility.hasText(filterPath)) {
       dialog.setFilterPath(filterPath);
@@ -183,7 +183,7 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusJarFiles() throws JavaModelException {
     Set<File> jarFiles = getJarFiles();
     if (jarFiles == null || jarFiles.isEmpty()) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "No jar files selected.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoJarFilesSelected"));
     }
     return Status.OK_STATUS;
   }

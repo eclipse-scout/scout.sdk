@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,23 +31,25 @@ public class TextField extends Composite {
   private StyledText m_text;
   private Label m_label;
   private Color m_backupTextBackground;
-  private int m_labelProcenatage;
+  private final int m_labelPercentage;
+
+  public final static int DEFAULT_LABEL_PERCENTAGE = 40;
 
   public TextField(Composite parent) {
-    this(parent, "", 40);
+    this(parent, "");
   }
 
-  public TextField(Composite parent, int labelProcentage) {
-    this(parent, "", labelProcentage);
+  public TextField(Composite parent, int labelPercentage) {
+    this(parent, "", labelPercentage);
   }
 
   public TextField(Composite parent, String labelName) {
-    this(parent, labelName, 40);
+    this(parent, labelName, DEFAULT_LABEL_PERCENTAGE);
   }
 
-  public TextField(Composite parent, String labelName, int labelProcentage) {
+  public TextField(Composite parent, String labelName, int labelPercentage) {
     super(parent, SWT.NONE);
-    m_labelProcenatage = labelProcentage;
+    m_labelPercentage = labelPercentage;
     createContent(this);
     setLabelText(labelName);
   }
@@ -60,9 +62,9 @@ public class TextField extends Composite {
     // layout
     parent.setLayout(new FormLayout());
     FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 0);
+    labelData.top = new FormAttachment(0, 4);
     labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(m_labelProcenatage, 0);
+    labelData.right = new FormAttachment(getLabelPercentage(), 0);
     labelData.bottom = new FormAttachment(100, 0);
     m_label.setLayoutData(labelData);
 
@@ -190,6 +192,10 @@ public class TextField extends Composite {
     else {
       m_text.setBackground(getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
     }
+  }
+
+  public int getLabelPercentage() {
+    return m_labelPercentage;
   }
 
 }
