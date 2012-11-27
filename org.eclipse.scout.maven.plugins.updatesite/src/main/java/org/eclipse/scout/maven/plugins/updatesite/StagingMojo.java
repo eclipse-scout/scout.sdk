@@ -70,6 +70,12 @@ public class StagingMojo extends AbstractMojo {
    */
   private String compositeUrl;
 
+
+  /**
+   * @parameter default-value="/home/data/httpd/download.eclipse.org/scout/stagingArea"
+   */
+  private String stagingArea;
+
   public String getP2InputDirectory() {
     return p2InputDirectory;
   }
@@ -123,7 +129,18 @@ public class StagingMojo extends AbstractMojo {
     File compositeRepo = createCompositeRepo();
     updateCompositeJars(compositeRepo);
     File zipFile = createStageZip(getStageDir());
-    createDoStageFile(zipFile);
+    File doStageFile = createDoStageFile(zipFile);
+    publish(zipFile);
+    publish(doStageFile);
+  }
+
+  public void publish(File file) throws MojoExecutionException{
+    try {
+      FileUtility.copyToDir(file, new File(getStagingArea()));
+    }
+    catch (IOException e) {
+      throw new MojoExecutionException("Publishing failed ", e);
+    }
   }
 
   public File createCompositeRepo() throws MojoExecutionException {
@@ -254,7 +271,7 @@ public class StagingMojo extends AbstractMojo {
     }
   }
 
-  private void createDoStageFile(File zipInputFile) throws MojoExecutionException {
+  private File createDoStageFile(File zipInputFile) throws MojoExecutionException {
     try {
       File out = new File(getOutputDirectory(), "doStage");
       String md5 = createMD5(zipInputFile) + "  " + zipInputFile.getName();
@@ -262,6 +279,7 @@ public class StagingMojo extends AbstractMojo {
       writer.write(md5);
       writer.flush();
       writer.close();
+      return out;
     }
     catch (FileNotFoundException e) {
       throw new MojoExecutionException("Could not create doStage file", e);
@@ -291,9 +309,23 @@ public class StagingMojo extends AbstractMojo {
   }
 
   private String getStageFileName() {
-    SimpleDateFormat f = new SimpleDateFormat("yyyymmdd-hhmm", Locale.ENGLISH);
+    SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd-hhmm", Locale.ENGLISH);
     String timestamp = f.format(new Date());
     return "stage_" + timestamp + ".zip";
+  }
+
+  /**
+   * @return the stagingArea
+   */
+  public String getStagingArea() {
+    return stagingArea;
+  }
+
+  /**
+   * @param stagingArea the stagingArea to set
+   */
+  public void setStagingArea(String stagingArea) {
+    this.stagingArea = stagingArea;
   }
 
 
