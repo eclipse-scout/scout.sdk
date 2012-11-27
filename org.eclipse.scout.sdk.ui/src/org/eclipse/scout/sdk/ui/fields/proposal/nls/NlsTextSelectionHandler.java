@@ -42,7 +42,7 @@ public class NlsTextSelectionHandler implements IProposalSelectionHandler {
 
   @Override
   public void handleProposalAccepted(Object proposal, String searchText, ProposalTextField proposalTextField) {
-    if (NlsTextContentProvider.NLS_NEW_PROPOSAL == proposal) {
+    if (NlsTextProposal.NEW_NLS_TEXT_PROPOSAL == proposal) {
       String proposalFieldText = "";
 
       if (!StringUtility.isNullOrEmpty(searchText)) {
@@ -72,8 +72,8 @@ public class NlsTextSelectionHandler implements IProposalSelectionHandler {
         proposalTextField.acceptProposal(null);
       }
     }
-    else {
-      proposalTextField.acceptProposal(proposal);
+    else if (proposal instanceof NlsTextProposal) {
+      proposalTextField.acceptProposal(((NlsTextProposal) proposal).getEntry());
     }
   }
 

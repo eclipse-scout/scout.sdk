@@ -11,19 +11,17 @@
 package org.eclipse.scout.sdk.ui.fields.proposal.nls;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.Map.Entry;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IDialogSettingsProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
@@ -34,8 +32,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
  */
 public class NlsTextContentProvider extends ContentProposalProvider implements IDialogSettingsProvider {
 
-  public static final Object NLS_NEW_PROPOSAL = new Object();
-
   private NlsTextLabelProvider m_labelProvider;
 
   public NlsTextContentProvider(NlsTextLabelProvider labelProvider) {
@@ -44,10 +40,14 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    HashSet<INlsEntry> entries = new HashSet<INlsEntry>();
+    HashSet<NlsTextProposal> firstGroup = new HashSet<NlsTextProposal>();
+    HashSet<NlsTextProposal> secondGroup = new HashSet<NlsTextProposal>();
     if (getLabelProvider().getNlsProject() != null) {
       if (!StringUtility.hasText(searchPattern)) {
         searchPattern = "*";
+      }
+      else {
+        searchPattern = searchPattern.trim();
       }
 
       getLabelProvider().startRecordMatchRegions();
@@ -57,34 +57,39 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
         if (monitor.isCanceled()) {
           break;
         }
-        // development language
-        int[] matchingRegions = getMatchingRegions(entry, entry.getTranslation(developmentLanguage), pattern);
-        if (matchingRegions != null) {
-          entries.add(entry);
-          getLabelProvider().addMatchRegions(entry, matchingRegions);
-        }
-        else {
-          // check key
-          if (getMatchingRegions(entry, entry.getKey(), pattern) != null) {
-            entries.add(entry);
+
+        NlsTextProposal candidate = new NlsTextProposal(entry, developmentLanguage);
+        if (candidate.matches(pattern)) {
+          int[] matchingRegions = candidate.getMatchingRegions(pattern);
+          if (candidate.getMatchKind() == NlsTextProposal.MATCH_DEV_LANG_TRANSLATION) {
+            firstGroup.add(candidate);
           }
-          // also check all languages
-          for (Entry<Language, String> e : entry.getAllTranslations().entrySet()) {
-            if (!developmentLanguage.equals(e.getKey())) {
-              if (getMatchingRegions(entry, e.getValue(), pattern) != null) {
-                entries.add(entry);
-                break;
-              }
-            }
+          else {
+            secondGroup.add(candidate);
           }
+          getLabelProvider().addMatchRegions(candidate, matchingRegions);
         }
       }
-      INlsEntry[] nlsEntryResult = entries.toArray(new INlsEntry[entries.size()]);
-      Arrays.sort(nlsEntryResult, new P_NlsEntryComparator());
-      Object[] result = new Object[nlsEntryResult.length + 1];
-      System.arraycopy(nlsEntryResult, 0, result, 0, nlsEntryResult.length);
-      result[result.length - 1] = NLS_NEW_PROPOSAL;
-      return result;
+
+      boolean hasSecondGroupItems = secondGroup.size() > 0;
+      int numAdditionalElements = hasSecondGroupItems ? 2 : 1;
+      Object[] nlsEntryResult = new Object[firstGroup.size() + secondGroup.size() + numAdditionalElements];
+
+      if (firstGroup.size() > 0) {
+        Object[] firstPart = firstGroup.toArray(new Object[firstGroup.size()]);
+        Arrays.sort(firstPart);
+        System.arraycopy(firstPart, 0, nlsEntryResult, 0, firstPart.length);
+      }
+
+      nlsEntryResult[firstGroup.size()] = NlsTextProposal.NEW_NLS_TEXT_PROPOSAL;
+
+      if (hasSecondGroupItems) {
+        nlsEntryResult[firstGroup.size() + 1] = MoreElementsProposal.INSTANCE;
+        Object[] secondPart = secondGroup.toArray(new Object[secondGroup.size()]);
+        Arrays.sort(secondPart);
+        System.arraycopy(secondPart, 0, nlsEntryResult, firstGroup.size() + numAdditionalElements, secondPart.length);
+      }
+      return nlsEntryResult;
     }
     else {
       return new Object[0];
@@ -107,19 +112,5 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
     }
     NlsTextContentProvider ref = (NlsTextContentProvider) obj;
     return CompareUtility.equals(getLabelProvider(), ref.getLabelProvider());
-  }
-
-  private class P_NlsEntryComparator implements Comparator<INlsEntry> {
-    @Override
-    public int compare(INlsEntry o1, INlsEntry o2) {
-      if (o1 == null) {
-        return -1;
-      }
-      if (o2 == null) {
-        return 1;
-      }
-      Language developmentLanguage = o1.getProject().getDevelopmentLanguage();
-      return CompareUtility.compareTo(new CompositeObject(o1.getTranslation(developmentLanguage), o1.getKey()), new CompositeObject(o2.getTranslation(developmentLanguage), o2.getKey()));
-    }
   }
 }

@@ -32,9 +32,9 @@ public class NlsProposalDescriptionProvider implements IProposalDescriptionProvi
 
   @Override
   public Control createDescriptionContent(Composite parent, Object proposal) {
-
-    if (proposal instanceof INlsEntry) {
-      INlsEntry nlsEntry = (INlsEntry) proposal;
+    if (proposal instanceof NlsTextProposal && proposal != NlsTextProposal.NEW_NLS_TEXT_PROPOSAL) {
+      NlsTextProposal prop = (NlsTextProposal) proposal;
+      INlsEntry nlsEntry = prop.getEntry();
       String key = nlsEntry.getKey();
       if (key == null) {
         return null;

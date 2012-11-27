@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal.nls;
 
-import java.util.regex.Pattern;
-
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -30,9 +28,6 @@ public class NlsTextLabelProvider extends SearchRangeStyledLabelProvider {
 
   private final INlsProject m_nlsProject;
 
-  private final static Pattern REGEX_CR = Pattern.compile("\r", Pattern.LITERAL);
-  private final static Pattern REGEX_LF = Pattern.compile("\n", Pattern.LITERAL);
-
   public NlsTextLabelProvider(INlsProject nlsProject) {
     m_nlsProject = nlsProject;
   }
@@ -42,55 +37,42 @@ public class NlsTextLabelProvider extends SearchRangeStyledLabelProvider {
     if (element == null) {
       return "";
     }
-    else if (NlsTextContentProvider.NLS_NEW_PROPOSAL == element) {
+    else if (element == NlsTextProposal.NEW_NLS_TEXT_PROPOSAL) {
       return Texts.get("Nls_newProposal_name");
     }
+    else if (element instanceof NlsTextProposal) {
+      NlsTextProposal proposal = (NlsTextProposal) element;
+      return proposal.getDisplayText();
+    }
     else if (element instanceof INlsEntry) {
+      // happens after the selection handler is fired to show the selected proposal (only INlsEntry is passed to the UI)
       INlsEntry entry = (INlsEntry) element;
-      String text = entry.getTranslation(getNlsProject().getDevelopmentLanguage(), true);
-      if (StringUtility.isNullOrEmpty(text)) {
+      String text = entry.getTranslation(entry.getProject().getDevelopmentLanguage(), true);
+      if (!StringUtility.hasText(text)) {
         text = entry.getKey();
       }
-
-      text = REGEX_CR.matcher(text).replaceAll("");
-      text = REGEX_LF.matcher(text).replaceAll(" ");
-
       return text;
     }
-    throw new IllegalArgumentException("expected instanceof INlsEntry, got '" + element + "'");
-  }
-
-  @Override
-  public String getTextSelected(Object element) {
-    if (element == NlsTextContentProvider.NLS_NEW_PROPOSAL) {
-      return getText(element);
-    }
-    else if (element == null) {
-      return "";
-    }
-    else {
-      StringBuilder textBuilder = new StringBuilder();
-      textBuilder.append(getText(element));
-      // instance check is done in getText
-      INlsEntry entry = (INlsEntry) element;
-      textBuilder.append("  (").append(entry.getKey()).append(")");
-      return textBuilder.toString();
-    }
+    return null;
   }
 
   @Override
   public Image getImage(Object element) {
-    if (NlsTextContentProvider.NLS_NEW_PROPOSAL == element) {
+    if (element == NlsTextProposal.NEW_NLS_TEXT_PROPOSAL) {
       return ScoutSdkUi.getImage(ScoutSdkUi.TextAdd);
     }
-    else {
-      return ScoutSdkUi.getImage(ScoutSdkUi.Text);
+    if (element instanceof NlsTextProposal) {
+      NlsTextProposal p = (NlsTextProposal) element;
+      switch (p.getMatchKind()) {
+        case NlsTextProposal.MATCH_DEV_LANG_TRANSLATION:
+          return ScoutSdkUi.getImage(ScoutSdkUi.Text);
+        case NlsTextProposal.MATCH_KEY:
+          return ScoutSdkUi.getImage(ScoutSdkUi.TextKey);
+        case NlsTextProposal.MATCH_FOREIGN_LANG:
+          return ScoutSdkUi.getImage(ScoutSdkUi.TextForeign);
+      }
     }
-  }
-
-  @Override
-  public Image getImageSelected(Object element) {
-    return getImage(element);
+    return null;
   }
 
   public INlsProject getNlsProject() {

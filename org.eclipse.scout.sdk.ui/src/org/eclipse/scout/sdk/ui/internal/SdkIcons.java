@@ -199,7 +199,9 @@ public interface SdkIcons {
   String Text = "text.png";
   String Texts = "texts.png";
   String TextAdd = "text_add.png";
+  String TextKey = "text_key.png";
   String TextRemove = "text_remove.png";
+  String TextForeign = "text_foreign.png";
   String TreeField = "treefield.gif";
   String TreeFieldAdd = "treefield_add.gif";
   String TreeFieldRemove = "treefield_remove.gif";
