@@ -113,12 +113,16 @@ public class StagingMojo extends AbstractMojo {
     this.compositeUrl = compositeUrl;
   }
 
+  private File getStageDir(){
+	  return new File(getOutputDirectory() + File.separator + "stage");
+  }
+
 
   @Override
   public void execute() throws MojoExecutionException {
     File compositeRepo = createCompositeRepo();
     updateCompositeJars(compositeRepo);
-    File zipFile = createStageZip(compositeRepo);
+    File zipFile = createStageZip(getStageDir());
     createDoStageFile(zipFile);
   }
 
@@ -126,7 +130,7 @@ public class StagingMojo extends AbstractMojo {
     if (getUpdatesiteDir() == null) throw new IllegalArgumentException("UpdatesiteDir cannot be null");
     getLog().info("Creating composite Repository");
     try {
-      File compositeRepo = new File(getOutputDirectory(), getCompositeDirName());
+      File compositeRepo = new File(getStageDir(), getCompositeDirName());
       File p2Dir = new File(compositeRepo.getPath(), getUpdatesiteDir());
       p2Dir.mkdirs();
       File p2InputDir = new File(getP2InputDirectory());
@@ -253,7 +257,7 @@ public class StagingMojo extends AbstractMojo {
   private void createDoStageFile(File zipInputFile) throws MojoExecutionException {
     try {
       File out = new File(getOutputDirectory(), "doStage");
-      String md5 = createMD5(zipInputFile) + " " + zipInputFile.getName();
+      String md5 = createMD5(zipInputFile) + "  " + zipInputFile.getName();
       FileWriter writer = new FileWriter(out);
       writer.write(md5);
       writer.flush();
