@@ -19,14 +19,14 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.resources.ObservablePreferences;
-import org.eclipse.scout.sdk.util.resources.ObservablePreferences.IFlushListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
@@ -39,7 +39,8 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
  * @since 3.8.0 22.11.2012
  */
 public final class RuntimeClasses implements IRuntimeClasses {
-  public final static String PREFERENCES_PREFIX = "default.super.types.";
+  private final static String PREFERENCES_PREFIX = "default.super.types.";
+
   private final static String EXTENSION_POINT_NAME = "runtimeClass";
   private final static String TAG_NAME = "element";
   private final static String ATTRIB_DEFAULT_CLASS = "default";
@@ -47,7 +48,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
 
   private final static Object lock = new Object();
   private final static Map<IScoutProject, Map<String /* interfaceFqn */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutProject, Map<String, StringHolder>>();
-  private final static Map<IScoutProject, IFlushListener> registeredListeners = new HashMap<IScoutProject, ObservablePreferences.IFlushListener>();
+  private final static Map<IScoutProject, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutProject, IPreferenceChangeListener>();
   private static Map<String /* interfaceFqn */, String /* default value */> defaultValues = null;
 
   private RuntimeClasses() {
@@ -89,9 +90,8 @@ public final class RuntimeClasses implements IRuntimeClasses {
     return defaultValues;
   }
 
-  private static String getConfiguredSuperTypeNameCached(IJavaProject jp, String interfaceFqn) {
+  private static String getConfiguredSuperTypeNameCached(IScoutProject context, String interfaceFqn) {
     synchronized (lock) {
-      IScoutProject context = ScoutWorkspace.getInstance().getScoutProject(jp.getProject());
       Map<String, StringHolder> projectConfigs = configuredValues.get(context);
       if (projectConfigs == null) {
         projectConfigs = new HashMap<String, StringHolder>();
@@ -99,9 +99,9 @@ public final class RuntimeClasses implements IRuntimeClasses {
 
         // first time we are reading properties for the given project -> we are starting to cache for that project
         // add listener to get informed when the settings change so that we can clear our cache for the project.
-        P_PreferenceFlushListener listener = new P_PreferenceFlushListener(projectConfigs);
+        P_PreferenceChangeListener listener = new P_PreferenceChangeListener(projectConfigs);
         registeredListeners.put(context, listener); // remember in case we must remove it again later on
-        context.getPreferences().addFlushListener(listener);
+        context.getPreferences().addPreferenceChangeListener(listener);
       }
       StringHolder ret = projectConfigs.get(interfaceFqn);
       if (ret == null) {
@@ -116,13 +116,17 @@ public final class RuntimeClasses implements IRuntimeClasses {
     return PREFERENCES_PREFIX + interfaceFqn;
   }
 
-  public static Map<String, String> getAll() {
+  public static Map<String, String> getAllDefaults() {
     Map<String, String> classes = getDefaults();
     HashMap<String, String> ret = new HashMap<String, String>(classes.size());
     for (Entry<String, String> entry : classes.entrySet()) {
       ret.put(entry.getKey(), entry.getValue());
     }
     return ret;
+  }
+
+  public static IType getSuperType(IType interfaceType, IScoutProject context) {
+    return getSuperType(interfaceType.getFullyQualifiedName(), context);
   }
 
   public static IType getSuperType(IType interfaceType, IJavaProject context) {
@@ -133,11 +137,24 @@ public final class RuntimeClasses implements IRuntimeClasses {
     return TypeUtility.getType(getSuperTypeName(interfaceFqn, context));
   }
 
+  public static IType getSuperType(String interfaceFqn, IScoutProject context) {
+    return TypeUtility.getType(getSuperTypeName(interfaceFqn, context));
+  }
+
+  public static String getSuperTypeName(IType interfaceType, IScoutProject context) {
+    return getSuperTypeName(interfaceType.getFullyQualifiedName(), context);
+  }
+
   public static String getSuperTypeName(IType interfaceType, IJavaProject context) {
     return getSuperTypeName(interfaceType.getFullyQualifiedName(), context);
   }
 
-  public static String getSuperTypeName(String interfaceFqn, IJavaProject context) {
+  public static String getSuperTypeName(String interfaceFqn, IJavaProject jp) {
+    IScoutProject context = ScoutWorkspace.getInstance().getScoutProject(jp.getProject());
+    return getSuperTypeName(interfaceFqn, context);
+  }
+
+  public static String getSuperTypeName(String interfaceFqn, IScoutProject context) {
     String config = getConfiguredSuperTypeNameCached(context, interfaceFqn);
     if (config == null) {
       return getDefaults().get(interfaceFqn);
@@ -157,21 +174,33 @@ public final class RuntimeClasses implements IRuntimeClasses {
     return getSuperTypeSignature(interfaceType.getFullyQualifiedName(), context);
   }
 
+  public static String getSuperTypeSignature(IType interfaceType, IScoutProject context) {
+    return getSuperTypeSignature(interfaceType.getFullyQualifiedName(), context);
+  }
+
+  public static String getSuperTypeSignature(String interfaceFqn, IScoutProject context) {
+    String superType = getSuperTypeName(interfaceFqn, context);
+    return SignatureCache.createTypeSignature(superType);
+  }
+
   public static String getSuperTypeSignature(String interfaceFqn, IJavaProject context) {
     String superType = getSuperTypeName(interfaceFqn, context);
     return SignatureCache.createTypeSignature(superType);
   }
 
-  private static class P_PreferenceFlushListener implements ObservablePreferences.IFlushListener {
+  private static class P_PreferenceChangeListener implements IPreferenceChangeListener {
     private Map<String, StringHolder> m_projectConfig;
 
-    private P_PreferenceFlushListener(Map<String, StringHolder> projectConfigs) {
+    private P_PreferenceChangeListener(Map<String, StringHolder> projectConfigs) {
       m_projectConfig = projectConfigs;
     }
 
     @Override
-    public void prefsFlushed() {
-      m_projectConfig.clear();
+    public void preferenceChange(PreferenceChangeEvent event) {
+      String key = event.getKey();
+      if (key != null && key.startsWith(PREFERENCES_PREFIX)) {
+        m_projectConfig.remove(key.substring(PREFERENCES_PREFIX.length())); // will be lazily filled again on next use
+      }
     }
   }
 
@@ -185,9 +214,9 @@ public final class RuntimeClasses implements IRuntimeClasses {
           configuredValues.remove(removed);
 
           // there is still a listener attached to the project preferences -> remove and deregister
-          IFlushListener existingListener = registeredListeners.remove(removed);
+          IPreferenceChangeListener existingListener = registeredListeners.remove(removed);
           if (existingListener != null) {
-            removed.getPreferences().removeFlushListener(existingListener);
+            removed.getPreferences().removePreferenceChangeListener(existingListener);
           }
         }
       }

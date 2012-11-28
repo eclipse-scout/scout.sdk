@@ -437,6 +437,10 @@
             interface="org.eclipse.scout.service.IService">
       </element>
       <element
+            default="org.eclipse.scout.service.AbstractService"
+            interface="org.eclipse.scout.service.IService2">
+      </element>
+      <element
             default="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField">
       </element>

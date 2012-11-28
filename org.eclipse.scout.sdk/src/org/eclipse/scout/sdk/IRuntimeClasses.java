@@ -16,7 +16,7 @@ package org.eclipse.scout.sdk;
  * @author Andreas Hoegger
  * @since 1.0.8 24.01.2009
  */
-interface IRuntimeClasses {
+public interface IRuntimeClasses {
 
 // CHECKSTYLE:OFF
   String ScoutSharedBundleId = "org.eclipse.scout.rt.shared"; // NO_UCD

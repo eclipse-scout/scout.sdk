@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.icon.IIconProvider;
-import org.eclipse.scout.sdk.util.resources.ObservablePreferences;
 
 public interface IScoutProject extends IScoutContainer {
 
@@ -86,6 +86,6 @@ public interface IScoutProject extends IScoutContainer {
   /**
    * @return
    */
-  ObservablePreferences getPreferences();
+  IEclipsePreferences getPreferences();
 
 }

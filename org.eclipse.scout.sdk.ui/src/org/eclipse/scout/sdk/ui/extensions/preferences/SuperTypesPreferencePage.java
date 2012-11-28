@@ -123,7 +123,7 @@ public class SuperTypesPreferencePage extends PreferencePage implements IWorkben
 
     final Composite parent = m_container;
     final ProgressIndicator indicator = new ProgressIndicator(parent, SWT.SMOOTH);
-    final Set<Entry<String, String>> configuredClasses = RuntimeClasses.getAll().entrySet();
+    final Set<Entry<String, String>> configuredClasses = RuntimeClasses.getAllDefaults().entrySet();
     indicator.beginTask(configuredClasses.size()/* * m_projectSettings.size()*/);
     GridData indicatorData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     indicatorData.horizontalSpan = 2;
