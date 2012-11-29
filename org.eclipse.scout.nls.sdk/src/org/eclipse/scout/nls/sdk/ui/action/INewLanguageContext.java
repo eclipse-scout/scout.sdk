@@ -14,7 +14,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Shell;
 
 public interface INewLanguageContext {
-  public boolean interactWithUi(Shell s);
+  boolean interactWithUi(Shell s);
 
-  public void execute(IProgressMonitor monitor);
+  void execute(IProgressMonitor monitor);
+
+  Object getModel();
 }

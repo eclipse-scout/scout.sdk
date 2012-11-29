@@ -190,6 +190,11 @@ public class SimpleNlsProject extends AbstractNlsProject {
           NlsCore.logError("Unable to create new language.", e);
         }
       }
+
+      @Override
+      public Object getModel() {
+        return m_model;
+      }
     };
   }
 
