@@ -40,7 +40,7 @@ public class ContentProposalProvider implements ILazyProposalContentProvider {
     return null;
   }
 
-  protected int[] getMatchingRegions(Object element, String elementText, NormalizedPattern pattern) {
+  public static int[] getMatchingRegions(Object element, String elementText, NormalizedPattern pattern) {
     if (element instanceof ISeparatorProposal) {
       return new int[0];
     }

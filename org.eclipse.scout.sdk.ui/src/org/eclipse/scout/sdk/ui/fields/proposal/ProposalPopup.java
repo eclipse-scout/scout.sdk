@@ -774,17 +774,19 @@ public class ProposalPopup extends Window {
       StyledString text = new StyledString(getText(element, cell.getColumnIndex(), CompareUtility.equals(m_selectedProposal, element)));
       if (cell.getColumnIndex() == 0) {
         if (m_wrappedLabelProvider instanceof ISearchRangeConsumer) {
-          int[] matchingRegions = ((ISearchRangeConsumer) m_wrappedLabelProvider).getMatchRanges(element);
+          ISearchRangeConsumer labelProvider = (ISearchRangeConsumer) m_wrappedLabelProvider;
+          int[] matchingRegions = labelProvider.getMatchRanges(element);
           if (matchingRegions != null && matchingRegions.length > 0) {
-
             for (int i = 0; i < matchingRegions.length - 1; i += 2) {
               text.setStyle(matchingRegions[i], matchingRegions[i + 1], m_boldStyler);
             }
           }
-          // package information
-          int index = text.getString().indexOf(JavaElementLabels.CONCAT_STRING);
-          if (index > 0) {
-            text.setStyle(index, text.length() - index, StyledString.QUALIFIER_STYLER);
+          if (labelProvider.isFormatConcatString()) {
+            // package information
+            int index = text.getString().indexOf(JavaElementLabels.CONCAT_STRING);
+            if (index > 0) {
+              text.setStyle(index, text.length() - index, StyledString.QUALIFIER_STYLER);
+            }
           }
         }
       }

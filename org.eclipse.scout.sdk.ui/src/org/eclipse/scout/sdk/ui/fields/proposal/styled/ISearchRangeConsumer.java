@@ -36,4 +36,5 @@ public interface ISearchRangeConsumer {
    */
   void endRecordMatchRegions();
 
+  boolean isFormatConcatString();
 }

@@ -17,8 +17,10 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
+import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider.NormalizedPattern;
 
 /**
@@ -111,13 +113,13 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
     int offset = 0;
     switch (getMatchKind()) {
       case MATCH_DEV_LANG_TRANSLATION:
-        return SearchPattern.getMatchingRegions(pattern.getPattern(), getDevLangTranslation(), pattern.getMatchKind());
+        return ContentProposalProvider.getMatchingRegions(this, getDevLangTranslation(), pattern);
       case MATCH_KEY:
         offset = getDevLangTranslation().length() + KEY_PREFIX.length();
-        return adapt(SearchPattern.getMatchingRegions(pattern.getPattern(), getKey(), pattern.getMatchKind()), offset);
+        return adapt(ContentProposalProvider.getMatchingRegions(this, getKey(), pattern), offset);
       case MATCH_FOREIGN_LANG:
         offset = getDevLangTranslation().length() + KEY_PREFIX.length() + getKey().length() + FOREIGN_LANG_PREFIX.length();
-        return adapt(SearchPattern.getMatchingRegions(pattern.getPattern(), getMatchedForeignLangTranslation(), pattern.getMatchKind()), offset);
+        return adapt(ContentProposalProvider.getMatchingRegions(this, getMatchedForeignLangTranslation(), pattern), offset);
     }
     return null;
   }
@@ -166,13 +168,13 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
 
   private String getMatchString() {
     if (getMatchKind() == MATCH_DEV_LANG_TRANSLATION) {
-      return getDevLangTranslation();
+      return StringUtility.lowercase(getDevLangTranslation());
     }
     else if (getMatchKind() == MATCH_KEY) {
-      return getKey();
+      return StringUtility.lowercase(getKey());
     }
     else {
-      return getMatchedForeignLangTranslation();
+      return StringUtility.lowercase(getMatchedForeignLangTranslation());
     }
   }
 

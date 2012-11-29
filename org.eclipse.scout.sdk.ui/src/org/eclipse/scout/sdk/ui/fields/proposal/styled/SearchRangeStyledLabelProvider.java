@@ -49,4 +49,8 @@ public class SearchRangeStyledLabelProvider extends SelectionStateLabelProvider 
     m_searchRanges.clear();
   }
 
+  @Override
+  public boolean isFormatConcatString() {
+    return true;
+  }
 }

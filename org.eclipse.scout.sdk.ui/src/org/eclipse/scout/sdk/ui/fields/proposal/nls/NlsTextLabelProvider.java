@@ -78,4 +78,9 @@ public class NlsTextLabelProvider extends SearchRangeStyledLabelProvider {
   public INlsProject getNlsProject() {
     return m_nlsProject;
   }
+
+  @Override
+  public boolean isFormatConcatString() {
+    return false;
+  }
 }

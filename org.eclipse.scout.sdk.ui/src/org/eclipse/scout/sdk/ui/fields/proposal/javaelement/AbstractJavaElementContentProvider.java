@@ -108,5 +108,10 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
     @Override
     public void endRecordMatchRegions() {
     }
+
+    @Override
+    public boolean isFormatConcatString() {
+      return false;
+    }
   }
 }
