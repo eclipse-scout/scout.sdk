@@ -14,6 +14,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -289,5 +290,17 @@ public final class JdtUtility {
       }
     }
     return true;
+  }
+
+  public static void setWorkspaceAutoBuilding(boolean autoBuild) throws CoreException {
+    IWorkspaceDescription description = ResourcesPlugin.getWorkspace().getDescription();
+    if (description.isAutoBuilding() != autoBuild) {
+      description.setAutoBuilding(autoBuild);
+      ResourcesPlugin.getWorkspace().setDescription(description);
+    }
+  }
+
+  public static boolean isWorkspaceAutoBuilding() throws CoreException {
+    return ResourcesPlugin.getWorkspace().getDescription().isAutoBuilding();
   }
 }

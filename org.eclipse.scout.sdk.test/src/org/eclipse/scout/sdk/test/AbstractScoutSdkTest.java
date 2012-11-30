@@ -24,7 +24,6 @@ import java.net.URL;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -54,7 +53,7 @@ public abstract class AbstractScoutSdkTest {
   private static final String RESOURCES_FOLDER_NAME = "resources";
 
   protected static void setupWorkspace(String baseFolder, String... projects) throws Exception {
-    setAutoBuild(false);
+    JdtUtility.setWorkspaceAutoBuilding(false);
     setAutoUpdateFormData(false);
     Assert.assertNotNull("baseFolder must not be null", baseFolder);
     if (projects == null || projects.length == 0) {
@@ -100,14 +99,6 @@ public abstract class AbstractScoutSdkTest {
 
   protected static void setAutoUpdateFormData(boolean autoBuild) {
     ScoutSdk.getDefault().setFormDataAutoUpdate(autoBuild);
-  }
-
-  protected static void setAutoBuild(boolean autoBuild) throws CoreException {
-    IWorkspaceDescription description = ResourcesPlugin.getWorkspace().getDescription();
-    if (description.isAutoBuilding() != autoBuild) {
-      description.setAutoBuilding(autoBuild);
-      ResourcesPlugin.getWorkspace().setDescription(description);
-    }
   }
 
   protected static void executeAndBuildWorkspace(IOperation... ops) throws Exception {
