@@ -258,6 +258,12 @@ public final class JdtUtility {
     waitForJobFamily(ResourcesPlugin.FAMILY_MANUAL_REFRESH);
   }
 
+  /**
+   * Waits until all jobs of the given family are finished. This method will block the
+   * calling thread until all such jobs have finished executing, or until this thread is
+   * interrupted. If there are no jobs in the family that are currently waiting, running,
+   * or sleeping, this method returns immediately.
+   */
   public static void waitForJobFamily(final Object family) {
     boolean wasInterrupted = false;
     do {
