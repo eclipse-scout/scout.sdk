@@ -33,9 +33,6 @@
          <viewShortcut
                id="org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart">
          </viewShortcut>
-         <viewShortcut
-               id="org.eclipse.scout.sdk.designer.internal.view.DesignerView">
-         </viewShortcut>
          <perspectiveShortcut
                id="org.eclipse.debug.ui.DebugPerspective">
          </perspectiveShortcut>
