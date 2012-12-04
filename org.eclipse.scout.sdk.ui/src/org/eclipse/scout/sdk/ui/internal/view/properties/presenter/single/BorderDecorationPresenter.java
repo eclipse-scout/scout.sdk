@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormDisplayHintPresenter.DisplayHint;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BorderDecorationPresenter.BorderDecoration;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
@@ -29,18 +29,26 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>FormDisplayHintPresenter</h3> ...
+ * <h3>{@link BorderDecorationPresenter}</h3> ...
+ * 
+ * @author mvi
+ * @since 3.8.0 04.12.2012
  */
-public class FormDisplayHintPresenter extends AbstractProposalPresenter<DisplayHint> {
+public class BorderDecorationPresenter extends AbstractProposalPresenter<BorderDecoration> {
 
-  protected static enum DisplayHint {
-    Dialog,
-    PopupWindow,
-    PopupDialog,
-    View
+  private final static String BORDER_DECORATION_EMPTY = "empty";
+  private final static String BORDER_DECORATION_LINE = "line";
+  private final static String BORDER_DECORATION_SECTION = "section";
+  private final static String BORDER_DECORATION_AUTO = "auto";
+
+  protected static enum BorderDecoration {
+    Empty,
+    Line,
+    Section,
+    Auto
   }
 
-  public FormDisplayHintPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
+  public BorderDecorationPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
@@ -59,28 +67,30 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<DisplayH
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(DisplayHint.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(BorderDecoration.values(), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
   @Override
-  protected DisplayHint parseInput(String input) throws CoreException {
-    int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    switch (parsedInt) {
-      case 0:
-        return DisplayHint.Dialog;
-      case 10:
-        return DisplayHint.PopupWindow;
-      case 12:
-        return DisplayHint.PopupDialog;
-      case 20:
-        return DisplayHint.View;
+  protected BorderDecoration parseInput(String input) throws CoreException {
+    String parsedString = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+    if (BORDER_DECORATION_EMPTY.equals(parsedString)) {
+      return BorderDecoration.Empty;
+    }
+    else if (BORDER_DECORATION_LINE.equals(parsedString)) {
+      return BorderDecoration.Line;
+    }
+    else if (BORDER_DECORATION_SECTION.equals(parsedString)) {
+      return BorderDecoration.Section;
+    }
+    else if (BORDER_DECORATION_AUTO.equals(parsedString)) {
+      return BorderDecoration.Auto;
     }
     return null;
   }
 
   @Override
-  protected synchronized void storeValue(DisplayHint value) throws CoreException {
+  protected synchronized void storeValue(BorderDecoration value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
@@ -94,17 +104,17 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<DisplayH
     else {
       StringBuilder source = new StringBuilder("return ");
       switch (value) {
-        case Dialog:
-          source.append("DISPLAY_HINT_DIALOG");
+        case Empty:
+          source.append("BORDER_DECORATION_EMPTY");
           break;
-        case PopupWindow:
-          source.append("DISPLAY_HINT_POPUP_WINDOW");
+        case Line:
+          source.append("BORDER_DECORATION_LINE");
           break;
-        case PopupDialog:
-          source.append("DISPLAY_HINT_POPUP_DIALOG");
+        case Section:
+          source.append("BORDER_DECORATION_SECTION");
           break;
-        case View:
-          source.append("DISPLAY_HINT_VIEW");
+        case Auto:
+          source.append("BORDER_DECORATION_AUTO");
           break;
       }
       source.append(";");

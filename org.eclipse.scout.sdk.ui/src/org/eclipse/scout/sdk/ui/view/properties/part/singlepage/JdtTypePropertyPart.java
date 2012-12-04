@@ -33,6 +33,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecMethodPre
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecResetSerchFilterMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BooleanPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BorderDecorationPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonDisplayStylePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonSystemTypePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.CodeTypeProposalPresenter;
@@ -50,6 +51,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LongPr
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupCallProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupServiceProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MasterFieldPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MenuProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MultiLineStringPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.NlsDocsTextPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.NlsTextPresenter;
@@ -388,7 +390,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter.setMethod(method);
     }
     else if (propertyType.equals("NLS_PROVIDER")) {
-      // TODO: presenter for NLS_PROVIDER (obsolete?)
+      // TODO: presenter for NLS_PROVIDER (on sql services: ? extends ScoutTexts)
     }
     else if (propertyType.equals("SQL_STYLE")) {
       // TODO: presenter for SQL_STYLE
@@ -403,7 +405,6 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
     else if (propertyType.equals("DOC")) {
       presenter = new NlsDocsTextPresenter(getFormToolkit(), parent);
-//      ((NlsDocsTextPresenter) presenter).setType(getPage().getType());
       presenter.setMethod(method);
     }
     else if (propertyType.equals("VERTICAL_ALIGNMENT")) {
@@ -420,10 +421,15 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       // TODO: presenter for DURATION_MINUTES
     }
     else if (propertyType.equals("MENU_CLASS")) {
-      // TODO: presenter for MENU_CLASS
+      presenter = new MenuProposalPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
     }
     else if (propertyType.equals("PRIMITIVE_TYPE")) {
       presenter = new PrimitiveTypePresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if (propertyType.equals("BORDER_DECORATION")) {
+      presenter = new BorderDecorationPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
 
