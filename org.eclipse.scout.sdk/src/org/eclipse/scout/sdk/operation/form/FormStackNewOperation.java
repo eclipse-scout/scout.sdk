@@ -178,10 +178,10 @@ public class FormStackNewOperation implements IOperation {
       serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
       serviceOp.setServiceInterfaceName(getServiceInterfaceName());
       serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS));
-      serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
+      serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
       serviceOp.setServiceName(getServiceImplementationName());
       serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS));
-      serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServiceImplementationBundle().getJavaProject()));
+      serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServiceImplementationBundle().getJavaProject()));
       serviceOp.run(monitor, workingCopyManager);
       m_outProcessService = serviceOp.getCreatedServiceImplementation();
       m_outProcessServiceInterface = serviceOp.getCreatedServiceInterface();
