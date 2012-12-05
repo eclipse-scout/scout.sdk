@@ -25,59 +25,60 @@
   <packaging>eclipse-plugin</packaging>
 
   <properties>
-    <platform-version-name>indigo</platform-version-name>
+    <target-platform>eclipse-3.7</target-platform>
+    <platform-version>[3.7,3.8)</platform-version>
   </properties>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>target-platform-configuration</artifactId>
-        <configuration>
-          <environments>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>ppc64</arch>
-            </environment>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>s390</arch>
-            </environment>
-            <environment>
-              <os>linux</os>
-              <ws>gtk</ws>
-              <arch>s390x</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86</arch>
-            </environment>
-            <environment>
-              <os>win32</os>
-              <ws>win32</ws>
-              <arch>x86_64</arch>
-            </environment>
-            <environment>
-              <os>macosx</os>
-              <ws>cocoa</ws>
-              <arch>x86</arch>
-            </environment>
-            <environment>
-              <os>solaris</os>
-              <ws>gtk</ws>
-              <arch>sparc</arch>
-            </environment>
-            <environment>
-              <os>solaris</os>
-              <ws>gtk</ws>
-              <arch>x86</arch>
-            </environment>
-          </environments>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+<!--   <build> -->
+<!--     <plugins> -->
+<!--       <plugin> -->
+<!--         <groupId>org.eclipse.tycho</groupId> -->
+<!--         <artifactId>target-platform-configuration</artifactId> -->
+<!--         <configuration> -->
+<!--           <environments> -->
+<!--             <environment> -->
+<!--               <os>linux</os> -->
+<!--               <ws>gtk</ws> -->
+<!--               <arch>ppc64</arch> -->
+<!--             </environment> -->
+<!--             <environment> -->
+<!--               <os>linux</os> -->
+<!--               <ws>gtk</ws> -->
+<!--               <arch>s390</arch> -->
+<!--             </environment> -->
+<!--             <environment> -->
+<!--               <os>linux</os> -->
+<!--               <ws>gtk</ws> -->
+<!--               <arch>s390x</arch> -->
+<!--             </environment> -->
+<!--             <environment> -->
+<!--               <os>win32</os> -->
+<!--               <ws>win32</ws> -->
+<!--               <arch>x86</arch> -->
+<!--             </environment> -->
+<!--             <environment> -->
+<!--               <os>win32</os> -->
+<!--               <ws>win32</ws> -->
+<!--               <arch>x86_64</arch> -->
+<!--             </environment> -->
+<!--             <environment> -->
+<!--               <os>macosx</os> -->
+<!--               <ws>cocoa</ws> -->
+<!--               <arch>x86</arch> -->
+<!--             </environment> -->
+<!--             <environment> -->
+<!--               <os>solaris</os> -->
+<!--               <ws>gtk</ws> -->
+<!--               <arch>sparc</arch> -->
+<!--             </environment> -->
+<!--             <environment> -->
+<!--               <os>solaris</os> -->
+<!--               <ws>gtk</ws> -->
+<!--               <arch>x86</arch> -->
+<!--             </environment> -->
+<!--           </environments> -->
+<!--         </configuration> -->
+<!--       </plugin> -->
+<!--     </plugins> -->
+<!--   </build> -->
 </project>

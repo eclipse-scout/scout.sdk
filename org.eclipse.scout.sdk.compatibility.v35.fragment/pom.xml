@@ -25,7 +25,8 @@
   <packaging>eclipse-plugin</packaging>
 
   <properties>
-    <platform-version-name>galileo</platform-version-name>
+    <target-platform>eclipse-3.5</target-platform>
+    <platform-version>[3.5,3.6)</platform-version>
   </properties>
 
   <build>
