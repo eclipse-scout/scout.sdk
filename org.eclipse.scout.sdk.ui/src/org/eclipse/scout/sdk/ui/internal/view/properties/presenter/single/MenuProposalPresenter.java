@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -81,10 +82,19 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
       m_proposals = null; // clear cache
     }
 
+    private void collectMenusRec(List<IType> collector, IType declaringType) {
+      for (IType t : ScoutTypeUtility.getMenus(declaringType)) {
+        collector.add(t);
+        collectMenusRec(collector, t);
+      }
+    }
+
     private synchronized void ensureCache() {
       if (m_proposals == null) {
         if (getMethod() != null) {
-          m_proposals = ScoutTypeUtility.getMenus(getMethod().getType());
+          ArrayList<IType> collector = new ArrayList<IType>();
+          collectMenusRec(collector, getMethod().getType());
+          m_proposals = collector.toArray(new IType[collector.size()]);
         }
         else {
           m_proposals = new IType[0];
