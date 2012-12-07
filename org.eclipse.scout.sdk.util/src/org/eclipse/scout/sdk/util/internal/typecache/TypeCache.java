@@ -46,7 +46,7 @@ public final class TypeCache implements ITypeCache {
   private final static TypeCache INSTANCE = new TypeCache();
 
   private final Object m_cacheLock;
-  private HashMap<String, List<IType>> m_cache;
+  private HashMap<String, ArrayList<IType>> m_cache;
   private P_ResourceListener m_resourceChangeListener;
 
   private final static Pattern DOLLAR_REMOVE_REGEX = Pattern.compile("\\$");
@@ -56,7 +56,7 @@ public final class TypeCache implements ITypeCache {
   }
 
   private TypeCache() {
-    m_cache = new HashMap<String, List<IType>>();
+    m_cache = new HashMap<String, ArrayList<IType>>();
     m_cacheLock = new Object();
     m_resourceChangeListener = new P_ResourceListener();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener);
@@ -93,35 +93,45 @@ public final class TypeCache implements ITypeCache {
 
   @Override
   public IType getType(String fullyQualifiedName) {
-    IType[] types = getTypes(fullyQualifiedName);
-    if (types.length == 1) {
-      return types[0];
-    }
-    else if (types.length > 1) {
-      SdkUtilActivator.logWarning("found more than one type matches for '" + fullyQualifiedName + "' (matches: '" + types.length + "').");
-      return types[0];
+    ArrayList<IType> types = getTypesInternal(fullyQualifiedName);
+    if (types != null) {
+      if (types.size() == 1) {
+        return types.get(0);
+      }
+      if (types.size() > 1) {
+        SdkUtilActivator.logWarning("found more than one type matches for '" + fullyQualifiedName + "' (matches: '" + types.size() + "').");
+        return types.get(0);
+      }
     }
     return null;
   }
 
   @Override
   public IType[] getTypes(String fullyQualifiedName) {
+    ArrayList<IType> types = getTypesInternal(fullyQualifiedName);
+    if (types == null) {
+      return new IType[]{};
+    }
+    return types.toArray(new IType[types.size()]);
+  }
+
+  private ArrayList<IType> getTypesInternal(String fullyQualifiedName) {
     if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
-      return new IType[0];
+      return null;
     }
     fullyQualifiedName = DOLLAR_REMOVE_REGEX.matcher(fullyQualifiedName).replaceAll("\\.");
-    List<IType> types = new ArrayList<IType>();
+    ArrayList<IType> types = null;
     synchronized (m_cacheLock) {
       types = m_cache.get(fullyQualifiedName);
       if (types == null) {
         types = new ArrayList<IType>();
       }
-      // keep cache clean
-      if (types.size() > 0) {
+      else if (types.size() > 0) {
+        // keep cache clean
         Iterator<IType> it = types.iterator();
         while (it.hasNext()) {
           IType type = it.next();
-          if (type == null || !type.exists()) {
+          if (!TypeUtility.exists(type)) {
             it.remove();
           }
         }
@@ -135,7 +145,7 @@ public final class TypeCache implements ITypeCache {
         types = resolveType(fullyQualifiedName);
       }
       catch (CoreException e) {
-        SdkUtilActivator.logError("error during resolving type '" + fullyQualifiedName + "'.", e);
+        SdkUtilActivator.logError("error resolving type '" + fullyQualifiedName + "'.", e);
       }
       synchronized (m_cacheLock) {
         if (types.size() > 0) {
@@ -147,7 +157,7 @@ public final class TypeCache implements ITypeCache {
         }
       }
     }
-    return types.toArray(new IType[types.size()]);
+    return types;
   }
 
   @Override
@@ -158,14 +168,10 @@ public final class TypeCache implements ITypeCache {
     return TypeUtility.exists(getType(fullyQualifiedName));
   }
 
-  private List<IType> resolveType(final String fqn) throws CoreException {
-    if (StringUtility.isNullOrEmpty(fqn)) {
-      return new ArrayList<IType>();
-    }
-
+  private ArrayList<IType> resolveType(final String fqn) throws CoreException {
     final TreeMap<CompositeLong, IType> matchList = new TreeMap<CompositeLong, IType>();
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
-    String fastPat = DOLLAR_REMOVE_REGEX.matcher(fqn).replaceAll("\\.");
+    String fastPat = fqn;
     int i = fastPat.lastIndexOf('.');
     if (i >= 0) {
       fastPat = fastPat.substring(i + 1);
@@ -213,7 +219,6 @@ public final class TypeCache implements ITypeCache {
               }
               return true;
             }
-
           });
         }
         else if (event.getType() == IResourceChangeEvent.PRE_DELETE && event.getResource().getType() == IResource.PROJECT) {
