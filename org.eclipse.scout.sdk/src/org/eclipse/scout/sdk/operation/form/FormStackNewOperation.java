@@ -100,7 +100,7 @@ public class FormStackNewOperation implements IOperation {
     // create empty form data
     String formDataSignature = null;
     if (getFormDataBundle() != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getFormName() + "Data", getFormDataBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), getFormDataBundle());
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getFormName() + "Data", getFormDataBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), getFormDataBundle());
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
       m_outFormData = formDataOp.getCreatedType();
@@ -177,10 +177,10 @@ public class FormStackNewOperation implements IOperation {
       serviceOp.setImplementationBundle(getServiceImplementationBundle());
       serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
       serviceOp.setServiceInterfaceName(getServiceInterfaceName());
-      serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS));
+      serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES));
       serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
       serviceOp.setServiceName(getServiceImplementationName());
-      serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS));
+      serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES));
       serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServiceImplementationBundle().getJavaProject()));
       serviceOp.run(monitor, workingCopyManager);
       m_outProcessService = serviceOp.getCreatedServiceImplementation();

@@ -166,7 +166,7 @@ public final class HierarchyCache implements IHierarchyCache {
       synchronized (m_cacheLock) {
         hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
       }
-      ITypeFilter compilationUnitFilter = TypeFilters.getInnterTypeFilter(type);
+      ITypeFilter compilationUnitFilter = TypeFilters.getInnerTypeFilter(type);
       for (CachedTypeHierarchy h : hierarchies) {
         if (h.isCreated()) {
           IType[] allTypes = h.getJdtHierarchy().getAllTypes();

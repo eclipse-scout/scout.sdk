@@ -135,9 +135,9 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     serviceOp.setInterfaceBundle(sharedBundle);
     serviceOp.setServiceInterfaceName("ITestService");
     serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
-    serviceOp.setServiceInterfacePackageName(sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_CUSTOM + ".notexisting"));
+    serviceOp.setServiceInterfacePackageName(sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES + ".notexisting"));
     serviceOp.setServiceName("TestService");
-    serviceOp.setServicePackageName(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM + ".notexisting"));
+    serviceOp.setServicePackageName(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES + ".notexisting"));
     serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
     OperationJob job = new OperationJob(serviceOp);
     job.schedule();

@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.EditorSelectionVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -38,7 +39,7 @@ public class TextServiceNodePage extends AbstractServiceNodePage {
 
   @Override
   public String getPageId() {
-    return getClass().getName();
+    return IScoutPageConstants.TEXT_SERVICE_NODE_PAGE;
   }
 
   /**

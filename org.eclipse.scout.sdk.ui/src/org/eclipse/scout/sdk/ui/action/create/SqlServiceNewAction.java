@@ -25,7 +25,7 @@ public class SqlServiceNewAction extends AbstractWizardAction {
   private IScoutBundle m_bundle;
 
   public SqlServiceNewAction() {
-    super(Texts.get("Action_newTypeX", "Sql Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SqlServiceAdd), null, false, Category.NEW);
+    super(Texts.get("Action_newTypeX", "SQL Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SqlServiceAdd), null, false, Category.NEW);
   }
 
   public void setScoutBundle(IScoutBundle bundle) {

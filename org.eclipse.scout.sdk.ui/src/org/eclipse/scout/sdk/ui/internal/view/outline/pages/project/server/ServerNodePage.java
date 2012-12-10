@@ -19,11 +19,9 @@ import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateActi
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom.CustomServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.outline.OutlineServiceTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.process.ProcessServiceTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -99,35 +97,22 @@ public class ServerNodePage extends AbstractPage {
       ScoutSdkUi.logWarning("Error occured during loading '" + ServerSessionNodePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
     }
     try {
+      new ServerServicesTablePage(this);
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("Error occured during loading '" + ServerServicesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+    }
+    try {
       new LookupServiceTablePage(this);
     }
     catch (Exception e) {
       ScoutSdkUi.logWarning("Error occured during loading '" + LookupServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
-    }
-
-    try {
-      new OutlineServiceTablePage(this);
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + OutlineServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
-    }
-    try {
-      new ProcessServiceTablePage(this);
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + ProcessServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
     }
     try {
       new CommonServicesNodePage(this);
     }
     catch (Exception e) {
       ScoutSdkUi.logWarning("Error occured during loading '" + CommonServicesNodePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
-    }
-    try {
-      new CustomServiceTablePage(this);
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + CustomServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
     }
     try {
       new LibrariesTablePage(this, getScoutResource());

@@ -117,7 +117,7 @@ public class FormDeleteAction extends AbstractScoutHandler {
     IType iService = TypeUtility.getType(RuntimeClasses.IService);
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     if (m_processServiceInterface == null) {
-      String serviceName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "I$1" + SdkProperties.SUFFIX_PROCESS_SERVICE);
+      String serviceName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "I$1" + SdkProperties.SUFFIX_SERVICE);
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getFormType().getJavaProject()), TypeFilters.getInterfaceFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().equals(serviceName)) {
@@ -127,7 +127,7 @@ public class FormDeleteAction extends AbstractScoutHandler {
       }
     }
     if (m_processServiceInterface != null && m_processServiceImplementation == null) {
-      String serviceName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "$1" + SdkProperties.SUFFIX_PROCESS_SERVICE);
+      String serviceName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "$1" + SdkProperties.SUFFIX_SERVICE);
 
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutProject(ScoutSdkCore.getScoutWorkspace().getScoutBundle(getFormType().getJavaProject().getProject()).getScoutProject()), TypeFilters.getClassFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {

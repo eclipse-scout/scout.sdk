@@ -70,9 +70,7 @@ public final class SdkProperties {
   public static final String SUFFIX_OUTLINE_PAGE = "Page";
   public static final String SUFFIX_PERMISSION = "Permission";
   public static final String SUFFIX_SERVICE = "Service";
-  public static final String SUFFIX_CUSTOM_SERVICE = "CustomService";
-  public static final String SUFFIX_PROCESS_SERVICE = "ProcessService";
-  public static final String SUFFIX_OUTLINE_SERVICE = "OutlineService";
+  public static final String SUFFIX_ACCESS_CONTROL_SERVICE = "AccessControlService";
   public static final String SUFFIX_CALENDAR_SERVICE = "CalendarService";
   public static final String SUFFIX_SMTP_SERVICE = "SmtpService";
   public static final String SUFFIX_SQL_SERVICE = "SqlService";

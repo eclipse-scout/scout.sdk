@@ -69,7 +69,7 @@ public class SearchFormNewOperation implements IOperation {
     // create empty form data
     String formDataSignature = null;
     if (getSearchFormDataLocationBundle() != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTypeName() + "Data", getSearchFormDataLocationBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), getSearchFormDataLocationBundle());
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTypeName() + "Data", getSearchFormDataLocationBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), getSearchFormDataLocationBundle());
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
       formDataSignature = SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName());

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
-import java.util.HashSet;
-
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -25,7 +23,6 @@ import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -93,9 +90,16 @@ public class FormTablePage extends AbstractPage {
       m_formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
-    IType[] allSubtypes = m_formHierarchy.getAllSubtypes(iForm, new P_FormFilter(searchForms, getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
-    return allSubtypes;
+    IJavaProject javaProject = getScoutResource().getJavaProject();
+    IType[] searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(javaProject));
+    IType[] allForms = m_formHierarchy.getAllSubtypes(iForm,
+        TypeFilters.getMultiTypeFilter(
+            TypeFilters.getClassesInProject(javaProject),
+            TypeFilters.getNotInTypes(searchForms)
+            ),
+        TypeComparators.getTypeNameComparator());
+
+    return allForms;
   }
 
   @SuppressWarnings("unchecked")
@@ -123,25 +127,4 @@ public class FormTablePage extends AbstractPage {
       });
     }
   }
-
-  private class P_FormFilter implements ITypeFilter {
-    private HashSet<String> m_searchForms = new HashSet<String>();
-    private ITypeFilter m_classesInProjectFilter;
-
-    public P_FormFilter(IType[] searchForms, IJavaProject javaProject) {
-      m_classesInProjectFilter = TypeFilters.getClassesInProject(javaProject);
-      for (IType t : searchForms) {
-        m_searchForms.add(t.getHandleIdentifier());
-      }
-    }
-
-    @Override
-    public boolean accept(IType type) {
-      if (!m_searchForms.contains(type.getHandleIdentifier())) {
-        return m_classesInProjectFilter.accept(type);
-      }
-      return false;
-    }
-  }
-
 }

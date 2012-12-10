@@ -215,11 +215,11 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
           }
           ITreeNode serviceImplNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION));
           if (serviceImplNode != null) {
-            serviceImplNode.setText(prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
+            serviceImplNode.setText(prefix + SdkProperties.SUFFIX_SERVICE);
           }
           ITreeNode serviceInterfaceNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE));
           if (serviceInterfaceNode != null) {
-            serviceInterfaceNode.setText("I" + prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
+            serviceInterfaceNode.setText("I" + prefix + SdkProperties.SUFFIX_SERVICE);
           }
           m_locationPage.refreshTree();
         }
@@ -364,12 +364,11 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     }
 
     protected IStatus getStatusTypeNames() {
-
       IScoutBundle serviceImplementationBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + serviceImplNode.getText();
           IType findType = serviceImplementationBundle.findType(fqn);
           if (findType != null && findType.exists()) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
@@ -381,7 +380,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceInterfaceNode.getText();
+          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + serviceInterfaceNode.getText();
           IType interfaceType = serviceInterfaceBundle.findType(fqn);
           if (interfaceType != null && interfaceType.exists()) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");

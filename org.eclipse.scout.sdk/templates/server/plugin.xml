@@ -3,7 +3,7 @@
   <extension point="org.eclipse.scout.service.services">
     <service class="org.eclipse.scout.rt.server.services.common.bookmark.FileSystemBookmarkStorageService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="@@BUNDLE_SERVER_NAME@@.ServerSession"/>
     <service class="org.eclipse.scout.rt.server.services.common.workflow.WorkflowProviderService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="@@BUNDLE_SERVER_NAME@@.ServerSession"/>
-    <service class="@@BUNDLE_SERVER_NAME@@.services.custom.security.AccessControlService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="@@BUNDLE_SERVER_NAME@@.ServerSession"/>
+    <service class="@@BUNDLE_SERVER_NAME@@.services.common.security.AccessControlService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="@@BUNDLE_SERVER_NAME@@.ServerSession"/>
   </extension>
   <extension point="org.eclipse.equinox.http.registry.servlets">
     <servlet alias="/process" class="org.eclipse.scout.rt.server.ServiceTunnelServlet">

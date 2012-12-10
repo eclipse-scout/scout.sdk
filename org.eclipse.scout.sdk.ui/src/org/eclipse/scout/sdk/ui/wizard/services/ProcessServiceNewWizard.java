@@ -146,12 +146,12 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (evt.getPropertyName().equals(ServiceNewWizardPage.PROP_TYPE_NAME)) {
         String typeName = m_serviceNewWizardPage.getTypeName();
         if (!StringUtility.isNullOrEmpty(typeName)) {
-          String prefix = typeName.replaceAll(SdkProperties.SUFFIX_PROCESS_SERVICE + "$", "");
+          String prefix = typeName.replaceAll(SdkProperties.SUFFIX_SERVICE + "$", "");
           TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_CREATE)).setText("Create" + prefix + SdkProperties.SUFFIX_PERMISSION);
           TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_READ)).setText("Read" + prefix + SdkProperties.SUFFIX_PERMISSION);
           TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_PERMISSION_UPDATE)).setText("Update" + prefix + SdkProperties.SUFFIX_PERMISSION);
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
-          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_PROCESS_SERVICE);
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + SdkProperties.SUFFIX_SERVICE);
+          TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_SERVICE);
           m_locationWizardPage.refreshTree();
         }
         m_locationWizardPage.pingStateChanging();
@@ -270,7 +270,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
@@ -280,7 +280,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + serviceInterfaceNode.getText();
+          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + serviceInterfaceNode.getText();
           if (serviceInterfaceBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }

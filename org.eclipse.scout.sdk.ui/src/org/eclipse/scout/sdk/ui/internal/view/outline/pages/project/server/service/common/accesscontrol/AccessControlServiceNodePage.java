@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom;
+package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.accesscontrol;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -16,14 +16,14 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.util.SdkProperties;
 
-public class CustomServiceNodePage extends AbstractServiceNodePage {
+public class AccessControlServiceNodePage extends AbstractServiceNodePage {
 
-  public CustomServiceNodePage(AbstractPage parent, IType implementationType, IType interfaceType) {
-    super(parent, implementationType, interfaceType, SdkProperties.SUFFIX_CUSTOM_SERVICE);
+  public AccessControlServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
+    super(parent, type, interfaceType, SdkProperties.SUFFIX_ACCESS_CONTROL_SERVICE);
   }
 
   @Override
   public String getPageId() {
-    return IScoutPageConstants.CUSTOM_SERVICE_NODE_PAGE;
+    return IScoutPageConstants.ACCESS_CONTROL_SERVICE_NODE_PAGE;
   }
 }

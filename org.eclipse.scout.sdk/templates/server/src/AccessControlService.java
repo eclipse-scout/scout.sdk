@@ -1,4 +1,4 @@
-package @@BUNDLE_SERVER_NAME@@.services.custom.security;
+package @@BUNDLE_SERVER_NAME@@.services.common.security;
 
 import java.security.AllPermission;
 import java.security.Permissions;

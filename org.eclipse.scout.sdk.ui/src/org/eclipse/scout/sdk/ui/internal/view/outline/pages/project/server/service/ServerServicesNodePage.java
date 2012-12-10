@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.outline;
+package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -25,15 +25,15 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 /**
  * Page representing a service implementation
  */
-public class OutlineServiceNodePage extends AbstractServiceNodePage {
+public class ServerServicesNodePage extends AbstractServiceNodePage {
 
-  public OutlineServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
-    super(parent, type, interfaceType, SdkProperties.SUFFIX_OUTLINE_SERVICE);
+  public ServerServicesNodePage(AbstractPage parent, IType type, IType interfaceType) {
+    super(parent, type, interfaceType, SdkProperties.SUFFIX_SERVICE);
   }
 
   @Override
   public String getPageId() {
-    return IScoutPageConstants.OUTLINE_SERVICE_NODE_PAGE;
+    return IScoutPageConstants.SERVER_SERVICE_NODE_PAGE;
   }
 
   @SuppressWarnings("unchecked")

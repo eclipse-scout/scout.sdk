@@ -72,6 +72,7 @@ public interface IRuntimeClasses {
   String AbstractResetButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton"; // NO_UCD
   String AbstractSearchButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton"; // NO_UCD
 
+  String IAccessControlService = "org.eclipse.scout.rt.shared.services.common.security.IAccessControlService";
   String IValidationStrategy = "org.eclipse.scout.rt.shared.validate.IValidationStrategy"; // NO_UCD
   String IActivityMap = "org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap"; // NO_UCD
   String IBigDecimalField = "org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField"; // NO_UCD

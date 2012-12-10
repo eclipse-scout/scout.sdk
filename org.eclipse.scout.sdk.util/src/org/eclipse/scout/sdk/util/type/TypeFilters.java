@@ -17,7 +17,6 @@ import java.util.Set;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
@@ -100,7 +99,7 @@ public class TypeFilters {
     };
   }
 
-  public static ITypeFilter getInnterTypeFilter(final IType type) {
+  public static ITypeFilter getInnerTypeFilter(final IType type) {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType t) {
@@ -113,15 +112,6 @@ public class TypeFilters {
           }
         }
         return false;
-      }
-    };
-  }
-
-  public static ITypeFilter getPackageFilter(final IPackageFragment packageFragment) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType type) {
-        return type.getPackageFragment().equals(packageFragment);
       }
     };
   }
@@ -256,10 +246,26 @@ public class TypeFilters {
     };
   }
 
-  public static ITypeFilter getNotInTypes(IType... excludedTypes) {
+  public static ITypeFilter getNotInTypes(IType[]... excludedTypes) {
     HashSet<IType> excludedSet = new HashSet<IType>();
     if (excludedTypes != null) {
+      for (IType[] list : excludedTypes) {
+        for (IType t : list) {
+          excludedSet.add(t);
+        }
+      }
+    }
+    return getNotInTypes(excludedSet);
+  }
+
+  public static ITypeFilter getNotInTypes(IType... excludedTypes) {
+    HashSet<IType> excludedSet = null;
+    if (excludedTypes != null) {
+      excludedSet = new HashSet<IType>(excludedTypes.length);
       excludedSet.addAll(Arrays.asList(excludedTypes));
+    }
+    else {
+      excludedSet = new HashSet<IType>(0);
     }
     return getNotInTypes(excludedSet);
   }

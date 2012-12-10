@@ -105,14 +105,8 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
     if (StringUtility.isNullOrEmpty(serviceName)) {
       return serviceName;
     }
-    if (serviceName.endsWith(SdkProperties.SUFFIX_PROCESS_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_PROCESS_SERVICE + "$", "$1");
-    }
-    if (serviceName.endsWith(SdkProperties.SUFFIX_OUTLINE_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_OUTLINE_SERVICE + "$", "$1");
-    }
-    if (serviceName.endsWith(SdkProperties.SUFFIX_CUSTOM_SERVICE)) {
-      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_CUSTOM_SERVICE + "$", "$1");
+    if (serviceName.endsWith(SdkProperties.SUFFIX_ACCESS_CONTROL_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_ACCESS_CONTROL_SERVICE + "$", "$1");
     }
     if (serviceName.endsWith(SdkProperties.SUFFIX_CALENDAR_SERVICE)) {
       return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_CALENDAR_SERVICE + "$", "$1");

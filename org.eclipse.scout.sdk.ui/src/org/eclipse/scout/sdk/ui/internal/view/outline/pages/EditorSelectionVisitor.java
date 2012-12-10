@@ -63,21 +63,16 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizar
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard.WizardTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerSessionNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.bookmark.BookmarkStorageServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.bookmark.BookmarkStorageServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.calendar.CalendarServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.sql.SqlServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.sql.SqlServiceTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom.CustomServiceNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom.CustomServicePackageNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.custom.CustomServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.outline.OutlineServiceNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.outline.OutlineServiceTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.process.ProcessServiceNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.process.ProcessServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.CodeNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.CodeTypeNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.CodeTypeTablePage;
@@ -406,17 +401,11 @@ public class EditorSelectionVisitor implements INodeVisitor {
     else if (page instanceof LookupCallTablePage) {
       return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.LookupCall));
     }
-    else if (page instanceof OutlineServiceTablePage) {
-      return visitOutlineServiceTablePage((OutlineServiceTablePage) page);
+    else if (page instanceof ServerServicesTablePage) {
+      return visitServicesTablePage((ServerServicesTablePage) page);
     }
-    else if (page instanceof OutlineServiceNodePage) {
-      return visitServiceNodePage((OutlineServiceNodePage) page);
-    }
-    else if (page instanceof ProcessServiceTablePage) {
-      return visitProcessServiceTablePage((ProcessServiceTablePage) page);
-    }
-    else if (page instanceof ProcessServiceNodePage) {
-      return visitServiceNodePage((ProcessServiceNodePage) page);
+    else if (page instanceof ServerServicesNodePage) {
+      return visitServiceNodePage((ServerServicesNodePage) page);
     }
     else if (page instanceof CommonServicesNodePage) {
       return visitServerServicesCommonNodePage((CommonServicesNodePage) page);
@@ -435,15 +424,6 @@ public class EditorSelectionVisitor implements INodeVisitor {
     }
     else if (page instanceof CalendarServiceTablePage) {
       return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ICalendarService));
-    }
-    else if (page instanceof CustomServiceTablePage) {
-      return visitCustomServiceTablePage((CustomServiceTablePage) page);
-    }
-    else if (page instanceof CustomServiceNodePage) {
-      return visitServiceNodePage((CustomServiceNodePage) page);
-    }
-    else if (page instanceof CustomServicePackageNodePage) {
-      return visitCustomServicePackageNodePage((CustomServicePackageNodePage) page);
     }
     ScoutSdkUi.logWarning("not visited node '" + page.getClass().getName() + "'.");
     return CANCEL;
@@ -560,46 +540,15 @@ public class EditorSelectionVisitor implements INodeVisitor {
 
   }
 
-  protected int visitOutlineServiceTablePage(OutlineServiceTablePage page) {
+  protected int visitServicesTablePage(ServerServicesTablePage page) {
     if (isType(getCurrentElement())) {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
         IScoutBundle serverBundle = page.getScoutResource();
-        if (currentElement.getPackageFragment().getElementName().equals(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_OUTLINE))) {
+        if (currentElement.getPackageFragment().getElementName().equals(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES))) {
           return CONTINUE_BRANCH;
         }
-
-      }
-    }
-    return CANCEL_SUBTREE;
-  }
-
-  protected int visitProcessServiceTablePage(ProcessServiceTablePage page) {
-    if (isType(getCurrentElement())) {
-      IType currentElement = (IType) getCurrentElement();
-      ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
-        IScoutBundle serverBundle = page.getScoutResource();
-        if (currentElement.getPackageFragment().getElementName().equals(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS))) {
-          return CONTINUE_BRANCH;
-        }
-
-      }
-    }
-    return CANCEL_SUBTREE;
-  }
-
-  protected int visitCustomServiceTablePage(CustomServiceTablePage page) {
-    if (isType(getCurrentElement())) {
-      IType currentElement = (IType) getCurrentElement();
-      ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
-        IScoutBundle serverBundle = page.getScoutResource();
-        if (currentElement.getPackageFragment().getElementName().startsWith(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM))) {
-          return CONTINUE_BRANCH;
-        }
-
       }
     }
     return CANCEL_SUBTREE;
@@ -629,20 +578,6 @@ public class EditorSelectionVisitor implements INodeVisitor {
           return CONTINUE_BRANCH;
         }
 
-      }
-    }
-    return CANCEL_SUBTREE;
-  }
-
-  protected int visitCustomServicePackageNodePage(CustomServicePackageNodePage page) {
-    if (isType(getCurrentElement())) {
-      IType currentElement = (IType) getCurrentElement();
-      ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
-      if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
-        IScoutBundle serverBundle = page.getScoutResource();
-        if (currentElement.getPackageFragment().getElementName().startsWith(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_CUSTOM))) {
-          return CONTINUE_BRANCH;
-        }
       }
     }
     return CANCEL_SUBTREE;

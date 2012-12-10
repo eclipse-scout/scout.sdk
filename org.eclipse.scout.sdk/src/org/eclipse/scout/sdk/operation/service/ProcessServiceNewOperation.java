@@ -102,12 +102,12 @@ public class ProcessServiceNewOperation implements IOperation {
       if (getServiceImplementationBundle() != null) {
         serviceOp.setImplementationBundle(getServiceImplementationBundle());
         serviceOp.setServiceName(getServiceImplementationName());
-        serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS));
+        serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES));
       }
       if (getServiceInterfaceBundle() != null) {
         serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
         serviceOp.setServiceInterfaceName(getServiceInterfaceName());
-        serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS));
+        serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES));
         serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
       }
       serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServiceImplementationBundle().getJavaProject()));

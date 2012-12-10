@@ -19,9 +19,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
@@ -35,7 +37,11 @@ import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -142,6 +148,25 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
     try {
       m_operation.validate();
       m_operation.run(monitor, workingCopyManager);
+
+      IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
+      ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
+      IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, TypeFilters.getClassesInProject(m_operation.getImplementationBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+
+      if (serverSessions != null && serverSessions.length == 1) {
+        final IType serverSessionType = serverSessions[0];
+        MethodOverrideOperation methodOp = new MethodOverrideOperation(m_operation.getCreatedServiceImplementation(), "getCurrentUserId", true) {
+          @Override
+          protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+            validator.addImport(serverSessionType.getFullyQualifiedName());
+            String serverSess = validator.getTypeName(SignatureCache.createTypeSignature(serverSessionType.getFullyQualifiedName()));
+            return "return " + serverSess + ".get().getUserId();";
+          }
+        };
+        methodOp.validate();
+        methodOp.run(monitor, workingCopyManager);
+      }
+
       return true;
     }
     catch (IllegalArgumentException e) {

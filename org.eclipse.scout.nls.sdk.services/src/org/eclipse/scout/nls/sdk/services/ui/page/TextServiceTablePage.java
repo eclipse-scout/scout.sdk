@@ -1,27 +1,27 @@
 package org.eclipse.scout.nls.sdk.services.ui.page;
 
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceNewAction;
+import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class TextServiceTablePage extends AbstractPage {
 
-  private PackageContentChangedListener m_packageContentListener;
-  private IPackageFragment m_textServicePackage;
+  private final IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+  private ICachedTypeHierarchy m_serviceHierarchy;
 
   public TextServiceTablePage() {
     setName(Texts.get("TextProviderServices"));
@@ -30,14 +30,18 @@ public class TextServiceTablePage extends AbstractPage {
 
   @Override
   public void unloadPage() {
-    if (m_packageContentListener != null) {
-      JavaCore.removeElementChangedListener(m_packageContentListener);
-      m_packageContentListener = null;
+    if (m_serviceHierarchy != null) {
+      m_serviceHierarchy.removeHierarchyListener(getPageDirtyListener());
+      m_serviceHierarchy = null;
     }
+    super.unloadPage();
   }
 
   @Override
   public void refresh(boolean clearCache) {
+    if (clearCache && m_serviceHierarchy != null) {
+      m_serviceHierarchy.invalidate();
+    }
     super.refresh(clearCache);
   }
 
@@ -48,7 +52,7 @@ public class TextServiceTablePage extends AbstractPage {
 
   @Override
   public String getPageId() {
-    return getClass().getName();
+    return IScoutPageConstants.TEXT_SERVICE_TABLE_PAGE;
   }
 
   @Override
@@ -63,10 +67,10 @@ public class TextServiceTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    m_textServicePackage = getScoutResource().getPackageFragment(getScoutResource().getPackageName(NlsSdkService.TEXT_SERVICE_PACKAGE_SUFFIX));
-    m_packageContentListener = new PackageContentChangedListener(this, m_textServicePackage);
-    JavaCore.addElementChangedListener(m_packageContentListener);
-
+    if (m_serviceHierarchy == null) {
+      m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
+      m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
+    }
     try {
       IType[] services = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
       ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());

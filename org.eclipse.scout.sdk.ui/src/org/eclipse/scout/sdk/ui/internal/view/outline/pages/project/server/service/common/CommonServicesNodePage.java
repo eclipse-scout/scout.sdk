@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.accesscontrol.AccessControlServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.bookmark.BookmarkStorageServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.calendar.CalendarServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.smtp.SmtpServiceTablePage;
@@ -72,6 +73,12 @@ public class CommonServicesNodePage extends AbstractPage {
     }
     catch (Exception e) {
       ScoutSdkUi.logError("could not create 'SmtpServiceTablePage'.", e);
+    }
+    try {
+      new AccessControlServiceTablePage(this);
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("could not create 'AccessControlServiceTablePage'.", e);
     }
   }
 

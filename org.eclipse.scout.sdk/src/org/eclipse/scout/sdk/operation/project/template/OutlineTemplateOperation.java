@@ -130,10 +130,10 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         outlineServiceOp.setImplementationBundle(getScoutProject().getServerBundle());
         outlineServiceOp.setInterfaceBundle(getScoutProject().getSharedBundle());
         outlineServiceOp.setServiceInterfaceName("IStandardOutlineService");
-        outlineServiceOp.setServiceInterfacePackageName(getScoutProject().getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_OUTLINE));
+        outlineServiceOp.setServiceInterfacePackageName(getScoutProject().getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES));
         outlineServiceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
         outlineServiceOp.setServiceName("StandardOutlineService");
-        outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_OUTLINE));
+        outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES));
         outlineServiceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getScoutProject().getServerBundle().getJavaProject()));
         outlineServiceOp.run(monitor, workingCopyManager);
       }

@@ -79,7 +79,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     IScoutBundle sharedBundle = m_scoutProject.getSharedBundle();
 
     // formdata
-    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
+    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), sharedBundle);
     formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
     formDataOp.run(monitor, workingCopyManager);
     IType formData = formDataOp.getCreatedType();

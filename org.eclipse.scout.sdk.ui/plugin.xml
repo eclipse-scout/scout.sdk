@@ -499,8 +499,6 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CodeNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CustomServiceNewAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.CustomServiceNewPackageAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.DesktopMenuNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.EntityNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction"></contextMenu>
@@ -513,7 +511,6 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.MenuNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.OutlineNewAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.OutlineServiceNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.PageNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.PermissionNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction"></contextMenu>

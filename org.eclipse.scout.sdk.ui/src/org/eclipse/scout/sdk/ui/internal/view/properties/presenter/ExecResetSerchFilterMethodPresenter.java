@@ -75,7 +75,7 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
         String formDataSimpleName = m_formType.getElementName().replaceAll(SdkProperties.SUFFIX_FORM + "$", SdkProperties.SUFFIX_FORM_DATA);
         IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getDeclaringType());
         for (IScoutBundle shared : clientBundle.getRequiredBundles(ScoutBundleFilters.getSharedFilter(), false)) {
-          String formDataFqn = shared.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + formDataSimpleName;
+          String formDataFqn = shared.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + formDataSimpleName;
           if (TypeUtility.existsType(formDataFqn)) {
             m_formDataType = TypeUtility.getType(formDataFqn);
             break;

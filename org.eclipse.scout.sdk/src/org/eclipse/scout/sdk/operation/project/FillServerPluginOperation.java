@@ -54,7 +54,7 @@ public class FillServerPluginOperation extends AbstractScoutProjectNewOperation 
     new InstallJavaFileOperation("templates/server/src/ServerApplication.java", destPathPref + "ServerApplication.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/server/src/ServerSession.java", destPathPref + "ServerSession.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/server/src/AccessControlService.java",
-        destPathPref + "services/custom/security/AccessControlService.java", m_project, props).run(monitor, workingCopyManager);
+        destPathPref + "services/common/security/AccessControlService.java", m_project, props).run(monitor, workingCopyManager);
     m_project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 }

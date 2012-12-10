@@ -100,13 +100,13 @@ public class FormPropertyPart extends JdtTypePropertyPart {
             sharedBundle = scoutProject.getSharedBundle();
           }
           if (sharedBundle != null) {
-            String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + entityName + SdkProperties.SUFFIX_FORM_DATA;
+            String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + entityName + SdkProperties.SUFFIX_FORM_DATA;
             if (TypeUtility.existsType(formDataName)) {
               model.addGlobalLink(new TypeOpenLink(TypeUtility.getType(formDataName)));
             }
           }
           // service
-          String formRegex = "(I)?" + entityName + SdkProperties.SUFFIX_PROCESS_SERVICE;
+          String formRegex = "(I)?" + entityName + SdkProperties.SUFFIX_SERVICE;
           ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
               TypeFilters.getRegexSimpleNameFilter(formRegex),
               ScoutTypeFilters.getInScoutProject(clientBundle.getScoutProject())

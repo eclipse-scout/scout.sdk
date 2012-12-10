@@ -265,7 +265,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (formDataBundle != null) {
         ITreeNode formDataNode = m_page2.getTreeNode(TYPE_SEARCH_FORM_DATA, true, true);
         if (formDataNode != null) {
-          String fqn = formDataBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + formDataNode.getText();
+          String fqn = formDataBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + formDataNode.getText();
           if (formDataBundle.findType(fqn) != null) {
             return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.WARNING) : (IStatus.ERROR),
                 ScoutSdkUi.PLUGIN_ID, "'" + formDataNode.getText() + "' " + Texts.get("AlreadyExists") + ".");

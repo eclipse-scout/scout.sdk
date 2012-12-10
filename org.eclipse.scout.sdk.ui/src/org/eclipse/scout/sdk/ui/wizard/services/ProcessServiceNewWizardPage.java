@@ -72,7 +72,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
-    m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_PROCESS_SERVICE);
+    m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_SERVICE);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -138,10 +138,10 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_PROCESS_SERVICE)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_SERVICE)) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
-    if (TypeUtility.existsType(getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {

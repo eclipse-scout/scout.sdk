@@ -8,11 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.process;
+package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service;
 
-import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -20,39 +19,40 @@ import org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.type.PackageContentChangedListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
-public class ProcessServiceTablePage extends AbstractPage {
-  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+public class ServerServicesTablePage extends AbstractPage {
+
+  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+
+  private final IType iSqlService = TypeUtility.getType(RuntimeClasses.ISqlService);
+  private final IType iBookmarkStorageService = TypeUtility.getType(RuntimeClasses.IBookmarkStorageService);
+  private final IType iCalendarService = TypeUtility.getType(RuntimeClasses.ICalendarService);
+  private final IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
+  private final IType iAccessControlService = TypeUtility.getType(RuntimeClasses.IAccessControlService);
+  private final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
 
   private ICachedTypeHierarchy m_serviceHierarchy;
-  private PackageContentChangedListener m_packageContentListener;
-  private IPackageFragment m_processServicePackage;
 
-  public ProcessServiceTablePage(AbstractPage parent) {
+  public ServerServicesTablePage(AbstractPage parent) {
     setParent(parent);
-    // package
-    m_processServicePackage = getScoutResource().getPackageFragment(getScoutResource().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_PROCESS));
-    m_packageContentListener = new PackageContentChangedListener(this, m_processServicePackage);
-    JavaCore.addElementChangedListener(m_packageContentListener);
-    setName(Texts.get("ProcessServiceTablePage"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Services));
+    setName(Texts.get("ServerServicesNodePage"));
   }
 
   @Override
   public void unloadPage() {
-    if (m_packageContentListener != null) {
-      JavaCore.removeElementChangedListener(m_packageContentListener);
-      m_packageContentListener = null;
+    if (m_serviceHierarchy != null) {
+      m_serviceHierarchy.removeHierarchyListener(getPageDirtyListener());
+      m_serviceHierarchy = null;
     }
+    super.unloadPage();
   }
 
   @Override
@@ -65,7 +65,7 @@ public class ProcessServiceTablePage extends AbstractPage {
 
   @Override
   public String getPageId() {
-    return IScoutPageConstants.PROCESS_SERVICE_TABLE_PAGE;
+    return IScoutPageConstants.SERVER_SERVICE_TABLE_PAGE;
   }
 
   @Override
@@ -83,26 +83,37 @@ public class ProcessServiceTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    for (IType service : resolveAllProcessServices()) {
+    for (IType service : resolveServices()) {
       IType serviceInterface = null;
       IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       if (interfaces.length > 0) {
         serviceInterface = interfaces[0];
       }
-      new ProcessServiceNodePage(this, service, serviceInterface);
+      new ServerServicesNodePage(this, service, serviceInterface);
     }
   }
 
-  protected IType[] resolveAllProcessServices() {
-    if (m_serviceHierarchy == null || !m_serviceHierarchy.isCreated()) {
+  protected IType[] resolveServices() {
+    if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
+      m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getClassesInProject(getScoutResource().getJavaProject()),
-        TypeFilters.getPackageFilter(m_processServicePackage)
-        );
-    IType[] processServices = m_serviceHierarchy.getAllSubtypes(iService, filter, TypeComparators.getTypeNameComparator());
-    return processServices;
+
+    IJavaProject javaProject = getScoutResource().getJavaProject();
+    IType[] sqlServices = m_serviceHierarchy.getAllSubtypes(iSqlService, TypeFilters.getClassesInProject(javaProject));
+    IType[] bookmarkServices = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, TypeFilters.getClassesInProject(javaProject));
+    IType[] calendarServices = m_serviceHierarchy.getAllSubtypes(iCalendarService, TypeFilters.getClassesInProject(javaProject));
+    IType[] smtpServices = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getClassesInProject(javaProject));
+    IType[] accessControlServices = m_serviceHierarchy.getAllSubtypes(iAccessControlService, TypeFilters.getClassesInProject(javaProject));
+    IType[] lookupServices = m_serviceHierarchy.getAllSubtypes(iLookupService, TypeFilters.getClassesInProject(javaProject));
+
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iService,
+        TypeFilters.getMultiTypeFilter(
+            TypeFilters.getClassesInProject(javaProject),
+            TypeFilters.getNotInTypes(sqlServices, bookmarkServices, calendarServices, smtpServices, accessControlServices, lookupServices)
+            ), TypeComparators.getTypeNameComparator());
+
+    return services;
   }
 
   @SuppressWarnings("unchecked")
@@ -117,7 +128,7 @@ public class ProcessServiceTablePage extends AbstractPage {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
-          return resolveAllProcessServices();
+          return resolveServices();
         }
       });
     }

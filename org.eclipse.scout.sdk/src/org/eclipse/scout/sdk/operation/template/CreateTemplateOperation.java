@@ -158,7 +158,7 @@ public class CreateTemplateOperation implements IOperation {
     op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
     IScoutBundle sharedBundle = findFormDataBundle(getTemplateBundle().getScoutProject());
     if (isCreateExternalFormData() && sharedBundle != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_PROCESS), sharedBundle);
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), sharedBundle);
       formDataOp.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
@@ -177,13 +177,13 @@ public class CreateTemplateOperation implements IOperation {
     formatOp.validate();
     formatOp.run(monitor, workingCopyManager);
     workingCopyManager.reconcile(templateType.getCompilationUnit(), monitor);
-    
+
     // form data
     if (isCreateExternalFormData() && sharedBundle != null) {
-    	FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType);
-    	formDataUpdateOp.run(monitor, workingCopyManager);
+      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType);
+      formDataUpdateOp.run(monitor, workingCopyManager);
     }
-    
+
     // getter fields
     org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(templateType);
     IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(templateType);
@@ -194,7 +194,7 @@ public class CreateTemplateOperation implements IOperation {
     for (IType t : templateType.getTypes()) {
       createFormFieldGetter(t, templateType, siblings, newFormFields, hierarchy, monitor, workingCopyManager);
     }
-    
+
     if (isReplaceFieldWithTemplate()) {
       workingCopyManager.register(getFormField().getCompilationUnit(), monitor);
       IImportValidator validator = new CompilationUnitImportValidator(getFormField().getCompilationUnit());

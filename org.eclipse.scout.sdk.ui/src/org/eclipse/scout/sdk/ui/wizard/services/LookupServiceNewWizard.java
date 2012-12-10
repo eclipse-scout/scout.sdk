@@ -262,7 +262,6 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
     }
 
     protected IStatus getStatusTypeNames() {
-
       IScoutBundle serviceImplementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);

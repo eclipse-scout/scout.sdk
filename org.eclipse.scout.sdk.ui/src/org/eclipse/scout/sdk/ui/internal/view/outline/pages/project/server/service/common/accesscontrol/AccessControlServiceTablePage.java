@@ -8,16 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.smtp;
+package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.accesscontrol;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.create.SmtpServiceNewAction;
-import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
-import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
@@ -29,14 +27,14 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 /**
  * <h3>SmtpServiceTablePage</h3> ...
  */
-public class SmtpServiceTablePage extends AbstractPage {
+public class AccessControlServiceTablePage extends AbstractPage {
 
-  private final IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
+  private final IType iAccessControlService = TypeUtility.getType(RuntimeClasses.IAccessControlService);
   private ICachedTypeHierarchy m_serviceHierarchy;
 
-  public SmtpServiceTablePage(AbstractPage parent) {
+  public AccessControlServiceTablePage(AbstractPage parent) {
     setParent(parent);
-    setName(Texts.get("SMTPServices"));
+    setName(Texts.get("AccessControlServices"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Services));
   }
 
@@ -59,7 +57,7 @@ public class SmtpServiceTablePage extends AbstractPage {
 
   @Override
   public String getPageId() {
-    return IScoutPageConstants.SMTP_SERVICE_TABLE_PAGE;
+    return IScoutPageConstants.ACCESS_CONTROL_SERVICE_TABLE_PAGE;
   }
 
   @Override
@@ -83,37 +81,22 @@ public class SmtpServiceTablePage extends AbstractPage {
       if (interfaces.length > 0) {
         serviceInterface = interfaces[0];
       }
-      new SmtpServiceNodePage(this, service, serviceInterface);
+      new ServerServicesNodePage(this, service, serviceInterface);
     }
   }
 
   protected IType[] resolveServices() {
     if (m_serviceHierarchy == null) {
-      m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSMTPService);
+      m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iAccessControlService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iAccessControlService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     return services;
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{FormDataSqlBindingValidateAction.class, SmtpServiceNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof FormDataSqlBindingValidateAction) {
-      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
-        @Override
-        public IType[] getTypes() {
-          return resolveServices();
-        }
-      });
-    }
-    else if (menu instanceof SmtpServiceNewAction) {
-      ((SmtpServiceNewAction) menu).setScoutBundle(getScoutResource());
-    }
+    return new Class[]{};
   }
 }
