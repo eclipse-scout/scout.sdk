@@ -23,5 +23,11 @@
             id="finalize.ui.rap.products"
             referenceId="fill.ui.rap">
       </operation>
+      <operation
+            class="org.eclipse.scout.sdk.rap.operations.project.RapProductFileFillOperation"
+            execAfterReference="true"
+            id="fill.ui.rap.product"
+            referenceId="fill.ui.rap">
+      </operation>
    </extension>
 </plugin>
