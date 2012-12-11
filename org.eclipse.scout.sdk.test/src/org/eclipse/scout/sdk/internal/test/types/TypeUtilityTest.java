@@ -13,8 +13,6 @@
  */
 package org.eclipse.scout.sdk.internal.test.types;
 
-import junit.framework.Assert;
-
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
@@ -24,6 +22,7 @@ import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;

@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.helper;
 
 import java.util.HashSet;
 
-import junit.framework.Assert;
-
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -27,6 +25,7 @@ import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.junit.Assert;
 
 /**
  *

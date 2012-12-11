@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.regex.Pattern;
 
-import junit.framework.Assert;
-
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
@@ -25,6 +23,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Button
 import org.eclipse.scout.sdk.util.type.FieldFilters;
 import org.eclipse.scout.sdk.util.type.IFieldFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

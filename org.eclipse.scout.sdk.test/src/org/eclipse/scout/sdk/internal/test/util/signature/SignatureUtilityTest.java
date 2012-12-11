@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -16,6 +14,7 @@ import org.eclipse.scout.sdk.util.signature.FullyQuallifiedValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**

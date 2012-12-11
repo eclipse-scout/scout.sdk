@@ -1,7 +1,5 @@
 package org.eclipse.scout.sdk.test;
 
-import junit.framework.Assert;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -12,6 +10,7 @@ import org.eclipse.scout.rt.testing.shared.ScoutJUnitPluginTestExecutor;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.testing.ITestHarness;
 import org.eclipse.ui.testing.TestableObject;
+import org.junit.Assert;
 
 /**
  * This application launches the eclipse workbench and registers a call-back that executes JUnit tests after the
