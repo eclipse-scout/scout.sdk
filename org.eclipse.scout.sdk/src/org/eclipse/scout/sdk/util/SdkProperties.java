@@ -125,7 +125,9 @@ public final class SdkProperties {
         mementoString.append(",");
       }
     }
-    IEclipsePreferences node = InstanceScope.INSTANCE.getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
+    @SuppressWarnings("deprecation")
+    //needed for backward compatibility to Eclipse 3.4 Ganymede
+    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
     node.put(PROJECT_PROD_LAUNCHERS + "_" + projectName, mementoString.toString());
     try {
       node.flush();
@@ -152,7 +154,9 @@ public final class SdkProperties {
 
   public static IFile[] getProjectProductLaunchers(String projectName) {
     ArrayList<IFile> products = new ArrayList<IFile>();
-    IEclipsePreferences node = InstanceScope.INSTANCE.getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
+    @SuppressWarnings("deprecation")
+    //needed for backward compatibility to Eclipse 3.4 Ganymede
+    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
     String mementoProducts = node.get(PROJECT_PROD_LAUNCHERS + "_" + projectName, "");
     if (!StringUtility.isNullOrEmpty(mementoProducts)) {
       String[] productLocations = mementoProducts.split(",\\s*");
