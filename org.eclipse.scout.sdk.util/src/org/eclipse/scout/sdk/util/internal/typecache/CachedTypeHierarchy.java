@@ -78,26 +78,15 @@ public class CachedTypeHierarchy extends TypeHierarchy implements ICachedTypeHie
   @Override
   void revalidate(IProgressMonitor monitor) {
     if (!m_created) {
-      // TODO aho verify type and project exitstance
       if (!TypeUtility.exists(getType()) || !getType().getJavaProject().exists()) {
         throw new IllegalArgumentException("type or project does not exist");
       }
       try {
-        if (getJdtHierarchy() == null) {
-          setJdtHierarchy(getType().newTypeHierarchy(monitor));
-        }
-        else {
-          if (TypeUtility.exists(getType()) && getType().getJavaProject().exists()) {
-            getJdtHierarchy().refresh(monitor);
-          }
-          else {
-            return;
-          }
-        }
+        setJdtHierarchy(getType().newTypeHierarchy(monitor));
         m_created = true;
       }
       catch (JavaModelException e) {
-        SdkUtilActivator.logError("Unable to refresh cached type hierarchy for type " + getType().getFullyQualifiedName(), e);
+        SdkUtilActivator.logError("Unable to create type hierarchy for type " + getType().getFullyQualifiedName(), e);
       }
     }
   }
