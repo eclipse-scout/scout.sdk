@@ -13,7 +13,6 @@ package org.eclipse.scout.nls.sdk.internal.jdt;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -29,10 +28,6 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 public final class NlsTypeUtility {
 
   private NlsTypeUtility() {
-  }
-
-  public static boolean exists(IJavaElement element) {
-    return element != null && element.exists();
   }
 
   public static IType getType(String fullyQualifiedName) {

@@ -34,6 +34,7 @@ import org.eclipse.scout.nls.sdk.internal.ui.TextField;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.IInputChangedListener;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.TextProposalField;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
+import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
@@ -249,7 +250,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     Group group = new Group(parent, SWT.NONE);
     group.setText("Languages");
 
-    String[][] langs = {{"default", null}, {"German", "de"}, {"French", "fr"}, {"Italian", "it"}, {"Spanish", "es"}};
+    String[][] langs = {{Language.LANGUAGE_DEFAULT.getLocale().getLanguage(), null}, {"German", "de"}, {"French", "fr"}, {"Italian", "it"}, {"Spanish", "es"}};
 
     for (final String[] entry : langs) {
       final Button chk = new Button(group, SWT.CHECK);

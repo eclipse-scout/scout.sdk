@@ -43,8 +43,11 @@ public class LookupCallNewOperation implements IOperation {
   private IScoutBundle m_serviceImplementationBundle;
   private IType m_lookupService;
   private boolean m_formatSource;
+
   //out members
   private IType m_outLookupCall;
+  private IType m_outLookupService;
+  private IType m_outLookupServiceInterface;
 
   @Override
   public String getOperationName() {
@@ -71,8 +74,10 @@ public class LookupCallNewOperation implements IOperation {
         serviceOp.validate();
         serviceOp.run(monitor, workingCopyManager);
         lookupServiceInterface = serviceOp.getCreatedServiceInterface();
+        m_outLookupService = serviceOp.getCreatedServiceImplementation();
       }
     }
+    m_outLookupServiceInterface = lookupServiceInterface;
     // lookup call
     ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP), getBundle());
     lookupCallOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.LookupCall));
@@ -179,4 +184,11 @@ public class LookupCallNewOperation implements IOperation {
     return m_outLookupCall;
   }
 
+  public IType getOutLookupService() {
+    return m_outLookupService;
+  }
+
+  public IType getOutLookupServiceInterface() {
+    return m_outLookupServiceInterface;
+  }
 }

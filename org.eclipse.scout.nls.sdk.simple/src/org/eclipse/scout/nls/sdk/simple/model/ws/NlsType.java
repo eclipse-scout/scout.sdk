@@ -31,7 +31,7 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.internal.jdt.NlsTypeUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h4>NlsType</h4>
@@ -68,7 +68,7 @@ public class NlsType implements INlsType {
 
   protected String getBundleValue() throws JavaModelException {
     IField field = m_type.getField(RESOURCE_BUNDLE_FIELD_NAME);
-    if (NlsTypeUtility.exists(field)) {
+    if (TypeUtility.exists(field)) {
       //int flags = field.getFlags();
       //int refFlags = Flags.AccPublic | Flags.AccStatic;
       //if ((refFlags & flags) == refFlags) {
@@ -84,7 +84,7 @@ public class NlsType implements INlsType {
   protected void loadSuperTypeHierarchy() throws JavaModelException {
     ITypeHierarchy typeHierarchy = m_type.newSupertypeHierarchy(new NullProgressMonitor());
     m_superTypes = typeHierarchy.getAllSuperclasses(m_type);
-    if (m_superTypes.length > 0 && NlsTypeUtility.exists(m_superTypes[0]) &&
+    if (m_superTypes.length > 0 && TypeUtility.exists(m_superTypes[0]) &&
         !m_superTypes[0].getFullyQualifiedName().equals(DynamicNls.class.getName()) &&
         !m_superTypes[0].getFullyQualifiedName().equals(Object.class.getName())) {
       m_propertySupport.setProperty(PROP_SUPER_TYPE, m_superTypes[0]);
@@ -171,7 +171,7 @@ public class NlsType implements INlsType {
             @Override
             public boolean visit(IResourceDelta d) {
               IResource resource = d.getResource();
-              if (resource != null && resource.equals(m_type.getResource())) {
+              if (resource != null && TypeUtility.exists(m_type) && resource.equals(m_type.getResource())) {
                 if (m_type.getResource().exists()) {
                   reload();
                 }

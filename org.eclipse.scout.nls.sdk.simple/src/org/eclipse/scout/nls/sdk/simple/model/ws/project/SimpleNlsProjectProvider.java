@@ -12,6 +12,7 @@ import org.eclipse.scout.nls.sdk.internal.jdt.NlsTypeUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
 import org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile.AbstractNlsFile;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class SimpleNlsProjectProvider implements INlsProjectProvider {
 
@@ -21,7 +22,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
   }
 
   protected INlsProject getNlsProject(IType type) throws CoreException {
-    if (!NlsTypeUtility.exists(type)) {
+    if (!TypeUtility.exists(type)) {
       NlsCore.logError("nls type '" + type.getFullyQualifiedName() + "' does not exist");
       return null;
     }
