@@ -12,6 +12,7 @@ package org.eclipse.scout.nls.sdk.services.operation;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
@@ -23,6 +24,8 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -34,6 +37,8 @@ public class CreateServiceNlsProjectOperation implements IOperation {
   private String m_translationFilePrefix;
   private String m_serviceName;
   private String[] m_languages;
+
+  private IType m_createdServiceType;
 
   public CreateServiceNlsProjectOperation() {
   }
@@ -89,6 +94,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     serviceOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     serviceOp.validate();
     serviceOp.run(monitor, workingCopyManager);
+    m_createdServiceType = serviceOp.getCreatedServiceImplementation();
 
     // override abstract method with path to resources
     MethodOverrideOperation methodOp = new MethodOverrideOperation(serviceOp.getCreatedServiceImplementation(), NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER, true);
@@ -97,7 +103,12 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     methodOp.run(monitor, workingCopyManager);
 
     // we have changed the NLS service hierarchy: clear the cache so that it will be re-created next time including our just created service.
+    TypeUtility.getPrimaryTypeHierarchy(getSuperType()).invalidate();
     getBundle().getScoutProject().clearNlsProjectCache();
+
+    // wait until all events have been fired and handled
+    ResourcesPlugin.getWorkspace().checkpoint(false);
+    JdtUtility.waitForIndexesReady();
   }
 
   public IType getSuperType() {
@@ -146,5 +157,9 @@ public class CreateServiceNlsProjectOperation implements IOperation {
 
   public String[] getLanguages() {
     return m_languages;
+  }
+
+  public IType getCreatedServiceType() {
+    return m_createdServiceType;
   }
 }
