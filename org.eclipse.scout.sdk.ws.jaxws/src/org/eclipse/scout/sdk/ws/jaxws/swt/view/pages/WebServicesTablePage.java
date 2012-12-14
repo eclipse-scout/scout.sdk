@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
@@ -28,6 +29,11 @@ public class WebServicesTablePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return true;
+  }
+
+  @Override
+  public int accept(INodeVisitor visitor) {
+    return INodeVisitor.CANCEL_SUBTREE;
   }
 
   @Override

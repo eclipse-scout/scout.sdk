@@ -51,7 +51,7 @@ public class LinkWithEditorAction extends Action {
   private P_UpdateSelectionJob m_updateSelectionJob;
 
   public LinkWithEditorAction(ScoutExplorerPart viewPart) {
-    super(null, AS_CHECK_BOX);
+    super(Texts.get("LinkWithEditor"), AS_CHECK_BOX);
     m_viewPart = viewPart;
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolSynchronize));
     setToolTipText(Texts.get("LinkWithEditor"));

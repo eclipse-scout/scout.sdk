@@ -24,6 +24,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart.InvisibleRootNode;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwingNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwtNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientLookupCallTablePage;
@@ -39,6 +40,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuN
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.OutlineNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.OutlineTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.TemplateTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ToolButtonTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormHandlerNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormHandlerTablePage;
@@ -46,6 +48,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.SearchFormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.AbstractBoxNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormFieldTemplateTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute.AttributeNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute.AttributeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity.EntityNodePage;
@@ -66,9 +69,14 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.Serve
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.accesscontrol.AccessControlServiceNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.accesscontrol.AccessControlServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.bookmark.BookmarkStorageServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.bookmark.BookmarkStorageServiceTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.calendar.CalendarServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.calendar.CalendarServiceTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.smtp.SmtpServiceNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.smtp.SmtpServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.sql.SqlServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.sql.SqlServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceNodePage;
@@ -422,8 +430,32 @@ public class EditorSelectionVisitor implements INodeVisitor {
     else if (page instanceof BookmarkStorageServiceNodePage) {
       return visitServiceNodePage((BookmarkStorageServiceNodePage) page);
     }
+    else if (page instanceof CalendarServiceNodePage) {
+      return visitServiceNodePage((CalendarServiceNodePage) page);
+    }
     else if (page instanceof CalendarServiceTablePage) {
       return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ICalendarService));
+    }
+    else if (page instanceof SmtpServiceNodePage) {
+      return visitServiceNodePage((SmtpServiceNodePage) page);
+    }
+    else if (page instanceof SmtpServiceTablePage) {
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.ISMTPService));
+    }
+    else if (page instanceof AccessControlServiceNodePage) {
+      return visitServiceNodePage((AccessControlServiceNodePage) page);
+    }
+    else if (page instanceof AccessControlServiceTablePage) {
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IAccessControlService));
+    }
+    else if (page instanceof LibrariesTablePage) {
+      return CANCEL_SUBTREE;
+    }
+    else if (page instanceof TemplateTablePage) {
+      return CONTINUE;
+    }
+    else if (page instanceof FormFieldTemplateTablePage) {
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IFormField));
     }
     ScoutSdkUi.logWarning("not visited node '" + page.getClass().getName() + "'.");
     return CANCEL;

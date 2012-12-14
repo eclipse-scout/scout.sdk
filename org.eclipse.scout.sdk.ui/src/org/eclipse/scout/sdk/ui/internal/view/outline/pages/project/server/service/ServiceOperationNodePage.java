@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -66,6 +67,11 @@ public class ServiceOperationNodePage extends AbstractPage {
   @Override
   public IScoutBundle getScoutResource() {
     return (IScoutBundle) super.getScoutResource();
+  }
+
+  @Override
+  public int accept(INodeVisitor visitor) {
+    return INodeVisitor.CANCEL_SUBTREE;
   }
 
   @SuppressWarnings("unchecked")

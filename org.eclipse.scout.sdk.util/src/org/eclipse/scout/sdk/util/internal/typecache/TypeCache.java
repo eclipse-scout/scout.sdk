@@ -153,7 +153,7 @@ public final class TypeCache implements ITypeCache {
         }
         else {
           m_cache.remove(fullyQualifiedName);
-          SdkUtilActivator.logWarning("could not resolve type '" + fullyQualifiedName + "'.");
+          SdkUtilActivator.logInfo("could not resolve type '" + fullyQualifiedName + "'.");
         }
       }
     }
