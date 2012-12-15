@@ -36,9 +36,11 @@ import org.eclipse.debug.core.model.IProcess;
 import org.eclipse.debug.internal.ui.DebugUIPlugin;
 import org.eclipse.debug.internal.ui.IInternalDebugUIConstants;
 import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.launching.IJavaLaunchConfigurationConstants;
 import org.eclipse.jdt.launching.IRuntimeClasspathEntry;
+import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.scout.commons.CompareUtility;
@@ -209,7 +211,7 @@ public class WsStubGenerationOperation implements IOperation {
 
   private void launchJavaApplicationSync(String launchName, String projectName, String javaMainTypeName, String argumentList, IProgressMonitor monitor) throws Exception {
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
-    ILaunchConfigurationType type = launchManager.getLaunchConfigurationType("org.eclipse.jdt.launching.localJavaApplication");
+    ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION);
     ILaunchConfigurationWorkingCopy wc = type.newInstance(null, launchName);
     wc.setAttribute(IDebugUIConstants.ATTR_CAPTURE_IN_CONSOLE, true);
     wc.setAttribute(IJavaLaunchConfigurationConstants.ATTR_PROJECT_NAME, projectName);
@@ -298,13 +300,13 @@ public class WsStubGenerationOperation implements IOperation {
       mementoList.add(classpathEntry.getMemento());
     }
 
-    // check whether the required lib tools.jar is part of the workspace classpath (required for WsImport)
+    // ensure that the file 'WsImport' is on classpath (required to build the webservice)
     IType wsImportType = TypeUtility.getType(JaxWsRuntimeClasses.WsImportType);
     if (wsImportType == null || !wsImportType.exists() || !TypeUtility.isOnClasspath(wsImportType, m_bundle.getJavaProject())) {
-      // manually add tool.jar to the classpath of the launch-configuration (from JRE).
-      File toolsJarFile = locateToolsJar();
+      // manually add the 'tools.jar' to the classpath of the launch-configuration
+      File toolsJarFile = findToolsJarInVm();
       if (toolsJarFile == null || !toolsJarFile.exists() || !toolsJarFile.isFile()) {
-        throw new CoreException(new ScoutStatus("Could not locate the Java library 'tools.jar'. Please ensure to have the environment variable JAVA_HOME set and the JAR /lib/tools.jar exists. Alternatively, add the JAR 'tools.jar' to the system libraries of the installed JRE in Eclipse Preferences 'Java | Installed JREs'."));
+        throw new CoreException(new ScoutStatus("Failed to locate the Java library 'tools.jar'. Please ensure the 'tools.jar' to be on the classpath or in the project's JDK."));
       }
       mementoList.add(JavaRuntime.newArchiveRuntimeClasspathEntry(new Path(toolsJarFile.getAbsolutePath())).getMemento());
     }
@@ -312,17 +314,54 @@ public class WsStubGenerationOperation implements IOperation {
     return mementoList;
   }
 
-  private File locateToolsJar() {
-    String[] defaultToolsLocation = {"lib", "tools.jar"};
+  /**
+   * Tries to find the 'tools.jar' Java library. The precedence of the search is as following:
+   * <ol>
+   * <li>project VM</li>
+   * <li>default VM</li>
+   * <li>Eclipse IDE VM</li>
+   * </ol>
+   * 
+   * @return the 'tools.jar' or <code>null</code> if not found.
+   */
+  private File findToolsJarInVm() {
+    // Project VM
+    IJavaProject project = m_bundle.getJavaProject();
+    try {
+      IVMInstall projectVm = JavaRuntime.getVMInstall(project);
+      File toolsJar = findToolsJarInVm(projectVm.getInstallLocation());
+      if (toolsJar != null) {
+        return toolsJar;
+      }
+    }
+    catch (CoreException e) {
+      JaxWsSdk.logError(String.format("Failed to find the 'tools.jar' in the JDK that is assigned to the project '%s'", m_bundle.getProject().getName()), e);
+    }
 
-    File file = new File(System.getProperty("java.home"));
-    if (file.getName().equalsIgnoreCase("jre")) {
-      file = file.getParentFile();
+    // Default VM
+    IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
+    File toolsJar = findToolsJarInVm(defaultVm.getInstallLocation());
+    if (toolsJar != null) {
+      return toolsJar;
     }
-    for (String name : defaultToolsLocation) {
-      file = new File(file, name);
+
+    // Eclipse IDE VM
+    return findToolsJarInVm(new File(System.getProperty("java.home")));
+  }
+
+  private File findToolsJarInVm(File vmRootFolder) {
+    if (vmRootFolder == null) {
+      return null;
     }
-    return file;
+    if (vmRootFolder.getName().equalsIgnoreCase("jre")) {
+      vmRootFolder = vmRootFolder.getParentFile();
+    }
+
+    File toolsJar = new File(vmRootFolder, "lib/tools.jar");
+    if (toolsJar.exists()) {
+      return toolsJar;
+    }
+    return null;
   }
 
   public IScoutBundle getBundle() {
