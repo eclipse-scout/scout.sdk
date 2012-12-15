@@ -136,7 +136,7 @@ public class WsStubGenerationOperation implements IOperation {
           if (!StringUtility.hasText(propName)) {
             continue;
           }
-          // skip not JAX-WS options
+          // skip non JAX-WS options
           if (propName.equals(JaxWsConstants.OPTION_JAR)) {
             continue;
           }
