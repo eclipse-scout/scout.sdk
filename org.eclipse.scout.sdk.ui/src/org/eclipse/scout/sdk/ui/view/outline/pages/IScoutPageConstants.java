@@ -54,6 +54,7 @@ public interface IScoutPageConstants {
   String DESKTOP_OUTLINE_TABLE_PAGE = "org.eclipse.scout.sdk.page.DesktopOutlineTablePage";
   String DOUBLE_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.DoubleFieldNodePage";
   String FILE_CHOOSER_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.FileChooserFieldNodePage";
+  String FORM_TEMPLATE_TABLE_PAGE = "org.eclipse.scout.sdk.page.FormTemplateTablePage";
   String FORM_FIELD_TEMPLATE_TABLE_PAGE = "org.eclipse.scout.sdk.page.FormFieldTemplateTablePage";
   String FORM_HANDLER_NODE_PAGE = "org.eclipse.scout.sdk.page.FormHandlerNodePage";
   String FORM_HANDLER_TABLE_PAGE = "org.eclipse.scout.sdk.page.FormHandlerTablePage";

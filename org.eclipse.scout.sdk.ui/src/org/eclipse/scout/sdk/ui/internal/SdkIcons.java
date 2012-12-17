@@ -262,6 +262,7 @@ public interface SdkIcons {
   String CalendarItemProviderAdd = ToolAdd; // TODO
   String CalendarItemProviderRemove = ToolRemove; // TODO
   String CalendarItemProviders = FolderOpen; // TODO
+  String FormTemplate = Default; // TODO
   String FormFieldTemplate = Default; // TODO
   String FormFieldTemplateAdd = ToolAdd; // TODO
   String FormFieldTemplateRemove = ToolRemove; // TODO

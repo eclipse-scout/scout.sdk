@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormFieldTemplateTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormTemplateTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -39,6 +40,7 @@ public class TemplateTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
+    new FormTemplateTablePage(this);
     new FormFieldTemplateTablePage(this);
   }
 
