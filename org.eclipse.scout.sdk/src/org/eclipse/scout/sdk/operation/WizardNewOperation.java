@@ -31,6 +31,7 @@ public class WizardNewOperation implements IOperation {
   private String m_superTypeSignature;
   private INlsEntry m_nlsEntry;
   private boolean m_formatSource;
+  private String m_packageName;
 
   // operation member
   private IType m_createdWizard;
@@ -48,11 +49,14 @@ public class WizardNewOperation implements IOperation {
     if (StringUtility.isNullOrEmpty(getTypeName())) {
       throw new IllegalArgumentException("type name can not be null or empty.");
     }
+    if (StringUtility.isNullOrEmpty(getPackageName())) {
+      throw new IllegalArgumentException("package can not be null or empty.");
+    }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_WIZARDS), getClientBundle());
+    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.run(monitor, workingCopyManager);
     m_createdWizard = newOp.getCreatedType();
@@ -126,4 +130,11 @@ public class WizardNewOperation implements IOperation {
     m_formatSource = formatSource;
   }
 
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
+  }
 }

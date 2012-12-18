@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -35,6 +36,7 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
@@ -74,13 +76,15 @@ public class CreateTemplateOperation implements IOperation {
 
   private String m_templateName;
   private String m_packageName;
+  private String m_formDataPackageSuffix;
   private boolean m_replaceFieldWithTemplate;
   private boolean m_createExternalFormData;
   private IType m_formField;
   private IScoutBundle m_templateBundle;
 
-  public CreateTemplateOperation(IType formField) {
+  public CreateTemplateOperation(IType formField, IScoutBundle bundle) {
     m_formField = formField;
+    m_templateBundle = bundle;
   }
 
   @Override
@@ -95,6 +99,9 @@ public class CreateTemplateOperation implements IOperation {
     }
     if (StringUtility.isNullOrEmpty(getTemplateName())) {
       throw new IllegalArgumentException("Template name can not be null or empty.");
+    }
+    if (StringUtility.isNullOrEmpty(getFormDataPackageSuffix())) {
+      throw new IllegalArgumentException("Formdata package can not be null or empty.");
     }
     if (StringUtility.isNullOrEmpty(getPackageName())) {
       throw new IllegalArgumentException("Template package can not be null or empty.");
@@ -133,7 +140,6 @@ public class CreateTemplateOperation implements IOperation {
 
         }
       }
-
     };
 
     String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
@@ -158,10 +164,14 @@ public class CreateTemplateOperation implements IOperation {
     op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
     IScoutBundle sharedBundle = findFormDataBundle(getTemplateBundle().getScoutProject());
     if (isCreateExternalFormData() && sharedBundle != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), sharedBundle);
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(getFormDataPackageSuffix()), sharedBundle);
       formDataOp.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
+
+      // add to exported packages
+      ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{formDataOp.getCreatedType().getPackageFragment()}, true);
+      manifestOp.run(monitor, workingCopyManager);
 
       FormDataAnnotationCreateOperation formDataAnnotationOp = new FormDataAnnotationCreateOperation(null);
       formDataAnnotationOp.setSdkCommand(SdkCommand.CREATE);
@@ -172,6 +182,10 @@ public class CreateTemplateOperation implements IOperation {
     op.validate();
     op.run(monitor, workingCopyManager);
     IType templateType = op.getCreatedType();
+
+    // add to exported packages
+    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{templateType.getPackageFragment()}, true);
+    manifestOp.run(monitor, workingCopyManager);
 
     JavaElementFormatOperation formatOp = new JavaElementFormatOperation(templateType, true);
     formatOp.validate();
@@ -370,6 +384,14 @@ public class CreateTemplateOperation implements IOperation {
    */
   public void setCreateExternalFormData(boolean createExternalFormData) {
     m_createExternalFormData = createExternalFormData;
+  }
+
+  public String getFormDataPackageSuffix() {
+    return m_formDataPackageSuffix;
+  }
+
+  public void setFormDataPackageSuffix(String formDataPackageSuffix) {
+    m_formDataPackageSuffix = formDataPackageSuffix;
   }
 
   private class P_FormField {

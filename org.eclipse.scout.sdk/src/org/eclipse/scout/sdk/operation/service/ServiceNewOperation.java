@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.IRuntimeClasses;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
@@ -108,7 +109,7 @@ public class ServiceNewOperation implements IOperation {
       m_createdServiceInterface = createdInterface;
       // register
       for (IScoutBundle cb : getProdyRegistrationBundles()) {
-        ScoutUtility.registerServiceClass(cb.getProject(), IScoutBundle.CLIENT_EXTENSION_POINT_SERVICE_PROXIES, IScoutBundle.CLIENT_EXTENSION_ELEMENT_SERVICE_PROXY, getCreatedServiceInterface().getFullyQualifiedName(), null, RuntimeClasses.ClientProxyServiceFactory, monitor);
+        ScoutUtility.registerServiceClass(cb.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, getCreatedServiceInterface().getFullyQualifiedName(), null, RuntimeClasses.ClientProxyServiceFactory, monitor);
       }
     }
     if (getImplementationBundle() != null) {
@@ -157,8 +158,8 @@ public class ServiceNewOperation implements IOperation {
           serviceFactory = RuntimeClasses.DefaultServiceFactory;
         }
 
-        ScoutUtility.registerServiceClass(sb.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES,
-            IScoutBundle.EXTENSION_ELEMENT_SERVICE, getCreatedServiceImplementation().getFullyQualifiedName(),
+        ScoutUtility.registerServiceClass(sb.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES,
+            IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, getCreatedServiceImplementation().getFullyQualifiedName(),
             sessionType == null ? null : sessionType.getFullyQualifiedName(), serviceFactory, monitor);
       }
     }

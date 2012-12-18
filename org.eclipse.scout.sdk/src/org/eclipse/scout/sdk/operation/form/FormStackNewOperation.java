@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class FormStackNewOperation implements IOperation {
 
   private String m_formName;
+  private String m_formPackage;
   private INlsEntry m_nlsEntry;
   private String m_formSuperTypeSignature;
   private String m_formIdName;
@@ -46,16 +47,26 @@ public class FormStackNewOperation implements IOperation {
   private boolean m_createModifyHandler = false;
   private IScoutBundle[] m_clientServiceRegistryBundles;
   private IScoutBundle m_formDataBundle;
-  private IScoutBundle m_serviceInterfaceBundle;
-  private String m_serviceInterfaceName;
+  private String m_formDataPackage;
+
   private IScoutBundle m_permissionCreateBundle;
   private String m_permissionCreateName;
+  private String m_permissionCreatePackage;
+
   private IScoutBundle m_permissionReadBundle;
   private String m_permissionReadName;
+  private String m_permissionReadPackage;
+
   private IScoutBundle m_permissionUpdateBundle;
+  private String m_permissionUpdateName;
+  private String m_permissionUpdatePackage;
+
+  private IScoutBundle m_serviceInterfaceBundle;
+  private String m_serviceInterfaceName;
+  private String m_serviceInterfacePackage;
   private IScoutBundle m_serviceImplementationBundle;
   private String m_serviceImplementationName;
-  private String m_permissionUpdateName;
+  private String m_serviceImplementationPackage;
   private IScoutBundle[] m_serverServiceRegistryBundles;
   private boolean m_formatSource;
 
@@ -100,7 +111,7 @@ public class FormStackNewOperation implements IOperation {
     // create empty form data
     String formDataSignature = null;
     if (getFormDataBundle() != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getFormName() + "Data", getFormDataBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), getFormDataBundle());
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getFormName() + "Data", getFormDataPackage(), getFormDataBundle());
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
       m_outFormData = formDataOp.getCreatedType();
@@ -117,7 +128,7 @@ public class FormStackNewOperation implements IOperation {
       formOp.setSuperTypeSignature(getFormSuperTypeSignature());
     }
     formOp.setFormDataSignature(formDataSignature);
-
+    formOp.setPackage(getFormPackage());
     formOp.setCreateButtonOk(isCreateButtonOk());
     formOp.setCreateButtonCancel(isCreateButtonCancel());
     formOp.validate();
@@ -132,18 +143,12 @@ public class FormStackNewOperation implements IOperation {
       beanPropOp.setSiblingField(null);
       beanPropOp.run(monitor, workingCopyManager);
     }
-//    // form data
-//    if (getFormDataBundle() != null) {
-//      FormDataUpdateOperation formDataOp = new FormDataUpdateOperation(getOutForm(), getFormDataBundle());
-//      formDataOp.validate();
-//      formDataOp.run(monitor, workingCopyManager);
-//      m_outFormData = formDataOp.getFormDataType();
-//
-//    }
+
     // permissions
     if (getPermissionCreateBundle() != null) {
       PermissionNewOperation permissionOp = new PermissionNewOperation(m_formatSource);
       permissionOp.setSharedBundle(getPermissionCreateBundle());
+      permissionOp.setPackageName(getPermissionCreatePackage());
       permissionOp.setTypeName(getPermissionCreateName());
       permissionOp.run(monitor, workingCopyManager);
       m_outCreatePermission = permissionOp.getCreatedPermission();
@@ -152,6 +157,7 @@ public class FormStackNewOperation implements IOperation {
     if (getPermissionReadBundle() != null) {
       PermissionNewOperation permissionOp = new PermissionNewOperation(m_formatSource);
       permissionOp.setSharedBundle(getPermissionReadBundle());
+      permissionOp.setPackageName(getPermissionReadPackage());
       permissionOp.setTypeName(getPermissionReadName());
       permissionOp.run(monitor, workingCopyManager);
       m_outReadPermission = permissionOp.getCreatedPermission();
@@ -160,6 +166,7 @@ public class FormStackNewOperation implements IOperation {
     if (getPermissionUpdateBundle() != null) {
       PermissionNewOperation permissionOp = new PermissionNewOperation(m_formatSource);
       permissionOp.setSharedBundle(getPermissionUpdateBundle());
+      permissionOp.setPackageName(getPermissionUpdatePackage());
       permissionOp.setTypeName(getPermissionUpdateName());
       permissionOp.run(monitor, workingCopyManager);
       m_outUpdatePermission = permissionOp.getCreatedPermission();
@@ -177,10 +184,10 @@ public class FormStackNewOperation implements IOperation {
       serviceOp.setImplementationBundle(getServiceImplementationBundle());
       serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
       serviceOp.setServiceInterfaceName(getServiceInterfaceName());
-      serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES));
+      serviceOp.setServiceInterfacePackageName(getServiceInterfacePackage());
       serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
       serviceOp.setServiceName(getServiceImplementationName());
-      serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES));
+      serviceOp.setServicePackageName(getServiceImplementationPackage());
       serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServiceImplementationBundle().getJavaProject()));
       serviceOp.run(monitor, workingCopyManager);
       m_outProcessService = serviceOp.getCreatedServiceImplementation();
@@ -621,6 +628,62 @@ public class FormStackNewOperation implements IOperation {
 
   public boolean isFormatSource() {
     return m_formatSource;
+  }
+
+  public String getFormPackage() {
+    return m_formPackage;
+  }
+
+  public void setFormPackage(String formPackage) {
+    m_formPackage = formPackage;
+  }
+
+  public String getFormDataPackage() {
+    return m_formDataPackage;
+  }
+
+  public void setFormDataPackage(String formDataPackage) {
+    m_formDataPackage = formDataPackage;
+  }
+
+  public String getServiceInterfacePackage() {
+    return m_serviceInterfacePackage;
+  }
+
+  public void setServiceInterfacePackage(String serviceInterfacePackage) {
+    m_serviceInterfacePackage = serviceInterfacePackage;
+  }
+
+  public String getServiceImplementationPackage() {
+    return m_serviceImplementationPackage;
+  }
+
+  public void setServiceImplementationPackage(String serviceImplementationPackage) {
+    m_serviceImplementationPackage = serviceImplementationPackage;
+  }
+
+  public String getPermissionCreatePackage() {
+    return m_permissionCreatePackage;
+  }
+
+  public void setPermissionCreatePackage(String permissionCreatePackage) {
+    m_permissionCreatePackage = permissionCreatePackage;
+  }
+
+  public String getPermissionReadPackage() {
+    return m_permissionReadPackage;
+  }
+
+  public void setPermissionReadPackage(String permissionReadPackage) {
+    m_permissionReadPackage = permissionReadPackage;
+  }
+
+  public String getPermissionUpdatePackage() {
+    return m_permissionUpdatePackage;
+  }
+
+  public void setPermissionUpdatePackage(String permissionUpdatePackage) {
+    m_permissionUpdatePackage = permissionUpdatePackage;
   }
 
 }

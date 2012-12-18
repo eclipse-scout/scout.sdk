@@ -79,7 +79,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     IScoutBundle sharedBundle = m_scoutProject.getSharedBundle();
 
     // formdata
-    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), sharedBundle);
+    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SERVICES), sharedBundle);
     formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
     formDataOp.run(monitor, workingCopyManager);
     IType formData = formDataOp.getCreatedType();
@@ -92,6 +92,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
 
     // form
     FormNewOperation formOp = new FormNewOperation();
+    formOp.setPackage(m_scoutProject.getClientBundle().getPackageName(".ui.forms"));
     formOp.setFormDataSignature(formDataSignature);
     formOp.setClientBundle(m_scoutProject.getClientBundle());
     formOp.setCreateButtonCancel(false);
@@ -135,8 +136,11 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     serviceOp.setClientServiceRegistryBundles(new IScoutBundle[]{m_scoutProject.getClientBundle()});
     serviceOp.setServerServiceRegistryBundles(new IScoutBundle[]{m_scoutProject.getServerBundle()});
     serviceOp.setServiceImplementationBundle(m_scoutProject.getServerBundle());
+    serviceOp.setServicePackageName(m_scoutProject.getServerBundle().getDefaultPackage(IScoutBundle.SERVER_SERVICES));
     serviceOp.setServiceImplementationName("DesktopProcessService");
     serviceOp.setServiceInterfaceBundle(sharedBundle);
+    serviceOp.setServiceInterfacePackageName(sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SERVICES));
+    serviceOp.setPermissionPackageName(sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SECURITY));
     serviceOp.setServiceInterfaceName("IDesktopProcessService");
     serviceOp.run(monitor, workingCopyManager);
     final IType serviceInterface = serviceOp.getCreatedServiceInterface();
@@ -204,7 +208,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     formDataUpdateOp.run(monitor, workingCopyManager);
 
     // desktop
-    IType desktopType = TypeUtility.getType(m_scoutProject.getClientBundle().getBundleName() + IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP + ".Desktop");
+    IType desktopType = TypeUtility.getType(m_scoutProject.getClientBundle().getDefaultPackage(IScoutBundle.CLIENT_DESKTOP) + ".Desktop");
     if (TypeUtility.exists(desktopType)) {
       MethodOverrideOperation execOpenOp = new MethodOverrideOperation(desktopType, "execOpened", false) {
         @Override

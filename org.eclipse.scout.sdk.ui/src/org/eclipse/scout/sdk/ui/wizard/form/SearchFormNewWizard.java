@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
-import org.eclipse.scout.sdk.ui.wizard.services.ServiceNewWizardPage;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -120,8 +119,14 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
     }
     m_operation.setTablePage(m_page1.getTablePageType());
     m_operation.setCreateSearchHandler(m_page2.getTreeNode(TYPE_HANDLER_SEARCH, true, true) != null);
-    m_operation.setSearchFormLocationBundle(m_page2.getLocationBundle(TYPE_SEARCH_FORM, true, true));
-    m_operation.setSearchFormDataLocationBundle(m_page2.getLocationBundle(TYPE_SEARCH_FORM_DATA, true, true));
+
+    IScoutBundle searchFormBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM, true, true);
+    m_operation.setSearchFormLocationBundle(searchFormBundle);
+    m_operation.setSearchFormPackageName(searchFormBundle.getPackageName(m_page1.getTargetPackage()));
+
+    IScoutBundle searchFormDataBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM_DATA, true, true);
+    m_operation.setSearchFormDataLocationBundle(searchFormDataBundle);
+    m_operation.setSearchFormDataPackageName(searchFormDataBundle.getPackageName(m_page1.getTargetPackage()));
     return true;
   }
 
@@ -144,7 +149,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   private class P_LocationPropertyListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (evt.getPropertyName().equals(ServiceNewWizardPage.PROP_TYPE_NAME)) {
+      if (evt.getPropertyName().equals(SearchFormNewWizardPage.PROP_TYPE_NAME)) {
         String typeName = m_page1.getTypeName();
         if (!StringUtility.isNullOrEmpty(typeName)) {
           String prefix = typeName.replaceAll(SdkProperties.SUFFIX_SEARCH_FORM + "$", "");
@@ -253,7 +258,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (searchFormBundle != null) {
         ITreeNode searchFormNode = m_page2.getTreeNode(TYPE_SEARCH_FORM, true, true);
         if (searchFormNode != null) {
-          String fqn = searchFormBundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS) + "." + searchFormNode.getText();
+          String fqn = searchFormBundle.getPackageName(m_page1.getTargetPackage()) + "." + searchFormNode.getText();
           if (searchFormBundle.findType(fqn) != null) {
             return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.ERROR) : (IStatus.WARNING),
                 ScoutSdkUi.PLUGIN_ID, "'" + searchFormNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
@@ -265,7 +270,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (formDataBundle != null) {
         ITreeNode formDataNode = m_page2.getTreeNode(TYPE_SEARCH_FORM_DATA, true, true);
         if (formDataNode != null) {
-          String fqn = formDataBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + formDataNode.getText();
+          String fqn = formDataBundle.getPackageName(m_page1.getTargetPackage()) + "." + formDataNode.getText();
           if (formDataBundle.findType(fqn) != null) {
             return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.WARNING) : (IStatus.ERROR),
                 ScoutSdkUi.PLUGIN_ID, "'" + formDataNode.getText() + "' " + Texts.get("AlreadyExists") + ".");

@@ -27,10 +27,12 @@ public class CodeIdField extends Composite {
 
   private final IScoutProject m_project;
   private final IProposalAdapterListener m_genericFieldListener;
+  private final int m_labelPercentage;
 
-  public CodeIdField(Composite parent, IScoutProject project) {
+  public CodeIdField(Composite parent, IScoutProject project, int labelPercentage) {
     super(parent, SWT.NONE);
     m_project = project;
+    m_labelPercentage = labelPercentage;
     m_genericFieldListener = new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -42,7 +44,7 @@ public class CodeIdField extends Composite {
   }
 
   private void createContent() {
-    m_nextCodeIdField = new FieldToolkit().createStyledTextField(this, Texts.get("CodeId"));
+    m_nextCodeIdField = new FieldToolkit().createStyledTextField(this, Texts.get("CodeId"), m_labelPercentage);
 
     setLayout(new GridLayout(1, false));
     m_nextCodeIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));

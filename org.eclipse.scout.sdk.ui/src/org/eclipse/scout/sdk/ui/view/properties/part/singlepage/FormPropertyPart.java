@@ -33,6 +33,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -100,9 +101,10 @@ public class FormPropertyPart extends JdtTypePropertyPart {
             sharedBundle = scoutProject.getSharedBundle();
           }
           if (sharedBundle != null) {
-            String formDataName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + entityName + SdkProperties.SUFFIX_FORM_DATA;
-            if (TypeUtility.existsType(formDataName)) {
-              model.addGlobalLink(new TypeOpenLink(TypeUtility.getType(formDataName)));
+            IType form = getPage().getType();
+            IType formDataType = ScoutTypeUtility.findFormDataForForm(form, sharedBundle);
+            if (TypeUtility.exists(formDataType)) {
+              model.addGlobalLink(new TypeOpenLink(formDataType));
             }
           }
           // service

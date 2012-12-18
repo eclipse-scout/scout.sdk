@@ -577,10 +577,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
-        IScoutBundle serverBundle = page.getScoutResource();
-        if (currentElement.getPackageFragment().getElementName().equals(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES))) {
-          return CONTINUE_BRANCH;
-        }
+        return CONTINUE_BRANCH;
       }
     }
     return CANCEL_SUBTREE;
@@ -605,11 +602,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
-        IScoutBundle serverBundle = page.getScoutResource();
-        if (currentElement.getPackageFragment().getElementName().startsWith(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON))) {
-          return CONTINUE_BRANCH;
-        }
-
+        return CONTINUE_BRANCH;
       }
     }
     return CANCEL_SUBTREE;

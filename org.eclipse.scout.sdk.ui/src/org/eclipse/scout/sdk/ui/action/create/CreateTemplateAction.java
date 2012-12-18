@@ -36,7 +36,6 @@ public class CreateTemplateAction extends AbstractScoutHandler {
   private IType m_type;
   private TemplateFromFromFieldDialog m_dialog;
   private IScoutBundle m_bundle;
-  private String m_packageName;
   private IPage m_page;
 
   public CreateTemplateAction() {
@@ -48,10 +47,10 @@ public class CreateTemplateAction extends AbstractScoutHandler {
     String name = "Abstract" + getType().getElementName();
     m_dialog = new TemplateFromFromFieldDialog(shell, name, getType());
     if (m_dialog.open() == IDialogConstants.OK_ID) {
-      CreateTemplateOperation op = new CreateTemplateOperation(getType());
+      CreateTemplateOperation op = new CreateTemplateOperation(getType(), m_bundle);
       op.setTemplateName(m_dialog.getTemplateName());
-      op.setPackageName(m_packageName);
-      op.setTemplateBundle(m_bundle);
+      op.setPackageName(m_bundle.getPackageName(m_dialog.getTargetPackage()));
+      op.setFormDataPackageSuffix(m_dialog.getTargetPackage());
       op.setReplaceFieldWithTemplate(m_dialog.isReplaceFormField());
       op.setCreateExternalFormData(m_dialog.isCreateExternalFormData());
       op.validate();
@@ -78,7 +77,6 @@ public class CreateTemplateAction extends AbstractScoutHandler {
   public void setType(IType type) {
     m_type = type;
     m_bundle = ScoutTypeUtility.getScoutBundle(m_type);
-    m_packageName = m_bundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_TEMPLATE_FORM_FIELD);
   }
 
   public void setPage(IPage page) {

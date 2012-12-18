@@ -87,9 +87,11 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
         }
       }
     });
+    IScoutBundle client = ScoutSdkCore.getScoutWorkspace().getScoutBundle(project.getProject());
     FormNewOperation formOp = new FormNewOperation();
     formOp.setTypeName("ANewForm");
-    formOp.setClientBundle(ScoutSdkCore.getScoutWorkspace().getScoutBundle(project.getProject()));
+    formOp.setPackage(client.getPackageName(".ui.forms"));
+    formOp.setClientBundle(client);
     formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, project));
     OperationJob job = new OperationJob(formOp);
     job.schedule();
@@ -135,9 +137,9 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     serviceOp.setInterfaceBundle(sharedBundle);
     serviceOp.setServiceInterfaceName("ITestService");
     serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
-    serviceOp.setServiceInterfacePackageName(sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES + ".notexisting"));
+    serviceOp.setServiceInterfacePackageName(sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SERVICES) + ".notexisting");
     serviceOp.setServiceName("TestService");
-    serviceOp.setServicePackageName(serverBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES + ".notexisting"));
+    serviceOp.setServicePackageName(serverBundle.getDefaultPackage(IScoutBundle.SERVER_SERVICES) + ".notexisting");
     serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
     OperationJob job = new OperationJob(serviceOp);
     job.schedule();

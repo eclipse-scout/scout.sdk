@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -33,6 +34,8 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -44,15 +47,17 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>CodeTypeWizardPage</h3> ...
  */
 public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
-  IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
-  final IType basicHierarchyPermission = TypeUtility.getType(RuntimeClasses.BasicHierarchyPermission);
+  private final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
+  private final IType basicHierarchyPermission = TypeUtility.getType(RuntimeClasses.BasicHierarchyPermission);
 
+  private String m_packageName;
   private String m_typeName;
   private IType m_superType;
 
   // ui fields
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
+  private EntityTextField m_entityField;
 
   // process members
   private final IScoutBundle m_sharedBundle;
@@ -62,6 +67,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewPermission"));
     setDescription(Texts.get("CreateANewPermission"));
+    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IScoutBundle.SHARED_SECURITY));
     m_superType = basicHierarchyPermission;
   }
 
@@ -72,8 +78,8 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    int labelColWidthPercent = 20;
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_PERMISSION);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -85,7 +91,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(basicHierarchyPermission, getSharedBundle().getJavaProject(), basicPermission));
+        new JavaElementAbstractTypeContentProvider(basicHierarchyPermission, getSharedBundle().getJavaProject(), basicPermission), labelColWidthPercent);
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -95,11 +101,22 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_sharedBundle, labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
+        pingStateChanging();
+      }
+    });
+
     // layout
     parent.setLayout(new GridLayout(1, true));
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   @Override
@@ -107,6 +124,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     PermissionNewOperation op = new PermissionNewOperation();
     // write back members
     op.setSharedBundle(getSharedBundle());
+    op.setPackageName(getSharedBundle().getPackageName(getTargetPackage()));
     op.setTypeName(getTypeName());
 
     IType superTypeProp = getSuperType();
@@ -122,6 +140,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     try {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
+      multiStatus.add(getStatusTargetPackge());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
@@ -134,10 +153,10 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_PERMISSION)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
     // check not allowed names
-    if (TypeUtility.existsType(getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SECURITY) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getSharedBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
@@ -149,6 +168,10 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     else {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
+  }
+
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {
@@ -192,4 +215,24 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
+  public String getTargetPackage() {
+    return m_packageName;
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    m_packageName = targetPackage;
+  }
 }

@@ -21,9 +21,9 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
+import org.eclipse.scout.sdk.IRuntimeClasses;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -128,10 +128,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
 
     HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.length);
-    IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IScoutBundleConstantes.EXTENSION_POINT_SERVICES, true);
+    IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IRuntimeClasses.EXTENSION_POINT_SERVICES, true);
     for (IExtension e : allServiceExtensions) {
       for (IConfigurationElement c : e.getConfigurationElements()) {
-        if (IScoutBundleConstantes.EXTENSION_ELEMENT_SERVICE.equals(c.getName())) {
+        if (IRuntimeClasses.EXTENSION_ELEMENT_SERVICE.equals(c.getName())) {
           String serviceClassDef = c.getAttribute("class");
           IType serviceImpl = typeMap.get(serviceClassDef);
           if (acceptsFilter(returnDocServices, projectFilter, serviceImpl)) {
@@ -195,7 +195,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   private static float getPriority(IType registration, IConfigurationElement config) {
     // first check plugin.xml definition for ranking
-    String xmlRank = config.getAttribute(IScoutBundleConstantes.EXTENSION_SERVICE_RANKING);
+    String xmlRank = config.getAttribute(IRuntimeClasses.EXTENSION_SERVICE_RANKING);
     if (xmlRank != null && xmlRank.length() > 0) {
       try {
         return Float.parseFloat(xmlRank);

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,10 +17,9 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.icon.IIconProvider;
-import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-public interface IScoutBundle extends IScoutContainer, IScoutBundleConstantes {
+public interface IScoutBundle extends IScoutContainer, IDefaultTargetPackage {
 
   public static final int DEPTH_ONE = 1;
   public static final int DEPTH_INFINITE = 2;
@@ -74,10 +73,32 @@ public interface IScoutBundle extends IScoutContainer, IScoutBundleConstantes {
   IPackageFragment getPackageFragment(String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager);
 
   /**
-   * @param extension
-   * @return
+   * For the given package identifier the complete package for this bundle is returned.<br>
+   * The scout project specific user settings are considered where existing.<br>
+   * <br>
+   * Example (project name = "org.eclipse.scout.example"):<br>
+   * serverBundle.getDefaultPackage(IScoutBundle.SERVER_SERVICES_LOOKUP) returns
+   * "org.eclipse.scout.example.server.services.lookup"
+   * 
+   * @param packageId
+   *          The id of the package to return. One of the IDefaultTargetPackage.* constants.
+   * @return the complete package inside this bundle.
+   * @see IDefaultTargetPackage
    */
-  String getPackageName(String extension);
+  String getDefaultPackage(String packageId);
+
+  /**
+   * Gets the complete package name for this bundle.<br>
+   * <br>
+   * Example (project name = "org.eclipse.scout.example"):<br>
+   * serverBundle.getPackageName("my.package") returns
+   * "org.eclipse.scout.example.server.my.package"
+   * 
+   * @param appendix
+   *          the suffix to add to the root package of this bundle.
+   * @return the complete package name for the given suffix.
+   */
+  String getPackageName(String appendix);
 
   /**
    * find the package corresponding to the given name. Will not create if does not exist.

@@ -31,13 +31,13 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * <h3>PermissionNewOperation</h3> ...
  */
 public class PermissionNewOperation implements IOperation {
-
+  private String m_packageName;
   private String m_typeName;
   private String m_superTypeSignature;
   private IScoutBundle m_sharedBundle;
+  private boolean m_formatSource;
 
   private IType m_createdType;
-  private boolean m_formatSource;
 
   public PermissionNewOperation() {
     this(false);
@@ -65,7 +65,7 @@ public class PermissionNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SECURITY), getSharedBundle());
+    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getSharedBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.run(monitor, workingCopyManager);
     m_createdType = newOp.getCreatedType();
@@ -130,5 +130,13 @@ public class PermissionNewOperation implements IOperation {
 
   public void setSuperTypeSignature(String superTypeSignature) {
     m_superTypeSignature = superTypeSignature;
+  }
+
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
   }
 }

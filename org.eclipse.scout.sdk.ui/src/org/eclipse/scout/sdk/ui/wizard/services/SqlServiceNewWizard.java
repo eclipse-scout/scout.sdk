@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.dnd.DND;
 
@@ -59,7 +60,8 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     m_locationWizardPage.addStatusProvider(statusProvider);
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
 
-    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSQLService"), Texts.get("CreateANewSQLService"), TypeUtility.getType(RuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE);
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSQLService"), Texts.get("CreateANewSQLService"),
+        TypeUtility.getType(RuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IScoutBundle.SERVER_SERVICES_SQL));
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.setSuperType(serviceSuperType);
@@ -94,7 +96,7 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
       m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON_SQL));
+      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
       m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     }
     IScoutBundle[] serverRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
@@ -131,8 +133,8 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
           TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION)).setText(prefix + SdkProperties.SUFFIX_SQL_SERVICE);
           m_locationWizardPage.refreshTree();
         }
-        m_locationWizardPage.pingStateChanging();
       }
+      m_locationWizardPage.pingStateChanging();
     }
   } // end class P_LocationPropertyListener
 
@@ -143,7 +145,6 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
         case TYPE_SERVICE_IMPLEMENTATION:
         case TYPE_SERVICE_REG_SERVER:
           return true;
-
         case IScoutBundle.BUNDLE_CLIENT:
         case IScoutBundle.BUNDLE_SHARED:
         case IScoutBundle.BUNDLE_SERVER:
@@ -224,7 +225,7 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON_SQL) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }

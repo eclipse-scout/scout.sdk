@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class LookupServiceNewOperation extends ServiceNewOperation {
 
@@ -31,7 +30,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
 
   @Override
   public String getOperationName() {
-    return "new Lookup service";
+    return "New Lookup service";
   }
 
   @Override
@@ -94,27 +93,4 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
       }
     }
   }
-
-  @Override
-  public void setImplementationBundle(IScoutBundle implementationBundle) {
-    super.setImplementationBundle(implementationBundle);
-    if (implementationBundle != null) {
-      setServicePackageName(implementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_LOOKUP));
-    }
-    else {
-      setServicePackageName(null);
-    }
-  }
-
-  @Override
-  public void setInterfaceBundle(IScoutBundle interfaceBundle) {
-    super.setInterfaceBundle(interfaceBundle);
-    if (interfaceBundle != null) {
-      setServiceInterfacePackageName(interfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP));
-    }
-    else {
-      setServiceInterfacePackageName(null);
-    }
-  }
-
 }

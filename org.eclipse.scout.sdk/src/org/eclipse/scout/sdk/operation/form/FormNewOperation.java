@@ -43,6 +43,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class FormNewOperation implements IOperation {
 
   private String m_typeName;
+  private String m_package;
   private String m_superTypeSignature;
   private INlsEntry m_nlsEntry;
   private String m_formDataSignature;
@@ -77,7 +78,7 @@ public class FormNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS), getClientBundle());
+    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackage(), getClientBundle());
     if (getSuperTypeSignature() != null) {
       newOp.setSuperTypeSignature(getSuperTypeSignature());
     }
@@ -231,5 +232,13 @@ public class FormNewOperation implements IOperation {
 
   public void setFormatSource(boolean formatSource) {
     m_formatSource = formatSource;
+  }
+
+  public String getPackage() {
+    return m_package;
+  }
+
+  public void setPackage(String _package) {
+    m_package = _package;
   }
 }

@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.nls.sdk.simple.operations.CreateSimpleNlsProjectOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -35,6 +34,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
   private IScoutBundle m_bundle;
   private String m_translationFolder;
   private String m_translationFilePrefix;
+  private String m_packageName;
   private String m_serviceName;
   private String[] m_languages;
 
@@ -90,7 +90,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     serviceOp.addServiceRegistrationBundle(getBundle());
     serviceOp.setImplementationBundle(getBundle());
     serviceOp.setServiceName(getServiceName());
-    serviceOp.setServicePackageName(getBundle().getProject().getName() + NlsSdkService.TEXT_SERVICE_PACKAGE_SUFFIX);
+    serviceOp.setServicePackageName(getPackageName());
     serviceOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     serviceOp.validate();
     serviceOp.run(monitor, workingCopyManager);
@@ -161,5 +161,13 @@ public class CreateServiceNlsProjectOperation implements IOperation {
 
   public IType getCreatedServiceType() {
     return m_createdServiceType;
+  }
+
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
   }
 }

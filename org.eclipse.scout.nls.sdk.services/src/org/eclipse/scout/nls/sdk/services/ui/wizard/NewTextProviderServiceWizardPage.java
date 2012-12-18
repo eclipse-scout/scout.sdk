@@ -41,15 +41,20 @@ import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProv
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.ui.wizard.ResourceProposalModel;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -65,6 +70,8 @@ import org.eclipse.swt.widgets.Group;
 
 public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPage {
 
+  private static final String TEXT_SERVICE_PACKAGE_ID = "shared.services.textprovider";
+
   // base interface
   private final IType iTextProviderService = TypeUtility.getType(RuntimeClasses.ITextProviderService);
 
@@ -73,12 +80,14 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
   private static final String PROP_TRANSLATION_FILE = "translationFile";
   private static final String PROP_SUPER_TYPE = "superType";
   private static final String PROP_CLASS_NAME = "className";
+  private static final String PROP_TARGET_PACKAGE = "targetPackage";
 
   // ui fields
   private ProposalTextField m_superTypeField;
   private StyledTextField m_className;
   private TextProposalField m_translationFolderField;
   private TextField<String> m_translationFileName;
+  private EntityTextField m_entityField;
 
   // process members
   private final IScoutBundle m_bundle;
@@ -90,6 +99,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     super(NewTextProviderServiceWizardPage.class.getName());
     setTitle("Create a new Text Provider Service");
     setDescription("Creates a new Text Provider Service.");
+    setTargetPackage(DefaultTargetPackage.get(bundle, TEXT_SERVICE_PACKAGE_ID));
     m_bundle = bundle;
     m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
@@ -134,6 +144,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_translationFolderField.setText("resources/texts");
     m_languagesToCreate.add(null); // default language
     m_superTypeField.acceptProposal(m_defaultProposal);
+    m_entityField.setText(getTargetPackage());
   }
 
   private void createServiceGroup(Composite parent) {
@@ -160,10 +171,20 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       }
     });
 
+    m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_bundle);
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
+        pingStateChanging();
+      }
+    });
+
     group.setLayout(new GridLayout(1, true));
     attachGridData(group);
     attachGridData(m_superTypeField);
     attachGridData(m_className);
+    attachGridData(m_entityField);
   }
 
   private Control createTranslationGroup(Composite parent) {
@@ -284,6 +305,9 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     if (StringUtility.isNullOrEmpty(getClassName())) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The class name must be specified."));
     }
+    else if (TypeUtility.existsType(m_bundle.getPackageName(getTargetPackage()) + "." + getClassName())) {
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already used. Choose another name."));
+    }
     else if (!Regex.REGEX_JAVAFIELD.matcher(getClassName()).matches()) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The service class name is invalid."));
     }
@@ -296,14 +320,17 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The translation file name must be specified."));
     }
 
-    for (NlsServiceType existing : m_existingServicesInPlugin) {
-      if (CompareUtility.equals(cleanFolder(existing.getTranslationsFolderName()), cleanFolder(getTranslationFolder())) &&
-          CompareUtility.equals(existing.getTranslationsPrefix(), getTranlationFileName())) {
-        multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "A service for the given translations does already exist."));
-        break;
+    if (m_existingServicesInPlugin != null) {
+      for (NlsServiceType existing : m_existingServicesInPlugin) {
+        if (CompareUtility.equals(cleanFolder(existing.getTranslationsFolderName()), cleanFolder(getTranslationFolder())) &&
+            CompareUtility.equals(existing.getTranslationsPrefix(), getTranlationFileName())) {
+          multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "A service for the given translations does already exist."));
+          break;
+        }
       }
     }
 
+    multiStatus.add(JavaElementValidator.validatePackageName(getTargetPackage()));
     multiStatus.add(Status.OK_STATUS);
   }
 
@@ -410,5 +437,26 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
   public String[] getLanguages() {
     return m_languagesToCreate.toArray(new String[m_languagesToCreate.size()]);
+  }
+
+  public String getTargetPackage() {
+    return (String) getProperty(PROP_TARGET_PACKAGE);
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    setProperty(PROP_TARGET_PACKAGE, targetPackage);
   }
 }

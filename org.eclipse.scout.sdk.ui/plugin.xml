@@ -111,6 +111,12 @@
             id="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkSuperTypesPreferencePage"
             name="Default Super Classes">
       </page>
+      <page
+            category="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkPreferencePage"
+            class="org.eclipse.scout.sdk.ui.extensions.preferences.TargetPackagePreferencePage"
+            id="org.eclipse.scout.sdk.ui.extensions.preferences.ScoutSdkTargetPackagePreferencePage"
+            name="Default Packages">
+      </page>
    </extension>
    <extension
             point="org.eclipse.scout.sdk.ui.outlineDragAndDrop">

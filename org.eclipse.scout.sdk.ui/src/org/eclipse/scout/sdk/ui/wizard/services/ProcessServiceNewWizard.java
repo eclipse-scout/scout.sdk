@@ -47,18 +47,23 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   private static final int TYPE_SERVICE_REG_CLIENT = 109;
   private static final int TYPE_SERVICE_REG_SERVER = 110;
 
-  private BundleTreeWizardPage m_locationWizardPage;
-  private ProcessServiceNewWizardPage m_serviceNewWizardPage;
-  private ProcessServiceNewOperation m_operation = new ProcessServiceNewOperation();
-  private ITreeNode m_locationWizardPageRoot;
+  private final BundleTreeWizardPage m_locationWizardPage;
+  private final ProcessServiceNewWizardPage m_serviceNewWizardPage;
+  private final ProcessServiceNewOperation m_operation;
+  private final ITreeNode m_locationWizardPageRoot;
+  private final IScoutProject m_scoutProject;
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewProcessService"));
+
+    m_scoutProject = serverBundle.getScoutProject();
+    m_operation = new ProcessServiceNewOperation();
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serviceNewWizardPage = new ProcessServiceNewWizardPage();
-    m_serviceNewWizardPage.setServerBundle(serverBundle);
+
+    m_serviceNewWizardPage = new ProcessServiceNewWizardPage(serverBundle);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
+
     m_locationWizardPageRoot = createTree(serverBundle);
     m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ProcessServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckerFilter());
     m_locationWizardPage.addStatusProvider(statusProvider);
@@ -108,18 +113,32 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   protected boolean beforeFinish() throws CoreException {
     m_serviceNewWizardPage.fillProcessServiceNewOperation(m_operation);
     m_operation.setClientServiceRegistryBundles(m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true));
-    m_operation.setPermissionCreateBundle(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_CREATE, true, true));
-    m_operation.setPermissionCreateName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_CREATE, true, true));
-    m_operation.setPermissionReadBundle(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_READ, true, true));
-    m_operation.setPermissionReadName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_READ, true, true));
-    m_operation.setPermissionUpdateBundle(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true));
-    m_operation.setPermissionUpdateName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_UPDATE, true, true));
-    m_operation.setServerServiceRegistryBundles(m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true));
-    m_operation.setServiceImplementationBundle(m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true));
-    m_operation.setServiceImplementationName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
-    m_operation.setServiceInterfaceBundle(m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true));
-    m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
 
+    IScoutBundle permissionBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_CREATE, true, true);
+    if (permissionBundle != null) {
+      m_operation.setPermissionPackageName(permissionBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setPermissionCreateBundle(permissionBundle);
+      m_operation.setPermissionCreateName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_CREATE, true, true));
+      m_operation.setPermissionReadBundle(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_READ, true, true));
+      m_operation.setPermissionReadName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_READ, true, true));
+      m_operation.setPermissionUpdateBundle(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true));
+      m_operation.setPermissionUpdateName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_UPDATE, true, true));
+    }
+    m_operation.setServerServiceRegistryBundles(m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true));
+
+    IScoutBundle serviceImplBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
+    if (serviceImplBundle != null) {
+      m_operation.setServiceImplementationBundle(serviceImplBundle);
+      m_operation.setServicePackageName(serviceImplBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setServiceImplementationName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
+    }
+
+    IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
+    if (serviceInterfaceBundle != null) {
+      m_operation.setServiceInterfaceBundle(serviceInterfaceBundle);
+      m_operation.setServiceInterfacePackageName(serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
+    }
     return true;
   }
 
@@ -270,7 +289,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
@@ -280,7 +299,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + serviceInterfaceNode.getText();
+          String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
           if (serviceInterfaceBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
@@ -307,7 +326,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (permissionBundle != null) {
         ITreeNode permissionNode = m_locationWizardPage.getTreeNode(permissionType, true, true);
         if (permissionNode != null) {
-          String fqn = permissionBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SECURITY) + "." + permissionNode.getText();
+          String fqn = permissionBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + permissionNode.getText();
           if (permissionBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }

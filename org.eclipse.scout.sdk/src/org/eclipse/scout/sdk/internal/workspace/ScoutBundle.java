@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.internal.workspace;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -36,6 +37,7 @@ import org.eclipse.scout.sdk.operation.util.PackageNewOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
@@ -45,6 +47,8 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
  * Project specific scout cache
  */
 public class ScoutBundle implements IScoutBundle {
+
+  private final static Pattern REGEX_LEADING_DOTS = Pattern.compile("^\\.*");
 
   private final IProject m_project;
   private final ScoutWorkspace m_workspaceGraph;
@@ -198,15 +202,25 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   @Override
-  public String getPackageName(String extension) {
-    if (extension == null) {
-      extension = "";
+  public String getDefaultPackage(String packageId) {
+    String pck = DefaultTargetPackage.get(getScoutProject(), packageId);
+    if (pck == null) {
+      throw new IllegalArgumentException("invalid package id");
     }
-    extension = extension.replaceAll("^\\.*", "");
-    if (extension.length() > 0) {
-      extension = "." + extension;
+    return getRootPackageName() + "." + pck;
+  }
+
+  @Override
+  public String getPackageName(String appendix) {
+    if (appendix == null) {
+      return getRootPackageName();
     }
-    return getRootPackageName() + extension;
+
+    appendix = REGEX_LEADING_DOTS.matcher(appendix).replaceAll("").trim();
+    if (appendix.length() > 0) {
+      appendix = "." + appendix;
+    }
+    return getRootPackageName() + appendix;
   }
 
   @Override

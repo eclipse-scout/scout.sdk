@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.dnd.DND;
 
@@ -53,7 +54,8 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
   public ClientServiceNewWizard(IScoutBundle clientBundle) {
     setWindowTitle(Texts.get("NewClientService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"), TypeUtility.getType(RuntimeClasses.IService), SdkProperties.SUFFIX_SERVICE);
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"),
+        TypeUtility.getType(RuntimeClasses.IService), SdkProperties.SUFFIX_SERVICE, clientBundle, DefaultTargetPackage.get(clientBundle, IScoutBundle.CLIENT_SERVICES));
     m_serviceNewWizardPage.setLocationBundle(clientBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -82,12 +84,12 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
       m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES));
+      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     IScoutBundle interfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
       m_operation.setInterfaceBundle(interfaceBundle);
-      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES));
+      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
     m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
@@ -130,9 +132,8 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
           TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_SERVICE);
           m_locationWizardPage.refreshTree();
         }
-        m_locationWizardPage.pingStateChanging();
-        m_serviceNewWizardPage.pingStateChanging();
       }
+      m_locationWizardPage.pingStateChanging();
     }
   } // end class P_LocationPropertyListener
 
@@ -208,7 +209,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
@@ -219,7 +220,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES) + "." + serviceInterfaceNode.getText();
+          String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
           if (serviceInterfaceBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }

@@ -126,12 +126,27 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     // fill operation before gui is disposed
     m_operation = new LookupCallNewOperation();
     m_operation.setInterfaceRegistrationBundle(m_page2.getLocationBundle(TYPE_SERVICE_REG_CLIENT, true, true));
-    m_operation.setBundle(m_page2.getLocationBundle(TYPE_LOOKUPCALL, true, true));
+
+    IScoutBundle lookupCallBundle = m_page2.getLocationBundle(TYPE_LOOKUPCALL, true, true);
+    if (lookupCallBundle != null) {
+      m_operation.setBundle(lookupCallBundle);
+      m_operation.setLookupCallPackageName(lookupCallBundle.getPackageName(m_page1.getTargetPackage()));
+    }
     m_operation.setFormatSource(false);
     m_operation.setImplementationRegistrationBundle(m_page2.getLocationBundle(TYPE_SERVICE_REG_SERVER, true, true));
     m_operation.setLookupCallName(m_page1.getTypeName());
-    m_operation.setServiceImplementationBundle(m_page2.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true));
-    m_operation.setServiceInterfaceBundle(m_page2.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true));
+
+    IScoutBundle serviceBundle = m_page2.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
+    if (serviceBundle != null) {
+      m_operation.setServiceImplementationBundle(serviceBundle);
+      m_operation.setServiceImplementationPackage(serviceBundle.getPackageName(m_page1.getTargetPackage()));
+    }
+
+    IScoutBundle interfaceBundle = m_page2.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
+    if (interfaceBundle != null) {
+      m_operation.setServiceInterfaceBundle(interfaceBundle);
+      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_page1.getTargetPackage()));
+    }
     switch (m_page1.getLookupServiceStrategy()) {
       case CREATE_NEW:
         IType superTypeProp = m_page1.getServiceSuperType();
@@ -184,7 +199,6 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
           }
           m_page2.refreshTree();
         }
-        m_page2.pingStateChanging();
       }
       else if (evt.getPropertyName().equals(LookupCallNewWizardPage.PROP_LOOKUP_SERVICE_STRATEGY)) {
         LOOKUP_SERVICE_STRATEGY strategy = m_page1.getLookupServiceStrategy();
@@ -204,7 +218,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
         }
         m_page2.refreshTree();
       }
-
+      m_page2.pingStateChanging();
     }
   } // end class P_LocationPropertyListener
 
@@ -309,7 +323,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_page2.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(m_page1.getTargetPackage()) + "." + serviceImplNode.getText();
           IType findType = serviceImplementationBundle.findType(fqn);
           if (findType != null && findType.exists()) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
@@ -321,7 +335,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_page2.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES) + "." + serviceInterfaceNode.getText();
+          String fqn = serviceInterfaceBundle.getPackageName(m_page1.getTargetPackage()) + "." + serviceInterfaceNode.getText();
           IType interfaceType = serviceInterfaceBundle.findType(fqn);
           if (interfaceType != null && interfaceType.exists()) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");

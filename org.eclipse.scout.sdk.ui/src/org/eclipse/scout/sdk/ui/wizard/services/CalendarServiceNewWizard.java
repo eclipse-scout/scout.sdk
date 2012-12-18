@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.dnd.DND;
@@ -55,7 +56,8 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
   public CalendarServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewCalendarService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewCalendarService"), Texts.get("CreateANewCalendarService"), TypeUtility.getType(RuntimeClasses.ICalendarService), SdkProperties.SUFFIX_CALENDAR_SERVICE);
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewCalendarService"), Texts.get("CreateANewCalendarService"),
+        TypeUtility.getType(RuntimeClasses.ICalendarService), SdkProperties.SUFFIX_CALENDAR_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IScoutBundle.SERVER_SERVICES_CALENDAR));
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -113,7 +115,7 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
       m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON_CALENDAR));
+      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
       m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     }
     // client bundles
@@ -128,7 +130,7 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle interfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
       m_operation.setInterfaceBundle(interfaceBundle);
-      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_COMMON_CALENDAR));
+      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
     m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarService));
@@ -163,8 +165,8 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
           TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_CALENDAR_SERVICE);
           m_locationWizardPage.refreshTree();
         }
-        m_locationWizardPage.pingStateChanging();
       }
+      m_locationWizardPage.pingStateChanging();
     }
   } // end class P_LocationPropertyListener
 
@@ -271,7 +273,7 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON_CALENDAR) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
@@ -281,7 +283,7 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_COMMON_CALENDAR) + "." + serviceInterfaceNode.getText();
+          String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
           if (serviceInterfaceBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }

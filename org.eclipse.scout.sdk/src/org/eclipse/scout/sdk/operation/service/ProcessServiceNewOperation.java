@@ -37,15 +37,21 @@ public class ProcessServiceNewOperation implements IOperation {
   private IScoutBundle[] m_clientServiceRegistryBundles;
   private IScoutBundle m_serviceInterfaceBundle;
   private String m_serviceInterfaceName;
+  private String m_serviceInterfacePackageName;
+
+  private String m_permissionPackageName;
   private IScoutBundle m_permissionCreateBundle;
   private String m_permissionCreateName;
   private IScoutBundle m_permissionReadBundle;
   private String m_permissionReadName;
   private IScoutBundle m_permissionUpdateBundle;
+  private String m_permissionUpdateName;
+
+  private String m_servicePackageName;
   private IScoutBundle m_serviceImplementationBundle;
   private String m_serviceImplementationName;
-  private String m_permissionUpdateName;
   private IScoutBundle[] m_serverServiceRegistryBundles;
+
   private IType m_formData;
 
   // created types
@@ -62,7 +68,6 @@ public class ProcessServiceNewOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
-
   }
 
   @Override
@@ -72,6 +77,7 @@ public class ProcessServiceNewOperation implements IOperation {
       PermissionNewOperation permissionOp = new PermissionNewOperation();
       permissionOp.setSharedBundle(getPermissionCreateBundle());
       permissionOp.setTypeName(getPermissionCreateName());
+      permissionOp.setPackageName(getPermissionPackageName());
       permissionOp.run(monitor, workingCopyManager);
       m_createdCreatePermission = permissionOp.getCreatedPermission();
     }
@@ -79,6 +85,7 @@ public class ProcessServiceNewOperation implements IOperation {
       PermissionNewOperation permissionOp = new PermissionNewOperation();
       permissionOp.setSharedBundle(getPermissionReadBundle());
       permissionOp.setTypeName(getPermissionReadName());
+      permissionOp.setPackageName(getPermissionPackageName());
       permissionOp.run(monitor, workingCopyManager);
       m_createdReadPermission = permissionOp.getCreatedPermission();
     }
@@ -86,6 +93,7 @@ public class ProcessServiceNewOperation implements IOperation {
       PermissionNewOperation permissionOp = new PermissionNewOperation();
       permissionOp.setSharedBundle(getPermissionUpdateBundle());
       permissionOp.setTypeName(getPermissionUpdateName());
+      permissionOp.setPackageName(getPermissionPackageName());
       permissionOp.run(monitor, workingCopyManager);
       m_createdUpdatePermission = permissionOp.getCreatedPermission();
     }
@@ -102,12 +110,12 @@ public class ProcessServiceNewOperation implements IOperation {
       if (getServiceImplementationBundle() != null) {
         serviceOp.setImplementationBundle(getServiceImplementationBundle());
         serviceOp.setServiceName(getServiceImplementationName());
-        serviceOp.setServicePackageName(getServiceImplementationBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES));
+        serviceOp.setServicePackageName(getServicePackageName());
       }
       if (getServiceInterfaceBundle() != null) {
         serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
         serviceOp.setServiceInterfaceName(getServiceInterfaceName());
-        serviceOp.setServiceInterfacePackageName(getServiceInterfaceBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES));
+        serviceOp.setServiceInterfacePackageName(getServiceInterfacePackageName());
         serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
       }
       serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServiceImplementationBundle().getJavaProject()));
@@ -374,6 +382,30 @@ public class ProcessServiceNewOperation implements IOperation {
    */
   public IType getFormData() {
     return m_formData;
+  }
+
+  public String getServiceInterfacePackageName() {
+    return m_serviceInterfacePackageName;
+  }
+
+  public void setServiceInterfacePackageName(String serviceInterfacePackageName) {
+    m_serviceInterfacePackageName = serviceInterfacePackageName;
+  }
+
+  public String getPermissionPackageName() {
+    return m_permissionPackageName;
+  }
+
+  public void setPermissionPackageName(String permissionPackageName) {
+    m_permissionPackageName = permissionPackageName;
+  }
+
+  public String getServicePackageName() {
+    return m_servicePackageName;
+  }
+
+  public void setServicePackageName(String servicePackageName) {
+    m_servicePackageName = servicePackageName;
   }
 
 }

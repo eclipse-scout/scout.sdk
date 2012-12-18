@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -31,6 +32,8 @@ import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -51,14 +54,16 @@ import org.eclipse.swt.widgets.Group;
  * @since 1.0.8 03.08.2009
  */
 public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
+  private final static int labelColWidthPercent = 20;
 
-  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
 
   public static final String PROP_NLS_NAME = "nlsName";
   public static final String PROP_TYPE_NAME = "typeName";
   public static final String PROP_SUPER_TYPE = "superType";
   public static final String PROP_CREATE_FORM_ID = "createFormId";
   public static final String PROP_FORM_ID_NAME = "formIdName";
+  public static final String PROP_TARGET_PACKAGE = "targetPackage";
 
   // ui fields
   private ProposalTextField m_nlsNameField;
@@ -66,6 +71,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_superTypeField;
   private Button m_createFormIdField;
   private StyledTextField m_formIdField;
+  private EntityTextField m_entityField;
   private final IType m_abstractForm;
 
   // process members
@@ -78,19 +84,22 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
     setTitle(Texts.get("Form"));
     setDescription(Texts.get("CreateANewForm"));
-
+    setTargetPackage(DefaultTargetPackage.get(clientBundle, IScoutBundle.CLIENT_FORMS));
     setSuperTypeInternal(m_abstractForm);
     setCreateFormId(true);
   }
 
   @Override
-  protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"));
+  protected void createContent(Composite p) {
+
+    Group group = new Group(p, SWT.SHADOW_ETCHED_IN);
+    group.setText(Texts.get("Form"));
+
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-
         try {
           setStateChanging(true);
           String oldKey = "";
@@ -114,7 +123,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    m_typeNameField = getFieldToolkit().createStyledTextField(group, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_FORM);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -125,8 +134,8 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iForm, getClientBundle().getJavaProject(), m_abstractForm));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("SuperType"),
+        new JavaElementAbstractTypeContentProvider(iForm, getClientBundle().getJavaProject(), m_abstractForm), labelColWidthPercent);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -136,16 +145,28 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    Control formIdGroup = createIdGroup(parent);
+    m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
+        pingStateChanging();
+      }
+    });
+
+    Control formIdGroup = createIdGroup(p);
 
     // layout
-    parent.setLayout(new GridLayout(1, true));
+    p.setLayout(new GridLayout(1, true));
+    group.setLayout(new GridLayout(1, true));
 
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     formIdGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-
+    group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   protected Control createIdGroup(Composite parent) {
@@ -163,7 +184,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_formIdField = getFieldToolkit().createStyledTextField(group, Texts.get("PropertyNameId"));
+    m_formIdField = getFieldToolkit().createStyledTextField(group, Texts.get("PropertyNameId"), labelColWidthPercent);
     m_formIdField.setReadOnlySuffix(SdkProperties.SUFFIX_ID);
     m_formIdField.setText(getTypeName());
     m_formIdField.addModifyListener(new ModifyListener() {
@@ -206,10 +227,15 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
       multiStatus.add(getStatusPropertyId());
+      multiStatus.add(getStatusTargetPackge());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
     }
+  }
+
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusPropertyId() {
@@ -223,13 +249,13 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_FORM)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
-    // check not allowed names
-    if (TypeUtility.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_FORMS) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
+    // check not allowed names
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
       return Status.OK_STATUS;
     }
@@ -357,4 +383,24 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     setPropertyString(PROP_FORM_ID_NAME, formId);
   }
 
+  public String getTargetPackage() {
+    return (String) getProperty(PROP_TARGET_PACKAGE);
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    setProperty(PROP_TARGET_PACKAGE, targetPackage);
+  }
 }

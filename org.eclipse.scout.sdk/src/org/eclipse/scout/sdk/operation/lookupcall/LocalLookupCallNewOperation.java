@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
@@ -39,6 +40,8 @@ public class LocalLookupCallNewOperation implements IOperation {
   private String m_lookupCallSuperTypeSignature;
   private IScoutBundle m_clientBundle;
   private boolean m_formatSource;
+  private String m_packageName;
+
   //out members
   private IType m_outLookupCall;
 
@@ -51,7 +54,7 @@ public class LocalLookupCallNewOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
 
     // lookup call
-    ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_SERVICES_LOOKUP), getBundle());
+    ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getPackageName(), getBundle());
     lookupCallOp.setSuperTypeSignature(getLookupCallSuperTypeSignature());
     lookupCallOp.validate();
     lookupCallOp.run(monitor, workingCopyManager);
@@ -89,6 +92,9 @@ public class LocalLookupCallNewOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
+    if (StringUtility.isNullOrEmpty(getPackageName())) {
+      throw new IllegalArgumentException("package can not be null or empty.");
+    }
   }
 
   public String getLookupCallName() {
@@ -127,4 +133,11 @@ public class LocalLookupCallNewOperation implements IOperation {
     return m_outLookupCall;
   }
 
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
+  }
 }

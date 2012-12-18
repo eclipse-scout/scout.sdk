@@ -43,6 +43,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.dnd.DND;
@@ -61,7 +62,8 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
   public BookmarkStorageServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewBookmarkService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewBookmarkStorageService"), Texts.get("CreateANewBookmarkStorageService"), TypeUtility.getType(RuntimeClasses.IBookmarkStorageService), SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE);
+    m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewBookmarkStorageService"), Texts.get("CreateANewBookmarkStorageService"),
+        TypeUtility.getType(RuntimeClasses.IBookmarkStorageService), SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IScoutBundle.SERVER_SERVICES_BOOKMARK));
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.IBookmarkStorageService));
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
@@ -119,7 +121,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
       m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON_BOOKMARK));
+      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
       m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     }
 
@@ -136,7 +138,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle interfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
       m_operation.setInterfaceBundle(interfaceBundle);
-      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_COMMON_BOOKMARK));
+      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
 
@@ -190,8 +192,8 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
           TreeUtility.findNode(m_locationWizardPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE)).setText("I" + prefix + SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE);
           m_locationWizardPage.refreshTree();
         }
-        m_locationWizardPage.pingStateChanging();
       }
+      m_locationWizardPage.pingStateChanging();
     }
   } // end class P_LocationPropertyListener
 
@@ -293,12 +295,11 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
     }
 
     protected IStatus getStatusTypeNames() {
-
       IScoutBundle serviceImplementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES_COMMON_BOOKMARK) + "." + serviceImplNode.getText();
+          String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
           if (serviceImplementationBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }
@@ -308,7 +309,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_COMMON_BOOKMARK) + "." + serviceInterfaceNode.getText();
+          String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
           if (serviceInterfaceBundle.findType(fqn) != null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
           }

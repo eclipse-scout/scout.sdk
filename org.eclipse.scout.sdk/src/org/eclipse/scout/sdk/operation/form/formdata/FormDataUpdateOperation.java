@@ -134,7 +134,7 @@ public class FormDataUpdateOperation implements IOperation {
         String packageName = Signature.getSignatureQualifier(getFormDataAnnotation().getFormDataTypeSignature());
         if (StringUtility.isNullOrEmpty(packageName)) {
           if (sharedBundle != null) {
-            packageName = sharedBundle.getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES);
+            packageName = sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SERVICES);
           }
         }
         String simpleName = (Signature.getSignatureSimpleName(Signature.getTypeErasure(getFormDataAnnotation().getFormDataTypeSignature())));

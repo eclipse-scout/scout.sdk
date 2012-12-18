@@ -16,9 +16,13 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
@@ -44,10 +48,13 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
   private StyledTextField m_templateNameField;
   private Button m_replaceExistingFormField;
   private Button m_createExternalFormDataField;
+  private EntityTextField m_entityField;
 
   private final IType m_formField;
+  private final IScoutBundle m_clientBundle;
 
   private String m_templateName;
+  private String m_packageName;
   private boolean m_replaceFormField;
   private boolean m_createExternalFormData;
 
@@ -60,6 +67,8 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     m_templateName = templateName;
     m_replaceFormField = true;
     m_createExternalFormData = true;
+    m_clientBundle = ScoutWorkspace.getInstance().getScoutBundle(formField.getJavaProject().getProject());
+    setTargetPackage(DefaultTargetPackage.get(m_clientBundle, IScoutBundle.CLIENT_TEMPLATE_FORMFIELD));
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setTitle(Texts.get("CreateTemplateOf", getFormField().getElementName()));
     setMessage(Texts.get("TemplateDesc"));
@@ -73,14 +82,26 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
 
   @Override
   protected Control createDialogArea(Composite parent) {
+    int labelColWidthPercent = 20;
+
     Composite container = new Composite(parent, SWT.NONE);
-    m_templateNameField = getFieldToolkit().createStyledTextField(container, Texts.get("TemplateName"));
+    m_templateNameField = getFieldToolkit().createStyledTextField(container, Texts.get("TemplateName"), labelColWidthPercent);
     m_templateNameField.setReadOnlyPrefix("Abstract");
     m_templateNameField.setText(getTemplateName());
     m_templateNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
         m_templateName = m_templateNameField.getText();
+        pingStateChanging();
+      }
+    });
+
+    m_entityField = getFieldToolkit().createEntityTextField(container, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
         pingStateChanging();
       }
     });
@@ -110,6 +131,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     // layout
     container.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
     container.setLayout(new GridLayout(1, true));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_templateNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_replaceExistingFormField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_createExternalFormDataField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
@@ -119,6 +141,11 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
   @Override
   protected void validate(MultiStatus multiStatus) {
     multiStatus.add(getStatusTemplateName());
+    multiStatus.add(getStatusTargetPackge());
+  }
+
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
   }
 
   private IStatus getStatusTemplateName() {
@@ -126,7 +153,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NameNotValid"));
     }
     IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(getFormField());
-    if (TypeUtility.existsType(bundle.getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_TEMPLATE_FORM_FIELD) + "." + getTemplateName())) {
+    if (TypeUtility.existsType(bundle.getPackageName(getTargetPackage()) + "." + getTemplateName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TemplateAlreadyExists"));
     }
     return Status.OK_STATUS;
@@ -158,5 +185,26 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
    */
   public boolean isCreateExternalFormData() {
     return m_createExternalFormData;
+  }
+
+  public String getTargetPackage() {
+    return m_packageName;
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    m_packageName = targetPackage;
   }
 }

@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.lookupcall.LocalLookupCallNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -37,6 +38,8 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -54,14 +57,14 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected final IType localLookupCall = TypeUtility.getType(RuntimeClasses.LocalLookupCall);
 
-  /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link ITypeProposal} **/
   public static final String PROP_SUPER_TYPE = "superType";
+  public static final String PROP_TARGET_PACKAGE = "targetPackage";
 
   // ui fields
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
+  private EntityTextField m_entityField;
 
   // process members
   private IScoutBundle m_clientBundle;
@@ -72,12 +75,13 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewLocalLookupCallNoPopup"));
     setDescription(Texts.get("CreateANewLocalLookupCall"));
     setLookupCallSuperTypeInternal(localLookupCall);
+    setTargetPackage(DefaultTargetPackage.get(client, IScoutBundle.CLIENT_SERVICES_LOOKUP));
   }
 
   @Override
   protected void createContent(Composite parent) {
-
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    int labelColWidthPercent = 20;
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -96,14 +100,22 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
             ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
             return new Object[][]{TypeUtility.toArray(localLookupCall), lookupServiceHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator())};
           }
-        });
-
+        }, labelColWidthPercent);
     m_superTypeField.acceptProposal(getLookupCallSuperType());
-
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setLookupCallSuperTypeInternal((IType) event.proposal);
+        pingStateChanging();
+      }
+    });
+
+    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
         pingStateChanging();
       }
     });
@@ -113,6 +125,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   @Override
@@ -125,6 +138,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
+      multiStatus.add(getStatusTargetPackge());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
@@ -136,6 +150,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     LocalLookupCallNewOperation op = new LocalLookupCallNewOperation();
     op.setBundle(getClientBundle());
     op.setLookupCallName(getTypeName());
+    op.setPackageName(getClientBundle().getPackageName(getTargetPackage()));
     op.setFormatSource(true);
     IType superTypeProp = getLookupCallSuperType();
     if (superTypeProp != null) {
@@ -146,12 +161,16 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     return true;
   }
 
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
+  }
+
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_LOOKUP_CALL)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
     // check not allowed names
-    if (TypeUtility.existsType(getClientBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
@@ -217,5 +236,26 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   private void setLookupCallSuperTypeInternal(IType superType) {
     setProperty(PROP_SUPER_TYPE, superType);
+  }
+
+  public String getTargetPackage() {
+    return (String) getProperty(PROP_TARGET_PACKAGE);
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    setProperty(PROP_TARGET_PACKAGE, targetPackage);
   }
 }

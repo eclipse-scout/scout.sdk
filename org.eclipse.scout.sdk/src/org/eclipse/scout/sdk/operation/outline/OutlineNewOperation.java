@@ -57,6 +57,8 @@ public class OutlineNewOperation implements IOperation {
   private boolean m_addToDesktop;
   private IType m_desktopType;
   private boolean m_formatSource;
+  private String m_packageName;
+
   // out members
   private IType m_createdOutline;
 
@@ -68,6 +70,9 @@ public class OutlineNewOperation implements IOperation {
     if (StringUtility.isNullOrEmpty(getTypeName())) {
       throw new IllegalArgumentException("type name can not be null or emtpy");
     }
+    if (StringUtility.isNullOrEmpty(getPackageName())) {
+      throw new IllegalArgumentException("package can not be null or empty.");
+    }
   }
 
   @Override
@@ -77,7 +82,7 @@ public class OutlineNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES), getClientBundle());
+    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getClientBundle());
     if (getSuperTypeSignature() == null) {
       setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IOutline, getClientBundle().getJavaProject()));
     }
@@ -297,4 +302,11 @@ public class OutlineNewOperation implements IOperation {
     return m_formatSource;
   }
 
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
+  }
 }

@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.internal.workspace.IScoutBundleConstantes;
+import org.eclipse.scout.sdk.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.view.property.IMultiPropertyViewPart;
 import org.eclipse.scout.sdk.ui.extensions.view.property.ISinglePropertyViewPart;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -55,7 +55,7 @@ public class PropertyViewExtensionPoint {
         for (IConfigurationElement partExtension : extension.getConfigurationElements()) {
           if (partExtension.getName().equals("part")) {
             long ranking = -1;
-            String rankingAttribute = partExtension.getAttribute(IScoutBundleConstantes.EXTENSION_SERVICE_RANKING);
+            String rankingAttribute = partExtension.getAttribute(IRuntimeClasses.EXTENSION_SERVICE_RANKING);
             if (!StringUtility.isNullOrEmpty(rankingAttribute)) {
               ranking = Long.parseLong(rankingAttribute);
             }

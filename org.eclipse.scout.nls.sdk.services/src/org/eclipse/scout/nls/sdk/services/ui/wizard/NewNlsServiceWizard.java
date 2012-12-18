@@ -25,11 +25,17 @@ public class NewNlsServiceWizard extends AbstractWorkspaceWizard {
   protected boolean beforeFinish() throws CoreException {
     m_op.setBundle(m_bundle);
     m_op.setLanguages(m_page1.getLanguages());
+    m_op.setPackageName(m_bundle.getPackageName(m_page1.getTargetPackage()));
     m_op.setServiceName(m_page1.getClassName());
     m_op.setSuperType(m_page1.getSuperType());
     m_op.setTranslationFilePrefix(m_page1.getTranlationFileName());
     m_op.setTranslationFolder(m_page1.getTranslationFolder());
     return true;
+  }
+
+  @Override
+  protected String getDialogSettingsKey() {
+    return super.getDialogSettingsKey() + "01"; // invalidate cached legacy dialog sizes
   }
 
   @Override

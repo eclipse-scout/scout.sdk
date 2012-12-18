@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.validation.BundleValidator;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
 
 /**
  * <h3>{@link AbstractLibraryBundleCreateOperation}</h3> ...
@@ -35,7 +35,7 @@ public abstract class AbstractLibraryBundleCreateOperation implements IOperation
 
   @Override
   public void validate() throws IllegalArgumentException {
-    IStatus nameStatus = BundleValidator.validateNewBundleName(getBundleName());
+    IStatus nameStatus = JavaElementValidator.validateNewBundleName(getBundleName());
     if (nameStatus.matches(IStatus.ERROR)) {
       throw new IllegalArgumentException(nameStatus.getMessage());
     }

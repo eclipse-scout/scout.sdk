@@ -134,7 +134,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   private IStatus getPropertyNameStatus() {
     String propertyName = getBeanName();
     if (propertyName == null || propertyName.length() == 0) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
     else {
       // check existing method names

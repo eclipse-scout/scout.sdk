@@ -79,7 +79,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
   }
 
   /**
-   * do not allow to move a field on an other field.
+   * do not allow to move a field on another field.
    */
   private AbstractFormFieldNodePage getFormFieldTargetType(OutlineDropTargetEvent event) {
     if (event.getCurrentTarget() instanceof AbstractFormFieldNodePage) {

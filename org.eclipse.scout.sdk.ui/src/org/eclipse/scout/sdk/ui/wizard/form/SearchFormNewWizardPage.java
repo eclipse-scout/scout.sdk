@@ -19,8 +19,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -30,10 +30,11 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -50,10 +51,11 @@ import org.eclipse.swt.widgets.Label;
  */
 public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private static final String PROP_NLS_NAME = "nlsName";
-  private static final String PROP_TYPE_NAME = "typeName";
-  private static final String PROP_SUPER_TYPE = "superType";
-  private static final String PROP_TABLE_PAGE = "tablePage";
+  public static final String PROP_NLS_NAME = "nlsName";
+  public static final String PROP_TYPE_NAME = "typeName";
+  public static final String PROP_SUPER_TYPE = "superType";
+  public static final String PROP_TABLE_PAGE = "tablePage";
+  public static final String PROP_TARGET_PACKAGE = "targetPackage";
 
   private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
   private final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
@@ -65,24 +67,31 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private ProposalTextField m_tablePageField;
+  private EntityTextField m_entityField;
 
   // process members
   private final IScoutBundle m_clientBundle;
   private final IType m_abstractSearchForm;
+  private final int m_labelColWidthPercent;
 
   public SearchFormNewWizardPage(IScoutBundle clientBundle) {
     super(SearchFormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
     m_abstractSearchForm = RuntimeClasses.getSuperType(RuntimeClasses.ISearchForm, clientBundle.getJavaProject());
+    m_labelColWidthPercent = 20;
     setTitle(Texts.get("SearchForm2"));
     setDescription(Texts.get("CreateANewSearchForm"));
     setSuperTypeInternal(m_abstractSearchForm);
+    setTargetPackage(DefaultTargetPackage.get(clientBundle, IScoutBundle.CLIENT_SEARCHFORMS));
   }
 
   @Override
   protected void createContent(Composite parent) {
-    Control tablePageGroup = createTablePageGroup(parent);
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"));
+
+    Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
+    group.setText(Texts.get("SearchForm"));
+
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"), m_labelColWidthPercent);
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -105,7 +114,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    m_typeNameField = getFieldToolkit().createStyledTextField(group, Texts.get("TypeName"), m_labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_SEARCH_FORM);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -116,8 +125,8 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iSearchForm, getClientBundle().getJavaProject(), m_abstractSearchForm));
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("SuperType"),
+        new JavaElementAbstractTypeContentProvider(iSearchForm, getClientBundle().getJavaProject(), m_abstractSearchForm), m_labelColWidthPercent);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -127,13 +136,28 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_clientBundle, m_labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
+        pingStateChanging();
+      }
+    });
+
+    Control tablePageGroup = createTablePageGroup(parent);
+
     // layout
     parent.setLayout(new GridLayout(1, true));
+    group.setLayout(new GridLayout(1, true));
+    group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     tablePageGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   private Control createTablePageGroup(Composite parent) {
@@ -141,13 +165,13 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     group.setText(Texts.get("AutoCreate"));
     Label label = new Label(group, SWT.NONE);
     label.setText(Texts.get("SelectTablePageForSearchForm"));
-    m_tablePageField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("TablePage"), new AbstractJavaElementContentProvider() {
+    m_tablePageField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("TablePage"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
         IType[] list = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
         return new Object[][]{list};
       }
-    });
+    }, m_labelColWidthPercent);
     m_tablePageField.acceptProposal(getTablePageType());
     m_tablePageField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -175,19 +199,6 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  void fillOperation(FormStackNewOperation operation) {
-    // operation.setCreateIdProperty(isCreateFormId());
-    // operation.setFormIdName(getFormId());
-    operation.setFormName(getTypeName());
-    if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName());
-    }
-    IType superTypeProp = getSuperType();
-    if (superTypeProp != null) {
-      operation.setFormSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
-    }
-  }
-
   @Override
   public SearchFormNewWizard getWizard() {
     return (SearchFormNewWizard) super.getWizard();
@@ -198,18 +209,23 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
+      multiStatus.add(getStatusTargetPackge());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
     }
   }
 
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
+  }
+
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_SEARCH_FORM)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
     // check not allowed names
-    if (TypeUtility.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
@@ -319,4 +335,24 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     setProperty(PROP_TABLE_PAGE, superType);
   }
 
+  public String getTargetPackage() {
+    return (String) getProperty(PROP_TARGET_PACKAGE);
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    setProperty(PROP_TARGET_PACKAGE, targetPackage);
+  }
 }

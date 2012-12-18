@@ -18,12 +18,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -39,25 +41,28 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  /** {@link String} **/
   public static final String PROP_TYPE_NAME = "typeName";
-  /** {@link ITypeProposal} **/
   public static final String PROP_SUPER_TYPE = "superType";
+  public static final String PROP_TARGET_PACKAGE = "targetPackage";
 
   // ui fields
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
+  private EntityTextField m_entityField;
 
   // process members
   private final IType m_definitionType;
   private final String m_typeNameSuffix;
+  private final IScoutBundle m_bundle;
 
   private IScoutBundle m_locationBundle;
 
-  public ServiceNewWizardPage(String title, String message, IType definitionType, String typeNameSuffix) {
+  public ServiceNewWizardPage(String title, String message, IType definitionType, String typeNameSuffix, IScoutBundle b, String defaultPackage) {
     super(ServiceNewWizardPage.class.getName());
     m_typeNameSuffix = typeNameSuffix;
     m_definitionType = definitionType;
+    m_bundle = b;
+    setTargetPackage(defaultPackage);
     setTitle(title);
     setDescription(message);
   }
@@ -87,11 +92,22 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_bundle, labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
+        pingStateChanging();
+      }
+    });
+
     // layout
     parent.setLayout(new GridLayout(1, true));
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   @Override
@@ -99,10 +115,15 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
+      multiStatus.add(getStatusTargetPackge());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
     }
+  }
+
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
@@ -180,4 +201,24 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     setProperty(PROP_SUPER_TYPE, superType);
   }
 
+  public String getTargetPackage() {
+    return (String) getProperty(PROP_TARGET_PACKAGE);
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    setProperty(PROP_TARGET_PACKAGE, targetPackage);
+  }
 }

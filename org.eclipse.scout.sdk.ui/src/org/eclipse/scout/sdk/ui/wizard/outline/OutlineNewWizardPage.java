@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -34,6 +35,8 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -56,11 +59,13 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_superType;
   private boolean m_addToDesktop;
   private boolean m_addToDesktopEnabled;
+  private String m_packageName;
 
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private Button m_addToDesktopField;
+  private EntityTextField m_entityField;
 
   // process members
   private final IType m_abstractOutline;
@@ -70,8 +75,9 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   public OutlineNewWizardPage(IScoutBundle clientBundle) {
     super(OutlineNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    setTitle(Texts.get("New Outline"));
+    setTitle(Texts.get("NewOutline"));
     setDescription(Texts.get("CreateANewOutline"));
+    setTargetPackage(DefaultTargetPackage.get(clientBundle, IScoutBundle.CLIENT_OUTLINES));
     // default values
     m_abstractOutline = RuntimeClasses.getSuperType(RuntimeClasses.IOutline, m_clientBundle.getJavaProject());
     m_superType = m_abstractOutline;
@@ -81,8 +87,8 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"));
+    int labelColWidthPercent = 20;
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -103,7 +109,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_OUTLINE);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -115,12 +121,22 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iOutline, getClientBundle().getJavaProject(), m_abstractOutline));
+        new JavaElementAbstractTypeContentProvider(iOutline, getClientBundle().getJavaProject(), m_abstractOutline), labelColWidthPercent);
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_superType = (IType) event.proposal;
+        pingStateChanging();
+      }
+    });
+
+    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
         pingStateChanging();
       }
     });
@@ -142,6 +158,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_addToDesktopField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
@@ -155,6 +172,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getNlsName() != null) {
       getOperation().setNlsEntry(getNlsName());
     }
+    getOperation().setPackageName(getClientBundle().getPackageName(getTargetPackage()));
     getOperation().setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
@@ -171,6 +189,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
+      multiStatus.add(getStatusTargetPackge());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
@@ -189,12 +208,16 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_operation;
   }
 
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
+  }
+
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_OUTLINE)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
     // check not allowed names
-    if (TypeUtility.existsType(getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
@@ -303,4 +326,24 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_addToDesktopEnabled;
   }
 
+  public String getTargetPackage() {
+    return m_packageName;
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    m_packageName = targetPackage;
+  }
 }

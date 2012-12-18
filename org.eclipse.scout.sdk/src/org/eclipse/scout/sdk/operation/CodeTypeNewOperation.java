@@ -36,6 +36,7 @@ public class CodeTypeNewOperation implements IOperation {
 
   private String m_nextCodeId;
   private String m_typeName;
+  private String m_packageName;
   private String m_superTypeSignature;
   private String m_genericTypeSignature;
   private INlsEntry m_nlsEntry;
@@ -61,7 +62,7 @@ public class CodeTypeNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_CODE), getSharedBundle());
+    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getSharedBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.run(monitor, workingCopyManager);
     m_createdType = newOp.getCreatedType();
@@ -182,5 +183,13 @@ public class CodeTypeNewOperation implements IOperation {
 
   public String getGenericTypeSignature() {
     return m_genericTypeSignature;
+  }
+
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
   }
 }

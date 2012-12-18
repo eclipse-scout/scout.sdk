@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
+import org.eclipse.scout.sdk.IRuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -123,7 +124,7 @@ public class WsConsumerDeleteOperation implements IOperation {
     // unregister server side
     IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(bundle.getJavaProject().getProject());
     for (IScoutBundle serverBundle : implementationBundle.getRequiredBundles(ScoutBundleFilters.getServerFilter(), true)) {
-      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, type.getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
+      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, type.getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
     }
   }
 

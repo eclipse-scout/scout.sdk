@@ -129,7 +129,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   }
 
   /**
-   * might be overridden to provide an other nls project
+   * might be overridden to provide another nls project
    * 
    * @param method
    *          not null

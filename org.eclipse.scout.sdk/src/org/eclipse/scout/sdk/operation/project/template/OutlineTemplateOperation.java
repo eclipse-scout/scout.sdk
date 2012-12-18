@@ -69,7 +69,7 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ResourcesPlugin.getWorkspace().checkpoint(false);
-    IType desktopType = TypeUtility.getType(m_scoutProject.getClientBundle().getBundleName() + IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP + ".Desktop");
+    IType desktopType = TypeUtility.getType(m_scoutProject.getClientBundle().getDefaultPackage(IScoutBundle.CLIENT_DESKTOP) + ".Desktop");
     if (TypeUtility.exists(desktopType)) {
       MethodOverrideOperation execOpenOp = new MethodOverrideOperation(desktopType, "execOpened", false) {
         @Override
@@ -118,6 +118,7 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
       outlineOp.setDesktopType(desktopType);
       outlineOp.setFormatSource(false);
       outlineOp.setTypeName(name);
+      outlineOp.setPackageName(getScoutProject().getClientBundle().getDefaultPackage(IScoutBundle.CLIENT_OUTLINES));
       outlineOp.setNlsEntry(entry);
       outlineOp.run(monitor, workingCopyManager);
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
@@ -130,10 +131,10 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         outlineServiceOp.setImplementationBundle(getScoutProject().getServerBundle());
         outlineServiceOp.setInterfaceBundle(getScoutProject().getSharedBundle());
         outlineServiceOp.setServiceInterfaceName("IStandardOutlineService");
-        outlineServiceOp.setServiceInterfacePackageName(getScoutProject().getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES));
+        outlineServiceOp.setServiceInterfacePackageName(getScoutProject().getSharedBundle().getDefaultPackage(IScoutBundle.SHARED_SERVICES));
         outlineServiceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
         outlineServiceOp.setServiceName("StandardOutlineService");
-        outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES));
+        outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getDefaultPackage(IScoutBundle.SERVER_SERVICES));
         outlineServiceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getScoutProject().getServerBundle().getJavaProject()));
         outlineServiceOp.run(monitor, workingCopyManager);
       }

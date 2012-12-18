@@ -37,9 +37,12 @@ public class LookupCallNewOperation implements IOperation {
   private String m_lookupCallName;
   private String m_serviceSuperTypeSignature;
   private IScoutBundle m_bundle;
+  private String m_lookupCallPackageName;
   private IScoutBundle m_interfaceRegistrationBundle;
+  private String m_serviceInterfacePackageName;
   private IScoutBundle m_serviceInterfaceBundle;
   private IScoutBundle m_implementationRegistrationBundle;
+  private String m_serviceImplementationPackage;
   private IScoutBundle m_serviceImplementationBundle;
   private IType m_lookupService;
   private boolean m_formatSource;
@@ -66,9 +69,11 @@ public class LookupCallNewOperation implements IOperation {
         serviceOp.addProxyRegistrationBundle(getInterfaceRegistrationBundle());
         serviceOp.setImplementationBundle(getServiceImplementationBundle());
         serviceOp.setServiceName(namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
+        serviceOp.setServicePackageName(getServiceImplementationPackage());
         serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
         serviceOp.setServiceInterfaceName("I" + namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
         serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
+        serviceOp.setServiceInterfacePackageName(getServiceInterfacePackageName());
         serviceOp.setServiceSuperTypeSignature(getServiceSuperTypeSignature());
         serviceOp.addServiceRegistrationBundle(getImplementationRegistrationBundle());
         serviceOp.validate();
@@ -79,7 +84,7 @@ public class LookupCallNewOperation implements IOperation {
     }
     m_outLookupServiceInterface = lookupServiceInterface;
     // lookup call
-    ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP), getBundle());
+    ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getLookupCallPackageName(), getBundle());
     lookupCallOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.LookupCall));
     lookupCallOp.validate();
     lookupCallOp.run(monitor, workingCopyManager);
@@ -190,5 +195,29 @@ public class LookupCallNewOperation implements IOperation {
 
   public IType getOutLookupServiceInterface() {
     return m_outLookupServiceInterface;
+  }
+
+  public String getServiceImplementationPackage() {
+    return m_serviceImplementationPackage;
+  }
+
+  public void setServiceImplementationPackage(String serviceImplementationPackage) {
+    m_serviceImplementationPackage = serviceImplementationPackage;
+  }
+
+  public String getServiceInterfacePackageName() {
+    return m_serviceInterfacePackageName;
+  }
+
+  public void setServiceInterfacePackageName(String serviceInterfacePackageName) {
+    m_serviceInterfacePackageName = serviceInterfacePackageName;
+  }
+
+  public String getLookupCallPackageName() {
+    return m_lookupCallPackageName;
+  }
+
+  public void setLookupCallPackageName(String lookupCallPackageName) {
+    m_lookupCallPackageName = lookupCallPackageName;
   }
 }

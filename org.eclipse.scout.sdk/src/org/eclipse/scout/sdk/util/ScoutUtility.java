@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
-import java.util.regex.Matcher;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
@@ -23,11 +21,13 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.IRuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
@@ -139,15 +140,15 @@ public final class ScoutUtility {
   public static void unregisterServiceProxy(IType interfaceType, IProgressMonitor monitor) throws CoreException {
     IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(interfaceType.getJavaProject().getProject());
     for (IScoutBundle clientBundle : interfaceBundle.getDependentBundles(ScoutBundleFilters.getClientFilter(), false)) {
-      ScoutUtility.unregisterServiceClass(clientBundle.getProject(), IScoutBundle.CLIENT_EXTENSION_POINT_SERVICE_PROXIES, IScoutBundle.CLIENT_EXTENSION_ELEMENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName(), monitor);
+      ScoutUtility.unregisterServiceClass(clientBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName(), monitor);
     }
   }
 
   public static void unregisterServiceImplementation(IType serviceType, IProgressMonitor monitor) throws CoreException {
     IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(serviceType.getJavaProject().getProject());
-    ScoutUtility.unregisterServiceClass(implementationBundle.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), monitor);
+    ScoutUtility.unregisterServiceClass(implementationBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), monitor);
     for (IScoutBundle serverBundle : implementationBundle.getRequiredBundles(ScoutBundleFilters.getServerFilter(), true)) {
-      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IScoutBundle.EXTENSION_POINT_SERVICES, IScoutBundle.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
+      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
     }
   }
 
@@ -479,96 +480,24 @@ public final class ScoutUtility {
     return buf.toString();
   }
 
-  public static List<String[]> extractSqlTableNames(String sql) {
-    List<String[]> sqlTables = new ArrayList<String[]>();
-    Pattern p = Pattern.compile("( *)([A-Za-z_]+)( *)([A-Za-z_]*)");
-    try {
-      int start = sql.toUpperCase().indexOf("FROM ") + 5;
-      int end = sql.toUpperCase().indexOf("WHERE ");
-      if (end == -1) {// no where, but maybe into?
-        end = sql.toUpperCase().indexOf("INTO ");
-      }
-      sql = sql.substring(start, end);
-      String[] possibleColumns = sql.split(",");
-      for (String column : possibleColumns) {
-        Matcher m = p.matcher(column);
-        if (m.find()) {
-          if (m.group(2) != null) {
-            sqlTables.add(new String[]{m.group(2), m.group(4)});
+  public static String[] getEntities(IScoutProject p) throws JavaModelException {
+    TreeSet<String> ret = new TreeSet<String>();
+    for (IScoutBundle b : p.getAllScoutBundles()) {
+      if (b.getType() == IScoutBundle.BUNDLE_CLIENT || b.getType() == IScoutBundle.BUNDLE_SHARED || b.getType() == IScoutBundle.BUNDLE_SERVER) {
+        String bundleName = b.getBundleName();
+        int bundleNameMin = bundleName.length() + 1;
+        for (IPackageFragmentRoot r : b.getJavaProject().getPackageFragmentRoots()) {
+          for (IJavaElement je : r.getChildren()) {
+            if (!je.isReadOnly() && je instanceof IPackageFragment) {
+              String pckName = je.getElementName();
+              if (pckName.startsWith(bundleName) && pckName.length() > bundleNameMin) {
+                ret.add(pckName.substring(bundleNameMin));
+              }
+            }
           }
         }
       }
     }
-    catch (Exception e) {
-    }
-    return sqlTables;
+    return ret.toArray(new String[ret.size()]);
   }
-
-  public static String extractWhereClause(String sql) {
-    int start = sql.toUpperCase().indexOf("WHERE ");
-    if (start == -1) {// no where clause...
-      return "";
-    }
-    int end = sql.toUpperCase().indexOf("INTO ");
-    if (end < start) {
-      end = sql.indexOf(JAVA_MARKER);
-    }
-
-    if (end < start) {
-      sql = sql.substring(start);
-    }
-    else {
-      sql = sql.substring(start, end);
-    }
-    return sql;
-  }
-
-  public static List<String> extractSqlColumns(String sql) {
-    List<String> sqlColumns = new ArrayList<String>();
-
-    // remove all comments
-    sql = sql.replaceAll("(/\\*)(.+)?(\\*/)", "");
-    // replace all newlines and tabs.
-    sql = sql.replaceAll("\\t|\\n", " ");
-    sql = sql.replaceAll("  *", " ");
-    sql = sql.substring(sql.toUpperCase().indexOf("SELECT") + 6) + " FROM "; /* need at least 1 FROM */
-    // mssql legacy
-    sql = sql.replaceAll("(TOP|top)\\s+[\\w#]+", "");
-
-    String REGEX_NO_BRACKET = "[^(^)]*";
-    String REGEX_NO_BRACKET_NO_COMMA = "[^(^)^,]";
-    String REGEX_NO_BRACKET_NO_COMMA_OPTIONAL = REGEX_NO_BRACKET_NO_COMMA + "*";
-    String REGEX_NO_BRACKET_NO_COMMA_MANDATORY = REGEX_NO_BRACKET_NO_COMMA + "+";
-    String REGEX_FINISH_KEYWORDS = " FROM | INTO | from | into ";
-    String REGEX_COLUMN_SYNTAX_END = "(,|" + REGEX_FINISH_KEYWORDS + ")";
-    String REGEX_BRACKET_EXP = makeBraketRegex(REGEX_NO_BRACKET);
-    String REGEX_BRACKET_EXP_2 = makeBraketRegex(REGEX_BRACKET_EXP);
-    String REGEX_COLUMN = "((" + REGEX_NO_BRACKET_NO_COMMA_OPTIONAL + "(\\(" + REGEX_BRACKET_EXP_2 + "\\)))+" + REGEX_NO_BRACKET_NO_COMMA_OPTIONAL + "|" + REGEX_NO_BRACKET_NO_COMMA_MANDATORY + ")";
-    String REGEX_COLUMN_INCL_TERM = REGEX_COLUMN + REGEX_COLUMN_SYNTAX_END;
-
-    Pattern patternInclTerm = Pattern.compile(REGEX_COLUMN_INCL_TERM);
-    Pattern patternColumnOnly = Pattern.compile(REGEX_COLUMN);
-    Pattern patternSplitColumn = Pattern.compile(REGEX_FINISH_KEYWORDS + "\\(" + REGEX_BRACKET_EXP_2 + "\\)");
-
-    Matcher matcher = patternInclTerm.matcher(sql);
-    boolean finished = false;
-    while (matcher.find() && !finished) {
-      String columnInclTerm = matcher.group();
-      String column = patternSplitColumn.split(columnInclTerm)[0];
-      String replace = columnInclTerm.replace(column, "");
-      String REGEX_FINSISH = REGEX_NO_BRACKET_NO_COMMA_OPTIONAL + "(" + REGEX_FINISH_KEYWORDS + ").*";
-      finished = replace.matches(REGEX_FINSISH);
-      Matcher matcher2 = patternColumnOnly.matcher(column);
-      if (matcher2.find()) {
-        column = matcher2.group();
-        sqlColumns.add(column.trim());
-      }
-    }
-    return sqlColumns;
-  }
-
-  private static String makeBraketRegex(String REGEX_NO_BRACKET) {
-    return REGEX_NO_BRACKET + "(\\(" + REGEX_NO_BRACKET + "\\)" + REGEX_NO_BRACKET + ")*";
-  }
-
 }

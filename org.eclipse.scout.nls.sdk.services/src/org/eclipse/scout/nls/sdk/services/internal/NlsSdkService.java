@@ -7,7 +7,6 @@ public class NlsSdkService extends AbstractUIPlugin {
 
   private static NlsSdkService plugin;
   public static final String PLUGIN_ID = "org.eclipse.scout.nls.sdk.services";
-  public static final String TEXT_SERVICE_PACKAGE_SUFFIX = ".services.common.text";
 
   static NlsSdkService getDefault() {
     return plugin;

@@ -17,19 +17,16 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 
-public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
+public class ExecResetSearchFilterMethodPresenter extends ExecMethodPresenter {
 
-  public ExecResetSerchFilterMethodPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
+  public ExecResetSearchFilterMethodPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
@@ -72,15 +69,7 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
       m_formType = declaringType;
       ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       if (TypeUtility.exists(m_formType) && formHierarchy.isSubtype(iSearchForm, m_formType)) {
-        String formDataSimpleName = m_formType.getElementName().replaceAll(SdkProperties.SUFFIX_FORM + "$", SdkProperties.SUFFIX_FORM_DATA);
-        IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getDeclaringType());
-        for (IScoutBundle shared : clientBundle.getRequiredBundles(ScoutBundleFilters.getSharedFilter(), false)) {
-          String formDataFqn = shared.getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + formDataSimpleName;
-          if (TypeUtility.existsType(formDataFqn)) {
-            m_formDataType = TypeUtility.getType(formDataFqn);
-            break;
-          }
-        }
+        m_formDataType = ScoutTypeUtility.findFormDataForForm(m_formType);
       }
     }
 
@@ -94,7 +83,6 @@ public class ExecResetSerchFilterMethodPresenter extends ExecMethodPresenter {
         content.append("exportFormData(formData);\n");
         content.append("searchFilter.setFormData(formData);");
         return content.toString();
-
       }
       else {
         return super.createMethodBody(validator);

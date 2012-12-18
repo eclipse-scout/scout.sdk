@@ -33,7 +33,7 @@ public class TextField extends Composite {
   private Color m_backupTextBackground;
   private final int m_labelPercentage;
 
-  public final static int DEFAULT_LABEL_PERCENTAGE = 40;
+  public final static int DEFAULT_LABEL_PERCENTAGE = 20;
 
   public TextField(Composite parent) {
     this(parent, "");

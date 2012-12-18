@@ -49,6 +49,9 @@ public class SearchFormNewOperation implements IOperation {
   private IScoutBundle m_searchFormDataLocationBundle;
   private IType m_tablePage;
   private boolean m_createSearchHandler;
+  private String m_searchFormPackageName;
+  private String m_searchFormDataPackageName;
+
   // created types
   private IType m_createdFormType;
   private IType m_createdFormDataType;
@@ -62,6 +65,12 @@ public class SearchFormNewOperation implements IOperation {
     if (StringUtility.isNullOrEmpty(getTypeName())) {
       throw new IllegalArgumentException("type name is null or empty.");
     }
+    if (StringUtility.isNullOrEmpty(getSearchFormPackageName())) {
+      throw new IllegalArgumentException("search form package is null or empty.");
+    }
+    if (StringUtility.isNullOrEmpty(getSearchFormDataPackageName())) {
+      throw new IllegalArgumentException("search form data package is null or empty.");
+    }
   }
 
   @Override
@@ -69,7 +78,7 @@ public class SearchFormNewOperation implements IOperation {
     // create empty form data
     String formDataSignature = null;
     if (getSearchFormDataLocationBundle() != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTypeName() + "Data", getSearchFormDataLocationBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES), getSearchFormDataLocationBundle());
+      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTypeName() + "Data", getSearchFormDataPackageName(), getSearchFormDataLocationBundle());
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataOp.run(monitor, workingCopyManager);
       formDataSignature = SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName());
@@ -78,7 +87,7 @@ public class SearchFormNewOperation implements IOperation {
       manifestOp.run(monitor, workingCopyManager);
     }
     // form
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSearchFormLocationBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_SEARCHFORMS), getSearchFormLocationBundle());
+    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSearchFormPackageName(), getSearchFormLocationBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     if (!StringUtility.isNullOrEmpty(formDataSignature)) {
       FormDataAnnotationCreateOperation annotOp = new FormDataAnnotationCreateOperation(null);
@@ -162,6 +171,7 @@ public class SearchFormNewOperation implements IOperation {
       formDataOp.run(monitor, workingCopyManager);
     }
     // format source
+    workingCopyManager.reconcile(getCreatedFormType().getCompilationUnit(), monitor);
     JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedFormType(), true);
     formatOp.validate();
     formatOp.run(monitor, workingCopyManager);
@@ -240,4 +250,19 @@ public class SearchFormNewOperation implements IOperation {
     return m_tablePage;
   }
 
+  public String getSearchFormPackageName() {
+    return m_searchFormPackageName;
+  }
+
+  public void setSearchFormPackageName(String searchFormPackageName) {
+    m_searchFormPackageName = searchFormPackageName;
+  }
+
+  public String getSearchFormDataPackageName() {
+    return m_searchFormDataPackageName;
+  }
+
+  public void setSearchFormDataPackageName(String searchFormDataPackageName) {
+    m_searchFormDataPackageName = searchFormDataPackageName;
+  }
 }

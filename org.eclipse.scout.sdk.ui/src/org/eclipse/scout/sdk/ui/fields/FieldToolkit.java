@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.SimpleLabelProvider;
@@ -33,6 +34,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
@@ -98,9 +100,13 @@ public class FieldToolkit {
     return field;
   }
 
-  public ProposalTextField createSiblingProposalField(Composite parent, IType declaringType, IType siblingDeclaringType) {
+  public ProposalTextField createSiblingProposalField(Composite parent, IType declaringType, IType siblingDeclaringType, int labelPercentage) {
     ITypeHierarchy localHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
-    return createSiblingProposalField(parent, declaringType, siblingDeclaringType, localHierarchy);
+    return createSiblingProposalField(parent, declaringType, siblingDeclaringType, localHierarchy, labelPercentage);
+  }
+
+  public ProposalTextField createSiblingProposalField(Composite parent, IType declaringType, IType siblingDeclaringType) {
+    return createSiblingProposalField(parent, declaringType, siblingDeclaringType, TextField.DEFAULT_LABEL_PERCENTAGE);
   }
 
   public ProposalTextField createSiblingProposalField(Composite parent, IType declaringType, IType siblingDeclaringType, ITypeHierarchy hierarchy) {
@@ -120,6 +126,23 @@ public class FieldToolkit {
     field.setLabelProvider(new SimpleLabelProvider());
     field.setContentProvider(new SimpleProposalProvider(siblingList.toArray(new SiblingProposal[siblingList.size()])));
     return field;
+  }
+
+  public EntityTextField createEntityTextField(Composite parent, String label, IScoutBundle b) {
+    return createEntityTextField(parent, label, b.getScoutProject());
+  }
+
+  public EntityTextField createEntityTextField(Composite parent, String label, IScoutProject p) {
+    return createEntityTextField(parent, label, p, TextField.DEFAULT_LABEL_PERCENTAGE);
+  }
+
+  public EntityTextField createEntityTextField(Composite parent, String label, IScoutBundle b, int labelPercentage) {
+    return createEntityTextField(parent, label, b.getScoutProject(), labelPercentage);
+  }
+
+  public EntityTextField createEntityTextField(Composite parent, String label, IScoutProject p, int labelPercentage) {
+    EntityTextField text = new EntityTextField(parent, label, labelPercentage, p);
+    return text;
   }
 
   /**

@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
@@ -35,6 +36,7 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -67,6 +69,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   public static final String PROP_SERVICE_SUPER_TYPE = "serviceSuperType";
   public static final String PROP_LOOKUP_SERVICE = "lookupService";
   public static final String PROP_LOOKUP_SERVICE_STRATEGY = "lookupServiceStrategy";
+  public static final String PROP_TARGET_PACKAGE = "targetPackage";
 
   // ui fields
   private StyledTextField m_typeNameField;
@@ -75,6 +78,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   private Button m_noServiceButton;
   private ProposalTextField m_serviceSuperTypeField;
   private ProposalTextField m_lookupServiceTypeField;
+  private EntityTextField m_entityField;
 
   // process members
   private final IType m_abstractSqlLookupService;
@@ -86,6 +90,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_sharedBundle = sharedBundle;
     m_serverBundle = serverBundle;
     m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.AbstractSqlLookupService, sharedBundle.getJavaProject());
+    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IScoutBundle.SHARED_SERVICES_LOOKUP));
     setTitle(Texts.get("NewLookupCall"));
     setDescription(Texts.get("CreateANewLookupCall"));
     setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
@@ -94,7 +99,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    int labelPercentage = 20;
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelPercentage);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -105,12 +111,23 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_sharedBundle, labelPercentage);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
+        pingStateChanging();
+      }
+    });
+
     Control lookupServiceGroup = createLookupServiceGroup(parent);
 
     // layout
     parent.setLayout(new GridLayout(1, true));
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     lookupServiceGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
@@ -228,10 +245,10 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_LOOKUP_CALL)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
     // check not allowed names
-    if (TypeUtility.existsType(getSharedBundle().getPackageName(IScoutBundle.SHARED_PACKAGE_APPENDIX_SERVICES_LOOKUP) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getSharedBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
@@ -405,4 +422,24 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
+  public String getTargetPackage() {
+    return (String) getProperty(PROP_TARGET_PACKAGE);
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    setProperty(PROP_TARGET_PACKAGE, targetPackage);
+  }
 }

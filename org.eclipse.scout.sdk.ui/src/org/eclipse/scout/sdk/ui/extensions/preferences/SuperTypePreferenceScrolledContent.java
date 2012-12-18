@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.ui.fields.SimpleScrolledComposite;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.SWT;
@@ -26,7 +27,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
@@ -35,7 +35,7 @@ import org.osgi.service.prefs.BackingStoreException;
  * @author mvi
  * @since 3.8.0 24.11.2012
  */
-public class SuperTypePreferenceScrolledContent {
+public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolledContent<DefaultSuperClassModel> {
 
   private final List<Combo> m_allSuperTypeCombos;
   private final List<Label> m_allLabels;
@@ -48,7 +48,8 @@ public class SuperTypePreferenceScrolledContent {
     m_allLabels = new ArrayList<Label>();
   }
 
-  public void loadModel(List<DefaultSuperClassModel> entries, IModelLoadProgressObserver observer) {
+  @Override
+  public void loadModel(List<DefaultSuperClassModel> entries, IModelLoadProgressObserver<DefaultSuperClassModel> observer) {
     m_entries = new ArrayList<DefaultSuperClassModel>(entries);
     for (DefaultSuperClassModel model : m_entries) {
       model.load();
@@ -58,12 +59,9 @@ public class SuperTypePreferenceScrolledContent {
     }
   }
 
+  @Override
   public void createContent(Composite parent) {
     m_scrollArea = new SimpleScrolledComposite(parent);
-    GridData dd = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    dd.exclude = true;
-    dd.heightHint = getNextParentSize(parent);
-    m_scrollArea.setLayoutData(dd);
 
     Composite c = m_scrollArea.getBody();
     GridLayout gl = new GridLayout(2, false);
@@ -99,6 +97,7 @@ public class SuperTypePreferenceScrolledContent {
     }
   }
 
+  @Override
   public void save() {
     final HashSet<IScoutProject> modifiedProjects = new HashSet<IScoutProject>(1);
     visitCombos(new ISuperTypeComboVisitor() {
@@ -125,6 +124,7 @@ public class SuperTypePreferenceScrolledContent {
     }
   }
 
+  @Override
   public void reset() {
     visitCombos(new ISuperTypeComboVisitor() {
       @Override
@@ -143,16 +143,19 @@ public class SuperTypePreferenceScrolledContent {
     }
   }
 
+  @Override
   public void setVisible(boolean visible) {
     ((GridData) m_scrollArea.getLayoutData()).exclude = !visible;
     m_scrollArea.setVisible(visible);
     m_scrollArea.reflow(true);
   }
 
+  @Override
   public void reflow() {
     m_scrollArea.reflow(true);
   }
 
+  @Override
   public void setSearchPattern(String pattern) {
     char[] searchPatternArray = pattern.toCharArray();
     for (int i = 0; i < m_allSuperTypeCombos.size(); i++) {
@@ -179,38 +182,7 @@ public class SuperTypePreferenceScrolledContent {
     }
   }
 
-  private static int getNextParentSize(Composite container) {
-    Composite parent = container;
-    while ((parent = parent.getParent()) != null) {
-      if (parent.getSize().y > 0) {
-        return parent.getSize().y - 140;
-      }
-    }
-    return 480;
-  }
-
-  public interface IModelLoadProgressObserver {
-    void loaded(DefaultSuperClassModel justLoadedModel);
-  }
-
   private interface ISuperTypeComboVisitor {
     void visit(Combo combo, String selectedValue, DefaultSuperClassModel model);
-  }
-
-  private static class SimpleScrolledComposite extends SharedScrolledComposite {
-    private SimpleScrolledComposite(Composite parent) {
-      super(parent, SWT.V_SCROLL);
-      setFont(parent.getFont());
-      setExpandHorizontal(true);
-      setExpandVertical(true);
-
-      Composite body = new Composite(this, SWT.NONE);
-      body.setFont(parent.getFont());
-      setContent(body);
-    }
-
-    private Composite getBody() {
-      return (Composite) getContent();
-    }
   }
 }

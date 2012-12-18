@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
@@ -39,6 +40,9 @@ public class DeleteAction extends AbstractScoutHandler {
     MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
     box.setText(Texts.get("Question"));
     if (m_types.size() == 1) {
+      if (!StringUtility.hasText(m_name) && m_types.get(0) != null) {
+        m_name = m_types.get(0).getElementName();
+      }
       box.setMessage(Texts.get("DeleteAction_ensureRequest", m_name));
     }
     else {

@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.CompilationUnitSaveOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecMethodPresenter;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecResetSerchFilterMethodPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecResetSearchFilterMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BooleanPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BorderDecorationPresenter;
@@ -451,7 +451,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   AbstractMethodPresenter createOperationPresenter(Composite parent, ConfigurationMethod method) {
     AbstractMethodPresenter presenter = null;
     if (method.getMethodName().equals("execResetSearchFilter")) {
-      presenter = new ExecResetSerchFilterMethodPresenter(getFormToolkit(), parent);
+      presenter = new ExecResetSearchFilterMethodPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else {

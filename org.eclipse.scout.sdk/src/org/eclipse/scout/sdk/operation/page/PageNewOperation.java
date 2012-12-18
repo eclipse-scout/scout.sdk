@@ -49,6 +49,7 @@ public class PageNewOperation extends AbstractPageOperation {
   private INlsEntry m_nlsEntry;
   private IType m_createdPage;
   private boolean m_formatSource;
+  private String m_packageName;
 
   public PageNewOperation() {
     this(false);
@@ -74,11 +75,14 @@ public class PageNewOperation extends AbstractPageOperation {
     if (getTypeName() == null) {
       throw new IllegalArgumentException("type name can not be null.");
     }
+    if (StringUtility.isNullOrEmpty(getPackageName())) {
+      throw new IllegalArgumentException("package can not be null or empty.");
+    }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getClientBundle().getPackageName(IScoutBundle.CLIENT_PACKAGE_APPENDIX_UI_DESKTOP_OUTLINES_PAGES), getClientBundle());
+    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getClientBundle());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.run(monitor, workingCopyManager);
     m_createdPage = newOp.getCreatedType();
@@ -168,5 +172,13 @@ public class PageNewOperation extends AbstractPageOperation {
 
   public void setFormatSource(boolean formatSource) {
     m_formatSource = formatSource;
+  }
+
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
   }
 }

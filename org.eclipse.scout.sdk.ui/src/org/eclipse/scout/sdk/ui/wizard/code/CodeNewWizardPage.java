@@ -93,8 +93,10 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
+    int labelColWidthPercent = 20;
+
     IScoutProject project = ScoutSdkCore.getScoutWorkspace().getScoutBundle(m_declaringType.getJavaProject().getProject()).getScoutProject();
-    m_nextCodeIdField = new CodeIdField(parent, project);
+    m_nextCodeIdField = new CodeIdField(parent, project, labelColWidthPercent);
     m_nextCodeIdField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -103,7 +105,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -124,7 +126,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_CODE);
     m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -141,7 +143,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
           protected Object[][] computeProposals() {
             return new Object[][]{TypeUtility.toArray(m_declaringType), ScoutTypeUtility.getCodes(m_declaringType)};
           }
-        });
+        }, labelColWidthPercent);
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -165,7 +167,8 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType), SignatureProposalProvider.DEFAULT_PRIMITIV_SIGNATURES);
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType),
+        SignatureProposalProvider.DEFAULT_PRIMITIV_SIGNATURES, labelColWidthPercent);
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -184,7 +187,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, iCode);
+    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, iCode, labelColWidthPercent);
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -262,7 +265,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_CODE)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_fieldNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
     // check not allowed names
     if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {

@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -33,6 +34,8 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,6 +54,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   private static final String PROP_TYPE_NAME = "typeName";
   private static final String PROP_SUPER_TYPE = "superType";
   private static final String PROP_FORM_DATA_TYPE = "formDataType";
+  private static final String PROP_TARGET_PACKAGE = "targetPackage";
 
   private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
   private final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
@@ -59,19 +63,24 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private ProposalTextField m_formDataTypeField;
+  private EntityTextField m_entityField;
 
   // process members
   private IScoutBundle m_serverBundle;
 
-  public ProcessServiceNewWizardPage() {
+  public ProcessServiceNewWizardPage(IScoutBundle serverBundle) {
     super(ProcessServiceNewWizardPage.class.getName());
+    m_serverBundle = serverBundle;
     setTitle(Texts.get("NewProcessService"));
     setDescription(Texts.get("CreateANewProcessService"));
+    setTargetPackage(DefaultTargetPackage.get(serverBundle, IScoutBundle.SERVER_SERVICES));
   }
 
   @Override
   protected void createContent(Composite parent) {
-    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
+    int labelColWidthPercent = 20;
+
+    m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_SERVICE);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -84,7 +93,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
     IType abstractService = RuntimeClasses.getSuperType(RuntimeClasses.IService, getServerBundle().getJavaProject());
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iService, getServerBundle().getJavaProject(), abstractService));
+        new JavaElementAbstractTypeContentProvider(iService, getServerBundle().getJavaProject(), abstractService), labelColWidthPercent);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -101,7 +110,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
         IType[] formDataTypes = formDataHierarchy.getAllSubtypes(abstractFormData, TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
         return new Object[][]{formDataTypes};
       }
-    });
+    }, labelColWidthPercent);
     m_formDataTypeField.acceptProposal(getFormDataType());
     m_formDataTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -111,13 +120,23 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), getServerBundle(), labelColWidthPercent);
+    m_entityField.setText(getTargetPackage());
+    m_entityField.addModifyListener(new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        setTargetPackageInternal((String) m_entityField.getText());
+        pingStateChanging();
+      }
+    });
+
     // layout
     parent.setLayout(new GridLayout(1, true));
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    GridData formDataTypeFieldData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-    m_formDataTypeField.setLayoutData(formDataTypeFieldData);
+    m_formDataTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   void fillProcessServiceNewOperation(ProcessServiceNewOperation op) {
@@ -131,6 +150,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
+      multiStatus.add(getStatusTargetPackge());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
@@ -141,7 +161,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_SERVICE)) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
-    if (TypeUtility.existsType(getServerBundle().getPackageName(IScoutBundle.SERVER_PACKAGE_APPENDIX_SERVICES) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getServerBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
@@ -162,12 +182,12 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     return Status.OK_STATUS;
   }
 
-  public IScoutBundle getServerBundle() {
-    return m_serverBundle;
+  protected IStatus getStatusTargetPackge() {
+    return JavaElementValidator.validatePackageName(getTargetPackage());
   }
 
-  public void setServerBundle(IScoutBundle serverBundle) {
-    m_serverBundle = serverBundle;
+  public IScoutBundle getServerBundle() {
+    return m_serverBundle;
   }
 
   public String getTypeName() {
@@ -233,4 +253,24 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     return (IType) getProperty(PROP_FORM_DATA_TYPE);
   }
 
+  public String getTargetPackage() {
+    return (String) getProperty(PROP_TARGET_PACKAGE);
+  }
+
+  public void setTargetPackage(String targetPackage) {
+    try {
+      setStateChanging(true);
+      setTargetPackageInternal(targetPackage);
+      if (isControlCreated()) {
+        m_entityField.setText(targetPackage);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setTargetPackageInternal(String targetPackage) {
+    setProperty(PROP_TARGET_PACKAGE, targetPackage);
+  }
 }

@@ -26,6 +26,13 @@ public interface IRuntimeClasses {
   String ScoutUiSwingBundleId = "org.eclipse.scout.rt.ui.swing"; // NO_UCD
   String ScoutClientSvgBundleId = "org.eclipse.scout.svg.client"; // NO_UCD
 
+  //extension points
+  String EXTENSION_ELEMENT_SERVICE = "service";
+  String EXTENSION_SERVICE_RANKING = "ranking";
+  String EXTENSION_POINT_SERVICES = "org.eclipse.scout.service.services";
+  String EXTENSION_POINT_CLIENT_SERVICE_PROXIES = "org.eclipse.scout.service.services";
+  String EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY = "proxy";
+
   String ACCESS = "org.eclipse.scout.rt.shared.services.common.security.ACCESS"; // NO_UCD
   String SERVICES = "org.eclipse.scout.service.SERVICES"; // NO_UCD
   String TEXTS = "org.eclipse.scout.rt.shared.TEXTS"; // NO_UCD

@@ -29,4 +29,11 @@
           class="org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceDeleteAction">
     </contextMenu>
  </extension>
+ <extension
+       point="org.eclipse.scout.sdk.targetPackage">
+    <targetPackage
+          default=".services.common.text"
+          id="shared.services.textprovider">
+    </targetPackage>
+ </extension>
 </plugin>

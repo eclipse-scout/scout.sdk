@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="newProjectOperation" name="New Scout Project Operations" schema="schema/newProjectOperation.exsd"/>
    <extension-point id="runtimeClass" name="runtimeClass" schema="schema/runtimeClass.exsd"/>
+   <extension-point id="targetPackage" name="targetPackage" schema="schema/targetPackage.exsd"/>
    <extension
          id="org.eclipse.scout.sdk.ScoutNature"
          name="Scout Bundle"
@@ -512,5 +513,92 @@
             default="org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep"
             interface="org.eclipse.scout.rt.client.ui.wizard.IWizardStep">
       </element>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.targetPackage">
+      <targetPackage
+            default=".ui.desktop"
+            id="client.desktop">
+      </targetPackage>
+      <targetPackage
+            default=".ui.desktop.outlines"
+            id="client.outline">
+      </targetPackage>
+      <targetPackage
+            default=".ui.desktop.outlines.pages"
+            id="client.page">
+      </targetPackage>
+      <targetPackage
+            default=""
+            id="client.form">
+      </targetPackage>
+      <targetPackage
+            default=".ui.template.formfield"
+            id="client.template.formfield">
+      </targetPackage>
+      <targetPackage
+            default=""
+            id="client.searchform">
+      </targetPackage>
+      <targetPackage
+            default=".ui.wizards"
+            id="client.wizard">
+      </targetPackage>
+      <targetPackage
+            default=".services"
+            id="client.services">
+      </targetPackage>
+      <targetPackage
+            default=".services.lookup"
+            id="client.services.lookup">
+      </targetPackage>
+      <targetPackage
+            default=".security"
+            id="shared.security">
+      </targetPackage>
+      <targetPackage
+            default=".services"
+            id="shared.services">
+      </targetPackage>
+      <targetPackage
+            default=".services.lookup"
+            id="shared.services.lookup">
+      </targetPackage>
+      <targetPackage
+            default=".services.code"
+            id="shared.services.code">
+      </targetPackage>
+      <targetPackage
+            default=".services.common.bookmark"
+            id="shared.services.bookmark">
+      </targetPackage>
+      <targetPackage
+            default=".services.common.calendar"
+            id="shared.services.calendar">
+      </targetPackage>
+      <targetPackage
+            default=".services"
+            id="server.services">
+      </targetPackage>
+      <targetPackage
+            default=".services.lookup"
+            id="server.services.lookup">
+      </targetPackage>
+      <targetPackage
+            default=".services.common.bookmark"
+            id="server.services.bookmark">
+      </targetPackage>
+      <targetPackage
+            default=".services.common.calendar"
+            id="server.services.calendar">
+      </targetPackage>
+      <targetPackage
+            default=".services.common.sql"
+            id="server.services.sql">
+      </targetPackage>
+      <targetPackage
+            default=".services.common.smtp"
+            id="server.services.smtp">
+      </targetPackage>
    </extension>
 </plugin>
