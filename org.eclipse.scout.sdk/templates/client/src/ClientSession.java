@@ -7,7 +7,6 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
 import @@BUNDLE_CLIENT_NAME@@.ui.desktop.Desktop;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
-import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 
 public class ClientSession extends AbstractClientSession{
@@ -22,11 +21,6 @@ public class ClientSession extends AbstractClientSession{
    */
   public static ClientSession get(){
     return ClientJob.getCurrentSession(ClientSession.class);
-  }
-
-  @FormData
-  public Long getPersonNr(){
-    return getSharedContextVariable("personNr",Long.class);
   }
 
   @Override

@@ -3,7 +3,6 @@ package @@BUNDLE_SERVER_NAME@@;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.AbstractServerSession;
 
@@ -19,16 +18,6 @@ public class ServerSession extends AbstractServerSession{
    */
   public static ServerSession get(){
     return ServerJob.getCurrentSession(ServerSession.class);
-  }
-
-  @FormData
-  public Long getPersonNr(){
-    return getSharedContextVariable("personNr",Long.class);
-  }
-
-  @FormData
-  public void setPersonNr(Long newValue) {
-    setSharedContextVariable("personNr",Long.class,newValue);
   }
 
   @Override
