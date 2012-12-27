@@ -15,10 +15,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
@@ -102,13 +104,19 @@ public class FormPropertyPart extends JdtTypePropertyPart {
           }
           if (sharedBundle != null) {
             IType form = getPage().getType();
-            IType formDataType = ScoutTypeUtility.findFormDataForForm(form, sharedBundle);
+            IType formDataType = null;
+            try {
+              formDataType = ScoutTypeUtility.findFormDataForForm(form);
+            }
+            catch (JavaModelException e) {
+              ScoutSdkUi.logError(e);
+            }
             if (TypeUtility.exists(formDataType)) {
               model.addGlobalLink(new TypeOpenLink(formDataType));
             }
           }
           // service
-          String formRegex = "(I)?" + entityName + SdkProperties.SUFFIX_SERVICE;
+          String formRegex = "(I)?" + entityName + "(Process)?" + SdkProperties.SUFFIX_SERVICE;
           ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
               TypeFilters.getRegexSimpleNameFilter(formRegex),
               ScoutTypeFilters.getInScoutProject(clientBundle.getScoutProject())

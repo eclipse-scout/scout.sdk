@@ -70,8 +70,6 @@ import org.eclipse.swt.widgets.Group;
 
 public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPage {
 
-  private static final String TEXT_SERVICE_PACKAGE_ID = "shared.services.textprovider";
-
   // base interface
   private final IType iTextProviderService = TypeUtility.getType(RuntimeClasses.ITextProviderService);
 
@@ -99,7 +97,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     super(NewTextProviderServiceWizardPage.class.getName());
     setTitle("Create a new Text Provider Service");
     setDescription("Creates a new Text Provider Service.");
-    setTargetPackage(DefaultTargetPackage.get(bundle, TEXT_SERVICE_PACKAGE_ID));
+    setTargetPackage(DefaultTargetPackage.get(bundle, NlsServiceType.TEXT_SERVICE_PACKAGE_ID));
     m_bundle = bundle;
     m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();

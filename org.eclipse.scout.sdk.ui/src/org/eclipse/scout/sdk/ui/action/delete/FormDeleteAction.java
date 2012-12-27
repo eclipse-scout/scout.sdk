@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.RuntimeClasses;
@@ -45,6 +46,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -99,39 +101,35 @@ public class FormDeleteAction extends AbstractScoutHandler {
     selectedMembers.add(m_formType);
     // form data
     if (m_formData == null) {
-      IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
-      ICachedTypeHierarchy formDataHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractFormData);
-      ITypeFilter formDataFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getFormType().getJavaProject()), TypeFilters.getClassFilter());
-      for (IType candidate : formDataHierarchy.getAllSubtypes(abstractFormData, formDataFilter, null)) {
-        if (candidate.getElementName().equals(getFormType().getElementName() + "Data")) {
-          m_formData = candidate;
-          break;
-        }
+      try {
+        m_formData = ScoutTypeUtility.findFormDataForForm(getFormType());
+      }
+      catch (JavaModelException e) {
+        ScoutSdkUi.logError(e);
       }
     }
-    if (m_formData != null && m_formData.exists()) {
+    if (TypeUtility.exists(m_formData)) {
       members.add(m_formData);
       selectedMembers.add(m_formData);
     }
     // find process service
+    String formName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "$1");
     IType iService = TypeUtility.getType(RuntimeClasses.IService);
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     if (m_processServiceInterface == null) {
-      String serviceName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "I$1" + SdkProperties.SUFFIX_SERVICE);
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getFormType().getJavaProject()), TypeFilters.getInterfaceFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
-        if (candidate.getElementName().equals(serviceName)) {
+        if (candidate.getElementName().matches("I" + formName + "(Process)?" + SdkProperties.SUFFIX_SERVICE)) {
           m_processServiceInterface = candidate;
           break;
         }
       }
     }
-    if (m_processServiceInterface != null && m_processServiceImplementation == null) {
-      String serviceName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "$1" + SdkProperties.SUFFIX_SERVICE);
 
+    if (m_processServiceInterface != null && m_processServiceImplementation == null) {
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutProject(ScoutSdkCore.getScoutWorkspace().getScoutBundle(getFormType().getJavaProject().getProject()).getScoutProject()), TypeFilters.getClassFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
-        if (candidate.getElementName().equals(serviceName)) {
+        if (candidate.getElementName().matches(formName + "(Process)?" + SdkProperties.SUFFIX_SERVICE)) {
           m_processServiceImplementation = candidate;
           break;
         }

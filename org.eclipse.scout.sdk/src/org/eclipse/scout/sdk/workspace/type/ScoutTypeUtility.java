@@ -50,7 +50,6 @@ import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -64,7 +63,6 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -188,28 +186,15 @@ public class ScoutTypeUtility extends TypeUtility {
     return null;
   }
 
-  public static IType findFormDataForForm(IType form, IScoutBundle... sharedBundles) {
-    String formDataSimpleName = form.getElementName().replaceAll(SdkProperties.SUFFIX_FORM + "$", SdkProperties.SUFFIX_FORM_DATA);
-    IScoutBundle clientBundle = getScoutBundle(form);
-    String pckSuffix = form.getPackageFragment().getElementName();
-    if (pckSuffix.startsWith(clientBundle.getBundleName())) {
-      pckSuffix = pckSuffix.substring(clientBundle.getBundleName().length());
-      if (pckSuffix.startsWith(".")) {
-        pckSuffix = pckSuffix.substring(1);
-      }
-    }
-    for (IScoutBundle shared : sharedBundles) {
-      String formDataFqn = shared.getPackageName(pckSuffix) + "." + formDataSimpleName;
-      if (TypeUtility.existsType(formDataFqn)) {
-        return TypeUtility.getType(formDataFqn);
+  public static IType findFormDataForForm(IType form) throws JavaModelException {
+    FormDataAnnotation a = findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
+    if (a != null && StringUtility.hasText(a.getFormDataTypeSignature())) {
+      IType t = TypeUtility.getTypeBySignature(a.getFormDataTypeSignature());
+      if (TypeUtility.exists(t)) {
+        return t;
       }
     }
     return null;
-  }
-
-  public static IType findFormDataForForm(IType form) {
-    IScoutBundle clientBundle = getScoutBundle(form);
-    return findFormDataForForm(form, clientBundle.getRequiredBundles(ScoutBundleFilters.getSharedFilter(), false));
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {

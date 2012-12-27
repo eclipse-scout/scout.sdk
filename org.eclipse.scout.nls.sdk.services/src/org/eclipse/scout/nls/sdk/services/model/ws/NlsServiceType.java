@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 public class NlsServiceType extends NlsType {
   private static final Pattern REGEX_RESOURCE_BUNDLE_GETTER = Pattern.compile("return\\s*\\\"([^\\\"]*)\\\"\\s*\\;", Pattern.DOTALL);
   public static final String DYNAMIC_NLS_BASE_NAME_GETTER = "getDynamicNlsBaseName";
+  public static final String TEXT_SERVICE_PACKAGE_ID = "shared.services.textprovider";
 
   public NlsServiceType(IType serviceType) {
     super(serviceType);
