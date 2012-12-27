@@ -88,7 +88,7 @@ public class EntityTextField extends Composite {
     deco.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ContentAssist));
 
     m_contentProvider = new P_EntityContentProvider();
-    m_proposalAdapter = new ContentProposalAdapter(m_text, m_contentProvider, m_contentProvider, KeyStroke.getInstance(SWT.CONTROL, SWT.SPACE), null);
+    m_proposalAdapter = new ContentProposalAdapter(m_text, m_contentProvider, m_contentProvider, KeyStroke.getInstance(SWT.CONTROL, ' '), null);
     m_proposalAdapter.setLabelProvider(m_contentProvider);
     m_proposalAdapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
 
