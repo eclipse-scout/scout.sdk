@@ -61,41 +61,38 @@ public class ScoutSourceUtility {
     if (nlsProject == null) {
       return name;
     }
-    IType referenceTypes = nlsProject.getNlsAccessorType();
-    if (referenceTypes != null) {
-      String methodSource = null;
-      try {
-        methodSource = method.getSource();
-        if (methodSource == null) {
-          return name;
-        }
-        else {
-          methodSource = ScoutUtility.removeComments(methodSource);
-        }
-      }
-      catch (Exception e) {
-        ScoutSdk.logWarning("could not find nls text of method '" + method.getElementName() + "'.", e);
+    String methodSource = null;
+    try {
+      methodSource = method.getSource();
+      if (methodSource == null) {
         return name;
       }
-
-      // check for TEXTS.get("...") value
-      Matcher m = Regex.REGEX_METHOD_RETURN_NLS_TEXT.matcher(methodSource);
-      if (m.find()) {
-        String key = m.group(2);
-        String translation = key;
-        INlsEntry entry = nlsProject.getEntry(key);
-        if (entry != null) {
-          translation = entry.getTranslation(nlsProject.getDevelopmentLanguage(), true);
-        }
-        return name + " (" + translation + ")";
+      else {
+        methodSource = ScoutUtility.removeComments(methodSource);
       }
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not find nls text of method '" + method.getElementName() + "'.", e);
+      return name;
+    }
 
-      // check for constant value
-      m = Regex.REGEX_METHOD_RETURN_NON_NLS_TEXT.matcher(methodSource);
-      if (m.find()) {
-        String s = m.group(1);
-        return name + " (" + s + ")";
+    // check for TEXTS.get("...") value
+    Matcher m = Regex.REGEX_METHOD_RETURN_NLS_TEXT.matcher(methodSource);
+    if (m.find()) {
+      String key = m.group(2);
+      String translation = key;
+      INlsEntry entry = nlsProject.getEntry(key);
+      if (entry != null) {
+        translation = entry.getTranslation(nlsProject.getDevelopmentLanguage(), true);
       }
+      return name + " (" + translation + ")";
+    }
+
+    // check for constant value
+    m = Regex.REGEX_METHOD_RETURN_NON_NLS_TEXT.matcher(methodSource);
+    if (m.find()) {
+      String s = m.group(1);
+      return name + " (" + s + ")";
     }
     return name;
   }
