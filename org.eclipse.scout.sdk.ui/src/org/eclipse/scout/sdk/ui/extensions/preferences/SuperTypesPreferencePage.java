@@ -34,9 +34,12 @@ public class SuperTypesPreferencePage extends AbstractScoutProjectPreferencePage
   }
 
   @Override
-  protected void loadAllModels(Set<Entry<String, String>> configuredClasses, IModelLoadProgressObserver<DefaultSuperClassModel> observer) {
+  protected void loadAllModels(IModelLoadProgressObserver<DefaultSuperClassModel> observer) {
     for (Entry<IScoutProject, SuperTypePreferenceScrolledContent> e : getProjectModelMap().entrySet()) {
       List<DefaultSuperClassModel> list = new ArrayList<DefaultSuperClassModel>();
+
+      Set<Entry<String, String>> configuredClasses = RuntimeClasses.getAllDefaults(e.getKey()).entrySet();
+
       for (Entry<String, String> entry : configuredClasses) {
         list.add(new DefaultSuperClassModel(entry.getKey(), entry.getValue(), e.getKey()));
       }
@@ -47,7 +50,10 @@ public class SuperTypesPreferencePage extends AbstractScoutProjectPreferencePage
   }
 
   @Override
-  protected Set<Entry<String, String>> getEntrySet() {
-    return RuntimeClasses.getAllDefaults().entrySet();
+  protected int getTotalWork() {
+    if (getProjectModelMap().size() > 0) {
+      return RuntimeClasses.getAllDefaults(getProjectModelMap().keySet().iterator().next()).size();
+    }
+    return 0;
   }
 }

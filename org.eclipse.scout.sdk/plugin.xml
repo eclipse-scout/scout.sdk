@@ -233,285 +233,477 @@
    <extension
          point="org.eclipse.scout.sdk.runtimeClass">
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap"
             interface="org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.basic.activitymap.AbstractExtensibleActivityMap"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.server.services.common.bookmark.AbstractSqlBookmarkStorageService"
             interface="org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService">
+         <default
+               class="org.eclipse.scout.rt.server.services.common.bookmark.AbstractSqlBookmarkStorageService">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton"
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.IButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleButton"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar"
             interface="org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.basic.calendar.AbstractExtensibleCalendar"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider"
             interface="org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.basic.calendar.provider.AbstractExtensibleCalendarItemProvider"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton"
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.checkbox.AbstractCheckBox"
             interface="org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.checkbox.AbstractCheckBox">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.shared.services.common.code.AbstractCode"
             interface="org.eclipse.scout.rt.shared.services.common.code.ICode">
+         <default
+               class="org.eclipse.scout.rt.shared.services.common.code.AbstractCode">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType"
             interface="org.eclipse.scout.rt.shared.services.common.code.ICodeType">
+         <default
+               class="org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn">
+         </default>
       </element>
 
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDoubleColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDoubleColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IIntegerColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn"
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.ui.swing.AbstractSwingEnvironment"
             interface="org.eclipse.scout.rt.ui.swing.ISwingEnvironment">
+         <default
+               class="org.eclipse.scout.rt.ui.swing.DefaultSwingEnvironment">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute"
             interface="org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.composer.entity.AbstractComposerEntity"
             interface="org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.composer.entity.AbstractComposerEntity">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.form.fields.filechooserfield.AbstractExtensibleFileChooserField"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.AbstractForm"
             interface="org.eclipse.scout.rt.client.ui.form.IForm">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.AbstractForm">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.IFormField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.AbstractFormHandler"
             interface="org.eclipse.scout.rt.client.ui.form.IFormHandler">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.AbstractFormHandler">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox"
             interface="org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.form.fields.imagebox.AbstractExtensibleImageField"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke"
             interface="org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke">
+         <default
+               class="org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox"
             interface="org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.mailfield.AbstractMailField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.mailfield.AbstractMailField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu"
             interface="org.eclipse.scout.rt.client.ui.action.menu.IMenu">
+         <default
+               class="org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.action.menu.AbstractExtensibleMenu"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton"
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline"
             interface="org.eclipse.scout.rt.client.ui.desktop.outline.IOutline">
+         <default
+               class="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensibleOutline"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton"
             interface="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes"
             interface="org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes">
+         <default
+               class="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable"
             interface="org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable">
+         <default
+               class="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithTable"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton"
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup"
             interface="org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadioButtonGroup">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton"
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton"
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractSearchForm"
             interface="org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm">
+         <default
+               class="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractSearchForm">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox"
             interface="org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.sequencebox.AbstractSequenceBox">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.service.AbstractService"
             interface="org.eclipse.scout.service.IService">
+         <default
+               class="org.eclipse.scout.service.AbstractService">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.service.AbstractService"
             interface="org.eclipse.scout.service.IService2">
+         <default
+               class="org.eclipse.scout.service.AbstractService">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield.AbstractExtensibleSmartField"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService"
             interface="org.eclipse.scout.rt.server.services.common.smtp.ISMTPService">
+         <default
+               class="org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService"
             interface="org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService">
+         <default
+               class="org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService"
             interface="org.eclipse.scout.rt.server.services.common.jdbc.ISqlService">
+         <default
+               class="org.eclipse.scout.rt.server.services.common.jdbc.AbstractSqlService">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService"
             interface="org.eclipse.scout.rt.shared.services.common.text.ITextProviderService">
+         <default
+               class="org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox"
             interface="org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.table.AbstractTable"
             interface="org.eclipse.scout.rt.client.ui.basic.table.ITable">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.AbstractTable">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton"
             interface="org.eclipse.scout.rt.client.ui.action.tool.IToolButton">
+         <default
+               class="org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree"
             interface="org.eclipse.scout.rt.client.ui.basic.tree.ITree">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.basic.tree.AbstractExtensibleTree"
+               priority="10">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox"
             interface="org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField"
             interface="org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.wizard.AbstractWizard"
             interface="org.eclipse.scout.rt.client.ui.wizard.IWizard">
+         <default
+               class="org.eclipse.scout.rt.client.ui.wizard.AbstractWizard">
+         </default>
       </element>
       <element
-            default="org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep"
             interface="org.eclipse.scout.rt.client.ui.wizard.IWizardStep">
+         <default
+               class="org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep">
+         </default>
       </element>
    </extension>
    <extension

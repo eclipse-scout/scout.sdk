@@ -7,6 +7,7 @@ Bundle-Activator: @@BUNDLE_CLIENT_NAME@@.Activator
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.client;visibility:=reexport,
+ org.eclipse.scout.rt.extension.client;visibility:=reexport,
  @@BUNDLE_SHARED_NAME@@,
  org.eclipse.scout.svg.client
 Export-Package: @@BUNDLE_CLIENT_NAME@@,

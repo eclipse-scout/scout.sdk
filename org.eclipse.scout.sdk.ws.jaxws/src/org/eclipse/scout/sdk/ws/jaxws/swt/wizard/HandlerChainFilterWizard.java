@@ -43,6 +43,7 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
     setWindowTitle(Texts.get("HandlerChainFilter"));
   }
 
+  @SuppressWarnings("null")
   public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, ScoutXmlElement xmlHandlerChain) {
     m_bundle = bundle;
     m_sunJaxWsBean = sunJaxWsBean;

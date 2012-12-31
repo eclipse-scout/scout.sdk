@@ -49,6 +49,9 @@
 
    <element name="element">
       <complexType>
+         <sequence>
+            <element ref="default" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="interface" type="string" use="required">
             <annotation>
                <documentation>
@@ -56,7 +59,19 @@
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="default" type="string" use="required">
+      </complexType>
+   </element>
+
+   <element name="default">
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="priority" type="string">
             <annotation>
                <documentation>
                   

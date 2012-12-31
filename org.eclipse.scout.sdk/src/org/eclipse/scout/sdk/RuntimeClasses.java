@@ -12,7 +12,8 @@ package org.eclipse.scout.sdk;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Set;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
@@ -23,11 +24,13 @@ import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChang
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.PreferenceChangeEvent;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
@@ -43,22 +46,24 @@ public final class RuntimeClasses implements IRuntimeClasses {
 
   private final static String EXTENSION_POINT_NAME = "runtimeClass";
   private final static String TAG_NAME = "element";
-  private final static String ATTRIB_DEFAULT_CLASS = "default";
   private final static String ATTRIB_INTERFACE = "interface";
+  private final static String TAG_DEFAULT_NAME = "default";
+  private final static String ATTRIB_DEFAULT_PRIO = "priority";
+  private final static String ATTRIB_DEFAULT_CLASS = "class";
 
   private final static Object lock = new Object();
   private final static Map<IScoutProject, Map<String /* interfaceFqn */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutProject, Map<String, StringHolder>>();
   private final static Map<IScoutProject, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutProject, IPreferenceChangeListener>();
-  private static Map<String /* interfaceFqn */, String /* default value */> defaultValues = null;
+  private static Map<String /* interfaceFqn */, TreeMap<Double, String> /* default values */> defaultValues = null;
 
   private RuntimeClasses() {
   }
 
-  private static Map<String, String> getDefaults() {
+  private static Map<String, TreeMap<Double, String>> getDefaults() {
     if (defaultValues == null) {
       synchronized (lock) {
         if (defaultValues == null) {
-          Map<String, String> tmp = new HashMap<String, String>();
+          Map<String, TreeMap<Double, String>> tmp = new HashMap<String, TreeMap<Double, String>>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();
@@ -66,16 +71,25 @@ public final class RuntimeClasses implements IRuntimeClasses {
             IConfigurationElement[] elements = extension.getConfigurationElements();
             for (IConfigurationElement element : elements) {
               if (TAG_NAME.equals(element.getName())) {
-                String def = element.getAttribute(ATTRIB_DEFAULT_CLASS);
                 String interf = element.getAttribute(ATTRIB_INTERFACE);
-                if (TypeUtility.exists(TypeUtility.getType(def)) && TypeUtility.exists(TypeUtility.getType(interf))) {
-                  String existing = tmp.put(interf, def);
-                  if (existing != null) {
-                    ScoutSdk.logWarning("Multiple super type definitions found for interface '" + interf + "'.");
-                  }
+                TreeMap<Double, String> curDefaults = tmp.get(interf);
+                if (curDefaults == null) {
+                  curDefaults = new TreeMap<Double, String>();
+                  tmp.put(interf, curDefaults);
                 }
-                else {
-                  ScoutSdk.logWarning("Super type definition (interface='" + interf + "', default='" + def + "') is not valid. Types could not be found.");
+
+                for (IConfigurationElement defaultElement : element.getChildren(TAG_DEFAULT_NAME)) {
+                  String def = defaultElement.getAttribute(ATTRIB_DEFAULT_CLASS);
+                  Double prio = -parseDouble(defaultElement.getAttribute(ATTRIB_DEFAULT_PRIO));
+                  if (TypeUtility.existsType(def)) {
+                    String existing = curDefaults.put(prio, def);
+                    if (existing != null) {
+                      ScoutSdk.logWarning("Multiple super type definitions with the same priority found for interface '" + interf + "'.");
+                    }
+                  }
+                  else {
+                    ScoutSdk.logWarning("Super type definition (interface='" + interf + "', default='" + def + "') is not valid. Types could not be found.");
+                  }
                 }
               }
             }
@@ -88,6 +102,18 @@ public final class RuntimeClasses implements IRuntimeClasses {
       }
     }
     return defaultValues;
+  }
+
+  private static Double parseDouble(String order) {
+    if (StringUtility.hasText(order)) {
+      try {
+        return new Double(Double.parseDouble(order));
+      }
+      catch (NumberFormatException e) {
+        ScoutSdk.logWarning("Invalid numeric extension order: '" + order + "'.", e);
+      }
+    }
+    return new Double(0);
   }
 
   private static String getConfiguredSuperTypeNameCached(IScoutProject context, String interfaceFqn) {
@@ -116,11 +142,15 @@ public final class RuntimeClasses implements IRuntimeClasses {
     return PREFERENCES_PREFIX + interfaceFqn;
   }
 
-  public static Map<String, String> getAllDefaults() {
-    Map<String, String> classes = getDefaults();
-    HashMap<String, String> ret = new HashMap<String, String>(classes.size());
-    for (Entry<String, String> entry : classes.entrySet()) {
-      ret.put(entry.getKey(), entry.getValue());
+  public static Map<String, String> getAllDefaults(IScoutProject context) {
+    Set<String> interfaces = getDefaults().keySet();
+    HashMap<String, String> ret = new HashMap<String, String>(interfaces.size());
+    for (String entry : interfaces) {
+      String defaultClass = getDefaultSuperType(entry, context);
+      if (defaultClass != null) {
+        // some classes may not be available for a project (e.g. no ISwingEnvironment for a project with swt UI).
+        ret.put(entry, defaultClass);
+      }
     }
     return ret;
   }
@@ -157,7 +187,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
   public static String getSuperTypeName(String interfaceFqn, IScoutProject context) {
     String config = getConfiguredSuperTypeNameCached(context, interfaceFqn);
     if (config == null) {
-      return getDefaults().get(interfaceFqn);
+      return getDefaultSuperTypeNameInternal(interfaceFqn, context);
     }
     else {
       IType t = TypeUtility.getType(config);
@@ -165,9 +195,32 @@ public final class RuntimeClasses implements IRuntimeClasses {
         return config;
       }
       else {
-        return getDefaults().get(interfaceFqn);
+        return getDefaultSuperTypeNameInternal(interfaceFqn, context);
       }
     }
+  }
+
+  private static String getDefaultSuperTypeNameInternal(String interfaceFqn, IScoutProject context) {
+    String defaultType = getDefaultSuperType(interfaceFqn, context);
+    if (defaultType == null) {
+      throw new IllegalArgumentException("No default super class for '" + interfaceFqn + "' found on classpath of project '" + context.getProjectName() + "'.");
+    }
+    return defaultType;
+  }
+
+  private static String getDefaultSuperType(String interfaceFqn, IScoutProject context) {
+    TreeMap<Double, String> defaults = getDefaults().get(interfaceFqn);
+    for (String fqn : defaults.values()) {
+      IType t = TypeUtility.getType(fqn);
+      if (TypeUtility.exists(t)) {
+        for (IScoutBundle b : context.getAllScoutBundles()) {
+          if (TypeUtility.isOnClasspath(t, b.getJavaProject())) {
+            return fqn;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   public static String getSuperTypeSignature(IType interfaceType, IJavaProject context) {

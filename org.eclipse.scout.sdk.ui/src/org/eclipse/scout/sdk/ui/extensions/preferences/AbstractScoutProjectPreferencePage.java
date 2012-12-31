@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -128,8 +127,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
 
     final Composite parent = m_container;
     final ProgressIndicator indicator = new ProgressIndicator(parent, SWT.SMOOTH);
-    final Set<Entry<String, String>> configuredClasses = getEntrySet();
-    indicator.beginTask(configuredClasses.size()/* * m_projectSettings.size()*/);
+    indicator.beginTask(getTotalWork());
     GridData indicatorData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     indicatorData.horizontalSpan = 2;
     indicatorData.heightHint = 15;
@@ -140,7 +138,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
       protected IStatus run(IProgressMonitor monitor) {
         if (parent != null && !parent.isDisposed()) {
           try {
-            loadAllModels(configuredClasses, new IModelLoadProgressObserver<U>() {
+            loadAllModels(new IModelLoadProgressObserver<U>() {
               @Override
               public void loaded(U justLoadedModel) {
                 parent.getDisplay().asyncExec(new Runnable() {
@@ -253,9 +251,9 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
     }
   }
 
-  protected abstract void loadAllModels(Set<Entry<String, String>> configuredClasses, IModelLoadProgressObserver<U> observer);
+  protected abstract void loadAllModels(IModelLoadProgressObserver<U> observer);
 
-  protected abstract Set<Entry<String, String>> getEntrySet();
+  protected abstract int getTotalWork();
 
   protected Map<IScoutProject, T> getProjectModelMap() {
     return m_projectSettings;

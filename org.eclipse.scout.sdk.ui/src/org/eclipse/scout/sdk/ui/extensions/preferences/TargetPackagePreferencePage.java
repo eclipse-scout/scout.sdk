@@ -33,10 +33,9 @@ public class TargetPackagePreferencePage extends AbstractScoutProjectPreferenceP
     super(Texts.get("ScoutSDKSuperTypePreferences"), TargetPackagePreferenceScrolledContent.class);
   }
 
-  //TODO: validation
-
   @Override
-  protected void loadAllModels(Set<Entry<String, String>> defaultPackages, IModelLoadProgressObserver<TargetPackageModel> observer) {
+  protected void loadAllModels(IModelLoadProgressObserver<TargetPackageModel> observer) {
+    Set<Entry<String, String>> defaultPackages = DefaultTargetPackage.getAllDefaults().entrySet();
     for (Entry<IScoutProject, TargetPackagePreferenceScrolledContent> e : getProjectModelMap().entrySet()) {
       List<TargetPackageModel> list = new ArrayList<TargetPackageModel>();
       for (Entry<String, String> entry : defaultPackages) {
@@ -49,7 +48,7 @@ public class TargetPackagePreferencePage extends AbstractScoutProjectPreferenceP
   }
 
   @Override
-  protected Set<Entry<String, String>> getEntrySet() {
-    return DefaultTargetPackage.getAllDefaults().entrySet();
+  protected int getTotalWork() {
+    return DefaultTargetPackage.getAllDefaults().size();
   }
 }

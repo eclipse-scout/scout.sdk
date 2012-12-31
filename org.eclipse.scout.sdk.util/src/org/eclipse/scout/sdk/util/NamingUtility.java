@@ -29,12 +29,22 @@ public final class NamingUtility {
   }
 
   public static String getSimpleName(String qualifiedName) {
-    int i = qualifiedName.lastIndexOf(".");
+    int i = qualifiedName.lastIndexOf('.');
     if (i >= 0) {
       return qualifiedName.substring(i + 1);
     }
     else {
       return qualifiedName;
+    }
+  }
+
+  public static String getPackage(String qualifiedClassName) {
+    int i = qualifiedClassName.lastIndexOf('.');
+    if (i >= 0) {
+      return qualifiedClassName.substring(0, i);
+    }
+    else {
+      return qualifiedClassName;
     }
   }
 

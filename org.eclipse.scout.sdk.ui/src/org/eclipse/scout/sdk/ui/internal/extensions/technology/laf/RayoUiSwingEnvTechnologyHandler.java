@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHan
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -78,7 +79,11 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
       newSuperClassType = root.getAST().newSimpleType(root.getAST().newQualifiedName(root.getAST().newName("com.bsiag.scout.rt.ui.swing.rayo"), root.getAST().newSimpleName("RayoSwingEnvironment")));
     }
     else {
-      newSuperClassType = root.getAST().newSimpleType(root.getAST().newQualifiedName(root.getAST().newName("org.eclipse.scout.rt.ui.swing"), root.getAST().newSimpleName("DefaultSwingEnvironment")));
+      String fqn = RuntimeClasses.getSuperTypeName(RuntimeClasses.ISwingEnvironment, swingEnv.getJavaProject());
+      String className = NamingUtility.getSimpleName(fqn);
+      String pckName = NamingUtility.getPackage(fqn);
+
+      newSuperClassType = root.getAST().newSimpleType(root.getAST().newQualifiedName(root.getAST().newName(pckName), root.getAST().newSimpleName(className)));
     }
 
     for (Object type : root.types()) {
