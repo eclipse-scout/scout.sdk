@@ -43,7 +43,6 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.widgets.Shell;
 
@@ -78,13 +77,10 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
         @Override
         protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
           if (m_lookupServiceInterface != null && member.equals(m_lookupServiceInterface)) {
-            ScoutUtility.unregisterServiceClass(m_lookupServiceInterface.getJavaProject().getProject(),
-                "org.eclipse.scout.rt.client.serviceProxies", "serviceProxy", m_lookupServiceInterface.getFullyQualifiedName(), null, monitor);
+            ScoutUtility.unregisterServiceProxy(m_lookupServiceInterface, monitor);
           }
           if (m_lookupService != null && member.equals(m_lookupService)) {
-            IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(m_lookupService.getJavaProject().getProject());
-            ScoutUtility.unregisterServiceClass(m_lookupService.getJavaProject().getProject(),
-                "org.eclipse.scout.rt.server.services", "service", m_lookupService.getFullyQualifiedName(), implementationBundle.getRootPackageName() + ".ServerSession", monitor);
+            ScoutUtility.unregisterServiceImplementation(m_lookupService, monitor);
           }
           super.deleteMember(member, icuForOrganizeImports, monitor, manager);
         }
