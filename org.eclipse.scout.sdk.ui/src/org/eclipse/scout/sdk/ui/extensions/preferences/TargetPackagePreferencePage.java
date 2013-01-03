@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 public class TargetPackagePreferencePage extends AbstractScoutProjectPreferencePage<TargetPackagePreferenceScrolledContent, TargetPackageModel> {
 
   public TargetPackagePreferencePage() {
-    super(Texts.get("ScoutSDKSuperTypePreferences"), TargetPackagePreferenceScrolledContent.class);
+    super(Texts.get("ScoutSDKDefaultPackagePreferences"), TargetPackagePreferenceScrolledContent.class);
   }
 
   @Override

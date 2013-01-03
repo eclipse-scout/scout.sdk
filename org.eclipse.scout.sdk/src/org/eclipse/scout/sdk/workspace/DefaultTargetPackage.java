@@ -116,6 +116,11 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
   }
 
   private static String getConfiguredDefaultPackageCached(IScoutProject context, String packageId) {
+    // get root project
+    while (context.getParentProject() != null) {
+      context = context.getParentProject();
+    }
+
     synchronized (lock) {
       Map<String, StringHolder> projectConfigs = configuredValues.get(context);
       if (projectConfigs == null) {
