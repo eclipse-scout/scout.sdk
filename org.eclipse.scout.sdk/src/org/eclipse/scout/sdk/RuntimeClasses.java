@@ -117,6 +117,11 @@ public final class RuntimeClasses implements IRuntimeClasses {
   }
 
   private static String getConfiguredSuperTypeNameCached(IScoutProject context, String interfaceFqn) {
+    // get root project
+    while (context.getParentProject() != null) {
+      context = context.getParentProject();
+    }
+
     synchronized (lock) {
       Map<String, StringHolder> projectConfigs = configuredValues.get(context);
       if (projectConfigs == null) {
