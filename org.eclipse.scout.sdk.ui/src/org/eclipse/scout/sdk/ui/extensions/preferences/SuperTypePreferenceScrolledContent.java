@@ -72,7 +72,14 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
 
     for (DefaultSuperClassModel entry : m_entries) {
       String[] proposals = entry.getProposals();
-      String selectedValue = entry.getProposals()[entry.getInitialSelectetdIndex()];
+      String selectedValue = null;
+      int selIndex = entry.getInitialSelectetdIndex();
+      if (selIndex >= 0) {
+        selectedValue = entry.getProposals()[selIndex];
+      }
+      else {
+        selectedValue = "";
+      }
       Label l = new Label(c, SWT.NONE);
       l.setToolTipText(entry.interfaceFqn);
       l.setText(entry.label + ": ");
