@@ -50,7 +50,7 @@ public class DiscouragedWsdlFolderCommand extends AbstractExecutableMarkerComman
     m_buildJaxWsBean = buildJaxWsBean;
     m_sunJaxWsBean = sunJaxWsBean;
     m_webserviceEnum = WebserviceEnum.Provider;
-    setSolutionDescription(Texts.get("DescriptionTaskMoveFiles", m_newFolder.getProjectRelativePath().toPortableString()));
+    setSolutionDescription(Texts.get("DescriptionTaskMoveFiles", m_newFolder.getProjectRelativePath().toString()));
   }
 
   /**

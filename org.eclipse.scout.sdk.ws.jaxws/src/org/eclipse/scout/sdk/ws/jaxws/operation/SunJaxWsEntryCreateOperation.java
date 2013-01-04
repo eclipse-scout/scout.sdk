@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ws.jaxws.operation;
 import javax.xml.namespace.QName;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
@@ -24,6 +25,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 
 public class SunJaxWsEntryCreateOperation implements IOperation {
 
@@ -34,7 +36,7 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
   private QName m_serviceQName;
   private QName m_portQName;
   private String m_urlPattern;
-  private String m_wsdlFile;
+  private IPath m_wsdlProjectRelativePath;
 
   private SunJaxWsBean m_createdSunJaxWsBean;
 
@@ -71,7 +73,7 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
       bean.setPort(m_portQName.toString());
     }
     bean.setUrlPattern(m_urlPattern);
-    bean.setWsdl(m_wsdlFile);
+    bean.setWsdl(PathNormalizer.toWsdlPath(m_wsdlProjectRelativePath.toString()));
     m_createdSunJaxWsBean = bean;
 
     ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_createdSunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_ENTRY_ADDED, monitor, m_alias);
@@ -130,12 +132,12 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
     m_urlPattern = urlPattern;
   }
 
-  public String getWsdlFileName() {
-    return m_wsdlFile;
+  public IPath getWsdlProjectRelativePath() {
+    return m_wsdlProjectRelativePath;
   }
 
-  public void setWsdlFile(String wsdlFile) {
-    m_wsdlFile = wsdlFile;
+  public void setWsdlProjectRelativePath(IPath wsdlProjectRelativePath) {
+    m_wsdlProjectRelativePath = wsdlProjectRelativePath.makeRelative();
   }
 
   /**

@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -43,8 +44,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -109,9 +109,10 @@ public class WsdlCreateOperation implements IOperation {
 
       definition.setExtensionRegistry(factory.newPopulatedExtensionRegistry());
 
+      final String targetNamespace = PathNormalizer.toTargetNamespace(m_targetNamespace);
       definition.setQName(new QName(m_alias));
-      definition.setTargetNamespace(JaxWsSdkUtility.normalizePath(m_targetNamespace, SeparatorType.TrailingType));
-      definition.addNamespace("tns", JaxWsSdkUtility.normalizePath(m_targetNamespace, SeparatorType.TrailingType));
+      definition.setTargetNamespace(targetNamespace);
+      definition.addNamespace("tns", targetNamespace);
       definition.addNamespace("mime", "http://schemas.xmlsoap.org/wsdl/mime/");
       definition.addNamespace("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
       definition.addNamespace("soap", "http://schemas.xmlsoap.org/wsdl/soap/");
@@ -148,7 +149,7 @@ public class WsdlCreateOperation implements IOperation {
       // Binding > Binding operation > Soap operation
       SOAPOperation soapOperation = (SOAPOperation) definition.getExtensionRegistry().createExtension(BindingOperation.class, new QName(definition.getNamespace("soap"), "operation"));
       bindingOperation.addExtensibilityElement(soapOperation);
-      soapOperation.setSoapActionURI(JaxWsSdkUtility.normalizePath(m_targetNamespace, SeparatorType.TrailingType) + m_serviceOperationName);
+      soapOperation.setSoapActionURI(new Path(targetNamespace).append(m_serviceOperationName).removeTrailingSeparator().toString());
 
       // Binding > Binding operation > Binding input
       BindingInput bindingInput = definition.createBindingInput();
@@ -181,7 +182,7 @@ public class WsdlCreateOperation implements IOperation {
 
       // Port > Soap address
       SOAPAddress httpAddress = new SOAPAddressImpl();
-      httpAddress.setLocationURI(JaxWsSdkUtility.normalizePath(m_targetNamespace, SeparatorType.None));
+      httpAddress.setLocationURI(new Path(targetNamespace).removeTrailingSeparator().toString());
       httpAddress.setElementType(new QName(definition.getNamespace("soap"), "address"));
       port.addExtensibilityElement(httpAddress);
 
@@ -246,7 +247,7 @@ public class WsdlCreateOperation implements IOperation {
       Element schemaXml = document.createElement("xsd:schema");
       schema.setElement(schemaXml);
       schemaXml.setAttribute("xmlns:xsd", definition.getNamespace("xsd"));
-      schemaXml.setAttribute("targetNamespace", JaxWsSdkUtility.normalizePath(m_targetNamespace, SeparatorType.TrailingType));
+      schemaXml.setAttribute("targetNamespace", targetNamespace);
 
       // definition of request
       Element schemaElementXml;

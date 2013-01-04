@@ -37,14 +37,14 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderNodePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ResourceSelectionWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.IFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 
 public class WsFileMoveWizard extends AbstractWorkspaceWizard {
 
@@ -65,23 +65,23 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
 
   @Override
   public void addPages() {
-    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("QuestionMoveFiles", m_destination.getProjectRelativePath().toPortableString()), Texts.get("QuestionMove"));
+    m_wizardPage = new ResourceSelectionWizardPage(Texts.get("QuestionMoveFiles", m_destination.getProjectRelativePath().toString()), Texts.get("QuestionMove"));
     m_wizardPage.setElements(getElementsToBeMoved());
     addPage(m_wizardPage);
   }
 
   private List<ElementBean> getElementsToBeMoved() {
-    List<ElementBean> elements = new LinkedList<ElementBean>();
+    final List<ElementBean> elements = new LinkedList<ElementBean>();
     // WSDL file
     IFile wsdlFile = null;
     if (m_webserviceEnum == WebserviceEnum.Provider) {
       if (m_sunJaxWsBean != null && StringUtility.hasText(m_sunJaxWsBean.getWsdl())) {
-        wsdlFile = JaxWsSdkUtility.getFile(m_bundle, m_sunJaxWsBean.getWsdl(), false);
+        wsdlFile = JaxWsSdkUtility.getFile(m_bundle, new Path(m_sunJaxWsBean.getWsdl()), false);
       }
     }
     else {
       if (m_buildJaxWsBean != null && StringUtility.hasText(m_buildJaxWsBean.getWsdl())) {
-        wsdlFile = JaxWsSdkUtility.getFile(m_bundle, m_buildJaxWsBean.getWsdl(), false);
+        wsdlFile = JaxWsSdkUtility.getFile(m_bundle, new Path(m_buildJaxWsBean.getWsdl()), false);
       }
     }
     if (wsdlFile == null || !wsdlFile.exists()) {
@@ -90,45 +90,39 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
 
     // registration in sun-jaxws.xml (provider) / build-jaxws.xml (consumer)
     if (m_webserviceEnum == WebserviceEnum.Provider) {
-      elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_SUNJAXWS_REGISTRATION, "Change WSDL file registration in sun-jaxws.xml to '" + m_destination.getProjectRelativePath().append(wsdlFile.getName()) + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), true));
+      elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_SUNJAXWS_REGISTRATION, String.format("Change WSDL file registration in sun-jaxws.xml to '%s'", m_destination.getProjectRelativePath().append(wsdlFile.getName())), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), true));
     }
     else {
-      elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_BUILDJAXWS_REGISTRATION, "Change WSDL file registration in build-jaxws.xml to '" + m_destination.getProjectRelativePath().append(wsdlFile.getName()) + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), true));
+      elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_BUILDJAXWS_REGISTRATION, String.format("Change WSDL file registration in build-jaxws.xml to '%'", m_destination.getProjectRelativePath().append(wsdlFile.getName())), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), true));
     }
+    elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_FILE, Texts.get("MoveXToY", "WSDL file", m_destination.getProjectRelativePath().append(wsdlFile.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, true));
 
-    elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_FILE, Texts.get("MoveXToY", "WSDL file", m_destination.getProjectRelativePath().append(wsdlFile.getName()).toPortableString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, true));
-    if (wsdlFile != null) {
-      Artefact[] artefacts = SchemaUtility.getArtefacts(wsdlFile, false);
-      for (Artefact artefact : artefacts) {
-        // referenced WSDL definitions
-        if (artefact instanceof WsdlArtefact) {
-          WsdlArtefact wsdlArtefact = (WsdlArtefact) artefact;
-          if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
-            IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, wsdlArtefact.getFile());
-            if (referencedWsdlFile != null && referencedWsdlFile.exists()) {
-              elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_WSDL, Texts.get("MoveReferencedXToY", "WSDL file", m_destination.getProjectRelativePath().append(referencedWsdlFile.getName()).toPortableString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), referencedWsdlFile, false));
-            }
-          }
-        }
-        // imported XSD schemas
-        if (artefact instanceof SchemaImportArtefact) {
-          SchemaImportArtefact schemaArtefact = (SchemaImportArtefact) artefact;
-          IFile importedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
-          if (importedSchemaFile != null && importedSchemaFile.exists()) {
-            elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_XSD, Texts.get("MoveReferencedXToY", "XSD schema (imported)", m_destination.getProjectRelativePath().append(importedSchemaFile.getName()).toPortableString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), importedSchemaFile, false));
-          }
-        }
+    SchemaUtility.visitArtefacts(wsdlFile, new SchemaArtefactVisitor<IFile>() {
 
-        // included XSD schemas
-        if (artefact instanceof SchemaIncludeArtefact) {
-          SchemaIncludeArtefact schemaArtefact = (SchemaIncludeArtefact) artefact;
-          IFile includedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
-          if (includedSchemaFile != null && includedSchemaFile.exists()) {
-            elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_XSD, Texts.get("MoveReferencedXToY", "XSD schema (included)", m_destination.getProjectRelativePath().append(includedSchemaFile.getName()).toPortableString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), includedSchemaFile, false));
-          }
+      @Override
+      public void onReferencedWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
+        IFileHandle<IFile> fileHandle = wsdlArtefact.getFileHandle();
+        if (fileHandle != null && fileHandle.exists()) {
+          elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_WSDL, Texts.get("MoveReferencedXToY", "WSDL file", m_destination.getProjectRelativePath().append(fileHandle.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), fileHandle.getFile(), false));
         }
       }
-    }
+
+      @Override
+      public void onSchemaIncludeArtefact(SchemaIncludeArtefact<IFile> schemaIncludeArtefact) {
+        IFileHandle<IFile> fileHandle = schemaIncludeArtefact.getFileHandle();
+        if (fileHandle != null && fileHandle.exists()) {
+          elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_XSD, Texts.get("MoveReferencedXToY", "XSD schema (included)", m_destination.getProjectRelativePath().append(fileHandle.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
+        }
+      }
+
+      @Override
+      public void onSchemaImportArtefact(SchemaImportArtefact<IFile> schemaImportArtefact) {
+        IFileHandle<IFile> fileHandle = schemaImportArtefact.getFileHandle();
+        if (fileHandle != null && fileHandle.exists()) {
+          elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_XSD, Texts.get("MoveReferencedXToY", "XSD schema (imported)", m_destination.getProjectRelativePath().append(fileHandle.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
+        }
+      }
+    });
 
     // WSDL location in binding files
     IFile[] bindingFiles = JaxWsSdkUtility.getBindingFiles(m_bundle, m_buildJaxWsBean.getPropertiers());
@@ -142,7 +136,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
         String wsdlLocation = xmlBindings.getAttribute("wsdlLocation");
         String schemaDefiningFileName = new Path(wsdlLocation).toFile().getName();
         IPath relativeWsdlFolderPath = m_destination.getProjectRelativePath().makeRelativeTo(JaxWsSdkUtility.getParentFolder(m_bundle, bindingFile).getProjectRelativePath());
-        String newWsdlLocation = JaxWsSdkUtility.normalizePath(relativeWsdlFolderPath.toPortableString(), SeparatorType.TrailingType) + schemaDefiningFileName;
+        String newWsdlLocation = PathNormalizer.toWsdlPath(relativeWsdlFolderPath.append(schemaDefiningFileName).toString());
         ElementBean elementBean = new ElementBean(WsFilesMoveOperation.ID_BINDING_FILE, "Change attribute 'wsdlLocation' in binding file '" + bindingFile.getName() + "' to '" + newWsdlLocation + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), bindingFile, false);
         elementBean.setData(newWsdlLocation);
         elements.add(elementBean);

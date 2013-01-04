@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
-import java.util.UUID;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
@@ -18,13 +21,10 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
-import org.eclipse.scout.sdk.ws.jaxws.marker.IMarkerRebuildListener;
-import org.eclipse.scout.sdk.ws.jaxws.marker.MarkerUtility;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
@@ -34,16 +34,11 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
-public class WebServiceProviderTablePage extends AbstractPage implements IMarkerRebuildListener {
+public class WebServiceProviderTablePage extends AbstractPage {
 
-  public static final int DATA_SUN_JAXWS_FILE = 1 << 0;
-
-  private String m_markerGroupUUID;
   private IScoutBundle m_bundle; // necessary to be hold as in method unloadPage, a reference to the bundle is required
-
   private ScoutXmlDocument m_sunJaxWsXml;
   private IResourceListener m_resourceListener;
-  private boolean m_pageUnloaded = false;
 
   public WebServiceProviderTablePage(IPage parent) {
     setParent(parent);
@@ -51,22 +46,9 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsIcons.WebserviceProviderFolder));
 
     m_bundle = getScoutResource();
-    m_markerGroupUUID = UUID.randomUUID().toString();
+
     m_resourceListener = new P_SunJaxWsResourceListener();
-
-    // register for events being interest in
-    int event = IResourceListener.EVENT_SUNJAXWS_ENTRY_ADDED |
-                IResourceListener.EVENT_SUNJAXWS_ENTRY_REMOVED |
-                IResourceListener.EVENT_SUNJAXWS_REPLACED |
-                IResourceListener.EVENT_UNKNOWN;
-    getSunJaxWsResource().addResourceListener(event, m_resourceListener);
-    getSunJaxWsResource().addResourceListener(IResourceListener.ELEMENT_FILE, m_resourceListener);
-
-    reloadData(DATA_SUN_JAXWS_FILE);
-  }
-
-  public XmlResource getSunJaxWsResource() {
-    return ResourceFactory.getSunJaxWsResource(m_bundle);
+    getSunJaxWsResource().addResourceListener(m_resourceListener);
   }
 
   @Override
@@ -87,7 +69,7 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof ProviderNewWizardAction) {
-      ((ProviderNewWizardAction) menu).init(getScoutResource());
+      ((ProviderNewWizardAction) menu).init(m_bundle);
     }
   }
 
@@ -99,96 +81,69 @@ public class WebServiceProviderTablePage extends AbstractPage implements IMarker
 
   @Override
   public void unloadPage() {
-    m_pageUnloaded = true;
-
-    MarkerUtility.clearMarkers(m_bundle, m_markerGroupUUID);
     getSunJaxWsResource().removeResourceListener(m_resourceListener);
     super.unloadPage();
   }
 
   @Override
-  public int getQuality() {
-    return MarkerUtility.getQuality(this, m_bundle, m_markerGroupUUID);
-  }
-
-  /**
-   * Reloads data of this node page
-   * The data value is either one of the data constants defined in
-   * class {@link WebServiceProviderTablePage} or must be built by <em>bitwise OR</em>'ing together
-   * 
-   * @param data
-   */
-  public void reloadData(int data) {
-    if ((data & DATA_SUN_JAXWS_FILE) > 0) {
-      m_sunJaxWsXml = getSunJaxWsResource().loadXml();
-    }
-    JaxWsSdk.getDefault().getMarkerQueueManager().queueRequest(this);
-  }
-
-  @Override
   public void refresh(boolean clearCache) {
     if (clearCache) {
-      super.refresh(clearCache);
+      m_sunJaxWsXml = null;
     }
-    else {
-      JaxWsSdk.getDefault().getMarkerQueueManager().queueRequest(this);
-    }
+    super.refresh(clearCache);
   }
 
   @Override
   protected void loadChildrenImpl() {
-    try {
-      if (m_sunJaxWsXml == null || m_sunJaxWsXml.getRoot() == null) {
-        return;
-      }
-
-      for (ScoutXmlElement sunJaxWsXml : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
-        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
-        BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
-
-        if (buildJaxWsBean != null) {
-          new WebServiceProviderNodePage(this, sunJaxWsBean, buildJaxWsBean);
-        }
-        else {
-          new WebServiceProviderCodeFirstNodePage(this, sunJaxWsBean);
-        }
-      }
+    if (m_sunJaxWsXml == null) {
+      m_sunJaxWsXml = getSunJaxWsResource().loadXml();
     }
-    finally {
-      JaxWsSdk.getDefault().getMarkerQueueManager().queueRequest(this);
-    }
-  }
+    for (ScoutXmlElement sunJaxWsXml : getEndpoints()) {
+      SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
+      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
 
-  @Override
-  public void rebuildMarkers() {
-    synchronized (m_markerGroupUUID) {
-      try {
-        MarkerUtility.clearMarkers(m_bundle, m_markerGroupUUID);
-
-        if (isPageUnloaded()) {
-          return;
-        }
+      if (buildJaxWsBean != null) {
+        new WebServiceProviderNodePage(this, sunJaxWsBean.getAlias());
       }
-      finally {
-        ScoutSeverityManager.getInstance().fireSeverityChanged(JaxWsSdkUtility.createResourceSet(getSunJaxWsResource().getFile()));
+      else {
+        new WebServiceProviderCodeFirstNodePage(this, sunJaxWsBean);
       }
     }
   }
 
-  public String getMarkerGroupUUID() {
-    return m_markerGroupUUID;
+  private final XmlResource getSunJaxWsResource() {
+    return ResourceFactory.getSunJaxWsResource(m_bundle);
   }
 
-  public boolean isPageUnloaded() {
-    return m_pageUnloaded;
+  private List<ScoutXmlElement> getEndpoints() {
+    if (m_sunJaxWsXml.getRoot() == null) {
+      return Collections.emptyList();
+    }
+    return m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT));
   }
 
   private class P_SunJaxWsResourceListener implements IResourceListener {
 
     @Override
     public void changed(String element, int event) {
-      reloadData(DATA_SUN_JAXWS_FILE);
-      markStructureDirty();
+      m_sunJaxWsXml = getSunJaxWsResource().loadXml();
+
+      // if endpoint was added or removed, mark structure dirty
+      final Set<String> endpoints = new HashSet<String>();
+      final Set<String> endpointsLoaded = new HashSet<String>();
+
+      for (ScoutXmlElement sunJaxWsXml : getEndpoints()) {
+        SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
+        endpoints.add(sunJaxWsBean.getAlias());
+      }
+      for (IPage page : getChildren()) {
+        if (page instanceof WebServiceProviderNodePage) {
+          endpointsLoaded.add(((WebServiceProviderNodePage) page).getAlias());
+        }
+      }
+      if (!endpointsLoaded.equals(endpoints)) {
+        JaxWsSdkUtility.markStructureDirtyAndFixSelection(WebServiceProviderTablePage.this);
+      }
     }
   }
 }

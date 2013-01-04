@@ -124,8 +124,8 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
   @Override
   protected void setInputInternal(IFolder input) {
     if (input != null) {
-      m_textField.setText(input.getProjectRelativePath().toPortableString());
-      m_textField.setToolTipText(input.getProjectRelativePath().toPortableString());
+      m_textField.setText(input.getProjectRelativePath().toString());
+      m_textField.setToolTipText(input.getProjectRelativePath().toString());
     }
     else {
       m_textField.setText("");

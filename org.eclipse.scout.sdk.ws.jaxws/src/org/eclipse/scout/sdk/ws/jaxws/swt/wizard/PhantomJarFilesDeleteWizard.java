@@ -51,7 +51,7 @@ public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
   private List<ElementBean> getPhantomElements() {
     List<ElementBean> elements = new LinkedList<ElementBean>();
     for (IFile file : m_phantomJarFiles) {
-      elements.add(new ElementBean(0, file.getFullPath().toPortableString(), JaxWsSdk.getImageDescriptor(JaxWsIcons.Jar), file, false));
+      elements.add(new ElementBean(0, file.getFullPath().toString(), JaxWsSdk.getImageDescriptor(JaxWsIcons.Jar), file, false));
     }
     return elements;
   }
@@ -82,7 +82,7 @@ public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
           @Override
           public void run() {
             ErrorDialog dialog = new ErrorDialog(Texts.get("FailedToDeleteFile"));
-            dialog.setError(Texts.get("FailedToDeleteFileX", jarFile.getProjectRelativePath().toPortableString()), e);
+            dialog.setError(Texts.get("FailedToDeleteFileX", jarFile.getProjectRelativePath().toString()), e);
             dialog.open();
           }
         });

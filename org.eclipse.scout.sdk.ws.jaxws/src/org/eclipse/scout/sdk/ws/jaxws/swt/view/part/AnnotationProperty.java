@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -14,6 +14,7 @@ public class AnnotationProperty {
 
   private boolean m_inherited;
   private String m_fullyQualifiedName;
+  private boolean m_defined;
 
   public boolean isInherited() {
     return m_inherited;
@@ -29,5 +30,16 @@ public class AnnotationProperty {
 
   public void setFullyQualifiedName(String fullyQualifiedName) {
     m_fullyQualifiedName = fullyQualifiedName;
+  }
+
+  /**
+   * @return <code>true</code> if the property is found, <code>false</code> otherwise.
+   */
+  public boolean isDefined() {
+    return m_defined;
+  }
+
+  public void setDefined(boolean defined) {
+    m_defined = defined;
   }
 }

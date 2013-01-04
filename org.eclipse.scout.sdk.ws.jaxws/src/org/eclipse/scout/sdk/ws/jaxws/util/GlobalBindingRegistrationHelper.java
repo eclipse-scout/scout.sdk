@@ -23,18 +23,16 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.SelectionDialog;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 import org.eclipse.swt.widgets.Shell;
 
 public class GlobalBindingRegistrationHelper {
 
-  public static SchemaCandidate popupForSchema(IScoutBundle bundle, IFile wsdlFile) throws CoreException {
+  public static SchemaCandidate popupForSchema(IFile wsdlFile) throws CoreException {
     // determine schema to use for global binding registration
     SchemaCandidate[] schemaCandidates = getSchemaCandidates(wsdlFile);
     if (schemaCandidates.length == 0) {
@@ -46,7 +44,7 @@ public class GlobalBindingRegistrationHelper {
     }
     else {
       // let user choose which schema to apply global binding to
-      P_SelectionDialog dialog = new P_SelectionDialog(ScoutSdkUi.getShell(), bundle);
+      P_SelectionDialog dialog = new P_SelectionDialog(ScoutSdkUi.getShell());
       dialog.setElements(Arrays.asList(schemaCandidates));
       if (dialog.open() == Window.OK) {
         return dialog.getElement();
@@ -58,26 +56,24 @@ public class GlobalBindingRegistrationHelper {
   }
 
   public static SchemaCandidate[] getSchemaCandidates(IFile wsdlFile) {
-    Artefact[] artefacts = SchemaUtility.getArtefacts(wsdlFile, true);
+    final List<SchemaCandidate> schemaCandidates = new ArrayList<SchemaCandidate>();
+    SchemaUtility.visitArtefacts(wsdlFile, new SchemaArtefactVisitor<IFile>() {
 
-    List<SchemaCandidate> candidates = new ArrayList<SchemaCandidate>();
-    for (Artefact artefact : artefacts) {
-      if (artefact instanceof WsdlArtefact) {
-        for (Schema inlineSchema : ((WsdlArtefact) artefact).getInlineSchemas()) {
-          candidates.add(new SchemaCandidate(inlineSchema, (WsdlArtefact) artefact));
+      @Override
+      protected void onWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
+        for (Schema inlineSchema : wsdlArtefact.getInlineSchemas()) {
+          schemaCandidates.add(new SchemaCandidate(inlineSchema, wsdlArtefact));
         }
       }
-    }
-    return candidates.toArray(new SchemaCandidate[candidates.size()]);
+    });
+
+    return schemaCandidates.toArray(new SchemaCandidate[schemaCandidates.size()]);
   }
 
   private static class P_SelectionDialog extends SelectionDialog<SchemaCandidate> {
 
-    private IScoutBundle m_bundle;
-
-    public P_SelectionDialog(Shell shell, IScoutBundle bundle) {
+    public P_SelectionDialog(Shell shell) {
       super(shell, "XML schema selection", "Which XML schema should be customized?");
-      m_bundle = bundle;
     }
 
     @Override
@@ -103,9 +99,9 @@ public class GlobalBindingRegistrationHelper {
       }
       else {
         String text;
-        IFile wsdlLocationFile = JaxWsSdkUtility.toFile(m_bundle, candidate.getWsdlArtefact().getFile());
-        if (wsdlLocationFile != null) {
-          text = wsdlLocationFile.getName();
+        IFileHandle<IFile> fileHandle = candidate.getWsdlArtefact().getFileHandle();
+        if (fileHandle != null) {
+          text = fileHandle.getName();
         }
         else {
           text = "?";
@@ -121,9 +117,9 @@ public class GlobalBindingRegistrationHelper {
 
   public static class SchemaCandidate {
     private Schema m_schema;
-    private WsdlArtefact m_wsdlArtefact;
+    private WsdlArtefact<IFile> m_wsdlArtefact;
 
-    public SchemaCandidate(Schema schema, WsdlArtefact wsdlArtefact) {
+    public SchemaCandidate(Schema schema, WsdlArtefact<IFile> wsdlArtefact) {
       m_schema = schema;
       m_wsdlArtefact = wsdlArtefact;
     }
@@ -136,11 +132,11 @@ public class GlobalBindingRegistrationHelper {
       m_schema = schema;
     }
 
-    public WsdlArtefact getWsdlArtefact() {
+    public WsdlArtefact<IFile> getWsdlArtefact() {
       return m_wsdlArtefact;
     }
 
-    public void setWsdlArtefact(WsdlArtefact wsdlArtefact) {
+    public void setWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
       m_wsdlArtefact = wsdlArtefact;
     }
   }

@@ -46,7 +46,7 @@ public class CorruptBindingFileCommand extends AbstractExecutableMarkerCommand {
   @Override
   public boolean prepareForUi() throws CoreException {
     try {
-      m_schemaCandidate = GlobalBindingRegistrationHelper.popupForSchema(m_bundle, m_wsdlResource.getFile());
+      m_schemaCandidate = GlobalBindingRegistrationHelper.popupForSchema(m_wsdlResource.getFile());
     }
     catch (CoreException e) {
       if (e.getStatus() != null && e.getStatus().getCode() == Status.CANCEL_STATUS.getCode()) {
@@ -63,17 +63,16 @@ public class CorruptBindingFileCommand extends AbstractExecutableMarkerCommand {
 
     BindingFileCreateOperation op = new BindingFileCreateOperation();
     op.setBundle(m_bundle);
-    op.setProjectRelativeFilePath(bindingFilePath);
+    op.setProjectRelativePath(bindingFilePath);
     op.setWsdlDestinationFolder(wsdlFolder);
 
     if (m_schemaCandidate != null) {
-      WsdlArtefact wsdlArtefact = m_schemaCandidate.getWsdlArtefact();
+      WsdlArtefact<IFile> wsdlArtefact = m_schemaCandidate.getWsdlArtefact();
       if (wsdlArtefact.getInlineSchemas().length > 1) {
         op.setSchemaTargetNamespace(SchemaUtility.getSchemaTargetNamespace(m_schemaCandidate.getSchema()));
       }
-      if (m_schemaCandidate.getWsdlArtefact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
-        IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, m_schemaCandidate.getWsdlArtefact().getFile());
-        op.setWsdlLocation(referencedWsdlFile);
+      if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+        op.setWsdlLocation(wsdlArtefact.getFileHandle().getFile());
       }
     }
     op.run(monitor, workingCopyManager);

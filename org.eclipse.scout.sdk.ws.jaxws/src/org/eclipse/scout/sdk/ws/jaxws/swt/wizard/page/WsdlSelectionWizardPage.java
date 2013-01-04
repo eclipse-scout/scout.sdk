@@ -98,12 +98,12 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
-                            m_bundle,
-                            new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
-                            Texts.get("WsdlFolder"),
-                            Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
-                            m_rootWsdlFolder, // root folder
-                            getWsdlFolder());
+            m_bundle,
+            new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
+            Texts.get("WsdlFolder"),
+            Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
+            m_rootWsdlFolder, // root folder
+            getWsdlFolder());
         if (folder != null) {
           setWsdlFolder(folder);
         }
@@ -112,7 +112,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
     });
     IFolder folder = getWsdlFolder();
     if (folder != null) {
-      m_wsdlFolderField.setText(folder.getProjectRelativePath().toPortableString());
+      m_wsdlFolderField.setText(folder.getProjectRelativePath().toString());
     }
 
     // layout
@@ -193,7 +193,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
       setWsdlFolderInternal(wsdlFolder);
       if (isControlCreated()) {
         if (wsdlFolder != null) {
-          m_wsdlFolderField.setText(wsdlFolder.getProjectRelativePath().toPortableString());
+          m_wsdlFolderField.setText(wsdlFolder.getProjectRelativePath().toString());
         }
         else {
           m_wsdlFolderField.setText("");

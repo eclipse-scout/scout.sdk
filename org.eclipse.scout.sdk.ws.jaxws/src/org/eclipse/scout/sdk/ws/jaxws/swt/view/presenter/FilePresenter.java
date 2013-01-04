@@ -13,9 +13,8 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 import java.io.File;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -25,7 +24,6 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.ExternalFileCopyOperation;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -45,7 +43,7 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
   private Text m_textField;
   private Button m_button;
   private String m_fileExtension;
-  private String m_fileDirectory;
+  private IFolder m_fileDirectory;
   private boolean m_showBrowseButton;
 
   public FilePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
@@ -144,12 +142,12 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
     File file = IOUtility.toFile(path);
 
     // check whether to copy external file into workspace
-    if (isCopyRequired(file)) {
+    if (!JaxWsSdkUtility.existsFileInProject(m_bundle, m_fileDirectory, file)) {
       ExternalFileCopyOperation op = new ExternalFileCopyOperation();
       op.setBundle(m_bundle);
       op.setOverwrite(true);
       op.setExternalFile(file);
-      op.setWorkspacePath(new Path(m_fileDirectory));
+      op.setWorkspacePath(m_fileDirectory.getProjectRelativePath());
       OperationJob job = new OperationJob(op);
       job.schedule();
       try {
@@ -161,7 +159,7 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
       }
     }
 
-    return JaxWsSdkUtility.getFile(m_bundle, JaxWsSdkUtility.normalizePath(m_fileDirectory, SeparatorType.BothType) + file.getName(), false);
+    return m_fileDirectory.getFile(file.getName());
   }
 
   public String getFileExtension() {
@@ -172,11 +170,11 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
     m_fileExtension = fileExtension;
   }
 
-  public String getFileDirectory() {
+  public IFolder getFileDirectory() {
     return m_fileDirectory;
   }
 
-  public void setFileDirectory(String fileDirectory) {
+  public void setFileDirectory(IFolder fileDirectory) {
     m_fileDirectory = fileDirectory;
   }
 
@@ -195,20 +193,5 @@ public class FilePresenter extends AbstractPropertyPresenter<IFile> {
       ((GridData) m_button.getLayoutData()).exclude = !showBrowseButton;
       m_composite.layout();
     }
-  }
-
-  private boolean isCopyRequired(File file) {
-    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, JaxWsSdkUtility.normalizePath(m_fileDirectory, SeparatorType.BothType) + file.getName(), false);
-
-    if (potentialSameFile != null && potentialSameFile.exists()) {
-      IPath potentialSameFilePath = new Path(potentialSameFile.getLocationURI().getRawPath());
-      IPath filePath = new Path(file.getAbsolutePath());
-
-      if (potentialSameFilePath.equals(filePath)) {
-        return false;
-      }
-    }
-
-    return true;
   }
 }

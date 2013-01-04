@@ -55,7 +55,7 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.preferences.IPreferenceConstants;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
 
 @SuppressWarnings("restriction")
@@ -109,7 +109,7 @@ public class WsStubGenerationOperation implements IOperation {
       String launcherName = m_alias + " (JAX-WS stub generation)";
 
       // ensure WSDL folder to be registered in build.xml
-      JaxWsSdkUtility.prepareFolderAccess(getWsdlFolder(), true);
+      JaxWsSdkUtility.ensureFolderAccessibleAndRegistered(getWsdlFolder(), true);
 
       IFile jarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_properties, m_wsdlFileName);
       // remove JAR file to ensure successful JAR generation
@@ -120,16 +120,16 @@ public class WsStubGenerationOperation implements IOperation {
         }
         catch (Exception e) {
           JaxWsSdk.logError("failed to delete jar file", e);
-          notifyListeners(false, new Exception("Failed to delete stub JAR-file '" + jarFile.getProjectRelativePath().toPortableString() + "'. The file might be locked because the server is running.", e));
+          notifyListeners(false, new Exception("Failed to delete stub JAR-file '" + jarFile.getProjectRelativePath().toString() + "'. The file might be locked because the server is running.", e));
           return;
         }
       }
 
       // assemble arguments to generate stub
       String args = null;
-      String jarFilePath = JaxWsSdkUtility.normalizePath(jarFile.getProjectRelativePath().toPortableString(), SeparatorType.None);
+      String jarFilePath = PathNormalizer.toJarPath(jarFile.getProjectRelativePath().toString());
       args = StringUtility.join("\n", args, jarFilePath);
-      args = StringUtility.join("\n", args, getWsdlFolder().getProjectRelativePath().append(m_wsdlFileName).toPortableString());
+      args = StringUtility.join("\n", args, getWsdlFolder().getProjectRelativePath().append(m_wsdlFileName).toString());
       args = StringUtility.join("\n", args, "1"); // apply patches
 
       if (m_properties != null && m_properties.size() > 0) {

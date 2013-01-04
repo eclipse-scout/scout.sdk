@@ -53,7 +53,7 @@ public class StubRebuildCommand extends AbstractExecutableMarkerCommand {
     op.addOperationFinishedListener(new P_OperationFinishedListener());
     op.setWsdlFileName(m_wsdlResource.getFile().getName());
     IPath wsdlFolderPath = m_wsdlResource.getFile().getProjectRelativePath().removeLastSegments(1); // get folder of WSDL file
-    op.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false));
+    op.setWsdlFolder(JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath, false));
     op.run(monitor, workingCopyManager);
   }
 

@@ -51,7 +51,7 @@ public class SourceFolderCreateOrUpdateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IFolder folder = JaxWsSdkUtility.getFolder(m_bundle, m_sourceFolder.makeRelativeTo(m_bundle.getProject().getFullPath()).toPortableString(), true);
+    IFolder folder = JaxWsSdkUtility.getFolder(m_bundle, m_sourceFolder.makeRelativeTo(m_bundle.getProject().getFullPath()), true);
     List<IClasspathEntry> classpathEntries = new LinkedList<IClasspathEntry>();
     for (IClasspathEntry entry : m_bundle.getJavaProject().getRawClasspath()) {
       if (entry.getPath().equals(folder.getFullPath())) {

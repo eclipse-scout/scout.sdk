@@ -22,7 +22,7 @@ public class PathProposal extends SimpleProposal {
   private IPath m_path;
 
   public PathProposal(IPath path) {
-    super(path.toPortableString(), ScoutSdkUi.getImage(ScoutSdkUi.Package));
+    super(path.toString(), ScoutSdkUi.getImage(ScoutSdkUi.Package));
     setData(DATA_PATH, path);
   }
 

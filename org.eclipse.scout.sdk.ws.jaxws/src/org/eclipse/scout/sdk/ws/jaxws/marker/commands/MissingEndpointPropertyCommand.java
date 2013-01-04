@@ -48,14 +48,19 @@ public class MissingEndpointPropertyCommand extends AbstractExecutableMarkerComm
 
   @Override
   public boolean prepareForUi() throws CoreException {
+    IType portTypeInterfaceType = null;
     if (m_portTypeQName != null) {
-      m_portTypeInterfaceType = JaxWsSdkUtility.resolvePortTypeInterfaceType(m_portTypeQName, m_stubJarFile);
-    }
-    if (m_portTypeInterfaceType != null) {
-      return true;
+      portTypeInterfaceType = JaxWsSdkUtility.resolvePortTypeInterfaceType(m_portTypeQName, m_stubJarFile);
     }
 
-    IType[] candidates = JaxWsSdkUtility.resolvePortTypeInterfaceTypes(null, m_stubJarFile);
+    IType[] candidates;
+    if (portTypeInterfaceType != null) {
+      candidates = new IType[]{portTypeInterfaceType};
+    }
+    else {
+      candidates = JaxWsSdkUtility.resolvePortTypeInterfaceTypes(null, m_stubJarFile);
+    }
+
     TypeSelectionDialog dialog = new TypeSelectionDialog(ScoutSdkUi.getShell(), Texts.get("PortTypeInterface"), Texts.get("PleaseChoosePortTypeInterface"));
     dialog.setElements(Arrays.asList(candidates));
     if (dialog.open() == Dialog.OK) {

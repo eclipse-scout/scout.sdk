@@ -13,12 +13,11 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.ICheckStateListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -39,7 +38,7 @@ public class ResourceSelectionWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     m_tableViewer = CheckboxTableViewer.newCheckList(parent, SWT.BORDER);
-    m_tableViewer.setContentProvider(new P_ContentProvider());
+    m_tableViewer.setContentProvider(ArrayContentProvider.getInstance());
     m_tableViewer.setLabelProvider(new P_LabelProvider());
 
     m_tableViewer.addCheckStateListener(new ICheckStateListener() {
@@ -90,24 +89,6 @@ public class ResourceSelectionWizardPage extends AbstractWorkspaceWizardPage {
       if (element.isMandatory()) {
         cell.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
       }
-    }
-  }
-
-  public class P_ContentProvider implements IStructuredContentProvider {
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Object[] getElements(Object inputElement) {
-      List<ElementBean> elements = (List<ElementBean>) inputElement;
-      return elements.toArray(new ElementBean[elements.size()]);
-    }
-
-    @Override
-    public void dispose() {
-    }
-
-    @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
   }
 }

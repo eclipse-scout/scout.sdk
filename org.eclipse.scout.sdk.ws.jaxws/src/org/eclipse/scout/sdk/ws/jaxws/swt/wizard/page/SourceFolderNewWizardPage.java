@@ -63,7 +63,7 @@ public class SourceFolderNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     m_textField = new StyledTextField(parent);
-    m_textField.setReadOnlyPrefix(m_bundle.getJavaProject().getPath().toPortableString() + "/");
+    m_textField.setReadOnlyPrefix(m_bundle.getJavaProject().getPath().toString() + "/");
     m_textField.setLabelText(Texts.get("SourceFolder"));
     m_textField.addModifyListener(new ModifyListener() {
 

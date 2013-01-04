@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -34,10 +35,13 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility.Registration;
+import org.eclipse.scout.sdk.ws.jaxws.validator.IServletAliasValidation;
+import org.eclipse.scout.sdk.ws.jaxws.validator.IUrlPatternValidation;
+import org.eclipse.scout.sdk.ws.jaxws.validator.ServletAliasValidator;
+import org.eclipse.scout.sdk.ws.jaxws.validator.UrlPatternValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -127,7 +131,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
       @Override
       public void modifyText(ModifyEvent e) {
         setAliasInternal(m_aliasField.getText());
-        m_urlPatternField.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(m_aliasField.getText(), SeparatorType.BothType));
+        m_urlPatternField.setReadOnlyPrefix(new Path(PathNormalizer.toServletAlias(m_aliasField.getText())).addTrailingSeparator().toString());
         pingStateChanging();
       }
     });
@@ -140,7 +144,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
 
     // URL pattern
     m_urlPatternField = getFieldToolkit().createStyledTextField(parent, Texts.get("UrlPattern"));
-    m_urlPatternField.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(StringUtility.emptyIfNull(getAlias()), SeparatorType.BothType));
+    m_urlPatternField.setReadOnlyPrefix(new Path(PathNormalizer.toServletAlias(StringUtility.emptyIfNull(getAlias()))).addTrailingSeparator().toString());
     m_urlPatternField.addModifyListener(new ModifyListener() {
 
       @Override
@@ -162,8 +166,10 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     parent.setLayout(new GridLayout(1, true));
 
     // servlet
+    boolean excludeBundleRegistration = m_candidateBundles.length <= 1;
     GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    gd.exclude = (m_candidateBundles.length <= 1);
+    gd.exclude = excludeBundleRegistration;
+    m_registrationBundleField.setVisible(!excludeBundleRegistration); // due to focus bug if only excluding from layout
     m_registrationBundleField.setLayoutData(gd);
     // alias
     gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
@@ -210,7 +216,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
   }
 
   @Override
-  protected void validatePage(MultiStatus multiStatus) {
+  protected void validatePage(final MultiStatus multiStatus) {
     if (!isControlCreated()) {
       return;
     }
@@ -218,23 +224,28 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "Please choose the bundle to contain the JAX-WS servlet registration"));
       return;
     }
-    if (StringUtility.isNullOrEmpty(getAlias()) || getAlias().equals("/")) {
-      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("EnterJaxWsAlias")));
-      return;
-    }
-    if (!getAlias().startsWith("/")) {
-      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("jaxWsAliasMustStartWithSlash")));
-      return;
-    }
-    if (getAlias().endsWith("/")) {
-      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("jaxWsAliasMustNotEndWithSlash")));
-      return;
-    }
-    if (!getAlias().matches("[\\w\\-/]*")) { // check for illegal characters
-      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidServletAliasX", getAlias())));
-      return;
-    }
+    final String servletAlias = getAlias();
+    boolean validationResult = ServletAliasValidator.validate(servletAlias, new IServletAliasValidation() {
 
+      @Override
+      public void onEmpty() {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("EnterJaxWsAlias")));
+      }
+
+      @Override
+      public void onWrongSeparators() {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "Invalid servlet alias '" + servletAlias + "'. Must start with a slash with no empty segments and no trailing slash."));
+      }
+
+      @Override
+      public void onIllegalCharacters() {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidServletAliasX", servletAlias)));
+      }
+
+    });
+    if (!validationResult) {
+      return;
+    }
     for (Registration registration : ServletRegistrationUtility.getJaxWsServletRegistrationsOnClasspath(m_bundle)) {
       if (!CompareUtility.equals(getRegistrationBundle().getBundleName(), registration.getBundle().getBundleName()) && CompareUtility.equals(registration.getAlias(), getAlias())) {
         multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "There already exists a JAX-WS servlet registration with the given alias in the bundle '" + registration.getBundle().getBundleName() + "'.\nPlease choose this bundle or another alias."));
@@ -244,23 +255,29 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
 
     // URL pattern
     if (m_urlPatternVisible) {
-      if (StringUtility.isNullOrEmpty(getUrlPattern()) || JaxWsSdkUtility.normalizePath(getUrlPattern(), SeparatorType.BothType).equals(JaxWsSdkUtility.normalizePath(getAlias(), SeparatorType.BothType))) {
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPatternField.getLabelText())));
-        return;
-      }
-      if (!getUrlPattern().startsWith(getAlias())) {
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPatternField.getLabelText(), getAlias())));
-        return;
-      }
-      if (!getUrlPattern().matches("[\\w\\-/]*")) { // check for illegal characters
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidUrlX", getUrlPattern())));
-        return;
-      }
-      if (getUrlPattern().endsWith("/")) {
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "URL pattern must not end with a '/'."));
-        return;
-      }
-      // TODO check for duplicate URL patterns
+      final String urlPattern = getUrlPattern();
+      UrlPatternValidator.validate(urlPattern, servletAlias, new IUrlPatternValidation() {
+
+        @Override
+        public void onEmpty() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPatternField.getLabelText())));
+        }
+
+        @Override
+        public void onIllegalCharacters() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidUrlX", urlPattern)));
+        }
+
+        @Override
+        public void onWrongSeparators() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "Invalid URL pattern '" + urlPattern + "'. Must start with a slash with no empty segments and no trailing slash."));
+        }
+
+        @Override
+        public void onNotStartingWithServletAlias() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPatternField.getLabelText(), servletAlias)));
+        }
+      });
     }
   }
 
@@ -312,8 +329,9 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
       setStateChanging(true);
       setAliasInternal(alias);
       if (isControlCreated()) {
-        m_aliasField.setText(StringUtility.nvl(alias, ""));
-        m_urlPatternField.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(StringUtility.nvl(alias, ""), SeparatorType.BothType));
+        String servletAlias = StringUtility.nvl(PathNormalizer.toServletAlias(alias), "");
+        m_aliasField.setText(servletAlias);
+        m_urlPatternField.setReadOnlyPrefix(new Path(servletAlias).addTrailingSeparator().toString());
       }
     }
     finally {

@@ -25,19 +25,17 @@ import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.AnnotationUpdateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.TypeBrowseDialog;
 
-public class MissingEndpointCodeFirstCommand extends AbstractExecutableMarkerCommand {
+public class InvalidEndpointInterfaceCommand extends AbstractExecutableMarkerCommand {
 
   private IType m_implType;
   private IType m_annotationType;
-  private String m_property;
   private IType m_portTypeInterfaceType;
 
-  public MissingEndpointCodeFirstCommand(IType implType) {
-    super("Missing or invalid " + WebService.class.getSimpleName() + " annotation declaration");
+  public InvalidEndpointInterfaceCommand(IType implType) {
+    super(Texts.get("InvalidEndpointInterfaceSpecified", WebService.class.getSimpleName(), implType.getElementName()));
     m_implType = implType;
     m_annotationType = TypeUtility.getType(WebService.class.getName());
-    m_property = "endpointInterface";
-    setSolutionDescription("By using this task, the annotation declaration is updated.");
+    setSolutionDescription(String.format("By using this task, you can change the endpoint interface.", WebService.class.getSimpleName()));
   }
 
   @Override
@@ -56,11 +54,7 @@ public class MissingEndpointCodeFirstCommand extends AbstractExecutableMarkerCom
     AnnotationUpdateOperation op = new AnnotationUpdateOperation();
     op.setDeclaringType(m_implType);
     op.setAnnotationType(m_annotationType);
-    op.addStringProperty(m_property, m_portTypeInterfaceType.getFullyQualifiedName());
+    op.addStringProperty("endpointInterface", m_portTypeInterfaceType.getFullyQualifiedName());
     new OperationJob(op).schedule();
-  }
-
-  public IType getPortTypeInterfaceType() {
-    return m_portTypeInterfaceType;
   }
 }

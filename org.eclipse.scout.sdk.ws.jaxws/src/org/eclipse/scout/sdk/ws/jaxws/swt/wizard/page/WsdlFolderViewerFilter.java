@@ -45,7 +45,7 @@ public class WsdlFolderViewerFilter extends ViewerFilter {
     IPath wsdlRootPath = m_rootFolder.getProjectRelativePath();
     IPath candidatePath = candidateFolder.getProjectRelativePath();
     candidatePath = candidatePath.makeRelativeTo(wsdlRootPath);
-    if (candidatePath.toPortableString().startsWith("..")) {
+    if (candidatePath.toString().startsWith("..")) {
       return false;
     }
     return m_rootFolder.exists(candidatePath);

@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
@@ -23,7 +22,7 @@ public class CorruptBuildJaxWsXmlFileCommand extends AbstractExecutableMarkerCom
   private IScoutBundle m_bundle;
 
   public CorruptBuildJaxWsXmlFileCommand(IScoutBundle bundle) {
-    super(new Path(JaxWsConstants.PATH_BUILD_JAXWS).lastSegment());
+    super(JaxWsConstants.PATH_BUILD_JAXWS.lastSegment());
     m_bundle = bundle;
     setSolutionDescription("Create a new '" + JaxWsConstants.PATH_BUILD_JAXWS + "' file");
   }

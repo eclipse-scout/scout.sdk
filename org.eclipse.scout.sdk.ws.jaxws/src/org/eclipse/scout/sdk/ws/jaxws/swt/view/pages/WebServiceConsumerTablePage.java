@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.ConsumerNewWizardAction;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class WebServiceConsumerTablePage extends AbstractPage {
 
@@ -133,7 +134,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
 
     @Override
     public void changed(String element, int event) {
-      markStructureDirty();
+      JaxWsSdkUtility.markStructureDirtyAndFixSelection(WebServiceConsumerTablePage.this);
     }
   }
 }
