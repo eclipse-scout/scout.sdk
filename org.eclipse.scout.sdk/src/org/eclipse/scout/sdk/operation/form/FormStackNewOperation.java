@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
+import org.eclipse.scout.sdk.operation.annotation.InputValidationAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceCreateMethodOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
@@ -45,6 +46,12 @@ public class FormStackNewOperation implements IOperation {
   private boolean m_createIdProperty = false;
   private boolean m_createNewHandler = false;
   private boolean m_createModifyHandler = false;
+  private boolean m_createExecStore = true;
+  private boolean m_createExecLoad = true;
+  private boolean m_createPrepareCreateMethod = true;
+  private boolean m_createCreateMethod = true;
+  private boolean m_createLoadMethod = true;
+  private boolean m_createStoreMethod = true;
   private IScoutBundle[] m_clientServiceRegistryBundles;
   private IScoutBundle m_formDataBundle;
   private String m_formDataPackage;
@@ -192,14 +199,20 @@ public class FormStackNewOperation implements IOperation {
       serviceOp.run(monitor, workingCopyManager);
       m_outProcessService = serviceOp.getCreatedServiceImplementation();
       m_outProcessServiceInterface = serviceOp.getCreatedServiceInterface();
+
+      // input validation annotation for process services
+      InputValidationAnnotationCreateOperation valStratOp = new InputValidationAnnotationCreateOperation(m_outProcessServiceInterface);
+      valStratOp.validate();
+      valStratOp.run(monitor, workingCopyManager);
+
       // fill service
       if (getOutFormData() != null) {
         ProcessServiceCreateMethodOperation processServiceFillOp = new ProcessServiceCreateMethodOperation();
         processServiceFillOp.setFormData(getOutFormData());
-        processServiceFillOp.setCreateCreateMethod(true);
-        processServiceFillOp.setCreateLoadMethod(true);
-        processServiceFillOp.setCreatePrepareCreateMethod(true);
-        processServiceFillOp.setCreateStoreMethod(true);
+        processServiceFillOp.setCreateCreateMethod(isCreateCreateMethod());
+        processServiceFillOp.setCreateLoadMethod(isCreateLoadMethod());
+        processServiceFillOp.setCreatePrepareCreateMethod(isCreatePrepareCreateMethod());
+        processServiceFillOp.setCreateStoreMethod(isCreateStoreMethod());
         processServiceFillOp.setCreatePermission(getOutCreatePermission());
         processServiceFillOp.setReadPermission(getOutReadPermission());
         processServiceFillOp.setUpdatePermission(getOutUpdatePermission());
@@ -229,8 +242,8 @@ public class FormStackNewOperation implements IOperation {
       m_outNewHandler = modifyHandlerOp.getCreatedHandler();
       if (getOutProcessServiceInterface() != null) {
         ModifyHandlerCreateMethodsOperation fillOp = new ModifyHandlerCreateMethodsOperation();
-        fillOp.setCreateExecLoad(true);
-        fillOp.setCreateExecStore(true);
+        fillOp.setCreateExecLoad(isCreateExecLoad());
+        fillOp.setCreateExecStore(isCreateExecStore());
         fillOp.setUpdatePermission(getOutUpdatePermission());
         fillOp.setFormData(getOutFormData());
         fillOp.setFormHandler(getOutNewHandler());
@@ -247,8 +260,8 @@ public class FormStackNewOperation implements IOperation {
       newHandlerOp.run(monitor, workingCopyManager);
       m_outNewHandler = newHandlerOp.getCreatedHandler();
       NewHandlerCreateMethodsOperation fillOp = new NewHandlerCreateMethodsOperation();
-      fillOp.setCreateExecLoad(true);
-      fillOp.setCreateExecStore(true);
+      fillOp.setCreateExecLoad(isCreateExecLoad());
+      fillOp.setCreateExecStore(isCreateExecStore());
       fillOp.setFormData(getOutFormData());
       fillOp.setFormHandler(getOutNewHandler());
       fillOp.setServiceInterface(getOutProcessServiceInterface());
@@ -686,4 +699,51 @@ public class FormStackNewOperation implements IOperation {
     m_permissionUpdatePackage = permissionUpdatePackage;
   }
 
+  public boolean isCreateExecStore() {
+    return m_createExecStore;
+  }
+
+  public void setCreateExecStore(boolean createExecStore) {
+    m_createExecStore = createExecStore;
+  }
+
+  public boolean isCreateExecLoad() {
+    return m_createExecLoad;
+  }
+
+  public void setCreateExecLoad(boolean createExecLoad) {
+    m_createExecLoad = createExecLoad;
+  }
+
+  public boolean isCreatePrepareCreateMethod() {
+    return m_createPrepareCreateMethod;
+  }
+
+  public void setCreatePrepareCreateMethod(boolean createPrepareCreateMethod) {
+    m_createPrepareCreateMethod = createPrepareCreateMethod;
+  }
+
+  public boolean isCreateCreateMethod() {
+    return m_createCreateMethod;
+  }
+
+  public void setCreateCreateMethod(boolean createCreateMethod) {
+    m_createCreateMethod = createCreateMethod;
+  }
+
+  public boolean isCreateLoadMethod() {
+    return m_createLoadMethod;
+  }
+
+  public void setCreateLoadMethod(boolean createLoadMethod) {
+    m_createLoadMethod = createLoadMethod;
+  }
+
+  public boolean isCreateStoreMethod() {
+    return m_createStoreMethod;
+  }
+
+  public void setCreateStoreMethod(boolean createStoreMethod) {
+    m_createStoreMethod = createStoreMethod;
+  }
 }

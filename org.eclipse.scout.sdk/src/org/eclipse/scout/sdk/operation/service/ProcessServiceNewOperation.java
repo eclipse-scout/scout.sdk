@@ -19,12 +19,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.annotation.InputValidationAnnotationCreateOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>{@link ProcessServiceNewOperation}</h3> ...
@@ -124,15 +122,7 @@ public class ProcessServiceNewOperation implements IOperation {
       m_createdServiceImplementation = serviceOp.getCreatedServiceImplementation();
 
       // input validation annotation for process services
-      AnnotationCreateOperation valStratOp = new AnnotationCreateOperation(m_createdServiceInterface, SignatureCache.createTypeSignature(RuntimeClasses.InputValidation)) {
-        @Override
-        public TextEdit createEdit(IImportValidator validator, String NL) throws CoreException {
-          validator.addImport(RuntimeClasses.InputValidation);
-          validator.addImport(RuntimeClasses.IValidationStrategy);
-          return super.createEdit(validator, NL);
-        }
-      };
-      valStratOp.addParameter("IValidationStrategy.PROCESS.class");
+      InputValidationAnnotationCreateOperation valStratOp = new InputValidationAnnotationCreateOperation(m_createdServiceInterface);
       valStratOp.validate();
       valStratOp.run(monitor, workingCopyManager);
 
