@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK JAX-WS
 Bundle-SymbolicName: org.eclipse.scout.sdk.ws.jaxws;singleton:=true
-Bundle-Version: 3.8.1.qualifier
+Bundle-Version: 3.8.2.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui,
- org.eclipse.scout.sdk;bundle-version="3.8.1",
- org.eclipse.scout.sdk.ui;bundle-version="3.8.1",
+ org.eclipse.scout.sdk;bundle-version="3.8.2",
+ org.eclipse.scout.sdk.ui;bundle-version="3.8.2",
  javax.wsdl
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
