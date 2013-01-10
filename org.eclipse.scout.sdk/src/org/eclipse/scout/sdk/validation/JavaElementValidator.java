@@ -42,7 +42,7 @@ public final class JavaElementValidator {
 
   public static IStatus validatePackageName(String pckName) {
     if (StringUtility.isNullOrEmpty(pckName)) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("PleaseSpecifyASubPackage"));
+      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("DefaultPackageIsDiscouraged"));
     }
     // no double points
     if (pckName.contains("..")) {
