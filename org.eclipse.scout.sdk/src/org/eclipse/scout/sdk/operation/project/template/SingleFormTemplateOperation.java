@@ -137,11 +137,11 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     serviceOp.setServerServiceRegistryBundles(new IScoutBundle[]{m_scoutProject.getServerBundle()});
     serviceOp.setServiceImplementationBundle(m_scoutProject.getServerBundle());
     serviceOp.setServicePackageName(m_scoutProject.getServerBundle().getDefaultPackage(IScoutBundle.SERVER_SERVICES));
-    serviceOp.setServiceImplementationName("DesktopProcessService");
+    serviceOp.setServiceImplementationName("DesktopService");
     serviceOp.setServiceInterfaceBundle(sharedBundle);
     serviceOp.setServiceInterfacePackageName(sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SERVICES));
     serviceOp.setPermissionPackageName(sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SECURITY));
-    serviceOp.setServiceInterfaceName("IDesktopProcessService");
+    serviceOp.setServiceInterfaceName("IDesktopService");
     serviceOp.run(monitor, workingCopyManager);
     final IType serviceInterface = serviceOp.getCreatedServiceInterface();
 

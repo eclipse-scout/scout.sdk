@@ -18,10 +18,11 @@ import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleT
  *
  */
 public interface IScoutProjectWizardPage {
-  public static final String PROP_PROJECT_NAME = "projectName";
-  public static final String PROP_PROJECT_ALIAS = "projectAlias";
-  public static final String PROP_PROJECT_NAME_POSTFIX = "projectNamePostfix";
-  public static final String PROP_SELECTED_BUNDLES = "selectedBundles";
+  String PROP_PROJECT_NAME = "projectName";
+  String PROP_PROJECT_ALIAS = "projectAlias";
+  String PROP_PROJECT_NAME_POSTFIX = "projectNamePostfix";
+  String PROP_SELECTED_BUNDLES = "selectedBundles";
+  String PROP_USE_DEFAULT_JDT_PREFS = "useDefaultJdtPrefs";
 
   void addPropertyChangeListener(PropertyChangeListener listener);
 

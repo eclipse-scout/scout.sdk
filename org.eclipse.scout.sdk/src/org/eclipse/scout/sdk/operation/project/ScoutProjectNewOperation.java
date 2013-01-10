@@ -131,7 +131,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
         else {
           workingCopyManager.register(u, monitor);
         }
-        JavaElementFormatOperation fo = new JavaElementFormatOperation(u, false);
+        JavaElementFormatOperation fo = new JavaElementFormatOperation(u, true);
         fo.validate();
         fo.run(monitor, workingCopyManager);
       }

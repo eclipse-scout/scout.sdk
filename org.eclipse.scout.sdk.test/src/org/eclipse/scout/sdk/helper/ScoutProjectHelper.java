@@ -48,6 +48,7 @@ public final class ScoutProjectHelper {
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, projectName);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, "");
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, "alias");
+    properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, false);
     properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, PlatformVersionUtility.getPlatformVersion());
     HashSet<String> nodesToCreate = new HashSet<String>();
     if (client) {

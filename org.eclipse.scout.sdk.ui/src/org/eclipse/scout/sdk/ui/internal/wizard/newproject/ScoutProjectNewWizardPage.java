@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
@@ -42,8 +41,11 @@ import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
@@ -59,19 +61,18 @@ import org.eclipse.swt.widgets.Label;
 public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage implements IScoutProjectWizardPage {
   private static final int TYPE_BUNDLE = 99;
 
-  private BasicPropertySupport m_propertySupport;
-
   protected StyledTextField m_projectNameField;
   protected StyledTextField m_postFixField;
   protected CheckableTree m_bundleTree;
   protected ITreeNode m_invisibleRootNode;
   protected StyledTextField m_projectAliasNameField;
+  protected Button m_useDefaultScoutPreferences;
 
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
-    m_propertySupport = new BasicPropertySupport(this);
     setTitle(Texts.get("CreateAScoutProject"));
     setDescription(Texts.get("CreateScoutProjectHelpMsg"));
+    setUseDefaultJdtPrefsInternal(true);
   }
 
   @Override
@@ -111,7 +112,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     m_bundleTree.addCheckSelectionListener(new ICheckStateListener() {
       @Override
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
-        m_propertySupport.setProperty(PROP_SELECTED_BUNDLES, m_bundleTree.getCheckedNodes());
+        setProperty(PROP_SELECTED_BUNDLES, m_bundleTree.getCheckedNodes());
         ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
         if (!node.isEnabled()) {
           checkState = false;
@@ -126,7 +127,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
     m_bundleTree.setChecked(TreeUtility.findNodes(m_invisibleRootNode, new P_InitialCheckNodesFilter()));
 
-    Control aliasGroup = createAliasGroup(parent);
+    Control aliasGroup = createPropertiesGroup(parent);
     m_projectNameField.setFocus();
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -175,11 +176,13 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     m_projectAliasNameField.setText(alias);
   }
 
-  protected Control createAliasGroup(Composite parent) {
+  protected Control createPropertiesGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_IN);
-    group.setText(Texts.get("ProjectAlias"));
+    group.setText(Texts.get("ProjectProperties"));
+
     Label label = new Label(group, SWT.NONE);
     label.setText(Texts.get("ProjectAliasHelp"));
+
     m_projectAliasNameField = getFieldToolkit().createStyledTextField(group, Texts.get("ProjectAlias"));
     m_projectAliasNameField.addModifyListener(new ModifyListener() {
       @Override
@@ -188,18 +191,31 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
         pingStateChanging();
       }
     });
+
+    m_useDefaultScoutPreferences = new Button(group, SWT.CHECK);
+    m_useDefaultScoutPreferences.setText(Texts.get("UseDefaultScoutJDTPreferences"));
+    m_useDefaultScoutPreferences.setSelection(isUseDefaultJdtPrefs());
+    m_useDefaultScoutPreferences.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setUseDefaultJdtPrefsInternal(m_useDefaultScoutPreferences.getSelection());
+        pingStateChanging();
+      }
+    });
+
     // layout
     group.setLayout(new GridLayout(1, true));
 
     label.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_projectAliasNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_useDefaultScoutPreferences.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     return group;
   }
 
   @Override
   public void putProperties(PropertyMap properties) {
-    // put properties of the textfields of this page (project name, etc)
+    // put properties of the text fields of this page (project name, etc)
     String postfix = getProjectNamePostfix();
     if (postfix != null) {
       postfix = postfix.trim();
@@ -211,6 +227,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, postfix);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, getProjectAlias().trim());
     properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, PlatformVersionUtility.getPlatformVersion());
+    properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, isUseDefaultJdtPrefs());
 
     // go through all node extensions and put properties which node has been checked
     ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
@@ -282,12 +299,12 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   @Override
   public void addPropertyChangeListener(PropertyChangeListener listener) {
-    m_propertySupport.addPropertyChangeListener(listener);
+    super.addPropertyChangeListener(listener);
   }
 
   @Override
   public void removePropertyChangeListener(PropertyChangeListener listener) {
-    m_propertySupport.removePropertyChangeListener(listener);
+    super.removePropertyChangeListener(listener);
   }
 
   @Override
@@ -322,7 +339,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   @Override
   public String getProjectName() {
-    return m_propertySupport.getPropertyString(PROP_PROJECT_NAME);
+    return getPropertyString(PROP_PROJECT_NAME);
   }
 
   public void setProjectName(String projectName) {
@@ -339,12 +356,12 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   private void setProjectNameInternal(String projectName) {
-    m_propertySupport.setPropertyString(PROP_PROJECT_NAME, projectName);
+    setPropertyString(PROP_PROJECT_NAME, projectName);
   }
 
   @Override
   public String getProjectNamePostfix() {
-    return m_propertySupport.getPropertyString(PROP_PROJECT_NAME_POSTFIX);
+    return getPropertyString(PROP_PROJECT_NAME_POSTFIX);
   }
 
   public void setProjectNamePostfix(String projectPostfix) {
@@ -361,12 +378,12 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   private void setProjectNamePostfixInternal(String projectPostfix) {
-    m_propertySupport.setPropertyString(PROP_PROJECT_NAME_POSTFIX, projectPostfix);
+    setPropertyString(PROP_PROJECT_NAME_POSTFIX, projectPostfix);
   }
 
   @Override
   public String getProjectAlias() {
-    return m_propertySupport.getPropertyString(PROP_PROJECT_ALIAS);
+    return getPropertyString(PROP_PROJECT_ALIAS);
   }
 
   public void setProjectAlias(String projectAlias) {
@@ -383,7 +400,28 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   private void setProjectAliasInternal(String alias) {
-    m_propertySupport.setPropertyString(PROP_PROJECT_ALIAS, alias);
+    setPropertyString(PROP_PROJECT_ALIAS, alias);
+  }
+
+  public boolean isUseDefaultJdtPrefs() {
+    return getPropertyBool(PROP_USE_DEFAULT_JDT_PREFS);
+  }
+
+  public void setUseDefaultJdtPrefs(boolean useDefaultJdtPrefs) {
+    try {
+      setStateChanging(true);
+      setUseDefaultJdtPrefsInternal(useDefaultJdtPrefs);
+      if (isControlCreated()) {
+        m_useDefaultScoutPreferences.setSelection(useDefaultJdtPrefs);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  private void setUseDefaultJdtPrefsInternal(boolean useDefaultJdtPrefs) {
+    setPropertyBool(PROP_USE_DEFAULT_JDT_PREFS, useDefaultJdtPrefs);
   }
 
   private class P_InitialCheckNodesFilter implements ITreeNodeFilter {

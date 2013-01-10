@@ -76,6 +76,10 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     return getProperties().getProperty(PROP_SELECTED_TEMPLATE_NAME, String.class);
   }
 
+  protected final boolean isUseDefaultJdtPrefs() {
+    return getProperties().getProperty(PROP_USE_DEFAULT_JDT_PREFS, Boolean.class);
+  }
+
   protected final String getPluginName(String pluginSuffix) {
     final String DELIM = ".";
     pluginSuffix = pluginSuffix.trim();
