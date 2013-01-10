@@ -84,6 +84,14 @@ public final class SignatureUtility {
     return getResolvedSignature(signature, signatureOwner, null);
   }
 
+  public static boolean endsWith(String stringToSearchIn, char charToFind) {
+    return stringToSearchIn != null && !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(stringToSearchIn.length() - 1) == charToFind;
+  }
+
+  public static boolean startsWith(String stringToSearchIn, char charToFind) {
+    return stringToSearchIn != null && !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(0) == charToFind;
+  }
+
   public static String getResolvedSignature(String signature, IType signatureOwner, IType contextType) throws JavaModelException {
     StringBuilder sigBuilder = new StringBuilder();
     switch (getTypeSignatureKind(signature)) {
@@ -94,7 +102,7 @@ public final class SignatureUtility {
         }
         break;
       case Signature.ARRAY_TYPE_SIGNATURE:
-        sigBuilder.append("[");
+        sigBuilder.append(Signature.C_ARRAY);
         sigBuilder.append(getResolvedSignature(signature.substring(1), signatureOwner, contextType));
         break;
       case ARBITRARY_ARRAY_SIGNATURE:
@@ -102,7 +110,7 @@ public final class SignatureUtility {
         sigBuilder.append(getResolvedSignature(signature.substring(1), signatureOwner, contextType));
         break;
       case Signature.BASE_TYPE_SIGNATURE:
-        if (signature.endsWith(";")) {
+        if (endsWith(signature, Signature.C_NAME_END)) {
           signature = signature.substring(0, signature.length() - 1);
         }
         sigBuilder.append(signature);
@@ -113,34 +121,39 @@ public final class SignatureUtility {
         sigBuilder.append(getResolvedSignature(sig, signatureOwner, contextType));
         break;
       case Signature.CLASS_TYPE_SIGNATURE:
-
         String[] typeArguments = Signature.getTypeArguments(signature);
         signature = Signature.getTypeErasure(signature);
         signature = SIG_REPLACEMENT_REGEX.matcher(signature).replaceAll(".");
-        if (signature.startsWith("Q")) {
+        if (startsWith(signature, Signature.C_UNRESOLVED)) {
           // unresolved
           String[][] resolvedTypeName = signatureOwner.resolveType(Signature.getSignatureSimpleName(signature));
-          if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-            String fqName = resolvedTypeName[0][0];
-            if (fqName != null && fqName.length() > 0) {
-              fqName = fqName + ".";
+          if (resolvedTypeName != null) {
+            if (resolvedTypeName.length == 1) {
+              String fqName = resolvedTypeName[0][0];
+              if (fqName != null && fqName.length() > 0) {
+                fqName = fqName + ".";
+              }
+              fqName = fqName + resolvedTypeName[0][1];
+              signature = SignatureCache.createTypeSignature(fqName);
             }
-            fqName = fqName + resolvedTypeName[0][1];
-            signature = SignatureCache.createTypeSignature(fqName);
+          }
+          else {
+            String tmpSig = findTypeParameterSignature(signature, signatureOwner, contextType);
+            signature = getResolvedSignature(tmpSig, signatureOwner, contextType);
           }
         }
-        if (signature.endsWith(";")) {
+        if (endsWith(signature, Signature.C_NAME_END)) {
           signature = signature.substring(0, signature.length() - 1);
         }
         sigBuilder.append(signature);
         if (typeArguments != null && typeArguments.length > 0) {
-          sigBuilder.append("<");
+          sigBuilder.append(Signature.C_GENERIC_START);
           for (int i = 0; i < typeArguments.length; i++) {
             sigBuilder.append(getResolvedSignature(typeArguments[i], signatureOwner, contextType));
           }
-          sigBuilder.append(">");
+          sigBuilder.append(Signature.C_GENERIC_END);
         }
-        sigBuilder.append(";");
+        sigBuilder.append(Signature.C_NAME_END);
         break;
       default:
         SdkUtilActivator.logWarning("unhandled signature type: '" + Signature.getTypeSignatureKind(signature) + "'");
