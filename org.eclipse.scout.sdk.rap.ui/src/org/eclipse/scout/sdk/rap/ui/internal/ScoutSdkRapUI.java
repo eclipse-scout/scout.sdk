@@ -10,10 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.ui.internal;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.rap.target.RapTargetVariable;
+import org.eclipse.scout.sdk.rap.target.RapTargetVariableListenerAdapter;
 import org.eclipse.scout.sdk.rap.ui.SdkRapIcons;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -25,23 +32,30 @@ import org.osgi.framework.BundleContext;
 
 public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.rap.ui";
-  
+
+  private static final String RAP_TARGET_VARIABLE_EMPTY_MSG = "scoutRapTargetVarEmptyMsg";
   private static final String IMAGE_PATH = "resources/icons/";
+
   private static ScoutSdkRapUI plugin;
   private static SdkLogManager logManager;
+  private static P_ScoutTargetVariableListener listener;
 
   @Override
   public void start(BundleContext bundleContext) throws Exception {
     super.start(bundleContext);
     plugin = this;
     logManager = new SdkLogManager(this);
+    listener = new P_ScoutTargetVariableListener();
+    RapTargetVariable.get().addListener(listener);
   }
 
   @Override
   public void stop(BundleContext bundleContext) throws Exception {
     super.stop(bundleContext);
-    plugin = null;
+    RapTargetVariable.get().removeListener(listener);
+    listener = null;
     logManager = null;
+    plugin = null;
   }
 
   public static ScoutSdkRapUI getDefault() {
@@ -183,4 +197,35 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
     }
   }
 
+  private class P_ScoutTargetVariableListener extends RapTargetVariableListenerAdapter {
+    @Override
+    public void emptyVariableInUse(final IFile targetFile) {
+      String doNotShowAgainString = getPreferenceStore().getString(RAP_TARGET_VARIABLE_EMPTY_MSG);
+      boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
+
+      if (!doNotShowAgain) {
+        final Display display = getDisplay();
+        display.syncExec(new Runnable() {
+          @Override
+          public void run() {
+            MessageDialogWithToggle msgbox = MessageDialogWithToggle.openYesNoQuestion(ScoutSdkUi.getShell(), Texts.get("NoRAPTargetLocationDefined"),
+                Texts.get("EmptyRapTargetVarFoundMsg", RapTargetVariable.RAP_TARGET_KEY, targetFile.getLocation().toOSString()), Texts.get("DoNotShowAgain"),
+                false, getPreferenceStore(), RAP_TARGET_VARIABLE_EMPTY_MSG);
+            if (msgbox.getReturnCode() == IDialogConstants.YES_ID) {
+              //TODO
+              System.out.println("==============================do create target platform==============================");
+            }
+          }
+        });
+      }
+    }
+  }
+
+  private static Display getDisplay() {
+    Display d = Display.getDefault();
+    if (d == null) {
+      d = PlatformUI.getWorkbench().getDisplay();
+    }
+    return d;
+  }
 }

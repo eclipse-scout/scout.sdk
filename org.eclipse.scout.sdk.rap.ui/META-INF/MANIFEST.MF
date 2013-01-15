@@ -11,3 +11,12 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.sdk.rap;bundle-version="3.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.scout.sdk.rap.ui,
+ org.eclipse.scout.sdk.rap.ui.internal,
+ org.eclipse.scout.sdk.rap.ui.internal.extensions,
+ org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle,
+ org.eclipse.scout.sdk.rap.ui.internal.extensions.export,
+ org.eclipse.scout.sdk.rap.ui.internal.extensions.technology,
+ org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project,
+ org.eclipse.scout.sdk.rap.ui.internal.wizard.export,
+ org.eclipse.scout.sdk.rap.ui.internal.wizard.project

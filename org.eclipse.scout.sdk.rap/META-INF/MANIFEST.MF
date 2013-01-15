@@ -6,8 +6,10 @@ Bundle-Version: 3.9.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.rap.ScoutSdkRap
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.scout.sdk;bundle-version="3.9.0";visibility:=reexport
+ org.eclipse.scout.sdk;bundle-version="3.9.0";visibility:=reexport,
+ org.eclipse.core.variables
 Export-Package: org.eclipse.scout.sdk.rap,
- org.eclipse.scout.sdk.rap.operations.project
+ org.eclipse.scout.sdk.rap.operations.project,
+ org.eclipse.scout.sdk.rap.target
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy

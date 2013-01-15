@@ -16,6 +16,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -34,8 +35,10 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class InstallTargetPlatformFileOperation extends InstallTextFileOperation {
   public static final String TARGET_FILE_NAME = "ScoutRAP.target";
-  private static final String VARIABLE_RAP_LOCATION = "RAP_LOCATION";
   public static final String ECLIPSE_HOME_VAR = "${eclipse_home}";
+
+  private static final String VARIABLE_RAP_LOCATION = "RAP_LOCATION";
+  private static final Pattern VAR_PATTERN = Pattern.compile("\\$\\{[^\\{\\}\\$]*\\}");
 
   private final ArrayList<ITargetEntryContributor> m_entryList;
   private final File m_installLocation;
@@ -127,7 +130,7 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
   }
 
   public void addLocalDirectory(String dir) {
-    if (m_installLocation != null) {
+    if (m_installLocation != null && !VAR_PATTERN.matcher(dir).matches()) {
       String absDir = new File(dir).getAbsolutePath();
       String eclipseDir = m_installLocation.getAbsolutePath();
       if (absDir.startsWith(eclipseDir)) {

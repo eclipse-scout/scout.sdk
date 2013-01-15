@@ -30,4 +30,12 @@
             referenceId="fill.ui.rap">
       </operation>
    </extension>
+   <extension
+         point="org.eclipse.core.variables.valueVariables">
+      <variable
+            description="Scout RAP Target Location"
+            name="scout_rap_target"
+            readOnly="false">
+      </variable>
+   </extension>
 </plugin>

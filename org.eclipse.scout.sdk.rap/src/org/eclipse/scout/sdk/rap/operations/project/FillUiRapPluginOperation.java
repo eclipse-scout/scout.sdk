@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
+import org.eclipse.scout.sdk.rap.target.RapTargetVariable;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
@@ -38,6 +39,8 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
   public final static String PROP_LOCAL_TARGET_FOLDER = "propLocalTargetFolder";
   public final static String PROP_TARGET_FILE = "propTargetFile";
   public final static String PROP_DOWNLOAD_ECLIPSE_PLATFORM = "propDownloadEclipsePlatform";
+
+  private final static String RAP_TARGET_VARIABLE = "${" + RapTargetVariable.RAP_TARGET_KEY + "}";
 
   private IProject m_project;
 
@@ -98,7 +101,10 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
     InstallTargetPlatformFileOperation op = new InstallTargetPlatformFileOperation(m_project);
     if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING) {
       // existing local RAP target
-      op.addLocalDirectory(getLocalTargetFolder());
+      op.addLocalDirectory(RAP_TARGET_VARIABLE);
+
+      // set the environment variable
+      RapTargetVariable.get().setValue(getLocalTargetFolder());
 
       // try to detect if the given folder is a complete platform or only contains the rap plugins
       if (!isPluginAvailable(getLocalTargetFolder(), "org.eclipse.platform_") || !isPluginAvailable(getLocalTargetFolder(), "org.eclipse.help.ui_")) {
@@ -131,7 +137,10 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       scoutRapTargetExtractOp.run(monitor, workingCopyManager);
 
       op.addRunningEclipseEntries();
-      op.addLocalDirectory(getExtractTargetFolder());
+      op.addLocalDirectory(RAP_TARGET_VARIABLE);
+
+      // set the environment variable
+      RapTargetVariable.get().setValue(getExtractTargetFolder());
     }
     op.validate();
     op.run(monitor, workingCopyManager);

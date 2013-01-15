@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.rap;
 
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.scout.sdk.rap.target.RapTargetVariable;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.osgi.framework.BundleContext;
 
@@ -26,13 +27,15 @@ public class ScoutSdkRap extends Plugin {
     super.start(bundleContext);
     plugin = this;
     logManager = new SdkLogManager(this);
+    RapTargetVariable.get().start();
   }
 
   @Override
   public void stop(BundleContext bundleContext) throws Exception {
     super.stop(bundleContext);
-    plugin = null;
+    RapTargetVariable.get().stop();
     logManager = null;
+    plugin = null;
   }
 
   public static ScoutSdkRap getDefault() {

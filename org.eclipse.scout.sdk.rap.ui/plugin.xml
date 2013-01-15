@@ -65,4 +65,10 @@
             technology="scout.technology.rap.filechooser">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="org.eclipse.scout.sdk.rap.ui.internal.RapStartup">
+      </startup>
+   </extension>
 </plugin>
