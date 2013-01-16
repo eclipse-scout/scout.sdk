@@ -15,12 +15,13 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.rap.target.RapTargetVariable;
 import org.eclipse.scout.sdk.rap.target.RapTargetVariableListenerAdapter;
 import org.eclipse.scout.sdk.rap.ui.SdkRapIcons;
+import org.eclipse.scout.sdk.rap.ui.internal.wizard.target.RapTargetNewWizard;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -208,12 +209,12 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
         display.syncExec(new Runnable() {
           @Override
           public void run() {
-            MessageDialogWithToggle msgbox = MessageDialogWithToggle.openYesNoQuestion(ScoutSdkUi.getShell(), Texts.get("NoRAPTargetLocationDefined"),
+            MessageDialogWithToggle msgbox = MessageDialogWithToggle.openYesNoQuestion(display.getActiveShell(), Texts.get("NoRAPTargetLocationDefined"),
                 Texts.get("EmptyRapTargetVarFoundMsg", RapTargetVariable.RAP_TARGET_KEY, targetFile.getLocation().toOSString()), Texts.get("DoNotShowAgain"),
                 false, getPreferenceStore(), RAP_TARGET_VARIABLE_EMPTY_MSG);
             if (msgbox.getReturnCode() == IDialogConstants.YES_ID) {
-              //TODO
-              System.out.println("==============================do create target platform==============================");
+              WizardDialog dialog = new WizardDialog(display.getActiveShell(), new RapTargetNewWizard());
+              dialog.open();
             }
           }
         });

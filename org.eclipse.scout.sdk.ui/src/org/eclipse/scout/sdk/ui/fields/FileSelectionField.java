@@ -52,7 +52,11 @@ public class FileSelectionField extends TextField {
   private String m_fileName;
 
   public FileSelectionField(Composite parent) {
-    super(parent);
+    this(parent, DEFAULT_LABEL_PERCENTAGE);
+  }
+
+  public FileSelectionField(Composite parent, int labelPercentage) {
+    super(parent, labelPercentage);
     m_eventListeners = new EventListenerList();
   }
 
@@ -109,7 +113,7 @@ public class FileSelectionField extends TextField {
     FormData labelData = new FormData();
     labelData.top = new FormAttachment(0, 4);
     labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(40, 0);
+    labelData.right = new FormAttachment(getLabelPercentage(), 0);
     labelData.bottom = new FormAttachment(100, 0);
     label.setLayoutData(labelData);
 
