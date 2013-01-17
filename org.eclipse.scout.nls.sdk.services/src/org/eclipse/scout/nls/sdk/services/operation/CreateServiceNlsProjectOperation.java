@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.services.operation;
 
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -24,6 +25,7 @@ import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -77,6 +79,28 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     }
   }
 
+  private void addBuildEntry() throws CoreException {
+    IFolder folder = getBundle().getProject().getFolder(getTranslationFolder());
+
+    PluginModelHelper pmh = new PluginModelHelper(getBundle().getProject());
+
+    // check if the folder is already exported
+    IContainer checkFolder = folder;
+    while (getBundle().getProject().getLocation().isPrefixOf(checkFolder.getLocation())) {
+      if (pmh.BuildProperties.existsBinaryBuildEntry(checkFolder)) {
+        return;
+      }
+      checkFolder = checkFolder.getParent();
+    }
+
+    String fld = getTranslationFolder();
+    if (!fld.endsWith("/")) {
+      fld = fld + "/";
+    }
+    pmh.BuildProperties.addBinaryBuildEntry(fld);
+    pmh.save();
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // ensure sync
@@ -84,6 +108,9 @@ public class CreateServiceNlsProjectOperation implements IOperation {
 
     // create language translation properties files
     createLanguageFiles(monitor);
+
+    // add the text files to the build properties (if not already existing)
+    addBuildEntry();
 
     // create and register text provider service
     ServiceNewOperation serviceOp = new ServiceNewOperation();
