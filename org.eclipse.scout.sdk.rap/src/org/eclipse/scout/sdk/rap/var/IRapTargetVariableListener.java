@@ -8,21 +8,20 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.rap.ui.internal;
+package org.eclipse.scout.sdk.rap.var;
 
-import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
-import org.eclipse.ui.IStartup;
+import java.util.EventListener;
+
+import org.eclipse.core.resources.IFile;
 
 /**
- * <h3>{@link RapStartup}</h3> ...
+ * <h3>{@link IRapTargetVariableListener}</h3> ...
  * 
  * @author mvi
  * @since 3.9.0 14.01.2013
  */
-public class RapStartup implements IStartup {
-  @Override
-  public void earlyStartup() {
-    // ensure the plug-in is started and the variable is propagated
-    RapTargetVariable.get().getValue();
-  }
+public interface IRapTargetVariableListener extends EventListener {
+  void valueChanged(String oldVal, String newVal);
+
+  void emptyVariableInUse(IFile targetFile);
 }

@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.rap;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.sdk.rap.target.RapTargetVariable;
+import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.osgi.framework.BundleContext;
 

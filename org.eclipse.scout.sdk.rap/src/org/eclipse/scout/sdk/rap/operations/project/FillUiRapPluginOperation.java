@@ -10,7 +10,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
-import org.eclipse.scout.sdk.rap.target.RapTargetVariable;
+import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
