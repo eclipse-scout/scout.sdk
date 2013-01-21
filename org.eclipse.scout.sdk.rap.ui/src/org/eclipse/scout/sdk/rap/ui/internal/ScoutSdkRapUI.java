@@ -18,7 +18,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.rap.ui.SdkRapIcons;
-import org.eclipse.scout.sdk.rap.ui.internal.wizard.target.RapTargetNewWizard;
+import org.eclipse.scout.sdk.rap.ui.internal.wizard.var.RapTargetNewWizard;
 import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
 import org.eclipse.scout.sdk.rap.var.RapTargetVariableListenerAdapter;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
