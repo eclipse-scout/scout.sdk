@@ -13,12 +13,6 @@
       </bundleNode>
    </extension>
    <extension
-         point="org.eclipse.scout.sdk.ui.contextMenu">
-      <contextMenu
-            class="org.eclipse.scout.sdk.rap.ui.internal.ModifyXmlAction">
-      </contextMenu>
-   </extension>
-   <extension
          point="org.eclipse.scout.sdk.ui.explorerPage">
       <pageFactory
             factory="org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory"
