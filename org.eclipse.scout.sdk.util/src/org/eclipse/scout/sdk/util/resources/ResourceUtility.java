@@ -75,7 +75,7 @@ public final class ResourceUtility {
       if (filter.accept(resource)) {
         collector.add(resource);
       }
-      if (resource instanceof IContainer) {
+      if (resource instanceof IContainer && resource.isAccessible()) {
         for (IResource child : ((IContainer) resource).members()) {
           collectResourcesRec(child, collector, filter);
         }

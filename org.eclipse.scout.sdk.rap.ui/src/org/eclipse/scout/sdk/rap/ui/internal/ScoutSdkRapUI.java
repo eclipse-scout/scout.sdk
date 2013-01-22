@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.rap.ui.internal;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -46,7 +47,7 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
     super.start(bundleContext);
     plugin = this;
     logManager = new SdkLogManager(this);
-    listener = new P_ScoutTargetVariableListener();
+    listener = new P_ScoutTargetVariableListener(getPreferenceStore());
     RapTargetVariable.get().addListener(listener);
   }
 
@@ -198,20 +199,24 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
     }
   }
 
-  private class P_ScoutTargetVariableListener extends RapTargetVariableListenerAdapter {
-    @Override
-    public void emptyVariableInUse(final IFile targetFile) {
-      String doNotShowAgainString = getPreferenceStore().getString(RAP_TARGET_VARIABLE_EMPTY_MSG);
-      boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
+  private static class P_ScoutTargetVariableListener extends RapTargetVariableListenerAdapter {
 
-      if (!doNotShowAgain) {
+    private final IPreferenceStore m_store;
+
+    private P_ScoutTargetVariableListener(IPreferenceStore store) {
+      m_store = store;
+    }
+
+    @Override
+    public synchronized void emptyVariableInUse(final IFile targetFile) {
+      if (isShowMessage()) {
         final Display display = getDisplay();
         display.syncExec(new Runnable() {
           @Override
           public void run() {
             MessageDialogWithToggle msgbox = MessageDialogWithToggle.openYesNoQuestion(display.getActiveShell(), Texts.get("NoRAPTargetLocationDefined"),
                 Texts.get("EmptyRapTargetVarFoundMsg", RapTargetVariable.RAP_TARGET_KEY, targetFile.getLocation().toOSString()), Texts.get("DoNotShowAgain"),
-                false, getPreferenceStore(), RAP_TARGET_VARIABLE_EMPTY_MSG);
+                false, m_store, RAP_TARGET_VARIABLE_EMPTY_MSG);
             if (msgbox.getReturnCode() == IDialogConstants.YES_ID) {
               WizardDialog dialog = new WizardDialog(display.getActiveShell(), new RapTargetNewWizard());
               dialog.open();
@@ -219,6 +224,11 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
           }
         });
       }
+    }
+
+    private boolean isShowMessage() {
+      String doNotShowAgainString = m_store.getString(RAP_TARGET_VARIABLE_EMPTY_MSG);
+      return !MessageDialogWithToggle.NEVER.equals(doNotShowAgainString);
     }
   }
 
