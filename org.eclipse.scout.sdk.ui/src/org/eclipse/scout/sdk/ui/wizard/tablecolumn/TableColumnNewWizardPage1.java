@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -27,12 +28,14 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
+import org.eclipse.scout.sdk.ui.fields.table.ISeparator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
@@ -40,12 +43,9 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -56,12 +56,11 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   final IType iSmartColumn = TypeUtility.getType(RuntimeClasses.ISmartColumn);
 
   private IType m_declaringType;
-  private boolean m_showAllTemplates;
   private CONTINUE_OPERATION m_nextOperation;
 
   private FilteredTable m_filteredTable;
-  private Button m_showAllTemplatesField;
-  private P_BCTypeTemplate m_selectedTemplate;
+  private Object m_currentSelection;
+  private IType m_selectedTemplate;
   private IWizardPage m_nextPage;
 
   public TableColumnNewWizardPage1(IType declaringType, CONTINUE_OPERATION op) {
@@ -75,17 +74,27 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     m_filteredTable = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
-    m_filteredTable.getViewer().addFilter(new P_ModeFilter());
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
-        if (!event.getSelection().isEmpty()) {
-          StructuredSelection selection = (StructuredSelection) event.getSelection();
-          m_selectedTemplate = (P_BCTypeTemplate) selection.getFirstElement();
+        if (m_currentSelection != null) {
+          m_filteredTable.getViewer().update(m_currentSelection, new String[]{"label"});
+        }
+        m_currentSelection = null;
+        m_selectedTemplate = null;
+
+        StructuredSelection selection = (StructuredSelection) event.getSelection();
+        if (!selection.isEmpty()) {
+          m_currentSelection = selection.getFirstElement();
+          if (!(m_currentSelection instanceof ISeparator)) {
+            m_selectedTemplate = (IType) selection.getFirstElement();
+          }
           validateNextPage();
           pingStateChanging();
         }
-
+        if (m_currentSelection != null) {
+          m_filteredTable.getViewer().update(m_currentSelection, new String[]{"label"});
+        }
       }
     });
     m_filteredTable.getViewer().addDoubleClickListener(new IDoubleClickListener() {
@@ -95,7 +104,10 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
           selectedItem = selection.getFirstElement();
-          m_selectedTemplate = (P_BCTypeTemplate) selectedItem;
+          if (selectedItem instanceof ISeparator) {
+            return;
+          }
+          m_selectedTemplate = (IType) selectedItem;
           validateNextPage();
           IWizardPage page = getNextPage();
           if (page == null) {
@@ -112,50 +124,11 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     });
 
-    HashMap<String, P_BCTypeTemplate> templates = new HashMap<String, P_BCTypeTemplate>();
-    IJavaProject javaProject = m_declaringType.getJavaProject();
-    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IStringColumn, javaProject),
-        new P_BCTypeTemplate(Texts.get("StringColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IStringColumn, javaProject)));
-    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IBooleanColumn, javaProject),
-        new P_BCTypeTemplate(Texts.get("BooleanColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IBooleanColumn, javaProject)));
-    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IDateColumn, javaProject),
-        new P_BCTypeTemplate(Texts.get("DateColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IDateColumn, javaProject)));
-    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IDoubleColumn, javaProject),
-        new P_BCTypeTemplate(Texts.get("DoubleColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IDoubleColumn, javaProject)));
-    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.IIntegerColumn, javaProject),
-        new P_BCTypeTemplate(Texts.get("IntegerColumn"), RuntimeClasses.getSuperType(RuntimeClasses.IIntegerColumn, javaProject)));
-    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.ILongColumn, javaProject),
-        new P_BCTypeTemplate(Texts.get("LongColumn"), RuntimeClasses.getSuperType(RuntimeClasses.ILongColumn, javaProject)));
-    templates.put(RuntimeClasses.getSuperTypeName(RuntimeClasses.ISmartColumn, javaProject),
-        new P_BCTypeTemplate(Texts.get("SmartColumn"), RuntimeClasses.getSuperType(RuntimeClasses.ISmartColumn, javaProject)));
-
-    ITypeHierarchy columnHierarchy = TypeUtility.getPrimaryTypeHierarchy(iColumn);
-    for (IType t : columnHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(javaProject))) {
-      if (!templates.containsKey(t.getFullyQualifiedName())) {
-        templates.put(t.getFullyQualifiedName(), new P_BCTypeTemplate(null, t));
-      }
-    }
-    P_TableContentProvider provider = new P_TableContentProvider(templates.values().toArray(new P_BCTypeTemplate[templates.size()]));
+    P_TableContentProvider provider = new P_TableContentProvider();
     m_filteredTable.getViewer().setLabelProvider(provider);
     m_filteredTable.getViewer().setContentProvider(provider);
     m_filteredTable.getViewer().setInput(provider);
-
-    m_showAllTemplatesField = new Button(parent, SWT.CHECK);
-    m_showAllTemplatesField.setSelection(false);
-    m_showAllTemplatesField.setText(Texts.get("ShowAllTemplates"));
-    m_showAllTemplatesField.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        try {
-          setStateChanging(true);
-          setShowAllTemplates(m_showAllTemplatesField.getSelection());
-
-        }
-        finally {
-          setStateChanging(false);
-        }
-      }
-    });
+    m_filteredTable.getViewer().setSorter(provider);
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -169,21 +142,21 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     else {
       org.eclipse.jdt.core.ITypeHierarchy selectedSuperTypeHierarchy = null;
       try {
-        selectedSuperTypeHierarchy = m_selectedTemplate.getType().newSupertypeHierarchy(null);
+        selectedSuperTypeHierarchy = m_selectedTemplate.newSupertypeHierarchy(null);
       }
       catch (JavaModelException e) {
-        ScoutSdkUi.logError("could not build type hierarchy of '" + m_selectedTemplate.getType().getFullyQualifiedName() + "'.", e);
+        ScoutSdkUi.logError("could not build type hierarchy of '" + m_selectedTemplate.getFullyQualifiedName() + "'.", e);
       }
       if (selectedSuperTypeHierarchy != null && selectedSuperTypeHierarchy.contains(iSmartColumn)) {
         SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);
-        wizard.setSuperType(m_selectedTemplate.getType());
+        wizard.setSuperType(m_selectedTemplate);
         m_nextPage = wizard.getPages()[0];
       }
       else {
         DefaultTableColumnNewWizard wizard = new DefaultTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);
-        wizard.setSuperType(m_selectedTemplate.getType());
+        wizard.setSuperType(m_selectedTemplate);
         m_nextPage = wizard.getPages()[0];
       }
     }
@@ -207,41 +180,61 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   public void setSuperType(IType selectedType) {
     IStructuredContentProvider prov = (IStructuredContentProvider) m_filteredTable.getViewer().getContentProvider();
     for (Object row : prov.getElements(null)) {
-      if (((P_BCTypeTemplate) row).getType().equals(selectedType)) {
+      if (((IType) row).equals(selectedType)) {
         m_filteredTable.getViewer().setSelection(new StructuredSelection(selectedType));
       }
     }
     validateNextPage();
   }
 
-  public boolean isShowAllTemplates() {
-    return m_showAllTemplates;
+  public IType getSelectedSuperType() {
+    return m_selectedTemplate;
   }
 
-  public void setShowAllTemplates(boolean showAllTemplates) {
-    try {
-      setStateChanging(true);
-      m_showAllTemplates = showAllTemplates;
-      if (isControlCreated()) {
-        m_showAllTemplatesField.setSelection(showAllTemplates);
-        m_filteredTable.getViewer().refresh();
+  private class P_TableContentProvider extends ViewerSorter implements IStructuredContentProvider, ITableLabelProvider {
+    private final Object[] m_templates;
+    private final HashSet<String> m_shortList;
+
+    private P_TableContentProvider() {
+      ArrayList<Object> templates = new ArrayList<Object>();
+      IJavaProject javaProject = m_declaringType.getJavaProject();
+
+      IType stringCol = RuntimeClasses.getSuperType(RuntimeClasses.IStringColumn, javaProject);
+      IType boolCol = RuntimeClasses.getSuperType(RuntimeClasses.IBooleanColumn, javaProject);
+      IType dateCol = RuntimeClasses.getSuperType(RuntimeClasses.IDateColumn, javaProject);
+      IType doubleCol = RuntimeClasses.getSuperType(RuntimeClasses.IDoubleColumn, javaProject);
+      IType intCol = RuntimeClasses.getSuperType(RuntimeClasses.IIntegerColumn, javaProject);
+      IType longCol = RuntimeClasses.getSuperType(RuntimeClasses.ILongColumn, javaProject);
+      IType smartCol = RuntimeClasses.getSuperType(RuntimeClasses.ISmartColumn, javaProject);
+
+      templates.add(stringCol);
+      templates.add(boolCol);
+      templates.add(dateCol);
+      templates.add(doubleCol);
+      templates.add(intCol);
+      templates.add(longCol);
+      templates.add(smartCol);
+
+      m_shortList = new HashSet<String>(7);
+      m_shortList.add(stringCol.getFullyQualifiedName());
+      m_shortList.add(boolCol.getFullyQualifiedName());
+      m_shortList.add(dateCol.getFullyQualifiedName());
+      m_shortList.add(doubleCol.getFullyQualifiedName());
+      m_shortList.add(intCol.getFullyQualifiedName());
+      m_shortList.add(longCol.getFullyQualifiedName());
+      m_shortList.add(smartCol.getFullyQualifiedName());
+
+      templates.add(new ISeparator() {
+      });
+
+      ITypeHierarchy columnHierarchy = TypeUtility.getPrimaryTypeHierarchy(iColumn);
+      for (IType t : columnHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(javaProject))) {
+        if (!m_shortList.contains(t.getFullyQualifiedName())) {
+          templates.add(t);
+        }
       }
 
-    }
-    finally {
-      setStateChanging(false);
-    }
-  }
-
-  public IType getSelectedSuperType() {
-    return m_selectedTemplate.getType();
-  }
-
-  private class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
-    P_BCTypeTemplate[] m_templates;
-
-    private P_TableContentProvider(P_BCTypeTemplate[] templates) {
-      m_templates = templates;
+      m_templates = templates.toArray(new Object[templates.size()]);
     }
 
     @Override
@@ -252,6 +245,9 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     @Override
     public Image getColumnImage(Object element, int columnIndex) {
       if (columnIndex == 0) {
+        if (element instanceof ISeparator) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.Separator);
+        }
         return ScoutSdkUi.getImage(ScoutSdkUi.FormField);
       }
       return null;
@@ -259,12 +255,27 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
     @Override
     public String getColumnText(Object element, int columnIndex) {
-      if (isShowAllTemplates()) {
-        return ((P_BCTypeTemplate) element).getType().getElementName();
+      if (columnIndex == 0) {
+        if (element instanceof ISeparator) {
+          return "------------------ more columns ------------------";
+        }
+
+        StringBuilder label = new StringBuilder();
+
+        IType t = (IType) element;
+        String typeName = t.getElementName();
+        if (typeName.toLowerCase().startsWith("abstract")) {
+          typeName = typeName.substring("abstract".length());
+        }
+        label.append(typeName);
+
+        StructuredSelection selection = (StructuredSelection) m_filteredTable.getViewer().getSelection();
+        if (selection.toList().contains(element)) {
+          label.append(" - ").append(t.getFullyQualifiedName());
+        }
+        return label.toString();
       }
-      else {
-        return ((P_BCTypeTemplate) element).getTemplateName();
-      }
+      return null;
     }
 
     @Override
@@ -281,44 +292,45 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
     @Override
     public boolean isLabelProperty(Object element, String property) {
-      return false;
+      return "label".equals(property);
     }
 
     @Override
     public void removeListener(ILabelProviderListener listener) {
     }
-  } // end class P_TableContentProvider
 
-  private class P_BCTypeTemplate {
-    private final IType m_type;
-    private final String m_templateName;
-
-    public P_BCTypeTemplate(String templateName, IType type) {
-      m_templateName = templateName;
-      m_type = type;
-
-    }
-
-    public IType getType() {
-      return m_type;
-    }
-
-    public String getTemplateName() {
-      return m_templateName;
-    }
-
-  } // end class P_BCTypeTemplate
-
-  private class P_ModeFilter extends ViewerFilter {
     @Override
-    public boolean select(Viewer viewer, Object parentElement, Object element) {
-      if (m_showAllTemplates) {
-        return true;
+    public int compare(Viewer viewer, Object e1, Object e2) {
+
+      CompositeObject comp1;
+      if (e1 instanceof ISeparator) {
+        comp1 = new CompositeObject(2);
       }
       else {
-        return ((P_BCTypeTemplate) element).getTemplateName() != null;
+        IType modelType = (IType) e1;
+        if (m_shortList.contains(modelType.getFullyQualifiedName())) {
+          comp1 = new CompositeObject(1, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
+        else {
+          comp1 = new CompositeObject(3, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
       }
-    }
-  }
 
+      CompositeObject comp2;
+      if (e2 instanceof ISeparator) {
+        comp2 = new CompositeObject(2);
+      }
+      else {
+        IType modelType = (IType) e2;
+        if (m_shortList.contains(modelType.getFullyQualifiedName())) {
+          comp2 = new CompositeObject(1, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
+        else {
+          comp2 = new CompositeObject(3, modelType.getElementName(), modelType.getFullyQualifiedName());
+        }
+      }
+
+      return comp1.compareTo(comp2);
+    }
+  } // end class P_TableContentProvider
 }
