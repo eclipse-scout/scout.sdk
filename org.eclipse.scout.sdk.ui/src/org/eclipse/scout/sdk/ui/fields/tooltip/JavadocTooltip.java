@@ -19,6 +19,8 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.net.URL;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
@@ -35,6 +37,7 @@ import org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover;
 import org.eclipse.jdt.internal.ui.text.javadoc.JavadocContentAccess2;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLinks;
 import org.eclipse.jdt.ui.JavaElementLabels;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.JavadocContentAccess;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.internal.text.html.HTMLPrinter;
@@ -51,6 +54,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.PlatformUI;
 import org.osgi.framework.Bundle;
 
 /**
@@ -251,7 +255,7 @@ public class JavadocTooltip extends AbstractTooltip {
 
           }
           else {
-            base = JavaDocLocations.getBaseURL(member);
+            base = getBaseURL(member);
           }
         }
         catch (JavaModelException ex) {
@@ -342,5 +346,41 @@ public class JavadocTooltip extends AbstractTooltip {
       catch (IOException e) {
       }
     }
+  }
+
+  /**
+   * Method copied from org.eclipse.jdt.internal.corext.javadoc.JavaDocLocations
+   */
+  public static String getBaseURL(IMember element) throws JavaModelException {
+    if (element.isBinary()) {
+      // Source attachment usually does not include Javadoc resources
+      // => Always use the Javadoc location as base:
+      URL baseURL = JavaUI.getJavadocLocation(element, false);
+      if (baseURL != null) {
+        if ("jar".equals(baseURL.getProtocol())) {
+          // It's a JarURLConnection, which is not known to the browser widget.
+          // Let's start the help web server:
+          URL baseURL2 = PlatformUI.getWorkbench().getHelpSystem().resolve(baseURL.toExternalForm(), true);
+          if (baseURL2 != null) { // can be null if org.eclipse.help.ui is not available
+            baseURL = baseURL2;
+          }
+        }
+        return baseURL.toExternalForm();
+      }
+    }
+    else {
+      IResource resource = element.getResource();
+      if (resource != null) {
+        /*
+         * Too bad: Browser widget knows nothing about EFS and custom URL handlers,
+         * so IResource#getLocationURI() does not work in all cases.
+         * We only support the local file system for now.
+         * A solution could be https://bugs.eclipse.org/bugs/show_bug.cgi?id=149022 .
+         */
+        IPath location = resource.getLocation();
+        if (location != null) return location.toFile().toURI().toString();
+      }
+    }
+    return null;
   }
 }
