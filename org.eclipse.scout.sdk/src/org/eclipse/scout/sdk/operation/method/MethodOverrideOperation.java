@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -55,6 +56,9 @@ public class MethodOverrideOperation extends MethodCreateOperation {
       setSuperTypeHierarchy(superTypeHierarchy);
     }
     IType superType = superTypeHierarchy.getSuperclass(getDeclaringType());
+    if (superType == null) {
+      throw new CoreException(new ScoutStatus("Super class of '" + getDeclaringType().getFullyQualifiedName() + "' could not be found."));
+    }
     m_methodToOverride = findMethodToOverride(superType, getMethodName(), superTypeHierarchy);
     if (m_methodToOverride == null) {
       ScoutSdk.logError("method '" + getMethodName() + "' to override on a super type of '" + getDeclaringType().getFullyQualifiedName() + "' could not be found [stop operation].");
