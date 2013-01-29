@@ -114,6 +114,9 @@ public class FormDataUtility {
       if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldData))) {
         builder = new TableFieldSourceBuilder(formField, hierarchy);
       }
+      else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
+        builder = new TableFieldBeanSourceBuilder(formField, hierarchy);
+      }
       else {
         builder = new CompositePrimaryTypeSourceBuilder(formField, hierarchy);
       }
@@ -134,6 +137,9 @@ public class FormDataUtility {
 
     if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldData))) {
       builder = new TableFieldSourceBuilder(formField, hierarchy);
+    }
+    else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
+      builder = new TableFieldBeanSourceBuilder(formField, hierarchy);
     }
     else {
       builder = new SourceBuilderWithProperties(formField);

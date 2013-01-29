@@ -21,6 +21,7 @@ public interface ISourceBuilder {
   public static final int METHOD_SOURCE_BUILDER = 2;
   public static final int ANNOTATION_SOURCE_BUILDER = 3;
   public static final int CONSTANT_INT_SOURCE_BUILDER = 3;
+  public static final int PROPERTY_SOURCE_BUILDER = 5;
 
   String getElementName();
 

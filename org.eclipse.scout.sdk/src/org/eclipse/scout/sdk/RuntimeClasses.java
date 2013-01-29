@@ -115,6 +115,8 @@ public final class RuntimeClasses {
   public static final String AbstractTable = "org.eclipse.scout.rt.client.ui.basic.table.AbstractTable"; // NO_UCD
   public static final String AbstractTableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField"; // NO_UCD
   public static final String AbstractTableFieldData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData"; // NO_UCD
+  public static final String AbstractTableFieldBeanData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData"; // NO_UCD
+  public static final String AbstractTableRowData = "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData"; // NO_UCD
   public static final String AbstractTimeField = "org.eclipse.scout.rt.client.ui.form.fields.timefield.AbstractTimeField"; // NO_UCD
   public static final String AbstractToolButton = "org.eclipse.scout.rt.client.ui.action.tool.AbstractToolButton"; // NO_UCD
   public static final String AbstractTree = "org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree"; // NO_UCD
