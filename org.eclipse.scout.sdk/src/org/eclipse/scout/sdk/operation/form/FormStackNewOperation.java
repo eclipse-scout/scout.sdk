@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -88,6 +89,7 @@ public class FormStackNewOperation implements IOperation {
   private IType m_outUpdatePermission;
   private IType m_outNewHandler;
   private IType m_outModifyHandler;
+  private IMethod m_outMainBoxGetterMethod;
 
   public FormStackNewOperation() {
     this(false);
@@ -142,6 +144,7 @@ public class FormStackNewOperation implements IOperation {
     formOp.run(monitor, workingCopyManager);
     m_outForm = formOp.getCreatedFormType();
     m_outMainBox = formOp.getCreatedMainBox();
+    m_outMainBoxGetterMethod = formOp.getCreatedMainBoxGetter();
     m_outForm.getCompilationUnit().reconcile(ICompilationUnit.NO_AST, false, null, monitor);
     if (isCreateIdProperty()) {
       BeanPropertyNewOperation beanPropOp = new BeanPropertyNewOperation(getOutForm(), getFormIdName(), SignatureCache.createTypeSignature(Long.class.getName()), Flags.AccPublic);
@@ -626,6 +629,10 @@ public class FormStackNewOperation implements IOperation {
    */
   public IType getOutNewHandler() {
     return m_outNewHandler;
+  }
+
+  public IMethod getOutMainBoxGetterMethod() {
+    return m_outMainBoxGetterMethod;
   }
 
   /**

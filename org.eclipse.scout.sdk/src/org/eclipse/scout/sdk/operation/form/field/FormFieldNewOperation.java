@@ -41,12 +41,15 @@ public class FormFieldNewOperation implements IOperation {
 
   // in members
   private final IType m_declaringType;
+  private IType m_formType;
+  private IJavaElement m_getterMethodSibling;
   private boolean m_formatSource;
   private String m_typeName;
   private String m_superTypeSignature;
   private double m_orderNr;
   private IJavaElement m_siblingField;
   private boolean m_createFormFieldGetterMethod;
+
   // out members
   private IType m_createdFormField;
   private IMethod m_createdFieldGetterMethod;
@@ -78,15 +81,15 @@ public class FormFieldNewOperation implements IOperation {
     if (StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
       throw new IllegalArgumentException("super type signature can not be null.");
     }
-
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException, IllegalArgumentException {
     manager.register(getDeclaringType().getCompilationUnit(), monitor);
-    updateOrderNumbers(monitor, manager);
+    if (getOrderNr() <= 0) {
+      updateOrderNumbers(monitor, manager);
+    }
     InnerTypeNewOperation createInnerTypeOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType());
-    // sibling
     createInnerTypeOp.setSibling(getSiblingField());
     createInnerTypeOp.setSuperTypeSignature(getSuperTypeSignature());
     AnnotationCreateOperation orderAnnotation = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
@@ -130,19 +133,27 @@ public class FormFieldNewOperation implements IOperation {
   }
 
   protected void createFormFieldGetter(IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
-    // find form
-    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
-    IType form = TypeUtility.getAncestor(getCreatedFormField(), TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
-        TypeFilters.getToplevelTypeFilter()));
+    IType form = getFormType();
+    if (!TypeUtility.exists(form)) {
+      // find form
+      ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
+      form = TypeUtility.getAncestor(getCreatedFormField(), TypeFilters.getMultiTypeFilterOr(
+          TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
+          TypeFilters.getToplevelTypeFilter()));
+    }
 
     if (TypeUtility.exists(form)) {
-      InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedFormField(), form, true);
-      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form);
-      IJavaElement sibling = sourceHelper.getSiblingMethodFieldGetter("get" + getTypeName());
-      if (sibling == null && getCreatedFormField().getDeclaringType().equals(form)) {
-        sibling = getCreatedFormField();
+      InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedFormField(), form, isFormatSource());
+
+      IJavaElement sibling = getGetterMethodSibling();
+      if (sibling == null) {
+        IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form);
+        sibling = sourceHelper.getSiblingMethodFieldGetter("get" + getTypeName());
+        if (sibling == null && getCreatedFormField().getDeclaringType().equals(form)) {
+          sibling = getCreatedFormField();
+        }
       }
+
       getterMethodOp.setSibling(sibling);
       getterMethodOp.validate();
       getterMethodOp.run(monitor, manager);
@@ -204,5 +215,25 @@ public class FormFieldNewOperation implements IOperation {
 
   public double getOrderNr() {
     return m_orderNr;
+  }
+
+  public void setOrderNr(double orderNr) {
+    m_orderNr = orderNr;
+  }
+
+  public IType getFormType() {
+    return m_formType;
+  }
+
+  public void setFormType(IType formType) {
+    m_formType = formType;
+  }
+
+  public IJavaElement getGetterMethodSibling() {
+    return m_getterMethodSibling;
+  }
+
+  public void setGetterMethodSibling(IJavaElement getterMethodSibling) {
+    m_getterMethodSibling = getterMethodSibling;
   }
 }
