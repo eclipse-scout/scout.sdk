@@ -47,6 +47,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -182,6 +183,61 @@ public class ScoutTypeUtility extends TypeUtility {
     return null;
   }
 
+  /**
+   * @return Returns <code>true</code> if the given type exists and if it is annotated with an
+   *         {@link RuntimeClasses#Replace} annotation.
+   * @since 3.8.2
+   */
+  public static boolean isReplaceAnnotationPresent(IType type) {
+    IAnnotation annotation = JdtUtility.getAnnotation(type, RuntimeClasses.Replace);
+    return TypeUtility.exists(annotation);
+  }
+
+  /**
+   * @return Returns the form field data for the given form field or <code>null</code> if it does not have one.
+   * @since 3.8.2
+   */
+  public static IType getFormDataType(IType formField, ITypeHierarchy hierarchy) throws JavaModelException {
+    IType primaryType = getFormFieldDataPrimaryTypeRec(formField, hierarchy);
+    if (!TypeUtility.exists(primaryType)) {
+      return null;
+    }
+    IType formDataType = primaryType.getType(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(formField.getElementName()), true));
+    if (TypeUtility.exists(formDataType)) {
+      return formDataType;
+    }
+    return null;
+  }
+
+  /**
+   * @return Returns the form field data for the given form field or <code>null</code> if it does not have one. The
+   *         method walks recursively through the list of declaring classes until it has reached a primary type.
+   * @since 3.8.2
+   */
+  private static IType getFormFieldDataPrimaryTypeRec(IType recursiveDeclaringType, ITypeHierarchy hierarchy) throws JavaModelException {
+    if (!TypeUtility.exists(recursiveDeclaringType)) {
+      return null;
+    }
+    FormDataAnnotation formDataAnnotation = findFormDataAnnotation(recursiveDeclaringType, hierarchy);
+    if (formDataAnnotation == null) {
+      return null;
+    }
+    if (FormDataAnnotation.isIgnore(formDataAnnotation)) {
+      return null;
+    }
+
+    IType declaringType = recursiveDeclaringType.getDeclaringType();
+    if (declaringType == null) {
+      // primary type
+      if (FormDataAnnotation.isSdkCommandCreate(formDataAnnotation) || FormDataAnnotation.isSdkCommandUse(formDataAnnotation)) {
+        return getTypeBySignature(formDataAnnotation.getFormDataTypeSignature());
+      }
+      return null;
+    }
+
+    return getFormFieldDataPrimaryTypeRec(declaringType, hierarchy);
+  }
+
   public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
     return findFormDataAnnnotationImpl(type, hierarchy);
   }
@@ -212,8 +268,37 @@ public class ScoutTypeUtility extends TypeUtility {
 
   private static void parseFormDataAnnotationReq(FormDataAnnotation annotation, IType type, ITypeHierarchy hierarchy, boolean isOwner) {
     if (TypeUtility.exists(type)) {
+      boolean replaceAnnotationPresent = isReplaceAnnotationPresent(type);
       IType superType = hierarchy.getSuperclass(type);
-      parseFormDataAnnotationReq(annotation, superType, hierarchy, false);
+      parseFormDataAnnotationReq(annotation, superType, hierarchy, replaceAnnotationPresent);
+
+      if (replaceAnnotationPresent) {
+        if (!isReplaceAnnotationPresent(superType)) {
+          // super type is the original field that is going to be replaced by the given type
+          // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
+          try {
+            IType declaringType = superType.getDeclaringType();
+            while (TypeUtility.exists(declaringType)) {
+              FormDataAnnotation declaringTypeformDataAnnotation = findFormDataAnnotation(declaringType, hierarchy);
+              if (FormDataAnnotation.isIgnore(declaringTypeformDataAnnotation)) {
+                // super type is embedded into a ignored form field. Hence this field is ignored as well. Adjust parsed annotation.
+                annotation.setSdkCommand(SdkCommand.IGNORE);
+                break;
+              }
+              declaringType = declaringType.getDeclaringType();
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdk.logWarning("could not determine enclosing class's @FormData annotation", e);
+          }
+        }
+
+        if (!FormDataAnnotation.isIgnore(annotation)) {
+          // a form field data must always be created for a replacing fields if its parent has one and it must extend the parent field's field data class
+          return;
+        }
+      }
+
       try {
         fillFormDataAnnotation(type, annotation, isOwner);
       }
@@ -704,19 +789,28 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   /**
+   * @see #getValidationRuleMethods(IType, ITypeHierarchy)
+   */
+  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType) throws JavaModelException {
+    return getValidationRuleMethods(declaringType, null);
+  }
+
+  /**
    * @return a map with all validation rule names mapped to the method on the most specific declaring type
    * @throws JavaModelException
    */
-  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType) throws JavaModelException {
+  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
-    org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy = null;
-    try {
-      superTypeHierarchy = declaringType.newSupertypeHierarchy(null);
+    if (superTypeHierarchy == null) {
+      try {
+        superTypeHierarchy = declaringType.newSupertypeHierarchy(null);
+      }
+      catch (JavaModelException e) {
+        ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'", e);
+        return Collections.emptyList();
+      }
     }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'", e);
-      return Collections.emptyList();
-    }
+
     ArrayList<IType> targetTypeList = new ArrayList<IType>(5);
     targetTypeList.add(0, declaringType);
     IType[] superClasses = superTypeHierarchy.getAllSuperclasses(declaringType);
@@ -807,10 +901,6 @@ public class ScoutTypeUtility extends TypeUtility {
           continue;
         }
         //found new rule annotation, now find most specific method in subclasses to generate source code
-        if (ruleSkip.booleanValue()) {
-          ruleMap.put(hashKey, null);
-          continue;
-        }
         if (ruleGeneratedSourceCode != null && ruleGeneratedSourceCode.length() == 0) {
           ruleGeneratedSourceCode = null;
         }
@@ -840,7 +930,7 @@ public class ScoutTypeUtility extends TypeUtility {
           implementedMethod = annotatedMethod;
         }
         //new rule is sufficiently parsed
-        ValidationRuleMethod vm = new ValidationRuleMethod(validationRuleAnnotation, ruleField, ruleString, ruleGeneratedSourceCode, annotatedMethod, implementedMethod, superTypeHierarchy);
+        ValidationRuleMethod vm = new ValidationRuleMethod(validationRuleAnnotation, ruleField, ruleString, ruleGeneratedSourceCode, annotatedMethod, implementedMethod, superTypeHierarchy, ruleSkip);
         ruleMap.put(hashKey, vm);
       }
     }

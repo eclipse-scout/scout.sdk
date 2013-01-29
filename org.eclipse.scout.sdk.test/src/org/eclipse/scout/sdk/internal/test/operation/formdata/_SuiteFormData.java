@@ -17,15 +17,16 @@ import org.junit.runners.Suite.SuiteClasses;
 //@SuiteClasses({FormWithTemplateTest.class, TemplateFormDataTest.class})
 @SuiteClasses({
     ExternalCheckboxFieldTest.class,
+    ExternalGroupboxTest.class,
     ExternalTableFieldTest.class,
     FormPropertiesTest.class,
     FormWithGroupboxesTest.class,
     FormWithTemplateTest.class,
     IgnoredFieldsFormTest.class,
     ListBoxFormTest.class,
+    ReplaceFormFiledTest.class,
     SimpleFormTest.class,
-    TableFieldFormTest.class,
-    ExternalGroupboxTest.class})
+    TableFieldFormTest.class})
 public class _SuiteFormData {
 
 }

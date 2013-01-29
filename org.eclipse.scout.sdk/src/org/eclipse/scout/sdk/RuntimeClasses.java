@@ -128,6 +128,7 @@ public final class RuntimeClasses {
   public static final String BasicHierarchyPermission = "org.eclipse.scout.rt.shared.security.BasicHierarchyPermission"; // NO_UCD
   public static final String BasicPermission = "java.security.BasicPermission"; // NO_UCD
   public static final String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
+  public static final String Replace = "org.eclipse.scout.commons.annotations.Replace"; // NO_UCD
   public static final String FormData_UpdateOperation = "org.eclipse.scout.commons.annotations.FormData.UpdateOperation"; // NO_UCD
   public static final String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
   public static final String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD

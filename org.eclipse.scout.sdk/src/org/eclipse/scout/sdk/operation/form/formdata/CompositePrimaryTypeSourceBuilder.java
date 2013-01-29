@@ -66,20 +66,39 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
     if (formDataAnnotation != null) {
       if (FormDataAnnotation.isCreate(formDataAnnotation)) {
         String formDataElementName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(formField.getElementName()), true);
-        String superTypeSignature = formDataAnnotation.getSuperTypeSignature();
-        if (formDataAnnotation.getGenericOrdinal() >= 0) {
-          IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
-          if (TypeUtility.isGenericType(superType)) {
-            String genericTypeSig = org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility.computeFormFieldGenericType(formField, formFieldHierarchy);
-            if (genericTypeSig != null) {
-              superTypeSignature = superTypeSignature.replaceAll("\\;$", "<" + genericTypeSig + ">;");
+        String superTypeSignature = null;
+        IType superType = null;
+
+        boolean replaceAnnotationPresent = ScoutTypeUtility.isReplaceAnnotationPresent(formField);
+        if (replaceAnnotationPresent) {
+          IType replacedType = formFieldHierarchy.getSuperclass(formField);
+          IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, formFieldHierarchy);
+          if (replacedFormFieldDataType != null) {
+            superTypeSignature = Signature.createTypeSignature(replacedFormFieldDataType.getTypeQualifiedName(), false);
+            superType = replacedFormFieldDataType;
+          }
+        }
+
+        if (superTypeSignature == null) {
+          superTypeSignature = formDataAnnotation.getSuperTypeSignature();
+          superType = TypeUtility.getTypeBySignature(superTypeSignature);
+          if (formDataAnnotation.getGenericOrdinal() >= 0) {
+            if (TypeUtility.isGenericType(superType)) {
+              String genericTypeSig = org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility.computeFormFieldGenericType(formField, formFieldHierarchy);
+              if (genericTypeSig != null) {
+                superTypeSignature = superTypeSignature.replaceAll("\\;$", "<" + genericTypeSig + ">;");
+              }
             }
           }
         }
-        ITypeSourceBuilder builder = FormDataUtility.getInnerTypeFormDataSourceBuilder(superTypeSignature, formField, formFieldHierarchy);
+
+        ITypeSourceBuilder builder = FormDataUtility.getInnerTypeFormDataSourceBuilder(superType, superTypeSignature, formField, formFieldHierarchy);
         builder.setElementName(formDataElementName);
         builder.setSuperTypeSignature(superTypeSignature);
         builder.setFlags(Flags.AccPublic | Flags.AccStatic);
+        if (replaceAnnotationPresent) {
+          builder.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(RuntimeClasses.Replace, true)));
+        }
         addBuilder(builder, CATEGORY_TYPE_FIELD);
         MethodSourceBuilder getterBuilder = new MethodSourceBuilder(NL);
         getterBuilder.setElementName("get" + formDataElementName);
