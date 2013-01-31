@@ -64,11 +64,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private boolean fastDetection(String content) {
     try {
-      String identifier = (String) TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER).getConstant();
-      if (identifier != null && identifier.startsWith("\"") && identifier.endsWith("\"")) {
-        // when scout runtime sources are present in the workspace -> field value is returned with double quotes
-        identifier = identifier.substring(1, identifier.length() - 1);
-      }
+      String identifier = TypeUtility.getFieldValueAsString(TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER));
       return content.startsWith(identifier);
     }
     catch (JavaModelException e) {

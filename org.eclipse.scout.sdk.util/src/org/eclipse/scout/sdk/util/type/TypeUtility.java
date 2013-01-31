@@ -362,6 +362,25 @@ public class TypeUtility {
     return null;
   }
 
+  public static String getFieldValueAsString(IField field) throws JavaModelException {
+    Object val = field.getConstant();
+    if (val instanceof String) {
+      String ret = (String) val;
+      ret = ret.trim();
+      if (ret.length() > 2 && ret.charAt(0) == '"' && ret.charAt(ret.length() - 1) == '"') {
+        // when scout runtime sources are present in the workspace -> field value is returned with double quotes
+        ret = ret.substring(1, ret.length() - 1);
+      }
+      return ret;
+    }
+    else if (val != null) {
+      return val.toString();
+    }
+    else {
+      return null;
+    }
+  }
+
   public static boolean equalTypes(IType[] arr1, IType[] arr2) {
     if (arr1 == null && arr2 == null) {
       return true;

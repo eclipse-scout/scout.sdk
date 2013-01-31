@@ -166,7 +166,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           builder.addAnnotation(new AnnotationSourceBuilder("Ljava.lang.Override;"));
           builder.setFlags(Flags.AccProtected);
           builder.setElementName("initValidationRules");
-          builder.addParameter(new MethodParameter(Signature.createTypeSignature("java.util.Map<String,Object>", false), "ruleMap"));
+          builder.addParameter(new MethodParameter(Signature.createTypeSignature("java.util.Map<String, Object>", false), "ruleMap"));
           addBuilder(builder, 4);
         }
       }

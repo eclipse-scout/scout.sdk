@@ -815,7 +815,7 @@ public class ScoutTypeUtility extends TypeUtility {
           }
         }
         if (ruleField != null) {
-          ruleString = (String) ruleField.getConstant();
+          ruleString = TypeUtility.getFieldValueAsString(ruleField);
         }
         String hashKey = ruleString;
         if (ruleMap.containsKey(hashKey)) {
