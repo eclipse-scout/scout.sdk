@@ -40,6 +40,7 @@ public interface IRuntimeClasses {
   String BasicHierarchyPermission = "org.eclipse.scout.rt.shared.security.BasicHierarchyPermission"; // NO_UCD
   String BasicPermission = "java.security.BasicPermission"; // NO_UCD
   String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
+  String Replace = "org.eclipse.scout.commons.annotations.Replace"; // NO_UCD
   String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
   String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD
   String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty"; // NO_UCD
@@ -65,6 +66,8 @@ public interface IRuntimeClasses {
   String AbstractFormFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData"; // NO_UCD
   String AbstractPropertyData = "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData"; // NO_UCD
   String AbstractTableFieldData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData"; // NO_UCD
+  String AbstractTableFieldBeanData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData"; // NO_UCD
+  String AbstractTableRowData = "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData"; // NO_UCD
 
   String AbstractComposerField_Tree = "org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField.Tree"; // NO_UCD
   String AbstractIcons = "org.eclipse.scout.rt.shared.AbstractIcons"; // NO_UCD

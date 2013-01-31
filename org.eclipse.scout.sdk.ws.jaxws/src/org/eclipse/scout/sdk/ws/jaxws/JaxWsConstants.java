@@ -10,14 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
+
 public final class JaxWsConstants {
 
-  public static final String PATH_WEB_INF = "/WEB-INF";
-  public static final String PATH_WSDL_PROVIDER = "/WEB-INF/wsdl/provider";
-  public static final String PATH_WSDL_CONSUMER = "/WEB-INF/wsdl/consumer";
-  public static final String PATH_BUILD = "/WEB-INF/build";
-  public static final String PATH_SUN_JAXWS = "/WEB-INF/sun-jaxws.xml";
-  public static final String PATH_BUILD_JAXWS = "/WEB-INF/build/build-jaxws.xml";
+  public static final IPath PATH_WEB_INF = new Path("/WEB-INF");
+  public static final IPath PATH_WSDL_PROVIDER = new Path("/WEB-INF/wsdl/provider");
+  public static final IPath PATH_WSDL_CONSUMER = new Path("/WEB-INF/wsdl/consumer");
+  public static final IPath PATH_BUILD = new Path("/WEB-INF/build");
+  public static final IPath PATH_SUN_JAXWS = new Path("/WEB-INF/sun-jaxws.xml");
+  public static final IPath PATH_BUILD_JAXWS = new Path("/WEB-INF/build/build-jaxws.xml");
   public static final String JAX_WS_ALIAS = "/jaxws";
   public static final String SERVER_EXTENSION_POINT_SERVLETS = "org.eclipse.equinox.http.registry.servlets";
 
@@ -29,7 +32,7 @@ public final class JaxWsConstants {
   public static final String OPTION_PACKAGE = "p";
   public static final String OPTION_JAR = "jar";
 
-  public static final String STUB_FOLDER = "ws-stub";
+  public static final IPath STUB_FOLDER = new Path("ws-stub");
 
   public static final int GENERICS_WEBSERVICE_CLIENT_SERVICE_INDEX = 0;
   public static final int GENERICS_WEBSERVICE_CLIENT_PORT_TYPE_INDEX = 1;
@@ -48,6 +51,7 @@ public final class JaxWsConstants {
     StubFolder(JaxWsSdk.PLUGIN_ID + ".stubFolder"),
     StubJar(JaxWsSdk.PLUGIN_ID + ".stubJar"),
     Implementation(JaxWsSdk.PLUGIN_ID + ".implementation"),
+    EndpointInterface(JaxWsSdk.PLUGIN_ID + ".endpointInterface"),
     Package(JaxWsSdk.PLUGIN_ID + ".package"),
     Wsdl(JaxWsSdk.PLUGIN_ID + ".wsdl"),
     WsdlFolder(JaxWsSdk.PLUGIN_ID + ".wsdlFolder"),

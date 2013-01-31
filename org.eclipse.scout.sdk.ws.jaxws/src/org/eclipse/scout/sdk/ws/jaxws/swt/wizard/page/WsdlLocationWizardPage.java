@@ -20,8 +20,10 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -31,10 +33,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.wsdl.Definition;
-import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
@@ -43,7 +42,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.IOUtility;
@@ -61,8 +59,9 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.AdditionalResourcesWizard;
+import org.eclipse.scout.sdk.ws.jaxws.util.JavaFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
@@ -188,9 +187,30 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
           setPath(path);
 
           // help the user by determing the referenced files
-          Artefact[] artefacts = SchemaUtility.getArtefacts(new Path(path).toFile(), false);
-          if (artefacts.length > 0) {
-            P_ReferencedFilesFoundWizard wizard = new P_ReferencedFilesFoundWizard(artefacts);
+          final Set<WsdlArtefact<File>> referencedWsdlArtefacts = new HashSet<WsdlArtefact<File>>();
+          final Set<SchemaIncludeArtefact<File>> schemaIncludeArtefacts = new HashSet<SchemaIncludeArtefact<File>>();
+          final Set<SchemaImportArtefact<File>> schemaImportArtefacts = new HashSet<SchemaImportArtefact<File>>();
+
+          SchemaUtility.visitArtefacts(new Path(path).toFile(), new SchemaArtefactVisitor<File>() {
+
+            @Override
+            public void onReferencedWsdlArtefact(WsdlArtefact<File> wsdlArtefact) {
+              referencedWsdlArtefacts.add(wsdlArtefact);
+            }
+
+            @Override
+            public void onSchemaIncludeArtefact(SchemaIncludeArtefact<File> schemaIncludeArtefact) {
+              schemaIncludeArtefacts.add(schemaIncludeArtefact);
+            }
+
+            @Override
+            public void onSchemaImportArtefact(SchemaImportArtefact<File> schemaImportArtefact) {
+              schemaImportArtefacts.add(schemaImportArtefact);
+            }
+          });
+
+          if (!referencedWsdlArtefacts.isEmpty() || !schemaIncludeArtefacts.isEmpty() || !schemaImportArtefacts.isEmpty()) {
+            P_ReferencedFilesFoundWizard wizard = new P_ReferencedFilesFoundWizard(referencedWsdlArtefacts, schemaIncludeArtefacts, schemaImportArtefacts);
             ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
             wizardDialog.setPageSize(450, 350);
             wizardDialog.open();
@@ -286,7 +306,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       });
       IFolder folder = getWsdlFolder();
       if (folder != null) {
-        m_wsdlFolderField.setText(folder.getProjectRelativePath().toPortableString());
+        m_wsdlFolderField.setText(folder.getProjectRelativePath().toString());
       }
     }
 
@@ -388,19 +408,9 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     }
 
     IFolder wsdlFolder = getWsdlFolder();
-    // check whether file already exists
-    if (getWsdlFile() != null && wsdlFolder != null) {
-      String wsdlFolderPath = JaxWsSdkUtility.normalizePath(wsdlFolder.getProjectRelativePath().toPortableString(), SeparatorType.BothType);
-
-      IFile conflictingFile = m_bundle.getProject().getFile(wsdlFolderPath + getWsdlFile().getName());
-      if (conflictingFile != null && conflictingFile.exists()) {
-        IPath conflictingFilePath = new Path(conflictingFile.getLocationURI().getRawPath());
-        IPath wsdlFilePath = new Path(getWsdlFile().getAbsolutePath());
-
-        if (!conflictingFilePath.equals(wsdlFilePath)) {
-          multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("WSDLFileAlreadyExists", conflictingFile.getName(), wsdlFolderPath)));
-        }
-      }
+    File wsdlFile = getWsdlFile();
+    if (JaxWsSdkUtility.existsFileInProject(m_bundle, wsdlFolder, wsdlFile)) {
+      multiStatus.add(new Status(IStatus.WARNING, JaxWsSdk.PLUGIN_ID, Texts.get("WSDLFileAlreadyExists", wsdlFile.getName(), wsdlFolder.getProjectRelativePath().toString())));
     }
 
     if (isWsdlFolderVisible() && getWsdlFolder() == null) {
@@ -536,7 +546,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       setWsdlFolderInternal(wsdlFolder);
       if (isControlCreated() && m_wsdlFolderField != null) {
         if (wsdlFolder != null) {
-          m_wsdlFolderField.setText(wsdlFolder.getProjectRelativePath().toPortableString());
+          m_wsdlFolderField.setText(wsdlFolder.getProjectRelativePath().toString());
         }
         else {
           m_wsdlFolderField.setText("");
@@ -578,13 +588,13 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       return;
     }
 
-    File file = new File(getPath());
+    File file = IOUtility.toFile(getPath());
     if (!file.exists()) {
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("FileDoesNotExistOrIsCorrupt")));
       return;
     }
 
-    Definition wsdlDefinition = loadWsdlDefinition(file);
+    Definition wsdlDefinition = JaxWsSdkUtility.loadWsdlDefinition(new JavaFileHandle(file));
     setWsdlDefinition(wsdlDefinition);
     if (wsdlDefinition == null) {
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("WsdlCorrupt", getPath())));
@@ -656,25 +666,13 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       return;
     }
 
-    Definition wsdlDefinition = loadWsdlDefinition(tempFile);
+    Definition wsdlDefinition = JaxWsSdkUtility.loadWsdlDefinition(new JavaFileHandle(tempFile));
     setWsdlDefinition(wsdlDefinition);
     if (wsdlDefinition == null) {
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("WsdlCorrupt", getPath())));
     }
     else {
       setWsdlFile(tempFile);
-    }
-  }
-
-  private Definition loadWsdlDefinition(File file) {
-    try {
-      WSDLFactory factory = WSDLFactory.newInstance();
-      WSDLReader reader = factory.newWSDLReader();
-      return reader.readWSDL(file.getAbsolutePath());
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError(e);
-      return null;
     }
   }
 
@@ -729,11 +727,15 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
   private class P_ReferencedFilesFoundWizard extends AbstractWorkspaceWizard {
 
     private ResourceSelectionWizardPage m_wizardPage;
-    private Artefact[] m_artefacts;
+    private Set<WsdlArtefact<File>> m_referencedWsdlArtefacts;
+    private Set<SchemaIncludeArtefact<File>> m_schemaIncludeArtefacts;
+    private Set<SchemaImportArtefact<File>> m_schemaImportArtefacts;
 
-    public P_ReferencedFilesFoundWizard(Artefact[] artefacts) {
+    public P_ReferencedFilesFoundWizard(Set<WsdlArtefact<File>> referencedWsdlArtefacts, Set<SchemaIncludeArtefact<File>> schemaIncludeArtefacts, Set<SchemaImportArtefact<File>> schemaImportArtefacts) {
       setWindowTitle(Texts.get("ReferencedFilesFound"));
-      m_artefacts = artefacts;
+      m_referencedWsdlArtefacts = referencedWsdlArtefacts;
+      m_schemaIncludeArtefacts = schemaIncludeArtefacts;
+      m_schemaImportArtefacts = schemaImportArtefacts;
     }
 
     @Override
@@ -741,26 +743,14 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       m_wizardPage = new ResourceSelectionWizardPage(Texts.get("ReferencedFilesFound"), Texts.get("QuestionReferencedFilesFound"));
 
       List<ElementBean> elements = new ArrayList<ElementBean>();
-      for (Artefact artefact : m_artefacts) {
-        String suffix = null;
-        ImageDescriptor imageDescriptor = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.File);
-        if (artefact instanceof WsdlArtefact) {
-          suffix = " (referenced WSDL file)";
-          imageDescriptor = JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile);
-        }
-        else if (artefact instanceof SchemaIncludeArtefact) {
-          suffix = " (included XSD schema)";
-          imageDescriptor = JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema);
-
-        }
-        else if (artefact instanceof SchemaImportArtefact) {
-          suffix = " (imported XSD schema)";
-          imageDescriptor = JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema);
-        }
-
-        ElementBean elementBean = new ElementBean(0, artefact.getFile().getAbsoluteFile().getAbsolutePath() + suffix, imageDescriptor, false);
-        elementBean.setData(artefact.getFile());
-        elements.add(elementBean);
+      for (WsdlArtefact<File> artefact : m_referencedWsdlArtefacts) {
+        elements.add(toElement(artefact, "referenced WSDL file", JaxWsIcons.WsdlFile));
+      }
+      for (SchemaIncludeArtefact<File> artefact : m_schemaIncludeArtefacts) {
+        elements.add(toElement(artefact, "included XSD schema", JaxWsIcons.XsdSchema));
+      }
+      for (SchemaImportArtefact<File> artefact : m_schemaImportArtefacts) {
+        elements.add(toElement(artefact, "imported XSD schema", JaxWsIcons.XsdSchema));
       }
       m_wizardPage.setElements(elements);
       addPage(m_wizardPage);
@@ -782,6 +772,12 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
       return true;
     }
-  }
 
+    private ElementBean toElement(Artefact<File> artefact, String suffix, String image) {
+      String label = String.format("%s (%s)", artefact.getFileHandle().getName(), suffix);
+      ElementBean elementBean = new ElementBean(0, label, JaxWsSdk.getImageDescriptor(image), false);
+      elementBean.setData(artefact.getFileHandle().getFile());
+      return elementBean;
+    }
+  }
 }

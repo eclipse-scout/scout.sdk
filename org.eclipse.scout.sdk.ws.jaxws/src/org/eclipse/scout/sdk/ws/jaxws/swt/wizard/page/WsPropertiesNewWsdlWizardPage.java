@@ -21,6 +21,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
@@ -37,7 +38,9 @@ import org.eclipse.scout.sdk.ws.jaxws.operation.WsdlStyleEnum;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
+import org.eclipse.scout.sdk.ws.jaxws.validator.IUrlPatternValidation;
+import org.eclipse.scout.sdk.ws.jaxws.validator.UrlPatternValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -162,7 +165,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
 
     m_urlPattern = getFieldToolkit().createStyledTextField(parent, Texts.get("UrlPattern"));
     m_urlPattern.setText(getWsdlName());
-    m_urlPattern.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(m_jaxWsServletAlias, SeparatorType.BothType));
+    m_urlPattern.setReadOnlyPrefix(new Path(PathNormalizer.toServletAlias(m_jaxWsServletAlias)).addTrailingSeparator().toString());
     m_urlPattern.setVisible(!isShowOnlyWsdlProperties());
     m_urlPattern.addModifyListener(new ModifyListener() {
 
@@ -356,7 +359,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   @Override
-  protected void validatePage(MultiStatus multiStatus) {
+  protected void validatePage(final MultiStatus multiStatus) {
     if (!isControlCreated()) {
       return;
     }
@@ -383,18 +386,31 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
 
-      // URL pattern
-      if (StringUtility.isNullOrEmpty(getUrlPattern()) || getUrlPattern().equals(m_jaxWsServletAlias)) {
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPattern.getLabelText())));
-      }
-      else if (!getUrlPattern().startsWith(m_jaxWsServletAlias)) {
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), m_jaxWsServletAlias)));
-      }
-      else if (!getUrlPattern().matches(".*[\\w\\-]+.*")) { // check for illegal characters
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidUrlX", getUrlPattern())));
-      }
-      else if (m_illegalUrlPatterns.contains(getUrlPattern())) {
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_urlPattern.getLabelText(), getUrlPattern())));
+      final String urlPattern = getUrlPattern();
+      UrlPatternValidator.validate(urlPattern, m_jaxWsServletAlias, new IUrlPatternValidation() {
+
+        @Override
+        public void onWrongSeparators() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "Invalid URL pattern '" + urlPattern + "'. Must start with a slash with no empty segments and no trailing slash."));
+        }
+
+        @Override
+        public void onNotStartingWithServletAlias() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XshouldStartWithY", m_urlPattern.getLabelText(), m_jaxWsServletAlias)));
+        }
+
+        @Override
+        public void onIllegalCharacters() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("InvalidUrlX", urlPattern)));
+        }
+
+        @Override
+        public void onEmpty() {
+          multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", m_urlPattern.getLabelText())));
+        }
+      });
+      if (m_illegalUrlPatterns.contains(urlPattern)) {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XWithYDoesAlreadyExist", m_urlPattern.getLabelText(), urlPattern)));
       }
     }
 
@@ -505,7 +521,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
   public void setJaxWsServletAlias(String jaxWsServletAlias) {
     m_jaxWsServletAlias = jaxWsServletAlias;
     if (isControlCreated()) {
-      m_urlPattern.setReadOnlyPrefix(JaxWsSdkUtility.normalizePath(m_jaxWsServletAlias, SeparatorType.BothType));
+      m_urlPattern.setReadOnlyPrefix(new Path(PathNormalizer.toServletAlias(m_jaxWsServletAlias)).addTrailingSeparator().toString());
     }
   }
 

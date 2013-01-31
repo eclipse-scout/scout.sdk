@@ -11,13 +11,9 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.AbstractSinglePageSectionBasedViewPart;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
-import org.eclipse.scout.sdk.util.IScoutSeverityListener;
-import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -26,7 +22,6 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction.FileExtensionType;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderTablePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.ActionPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -35,23 +30,14 @@ import org.eclipse.swt.layout.GridData;
 public class WebServiceProviderTablePagePropertyViewPart extends AbstractSinglePageSectionBasedViewPart {
 
   public static final String SECTION_ID_FILTER = "section.jaxws.filter";
-  public static final String SECTION_ID_REPAIR = "section.jaxws.repair";
   public static final String SECTION_ID_LINKS = "section.jaxws.links";
   public static final String SECTION_ID_PROVIDER = "section.jaxws.wsprovider";
 
-  private P_ScoutSeverityListener m_severityListener;
   private IScoutBundle m_bundle;
 
   @Override
   protected void init() {
     m_bundle = getPage().getScoutResource();
-    m_severityListener = new P_ScoutSeverityListener();
-    ScoutSeverityManager.getInstance().addQualityManagerListener(m_severityListener);
-  }
-
-  @Override
-  protected void cleanup() {
-    ScoutSeverityManager.getInstance().removeQualityManagerListener(m_severityListener);
   }
 
   @Override
@@ -60,18 +46,9 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
     try {
       createSection(SECTION_ID_FILTER, Texts.get("Filter"));
       getSection(SECTION_ID_FILTER).setExpanded(false);
-      createSection(SECTION_ID_REPAIR, Texts.get("RepairRequired"), Texts.get("SectionRepairDescription"), false);
       createSection(SECTION_ID_LINKS, Texts.get("ConsiderLinks"));
       createSection(SECTION_ID_PROVIDER, Texts.get("WebserviceProvider"));
       boolean sectionLinksVisible = false;
-
-      // repair action
-      getSection(SECTION_ID_REPAIR).setVisible(JaxWsSdk.getDefault().containsMarkerCommands(getPage().getMarkerGroupUUID()));
-
-      RepairAction a = new RepairAction();
-      a.init(getPage().getMarkerGroupUUID(), getPage().getScoutResource());
-      AbstractPresenter presenter = new ActionPresenter(getSection(SECTION_ID_REPAIR).getSectionClient(), a, getFormToolkit());
-      applyLayoutData(presenter);
 
       // filter section
       PageFilterPresenter filterPresenter = new PageFilterPresenter(getFormToolkit(), getSection(SECTION_ID_FILTER).getSectionClient(), getPage());
@@ -119,24 +96,5 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
   private void applyLayoutData(AbstractPresenter presenter) {
     GridData layoutData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
     presenter.getContainer().setLayoutData(layoutData);
-  }
-
-  private class P_ScoutSeverityListener implements IScoutSeverityListener {
-
-    @Override
-    public void severityChanged(IResource resource) {
-      if (resource == ResourceFactory.getSunJaxWsResource(m_bundle).getFile()) {
-        ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
-
-          @Override
-          public void run() {
-            if (getPage().isPageUnloaded() || getForm().isDisposed()) {
-              return;
-            }
-            getSection(SECTION_ID_REPAIR).setVisible(JaxWsSdk.getDefault().containsMarkerCommands(getPage().getMarkerGroupUUID()));
-          }
-        });
-      }
-    }
   }
 }

@@ -15,10 +15,12 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -35,10 +37,11 @@ public class BindingFilePresenter extends FilePresenter {
 
   private BuildJaxWsBean m_buildJaxWsBean;
 
-  public BindingFilePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
+  public BindingFilePresenter(IScoutBundle bundle, Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit);
+    setBundle(bundle);
     setResetLinkVisible(true);
-    setFileDirectory(JaxWsConstants.PATH_BUILD);
+    setFileDirectory(JaxWsSdkUtility.getFolder(bundle, JaxWsConstants.PATH_BUILD, false));
     setFileExtension("xml");
     setLabel(Texts.get("BindingFile"));
     setMarkerType(MarkerType.BindingFile);
@@ -56,12 +59,12 @@ public class BindingFilePresenter extends FilePresenter {
     Map<String, List<String>> propertiers = m_buildJaxWsBean.getPropertiers();
     String path = null;
     if (oldFile != null) {
-      path = oldFile.getProjectRelativePath().toPortableString();
+      path = oldFile.getProjectRelativePath().toString();
     }
     if (!removeBindingFileEntry(propertiers, path)) {
       return null;
     }
-    JaxWsSdkUtility.addBuildProperty(propertiers, JaxWsConstants.OPTION_BINDING_FILE, newFile.getProjectRelativePath().toPortableString());
+    JaxWsSdkUtility.addBuildProperty(propertiers, JaxWsConstants.OPTION_BINDING_FILE, newFile.getProjectRelativePath().toString());
     m_buildJaxWsBean.setProperties(propertiers);
 
     // store property map
@@ -75,7 +78,7 @@ public class BindingFilePresenter extends FilePresenter {
 
     String bindingFileRaw = null;
     if (file != null) {
-      bindingFileRaw = file.getProjectRelativePath().toPortableString();
+      bindingFileRaw = file.getProjectRelativePath().toString();
     }
 
     Map<String, List<String>> propertiers = m_buildJaxWsBean.getPropertiers();
@@ -89,7 +92,7 @@ public class BindingFilePresenter extends FilePresenter {
   }
 
   private boolean removeBindingFileEntry(Map<String, List<String>> properties, String bindingFileRaw) {
-    IFile bindingFile = JaxWsSdkUtility.getFile(m_bundle, bindingFileRaw, false);
+    IFile bindingFile = JaxWsSdkUtility.getFile(m_bundle, new Path(bindingFileRaw), false);
     if (bindingFile != null && bindingFile.exists()) {
       MessageBox messageBox = new MessageBox(ScoutSdkUi.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO | SWT.CANCEL);
       messageBox.setMessage(Texts.get("QuestionShouldFileXAlsoBeDeletedFromDisk", bindingFileRaw));

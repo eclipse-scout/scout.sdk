@@ -11,21 +11,22 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.layout.TableColumnLayout;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
-import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -47,7 +48,7 @@ import org.eclipse.swt.widgets.Table;
 
 public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
 
-  private List<File> m_files;
+  private Set<File> m_files;
 
   private TableViewer m_tableViewer;
   private Button m_addButton;
@@ -86,8 +87,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
             Iterator iterator = selection.iterator();
 
             while (iterator.hasNext()) {
-              File file = (File) iterator.next();
-              m_files.remove(file);
+              m_files.remove((File) iterator.next());
             }
             m_tableViewer.refresh();
           }
@@ -100,7 +100,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
     nameColumn.getColumn().setResizable(false);
     nameColumn.getColumn().setText(Texts.get("Resource"));
 
-    m_tableViewer.setContentProvider(new P_ContentProvider());
+    m_tableViewer.setContentProvider(ArrayContentProvider.getInstance());
     m_tableViewer.setInput(m_files);
 
     Composite buttonComposite = new Composite(container, SWT.NONE);
@@ -126,8 +126,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
         Iterator iterator = selection.iterator();
 
         while (iterator.hasNext()) {
-          File file = (File) iterator.next();
-          m_files.remove(file);
+          m_files.remove((File) iterator.next());
         }
         m_tableViewer.refresh();
       }
@@ -168,19 +167,10 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
       String[] files = dialog.getFileNames();
 
       // prefix with base path since files only consists of filename
-      String basePath = dialog.getFilterPath();
-      for (int i = 0, n = files.length; i < n; i++) {
-        String path = basePath;
-        if (path.charAt(path.length() - 1) != File.separatorChar) {
-          path += File.separatorChar;
-        }
-        path += files[i];
-
-        File file = new File(path);
-
-        if (!m_files.contains(file)) {
-          m_files.add(new File(path));
-        }
+      IPath basePath = new Path(dialog.getFilterPath());
+      for (String filename : files) {
+        File file = basePath.append(filename).toFile();
+        m_files.add(file);
       }
     }
 
@@ -192,7 +182,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   public void setFiles(File[] files) {
-    m_files = new ArrayList<File>(Arrays.asList(files));
+    m_files = new HashSet<File>(Arrays.asList(files));
   }
 
   private class P_LabelProvider extends CellLabelProvider {
@@ -209,24 +199,6 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
       else {
         cell.setImage(JaxWsSdk.getImage(JaxWsIcons.XsdSchema));
       }
-    }
-  }
-
-  public class P_ContentProvider implements IStructuredContentProvider {
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Object[] getElements(Object inputElement) {
-      List<File> files = (List<File>) inputElement;
-      return files.toArray(new File[files.size()]);
-    }
-
-    @Override
-    public void dispose() {
-    }
-
-    @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
     }
   }
 }

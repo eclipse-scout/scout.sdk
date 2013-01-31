@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
 
@@ -105,9 +106,17 @@ public class FormDataUtility {
   public static ITypeSourceBuilder getPrimaryTypeFormDataSourceBuilder(String superTypeSignature, IType formField, ITypeHierarchy hierarchy) {
     ITypeSourceBuilder builder = null;
     try {
-      String typeErasure = Signature.getTypeErasure(superTypeSignature);
-      if (Signature.getSignatureSimpleName(typeErasure).equals(Signature.getSimpleName(RuntimeClasses.AbstractTableFieldData))) {
+      IType superType = ScoutTypeUtility.getTypeBySignature(superTypeSignature);
+      ITypeHierarchy superTypeHierarchy = null;
+      if (TypeUtility.exists(superType)) {
+        superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
+      }
+
+      if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldData))) {
         builder = new TableFieldSourceBuilder(formField, hierarchy);
+      }
+      else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
+        builder = new TableFieldBeanSourceBuilder(formField, hierarchy);
       }
       else {
         builder = new CompositePrimaryTypeSourceBuilder(formField, hierarchy);
@@ -120,11 +129,18 @@ public class FormDataUtility {
     return builder;
   }
 
-  public static ITypeSourceBuilder getInnerTypeFormDataSourceBuilder(String superTypeSignature, IType formField, ITypeHierarchy hierarchy) {
+  public static ITypeSourceBuilder getInnerTypeFormDataSourceBuilder(IType superType, String superTypeSignature, IType formField, ITypeHierarchy hierarchy) {
     ITypeSourceBuilder builder = null;
-    String typeErasure = Signature.getTypeErasure(superTypeSignature);
-    if (Signature.toString(typeErasure).equals(RuntimeClasses.AbstractTableFieldData)) {
+    ITypeHierarchy superTypeHierarchy = null;
+    if (TypeUtility.exists(superType)) {
+      superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
+    }
+
+    if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldData))) {
       builder = new TableFieldSourceBuilder(formField, hierarchy);
+    }
+    else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
+      builder = new TableFieldBeanSourceBuilder(formField, hierarchy);
     }
     else {
       builder = new SourceBuilderWithProperties(formField);

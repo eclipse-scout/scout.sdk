@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -298,7 +299,13 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     if (m_buildJaxWsBean == null) {
       return null;
     }
-    IFile file = JaxWsSdkUtility.getFile(m_bundle, m_buildJaxWsBean.getWsdl(), false);
+    final IFile file;
+    if (m_buildJaxWsBean.getWsdl() == null) {
+      file = null;
+    }
+    else {
+      file = JaxWsSdkUtility.getFile(m_bundle, new Path(m_buildJaxWsBean.getWsdl()), false);
+    }
     if (!getWsdlResource().isSameFile(file)) {
       getWsdlResource().setFile(file);
     }

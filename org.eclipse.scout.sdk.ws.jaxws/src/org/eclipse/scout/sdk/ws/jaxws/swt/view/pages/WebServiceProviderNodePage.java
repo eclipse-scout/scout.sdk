@@ -26,6 +26,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.StringUtility;
@@ -61,7 +62,7 @@ import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageReloadNotification;
 
 public class WebServiceProviderNodePage extends AbstractPage implements IMarkerRebuildListener, IPageReloadNotification {
 
-  public static final int DATA_JDT_TYPE = 1 << 0;
+  public static final int DATA_ENDPOINT_TYPE = 1 << 0;
   public static final int DATA_BUILD_JAXWS_ENTRY = 1 << 1;
   public static final int DATA_WSDL_FILE = 1 << 2;
   public static final int DATA_BINDING_FILE = 1 << 3;
@@ -95,17 +96,14 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
   private ManagedResource m_manifestResource;
   private ManagedResource m_stubJarResource;
 
-  public WebServiceProviderNodePage(IPage parent, SunJaxWsBean sunJaxWsBean, BuildJaxWsBean buildJaxWsBean) {
+  public WebServiceProviderNodePage(final IPage parent, final String alias) {
     setParent(parent);
-    setName(StringUtility.nvl(sunJaxWsBean.getAlias(), "?"));
+    setName(StringUtility.nvl(alias, "?"));
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.WebserviceProvider));
 
-    m_sunJaxWsBean = sunJaxWsBean;
-    m_buildJaxWsBean = buildJaxWsBean;
-    m_alias = sunJaxWsBean.getAlias();
+    m_alias = alias;
     m_bundle = getScoutResource();
     m_markerGroupUUID = UUID.randomUUID().toString();
-
     m_wsdlResource = new WsdlResource(m_bundle);
     m_wsdlResourceListener = new P_WsdlResourceListener();
 
@@ -114,7 +112,6 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     m_manifestResourceListener = new P_ManifestResourceListener();
 
     m_stubJarResource = new ManagedResource(m_bundle.getProject());
-    m_stubJarResource.setFile(JaxWsSdkUtility.getStubJarFile(m_bundle, buildJaxWsBean, sunJaxWsBean.getWsdl()));
     m_stubJarResourceListener = new P_StubJarResourceListener();
 
     m_sunJaxWsResourceListener = new P_SunJaxWsResourceListener();
@@ -127,8 +124,8 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     m_pageLoadedListenerLock = new Object();
 
     // register for events being of interest
-    getSunJaxWsResource().addResourceListener(sunJaxWsBean.getAlias(), m_sunJaxWsResourceListener);
-    getBuildJaxWsResource().addResourceListener(sunJaxWsBean.getAlias(), m_buildJaxWsResourceListener);
+    getSunJaxWsResource().addResourceListener(m_sunJaxWsResourceListener);
+    getBuildJaxWsResource().addResourceListener(m_buildJaxWsResourceListener);
     getWsdlResource().addResourceListener(IResourceListener.EVENT_WSDL_REPLACED | IResourceListener.EVENT_UNKNOWN | IResourceListener.EVENT_STUB_REBUILT, m_wsdlResourceListener);
     m_manifestResource.addResourceListener(IResourceListener.EVENT_MANIFEST_CLASSPATH | IResourceListener.EVENT_UNKNOWN, m_manifestResourceListener);
     m_stubJarResource.addResourceListener(m_stubJarResourceListener);
@@ -139,7 +136,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     m_portTypeChangedListener = new P_PortTypeChangeListener();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(m_portTypeChangedListener);
 
-    reloadPage(DATA_JDT_TYPE | DATA_BINDING_FILE | DATA_WSDL_FILE | DATA_STUB_FILES);
+    reloadPage(DATA_SUN_JAXWS_ENTRY | DATA_BUILD_JAXWS_ENTRY | DATA_ENDPOINT_TYPE | DATA_BINDING_FILE | DATA_WSDL_FILE | DATA_STUB_FILES);
   }
 
   @Override
@@ -191,6 +188,10 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
         }
       }
     }
+    if (m_sunJaxWsBean == null) { // endpoint definition does not exist anymore
+      return;
+    }
+
     if ((dataMask & DATA_BUILD_JAXWS_ENTRY) > 0) {
       BuildJaxWsBean buildJaxWsBean = getBuildJaxWsBean();
       if (buildJaxWsBean == null) {
@@ -305,12 +306,22 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
           return;
         }
 
-        if (!MarkerRebuildUtility.rebuildBuildJaxWsMarkers(getBuildJaxWsResource().getFile(), m_buildJaxWsBean, m_sunJaxWsBean.getAlias(), m_wsdlResource, m_markerGroupUUID, m_bundle, WebserviceEnum.Provider)) {
+        if (!MarkerRebuildUtility.rebuildBuildJaxWsMarkers(getBuildJaxWsResource().getFile(), m_buildJaxWsBean, m_alias, m_wsdlResource, m_markerGroupUUID, m_bundle, WebserviceEnum.Provider)) {
           return;
         }
         if (!MarkerRebuildUtility.rebuildSunJaxWsMarkers(getBuildJaxWsResource().getFile(), m_sunJaxWsBean, m_wsdlResource, m_markerGroupUUID, m_bundle)) {
           return;
         }
+
+        PortType portType = JaxWsSdkUtility.getPortType(getWsdlDefinition(), m_sunJaxWsBean.getServiceQNameSafe(), m_sunJaxWsBean.getPort());
+        QName portTypeQName = null;
+        if (portType != null) {
+          portTypeQName = portType.getQName();
+        }
+        if (!MarkerRebuildUtility.rebuildStubJarFileMarkers(m_buildJaxWsBean, m_wsdlResource, portTypeQName, m_sunJaxWsBean.getServiceQNameSafe(), m_bundle, m_markerGroupUUID)) {
+          return;
+        }
+
         if (!MarkerRebuildUtility.rebuildPortTypeImplMarkers(getSunJaxWsResource().getFile(), m_sunJaxWsBean, m_buildJaxWsBean, getPortType(), m_wsdlDefinition, m_markerGroupUUID, m_bundle)) {
           return;
         }
@@ -321,15 +332,6 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
           return;
         }
 
-        PortType portType = JaxWsSdkUtility.getPortType(getWsdlDefinition(), m_sunJaxWsBean.getServiceQNameSafe(), m_sunJaxWsBean.getPort());
-        QName portTypeQName = null;
-        if (portType != null) {
-          portTypeQName = portType.getQName();
-        }
-
-        if (!MarkerRebuildUtility.rebuildStubJarFileMarkers(m_buildJaxWsBean, m_wsdlResource, portTypeQName, m_sunJaxWsBean.getServiceQNameSafe(), m_bundle, m_markerGroupUUID)) {
-          return;
-        }
       }
       catch (Exception e) {
         JaxWsSdk.logWarning("failed to update markers", e);
@@ -359,7 +361,13 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
   }
 
   private Definition loadWsdlDefinition() {
-    IFile file = JaxWsSdkUtility.getFile(m_bundle, m_sunJaxWsBean.getWsdl(), false);
+    final IFile file;
+    if (m_sunJaxWsBean == null || m_sunJaxWsBean.getWsdl() == null) {
+      file = null;
+    }
+    else {
+      file = JaxWsSdkUtility.getFile(m_bundle, new Path(m_sunJaxWsBean.getWsdl()), false);
+    }
     if (!getWsdlResource().isSameFile(file)) {
       getWsdlResource().setFile(file);
     }
@@ -405,6 +413,10 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
       m_portTypeChangedListener.setType(portType);
     }
     return portType;
+  }
+
+  public String getAlias() {
+    return m_alias;
   }
 
   public SunJaxWsBean getSunJaxWsBean() {
@@ -490,7 +502,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
       if (event == EVENT_SUNJAXWS_HANDLER_CHANGED || event == EVENT_SUNJAXWS_URL_PATTERN_CHANGED) {
         reloadPage(DATA_SUN_JAXWS_ENTRY);
       }
-      else if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_WSDL_REPLACED) {
+      else if (event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED || event == EVENT_WSDL_REPLACED || event == EVENT_UNKNOWN) {
         reloadPage(DATA_SUN_JAXWS_ENTRY | DATA_WSDL_FILE);
       }
       else {
@@ -540,7 +552,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
 
     @Override
     protected void typeChanged() {
-      reloadPage(DATA_JDT_TYPE);
+      reloadPage(DATA_ENDPOINT_TYPE);
     }
   }
 }

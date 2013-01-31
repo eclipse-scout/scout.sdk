@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -30,13 +31,13 @@ import org.eclipse.scout.sdk.ws.jaxws.operation.WsConsumerDeleteOperation;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ResourceSelectionWizardPage;
+import org.eclipse.scout.sdk.ws.jaxws.util.IFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 
 public class WsConsumerDeleteWizard extends AbstractWorkspaceWizard {
 
@@ -60,7 +61,7 @@ public class WsConsumerDeleteWizard extends AbstractWorkspaceWizard {
   }
 
   private List<ElementBean> getElementsToBeDeleted() {
-    List<ElementBean> elements = new LinkedList<ElementBean>();
+    final List<ElementBean> elements = new LinkedList<ElementBean>();
     // registration
     elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REGISTRATION, "Registration entry in build-jaxws.xml", JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), true));
 
@@ -78,57 +79,52 @@ public class WsConsumerDeleteWizard extends AbstractWorkspaceWizard {
 
     IFile stubJarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_buildJaxWsBean, wsdlFileName);
     if (stubJarFile != null && stubJarFile.exists()) {
-      elements.add(new ElementBean(WsConsumerDeleteOperation.ID_STUB, "Stub JAR file '" + stubJarFile.getFullPath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.Jar), stubJarFile, false));
+      elements.add(new ElementBean(WsConsumerDeleteOperation.ID_STUB, "Stub JAR file '" + stubJarFile.getFullPath().toString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.Jar), stubJarFile, false));
     }
 
     // WSDL file
     IFile wsdlFile = null;
     if (m_buildJaxWsBean != null && StringUtility.hasText(m_buildJaxWsBean.getWsdl())) {
-      wsdlFile = JaxWsSdkUtility.getFile(m_bundle, m_buildJaxWsBean.getWsdl(), false);
+      wsdlFile = JaxWsSdkUtility.getFile(m_bundle, new Path(m_buildJaxWsBean.getWsdl()), false);
     }
     if (wsdlFile != null && wsdlFile.exists()) {
-      elements.add(new ElementBean(WsConsumerDeleteOperation.ID_WSDL_FILE, "WSDL file '" + wsdlFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, false));
+      elements.add(new ElementBean(WsConsumerDeleteOperation.ID_WSDL_FILE, "WSDL file '" + wsdlFile.getProjectRelativePath().toString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, false));
     }
 
-    if (wsdlFile != null) {
-      Artefact[] artefacts = SchemaUtility.getArtefacts(wsdlFile, false);
-      for (Artefact artefact : artefacts) {
-        // referenced WSDL definitions
-        if (artefact instanceof WsdlArtefact) {
-          WsdlArtefact wsdlArtefact = (WsdlArtefact) artefact;
-          if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
-            IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, wsdlArtefact.getFile());
-            if (referencedWsdlFile != null && referencedWsdlFile.exists()) {
-              elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_WSDL, "Referenced WSDL file '" + referencedWsdlFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), referencedWsdlFile, false));
-            }
-          }
-        }
-        // imported XSD schemas
-        if (artefact instanceof SchemaImportArtefact) {
-          SchemaImportArtefact schemaArtefact = (SchemaImportArtefact) artefact;
-          IFile importedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
-          if (importedSchemaFile != null && importedSchemaFile.exists()) {
-            elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, "Imported XSD schema '" + importedSchemaFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), importedSchemaFile, false));
-          }
-        }
+    SchemaUtility.visitArtefacts(wsdlFile, new SchemaArtefactVisitor<IFile>() {
 
-        // included XSD schemas
-        if (artefact instanceof SchemaIncludeArtefact) {
-          SchemaIncludeArtefact schemaArtefact = (SchemaIncludeArtefact) artefact;
-          IFile includedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
-          if (includedSchemaFile != null && includedSchemaFile.exists()) {
-            elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, "Included XSD schema '" + includedSchemaFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), includedSchemaFile, false));
-          }
+      @Override
+      public void onReferencedWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
+        IFileHandle<IFile> fileHandle = wsdlArtefact.getFileHandle();
+        if (fileHandle != null && fileHandle.exists()) {
+          elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_WSDL, String.format("Referenced WSDL file '%s'", fileHandle.getFullPath().toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), fileHandle.getFile(), false));
         }
       }
-    }
+
+      @Override
+      public void onSchemaIncludeArtefact(SchemaIncludeArtefact<IFile> schemaIncludeArtefact) {
+        IFileHandle<IFile> fileHandle = schemaIncludeArtefact.getFileHandle();
+        if (fileHandle != null && fileHandle.exists()) {
+          elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, String.format("Included XSD schema '%s'", fileHandle.getFullPath().toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
+        }
+      }
+
+      @Override
+      public void onSchemaImportArtefact(SchemaImportArtefact<IFile> schemaImportArtefact) {
+        IFileHandle<IFile> fileHandle = schemaImportArtefact.getFileHandle();
+        if (fileHandle != null && fileHandle.exists()) {
+          elements.add(new ElementBean(WsConsumerDeleteOperation.ID_REF_XSD, String.format("Imported XSD schema '%s'", fileHandle.getFullPath().toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
+        }
+      }
+
+    });
 
     // binding file
     if (m_buildJaxWsBean != null) {
       IFile[] bindingFiles = JaxWsSdkUtility.getBindingFiles(m_bundle, m_buildJaxWsBean.getPropertiers());
       for (IFile bindingFile : bindingFiles) {
         if (bindingFile != null && bindingFile.exists()) {
-          elements.add(new ElementBean(WsConsumerDeleteOperation.ID_BINDING_FILE, "Binding file '" + bindingFile.getProjectRelativePath().toPortableString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.BindingFile), bindingFile, false));
+          elements.add(new ElementBean(WsConsumerDeleteOperation.ID_BINDING_FILE, String.format("Binding file '%s'", bindingFile.getProjectRelativePath().toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.BindingFile), bindingFile, false));
         }
       }
     }

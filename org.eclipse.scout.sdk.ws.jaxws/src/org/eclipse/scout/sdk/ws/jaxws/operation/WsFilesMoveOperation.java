@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
@@ -33,7 +34,7 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 
 public class WsFilesMoveOperation implements IOperation {
 
@@ -80,14 +81,14 @@ public class WsFilesMoveOperation implements IOperation {
             break;
           }
           case ID_WSDL_SUNJAXWS_REGISTRATION: {
-            wsdlFileName = JaxWsSdkUtility.getFile(m_bundle, m_sunJaxWsBean.getWsdl(), false).getName();
-            m_sunJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_destination.getProjectRelativePath().append(wsdlFileName).toPortableString(), SeparatorType.None));
+            wsdlFileName = new Path(m_sunJaxWsBean.getWsdl()).lastSegment();
+            m_sunJaxWsBean.setWsdl(PathNormalizer.toWsdlPath(m_destination.getProjectRelativePath().append(wsdlFileName).toString()));
             ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
             break;
           }
           case ID_WSDL_BUILDJAXWS_REGISTRATION: {
-            wsdlFileName = JaxWsSdkUtility.getFile(m_bundle, m_buildJaxWsBean.getWsdl(), false).getName();
-            m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_destination.getProjectRelativePath().append(wsdlFileName).toPortableString(), SeparatorType.None));
+            wsdlFileName = new Path(m_buildJaxWsBean.getWsdl()).lastSegment();
+            m_buildJaxWsBean.setWsdl(PathNormalizer.toWsdlPath(m_destination.getProjectRelativePath().append(wsdlFileName).toString()));
             ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
             break;
           }
@@ -131,7 +132,7 @@ public class WsFilesMoveOperation implements IOperation {
     }
     try {
       // ensure folder to be created
-      JaxWsSdkUtility.getFolder(m_bundle, destinationFolderPath.getProjectRelativePath().toPortableString(), true);
+      JaxWsSdkUtility.getFolder(m_bundle, destinationFolderPath.getProjectRelativePath(), true);
       // move file
       file.move(destinationFolderPath.getFullPath().append(file.getName()), true, true, monitor);
     }

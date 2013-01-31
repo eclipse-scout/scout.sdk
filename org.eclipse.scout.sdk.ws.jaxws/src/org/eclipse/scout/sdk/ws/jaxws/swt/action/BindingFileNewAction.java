@@ -17,7 +17,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -60,7 +60,7 @@ public class BindingFileNewAction extends AbstractLinkAction {
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     SchemaCandidate schemaCandidate = null;
     try {
-      schemaCandidate = GlobalBindingRegistrationHelper.popupForSchema(m_bundle, m_wsdlResource.getFile());
+      schemaCandidate = GlobalBindingRegistrationHelper.popupForSchema(m_wsdlResource.getFile());
     }
     catch (CoreException e) {
       if (e.getStatus() != null && e.getStatus().getCode() == Status.CANCEL_STATUS.getCode()) {
@@ -70,22 +70,21 @@ public class BindingFileNewAction extends AbstractLinkAction {
 
     BindingFileCreateOperation op = new BindingFileCreateOperation();
     if (schemaCandidate != null) {
-      WsdlArtefact wsdlArtefact = schemaCandidate.getWsdlArtefact();
+      WsdlArtefact<IFile> wsdlArtefact = schemaCandidate.getWsdlArtefact();
       if (wsdlArtefact.getInlineSchemas().length > 1) {
         op.setSchemaTargetNamespace(SchemaUtility.getSchemaTargetNamespace(schemaCandidate.getSchema()));
       }
-      if (schemaCandidate.getWsdlArtefact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
-        IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, schemaCandidate.getWsdlArtefact().getFile());
-        op.setWsdlLocation(referencedWsdlFile);
+      if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+        op.setWsdlLocation(wsdlArtefact.getFileHandle().getFile());
       }
     }
 
-    String bindingFileName = JaxWsSdkUtility.createUniqueBindingFileNamePath(m_bundle, m_buildJaxWsBean.getAlias(), op.getSchemaTargetNamespace());
+    IPath bindingFilePath = JaxWsSdkUtility.toUniqueProjectRelativeBindingFilePath(m_bundle, m_buildJaxWsBean.getAlias(), op.getSchemaTargetNamespace());
     Map<String, List<String>> properties = m_buildJaxWsBean.getPropertiers();
-    JaxWsSdkUtility.addBuildProperty(properties, JaxWsConstants.OPTION_BINDING_FILE, bindingFileName);
+    JaxWsSdkUtility.addBuildProperty(properties, JaxWsConstants.OPTION_BINDING_FILE, bindingFilePath.toString());
 
     op.setBundle(m_bundle);
-    op.setProjectRelativeFilePath(new Path(bindingFileName));
+    op.setProjectRelativePath(bindingFilePath);
     op.setWsdlDestinationFolder(JaxWsSdkUtility.getParentFolder(m_bundle, m_wsdlResource.getFile()));
     op.setCreateGlobalBindingSection(!JaxWsSdkUtility.containsGlobalBindingSection(m_bundle, properties, false));
     new OperationJob(op).schedule();

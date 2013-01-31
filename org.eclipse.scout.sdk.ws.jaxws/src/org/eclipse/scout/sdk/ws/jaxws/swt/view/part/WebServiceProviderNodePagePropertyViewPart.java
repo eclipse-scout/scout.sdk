@@ -69,13 +69,13 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.UrlPatternPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFilePresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFolderPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.IFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPresenterValueChangedListener;
@@ -364,7 +364,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       applyLayoutData(m_wsdlFolderPresenter);
 
       // wsdl file
-      m_wsdlFilePresenter = new WsdlFilePresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
+      m_wsdlFilePresenter = new WsdlFilePresenter(m_bundle, getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit());
       m_wsdlFilePresenter.setLabel(Texts.get("WsdlFile"));
       m_wsdlFilePresenter.setBundle(m_bundle);
       m_wsdlFilePresenter.setMarkerType(MarkerType.Wsdl);
@@ -457,12 +457,12 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
     IFile wsdlFile = getPage().getWsdlResource().getFile();
     if (wsdlFile != null) {
       IPath wsdlFolderPath = wsdlFile.getProjectRelativePath().removeLastSegments(1);
-      IFolder folder = JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath.toPortableString(), false);
+      IFolder folder = JaxWsSdkUtility.getFolder(m_bundle, wsdlFolderPath, false);
       if (folder == null) {
         folder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false);
       }
       m_wsdlFolderPresenter.setInput(folder);
-      m_wsdlFilePresenter.setFileDirectory(folder.getProjectRelativePath().toPortableString());
+      m_wsdlFilePresenter.setFileDirectory(folder);
     }
     m_wsdlFolderPresenter.setBuildJaxWsBean(buildJaxWsBean);
     m_wsdlFolderPresenter.setSunJaxWsBean(sunJaxWsBean);
@@ -563,47 +563,43 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient());
 
       WsdlResource wsdlResource = getPage().getWsdlResource();
-      Artefact[] artefacts = SchemaUtility.getArtefacts(wsdlResource.getFile(), false);
+      SchemaUtility.visitArtefacts(wsdlResource.getFile(), new SchemaArtefactVisitor<IFile>() {
 
-      for (Artefact artefact : artefacts) {
-        // referenced WSDL definitions
-        if (artefact instanceof WsdlArtefact) {
-          WsdlArtefact wsdlArtefact = (WsdlArtefact) artefact;
-          if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
-            IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, wsdlArtefact.getFile());
-            FileOpenAction action = new FileOpenAction();
-            action.init(referencedWsdlFile, referencedWsdlFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
+        @Override
+        public void onReferencedWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
+          IFileHandle<IFile> fileHandle = wsdlArtefact.getFileHandle();
+          FileOpenAction action = new FileOpenAction();
+          action.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
 
-            ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient(), action, getFormToolkit());
-            actionPresenter.setEnabled(referencedWsdlFile.exists());
-            applyLayoutData(actionPresenter);
-          }
-        }
-        // imported XSD schemas
-        if (artefact instanceof SchemaImportArtefact) {
-          SchemaImportArtefact schemaArtefact = (SchemaImportArtefact) artefact;
-          IFile importedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
-
-          FileOpenAction b = new FileOpenAction();
-          b.init(importedSchemaFile, importedSchemaFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
-          b.setToolTip("namespace: " + StringUtility.nvl(schemaArtefact.getNamespaceUri(), "?"));
-          ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient(), b, getFormToolkit());
-          actionPresenter.setEnabled(importedSchemaFile.exists());
+          ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient(), action, getFormToolkit());
+          actionPresenter.setEnabled(fileHandle.exists());
           applyLayoutData(actionPresenter);
         }
 
-        // included XSD schemas
-        if (artefact instanceof SchemaIncludeArtefact) {
-          SchemaIncludeArtefact schemaArtefact = (SchemaIncludeArtefact) artefact;
-          IFile includedSchemaFile = JaxWsSdkUtility.toFile(m_bundle, schemaArtefact.getFile());
+        @Override
+        public void onSchemaIncludeArtefact(SchemaIncludeArtefact<IFile> schemaIncludeArtefact) {
+          IFileHandle<IFile> fileHandle = schemaIncludeArtefact.getFileHandle();
 
           FileOpenAction b = new FileOpenAction();
-          b.init(includedSchemaFile, includedSchemaFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
           ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient(), b, getFormToolkit());
-          actionPresenter.setEnabled(includedSchemaFile.exists());
+          actionPresenter.setEnabled(fileHandle.exists());
           applyLayoutData(actionPresenter);
         }
-      }
+
+        @Override
+        public void onSchemaImportArtefact(SchemaImportArtefact<IFile> schemaImportArtefact) {
+          IFileHandle<IFile> fileHandle = schemaImportArtefact.getFileHandle();
+
+          FileOpenAction b = new FileOpenAction();
+          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          b.setToolTip("namespace: " + StringUtility.nvl(schemaImportArtefact.getNamespaceUri(), "?"));
+          ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient(), b, getFormToolkit());
+          actionPresenter.setEnabled(fileHandle.exists());
+          applyLayoutData(actionPresenter);
+        }
+
+      });
     }
     catch (Exception e) {
       JaxWsSdk.logError(e);
@@ -687,8 +683,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
 
       IFile[] bindingFiles = JaxWsSdkUtility.getBindingFiles(m_bundle, buildJaxWsBean.getPropertiers());
       for (int index = 0; index < bindingFiles.length; index++) {
-        BindingFilePresenter filePresenter = new BindingFilePresenter(m_bindingFilesComposite, getFormToolkit());
-        filePresenter.setBundle(m_bundle);
+        BindingFilePresenter filePresenter = new BindingFilePresenter(m_bundle, m_bindingFilesComposite, getFormToolkit());
         filePresenter.setMarkerGroupUUID(JaxWsSdkUtility.toMarkerGroupUUID(getPage().getMarkerGroupUUID(), index));
         filePresenter.setInput(bindingFiles[index]);
         filePresenter.setBuildJaxWsBean(buildJaxWsBean);

@@ -10,35 +10,33 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 
+import javax.jws.WebService;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.operation.AnnotationUpdateOperation;
 
-public class MissingAnnotationTypePropertyCommand extends AbstractExecutableMarkerCommand {
+public class MissingWebServiceAnnotationCommand extends AbstractExecutableMarkerCommand {
 
-  private IType m_declaringType;
+  private IType m_implType;
   private IType m_annotationType;
-  private String m_property;
-  private IType m_propertyValue;
 
-  public MissingAnnotationTypePropertyCommand(IType declaringType, IType annotationType, String property, IType propertyValue) {
-    super("Invalid annotation declaration");
-    m_declaringType = declaringType;
-    m_annotationType = annotationType;
-    m_property = property;
-    m_propertyValue = propertyValue;
-    setSolutionDescription("By using this task, the annotation declaration is updated.");
+  public MissingWebServiceAnnotationCommand(IType implType) {
+    super(String.format("Missing @%s annotation", WebService.class.getSimpleName()));
+    m_implType = implType;
+    m_annotationType = TypeUtility.getType(WebService.class.getName());
+    setSolutionDescription(String.format("By using this task, the @%s annotation is added.", WebService.class.getSimpleName()));
   }
 
   @Override
   public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     AnnotationUpdateOperation op = new AnnotationUpdateOperation();
-    op.setDeclaringType(m_declaringType);
+    op.setDeclaringType(m_implType);
     op.setAnnotationType(m_annotationType);
-    op.addTypeProperty(m_property, m_propertyValue);
     new OperationJob(op).schedule();
   }
 }

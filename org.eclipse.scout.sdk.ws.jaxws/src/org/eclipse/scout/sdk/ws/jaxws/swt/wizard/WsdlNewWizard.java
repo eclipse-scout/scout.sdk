@@ -23,8 +23,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsPropertiesNewWsdlWizardPage;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 
 public class WsdlNewWizard extends AbstractWorkspaceWizard {
 
@@ -80,7 +79,7 @@ public class WsdlNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
-    String targetNamespace = JaxWsSdkUtility.normalizePath(m_wizardPage.getTargetNamespace(), SeparatorType.TrailingType);
+    String targetNamespace = PathNormalizer.toTargetNamespace(m_wizardPage.getTargetNamespace());// TODO dwi verify
 
     m_operation = new WsdlCreateOperation();
     m_operation.setBundle(m_bundle);
@@ -104,12 +103,12 @@ public class WsdlNewWizard extends AbstractWorkspaceWizard {
 
     if (m_sunJaxWsBean != null) {
       // update entry in sunJaxWs.xml
-      m_sunJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlResource.getFile().getName(), SeparatorType.None));
+      m_sunJaxWsBean.setWsdl(PathNormalizer.toWsdlPath(m_wsdlResource.getFile().getProjectRelativePath().toString())); // TODO dwi verify
       ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
     }
     else {
       // update entry in buildJaxWs.xml
-      m_buildJaxWsBean.setWsdl(JaxWsSdkUtility.normalizePath(m_wsdlResource.getFile().getName(), SeparatorType.None));
+      m_buildJaxWsBean.setWsdl(PathNormalizer.toWsdlPath(m_wsdlResource.getFile().getProjectRelativePath().toString())); // TODO dwi verify
       ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
     }
     return true;

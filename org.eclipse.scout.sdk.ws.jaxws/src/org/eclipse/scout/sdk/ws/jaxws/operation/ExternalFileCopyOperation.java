@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
+import org.eclipse.scout.sdk.ws.jaxws.util.JavaFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class ExternalFileCopyOperation implements IOperation {
@@ -63,7 +64,7 @@ public class ExternalFileCopyOperation implements IOperation {
         tempProject.open(new NullProgressMonitor());
       }
 
-      Path path = new Path(m_externalFile.getAbsolutePath());
+      IPath path = new JavaFileHandle(m_externalFile).getFullPath();
       IFile link = tempProject.getFile(path.lastSegment());
       link.createLink(path, IResource.NONE, new NullProgressMonitor());
 
@@ -78,18 +79,18 @@ public class ExternalFileCopyOperation implements IOperation {
             targetFile.delete(true, true, new NullProgressMonitor());
           }
           else {
-            throw new CoreException(new ScoutStatus("File '" + targetFile.getFullPath().toPortableString() + "' already exists."));
+            throw new CoreException(new ScoutStatus("File '" + targetFile.getFullPath().toString() + "' already exists."));
           }
         }
 
         // create folder if not exist yet
-        JaxWsSdkUtility.getFolder(m_bundle, m_workspacePath.toPortableString(), true);
+        JaxWsSdkUtility.getFolder(m_bundle, m_workspacePath, true);
         IPath destination = projectPath.append(relativePath);
         link.copy(destination, true, new NullProgressMonitor());
         m_fileCopied = m_bundle.getProject().getFile(destination.makeRelativeTo(projectPath));
       }
       else {
-        throw new CoreException(new ScoutStatus("Temporary link '" + link.getFullPath().toPortableString() + "' is not accessible."));
+        throw new CoreException(new ScoutStatus("Temporary link '" + link.getFullPath().toString() + "' is not accessible."));
       }
     }
     finally {
@@ -144,5 +145,4 @@ public class ExternalFileCopyOperation implements IOperation {
   public void setOverwrite(boolean overwrite) {
     m_overwrite = overwrite;
   }
-
 }

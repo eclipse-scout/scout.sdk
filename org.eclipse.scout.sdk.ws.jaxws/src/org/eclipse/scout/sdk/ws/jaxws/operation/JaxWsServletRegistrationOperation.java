@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 
 public class JaxWsServletRegistrationOperation implements IOperation {
@@ -93,7 +93,8 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xml.getDocument(), IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
 
     String jaxWsServletClass = TypeUtility.getType(JaxWsRuntimeClasses.JaxWsServlet).getFullyQualifiedName();
-    String alias = StringUtility.trim(JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType));
+
+    String alias = PathNormalizer.toServletAlias(m_jaxWsAlias);
 
     // get original alias of servlet registration bundle and remove the servlet registration to be registered anew
     PluginModelHelper h = new PluginModelHelper(m_registrationBundle.getProject());
@@ -161,7 +162,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
               if (originalAlias != null && endpointPattern.startsWith(originalAlias)) {
                 endpointPattern = endpointPattern.substring(originalAlias.length());
               }
-              String urlPattern = JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.BothType) + JaxWsSdkUtility.normalizePath(endpointPattern, SeparatorType.None);
+              String urlPattern = PathNormalizer.toUrlPattern(alias, endpointPattern);
               sunJaxWsEntryBean.setUrlPattern(urlPattern);
             }
             if (changedEntries.size() > 0) {
@@ -175,11 +176,12 @@ public class JaxWsServletRegistrationOperation implements IOperation {
       JaxWsSdk.logError("faild to update URL-pattern", e);
     }
 
-    // change new URL pattenr
+    // change new URL pattern
     if (m_sunJaxWsBean != null && m_urlPattern != null) {
-      String urlPattern = m_urlPattern;
-      if (!JaxWsSdkUtility.normalizePath(m_urlPattern, SeparatorType.LeadingType).startsWith(JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType))) {
-        urlPattern = JaxWsSdkUtility.normalizePath(m_jaxWsAlias, SeparatorType.LeadingType) + JaxWsSdkUtility.normalizePath(m_urlPattern, SeparatorType.LeadingType);
+      String urlPattern = PathNormalizer.toUrlPattern(m_urlPattern);
+
+      if (!urlPattern.startsWith(alias)) {
+        urlPattern = PathNormalizer.toUrlPattern(alias, urlPattern);
       }
       m_sunJaxWsBean.setUrlPattern(urlPattern);
       ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());

@@ -26,8 +26,9 @@ public class ValidationRuleMethod {
   private final IMethod m_annotatedMethod;
   private final IMethod m_implementedMethod;
   private final ITypeHierarchy m_superTypeHierarchy;
+  private final boolean m_skipRule;
 
-  public ValidationRuleMethod(IAnnotation annotation, IField ruleField, String ruleName, String ruleGeneratedSourceCode, IMethod annotatedMethod, IMethod implementedMethod, ITypeHierarchy superTypeHierarchy) {
+  public ValidationRuleMethod(IAnnotation annotation, IField ruleField, String ruleName, String ruleGeneratedSourceCode, IMethod annotatedMethod, IMethod implementedMethod, ITypeHierarchy superTypeHierarchy, boolean skipRule) {
     m_annotation = annotation;
     m_ruleField = ruleField;
     m_ruleName = ruleName;
@@ -35,6 +36,7 @@ public class ValidationRuleMethod {
     m_annotatedMethod = annotatedMethod;
     m_implementedMethod = implementedMethod;
     m_superTypeHierarchy = superTypeHierarchy;
+    m_skipRule = skipRule;
   }
 
   /**
@@ -86,4 +88,10 @@ public class ValidationRuleMethod {
     return m_superTypeHierarchy;
   }
 
+  /**
+   * @return Returns <code>true</code> if this rule should be skipped.
+   */
+  public boolean isSkipRule() {
+    return m_skipRule;
+  }
 }

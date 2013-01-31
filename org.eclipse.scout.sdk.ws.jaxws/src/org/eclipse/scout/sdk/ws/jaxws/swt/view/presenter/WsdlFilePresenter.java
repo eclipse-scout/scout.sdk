@@ -12,12 +12,14 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.WsdlLocationWizard;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.widgets.Composite;
 
 public class WsdlFilePresenter extends FilePresenter {
@@ -25,16 +27,17 @@ public class WsdlFilePresenter extends FilePresenter {
   private BuildJaxWsBean m_buildJaxWsBean;
   private SunJaxWsBean m_sunJaxWsBean;
 
-  public WsdlFilePresenter(Composite parent, PropertyViewFormToolkit toolkit) {
+  public WsdlFilePresenter(IScoutBundle bundle, Composite parent, PropertyViewFormToolkit toolkit) {
     super(parent, toolkit);
+    setBundle(bundle);
     setLabel(Texts.get("WsdlFile"));
     setUseLinkAsLabel(true);
     setFileExtension("wsdl");
     if (m_sunJaxWsBean != null) {
-      setFileDirectory(JaxWsConstants.PATH_WSDL_PROVIDER);
+      setFileDirectory(JaxWsSdkUtility.getFolder(bundle, JaxWsConstants.PATH_WSDL_PROVIDER, false));
     }
     else {
-      setFileDirectory(JaxWsConstants.PATH_WSDL_CONSUMER);
+      setFileDirectory(JaxWsSdkUtility.getFolder(bundle, JaxWsConstants.PATH_WSDL_CONSUMER, false));
     }
   }
 

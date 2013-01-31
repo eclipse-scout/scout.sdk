@@ -93,7 +93,7 @@ public class XmlResource extends ManagedResource {
 
         m_modificationStamp = ManagedResource.API_MODIFICATION_STAMP;
         try {
-          JaxWsSdkUtility.prepareFileAccess(m_file, true);
+          JaxWsSdkUtility.ensureFileAccessibleAndRegistered(m_file, true);
           m_file.setContents(new ByteArrayInputStream(os.toByteArray()), true, true, monitor);
           m_xmlDocument = xmlDocument;
         }

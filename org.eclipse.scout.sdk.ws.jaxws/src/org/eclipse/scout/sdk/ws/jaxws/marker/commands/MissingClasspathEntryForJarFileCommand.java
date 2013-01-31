@@ -16,8 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 
 public class MissingClasspathEntryForJarFileCommand extends AbstractExecutableMarkerCommand {
 
@@ -33,7 +32,7 @@ public class MissingClasspathEntryForJarFileCommand extends AbstractExecutableMa
 
   @Override
   public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    String jarFilePath = JaxWsSdkUtility.normalizePath(m_stubJarFile.getProjectRelativePath().toPortableString(), SeparatorType.None);
+    String jarFilePath = PathNormalizer.toJarPath(m_stubJarFile.getProjectRelativePath().toString());
     PluginModelHelper h = new PluginModelHelper(m_bundle.getProject());
     h.Manifest.addClasspathEntry(jarFilePath);
     h.save();

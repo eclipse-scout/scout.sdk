@@ -26,7 +26,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -57,7 +56,6 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WsdlSelectionWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper;
 import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper.SchemaCandidate;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility.SeparatorType;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
@@ -163,7 +161,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
       File wsdlFile = m_wsdlLocationWizardPage.getWsdlFile();
 
       List<ExternalFileCopyOperation> copyOperations = new LinkedList<ExternalFileCopyOperation>();
-      if (isCopyRequired(m_wsdlLocationWizardPage.getWsdlFolder(), wsdlFile)) {
+      if (!JaxWsSdkUtility.existsFileInProject(m_bundle, wsdlFolder, wsdlFile)) {
         ExternalFileCopyOperation op = new ExternalFileCopyOperation();
         op.setBundle(m_bundle);
         op.setOverwrite(true);
@@ -173,7 +171,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
       }
 
       for (File file : m_wsdlLocationWizardPage.getAdditionalFiles()) {
-        if (isCopyRequired(m_wsdlLocationWizardPage.getWsdlFolder(), file)) {
+        if (!JaxWsSdkUtility.existsFileInProject(m_bundle, wsdlFolder, file)) {
           ExternalFileCopyOperation op = new ExternalFileCopyOperation();
           op.setBundle(m_bundle);
           op.setOverwrite(true);
@@ -246,7 +244,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
       m_wsdlCreateOperation.setAlias(m_alias);
 
       WsdlResource wsdlResource = new WsdlResource(m_bundle);
-      wsdlResource.setFile(JaxWsSdkUtility.getFile(m_bundle, wsdlFolder.getProjectRelativePath().append(m_wsPropertiesNewWsdlWizardPage.getWsdlName()).toPortableString(), false));
+      wsdlResource.setFile(JaxWsSdkUtility.getFile(m_bundle, wsdlFolder.getProjectRelativePath().append(m_wsPropertiesNewWsdlWizardPage.getWsdlName()), false));
       m_wsdlCreateOperation.setWsdlResource(wsdlResource);
       m_wsdlCreateOperation.setTargetNamespace(targetNamespace);
       m_wsdlCreateOperation.setService(m_wsPropertiesNewWsdlWizardPage.getServiceName());
@@ -282,7 +280,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     m_sunJaxWsEntryCreateOperation.setServiceQName(serviceQName);
     m_sunJaxWsEntryCreateOperation.setPortQName(portQName);
     m_sunJaxWsEntryCreateOperation.setUrlPattern(urlPattern);
-    m_sunJaxWsEntryCreateOperation.setWsdlFile(JaxWsSdkUtility.normalizePath(wsdlFolder.getProjectRelativePath().toPortableString(), SeparatorType.TrailingType) + wsdlFileName);
+    m_sunJaxWsEntryCreateOperation.setWsdlProjectRelativePath(wsdlFolder.getProjectRelativePath().append(wsdlFileName));
 
     m_stubGenerationOperation = new WsStubGenerationOperation();
     m_stubGenerationOperation.setBundle(m_bundle);
@@ -330,7 +328,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
           wsdlResource = m_wsdlCreateOperation.getWsdlResource();
         }
         else {
-          IFile wsdlFile = JaxWsSdkUtility.getFile(m_bundle, m_sunJaxWsEntryCreateOperation.getWsdlFileName(), false);
+          IFile wsdlFile = JaxWsSdkUtility.getFile(m_bundle, m_sunJaxWsEntryCreateOperation.getWsdlProjectRelativePath(), false);
           wsdlResource = new WsdlResource(m_bundle);
           wsdlResource.setFile(wsdlFile);
         }
@@ -346,18 +344,17 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
             schemaTargetNamespace = SchemaUtility.getSchemaTargetNamespace(candidate.getSchema());
           }
 
-          String bindingFileName = JaxWsSdkUtility.createUniqueBindingFileNamePath(m_bundle, m_alias, schemaTargetNamespace);
+          IPath bindingFilePath = JaxWsSdkUtility.toUniqueProjectRelativeBindingFilePath(m_bundle, m_alias, schemaTargetNamespace);
 
           BindingFileCreateOperation op = new BindingFileCreateOperation();
           op.setBundle(m_bundle);
           op.setWsdlDestinationFolder(m_wsdlLocationWizardPage.getWsdlFolder());
           op.setSchemaTargetNamespace(schemaTargetNamespace);
           if (candidate.getWsdlArtefact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
-            IFile referencedWsdlFile = JaxWsSdkUtility.toFile(m_bundle, candidate.getWsdlArtefact().getFile());
-            op.setWsdlLocation(referencedWsdlFile);
+            op.setWsdlLocation(candidate.getWsdlArtefact().getFileHandle().getFile());
           }
-          op.setProjectRelativeFilePath(new Path(bindingFileName));
-          JaxWsSdkUtility.addBuildProperty(buildProperties, JaxWsConstants.OPTION_BINDING_FILE, bindingFileName);
+          op.setProjectRelativePath(bindingFilePath);
+          JaxWsSdkUtility.addBuildProperty(buildProperties, JaxWsConstants.OPTION_BINDING_FILE, bindingFilePath.toString());
 
           // Global binding file section can only be defined in one file -> pick first
           if (i == 0) {
@@ -374,7 +371,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
         m_stubGenerationOperation.validate();
         m_stubGenerationOperation.run(monitor, workingCopyManager);
 
-        IFile stubJarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_buildJaxWsEntryCreateOperation.getBuildProperties(), m_sunJaxWsEntryCreateOperation.getWsdlFileName());
+        IFile stubJarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_buildJaxWsEntryCreateOperation.getBuildProperties(), m_sunJaxWsEntryCreateOperation.getWsdlProjectRelativePath().lastSegment());
         IType portTypeInterfaceType = JaxWsSdkUtility.resolvePortTypeInterfaceType(m_portTypeQName, stubJarFile);
 
         // wait for stub JAR to be part of the classpth
@@ -428,21 +425,6 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     finally {
       JaxWsSdk.getDefault().getMarkerQueueManager().resume();
     }
-  }
-
-  private boolean isCopyRequired(IFolder wsdlFolder, File wsdlFile) {
-    IFile potentialSameFile = JaxWsSdkUtility.getFile(m_bundle, wsdlFolder.getProjectRelativePath().toPortableString(), wsdlFile.getName(), false);
-
-    if (potentialSameFile != null && potentialSameFile.exists()) {
-      IPath potentialSameFilePath = new Path(potentialSameFile.getLocationURI().getRawPath());
-      IPath wsdlFilePath = new Path(wsdlFile.getAbsolutePath());
-
-      if (potentialSameFilePath.equals(wsdlFilePath)) {
-        return false;
-      }
-    }
-
-    return true;
   }
 
   private class P_WsdlSelectionPropertyListener implements PropertyChangeListener {

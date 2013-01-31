@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -129,7 +129,7 @@ public class SourceFolderSelectionDialog extends TitleAreaDialog {
     @Override
     public void update(ViewerCell cell) {
       IClasspathEntry sourceFolderEntry = (IClasspathEntry) cell.getElement();
-      cell.setText(sourceFolderEntry.getPath().toPortableString());
+      cell.setText(sourceFolderEntry.getPath().toString());
 
       cell.setImage(JaxWsSdk.getImage(JaxWsIcons.SourceFolder));
     }

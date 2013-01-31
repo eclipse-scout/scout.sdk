@@ -18,7 +18,6 @@ import java.io.ByteArrayOutputStream;
 
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
-import javax.wsdl.xml.WSDLReader;
 import javax.wsdl.xml.WSDLWriter;
 
 import org.eclipse.core.runtime.CoreException;
@@ -29,7 +28,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
+import org.eclipse.scout.sdk.ws.jaxws.util.EclipseFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class WsdlResource extends ManagedResource {
@@ -49,16 +48,7 @@ public class WsdlResource extends ManagedResource {
 
       if (m_wsdlDefinition == null || m_file.getModificationStamp() != m_modificationStamp) {
         m_modificationStamp = m_file.getModificationStamp();
-        m_wsdlDefinition = null;
-
-        try {
-          WSDLFactory factory = WSDLFactory.newInstance();
-          WSDLReader reader = factory.newWSDLReader();
-          m_wsdlDefinition = reader.readWSDL(m_file.getRawLocationURI().getPath());
-        }
-        catch (Exception e) {
-          JaxWsSdk.logError("Could not load WSDL file '" + m_file.getName() + "'", e);
-        }
+        m_wsdlDefinition = JaxWsSdkUtility.loadWsdlDefinition(new EclipseFileHandle(m_file));
       }
     }
 
@@ -99,7 +89,7 @@ public class WsdlResource extends ManagedResource {
 
         m_modificationStamp = ManagedResource.API_MODIFICATION_STAMP;
         try {
-          JaxWsSdkUtility.prepareFileAccess(m_file, true);
+          JaxWsSdkUtility.ensureFileAccessibleAndRegistered(m_file, true);
           m_file.setContents(new ByteArrayInputStream(os.toByteArray()), true, true, monitor);
           m_wsdlDefinition = definition;
         }

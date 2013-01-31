@@ -144,10 +144,42 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
   protected void addValidationRules(IType type) {
     // validation rules
     try {
-      List<ValidationRuleMethod> list = ScoutTypeUtility.getValidationRuleMethods(type);
+      boolean replaceAnnotationPresent = ScoutTypeUtility.isReplaceAnnotationPresent(type);
+
+      ITypeHierarchy hierarchy = TypeUtility.getSuperTypeHierarchy(type);
+      if (hierarchy == null) {
+        return;
+      }
+
+      // If the replace annotation is available, we have to check whether the replaced field
+      // is not associated to a form field data
+      boolean superTypeHasNoFormFieldData = false;
+      if (replaceAnnotationPresent) {
+        IType superType = hierarchy.getSuperclass(type);
+        superTypeHasNoFormFieldData = ScoutTypeUtility.getFormDataType(superType, hierarchy) == null;
+      }
+
+      List<ValidationRuleMethod> list = ScoutTypeUtility.getValidationRuleMethods(type, hierarchy.getJdtHierarchy());
       if (list.size() > 0) {
         for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
           ValidationRuleMethod vm = it.next();
+          if (replaceAnnotationPresent) {
+            if (superTypeHasNoFormFieldData && vm.isSkipRule()) {
+              it.remove();
+              continue;
+            }
+            else if (!superTypeHasNoFormFieldData && !type.equals(vm.getImplementedMethod().getDeclaringType())) {
+              // remove all validation rules that are not overridden by the replacement class
+              it.remove();
+              continue;
+            }
+          }
+          else if (vm.isSkipRule()) {
+            // class does not replace its super class. Hence remove all skipped validation rules
+            it.remove();
+            continue;
+          }
+
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
           if (generatedSourceCode != null) {
             if (generatedSourceCode.equals("null")) {
@@ -199,7 +231,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
           //filter
           generatedSourceCode = filterGeneratedSourceCode(vm.getImplementedMethod(), generatedSourceCode, validator);
-          if (generatedSourceCode == null || containsBrackets(generatedSourceCode)) {
+          if (!vm.isSkipRule() && (generatedSourceCode == null || containsBrackets(generatedSourceCode))) {
             //add javadoc warning
             String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
             buf.append("/**");
@@ -225,11 +257,18 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           }
           //
           buf.append(NL);
-          buf.append("ruleMap.put(");
-          buf.append(ruleDecl);
-          buf.append(", ");
-          buf.append(generatedSourceCode);
-          buf.append(");");
+          if (vm.isSkipRule()) {
+            buf.append("ruleMap.remove(");
+            buf.append(ruleDecl);
+            buf.append(");");
+          }
+          else {
+            buf.append("ruleMap.put(");
+            buf.append(ruleDecl);
+            buf.append(", ");
+            buf.append(generatedSourceCode);
+            buf.append(");");
+          }
         }
         catch (Exception e) {
           String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName() + "#" + vm.getImplementedMethod().getElementName();

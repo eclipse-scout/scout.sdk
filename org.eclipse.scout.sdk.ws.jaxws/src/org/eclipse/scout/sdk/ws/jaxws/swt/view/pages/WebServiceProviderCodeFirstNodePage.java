@@ -16,10 +16,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.jws.WebService;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.StringUtility;
@@ -39,6 +42,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderCodeFirstDeleteAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
+import org.eclipse.scout.sdk.ws.jaxws.swt.view.part.AnnotationProperty;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.AbstractTypeChangedListener;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
@@ -46,8 +50,9 @@ import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageReloadNotification;
 
 public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements IMarkerRebuildListener, IPageReloadNotification {
 
-  public static final int DATA_JDT_TYPE = 1 << 0;
-  public static final int DATA_SUN_JAXWS_ENTRY = 1 << 1;
+  public static final int DATA_ENDPOINT_TYPE = 1 << 0;
+  public static final int DATA_ENDPOINT_INTERFACE_TYPE = 1 << 1;
+  public static final int DATA_SUN_JAXWS_ENTRY = 1 << 2;
 
   private boolean m_pageUnloaded = false;
   private String m_markerGroupUUID;
@@ -60,7 +65,8 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
   private SunJaxWsBean m_sunJaxWsBean;
 
   private IResourceListener m_sunJaxWsResourceListener;
-  private P_PortTypeChangeListener m_portTypeChangedListener;
+  private P_EndpointTypeChangeListener m_endpointTypeChangeListener;
+  private P_EndpointInterfaceTypeChangeListener m_endpointInterfaceTypeChangeListener;
   private Set<IPageLoadedListener> m_pageLoadedListeners;
 
   public WebServiceProviderCodeFirstNodePage(IPage parent, SunJaxWsBean sunJaxWsBean) {
@@ -80,13 +86,16 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
     // register for events being of interest
     getSunJaxWsResource().addResourceListener(sunJaxWsBean.getAlias(), m_sunJaxWsResourceListener);
 
-    m_portTypeChangedListener = new P_PortTypeChangeListener();
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(m_portTypeChangedListener);
+    m_endpointTypeChangeListener = new P_EndpointTypeChangeListener();
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(m_endpointTypeChangeListener);
+
+    m_endpointInterfaceTypeChangeListener = new P_EndpointInterfaceTypeChangeListener();
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(m_endpointInterfaceTypeChangeListener);
 
     // register page to receive page reload notification
     JaxWsSdk.getDefault().registerPage(WebServiceProviderNodePage.class, this);
 
-    reloadPage(DATA_JDT_TYPE);
+    reloadPage(DATA_ENDPOINT_TYPE | DATA_ENDPOINT_INTERFACE_TYPE);
   }
 
   @Override
@@ -132,12 +141,23 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
       }
     }
 
-    if ((dataMask & DATA_JDT_TYPE) > 0) {
+    // endpoint (port type)
+    if ((dataMask & DATA_ENDPOINT_TYPE) > 0) {
       m_portType = null;
       if (m_sunJaxWsBean != null && m_sunJaxWsBean.getImplementation() != null && TypeUtility.existsType(m_sunJaxWsBean.getImplementation())) {
         m_portType = TypeUtility.getType(m_sunJaxWsBean.getImplementation());
       }
-      m_portTypeChangedListener.setType(m_portType);
+      m_endpointTypeChangeListener.setType(m_portType);
+    }
+
+    // endpoint interface
+    if ((dataMask & DATA_ENDPOINT_INTERFACE_TYPE) > 0) {
+      IAnnotation wsAnnotation = JaxWsSdkUtility.getAnnotation(m_portType, WebService.class.getName(), false);
+      AnnotationProperty endpointProperty = JaxWsSdkUtility.parseAnnotationTypeValue(m_portType, wsAnnotation, "endpointInterface");
+      if (endpointProperty.isDefined()) {
+        IType portTypeInterfaceType = TypeUtility.getType(endpointProperty.getFullyQualifiedName());
+        m_endpointInterfaceTypeChangeListener.setType(portTypeInterfaceType);
+      }
     }
 
     // notify listeners
@@ -161,7 +181,8 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
 
     MarkerUtility.clearMarkers(m_bundle, m_markerGroupUUID);
     getSunJaxWsResource().removeResourceListener(m_sunJaxWsResourceListener);
-    ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_portTypeChangedListener);
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_endpointTypeChangeListener);
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_endpointInterfaceTypeChangeListener);
 
     // unregister page to not receive page reload notification anymore
     JaxWsSdk.getDefault().unregisterPage(WebServiceProviderNodePage.class, this);
@@ -304,7 +325,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
     }
   }
 
-  private class P_PortTypeChangeListener extends AbstractTypeChangedListener {
+  private class P_EndpointTypeChangeListener extends AbstractTypeChangedListener {
 
     @Override
     protected boolean shouldAnalayseForChange(IResourceChangeEvent event) {
@@ -313,7 +334,20 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
 
     @Override
     protected void typeChanged() {
-      reloadPage(DATA_JDT_TYPE);
+      reloadPage(DATA_ENDPOINT_TYPE);
+    }
+  }
+
+  private class P_EndpointInterfaceTypeChangeListener extends AbstractTypeChangedListener {
+
+    @Override
+    protected boolean shouldAnalayseForChange(IResourceChangeEvent event) {
+      return !isPageUnloaded();
+    }
+
+    @Override
+    protected void typeChanged() {
+      reloadPage(DATA_ENDPOINT_INTERFACE_TYPE);
     }
   }
 }

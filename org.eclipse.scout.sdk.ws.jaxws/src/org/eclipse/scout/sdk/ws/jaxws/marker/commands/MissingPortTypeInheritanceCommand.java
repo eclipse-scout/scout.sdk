@@ -123,6 +123,6 @@ public class MissingPortTypeInheritanceCommand extends AbstractExecutableMarkerC
 
     JaxWsSdkUtility.overrideUnimplementedMethodsAsync(m_type);
 
-    JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderNodePage.class, m_markerGroupUUID, WebServiceProviderNodePage.DATA_JDT_TYPE);
+    JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderNodePage.class, m_markerGroupUUID, WebServiceProviderNodePage.DATA_ENDPOINT_TYPE);
   }
 }

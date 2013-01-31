@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
@@ -26,13 +27,14 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 
 public class BuildJaxWsEntryCreateOperation implements IOperation {
 
   private IScoutBundle m_bundle;
 
   private String m_alias;
-  private String m_wsdlFile;
+  private IPath m_wsdlProjectRelativePath;
   private Map<String, List<String>> m_buildProperties;
 
   private WebserviceEnum m_webserviceEnum;
@@ -74,7 +76,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
     BuildJaxWsBean bean = new BuildJaxWsBean(xml, m_webserviceEnum);
     bean.setAlias(m_alias);
     if (m_webserviceEnum == WebserviceEnum.Consumer) {
-      bean.setWsdl(m_wsdlFile); // if provider, this is stored in sun-jaxws.xml
+      bean.setWsdl(PathNormalizer.toWsdlPath(m_wsdlProjectRelativePath.toString())); // if provider, this is stored in sun-jaxws.xml
     }
     bean.setProperties(m_buildProperties);
     m_createdBuildJaxWsBean = bean;
@@ -116,17 +118,17 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
    * 
    * @return
    */
-  public String getWsdlFile() {
-    return m_wsdlFile;
+  public IPath getWsdlProjectRelativePath() {
+    return m_wsdlProjectRelativePath;
   }
 
   /**
    * only used for webservice consumer
    * 
-   * @param wsdlFile
+   * @param wsdlProjectRelativePath
    */
-  public void setWsdlFile(String wsdlFile) {
-    m_wsdlFile = wsdlFile;
+  public void setWsdlProjectRelativePath(IPath wsdlProjectRelativePath) {
+    m_wsdlProjectRelativePath = wsdlProjectRelativePath;
   }
 
   /**

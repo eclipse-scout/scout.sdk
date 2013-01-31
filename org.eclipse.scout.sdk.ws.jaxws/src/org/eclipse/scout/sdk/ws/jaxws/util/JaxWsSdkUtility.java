@@ -32,6 +32,8 @@ import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
+import javax.wsdl.factory.WSDLFactory;
+import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebServiceClient;
 
@@ -52,8 +54,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -77,7 +77,9 @@ import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
 import org.eclipse.jdt.internal.ui.wizards.buildpaths.FolderSelectionDialog;
 import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
@@ -86,6 +88,8 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -94,7 +98,6 @@ import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutElement;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -114,6 +117,7 @@ import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.navigator.ResourceComparator;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 import com.sun.xml.internal.bind.api.impl.NameConverter;
 
@@ -123,26 +127,31 @@ public final class JaxWsSdkUtility {
   private JaxWsSdkUtility() {
   }
 
-  public static boolean isValidJavaIdentifier(String identifier) {
-    if (StringUtility.isNullOrEmpty(identifier)) {
+  public static boolean existsFileInProject(IScoutBundle bundle, IFolder folder, File javaFile) {
+    if (javaFile == null || folder == null) {
       return false;
     }
 
-    char[] chars = identifier.toCharArray();
-    for (int i = 0; i < chars.length; i++) {
-      if (i == 0) {
-        if (!Character.isJavaIdentifierStart(chars[i])) {
-          return false;
-        }
-      }
-      else {
-        if (!Character.isJavaIdentifierPart(chars[i])) {
-          return false;
-        }
-      }
-    }
+    IFile projectFile = bundle.getProject().getFile(folder.getProjectRelativePath().append(javaFile.getName()));
+    if (projectFile.exists()) {
+      IPath fullPathProjectFile = projectFile.getLocation();
+      IPath fullPathJavaFile = new Path(javaFile.getPath());
 
-    return true;
+      return fullPathProjectFile.equals(fullPathJavaFile);
+    }
+    return false;
+  }
+
+  public static Definition loadWsdlDefinition(IFileHandle fileHandle) {
+    try {
+      WSDLFactory factory = WSDLFactory.newInstance();
+      WSDLReader reader = factory.newWSDLReader();
+      return reader.readWSDL(fileHandle.getParent().getFullPath().toString(), new InputSource(fileHandle.getInputStream()));
+    }
+    catch (Exception e) {
+      JaxWsSdk.logError(String.format("Could not load WSDL file '%s'", fileHandle.getName()), e);
+      return null;
+    }
   }
 
   public static boolean exists(IResource resource) {
@@ -157,50 +166,20 @@ public final class JaxWsSdkUtility {
       }
     }
     catch (CoreException e) {
-      JaxWsSdk.logWarning("The 'resource '" + resource.getFullPath().toPortableString() + "' could not be synchronized with the filesystem.");
+      JaxWsSdk.logWarning("The 'resource '" + resource.getFullPath().toString() + "' could not be synchronized with the filesystem.");
     }
   }
 
-  public static IFile toFile(IScoutBundle bundle, File file) {
-    if (bundle == null || file == null) {
+  public static IFile getFile(IScoutBundle scoutBundle, IPath projectRelativePath, boolean autoCreate) {
+    if (projectRelativePath == null || projectRelativePath.isEmpty()) {
       return null;
     }
-
-    IPath path = new Path(file.getAbsolutePath()).makeRelativeTo(bundle.getProject().getLocation());
-    return JaxWsSdkUtility.getFile(bundle, path.toPortableString(), false);
-  }
-
-  public static File toFile(IFile file) {
-    if (file == null) {
-      return null;
-    }
-    return new File(file.getLocationURI());
-  }
-
-  public static IFile getFile(IScoutBundle scoutBundle, String path, boolean autoCreate) {
-    return getFile(scoutBundle, null, path, autoCreate);
-  }
-
-  public static IFile getFile(IScoutBundle scoutBundle, String projectRelativePath, String fileName, boolean autoCreate) {
-    if (fileName == null) {
-      return null;
-    }
-    IPath path;
-    if (StringUtility.isNullOrEmpty(projectRelativePath)) {
-      path = new Path(fileName);
-    }
-    else {
-      // ensure that the path begins and ends with a slash
-      projectRelativePath = normalizePath(projectRelativePath, SeparatorType.BothType);
-      path = new Path(projectRelativePath + fileName);
-    }
-
-    IFile file = scoutBundle.getProject().getFile(path);
-    prepareFileAccess(file, autoCreate);
+    IFile file = scoutBundle.getProject().getFile(projectRelativePath.makeRelative());
+    ensureFileAccessibleAndRegistered(file, autoCreate);
     return file;
   }
 
-  public static void prepareFileAccess(IFile file, boolean autoCreate) {
+  public static void ensureFileAccessibleAndRegistered(IFile file, boolean autoCreate) {
     refreshLocal(file, IResource.DEPTH_ZERO);
 
     if (!exists(file) && autoCreate) {
@@ -221,7 +200,7 @@ public final class JaxWsSdkUtility {
     // register folder in build properties
     if (autoCreate && file.getParent() instanceof IFolder) {
       IFolder folder = (IFolder) file.getParent();
-      if (!folder.getProjectRelativePath().toPortableString().contains("build")) {
+      if (!folder.getProjectRelativePath().toString().contains("build")) {
         try {
           PluginModelHelper h = new PluginModelHelper(file.getProject());
           h.BuildProperties.addBinaryBuildEntry(folder);
@@ -234,18 +213,16 @@ public final class JaxWsSdkUtility {
     }
   }
 
-  public static IFolder getFolder(IScoutBundle scoutBundle, String projectRelativePath, boolean autoCreate) {
-    if (StringUtility.isNullOrEmpty(projectRelativePath)) {
+  public static IFolder getFolder(IScoutBundle scoutBundle, IPath projectRelativePath, boolean autoCreate) {
+    if (projectRelativePath == null || projectRelativePath.isEmpty()) {
       return null;
     }
-    // ensure that the path begins and ends with a slash
-    IPath path = new Path(normalizePath(projectRelativePath, SeparatorType.BothType));
-    IFolder folder = scoutBundle.getProject().getFolder(path);
-    prepareFolderAccess(folder, autoCreate);
+    IFolder folder = scoutBundle.getProject().getFolder(projectRelativePath.makeRelative());
+    ensureFolderAccessibleAndRegistered(folder, autoCreate);
     return folder;
   }
 
-  public static void prepareFolderAccess(IFolder folder, boolean autoCreate) {
+  public static void ensureFolderAccessibleAndRegistered(IFolder folder, boolean autoCreate) {
     refreshLocal(folder, IResource.DEPTH_INFINITE);
 
     if (!folder.exists() && autoCreate) {
@@ -259,7 +236,7 @@ public final class JaxWsSdkUtility {
     }
 
     // register folder in build properties
-    if (autoCreate && !folder.getProjectRelativePath().toPortableString().contains("build")) {
+    if (autoCreate && !folder.getProjectRelativePath().toString().contains("build")) {
       try {
         PluginModelHelper h = new PluginModelHelper(folder.getProject());
         h.BuildProperties.addBinaryBuildEntry(folder);
@@ -296,51 +273,6 @@ public final class JaxWsSdkUtility {
     }
   }
 
-  /**
-   * To obtain the fully qualified name
-   * 
-   * @param declaringType
-   *          the type which contains possible import directives
-   * @param signature
-   *          the signature obtained by {@link IField#getTypeSignature()} or {@link IMethod#getReturnType()},
-   *          respectively
-   * @return the fully qualified name
-   */
-  public static String getFullyQualifiedNameFromSignature(IType declaringType, String signature) {
-    return getFullyQualifiedNameFromName(declaringType, StringUtility.join(".", Signature.getSignatureQualifier(signature), Signature.getSignatureSimpleName(signature)));
-  }
-
-  /**
-   * To obtain the fully qualified name
-   * 
-   * @param declaringType
-   *          the type which contains possible import directives
-   * @param name
-   *          the name as in declaring type
-   * @return the fully qualified name
-   */
-  public static String getFullyQualifiedNameFromName(IType declaringType, String name) {
-    try {
-      String[][] fullyQualifiedSignature = declaringType.resolveType(name);
-      if (fullyQualifiedSignature != null && fullyQualifiedSignature.length > 0) {
-        if (!StringUtility.isNullOrEmpty(fullyQualifiedSignature[0][0])) {
-          return fullyQualifiedSignature[0][0] + "." + fullyQualifiedSignature[0][1];
-        }
-        else {
-          return fullyQualifiedSignature[0][1];
-        }
-      }
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError(e);
-    }
-    return null;
-  }
-
-  public static String getFullyQualifiedSignature(IType declaringType, String signature) {
-    return SignatureCache.createTypeSignature(JaxWsSdkUtility.getFullyQualifiedNameFromSignature(declaringType, signature));
-  }
-
   public static void organizeImports(IType type) {
     try {
       CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(type.getJavaProject());
@@ -358,15 +290,6 @@ public final class JaxWsSdkUtility {
     }
     catch (Throwable e) {
       JaxWsSdk.logError(e);
-    }
-  }
-
-  public static String getFileNameWithoutExtension(IFile file) {
-    if (file.getFileExtension() != null) {
-      return file.getName().substring(0, file.getName().length() - file.getFileExtension().length() - 1);
-    }
-    else {
-      return file.getName();
     }
   }
 
@@ -390,34 +313,6 @@ public final class JaxWsSdkUtility {
     }
 
     return property.substring(0, 1).toUpperCase() + property.substring(1);
-  }
-
-  public static String normalizePath(String path, SeparatorType separatorType) {
-    if (path == null) {
-      return null;
-    }
-    if (separatorType == SeparatorType.BothType || separatorType == SeparatorType.LeadingType) {
-      if (!path.startsWith("/")) {
-        path = "/" + path;
-      }
-    }
-    else {
-      if (path.startsWith("/")) {
-        path = path.substring(1);
-      }
-    }
-
-    if (separatorType == SeparatorType.BothType || separatorType == SeparatorType.TrailingType) {
-      if (!path.endsWith("/")) {
-        path += "/";
-      }
-    }
-    else {
-      if (path.endsWith("/")) {
-        path = path.substring(0, path.length() - 1);
-      }
-    }
-    return path;
   }
 
   /**
@@ -476,16 +371,6 @@ public final class JaxWsSdkUtility {
         }
       }
     }
-  }
-
-  public static Set<IResource> createResourceSet(IResource... resources) {
-    Set<IResource> resourceSet = new HashSet<IResource>();
-    for (IResource resource : resources) {
-      if (resource != null) {
-        resourceSet.add(resource);
-      }
-    }
-    return resourceSet;
   }
 
   public static PortType getPortType(Definition wsdlDefinition, QName serviceQName, String portName) {
@@ -761,118 +646,6 @@ public final class JaxWsSdkUtility {
     return extractQNameFromAnnotation(annotation);
   }
 
-  private static QName extractQNameFromAnnotation(IAnnotation annotation) {
-    if (annotation == null || !annotation.exists()) {
-      return null;
-    }
-
-    String localPart = null;
-    String namespaceURI = null;
-    try {
-      for (IMemberValuePair pair : annotation.getMemberValuePairs()) {
-        if (pair.getMemberName().equals("name")) {
-          localPart = (String) pair.getValue();
-        }
-        else if (pair.getMemberName().equals("targetNamespace")) {
-          namespaceURI = (String) pair.getValue();
-        }
-        if (namespaceURI != null && localPart != null) {
-          break;
-        }
-      }
-
-      QName qname = null;
-      if (namespaceURI != null && localPart != null) {
-        qname = new QName(namespaceURI, localPart);
-      }
-      else if (localPart != null) {
-        qname = new QName(localPart);
-      }
-
-      if (qname != null) {
-        return qname;
-      }
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError("could not extract QName from annotation '" + annotation.getElementName() + "'", e);
-    }
-    return null;
-  }
-
-  public static boolean hasPackageElements(IScoutBundle bundle, String sourceFolder, String packageName) {
-    if (!isValidSourceFolder(bundle, sourceFolder) || packageName == null) {
-      return false;
-    }
-
-    try {
-      IPath rootPath = bundle.getProject().getFullPath().append(sourceFolder);
-
-      IPackageFragmentRoot root = bundle.getJavaProject().findPackageFragmentRoot(rootPath);
-      if (root == null || !root.exists()) {
-        return false;
-      }
-      IPackageFragment packageFragment = root.getPackageFragment(StringUtility.nvl(packageName, "")); // "" for default package
-      return packageFragment != null && packageFragment.exists() && (packageFragment.hasChildren() || packageFragment.hasSubpackages());
-    }
-    catch (JavaModelException e) {
-      return false;
-    }
-  }
-
-  public static IPackageFragment toPackageFragment(IScoutBundle bundle, String sourceFolder, String packageName) {
-    try {
-      if (!isValidSourceFolder(bundle, sourceFolder)) {
-        return null;
-      }
-
-      IPath rootPath = bundle.getProject().getFullPath().append(sourceFolder);
-
-      IPackageFragmentRoot root = bundle.getJavaProject().findPackageFragmentRoot(rootPath);
-      if (root == null || !root.exists()) {
-        return null;
-      }
-      IPackageFragment packageFragment = root.getPackageFragment(StringUtility.nvl(packageName, "")); // "" for default package
-      if (packageFragment != null && packageFragment.exists()) {
-        return packageFragment;
-      }
-    }
-    catch (JavaModelException e) {
-      JaxWsSdk.logError("could not obtain package fragment", e);
-    }
-    return null;
-  }
-
-  public static void clearPackage(IScoutBundle bundle, String sourceFolder, String packageName) {
-    try {
-      IPackageFragment packageFragment = toPackageFragment(bundle, sourceFolder, packageName);
-      if (packageFragment != null && packageFragment.exists()) {
-        packageFragment.delete(true, new NullProgressMonitor());
-      }
-    }
-    catch (JavaModelException e) {
-      JaxWsSdk.logError("could not clear package", e);
-    }
-  }
-
-  public static void createSourceFolder(IScoutBundle bundle, String sourceFolder) throws JavaModelException {
-    List<IClasspathEntry> list = new LinkedList<IClasspathEntry>();
-    IClasspathEntry[] entries = bundle.getJavaProject().getRawClasspath();
-    for (IClasspathEntry entry : entries) {
-      if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-        if (JaxWsSdkUtility.getFolder(bundle, sourceFolder, false).getFullPath().equals(entry.getPath())) {
-          // source folder already exists
-          return;
-        }
-      }
-      list.add(entry);
-    }
-
-    IFolder srcFolder = JaxWsSdkUtility.getFolder(bundle, "/" + sourceFolder, true);
-    IClasspathEntry newEntry = JavaCore.newSourceEntry(srcFolder.getFullPath());
-    list.add(newEntry);
-    bundle.getJavaProject().setRawClasspath(list.toArray(new IClasspathEntry[0]), bundle.getJavaProject().getOutputLocation(), new NullProgressMonitor());
-  }
-
   public static boolean isValidSourceFolder(IScoutBundle bundle, String sourceFolder) {
     if (sourceFolder == null) {
       return false;
@@ -982,26 +755,6 @@ public final class JaxWsSdkUtility {
     return JaxWsSdkUtility.targetNamespaceToPackageName(targetNamespace);
   }
 
-  private static String getWsdlBindingPackageName(Definition definition) {
-    if (definition == null) {
-      return null;
-    }
-    for (Object e : definition.getExtensibilityElements()) {
-      if (e instanceof UnknownExtensibilityElement) {
-        UnknownExtensibilityElement uee = (UnknownExtensibilityElement) e;
-        if (uee.getElementType().equals(new QName("http://java.sun.com/xml/ns/jaxws", "bindings"))) {
-          Element element = uee.getElement();
-          NodeList nodes = element.getElementsByTagNameNS("http://java.sun.com/xml/ns/jaxws", "package");
-          if (nodes.getLength() > 0) {
-            Element globalPackageBindingElement = (Element) nodes.item(0);
-            return globalPackageBindingElement.getAttribute("name");
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   public static String targetNamespaceToPackageName(String targetNamespace) {
     if (targetNamespace == null) {
       return null;
@@ -1093,7 +846,7 @@ public final class JaxWsSdkUtility {
     map.put("verbose", null);
 
     List<String> values = new LinkedList<String>();
-    values.add("2.0");
+    values.add("2.1");
     map.put("target", values);
     return map;
   }
@@ -1110,7 +863,7 @@ public final class JaxWsSdkUtility {
       }
 
       for (String bindingFileRaw : property.getValue()) {
-        IFile bindingFile = JaxWsSdkUtility.getFile(bundle, bindingFileRaw, false);
+        IFile bindingFile = JaxWsSdkUtility.getFile(bundle, new Path(bindingFileRaw), false);
         bindingFiles.add(bindingFile);
       }
     }
@@ -1160,22 +913,21 @@ public final class JaxWsSdkUtility {
    * @param alias
    * @return
    */
-  public static String createUniqueBindingFileNamePath(IScoutBundle bundle, String alias, String schemaTargetNamespace) {
+  public static IPath toUniqueProjectRelativeBindingFilePath(IScoutBundle bundle, String alias, String schemaTargetNamespace) {
     String filename = StringUtility.join("-", alias, schemaTargetNamespace, "bindings");
     filename = JaxWsSdkUtility.toValidFileName(filename);
 
-    String bindingFileName = JaxWsSdkUtility.normalizePath(JaxWsConstants.PATH_BUILD, SeparatorType.TrailingType) + filename;
-    String candiate = bindingFileName;
+    final IPath folderBindingFile = JaxWsConstants.PATH_BUILD;
+    final IPath filePath = folderBindingFile.append(filename).addFileExtension("xml");
+    IFile file = JaxWsSdkUtility.getFile(bundle, filePath, false);
 
-    IFile file = JaxWsSdkUtility.getFile(bundle, candiate + ".xml", false);
     int i = 0;
-    while (file != null && file.exists()) {
-      i++;
-      candiate = bindingFileName + " (" + i + ")";
-      file = JaxWsSdkUtility.getFile(bundle, candiate + ".xml", false);
+    while (file.exists()) {
+      final String newFileName = String.format("%s (%s)", filename, ++i);
+      final IPath newFilePath = folderBindingFile.append(newFileName).addFileExtension("xml");
+      file = JaxWsSdkUtility.getFile(bundle, newFilePath, false);
     }
-
-    return candiate + ".xml";
+    return file.getProjectRelativePath();
   }
 
   public static Color getColorLightGray() {
@@ -1200,11 +952,14 @@ public final class JaxWsSdkUtility {
     try {
       for (IMemberValuePair pair : annotation.getMemberValuePairs()) {
         if (pair.getMemberName().equals(property)) {
-          String propertySignature = SignatureCache.createTypeSignature((String) pair.getValue());
-          String fullyQualifiedName = JaxWsSdkUtility.getFullyQualifiedNameFromSignature(declaringType, propertySignature);
-
-          propertyValue.setInherited(false);
-          propertyValue.setFullyQualifiedName(fullyQualifiedName);
+          String fqn = (String) pair.getValue();
+          if (StringUtility.hasText(fqn)) {
+            String propertySignature = SignatureCache.createTypeSignature((String) pair.getValue());
+            String fullyQualifiedName = JaxWsSdkUtility.getFullyQualifiedNameFromSignature(declaringType, propertySignature);
+            propertyValue.setInherited(false);
+            propertyValue.setFullyQualifiedName(fullyQualifiedName);
+            propertyValue.setDefined(true);
+          }
           return propertyValue;
         }
       }
@@ -1215,7 +970,11 @@ public final class JaxWsSdkUtility {
       String fqnAnnotationType = getFullyQualifiedNameFromName(declaringType, annotation.getElementName());
       IType type = TypeUtility.getType(fqnAnnotationType);
       if (TypeUtility.exists(type)) {
-        propertyValue.setFullyQualifiedName((String) type.getMethod(property, new String[0]).getDefaultValue().getValue());
+        String fqn = (String) type.getMethod(property, new String[0]).getDefaultValue().getValue();
+        if (StringUtility.hasText(fqn)) {
+          propertyValue.setFullyQualifiedName(fqn);
+          propertyValue.setDefined(true);
+        }
       }
       return propertyValue;
     }
@@ -1302,10 +1061,6 @@ public final class JaxWsSdkUtility {
     return SignatureUtility.getTypeReference(typeSignature, declaringType, validator);
   }
 
-  public static String toValidFileName(String name) {
-    return name.replaceAll("[\\\\/\\:\\*\\?\\<\\>\"]", "");
-  }
-
   public static boolean containsGlobalBindingSection(IScoutBundle bundle, Map<String, List<String>> propertiers, boolean checkForMultipleOccurences) {
     IFile[] bindingFiles = JaxWsSdkUtility.getBindingFiles(bundle, propertiers);
 
@@ -1350,18 +1105,6 @@ public final class JaxWsSdkUtility {
     return false;
   }
 
-  private static String getStubJarFilePath(String jarFileName) {
-    if (jarFileName == null) {
-      return null;
-    }
-    // ensure no file extension set
-    jarFileName = new Path(jarFileName).removeFileExtension().lastSegment();
-    // ensure valid filename
-    jarFileName = JaxWsSdkUtility.toValidFileName(jarFileName);
-    String folder = JaxWsSdkUtility.normalizePath(JaxWsConstants.STUB_FOLDER, SeparatorType.BothType);
-    return StringUtility.join("/", folder, jarFileName + ".jar");
-  }
-
   public static IFile getStubJarFile(IScoutBundle bundle, BuildJaxWsBean buildJaxWsBean, String wsdlFileName) {
     Map<String, List<String>> buildProperties = null;
     if (buildJaxWsBean != null) {
@@ -1402,31 +1145,14 @@ public final class JaxWsSdkUtility {
       return null;
     }
 
-    String path = JaxWsSdkUtility.getStubJarFilePath(jarFileName);
-    return JaxWsSdkUtility.getFile(bundle, path, false);
-  }
-
-  public static IScoutBundle getRootBundle(IScoutBundle serverBundle) {
-    if (serverBundle.getType() != IScoutElement.BUNDLE_SERVER) {
-      return null;
-    }
-    IScoutBundle bundle = serverBundle;
-
-    while (bundle.getScoutProject().getParentProject() != null) {
-      IScoutBundle candidate = bundle.getScoutProject().getParentProject().getServerBundle();
-      if (candidate == null || !serverBundle.isOnClasspath(candidate)) {
-        break;
-      }
-      bundle = bundle.getScoutProject().getParentProject().getServerBundle();
-    }
-    return bundle;
+    return JaxWsSdkUtility.toStubJarFile(bundle, jarFileName);
   }
 
   public static boolean registerJarLib(IScoutBundle bundle, IFile jarFile, boolean remove, IProgressMonitor monitor) {
     boolean success = true;
     JaxWsSdkUtility.refreshLocal(jarFile, IResource.DEPTH_ONE);
 
-    String jarFilePath = JaxWsSdkUtility.normalizePath(jarFile.getProjectRelativePath().toPortableString(), SeparatorType.None);
+    IPath jarFilePath = jarFile.getProjectRelativePath();
     IJavaProject javaProject = bundle.getJavaProject();
     IProject project = bundle.getProject();
 
@@ -1492,18 +1218,6 @@ public final class JaxWsSdkUtility {
     new OperationJob(op).schedule();
   }
 
-  public static <T> void removeDuplicateEntries(List<T> list) {
-    Set<T> elementsVisited = new HashSet<T>();
-    Iterator<T> iterator = list.iterator();
-    while (iterator.hasNext()) {
-      T element = iterator.next();
-      if (elementsVisited.contains(element)) {
-        iterator.remove();
-      }
-      elementsVisited.add(element);
-    }
-  }
-
   public static void sortTypesByName(List<IType> list, boolean removeDuplicates) {
     if (removeDuplicates) {
       JaxWsSdkUtility.removeDuplicateEntries(list);
@@ -1526,12 +1240,12 @@ public final class JaxWsSdkUtility {
     if (parentFolderPath.segmentCount() == 0) {
       return null;
     }
-    return JaxWsSdkUtility.getFolder(bundle, parentFolderPath.toPortableString(), false);
+    return JaxWsSdkUtility.getFolder(bundle, parentFolderPath, false);
   }
 
   public static IFolder openProjectFolderDialog(IScoutBundle bundle, ViewerFilter filter, String title, String description, IFolder rootFolder, IFolder initialFolder) {
     if (!JaxWsSdkUtility.exists(rootFolder)) {
-      rootFolder = JaxWsSdkUtility.getFolder(bundle, rootFolder.getProjectRelativePath().toPortableString(), true);
+      rootFolder = JaxWsSdkUtility.getFolder(bundle, rootFolder.getProjectRelativePath(), true);
     }
     ILabelProvider labelProvider = new WorkbenchLabelProvider();
     ITreeContentProvider contentProvider = new WorkbenchContentProvider();
@@ -1544,7 +1258,7 @@ public final class JaxWsSdkUtility {
     if (initialFolder != null) {
       dialog.setInitialSelection(initialFolder);
     }
-    String parentFolderPath = rootFolder.getProjectRelativePath().removeLastSegments(1).toPortableString();
+    IPath parentFolderPath = rootFolder.getProjectRelativePath().removeLastSegments(1);
     dialog.setInput(JaxWsSdkUtility.getFolder(bundle, parentFolderPath, true));
     dialog.setComparator(new ResourceComparator(ResourceComparator.NAME));
 
@@ -1554,8 +1268,164 @@ public final class JaxWsSdkUtility {
     return null;
   }
 
-  public static enum SeparatorType {
-    LeadingType, TrailingType, BothType, None;
+  /**
+   * Workaround to the bug that sometimes the property page is not closed on structure change from external files.
+   * 
+   * @param parentPage
+   */
+  public static void markStructureDirtyAndFixSelection(final IPage parentPage) {
+    ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
+
+      @Override
+      public void run() {
+        try {
+          // update selection if child has active selection
+          IScoutExplorerPart explorer = ScoutSdkUi.getExplorer(false);
+          if (explorer == null) {
+            return;
+          }
+          IStructuredSelection selection = explorer.getSelection();
+          if (selection.isEmpty()) {
+            return;
+          }
+          if (new ArrayList<IPage>(parentPage.getChildren()).removeAll(selection.toList())) {
+            // child node is selected -> update selection to the WebServiceProviderTablePage
+            explorer.setSelection(new StructuredSelection(parentPage));
+          }
+        }
+        catch (Exception e) {
+          JaxWsSdk.logError(e);
+        }
+        parentPage.markStructureDirty();
+      }
+    });
+  }
+
+  /**
+   * To obtain the fully qualified name
+   * 
+   * @param declaringType
+   *          the type which contains possible import directives
+   * @param signature
+   *          the signature obtained by {@link IField#getTypeSignature()} or {@link IMethod#getReturnType()},
+   *          respectively
+   * @return the fully qualified name
+   */
+  private static String getFullyQualifiedNameFromSignature(IType declaringType, String signature) {
+    return getFullyQualifiedNameFromName(declaringType, StringUtility.join(".", Signature.getSignatureQualifier(signature), Signature.getSignatureSimpleName(signature)));
+  }
+
+  /**
+   * To obtain the fully qualified name
+   * 
+   * @param declaringType
+   *          the type which contains possible import directives
+   * @param name
+   *          the name as in declaring type
+   * @return the fully qualified name
+   */
+  private static String getFullyQualifiedNameFromName(IType declaringType, String name) {
+    try {
+      String[][] fullyQualifiedSignature = declaringType.resolveType(name);
+      if (fullyQualifiedSignature != null && fullyQualifiedSignature.length > 0) {
+        if (!StringUtility.isNullOrEmpty(fullyQualifiedSignature[0][0])) {
+          return fullyQualifiedSignature[0][0] + "." + fullyQualifiedSignature[0][1];
+        }
+        else {
+          return fullyQualifiedSignature[0][1];
+        }
+      }
+    }
+    catch (Exception e) {
+      JaxWsSdk.logError(e);
+    }
+    return null;
+  }
+
+  private static <T> void removeDuplicateEntries(List<T> list) {
+    Set<T> elementsVisited = new HashSet<T>();
+    Iterator<T> iterator = list.iterator();
+    while (iterator.hasNext()) {
+      T element = iterator.next();
+      if (elementsVisited.contains(element)) {
+        iterator.remove();
+      }
+      elementsVisited.add(element);
+    }
+  }
+
+  private static IFile toStubJarFile(IScoutBundle bundle, String jarFileName) {
+    if (jarFileName == null) {
+      return null;
+    }
+    // ensure no file extension set
+    jarFileName = new Path(jarFileName).removeFileExtension().lastSegment();
+    // ensure valid filename
+    jarFileName = JaxWsSdkUtility.toValidFileName(jarFileName);
+    IPath path = JaxWsConstants.STUB_FOLDER.append(jarFileName).addFileExtension("jar");
+    return JaxWsSdkUtility.getFile(bundle, path, false);
+  }
+
+  private static String toValidFileName(String name) {
+    return name.replaceAll("[\\\\/\\:\\*\\?\\<\\>\"]", "");
+  }
+
+  private static String getWsdlBindingPackageName(Definition definition) {
+    if (definition == null) {
+      return null;
+    }
+    for (Object e : definition.getExtensibilityElements()) {
+      if (e instanceof UnknownExtensibilityElement) {
+        UnknownExtensibilityElement uee = (UnknownExtensibilityElement) e;
+        if (uee.getElementType().equals(new QName("http://java.sun.com/xml/ns/jaxws", "bindings"))) {
+          Element element = uee.getElement();
+          NodeList nodes = element.getElementsByTagNameNS("http://java.sun.com/xml/ns/jaxws", "package");
+          if (nodes.getLength() > 0) {
+            Element globalPackageBindingElement = (Element) nodes.item(0);
+            return globalPackageBindingElement.getAttribute("name");
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  private static QName extractQNameFromAnnotation(IAnnotation annotation) {
+    if (annotation == null || !annotation.exists()) {
+      return null;
+    }
+
+    String localPart = null;
+    String namespaceURI = null;
+    try {
+      for (IMemberValuePair pair : annotation.getMemberValuePairs()) {
+        if (pair.getMemberName().equals("name")) {
+          localPart = (String) pair.getValue();
+        }
+        else if (pair.getMemberName().equals("targetNamespace")) {
+          namespaceURI = (String) pair.getValue();
+        }
+        if (namespaceURI != null && localPart != null) {
+          break;
+        }
+      }
+
+      QName qname = null;
+      if (namespaceURI != null && localPart != null) {
+        qname = new QName(namespaceURI, localPart);
+      }
+      else if (localPart != null) {
+        qname = new QName(localPart);
+      }
+
+      if (qname != null) {
+        return qname;
+      }
+    }
+    catch (Exception e) {
+      JaxWsSdk.logError("could not extract QName from annotation '" + annotation.getElementName() + "'", e);
+    }
+    return null;
   }
 
   private static class JarFileSearchScope implements IJavaSearchScope {

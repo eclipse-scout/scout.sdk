@@ -113,7 +113,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
     });
     IFolder folder = getWsdlFolder();
     if (folder != null) {
-      m_wsdlFolderField.setText(folder.getProjectRelativePath().toPortableString());
+      m_wsdlFolderField.setText(folder.getProjectRelativePath().toString());
     }
 
     // layout
@@ -194,7 +194,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
       setWsdlFolderInternal(wsdlFolder);
       if (isControlCreated()) {
         if (wsdlFolder != null) {
-          m_wsdlFolderField.setText(wsdlFolder.getProjectRelativePath().toPortableString());
+          m_wsdlFolderField.setText(wsdlFolder.getProjectRelativePath().toString());
         }
         else {
           m_wsdlFolderField.setText("");

@@ -69,6 +69,12 @@
       <super type="org.eclipse.scout.sdk.ws.jaxws.jaxws" />
    </extension>
    <extension
+      id="endpointInterface"
+      name="endpointInterface"
+      point="org.eclipse.core.resources.markers">
+      <super type="org.eclipse.scout.sdk.ws.jaxws.jaxws" />
+   </extension>
+   <extension
       id="package"
       name="package"
       point="org.eclipse.core.resources.markers">

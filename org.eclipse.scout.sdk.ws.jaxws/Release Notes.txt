@@ -24,3 +24,14 @@ c) WSDL file is not put into the JAR archive anymore when building the webservic
 Migration:
 - Use Scout SDK (repair actions) to move WSDL files of webservice providers into folder '/WEB-INF/wsdl/provider' and of webservice consumer into folder '/WEB-INF/wsdl/consumers'
 - Rebuild webservice stubs (should automatically be done if using repair action)
+
+05.01.2013
+Bug-fixes:
+- fixed bug that resources (WSDL/schema artefacts) could not be loaded when working on custom Eclipse File System (e.g. when working with JAAZ team provider)
+- changed code with file path handling to work with IPath class
+- visitor pattern to work with schema artefacts
+- visitor pattern to validate URL-pattern/servlet alias
+- removed unused code from JaxWsSdkUtility
+- consolidated WSDL file loading / file-copy-detection into JaxWsSdkUtility
+- minor bug fixes
+Migration: None

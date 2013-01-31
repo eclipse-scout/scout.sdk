@@ -268,11 +268,12 @@ public class SunJaxWsBean {
     }
 
     ScoutXmlElement rootXml = document.getRoot();
-    if (rootXml == null || !rootXml.hasChild(SunJaxWsBean.XML_ENDPOINT)) {
+    String xmlEndpoint = StringUtility.join(":", rootXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT);
+    if (rootXml == null || !rootXml.hasChild(xmlEndpoint)) {
       return null;
     }
 
-    ScoutXmlElement xml = rootXml.getChild(StringUtility.join(":", rootXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT), SunJaxWsBean.XML_ALIAS, alias);
+    ScoutXmlElement xml = rootXml.getChild(xmlEndpoint, SunJaxWsBean.XML_ALIAS, alias);
     if (xml == null) {
       return null;
     }
