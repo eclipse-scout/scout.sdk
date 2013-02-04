@@ -45,7 +45,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.junit.AfterClass;
 import org.junit.Assert;
 
 public abstract class AbstractScoutSdkTest {
@@ -73,7 +72,6 @@ public abstract class AbstractScoutSdkTest {
    * 
    * @throws Exception
    */
-  @AfterClass
   public static void clearWorkspace() throws Exception {
     Job delJob = new Job("") {
       @Override
@@ -156,7 +154,7 @@ public abstract class AbstractScoutSdkTest {
     return project;
   }
 
-  private static Path createPath(String... pathElements) {
+  protected static Path createPath(String... pathElements) {
     StringBuilder builder = new StringBuilder();
     for (String e : pathElements) {
       if (e != null) {
@@ -167,7 +165,7 @@ public abstract class AbstractScoutSdkTest {
     return new Path(builder.toString());
   }
 
-  private static void copyFilesRecursive(String from, String toDir) throws IOException {
+  protected static void copyFilesRecursive(String from, String toDir) throws IOException {
     File fromFile = new File(from);
     if (!fromFile.exists()) {
       return;

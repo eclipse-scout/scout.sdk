@@ -7,12 +7,30 @@ Bundle-Activator: org.eclipse.scout.sdk.internal.test.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui;bundle-version="3.5.0",
- org.junit4;bundle-version="4.3.1",
+ org.junit4;bundle-version="4.3.1";visibility:=reexport,
  org.eclipse.compare;bundle-version="3.5.0",
  org.eclipse.compare.core;bundle-version="3.5.0",
- org.eclipse.scout.sdk;bundle-version="3.9.0",
- org.eclipse.scout.sdk.ui;bundle-version="3.9.0",
- org.eclipse.scout.rt.testing.shared;bundle-version="3.7.0"
+ org.eclipse.scout.sdk;bundle-version="3.9.0";visibility:=reexport,
+ org.eclipse.scout.sdk.ui;bundle-version="3.9.0";visibility:=reexport,
+ org.eclipse.scout.rt.testing.shared;bundle-version="3.7.0";visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
+Export-Package: org.eclipse.scout.sdk,
+ org.eclipse.scout.sdk.helper,
+ org.eclipse.scout.sdk.internal.test,
+ org.eclipse.scout.sdk.internal.test.api.compatibitity,
+ org.eclipse.scout.sdk.internal.test.bug.beforeopensource,
+ org.eclipse.scout.sdk.internal.test.jdt,
+ org.eclipse.scout.sdk.internal.test.operation,
+ org.eclipse.scout.sdk.internal.test.operation.form,
+ org.eclipse.scout.sdk.internal.test.operation.form.fields,
+ org.eclipse.scout.sdk.internal.test.operation.formdata,
+ org.eclipse.scout.sdk.internal.test.operation.project,
+ org.eclipse.scout.sdk.internal.test.presenter,
+ org.eclipse.scout.sdk.internal.test.types,
+ org.eclipse.scout.sdk.internal.test.util,
+ org.eclipse.scout.sdk.internal.test.util.signature,
+ org.eclipse.scout.sdk.internal.test.workspace,
+ org.eclipse.scout.sdk.operation.form.formdata,
+ org.eclipse.scout.sdk.test

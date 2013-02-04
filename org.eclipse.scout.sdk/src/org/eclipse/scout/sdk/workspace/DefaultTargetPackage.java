@@ -180,7 +180,12 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
           // there is still a listener attached to the project preferences -> remove and deregister
           IPreferenceChangeListener existingListener = registeredListeners.remove(removed);
           if (existingListener != null) {
-            removed.getPreferences().removePreferenceChangeListener(existingListener);
+            try {
+              removed.getPreferences().removePreferenceChangeListener(existingListener);
+            }
+            catch (IllegalStateException e) {
+              //nop
+            }
           }
         }
       }

@@ -336,7 +336,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   }
 
   private void fireEvent(JdtEvent e) {
-    // first notify hierarchies which could be used of other listeners
+    // first notify hierarchies which could be used by other listeners
     if (m_hierarchyCache != null) {
       m_hierarchyCache.elementChanged(e);
     }
@@ -362,7 +362,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
             }
             else {
               listeners.add(listener);
-
             }
           }
           if (listenerList.isEmpty()) {

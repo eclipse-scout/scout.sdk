@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.util.internal.typecache;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
@@ -106,7 +105,7 @@ public final class HierarchyCache implements IHierarchyCache {
   @Override
   public TypeHierarchy getSuperHierarchy(IType type) {
     try {
-      ITypeHierarchy hierarchy = type.newSupertypeHierarchy(new NullProgressMonitor());
+      ITypeHierarchy hierarchy = type.newSupertypeHierarchy(null);
       return new TypeHierarchy(null, hierarchy);
     }
     catch (JavaModelException e) {
