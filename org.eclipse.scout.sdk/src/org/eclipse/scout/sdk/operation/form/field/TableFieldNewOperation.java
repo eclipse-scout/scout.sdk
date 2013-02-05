@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
@@ -47,8 +48,13 @@ public class TableFieldNewOperation implements IOperation {
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
   private IJavaElement m_sibling;
+  private IJavaElement m_getterMethodSibling;
+  private IType m_formType;
+  private double m_orderNr;
+
   private IType m_createdField;
   private IType m_createdTable;
+  private IMethod m_createdFieldGetterMethod;
 
   public TableFieldNewOperation(IType declaringType) {
     m_declaringType = declaringType;
@@ -72,9 +78,13 @@ public class TableFieldNewOperation implements IOperation {
     newOp.setTypeName(getTypeName());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSiblingField(getSibling());
+    newOp.setFormType(getFormType());
+    newOp.setGetterMethodSibling(getGetterMethodSibling());
+    newOp.setOrderNr(getOrderNr());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdField = newOp.getCreatedFormField();
+    m_createdFieldGetterMethod = newOp.getCreatedFieldGetterMethod();
     if (getNlsEntry() != null) {
       NlsTextMethodUpdateOperation labelOp = new NlsTextMethodUpdateOperation(getCreatedField(), NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL);
       labelOp.setNlsEntry(getNlsEntry());
@@ -175,4 +185,31 @@ public class TableFieldNewOperation implements IOperation {
     m_sibling = sibling;
   }
 
+  public double getOrderNr() {
+    return m_orderNr;
+  }
+
+  public void setOrderNr(double orderNr) {
+    m_orderNr = orderNr;
+  }
+
+  public IType getFormType() {
+    return m_formType;
+  }
+
+  public void setFormType(IType formType) {
+    m_formType = formType;
+  }
+
+  public IJavaElement getGetterMethodSibling() {
+    return m_getterMethodSibling;
+  }
+
+  public void setGetterMethodSibling(IJavaElement getterMethodSibling) {
+    m_getterMethodSibling = getterMethodSibling;
+  }
+
+  public IMethod getCreatedFieldGetterMethod() {
+    return m_createdFieldGetterMethod;
+  }
 }
