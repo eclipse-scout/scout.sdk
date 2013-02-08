@@ -111,7 +111,8 @@ public class FormDataUtility {
         superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
       }
 
-      if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldData))) {
+      String typeErasure = Signature.getTypeErasure(superTypeSignature);
+      if (Signature.getSignatureSimpleName(typeErasure).equals(Signature.getSimpleName(RuntimeClasses.AbstractTableFieldData))) {
         builder = new TableFieldSourceBuilder(formField, hierarchy);
       }
       else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
@@ -135,7 +136,8 @@ public class FormDataUtility {
       superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
     }
 
-    if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldData))) {
+    String typeErasure = Signature.getTypeErasure(superTypeSignature);
+    if (Signature.toString(typeErasure).equals(RuntimeClasses.AbstractTableFieldData)) {
       builder = new TableFieldSourceBuilder(formField, hierarchy);
     }
     else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
