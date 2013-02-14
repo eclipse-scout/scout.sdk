@@ -36,6 +36,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.egit.ui.UIPreferences;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.test.Activator;
@@ -51,7 +53,22 @@ public abstract class AbstractScoutSdkTest {
 
   private static final String RESOURCES_FOLDER_NAME = "resources";
 
+  protected static void showEgitMessageBoxes(boolean show) {
+    try {
+      IPreferenceStore store = org.eclipse.egit.ui.Activator.getDefault().getPreferenceStore();
+      store.setValue(UIPreferences.SHOW_DETACHED_HEAD_WARNING, show);
+      store.setValue(UIPreferences.SHOW_GIT_PREFIX_WARNING, show);
+      store.setValue(UIPreferences.SHOW_HOME_DIR_WARNING, show);
+      store.setValue(UIPreferences.SHOW_INITIAL_CONFIG_DIALOG, show);
+      store.setValue(UIPreferences.SHOW_REBASE_CONFIRM, show);
+    }
+    catch (Throwable e) {
+      //NOP
+    }
+  }
+
   protected static void setupWorkspace(String baseFolder, String... projects) throws Exception {
+    showEgitMessageBoxes(false);
     JdtUtility.setWorkspaceAutoBuilding(false);
     setAutoUpdateFormData(false);
     Assert.assertNotNull("baseFolder must not be null", baseFolder);
