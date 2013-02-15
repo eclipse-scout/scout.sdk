@@ -48,6 +48,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.junit.Assert;
+import org.osgi.framework.Bundle;
 
 public abstract class AbstractScoutSdkTest {
 
@@ -68,6 +69,10 @@ public abstract class AbstractScoutSdkTest {
   }
 
   protected static void setupWorkspace(String baseFolder, String... projects) throws Exception {
+    setupWorkspace(Platform.getBundle(Activator.PLUGIN_ID), baseFolder, projects);
+  }
+
+  protected static void setupWorkspace(Bundle resourceBundle, String baseFolder, String... projects) throws Exception {
     showEgitMessageBoxes(false);
     JdtUtility.setWorkspaceAutoBuilding(false);
     setAutoUpdateFormData(false);
@@ -77,7 +82,7 @@ public abstract class AbstractScoutSdkTest {
     }
     for (String project : projects) {
       IProject javaProject = createProject(project);
-      copyProject(RESOURCES_FOLDER_NAME, baseFolder, project);
+      copyProject(resourceBundle, RESOURCES_FOLDER_NAME, baseFolder, project);
       javaProject.close(null);
       javaProject.open(null);
     }
@@ -146,8 +151,8 @@ public abstract class AbstractScoutSdkTest {
 //    System.out.println("end wait " + System.currentTimeMillis());
   }
 
-  protected static void copyProject(String... pathElements) throws IOException {
-    URL resource = FileLocator.find(Platform.getBundle(Activator.PLUGIN_ID), createPath(pathElements), null);
+  protected static void copyProject(Bundle resourceBundle, String... pathElements) throws IOException {
+    URL resource = FileLocator.find(resourceBundle, createPath(pathElements), null);
     if (resource != null) {
       String path = FileLocator.toFileURL(resource).getPath();
       copyFilesRecursive(path, ResourcesPlugin.getWorkspace().getRoot().getLocation().toOSString());
