@@ -133,7 +133,6 @@ public class StagingMojo extends AbstractMojo {
 	  return new File(getOutputDirectory() + File.separator + "stage");
   }
 
-
   @Override
   public void execute() throws MojoExecutionException {
     File compositeRepo = createCompositeRepo();
@@ -363,6 +362,4 @@ public class StagingMojo extends AbstractMojo {
   public void setStagingArea(String stagingArea) {
     this.stagingArea = stagingArea;
   }
-
-
 }

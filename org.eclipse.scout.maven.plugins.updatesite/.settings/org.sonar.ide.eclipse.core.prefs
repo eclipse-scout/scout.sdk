@@ -1,0 +1,5 @@
+analyseLocally=false
+eclipse.preferences.version=1
+projectKey=org.eclipse.scout.maven.plugins\:org.eclipse.scout.maven.plugins.updatesite
+serverUrl=https\://scout.bsiag.com/sonar
+version=2
