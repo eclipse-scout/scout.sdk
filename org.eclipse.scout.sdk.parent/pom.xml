@@ -26,10 +26,10 @@
 
   <modules>
     <module>../org.eclipse.scout.sdk.compatibility</module>
-    <module>../org.eclipse.scout.sdk.compatibility.v35.fragment</module>
     <module>../org.eclipse.scout.sdk.compatibility.v36.fragment</module>
     <module>../org.eclipse.scout.sdk.compatibility.v37v41.fragment</module>
     <module>../org.eclipse.scout.sdk.compatibility.v38v42.fragment</module>
+    <module>../org.eclipse.scout.sdk.compatibility.v43.fragment</module>
     <module>../org.eclipse.scout.sdk.util</module>
     <module>../org.eclipse.scout.nls.sdk</module>
     <module>../org.eclipse.scout.nls.sdk.simple</module>

@@ -4,8 +4,8 @@
    <extension
          point="org.eclipse.scout.sdk.compatibility.activator">
       <activator
-            class="org.eclipse.scout.sdk.compatibility.v38v42.internal.service.CompatibilityActivator"
-            platformVersion="3.8,4.2">
+            class="org.eclipse.scout.sdk.compatibility.v43.internal.CompatibilityActivator"
+            platformVersion="4.3">
       </activator>
    </extension>
 </fragment>
