@@ -59,7 +59,6 @@ public class StagingMojo extends AbstractMojo {
   private String updatesiteDir;
 
   /**
-   * TODO e.g. nightly, 3.8.1, 3.9.0
    *
    * @parameter default-value="nightly"
    */
@@ -75,6 +74,12 @@ public class StagingMojo extends AbstractMojo {
    * @parameter default-value="/home/data/httpd/download.eclipse.org/scout/stagingArea"
    */
   private String stagingArea;
+
+  /**
+   * @parameter default-value=100
+   */
+  private String maxSize;
+
 
   public String getP2InputDirectory() {
     return p2InputDirectory;
@@ -104,6 +109,11 @@ public class StagingMojo extends AbstractMojo {
 
   public String getUpdatesiteDir() {
     return updatesiteDir;
+  }
+
+
+  public int getMaxSize() {
+    return Integer.parseInt(maxSize);
   }
 
 
@@ -173,6 +183,7 @@ public class StagingMojo extends AbstractMojo {
       String jarName = contentJar.getName();
       File contentXML = extractCompositeArchive(outputDir, contentJar);
       appendChild(contentXML, getUpdatesiteDir());
+      truncateChildren(contentXML,getMaxSize());
       File contentFolder = new File(outputDir,folderName);
       contentFolder.mkdir();
       FileUtility.copyToDir(contentXML, contentFolder);
@@ -226,6 +237,31 @@ public class StagingMojo extends AbstractMojo {
     }
     catch (IOException e) {
       throw new MojoExecutionException("Could not append child", e);
+    }
+  }
+
+  public void truncateChildren(File contentXML, int truncateSize) throws MojoExecutionException {
+    try {
+      Document doc = FileUtility.readDOM(contentXML);
+      NodeList childrenNodes = doc.getElementsByTagName("children");
+      Node children = childrenNodes.item(0);
+
+      NodeList childNodes = doc.getElementsByTagName("child");
+      int removeCount = childNodes.getLength()- truncateSize;
+      for (int i = 0; i < removeCount; i++) {
+        children.removeChild(children.getFirstChild());
+      }
+      children.getAttributes().getNamedItem("size").setNodeValue(String.valueOf(truncateSize));
+      FileUtility.writeDOM(doc, contentXML);
+    }
+    catch (ParserConfigurationException e) {
+      throw new MojoExecutionException("Could not truncate children", e);
+    }
+    catch (SAXException e) {
+      throw new MojoExecutionException("Could not truncate children", e);
+    }
+    catch (IOException e) {
+      throw new MojoExecutionException("Could not truncate children", e);
     }
   }
 
