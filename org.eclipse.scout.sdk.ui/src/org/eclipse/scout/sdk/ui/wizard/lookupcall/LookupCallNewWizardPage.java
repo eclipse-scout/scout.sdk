@@ -89,7 +89,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     super(LookupCallNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
     m_serverBundle = serverBundle;
-    m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.AbstractSqlLookupService, sharedBundle.getJavaProject());
+    m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.ILookupService, sharedBundle.getJavaProject());
     setTargetPackage(DefaultTargetPackage.get(sharedBundle, IScoutBundle.SHARED_SERVICES_LOOKUP));
     setTitle(Texts.get("NewLookupCall"));
     setDescription(Texts.get("CreateANewLookupCall"));

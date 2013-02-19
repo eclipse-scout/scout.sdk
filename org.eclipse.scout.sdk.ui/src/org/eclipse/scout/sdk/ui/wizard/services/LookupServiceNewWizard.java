@@ -71,7 +71,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.AbstractSqlLookupService, serverBundle.getJavaProject()));
+    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.ILookupService, serverBundle.getJavaProject()));
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
