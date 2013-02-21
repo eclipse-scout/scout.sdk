@@ -73,6 +73,7 @@ public class FormStackNewOperation implements IOperation {
   private String m_serviceInterfaceName;
   private String m_serviceInterfacePackage;
   private IScoutBundle m_serviceImplementationBundle;
+  private String m_serviceImplementationSuperTypeSignature;
   private String m_serviceImplementationName;
   private String m_serviceImplementationPackage;
   private IScoutBundle[] m_serverServiceRegistryBundles;
@@ -198,7 +199,11 @@ public class FormStackNewOperation implements IOperation {
       serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
       serviceOp.setServiceName(getServiceImplementationName());
       serviceOp.setServicePackageName(getServiceImplementationPackage());
-      serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServiceImplementationBundle().getJavaProject()));
+      String serviceSuperTypeSig = getServiceImplementationSuperTypeSignature();
+      if (serviceSuperTypeSig == null) {
+        serviceSuperTypeSig = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServiceImplementationBundle().getJavaProject());
+      }
+      serviceOp.setServiceSuperTypeSignature(serviceSuperTypeSig);
       serviceOp.run(monitor, workingCopyManager);
       m_outProcessService = serviceOp.getCreatedServiceImplementation();
       m_outProcessServiceInterface = serviceOp.getCreatedServiceInterface();
@@ -752,5 +757,13 @@ public class FormStackNewOperation implements IOperation {
 
   public void setCreateStoreMethod(boolean createStoreMethod) {
     m_createStoreMethod = createStoreMethod;
+  }
+
+  public String getServiceImplementationSuperTypeSignature() {
+    return m_serviceImplementationSuperTypeSignature;
+  }
+
+  public void setServiceImplementationSuperTypeSignature(String serviceSuperTypeSignature) {
+    m_serviceImplementationSuperTypeSignature = serviceSuperTypeSignature;
   }
 }
