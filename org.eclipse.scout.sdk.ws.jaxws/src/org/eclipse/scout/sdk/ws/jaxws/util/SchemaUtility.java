@@ -26,6 +26,7 @@ import javax.wsdl.extensions.schema.SchemaReference;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
 
@@ -144,18 +145,23 @@ public final class SchemaUtility {
     List<?> includes = schema.getIncludes();
     if (includes != null && !includes.isEmpty()) {
       for (Object include : includes) {
-        if (include instanceof SchemaReference) {
-          SchemaReference schemaInclude = (SchemaReference) include;
+        if (!(include instanceof SchemaReference)) {
+          continue;
+        }
+        SchemaReference schemaInclude = (SchemaReference) include;
+        String schemaLocationURI = schemaInclude.getSchemaLocationURI();
+        if (!StringUtility.hasText(schemaLocationURI)) {
+          continue;
+        }
 
-          IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaInclude.getSchemaLocationURI()));
-          if (referencedSchemaResource != null) {
-            Schema referencedSchema = schemaInclude.getReferencedSchema();
-            SchemaIncludeArtefact<T> artefact = new SchemaIncludeArtefact<T>(referencedSchemaResource, referencedSchema);
-            visitor.onSchemaIncludeArtefact(artefact);
+        IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaLocationURI));
+        if (referencedSchemaResource != null) {
+          Schema referencedSchema = schemaInclude.getReferencedSchema();
+          SchemaIncludeArtefact<T> artefact = new SchemaIncludeArtefact<T>(referencedSchemaResource, referencedSchema);
+          visitor.onSchemaIncludeArtefact(artefact);
 
-            // recursion
-            visitReferencedSchemaResources(visitor, referencedSchemaResource, referencedSchema);
-          }
+          // recursion
+          visitReferencedSchemaResources(visitor, referencedSchemaResource, referencedSchema);
         }
       }
     }
@@ -164,22 +170,27 @@ public final class SchemaUtility {
     Map<?, ?> importMap = schema.getImports();
     if (importMap != null && !importMap.isEmpty()) {
       for (Object importObject : importMap.values()) {
-        if (importObject instanceof List<?>) {
-          List<?> importList = (List<?>) importObject;
+        if (!(importObject instanceof List<?>)) {
+          continue;
+        }
+        for (Object importDirective : (List<?>) importObject) {
+          if (!(importDirective instanceof SchemaImport)) {
+            continue;
+          }
+          SchemaImport schemaImport = (SchemaImport) importDirective;
+          String schemaLocationURI = schemaImport.getSchemaLocationURI();
+          if (!StringUtility.hasText(schemaLocationURI)) {
+            continue;
+          }
 
-          for (Object importDirective : importList) {
-            if (importDirective instanceof SchemaImport) {
-              SchemaImport schemaImport = (SchemaImport) importDirective;
-              IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaImport.getSchemaLocationURI()));
-              if (referencedSchemaResource != null) {
-                Schema referencedSchema = schemaImport.getReferencedSchema();
-                SchemaImportArtefact<T> artefact = new SchemaImportArtefact<T>(referencedSchemaResource, referencedSchema, schemaImport.getNamespaceURI());
-                visitor.onSchemaImportArtefact(artefact);
+          IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaLocationURI));
+          if (referencedSchemaResource != null) {
+            Schema referencedSchema = schemaImport.getReferencedSchema();
+            SchemaImportArtefact<T> artefact = new SchemaImportArtefact<T>(referencedSchemaResource, referencedSchema, schemaImport.getNamespaceURI());
+            visitor.onSchemaImportArtefact(artefact);
 
-                // recursion
-                visitReferencedSchemaResources(visitor, referencedSchemaResource, referencedSchema);
-              }
-            }
+            // recursion
+            visitReferencedSchemaResources(visitor, referencedSchemaResource, referencedSchema);
           }
         }
       }
