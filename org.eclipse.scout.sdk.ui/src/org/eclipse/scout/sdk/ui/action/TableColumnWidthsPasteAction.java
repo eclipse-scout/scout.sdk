@@ -64,8 +64,11 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private boolean fastDetection(String content) {
     try {
-      String identifier = TypeUtility.getFieldValueAsString(TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER));
-      return content.startsWith(identifier);
+      Object identifier = TypeUtility.getFieldConstant(TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER));
+      if (identifier instanceof String) {
+        return content.startsWith(identifier.toString());
+      }
+      return false;
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("Unable to get the identification constant from the scout class", e);

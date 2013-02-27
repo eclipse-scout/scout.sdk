@@ -362,7 +362,7 @@ public class TypeUtility {
     return null;
   }
 
-  public static String getFieldValueAsString(IField field) throws JavaModelException {
+  public static Object getFieldConstant(IField field) throws JavaModelException {
     Object val = field.getConstant();
     if (val instanceof String) {
       String ret = (String) val;
@@ -373,11 +373,8 @@ public class TypeUtility {
       }
       return ret;
     }
-    else if (val != null) {
-      return val.toString();
-    }
     else {
-      return null;
+      return val;
     }
   }
 
