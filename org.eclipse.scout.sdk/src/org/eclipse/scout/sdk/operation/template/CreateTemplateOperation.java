@@ -33,7 +33,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
@@ -56,7 +56,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -162,7 +162,7 @@ public class CreateTemplateOperation implements IOperation {
     op.setSuperTypeSignature(superclassTypeSignature);
     //}
     op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
-    IScoutBundle sharedBundle = findFormDataBundle(getTemplateBundle().getScoutProject());
+    IScoutBundle sharedBundle = getTemplateBundle().getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
     if (isCreateExternalFormData() && sharedBundle != null) {
       ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(getFormDataPackageSuffix()), sharedBundle);
       formDataOp.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
@@ -255,16 +255,6 @@ public class CreateTemplateOperation implements IOperation {
         ScoutSdk.logError("could not create template for '" + getFormField().getFullyQualifiedName() + "'.", e);
       }
     }
-  }
-
-  protected IScoutBundle findFormDataBundle(IScoutProject project) {
-    if (project != null) {
-      if (project.getSharedBundle() != null) {
-        return project.getSharedBundle();
-      }
-      return findFormDataBundle(project.getParentProject());
-    }
-    return null;
   }
 
   protected void updateFormFieldGetter(IType formField, IMethod templateFieldGetter, HashMap<String, P_FormField> templateFormFields, IImportValidator validator, MultiTextEdit edit, ITypeHierarchy hierarchy) {

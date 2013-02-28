@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project;
 
-import org.eclipse.scout.sdk.rap.ui.internal.ScoutSdkRapUI;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNode;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>UiRapNodePage</h3> ...
@@ -21,39 +20,14 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @author Andreas Hoegger
  * @since 3.8.0 20.10.2011
  */
-public class UiRapNodePage extends AbstractPage {
+public class UiRapNodePage extends AbstractBundleNodeTablePage {
 
-  private final IScoutBundle m_scoutBundle;
-
-  public UiRapNodePage(IPage parentPage, IScoutBundle uiRapBundle) {
-    setParent(parentPage);
-    m_scoutBundle = uiRapBundle;
-    setName(getScoutResource().getSimpleName());
-    setImageDescriptor(ScoutSdkRapUI.getImageDescriptor(ScoutSdkRapUI.RapBundle));
+  public UiRapNodePage(IPage parentPage, ScoutBundleNode node) {
+    super(parentPage, node);
   }
 
   @Override
   public String getPageId() {
-    return UiRapNodePage.class.getName();
-  }
-
-  @Override
-  public int getOrder() {
-    return 20;
-  }
-
-  @Override
-  public boolean isChildrenLoaded() {
-    return true;
-  }
-
-  @Override
-  public boolean isFolder() {
-    return false;
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return m_scoutBundle;
+    return "org.eclipse.scout.sdk.page.UiRapNodePage";
   }
 }

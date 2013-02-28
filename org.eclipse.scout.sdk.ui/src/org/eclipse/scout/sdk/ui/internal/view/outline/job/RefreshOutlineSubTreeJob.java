@@ -23,7 +23,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ProjectsTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -60,11 +60,11 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
     final Cursor waitCursor = new Cursor(display, SWT.CURSOR_WAIT);
     try {
       m_backupTree = new P_BackupNode[dirtyStructureRoots.length];
-      // gui thread
       if (dirtyStructureRoots.length > 0) {
         if (m_treeControl == null || m_treeControl.isDisposed()) {
           return;
         }
+        // gui thread
         display.syncExec(new Runnable() {
           @Override
           public void run() {

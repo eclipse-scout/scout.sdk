@@ -101,7 +101,7 @@ public class InstallTextFileOperation implements IOperation {
       m_createdFile.create(new ByteArrayInputStream(s.getBytes()), true, monitor);
     }
     catch (Exception e) {
-      ScoutSdk.logError("could not install text file.", e);
+      throw new CoreException(new ScoutStatus(e));
     }
   }
 

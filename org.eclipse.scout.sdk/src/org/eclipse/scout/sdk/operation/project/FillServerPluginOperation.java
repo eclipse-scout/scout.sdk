@@ -22,6 +22,10 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class FillServerPluginOperation extends AbstractScoutProjectNewOperation {
   private IProject m_project;
 
+  public final static String PROP_INSTALL_SERVER_APP_CLASS = "INSTALL_SERVER_APP_CLASS";
+  public final static String PROP_INSTALL_SERVER_SESSION_CLASS = "INSTALL_SERVER_SESSION_CLASS";
+  public final static String PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS = "INSTALL_ACCESS_CONTROL_SVC_CLASS";
+
   @Override
   public String getOperationName() {
     return "Fill Scout Server Plugin";
@@ -46,15 +50,36 @@ public class FillServerPluginOperation extends AbstractScoutProjectNewOperation 
     }
   }
 
+  private boolean isInstallApp() {
+    Boolean b = getProperties().getProperty(PROP_INSTALL_SERVER_APP_CLASS, Boolean.class);
+    return b == null || b.booleanValue();
+  }
+
+  private boolean isInstallSession() {
+    Boolean b = getProperties().getProperty(PROP_INSTALL_SERVER_SESSION_CLASS, Boolean.class);
+    return b == null || b.booleanValue();
+  }
+
+  private boolean isInstallAccessControlSvc() {
+    Boolean b = getProperties().getProperty(PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS, Boolean.class);
+    return b == null || b.booleanValue();
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String destPathPref = "src/" + (m_project.getName().replace('.', '/')) + "/";
     Map<String, String> props = getStringProperties();
     new InstallJavaFileOperation("templates/server/src/Activator.java", destPathPref + "Activator.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/server/src/ServerApplication.java", destPathPref + "ServerApplication.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/server/src/ServerSession.java", destPathPref + "ServerSession.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/server/src/AccessControlService.java",
-        destPathPref + "services/common/security/AccessControlService.java", m_project, props).run(monitor, workingCopyManager);
+    if (isInstallApp()) {
+      new InstallJavaFileOperation("templates/server/src/ServerApplication.java", destPathPref + "ServerApplication.java", m_project, props).run(monitor, workingCopyManager);
+    }
+    if (isInstallSession()) {
+      new InstallJavaFileOperation("templates/server/src/ServerSession.java", destPathPref + "ServerSession.java", m_project, props).run(monitor, workingCopyManager);
+    }
+    if (isInstallAccessControlSvc()) {
+      new InstallJavaFileOperation("templates/server/src/AccessControlService.java",
+          destPathPref + "services/common/security/AccessControlService.java", m_project, props).run(monitor, workingCopyManager);
+    }
     m_project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 }

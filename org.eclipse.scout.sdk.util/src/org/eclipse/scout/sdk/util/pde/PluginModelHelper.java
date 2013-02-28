@@ -20,6 +20,7 @@ import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.IPluginObject;
+import org.eclipse.pde.internal.core.ibundle.IBundlePlugin;
 import org.eclipse.pde.internal.core.ibundle.IManifestHeader;
 import org.eclipse.pde.internal.core.text.bundle.BundleClasspathHeader;
 import org.eclipse.pde.internal.core.text.bundle.ExportPackageHeader;
@@ -149,7 +150,7 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public void addDependency(String pluginId, boolean reexport) throws CoreException {
-      addDependency(pluginId, false, false);
+      addDependency(pluginId, reexport, false);
     }
 
     /**
@@ -659,6 +660,15 @@ public class PluginModelHelper {
       removeSimpleExtension(extensionPointId, elementName, null);
     }
 
+    public void removeExtensionPoint(String extensionPointId) throws CoreException {
+      List<IPluginExtension> pluginExtensionPoints = getPluginExtensionPoints(extensionPointId);
+      for (IPluginExtension point : pluginExtensionPoints) {
+        if (point.getParent() instanceof IBundlePlugin) {
+          ((IBundlePlugin) point.getParent()).remove(point);
+        }
+      }
+    }
+
     /**
      * Gets all simple extensions with given <code>extensionPointId</code>, <code>elementName</code> and
      * <code>attributes</code>.<br>
@@ -722,14 +732,22 @@ public class PluginModelHelper {
       return getSimpleExtensions(extensionPointId, elementName, null);
     }
 
-    private List<IPluginElement> getPluginExtensions(String extensionPointId) {
-      LinkedList<IPluginElement> result = new LinkedList<IPluginElement>();
+    private List<IPluginExtension> getPluginExtensionPoints(String extensionPointId) {
+      LinkedList<IPluginExtension> result = new LinkedList<IPluginExtension>();
       for (IPluginExtension extPoint : m_model.getExtensionsModel().getExtensions().getExtensions()) {
         if (extPoint.getPoint().equals(extensionPointId)) {
-          for (IPluginObject element : extPoint.getChildren()) {
-            if (element instanceof IPluginElement) {
-              result.add((IPluginElement) element);
-            }
+          result.add(extPoint);
+        }
+      }
+      return result;
+    }
+
+    private List<IPluginElement> getPluginExtensions(String extensionPointId) {
+      LinkedList<IPluginElement> result = new LinkedList<IPluginElement>();
+      for (IPluginExtension extPoint : getPluginExtensionPoints(extensionPointId)) {
+        for (IPluginObject element : extPoint.getChildren()) {
+          if (element instanceof IPluginElement) {
+            result.add((IPluginElement) element);
           }
         }
       }

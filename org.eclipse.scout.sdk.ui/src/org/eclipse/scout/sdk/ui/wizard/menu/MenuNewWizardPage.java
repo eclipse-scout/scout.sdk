@@ -19,8 +19,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -63,7 +63,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   private static final String PROP_FORM_HANDLER = "formHandler";
 
   private final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
-  private final IType iformType = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType iFormType = TypeUtility.getType(RuntimeClasses.IForm);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -166,11 +166,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     m_formToOpenField = getFieldToolkit().createJavaElementProposalField(groupBox, Texts.get("FormToStart"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        ITypeHierarchy cachedFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iformType);
+        ITypeHierarchy cachedFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormType);
         ITypeFilter formsFilter = TypeFilters.getMultiTypeFilter(
             TypeFilters.getTypesOnClasspath(getDeclaringType().getJavaProject()),
             TypeFilters.getClassFilter());
-        IType[] formCandidates = cachedFormHierarchy.getAllSubtypes(iformType, formsFilter, TypeComparators.getTypeNameComparator());
+        IType[] formCandidates = cachedFormHierarchy.getAllSubtypes(iFormType, formsFilter, TypeComparators.getTypeNameComparator());
         return new Object[][]{formCandidates};
       }
     });

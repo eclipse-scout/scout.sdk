@@ -17,9 +17,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.TargetPackageEntry;
 import org.eclipse.scout.sdk.ui.extensions.preferences.IScoutProjectScrolledContent.IModelLoadProgressObserver;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link TargetPackagePreferencePage}</h3> ...
@@ -30,16 +31,18 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 public class TargetPackagePreferencePage extends AbstractScoutProjectPreferencePage<TargetPackagePreferenceScrolledContent, TargetPackageModel> {
 
   public TargetPackagePreferencePage() {
-    super(Texts.get("ScoutSDKDefaultPackagePreferences"), TargetPackagePreferenceScrolledContent.class);
+    super(Texts.get("ScoutSDKDefaultPackagePreferences"), TargetPackagePreferenceScrolledContent.class, IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED);
   }
 
   @Override
   protected void loadAllModels(IModelLoadProgressObserver<TargetPackageModel> observer) {
-    Set<Entry<String, String>> defaultPackages = DefaultTargetPackage.getAllDefaults().entrySet();
-    for (Entry<IScoutProject, TargetPackagePreferenceScrolledContent> e : getProjectModelMap().entrySet()) {
+    Set<TargetPackageEntry> defaultPackages = DefaultTargetPackage.getAllDefaults();
+    for (Entry<IScoutBundle, TargetPackagePreferenceScrolledContent> e : getProjectModelMap().entrySet()) {
       List<TargetPackageModel> list = new ArrayList<TargetPackageModel>();
-      for (Entry<String, String> entry : defaultPackages) {
-        list.add(new TargetPackageModel(entry.getKey(), entry.getValue(), e.getKey()));
+      for (TargetPackageEntry entry : defaultPackages) {
+        if (e.getKey().getType().equals(entry.getBundleType())) {
+          list.add(new TargetPackageModel(entry.getId(), entry.getDefaultSuffix(), e.getKey()));
+        }
       }
       Collections.sort(list);
 

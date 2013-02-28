@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.laf;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -18,6 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
@@ -28,7 +30,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -41,7 +43,8 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
@@ -120,8 +123,8 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    IType[] swingEnvs = getSwingEnvironments(project.getUiSwingBundle());
+  public TriState getSelection(IScoutBundle project) {
+    IType[] swingEnvs = getSwingEnvironments(project);
     if (swingEnvs == null || swingEnvs.length == 0) {
       return TriState.FALSE;
     }
@@ -152,27 +155,31 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getClientBundle() != null && project.getClientBundle().getProject().exists() &&
-        project.getUiSwingBundle() != null && project.getUiSwingBundle().getProject().exists();
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false) != null;
   }
 
   private IType[] getSwingEnvironments(IScoutBundle bundle) {
+    IScoutBundle[] swingBundles = bundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
+    ArrayList<IJavaProject> projects = new ArrayList<IJavaProject>(swingBundles.length);
+    for (IScoutBundle swingChild : swingBundles) {
+      projects.add(swingChild.getJavaProject());
+    }
     IType baseType = TypeUtility.getType(RuntimeClasses.ISwingEnvironment);
     if (TypeUtility.exists(baseType)) {
       IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(baseType);
-      return hierarchy.getAllSubtypes(baseType, TypeFilters.getClassesInProject(bundle.getJavaProject()));
+      return hierarchy.getAllSubtypes(baseType, TypeFilters.getTypesInProjects(projects.toArray(new IJavaProject[projects.size()])));
     }
     return new IType[]{};
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    for (IType swingEnvType : getSwingEnvironments(project.getUiSwingBundle())) {
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
+    for (IType swingEnvType : getSwingEnvironments(project)) {
       IResource res = swingEnvType.getResource();
       if (res.getType() == IResource.FILE) {
         IFile javaRes = (IFile) res;
-        ScoutTechnologyResource tr = new ScoutTechnologyResource(project.getUiSwingBundle(), javaRes);
+        ScoutTechnologyResource tr = new ScoutTechnologyResource(ScoutTypeUtility.getScoutBundle(swingEnvType.getJavaProject()), javaRes);
         list.add(tr);
       }
     }

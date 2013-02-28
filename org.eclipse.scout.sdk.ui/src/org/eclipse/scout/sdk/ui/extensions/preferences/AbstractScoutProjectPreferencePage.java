@@ -21,11 +21,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.ui.extensions.preferences.IScoutProjectScrolledContent.IModelLoadProgressObserver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -54,24 +55,22 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
   private T m_currentProjectSetting;
   private Composite m_container;
 
-  private final Map<IScoutProject, T> m_projectSettings;
+  private final Map<IScoutBundle, T> m_projectSettings;
 
-  public AbstractScoutProjectPreferencePage(String desc, Class<T> contentClass) {
+  public AbstractScoutProjectPreferencePage(String desc, Class<T> contentClass, String... scoutBundleTypes) {
     setDescription(desc);
 
-    IScoutProject[] rootProjects = ScoutWorkspace.getInstance().getRootProjects();
-    m_projectSettings = new HashMap<IScoutProject, T>(rootProjects.length);
-    for (IScoutProject p : rootProjects) {
-      if (p.getSharedBundle() != null && p.getSharedBundle().getProject() != null && p.getSharedBundle().getProject().exists()) {
-        try {
-          m_projectSettings.put(p, contentClass.newInstance());
-        }
-        catch (InstantiationException e) {
-          ScoutSdkUi.logError(e);
-        }
-        catch (IllegalAccessException e) {
-          ScoutSdkUi.logError(e);
-        }
+    IScoutBundle[] rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getBundlesOfTypeFilter(scoutBundleTypes));
+    m_projectSettings = new HashMap<IScoutBundle, T>(rootProjects.length);
+    for (IScoutBundle p : rootProjects) {
+      try {
+        m_projectSettings.put(p, contentClass.newInstance());
+      }
+      catch (InstantiationException e) {
+        ScoutSdkUi.logError(e);
+      }
+      catch (IllegalAccessException e) {
+        ScoutSdkUi.logError(e);
       }
     }
   }
@@ -230,7 +229,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
   }
 
   private void createSettingsLists(final Composite parent) {
-    for (Entry<IScoutProject, T> e : m_projectSettings.entrySet()) {
+    for (Entry<IScoutBundle, T> e : m_projectSettings.entrySet()) {
       e.getValue().createContent(parent);
     }
   }
@@ -255,15 +254,15 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
 
   protected abstract int getTotalWork();
 
-  protected Map<IScoutProject, T> getProjectModelMap() {
+  protected Map<IScoutBundle, T> getProjectModelMap() {
     return m_projectSettings;
   }
 
   private void initializeValues() {
     String[] projectNames = new String[m_projectSettings.size()];
     int i = 0;
-    for (IScoutProject p : m_projectSettings.keySet()) {
-      projectNames[i++] = p.getProjectName();
+    for (IScoutBundle p : m_projectSettings.keySet()) {
+      projectNames[i++] = p.getSymbolicName();
     }
     Arrays.sort(projectNames);
     m_projectCombo.setItems(projectNames);
@@ -277,8 +276,8 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
       m_currentProjectSetting.setVisible(false);
     }
 
-    for (IScoutProject p : m_projectSettings.keySet()) {
-      if (p.getProjectName().equals(projectName)) {
+    for (IScoutBundle p : m_projectSettings.keySet()) {
+      if (p.getSymbolicName().equals(projectName)) {
         m_currentProjectSetting = m_projectSettings.get(p);
         m_currentProjectSetting.setVisible(true);
         break;

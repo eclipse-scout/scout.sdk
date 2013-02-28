@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,4 +50,8 @@ public class ExternalCheckboxFieldTest extends AbstractScoutSdkTest {
 
   }
 
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
+  }
 }

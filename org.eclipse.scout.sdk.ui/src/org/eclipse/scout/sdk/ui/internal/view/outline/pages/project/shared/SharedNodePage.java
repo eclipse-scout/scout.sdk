@@ -11,34 +11,31 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSharedBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNode;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>SharedNodePage</h3> ...
  */
-public class SharedNodePage extends AbstractPage {
+public class SharedNodePage extends AbstractBundleNodeTablePage {
 
-  final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
-  private final IScoutBundle m_sharedProject;
+  private final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
 
-  public SharedNodePage(IPage parent, IScoutBundle sharedProject) {
-    setParent(parent);
-    m_sharedProject = sharedProject;
-    setName(getScoutResource().getSimpleName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundle));
+  public SharedNodePage(IPage parent, ScoutBundleNode node) {
+    super(parent, node);
   }
 
   @Override
@@ -47,29 +44,9 @@ public class SharedNodePage extends AbstractPage {
   }
 
   @Override
-  public int getOrder() {
-    return 200;
-  }
-
-  @Override
-  public boolean isFolder() {
-    return true;
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return m_sharedProject;
-  }
-
-  @Override
-  public boolean isInitiallyLoaded() {
-    return true;
-  }
-
-  @Override
   public void loadChildrenImpl() {
-
-    if (getScoutResource().getScoutProject().getIconProvider() != null) {
+    super.loadChildrenImpl();
+    if (getScoutResource().getIconProvider() != null) {
       ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
       IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), null);
       if (iconTypes.length > 0) {
@@ -83,26 +60,31 @@ public class SharedNodePage extends AbstractPage {
       new LookupCallTablePage(this);
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("could not create LookupCallTablePage in project '" + getScoutResource().getRootPackageName() + "'", e);
+      ScoutSdkUi.logWarning("could not create LookupCallTablePage in project '" + getScoutResource().getSymbolicName() + "'", e);
     }
     try {
       new LibrariesTablePage(this, getScoutResource());
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
     }
   }
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    WellformAction action = (WellformAction) menu;
-    action.setLabel(Texts.get("WellformSharedBundle"));
-    action.setOperation(new WellformSharedBundleOperation(getScoutResource()));
+    if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setLabel(Texts.get("WellformSharedBundle"));
+      action.setOperation(new WellformSharedBundleOperation(getScoutResource()));
+    }
+    else if (menu instanceof ScoutBundleNewAction) {
+      ((ScoutBundleNewAction) menu).setScoutProject(getScoutResource());
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class};
+    return new Class[]{WellformAction.class, ScoutBundleNewAction.class};
   }
 }

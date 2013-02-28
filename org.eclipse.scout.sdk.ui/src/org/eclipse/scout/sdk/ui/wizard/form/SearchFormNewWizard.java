@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
@@ -37,15 +38,15 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
 public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
-  public static final int TYPE_SEARCH_FORM = 100;
-  public static final int TYPE_SEARCH_FORM_DATA = 101;
-  public static final int TYPE_HANDLER_SEARCH = 102;
+  public static final String TYPE_SEARCH_FORM = "searchForm";
+  public static final String TYPE_SEARCH_FORM_DATA = "searchFormData";
+  public static final String TYPE_HANDLER_SEARCH = "searchHandler";
 
   private final IScoutBundle m_clientBundle;
   private SearchFormNewWizardPage m_page1;
@@ -86,24 +87,22 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   }
 
   private ITreeNode createTree(IScoutBundle clientBundle) {
-    IScoutBundle sharedBundle = null;
-    IScoutProject scoutProject = clientBundle.getScoutProject();
-    while (sharedBundle == null && scoutProject != null) {
-      sharedBundle = scoutProject.getSharedBundle();
-      scoutProject = scoutProject.getParentProject();
-    }
-    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle.getScoutProject(), NodeFilters.getAcceptAll());
+    IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+
+    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
 
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
+
     // form
-    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_SEARCH_FORM, Texts.get("SearchForm"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SEARCH_FORM);
+    ITreeNode formNode = TreeUtility.createNode(clientNode, TYPE_SEARCH_FORM, Texts.get("SearchForm"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
+
     // searchHandler
-    TreeUtility.createNode(formNode, TYPE_HANDLER_SEARCH, Texts.get("SearchHandler"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_HANDLER_SEARCH);
+    TreeUtility.createNode(formNode, TYPE_HANDLER_SEARCH, Texts.get("SearchHandler"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
 
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // formData
-      TreeUtility.createNode(sharedNode, TYPE_SEARCH_FORM_DATA, Texts.get("SearchFormData"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SEARCH_FORM_DATA);
+      TreeUtility.createNode(sharedNode, TYPE_SEARCH_FORM_DATA, Texts.get("SearchFormData"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
     }
     return rootNode;
   }
@@ -165,27 +164,14 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   private class P_InitialCheckedFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_HANDLER_SEARCH:
-        case TYPE_SEARCH_FORM:
-        case TYPE_SEARCH_FORM_DATA:
-          return true;
-        default:
-          return false;
-      }
+      return TreeUtility.isOneOf(node.getType(), TYPE_HANDLER_SEARCH, TYPE_SEARCH_FORM, TYPE_SEARCH_FORM_DATA);
     }
   } // end class P_InitialCheckedFilter
 
   private class P_TreeDndListener implements ITreeDndListener {
     @Override
     public boolean isDragableNode(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_SEARCH_FORM:
-          return true;
-
-        default:
-          return false;
-      }
+      return TYPE_SEARCH_FORM.equals(node.getType());
     }
 
     @Override
@@ -210,7 +196,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
           ITreeNode oldFomDataParent = formDataNode.getParent();
           IScoutBundle formBundle = (IScoutBundle) dndEvent.node.getParent().getData();
-          IScoutBundle[] sharedBundles = formBundle.getRequiredBundles(ScoutBundleFilters.getSharedFilter(), false);
+          IScoutBundle[] sharedBundles = formBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
           for (IScoutBundle formDataBundle : sharedBundles) {
             ITreeNode sharedNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByData(formDataBundle));
             if (sharedNode != null) {
@@ -233,15 +219,12 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
     }
 
     private void validateDropMove(DndEvent dndEvent) {
-      switch (dndEvent.node.getType()) {
-        case TYPE_SEARCH_FORM:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_CLIENT;
-          break;
-        default:
-          dndEvent.doit = false;
-          break;
+      if (TYPE_SEARCH_FORM.equals(dndEvent.node.getType())) {
+        dndEvent.doit = IScoutBundle.TYPE_CLIENT.equals(dndEvent.targetParent.getType());
       }
-
+      else {
+        dndEvent.doit = false;
+      }
     }
   } // end class P_TreeDndListener
 
@@ -258,10 +241,16 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (searchFormBundle != null) {
         ITreeNode searchFormNode = m_page2.getTreeNode(TYPE_SEARCH_FORM, true, true);
         if (searchFormNode != null) {
-          String fqn = searchFormBundle.getPackageName(m_page1.getTargetPackage()) + "." + searchFormNode.getText();
-          if (searchFormBundle.findType(fqn) != null) {
-            return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.ERROR) : (IStatus.WARNING),
-                ScoutSdkUi.PLUGIN_ID, "'" + searchFormNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+          try {
+            String fqn = searchFormBundle.getPackageName(m_page1.getTargetPackage()) + "." + searchFormNode.getText();
+            if (searchFormBundle.getJavaProject().findType(fqn) != null) {
+              return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.ERROR) : (IStatus.WARNING),
+                  ScoutSdkUi.PLUGIN_ID, "'" + searchFormNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("AnErrorOccured"));
           }
         }
       }
@@ -270,10 +259,16 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (formDataBundle != null) {
         ITreeNode formDataNode = m_page2.getTreeNode(TYPE_SEARCH_FORM_DATA, true, true);
         if (formDataNode != null) {
-          String fqn = formDataBundle.getPackageName(m_page1.getTargetPackage()) + "." + formDataNode.getText();
-          if (formDataBundle.findType(fqn) != null) {
-            return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.WARNING) : (IStatus.ERROR),
-                ScoutSdkUi.PLUGIN_ID, "'" + formDataNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+          try {
+            String fqn = formDataBundle.getPackageName(m_page1.getTargetPackage()) + "." + formDataNode.getText();
+            if (formDataBundle.getJavaProject().findType(fqn) != null) {
+              return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.WARNING) : (IStatus.ERROR),
+                  ScoutSdkUi.PLUGIN_ID, "'" + formDataNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("AnErrorOccured"));
           }
         }
       }
@@ -285,16 +280,13 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (formBundle != null) {
         IScoutBundle formDataBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM_DATA, true, true);
         if (formDataBundle != null) {
-          if (!formBundle.isOnClasspath(formDataBundle)) {
+          if (!ScoutTypeUtility.isOnClasspath(formDataBundle, formBundle)) {
             return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.WARNING) : (IStatus.ERROR),
                 ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_page2.getTextOfNode(TYPE_SEARCH_FORM_DATA), m_page2.getTextOfNode(TYPE_SEARCH_FORM)));
           }
         }
-
       }
       return Status.OK_STATUS;
     }
-
   } // end class P_StatusRevalidator
-
 }

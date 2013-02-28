@@ -3,6 +3,7 @@ package org.eclipse.scout.sdk.ui.internal.wizard.export;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -18,7 +19,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -30,8 +31,8 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
   private final static String PROP_PRODUCT_FILE = "productFile";
   private final static String PROP_WAR_FILE_NAME = "warFileName";
 
-  private final IScoutProject m_scoutProject;
-  private final int m_nodeTypeFilter;
+  private final IScoutBundle m_scoutProject;
+  private final String m_nodeTypeFilter;
   private final String m_settingsProductFile;
   private final String m_settingsWarFileName;
 
@@ -39,7 +40,7 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
   protected ProductSelectionField m_productField;
   protected IStatus m_productStatus = Status.OK_STATUS;
 
-  public AbstractExportProductWizardPage(IScoutProject scoutProject, String pageName, String title, int nodeTypeFilter,
+  public AbstractExportProductWizardPage(IScoutBundle scoutProject, String pageName, String title, String nodeTypeFilter,
       String prodFileSetting, String warFileNameSetting) {
     super(pageName);
     m_scoutProject = scoutProject;
@@ -63,7 +64,13 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
     });
     m_warFileName.setText(getDialogSettings().get(m_settingsWarFileName));
 
-    ITreeNode productTreeRoot = TreeUtility.createProductTree(getScoutProject(), new DeployableProductFileNodeFilter(m_nodeTypeFilter), false);
+    ITreeNode productTreeRoot = null;
+    try {
+      productTreeRoot = TreeUtility.createProductTree(getScoutProject(), new DeployableProductFileNodeFilter(m_nodeTypeFilter), false);
+    }
+    catch (CoreException e1) {
+      ScoutSdkUi.logError("unable to create product file list", e1);
+    }
     m_productField = new ProductSelectionField(parent, productTreeRoot);
     m_productField.setLabelText(Texts.get("ProductFile"));
     m_productField.addProductSelectionListener(new IProductSelectionListener() {
@@ -171,7 +178,7 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
     getDialogSettings().put(m_settingsProductFile, setting);
   }
 
-  public IScoutProject getScoutProject() {
+  public IScoutBundle getScoutProject() {
     return m_scoutProject;
   }
 

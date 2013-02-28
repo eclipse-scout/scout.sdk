@@ -18,7 +18,10 @@ import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -70,12 +73,12 @@ public class Bug87486Test extends AbstractScoutSdkTest {
   }
 
   private void checkResolveName(String iconName, boolean assertIconExists) {
-    ScoutSdkCore.getScoutWorkspace().getRootProjects();
+    ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());
 
     IType icons = TypeUtility.getType("a.shared.Icons");
     Assert.assertTrue(TypeUtility.exists(icons));
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("a.shared");
-    IScoutProject scoutProject = ScoutSdkCore.getScoutWorkspace().getScoutBundle(project).getScoutProject();
+    IScoutBundle scoutProject = ScoutTypeUtility.getScoutBundle(project);
     IIconProvider projectIcons = scoutProject.getIconProvider();
     ScoutIconDesc iconDesc = projectIcons.getIcon(iconName);
 
@@ -87,5 +90,10 @@ public class Bug87486Test extends AbstractScoutSdkTest {
     else {
       Assert.assertNull(iconDesc.getImageDescriptor());
     }
+  }
+
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
   }
 }

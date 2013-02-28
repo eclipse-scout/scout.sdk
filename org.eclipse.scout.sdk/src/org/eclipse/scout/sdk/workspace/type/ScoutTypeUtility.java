@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotatable;
@@ -42,8 +43,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
@@ -63,7 +64,6 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -82,12 +82,44 @@ public class ScoutTypeUtility extends TypeUtility {
     return getInnerTypesOrdered(declaringType, superType, ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
-  public static IScoutBundle getScoutBundle(IJavaElement element) {
-    return ScoutSdkCore.getScoutWorkspace().getScoutBundle(element.getJavaProject().getProject());
+  public static IScoutBundle getScoutBundle(IProject p) {
+    return ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(p);
   }
 
-  public static IScoutProject getScoutProject(IJavaElement element) {
-    return ScoutSdkCore.getScoutWorkspace().getScoutBundle(element.getJavaProject().getProject()).getScoutProject();
+  public static IScoutBundle getScoutBundle(IJavaElement element) {
+    return ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(element);
+  }
+
+  /**
+   * checks whether element is on the classpath of the given bundle
+   * 
+   * @param element
+   *          the element to search
+   * @param bundle
+   *          the bundle classpath to search in
+   * @return true if element was found in the classpath of bundle
+   */
+  public static boolean isOnClasspath(IScoutBundle element, IScoutBundle bundle) {
+    if (element == null || bundle == null) {
+      return false;
+    }
+    return isOnClasspath(element.getJavaProject(), bundle.getJavaProject());
+  }
+
+  /**
+   * checks whether element is on the classpath of the given bundle
+   * 
+   * @param element
+   *          the element to search
+   * @param bundle
+   *          the bundle classpath to search in
+   * @return true if element was found in the classpath of bundle
+   */
+  public static boolean isOnClasspath(IJavaElement element, IScoutBundle bundle) {
+    if (bundle == null) {
+      return false;
+    }
+    return isOnClasspath(element, bundle.getJavaProject());
   }
 
   /**
@@ -174,7 +206,7 @@ public class ScoutTypeUtility extends TypeUtility {
   public static INlsProject findNlsProject(IJavaElement element) {
     IScoutBundle scoutBundle = getScoutBundle(element);
     if (scoutBundle != null) {
-      return scoutBundle.findBestMatchNlsProject();
+      return scoutBundle.getNlsProject();
     }
     return null;
   }
@@ -182,7 +214,7 @@ public class ScoutTypeUtility extends TypeUtility {
   public static IIconProvider findIconProvider(IJavaElement element) {
     IScoutBundle scoutBundle = getScoutBundle(element);
     if (scoutBundle != null) {
-      return scoutBundle.findBestMatchIconProvider();
+      return scoutBundle.getIconProvider();
     }
     return null;
   }

@@ -18,7 +18,6 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
@@ -26,7 +25,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.icon.IconContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.icon.IconLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutElement;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -106,7 +105,7 @@ public class IconsEditor extends EditorPart {
   public void setScoutSharedBundle(IScoutBundle sharedBundle) {
     // XXX load async
     if (sharedBundle != null) {
-      m_iconProvider = sharedBundle.findBestMatchIconProvider();
+      m_iconProvider = sharedBundle.getIconProvider();
       if (m_viewer != null && !m_viewer.getControl().isDisposed()) {
         m_viewer.setContentProvider(new IconContentProvider(m_iconProvider, (ILabelProvider) m_viewer.getLabelProvider()));
         m_viewer.refresh();
@@ -133,8 +132,8 @@ public class IconsEditor extends EditorPart {
   public void init(IEditorSite site, IEditorInput input) throws PartInitException {
     if (input instanceof FileEditorInput) {
       IFile file = ((FileEditorInput) input).getFile();
-      IScoutBundle scoutProject = ScoutSdkCore.getScoutWorkspace().getScoutBundle(file.getProject());
-      if (scoutProject.getType() == IScoutElement.BUNDLE_SHARED) {
+      IScoutBundle scoutProject = ScoutTypeUtility.getScoutBundle(file.getProject());
+      if (scoutProject != null && IScoutBundle.TYPE_SHARED.equals(scoutProject.getType())) {
         setScoutSharedBundle(scoutProject);
       }
       // TODO parse file

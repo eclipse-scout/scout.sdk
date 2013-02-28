@@ -15,14 +15,17 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
+
+  private final static String CLIENT_SVG_BUNDLE_NAME = "org.eclipse.scout.svg.client";
 
   public final static String[] COMMON_SVG_PLUGINS = new String[]{
       "org.apache.batik.bridge",
@@ -37,7 +40,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
       "org.apache.batik.util",
       "org.apache.batik.util.gui",
       "org.apache.batik.xml",
-      "org.eclipse.scout.svg.client",
+      CLIENT_SVG_BUNDLE_NAME,
       "org.w3c.css.sac",
       "org.w3c.dom.smil",
       "org.w3c.dom.svg"};
@@ -47,7 +50,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    selectionChangedManifest(resources, selected, RuntimeClasses.ScoutClientSvgBundleId);
+    selectionChangedManifest(resources, selected, CLIENT_SVG_BUNDLE_NAME);
   }
 
   @Override
@@ -56,17 +59,21 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getClientBundle() != null && project.getClientBundle().getProject().exists();
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false) != null;
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    return getSelectionManifest(project.getClientBundle(), RuntimeClasses.ScoutClientSvgBundleId);
+  public TriState getSelection(IScoutBundle project) {
+    return getSelectionManifests(getClientBundlesBelow(project), CLIENT_SVG_BUNDLE_NAME);
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeManifestFile(project.getClientBundle(), list);
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
+    contributeManifestFiles(getClientBundlesBelow(project), list);
+  }
+
+  private IScoutBundle[] getClientBundlesBelow(IScoutBundle start) {
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
   }
 }

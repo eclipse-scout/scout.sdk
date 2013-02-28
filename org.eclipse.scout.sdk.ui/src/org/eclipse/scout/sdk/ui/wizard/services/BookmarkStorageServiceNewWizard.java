@@ -21,8 +21,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
@@ -43,16 +45,16 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
 public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
-  public static final int TYPE_SERVICE_INTERFACE = 107;
-  public static final int TYPE_SERVICE_IMPLEMENTATION = 108;
-  public static final int TYPE_SERVICE_REG_CLIENT = 109;
-  public static final int TYPE_SERVICE_REG_SERVER = 110;
+  public static final String TYPE_SERVICE_INTERFACE = "svcIfc";
+  public static final String TYPE_SERVICE_IMPLEMENTATION = "svcImpl";
+  public static final String TYPE_SERVICE_REG_CLIENT = "svcRegClient";
+  public static final String TYPE_SERVICE_REG_SERVER = "svcRegServer";
 
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
@@ -63,7 +65,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
     setWindowTitle(Texts.get("NewBookmarkService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewBookmarkStorageService"), Texts.get("CreateANewBookmarkStorageService"),
-        TypeUtility.getType(RuntimeClasses.IBookmarkStorageService), SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IScoutBundle.SERVER_SERVICES_BOOKMARK));
+        TypeUtility.getType(RuntimeClasses.IBookmarkStorageService), SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_BOOKMARK));
     m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.IBookmarkStorageService));
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
@@ -83,31 +85,31 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode createTree(IScoutBundle serverBundle) {
     IScoutBundle sharedBundle = null;
     IScoutBundle clientBundle = null;
-    IScoutProject scoutProject = serverBundle.getScoutProject();
-    while ((sharedBundle == null || clientBundle == null) && scoutProject != null) {
-      sharedBundle = scoutProject.getSharedBundle();
-      clientBundle = scoutProject.getClientBundle();
-      scoutProject = scoutProject.getParentProject();
+    if (serverBundle != null) {
+      sharedBundle = serverBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+      if (sharedBundle != null) {
+        clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
+      }
     }
 
-    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle.getScoutProject(), NodeFilters.getAcceptAll());
+    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
 
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
       // service client reg
-      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, Texts.get("ServiceProxyRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
+      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, Texts.get("ServiceProxyRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public));
     }
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // service interface
-      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
+      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface));
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public));
     }
     return rootNode;
   }
@@ -200,34 +202,14 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
   private class P_InitialCheckerFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_SERVICE_IMPLEMENTATION:
-        case TYPE_SERVICE_INTERFACE:
-        case TYPE_SERVICE_REG_CLIENT:
-        case TYPE_SERVICE_REG_SERVER:
-          return true;
-
-        case IScoutBundle.BUNDLE_CLIENT:
-        case IScoutBundle.BUNDLE_SHARED:
-        case IScoutBundle.BUNDLE_SERVER:
-        default:
-          return false;
-      }
+      return TreeUtility.isOneOf(node.getType(), TYPE_SERVICE_IMPLEMENTATION, TYPE_SERVICE_INTERFACE, TYPE_SERVICE_REG_CLIENT, TYPE_SERVICE_REG_SERVER);
     }
   } // end class P_InitialCheckerFilter
 
   private class P_TreeDndListener implements ITreeDndListener {
     @Override
     public boolean isDragableNode(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_SERVICE_IMPLEMENTATION:
-        case TYPE_SERVICE_INTERFACE:
-        case TYPE_SERVICE_REG_CLIENT:
-        case TYPE_SERVICE_REG_SERVER:
-          return true;
-        default:
-          return false;
-      }
+      return TreeUtility.isOneOf(node.getType(), TYPE_SERVICE_IMPLEMENTATION, TYPE_SERVICE_INTERFACE, TYPE_SERVICE_REG_CLIENT, TYPE_SERVICE_REG_SERVER);
     }
 
     @Override
@@ -251,36 +233,32 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
     }
 
     private void validateDropCopy(DndEvent dndEvent) {
-      switch (dndEvent.node.getType()) {
-        case TYPE_SERVICE_REG_CLIENT:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_CLIENT;
-          break;
-        case TYPE_SERVICE_REG_SERVER:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_SERVER;
-          break;
-        default:
-          dndEvent.doit = false;
-          break;
+      String t = dndEvent.node.getType();
+      if (TYPE_SERVICE_REG_CLIENT.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_CLIENT.equals(dndEvent.targetParent.getType());
+      }
+      else if (TYPE_SERVICE_REG_SERVER.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_SERVER.equals(dndEvent.targetParent.getType());
+      }
+      else {
+        dndEvent.doit = false;
       }
     }
 
     private void validateDropMove(DndEvent dndEvent) {
-      switch (dndEvent.node.getType()) {
-        case TYPE_SERVICE_REG_CLIENT:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_CLIENT;
-          break;
-        case TYPE_SERVICE_INTERFACE:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_SHARED;
-          break;
-        case TYPE_SERVICE_IMPLEMENTATION:
-        case TYPE_SERVICE_REG_SERVER:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_SERVER;
-          break;
-        default:
-          dndEvent.doit = false;
-          break;
+      String t = dndEvent.node.getType();
+      if (TYPE_SERVICE_REG_CLIENT.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_CLIENT.equals(dndEvent.targetParent.getType());
       }
-
+      else if (TYPE_SERVICE_INTERFACE.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_SHARED.equals(dndEvent.targetParent.getType());
+      }
+      else if (TYPE_SERVICE_IMPLEMENTATION.equals(t) || TYPE_SERVICE_REG_SERVER.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_SERVER.equals(dndEvent.targetParent.getType());
+      }
+      else {
+        dndEvent.doit = false;
+      }
     }
   } // end class P_TreeDndListener
 
@@ -299,9 +277,15 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
-          if (serviceImplementationBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+          try {
+            String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
+            if (serviceImplementationBundle.getJavaProject().findType(fqn) != null) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("AnErrorOccured"));
           }
         }
       }
@@ -309,9 +293,15 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
-          if (serviceInterfaceBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+          try {
+            String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
+            if (serviceInterfaceBundle.getJavaProject().findType(fqn) != null) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("AnErrorOccured"));
           }
         }
       }
@@ -323,7 +313,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceBundle != null) {
-          if (!serviceImplementationBundle.isOnClasspath(serviceInterfaceBundle)) {
+          if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceImplementationBundle)) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
@@ -339,8 +329,8 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
-            if (!serviceRegistrationBundle.isOnClasspath(serviceInterfaceBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getBundleName()));
+            if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceRegistrationBundle)) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getSymbolicName()));
             }
           }
         }
@@ -356,16 +346,13 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
-            if (!serviceRegistrationBundle.isOnClasspath(serviceImplementationBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getBundleName()));
+            if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
             }
           }
         }
       }
-
       return Status.OK_STATUS;
     }
-
   } // end class P_StatusRevalidator
-
 }

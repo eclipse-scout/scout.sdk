@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.export.ExportScoutProjectEnt
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizardPage;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -51,7 +51,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
   private static final String SETTINGS_EXPORT_EAR = "exportEARSetting";
   private static final String SETTINGS_EAR_FILE_NAME = "earFileNameSetting";
 
-  private static final int TYPE_EXPORT_ENTRY = 101;
+  private static final String TYPE_EXPORT_ENTRY = "exportEntry";
 
   private final BasicPropertySupport m_propertySupport;
 
@@ -61,7 +61,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
   private CheckableTree m_entryTree;
   private ITreeNode m_invisibleRootNode;
 
-  public ExportScoutProjectWizardPage(IScoutProject scoutProject) {
+  public ExportScoutProjectWizardPage(IScoutBundle scoutProject) {
     super(ExportScoutProjectWizardPage.class.getName());
     setTitle(Texts.get("ExportScoutProject"));
     setDescription(Texts.get("ExportScoutProjectMessage"));

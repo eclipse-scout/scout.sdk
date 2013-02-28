@@ -16,10 +16,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -35,7 +35,7 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
   final String interfaceFqn;
   final String defaultVal;
   final String label;
-  final IScoutProject scoutProject;
+  final IScoutBundle scoutProject;
 
   private String[] m_proposals;
   private String[] m_proposalDisplayTexts;
@@ -43,7 +43,7 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
   private int m_initialSelectedIndex;
   private int m_defaultIndex;
 
-  DefaultSuperClassModel(String ifFqn, String def, IScoutProject p) {
+  DefaultSuperClassModel(String ifFqn, String def, IScoutBundle p) {
     interfaceFqn = ifFqn;
     defaultVal = def;
     scoutProject = p;
@@ -54,7 +54,7 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
     m_proposals = getTypeProposals(scoutProject, interfaceFqn, defaultVal);
     m_proposalDisplayTexts = getFqnDisplayTexts(m_proposals);
 
-    m_initialSelectedIndex = indexOf(m_proposals, RuntimeClasses.getSuperTypeName(interfaceFqn, scoutProject.getSharedBundle().getJavaProject()));
+    m_initialSelectedIndex = indexOf(m_proposals, RuntimeClasses.getSuperTypeName(interfaceFqn, scoutProject.getJavaProject()));
     m_defaultIndex = indexOf(m_proposals, defaultVal);
   }
 
@@ -83,11 +83,11 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
     return -1;
   }
 
-  private static String[] getTypeProposals(IScoutProject p, String interfaceFqn, String defaultVal) {
+  private static String[] getTypeProposals(IScoutBundle p, String interfaceFqn, String defaultVal) {
     HashSet<String> ret = new HashSet<String>();
     ret.add(defaultVal);
     IType base = TypeUtility.getType(interfaceFqn);
-    for (IScoutBundle b : p.getAllScoutBundles()) {
+    for (IScoutBundle b : p.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
       IType[] proposals = ScoutTypeUtility.getAbstractTypesOnClasspath(base, b.getJavaProject());
       for (IType t : proposals) {
         if (TypeUtility.exists(t)) {

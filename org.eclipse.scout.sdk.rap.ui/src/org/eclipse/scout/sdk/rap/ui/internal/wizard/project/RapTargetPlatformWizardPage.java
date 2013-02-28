@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
-import org.eclipse.scout.sdk.rap.RapRuntimeClasses;
+import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation.TARGET_STRATEGY;
@@ -575,7 +575,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   }
 
   private void initOfferedTargetStrategies(TARGET_STRATEGY[] offeredTargetStrategies) {
-    boolean isRapTargetPluginAvailable = PlatformVersionUtility.isLatest() && Platform.getBundle(RapRuntimeClasses.ScoutRapTargetPlugin) != null;
+    boolean isRapTargetPluginAvailable = PlatformVersionUtility.isLatest() && Platform.getBundle(IScoutSdkRapConstants.ScoutRapTargetPlugin) != null;
 
     if (!isRapTargetPluginAvailable) {
       // the rap target plugin is not installed: filter the strategy out if it is in the list

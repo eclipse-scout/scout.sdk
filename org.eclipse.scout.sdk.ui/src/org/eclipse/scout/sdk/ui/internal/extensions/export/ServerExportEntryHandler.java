@@ -15,6 +15,8 @@ import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler {
 
@@ -57,12 +59,11 @@ public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler
 
   @Override
   public boolean isAvailable(IExportScoutProjectWizard wizard) {
-    return wizard.getProject().getServerBundle() != null;
+    return wizard.getProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true) != null;
   }
 
   private boolean isClientAvailable(IExportScoutProjectWizard wizard) {
-    return wizard.getProject().getClientBundle() != null &&
-          (wizard.getProject().getUiSwingBundle() != null || wizard.getProject().getUiSwtBundle() != null);
+    return wizard.getProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), true) != null;
   }
 
   @Override
@@ -81,6 +82,6 @@ public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler
     }
 
     page.setExcludePage((!selected && !wizard.getExportWizardPage().isNodesSelected(ClientExportEntryHandler.ID)) ||
-         !isClientAvailable(wizard));
+        !isClientAvailable(wizard));
   }
 }

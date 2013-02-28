@@ -11,10 +11,11 @@
 package org.eclipse.scout.sdk.operation.form.formdata;
 
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -30,16 +31,16 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
   final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
   final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
 
-  public CompositePrimaryTypeSourceBuilder(IType type) {
-    this(type, TypeUtility.getLocalTypeHierarchy(type));
+  public CompositePrimaryTypeSourceBuilder(IType type, IJavaProject targetProject) {
+    this(type, targetProject, TypeUtility.getLocalTypeHierarchy(type));
   }
 
-  public CompositePrimaryTypeSourceBuilder(IType type, ITypeHierarchy formFieldHierarchy) {
-    super(type);
-    visitFormFields(type, formFieldHierarchy);
+  public CompositePrimaryTypeSourceBuilder(IType type, IJavaProject targetProject, ITypeHierarchy formFieldHierarchy) {
+    super(type, targetProject);
+    visitFormFields(type, formFieldHierarchy, targetProject);
   }
 
-  protected void visitFormFields(IType declaringType, ITypeHierarchy formFieldHierarchy) {
+  protected void visitFormFields(IType declaringType, ITypeHierarchy formFieldHierarchy, IJavaProject targetProject) {
     try {
       if (declaringType.getTypes().length > 0) {
         if (formFieldHierarchy == null) {
@@ -48,7 +49,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
         ITypeFilter formFieldFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(iFormField, formFieldHierarchy));//, TypeFilters.getClassFilter());
         for (IType t : TypeUtility.getInnerTypes(declaringType, formFieldFilter, ScoutTypeComparators.getOrderAnnotationComparator())) {
           try {
-            addFormField(t, formFieldHierarchy);
+            addFormField(t, formFieldHierarchy, targetProject);
           }
           catch (JavaModelException e) {
             ScoutSdk.logError("could not add form field '" + declaringType.getElementName() + "' to form data.", e);
@@ -61,7 +62,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
     }
   }
 
-  protected void addFormField(IType formField, ITypeHierarchy formFieldHierarchy) throws JavaModelException {
+  protected void addFormField(IType formField, ITypeHierarchy formFieldHierarchy, IJavaProject targetProject) throws JavaModelException {
     FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(formField, formFieldHierarchy);
     if (formDataAnnotation != null) {
       if (FormDataAnnotation.isCreate(formDataAnnotation)) {
@@ -92,7 +93,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
           }
         }
 
-        ITypeSourceBuilder builder = FormDataUtility.getInnerTypeFormDataSourceBuilder(superType, superTypeSignature, formField, formFieldHierarchy);
+        ITypeSourceBuilder builder = FormDataUtility.getInnerTypeFormDataSourceBuilder(superType, superTypeSignature, formField, formFieldHierarchy, targetProject);
         builder.setElementName(formDataElementName);
         builder.setSuperTypeSignature(superTypeSignature);
         builder.setFlags(Flags.AccPublic | Flags.AccStatic);
@@ -112,7 +113,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
     }
     // visit children
     if (formFieldHierarchy.isSubtype(iCompositeField, formField)) {
-      visitFormFields(formField, formFieldHierarchy);
+      visitFormFields(formField, formFieldHierarchy, targetProject);
     }
   }
 }

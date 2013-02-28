@@ -9,29 +9,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.export.ExportEarOperation;
-import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.export.ExportScoutProjectEntry;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements IExportScoutProjectWizard {
   private final static Pattern ALIAS_REGEX = Pattern.compile(".*products.*/([^-]*)-.*.product");
 
   private final ExportScoutProjectWizardPage m_page1;
-  private final IScoutProject m_project;
+  private final IScoutBundle m_project;
 
   private final String m_projectAlias;
 
-  public ExportScoutProjectWizard(IScoutProject project) {
+  public ExportScoutProjectWizard(IScoutBundle project) {
     m_project = project;
     m_projectAlias = findProjectAlias();
     m_page1 = new ExportScoutProjectWizardPage(project);
@@ -92,7 +94,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
   }
 
   @Override
-  public IScoutProject getProject() {
+  public IScoutBundle getProject() {
     return m_project;
   }
 
@@ -102,28 +104,34 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
   }
 
   private String findProjectAlias() {
-    IFile[] prodFiles = TreeUtility.getAllProductFiles(getProject());
-    HashMap<String, Integer> aliasList = new HashMap<String, Integer>(prodFiles.length);
-    for (IFile f : prodFiles) {
-      String alias = getAliasFromProductFile(f);
-      if (alias != null) {
-        Integer i = aliasList.get(alias);
-        if (i == null) {
-          i = 0;
+    try {
+      IResource[] prodFiles = ResourceUtility.getAllResources(getProject().getProject(), ResourceFilters.getProductFilter());
+      HashMap<String, Integer> aliasList = new HashMap<String, Integer>(prodFiles.length);
+      for (IResource f : prodFiles) {
+        String alias = getAliasFromProductFile((IFile) f);
+        if (alias != null) {
+          Integer i = aliasList.get(alias);
+          if (i == null) {
+            i = 0;
+          }
+          aliasList.put(alias, ++i);
         }
-        aliasList.put(alias, ++i);
       }
-    }
 
-    String ret = null;
-    Integer last = null;
-    for (Entry<String, Integer> e : aliasList.entrySet()) {
-      if (last == null || last < e.getValue()) {
-        ret = e.getKey();
-        last = e.getValue();
+      String ret = null;
+      Integer last = null;
+      for (Entry<String, Integer> e : aliasList.entrySet()) {
+        if (last == null || last < e.getValue()) {
+          ret = e.getKey();
+          last = e.getValue();
+        }
       }
+      return ret;
     }
-    return ret;
+    catch (CoreException e) {
+      ScoutSdkUi.logWarning(e);
+      return null;
+    }
   }
 
   private String getAliasFromProductFile(IFile prodFile) {

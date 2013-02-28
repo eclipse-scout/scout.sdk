@@ -20,12 +20,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.ScoutResourceFilters;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.resource.ScoutResourceFilters;
 
 /**
  * <h3>{@link LibraryBundlesAddOperation}</h3> ...
@@ -75,10 +75,10 @@ public class LibraryBundlesAddOperation implements IOperation {
     ownerHelper.save();
     // add the dependencies to the product files
     // find all product files in the current scout project.
-    for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(getBundle().getScoutProject()))) {
+    for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(getBundle()))) {
       ProductFileModelHelper h = new ProductFileModelHelper((IFile) productFile);
       // add library bundle if there is already the library owner bundle in it.
-      if (h.ProductFile.existsDependency(getBundle().getBundleName())) {
+      if (h.ProductFile.existsDependency(getBundle().getSymbolicName())) {
         for (IPluginModelBase lib : libraries) {
           h.ProductFile.addDependency(lib.getBundleDescription().getName());
         }

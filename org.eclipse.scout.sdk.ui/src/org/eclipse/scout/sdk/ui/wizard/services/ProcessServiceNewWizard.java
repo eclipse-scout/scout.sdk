@@ -18,9 +18,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
@@ -35,28 +36,28 @@ import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
 public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
-  private static final int TYPE_PERMISSION_CREATE = 104;
-  private static final int TYPE_PERMISSION_READ = 105;
-  private static final int TYPE_PERMISSION_UPDATE = 106;
-  private static final int TYPE_SERVICE_INTERFACE = 107;
-  private static final int TYPE_SERVICE_IMPLEMENTATION = 108;
-  private static final int TYPE_SERVICE_REG_CLIENT = 109;
-  private static final int TYPE_SERVICE_REG_SERVER = 110;
+  private static final String TYPE_PERMISSION_CREATE = "permCreate";
+  private static final String TYPE_PERMISSION_READ = "permRead";
+  private static final String TYPE_PERMISSION_UPDATE = "permUpdate";
+  private static final String TYPE_SERVICE_INTERFACE = "svcIfc";
+  private static final String TYPE_SERVICE_IMPLEMENTATION = "svcImpl";
+  private static final String TYPE_SERVICE_REG_CLIENT = "svcClientReg";
+  private static final String TYPE_SERVICE_REG_SERVER = "svcServerReg";
 
   private final BundleTreeWizardPage m_locationWizardPage;
   private final ProcessServiceNewWizardPage m_serviceNewWizardPage;
   private final ProcessServiceNewOperation m_operation;
   private final ITreeNode m_locationWizardPageRoot;
-  private final IScoutProject m_scoutProject;
+  private final IScoutBundle m_serverBundle;
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewProcessService"));
-
-    m_scoutProject = serverBundle.getScoutProject();
+    m_serverBundle = serverBundle;
     m_operation = new ProcessServiceNewOperation();
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 
@@ -69,6 +70,7 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
     m_locationWizardPage.addStatusProvider(statusProvider);
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
     addPage(m_locationWizardPage);
+
     // init
     m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, serverBundle.getJavaProject()));
   }
@@ -76,35 +78,37 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode createTree(IScoutBundle serverBundle) {
     IScoutBundle sharedBundle = null;
     IScoutBundle clientBundle = null;
-    IScoutProject scoutProject = serverBundle.getScoutProject();
-    while ((sharedBundle == null || clientBundle == null) && scoutProject != null) {
-      sharedBundle = scoutProject.getSharedBundle();
-      clientBundle = scoutProject.getClientBundle();
-      scoutProject = scoutProject.getParentProject();
+    if (serverBundle != null) {
+      sharedBundle = serverBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+      if (sharedBundle != null) {
+        clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
+      }
     }
-    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle.getScoutProject(), NodeFilters.getAcceptAll());
+
+    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
       // service client reg
-      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, Texts.get("ServiceProxyRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_CLIENT);
+      TreeUtility.createNode(clientNode, TYPE_SERVICE_REG_CLIENT, Texts.get("ServiceProxyRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public));
     }
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // permission create
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, Texts.get("CreatePermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_CREATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_CREATE, Texts.get("CreatePermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
       // permission read
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, Texts.get("ReadPermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_READ);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_READ, Texts.get("ReadPermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
       // permission update
-      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, Texts.get("UpdatePermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_PERMISSION_UPDATE);
+      TreeUtility.createNode(sharedNode, TYPE_PERMISSION_UPDATE, Texts.get("UpdatePermission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
       // service interface
-      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), TYPE_SERVICE_INTERFACE);
+      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface));
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), TYPE_SERVICE_IMPLEMENTATION);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), TYPE_SERVICE_REG_SERVER);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public));
     }
     return rootNode;
   }
@@ -181,39 +185,16 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   private class P_InitialCheckerFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_PERMISSION_CREATE:
-        case TYPE_PERMISSION_READ:
-        case TYPE_PERMISSION_UPDATE:
-        case TYPE_SERVICE_IMPLEMENTATION:
-        case TYPE_SERVICE_INTERFACE:
-        case TYPE_SERVICE_REG_CLIENT:
-        case TYPE_SERVICE_REG_SERVER:
-          return true;
-        case IScoutBundle.BUNDLE_CLIENT:
-        case IScoutBundle.BUNDLE_SHARED:
-        case IScoutBundle.BUNDLE_SERVER:
-        default:
-          return false;
-      }
+      return TreeUtility.isOneOf(node.getType(), TYPE_PERMISSION_CREATE, TYPE_PERMISSION_READ, TYPE_PERMISSION_UPDATE,
+          TYPE_SERVICE_IMPLEMENTATION, TYPE_SERVICE_INTERFACE, TYPE_SERVICE_REG_CLIENT, TYPE_SERVICE_REG_SERVER);
     }
   } // end class P_InitialCheckerFilter
 
   private class P_TreeDndListener implements ITreeDndListener {
     @Override
     public boolean isDragableNode(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_PERMISSION_CREATE:
-        case TYPE_PERMISSION_READ:
-        case TYPE_PERMISSION_UPDATE:
-        case TYPE_SERVICE_IMPLEMENTATION:
-        case TYPE_SERVICE_INTERFACE:
-        case TYPE_SERVICE_REG_CLIENT:
-        case TYPE_SERVICE_REG_SERVER:
-          return true;
-        default:
-          return false;
-      }
+      return TreeUtility.isOneOf(node.getType(), TYPE_PERMISSION_CREATE, TYPE_PERMISSION_READ, TYPE_PERMISSION_UPDATE,
+          TYPE_SERVICE_IMPLEMENTATION, TYPE_SERVICE_INTERFACE, TYPE_SERVICE_REG_CLIENT, TYPE_SERVICE_REG_SERVER);
     }
 
     @Override
@@ -232,44 +213,36 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
 
     @Override
     public void dndPerformed(DndEvent dndEvent) {
-
       m_serviceNewWizardPage.pingStateChanging();
     }
 
     private void validateDropCopy(DndEvent dndEvent) {
-      switch (dndEvent.node.getType()) {
-        case TYPE_SERVICE_REG_CLIENT:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_CLIENT;
-          break;
-        case TYPE_SERVICE_REG_SERVER:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_SERVER;
-          break;
-        default:
-          dndEvent.doit = false;
-          break;
+      String t = dndEvent.node.getType();
+      if (TYPE_SERVICE_REG_CLIENT.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_CLIENT.equals(dndEvent.targetParent.getType());
+      }
+      else if (TYPE_SERVICE_REG_SERVER.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_SERVER.equals(dndEvent.targetParent.getType());
+      }
+      else {
+        dndEvent.doit = false;
       }
     }
 
     private void validateDropMove(DndEvent dndEvent) {
-      switch (dndEvent.node.getType()) {
-        case TYPE_SERVICE_REG_CLIENT:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_CLIENT;
-          break;
-        case TYPE_PERMISSION_CREATE:
-        case TYPE_PERMISSION_READ:
-        case TYPE_PERMISSION_UPDATE:
-        case TYPE_SERVICE_INTERFACE:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_SHARED;
-          break;
-        case TYPE_SERVICE_IMPLEMENTATION:
-        case TYPE_SERVICE_REG_SERVER:
-          dndEvent.doit = dndEvent.targetParent.getType() == IScoutBundle.BUNDLE_SERVER;
-          break;
-        default:
-          dndEvent.doit = false;
-          break;
+      String t = dndEvent.node.getType();
+      if (TYPE_SERVICE_REG_CLIENT.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_CLIENT.equals(dndEvent.targetParent.getType());
       }
-
+      else if (TreeUtility.isOneOf(t, TYPE_PERMISSION_CREATE, TYPE_PERMISSION_READ, TYPE_PERMISSION_UPDATE, TYPE_SERVICE_INTERFACE)) {
+        dndEvent.doit = IScoutBundle.TYPE_SHARED.equals(dndEvent.targetParent.getType());
+      }
+      else if (TYPE_SERVICE_IMPLEMENTATION.equals(t) || TYPE_SERVICE_REG_SERVER.equals(t)) {
+        dndEvent.doit = IScoutBundle.TYPE_SERVER.equals(dndEvent.targetParent.getType());
+      }
+      else {
+        dndEvent.doit = false;
+      }
     }
   } // end class P_TreeDndListener
 
@@ -284,14 +257,19 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
     }
 
     protected IStatus getStatusTypeNames() {
-
       IScoutBundle serviceImplementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
       if (serviceImplementationBundle != null) {
         ITreeNode serviceImplNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
-          String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
-          if (serviceImplementationBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+          try {
+            String fqn = serviceImplementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceImplNode.getText();
+            if (serviceImplementationBundle.getJavaProject().findType(fqn) != null) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("AnErrorOccured"));
           }
         }
       }
@@ -299,9 +277,15 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceInterfaceBundle != null) {
         ITreeNode serviceInterfaceNode = m_locationWizardPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
-          String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
-          if (serviceInterfaceBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+          try {
+            String fqn = serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
+            if (serviceInterfaceBundle.getJavaProject().findType(fqn) != null) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("AnErrorOccured"));
           }
         }
       }
@@ -321,14 +305,20 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       return Status.OK_STATUS;
     }
 
-    protected IStatus getStatusPermission(int permissionType) {
+    protected IStatus getStatusPermission(String permissionType) {
       IScoutBundle permissionBundle = m_locationWizardPage.getLocationBundle(permissionType, true, true);
       if (permissionBundle != null) {
         ITreeNode permissionNode = m_locationWizardPage.getTreeNode(permissionType, true, true);
         if (permissionNode != null) {
-          String fqn = permissionBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + permissionNode.getText();
-          if (permissionBundle.findType(fqn) != null) {
-            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+          try {
+            String fqn = permissionBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()) + "." + permissionNode.getText();
+            if (permissionBundle.getJavaProject().findType(fqn) != null) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("AnErrorOccured"));
           }
         }
       }
@@ -340,25 +330,25 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
       if (serviceImplementationBundle != null) {
         IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceBundle != null) {
-          if (!serviceImplementationBundle.isOnClasspath(serviceInterfaceBundle)) {
+          if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceImplementationBundle)) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
         IScoutBundle permissionCreateBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_CREATE, true, true);
         if (permissionCreateBundle != null) {
-          if (!serviceImplementationBundle.isOnClasspath(permissionCreateBundle)) {
+          if (!ScoutTypeUtility.isOnClasspath(permissionCreateBundle, serviceImplementationBundle)) {
             return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_CREATE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
         IScoutBundle permissionReadBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_READ, true, true);
         if (permissionReadBundle != null) {
-          if (!serviceImplementationBundle.isOnClasspath(permissionReadBundle)) {
+          if (!ScoutTypeUtility.isOnClasspath(permissionReadBundle, serviceImplementationBundle)) {
             return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_READ), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
         IScoutBundle permissionUpdateBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true);
         if (permissionUpdateBundle != null) {
-          if (!serviceImplementationBundle.isOnClasspath(permissionUpdateBundle)) {
+          if (!ScoutTypeUtility.isOnClasspath(permissionUpdateBundle, serviceImplementationBundle)) {
             return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotAClasspathOfY", m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_UPDATE), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION)));
           }
         }
@@ -374,8 +364,8 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
-            if (!serviceRegistrationBundle.isOnClasspath(serviceInterfaceBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getBundleName()));
+            if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceRegistrationBundle)) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getSymbolicName()));
             }
           }
         }
@@ -391,15 +381,13 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
           if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
-            if (!serviceRegistrationBundle.isOnClasspath(serviceImplementationBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getBundleName()));
+            if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
+              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
             }
           }
         }
       }
-
       return Status.OK_STATUS;
     }
-
   } // end class P_StatusRevalidator
 }

@@ -22,8 +22,8 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.IRuntimeClasses;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
@@ -135,7 +135,7 @@ public class ServiceNewOperation implements IOperation {
             TypeFilters.getInWorkspaceFilter(),
             TypeFilters.getClassFilter()
             );
-        if (sb.getType() == IScoutBundle.BUNDLE_CLIENT) {
+        if (sb.getType().equals(IScoutBundle.TYPE_CLIENT)) {
           serviceFactory = RuntimeClasses.ClientServiceFactory;
           // find client session
           ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
@@ -144,7 +144,7 @@ public class ServiceNewOperation implements IOperation {
             sessionType = clientSessions[0];
           }
         }
-        else if (sb.getType() == IScoutBundle.BUNDLE_SERVER) {
+        else if (sb.getType().equals(IScoutBundle.TYPE_SERVER)) {
           serviceFactory = RuntimeClasses.ServerServiceFactory;
           // find server session
           ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
@@ -153,7 +153,7 @@ public class ServiceNewOperation implements IOperation {
             sessionType = serverSessions[0];
           }
         }
-        else if (sb.getType() == IScoutBundle.BUNDLE_SHARED) {
+        else if (sb.getType().equals(IScoutBundle.TYPE_SHARED)) {
           sessionType = null;
           serviceFactory = RuntimeClasses.DefaultServiceFactory;
         }

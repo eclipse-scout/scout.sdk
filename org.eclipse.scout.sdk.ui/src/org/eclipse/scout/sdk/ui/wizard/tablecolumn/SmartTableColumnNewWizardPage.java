@@ -22,8 +22,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.SmartTableColumnNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
@@ -44,6 +44,7 @@ import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -81,6 +82,8 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
+  private final IScoutBundle m_clientBundle;
+  private final IScoutBundle m_sharedBundle;
   private IType m_superType;
   private IType m_createdColumn;
 
@@ -89,6 +92,8 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewSmartTableColumn"));
     setDescription(Texts.get("CreateANewSmartTableColumn"));
     m_declaringType = declaringType;
+    m_clientBundle = ScoutTypeUtility.getScoutBundle(m_declaringType.getJavaProject());
+    m_sharedBundle = m_clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
     // default values
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
@@ -333,11 +338,11 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   public IScoutBundle getClientBundle() {
-    return ScoutTypeUtility.getScoutBundle(m_declaringType);
+    return m_clientBundle;
   }
 
   public IScoutBundle getSharedBundle() {
-    return getClientBundle().findBestMatchShared();
+    return m_sharedBundle;
   }
 
   /**

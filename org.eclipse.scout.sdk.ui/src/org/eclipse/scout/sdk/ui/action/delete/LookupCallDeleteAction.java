@@ -26,9 +26,8 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
@@ -43,7 +42,9 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -111,8 +112,8 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
     }
     if (m_lookupServiceInterface != null && m_lookupService == null) {
       String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_CALL + "$", "$1" + SdkProperties.SUFFIX_LOOKUP_SERVICE);
-
-      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutProject(ScoutSdkCore.getScoutWorkspace().getScoutBundle(getLookupCall().getJavaProject().getProject()).getScoutProject()), TypeFilters.getClassFilter());
+      IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(getLookupCall().getJavaProject());
+      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(bundle), TypeFilters.getClassFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().equals(serviceName)) {
           m_lookupService = candidate;

@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;

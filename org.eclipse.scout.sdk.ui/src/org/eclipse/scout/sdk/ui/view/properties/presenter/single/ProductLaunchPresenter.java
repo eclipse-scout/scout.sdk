@@ -35,9 +35,11 @@ import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
@@ -145,20 +147,10 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     m_mainGroup.setText(productFile.getParent().getName());
 
     Label l = getToolkit().createLabel(m_mainGroup, "");
-    switch (getBundle().getType()) {
-      case IScoutBundle.BUNDLE_SERVER:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherServer));
-        break;
-      case IScoutBundle.BUNDLE_UI_SWING:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwing));
-        break;
-      case IScoutBundle.BUNDLE_UI_SWT:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherSwt));
-        break;
-      // XXX RAP replace by better code
-      case 8:
-        l.setImage(ScoutSdkUi.getImage(ScoutSdkUi.LauncherRap));
-        break;
+
+    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+    if (uiExt != null && uiExt.getLauncherIconPath() != null) {
+      l.setImage(ScoutSdkUi.getDefault().getImageRegistry().get(uiExt.getLauncherIconPath()));
     }
 
     m_productModel = null;

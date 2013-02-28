@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class CreateClientPluginOperation extends AbstractCreateScoutBundleOperation {
 
   public final static String PROP_BUNDLE_CLIENT_NAME = "BUNDLE_CLIENT_NAME";
+  public final static String PROP_INSTALL_ICONS = "INSTALL_ICONS";
 
   public final static String CLIENT_PROJECT_NAME_SUFFIX = ".client";
   public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.ClientBundle";
@@ -45,6 +46,11 @@ public class CreateClientPluginOperation extends AbstractCreateScoutBundleOperat
     setSymbolicName(getPluginName(CLIENT_PROJECT_NAME_SUFFIX));
   }
 
+  private boolean isInstallIcons() {
+    Boolean b = getProperties().getProperty(PROP_INSTALL_ICONS, Boolean.class);
+    return b == null || b.booleanValue();
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
@@ -55,8 +61,10 @@ public class CreateClientPluginOperation extends AbstractCreateScoutBundleOperat
       new InstallTextFileOperation("templates/client/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", project, props).run(monitor, workingCopyManager);
       new InstallTextFileOperation("templates/client/plugin.xml", "plugin.xml", project, props).run(monitor, workingCopyManager);
       new InstallTextFileOperation("templates/client/build.properties", "build.properties", project, props).run(monitor, workingCopyManager);
-      new InstallBinaryFileOperation("templates/client/resources/icons/eye.png", project, "resources/icons/eye.png").run(monitor, workingCopyManager);
-      new InstallBinaryFileOperation("templates/client/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
+      if (isInstallIcons()) {
+        new InstallBinaryFileOperation("templates/client/resources/icons/eye.png", project, "resources/icons/eye.png").run(monitor, workingCopyManager);
+        new InstallBinaryFileOperation("templates/client/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
+      }
     }
     catch (MalformedURLException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));

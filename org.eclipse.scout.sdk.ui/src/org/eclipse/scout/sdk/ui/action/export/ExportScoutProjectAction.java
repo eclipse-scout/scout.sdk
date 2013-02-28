@@ -5,17 +5,17 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportScoutProjectWizard;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class ExportScoutProjectAction extends AbstractWizardAction {
 
-  private IScoutProject m_res;
+  private IScoutBundle m_res;
 
   public ExportScoutProjectAction() {
     super(Texts.get("ExportScoutProjectMenu"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ScoutProjectExport), null, false, Category.IMPORT);
   }
 
-  public void setScoutProject(IScoutProject res) {
+  public void setScoutProject(IScoutBundle res) {
     m_res = res;
   }
 

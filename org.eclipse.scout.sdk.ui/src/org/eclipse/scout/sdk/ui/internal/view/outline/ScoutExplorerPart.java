@@ -43,7 +43,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -52,12 +51,10 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineProcess;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.BundleNodeGroupTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
@@ -156,7 +153,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
     ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(new IScoutWorkspaceListener() {
       @Override
-      public void worspaceChanged(ScoutWorkspaceEvent event) {
+      public void workspaceChanged(ScoutWorkspaceEvent event) {
         switch (event.getType()) {
           case ScoutWorkspaceEvent.TYPE_WORKSPACE_INITIALIZED: {
             new LoadInitialOutlineProcess(ScoutExplorerPart.this).schedule();
@@ -173,7 +170,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   public void expandAndSelectProjectLevel() {
     try {
       m_viewContentProvider.setLoadSync(true);
-      final Holder<IPage> selectedPage = new Holder<IPage>(null);
       final ArrayList<IPage> expandedPages = new ArrayList<IPage>();
       INodeVisitor visitor = new INodeVisitor() {
         @Override
@@ -184,29 +180,17 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
           else if (page instanceof ProjectsTablePage) {
             return CONTINUE;
           }
-          else if (page instanceof ProjectNodePage) {
-            if (selectedPage.getValue() == null) {
-              selectedPage.setValue(page);
-            }
-            if (page.getParent() instanceof ProjectsTablePage) {
-              expandedPages.add(page);
-              return CONTINUE;
-            }
+          else if (page instanceof BundleNodeGroupTablePage && page.getParent() instanceof ProjectsTablePage) {
+            expandedPages.add(page); // top level bundle group
+            return CONTINUE;
+          }
+          else if (page instanceof AbstractBundleNodeTablePage) {
+            expandedPages.add(page); // first level bundle below top level bundle group
             return CANCEL_SUBTREE;
           }
-          else if (page instanceof ClientNodePage) {
-            expandedPages.add(page);
+          else {
             return CANCEL_SUBTREE;
           }
-          else if (page instanceof SharedNodePage) {
-            expandedPages.add(page);
-            return CANCEL_SUBTREE;
-          }
-          else if (page instanceof ServerNodePage) {
-            expandedPages.add(page);
-            return CANCEL_SUBTREE;
-          }
-          return CANCEL_SUBTREE;
         }
       };
       getRootPage().accept(visitor);

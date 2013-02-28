@@ -107,7 +107,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
 
           if (m_servletRegistrationAliasMap.containsKey(registrationBundle)) {
             // only allow to change the alias if the bundle that hosts the servlet registration is the bundle of the caller itself or has no alias defined
-            m_aliasField.setEnabled(registrationBundle.getBundleName().equals(getBundle().getBundleName()) || !StringUtility.hasText(m_servletRegistrationAliasMap.get(registrationBundle)));
+            m_aliasField.setEnabled(registrationBundle.getSymbolicName().equals(getBundle().getSymbolicName()) || !StringUtility.hasText(m_servletRegistrationAliasMap.get(registrationBundle)));
             setAlias(StringUtility.nvl(m_servletRegistrationAliasMap.get(registrationBundle), JaxWsConstants.JAX_WS_ALIAS));
           }
           else {
@@ -248,8 +248,8 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
       return;
     }
     for (Registration registration : ServletRegistrationUtility.getJaxWsServletRegistrationsOnClasspath(m_bundle)) {
-      if (!CompareUtility.equals(getRegistrationBundle().getBundleName(), registration.getBundle().getBundleName()) && CompareUtility.equals(registration.getAlias(), getAlias())) {
-        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "There already exists a JAX-WS servlet registration with the given alias in the bundle '" + registration.getBundle().getBundleName() + "'.\nPlease choose this bundle or another alias."));
+      if (!CompareUtility.equals(getRegistrationBundle().getSymbolicName(), registration.getBundle().getSymbolicName()) && CompareUtility.equals(registration.getAlias(), getAlias())) {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, "There already exists a JAX-WS servlet registration with the given alias in the bundle '" + registration.getBundle().getSymbolicName() + "'.\nPlease choose this bundle or another alias."));
         return;
       }
     }
@@ -374,7 +374,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     private static final String DATA_BUNDLE = "dataBundle";
 
     private P_BundleProposal(IScoutBundle bundle) {
-      super(bundle.getBundleName(), ScoutSdkUi.getImage(SdkIcons.ServerBundle));
+      super(bundle.getSymbolicName(), ScoutSdkUi.getImage(SdkIcons.ServerBundle));
       setData(DATA_BUNDLE, bundle);
     }
 

@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.scout.sdk.ui" id="scoutBundle" name="Scout Bundle"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         Extension Point to define the display and behavior of Scout bundles in the UI.
       </documentation>
    </annotation>
 
@@ -23,21 +23,21 @@
          <attribute name="point" type="string" use="required">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="id" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
             </annotation>
          </attribute>
          <attribute name="name" type="string">
             <annotation>
                <documentation>
-
+                  
                </documentation>
                <appinfo>
                   <meta.attribute translatable="true"/>
@@ -48,6 +48,11 @@
    </element>
 
    <element name="bundleNode">
+      <annotation>
+         <documentation>
+            Defines a scout bundle node in the UI.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
@@ -59,60 +64,66 @@
          <attribute name="bundleName" type="string" use="required">
             <annotation>
                <documentation>
-                  The bundle name will be extended by [projectName][bundleName][posfix].
+                  The bundle name will be extended by [projectName][bundleName][posfix] when creating new bundles of this type.
                </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="bundleType" type="string" use="required">
+            <annotation>
+               <documentation>
+                  To which bundle type does this UI definition belong.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.scout.sdk.runtimeBundles/bundle/@type"/>
+               </appinfo>
             </annotation>
          </attribute>
          <attribute name="orderNumber" type="string">
             <annotation>
                <documentation>
-                  An integer to define the order of the node in the bundle tree. 0-100 for UI bundles, 101-200 for client bundles, 201-300 for shared bundles, 301-400 for server bundles.
+                  An integer to define the order of the node when displaying scout bundles in a tree or list.
                </documentation>
             </annotation>
          </attribute>
-         <attribute name="class" type="string" use="required">
+         <attribute name="bundlePage" type="string">
             <annotation>
                <documentation>
-
+                  The page that should be shown in the scout explorer for bundles of this type.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.ui.extensions.IScoutBundleExtension"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.ui.view.outline.pages.IPage"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="bundleNewHandler" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The handler that cares about creation of new bundles of this type.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.ui.extensions.bundle.INewScoutBundleHandler"/>
                </appinfo>
             </annotation>
          </attribute>
          <attribute name="icon" type="string">
             <annotation>
                <documentation>
-                  The icon to use in the scout explorer for this bundle.
+                  The icon to use for this bundle when displaying it as node in a list or tree.
                </documentation>
                <appinfo>
                   <meta.attribute kind="resource"/>
                </appinfo>
             </annotation>
          </attribute>
-         <attribute name="bundleType" use="required">
+         <attribute name="launcherIcon" type="string">
             <annotation>
                <documentation>
-
+                  The icon to show when a product launcher for the bundle is created.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="identifier"/>
+                  <meta.attribute kind="resource"/>
                </appinfo>
             </annotation>
-            <simpleType>
-               <restriction base="string">
-                  <enumeration value="GUI_Bundle">
-                  </enumeration>
-                  <enumeration value="Client_Bundle">
-                  </enumeration>
-                  <enumeration value="Shared_Bundle">
-                  </enumeration>
-                  <enumeration value="Server_Bundle">
-                  </enumeration>
-                  <enumeration value="Other">
-                  </enumeration>
-               </restriction>
-            </simpleType>
          </attribute>
       </complexType>
    </element>
@@ -122,7 +133,7 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         3.7.0
       </documentation>
    </annotation>
 
@@ -131,27 +142,33 @@
          <meta.section type="examples"/>
       </appinfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;extension
+         point=&quot;org.eclipse.scout.sdk.ui.scoutBundle&quot;&gt;
+      &lt;bundleNode
+            bundleName=&quot;ui.swing&quot;
+            bundleNewHandler=&quot;org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwingScoutBundleExtension&quot;
+            bundlePage=&quot;org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwingNodePage&quot;
+            bundleType=&quot;UI_SWING&quot;
+            icon=&quot;resources/icons/uiBundle.png&quot;
+            id=&quot;org.eclipse.scout.sdk.ui.UiSwingBundle&quot;
+            launcherIcon=&quot;resources/icons/swingLauncher.gif&quot;
+            orderNumber=&quot;-510&quot;&gt;
+      &lt;/bundleNode&gt;
+      &lt;bundleNode
+            bundleName=&quot;ui.swt&quot;
+            bundleNewHandler=&quot;org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwtScoutBundleExtension&quot;
+            bundlePage=&quot;org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwtNodePage&quot;
+            bundleType=&quot;UI_SWT&quot;
+            icon=&quot;resources/icons/uiBundle.png&quot;
+            id=&quot;org.eclipse.scout.sdk.ui.UiSwtBundle&quot;
+            launcherIcon=&quot;resources/icons/swtLauncher.gif&quot;
+            orderNumber=&quot;-500&quot;&gt;
+      &lt;/bundleNode&gt;
+&lt;/extension&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="apiinfo"/>
-      </appinfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>

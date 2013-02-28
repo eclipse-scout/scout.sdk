@@ -10,12 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
-import org.eclipse.scout.sdk.internal.ScoutSdk;
-
 public abstract class AbstractCreateScoutBundleOperation extends AbstractCreateEclipseJavaPluginOperation {
-
   public AbstractCreateScoutBundleOperation() {
     super();
-    addNature(ScoutSdk.NATURE_ID);
   }
 }

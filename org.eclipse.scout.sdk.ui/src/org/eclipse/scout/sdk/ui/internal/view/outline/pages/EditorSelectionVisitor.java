@@ -21,14 +21,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart.InvisibleRootNode;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwingNodePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwtNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.BundleNodeGroupTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientLookupCallTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientServiceTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientSessionNodePage;
@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.SearchFormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.AbstractBoxNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormFieldTemplateTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormTemplateTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute.AttributeNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute.AttributeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity.EntityNodePage;
@@ -64,7 +65,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizar
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard.WizardStepNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard.WizardStepTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard.WizardTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerSessionNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesTablePage;
@@ -90,14 +90,12 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.Permi
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.PermissionTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedContextPropertyNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedContextPropertyTablePage;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
-import org.eclipse.scout.sdk.ui.view.outline.pages.project.IProjectNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.util.NamingUtility;
@@ -241,26 +239,14 @@ public class EditorSelectionVisitor implements INodeVisitor {
     else if (page instanceof ProjectsTablePage) {
       return CONTINUE;
     }
-    else if (page instanceof UiSwingNodePage) {
-      return visitBundleNodePage(((UiSwingNodePage) page).getScoutResource());
-    }
-    else if (page instanceof UiSwtNodePage) {
-      return visitBundleNodePage(((UiSwtNodePage) page).getScoutResource());
-    }
-    else if (page instanceof IProjectNodePage) {
-      return visitProjectNode((IProjectNodePage) page);
-    }
     else if (page instanceof IconNodePage) {
       return CANCEL_SUBTREE;
     }
-    else if (page instanceof ClientNodePage) {
-      return visitBundleNodePage(((ClientNodePage) page).getScoutResource());
+    else if (page instanceof BundleNodeGroupTablePage) {
+      return CONTINUE;
     }
-    else if (page instanceof SharedNodePage) {
-      return visitBundleNodePage(((SharedNodePage) page).getScoutResource());
-    }
-    else if (page instanceof ServerNodePage) {
-      return visitBundleNodePage(((ServerNodePage) page).getScoutResource());
+    else if (page instanceof AbstractBundleNodeTablePage) {
+      return visitBundleNodePage(((AbstractBundleNodeTablePage) page).getScoutResource());
     }
     else if (page instanceof ClientSessionNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
@@ -454,18 +440,14 @@ public class EditorSelectionVisitor implements INodeVisitor {
     else if (page instanceof TemplateTablePage) {
       return CONTINUE;
     }
+    else if (page instanceof FormTemplateTablePage) {
+      return CONTINUE;
+    }
     else if (page instanceof FormFieldTemplateTablePage) {
       return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IFormField));
     }
     ScoutSdkUi.logWarning("not visited node '" + page.getClass().getName() + "'.");
     return CANCEL;
-  }
-
-  private int visitProjectNode(IProjectNodePage page) {
-    if (page.getScoutResource().contains(getCurrentElement())) {
-      return CONTINUE_BRANCH;
-    }
-    return CANCEL_SUBTREE;
   }
 
   private int visitBundleNodePage(IScoutBundle bundle) {

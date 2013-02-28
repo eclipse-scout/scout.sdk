@@ -20,7 +20,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -48,7 +47,6 @@ public abstract class AbstractCreateEclipseProjectOperation extends AbstractScou
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // check for exist
     if (ResourcesPlugin.getWorkspace().getRoot().getProject(getSymbolicName()).exists()) {
-      ScoutSdk.logError("Bundle: " + getSymbolicName() + " exists already!");
       throw new CoreException(new ScoutStatus("Bundle: " + getSymbolicName() + " exists already!"));
     }
     m_createdProject = createProject(monitor, workingCopyManager);
@@ -89,5 +87,4 @@ public abstract class AbstractCreateEclipseProjectOperation extends AbstractScou
     project.setDescription(description, monitor);
     return project;
   }
-
 }

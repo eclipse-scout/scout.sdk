@@ -11,18 +11,20 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNode;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.CommonServicesNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -31,23 +33,17 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>ServerNodePage</h3> ...
  */
-public class ServerNodePage extends AbstractPage {
-  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-  final IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
+public class ServerNodePage extends AbstractBundleNodeTablePage {
+  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+  private final IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
+  private final ICachedTypeHierarchy m_serverSessionHierarchy;
 
-  private final IScoutBundle m_serverBundle;
-  private ICachedTypeHierarchy m_serverSessionHierarchy;
-
-  public ServerNodePage(IPage parent, IScoutBundle serverBundle) {
-    setParent(parent);
-    m_serverBundle = serverBundle;
-    setName(getScoutResource().getSimpleName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle));
+  public ServerNodePage(IPage parent, ScoutBundleNode node) {
+    super(parent, node);
     m_serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
     m_serverSessionHierarchy.addHierarchyListener(getPageDirtyListener());
   }
@@ -58,73 +54,50 @@ public class ServerNodePage extends AbstractPage {
   }
 
   @Override
-  public int getOrder() {
-    return 300;
-  }
-
-  @Override
   public void unloadPage() {
     m_serverSessionHierarchy.removeHierarchyListener(getPageDirtyListener());
   }
 
   @Override
-  public boolean isInitiallyLoaded() {
-    return true;
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return m_serverBundle;
-  }
-
-  @Override
   public void loadChildrenImpl() {
-
+    super.loadChildrenImpl();
     try {
       ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());
       IType[] serverSessions = m_serverSessionHierarchy.getAllSubtypes(iServerSession, filter, TypeComparators.getTypeNameComparator());
       if (serverSessions.length > 1) {
-        ScoutSdkUi.logError("The server bundle '" + getScoutResource().getBundleName() + "' can have in maximum 1 server session.");
+        ScoutSdkUi.logError("The server bundle '" + getScoutResource().getSymbolicName() + "' can have in maximum 1 server session.");
       }
       else if (serverSessions.length == 1) {
         new ServerSessionNodePage(this, serverSessions[0]);
       }
-      else {
-        ScoutSdkUi.logInfo("No server session found in server bundle '" + getScoutResource().getBundleName() + "'.");
-      }
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + ServerSessionNodePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured during loading '" + ServerSessionNodePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
     }
     try {
       new ServerServicesTablePage(this);
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + ServerServicesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured during loading '" + ServerServicesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
     }
     try {
       new LookupServiceTablePage(this);
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + LookupServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured during loading '" + LookupServiceTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
     }
     try {
       new CommonServicesNodePage(this);
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured during loading '" + CommonServicesNodePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured during loading '" + CommonServicesNodePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
     }
     try {
       new LibrariesTablePage(this, getScoutResource());
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
     }
-  }
-
-  @Override
-  public boolean isFolder() {
-    return true;
   }
 
   protected IType[] resolveServices() {
@@ -136,7 +109,7 @@ public class ServerNodePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class};
+    return new Class[]{WellformAction.class, FormDataSqlBindingValidateAction.class, ScoutBundleNewAction.class};
   }
 
   @Override
@@ -151,6 +124,9 @@ public class ServerNodePage extends AbstractPage {
           return resolveServices();
         }
       });
+    }
+    else if (menu instanceof ScoutBundleNewAction) {
+      ((ScoutBundleNewAction) menu).setScoutProject(getScoutResource());
     }
   }
 }

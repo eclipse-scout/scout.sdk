@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.CodeIdExtensionPoint;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -25,11 +25,11 @@ public class CodeIdField extends Composite {
   private StyledTextField m_nextCodeIdField;
   private ProposalTextField m_genericTypeField;
 
-  private final IScoutProject m_project;
+  private final IScoutBundle m_project;
   private final IProposalAdapterListener m_genericFieldListener;
   private final int m_labelPercentage;
 
-  public CodeIdField(Composite parent, IScoutProject project, int labelPercentage) {
+  public CodeIdField(Composite parent, IScoutBundle project, int labelPercentage) {
     super(parent, SWT.NONE);
     m_project = project;
     m_labelPercentage = labelPercentage;

@@ -27,9 +27,9 @@ import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.compatibility.License;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
+import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
 import org.eclipse.scout.sdk.rap.operations.project.InstallTargetPlatformFileOperation;
-import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.osgi.framework.Version;
 
 /**
@@ -114,7 +114,7 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
+  public TriState getSelection(IScoutBundle project) {
     ScoutTechnologyResource[] targetFiles = getTargetFiles(project);
     if (targetFiles.length < 1) {
       return TriState.FALSE;
@@ -142,15 +142,14 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    IScoutBundle[] rapBundles = project.getAllBundles(UiRapBundleNodeFactory.BUNDLE_UI_RAP);
-    return project.getClientBundle() != null && rapBundles != null && rapBundles.length > 0 && getTargetFiles(project).length > 0;
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutSdkRapConstants.TYPE_UI_RAP), false) != null;
   }
 
-  private static ScoutTechnologyResource[] getTargetFiles(IScoutProject project) {
+  private static ScoutTechnologyResource[] getTargetFiles(IScoutBundle project) {
     final ArrayList<ScoutTechnologyResource> ret = new ArrayList<ScoutTechnologyResource>();
     try {
-      for (IScoutBundle b : project.getAllScoutBundles()) {
+      for (IScoutBundle b : project.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
         final IScoutBundle bundle = b;
         bundle.getProject().accept(new IResourceVisitor() {
           @Override
@@ -175,7 +174,7 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
     for (ScoutTechnologyResource r : getTargetFiles(project)) {
       list.add(r);
     }

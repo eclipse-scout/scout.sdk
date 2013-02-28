@@ -17,8 +17,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -34,7 +36,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -82,7 +83,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("SearchForm2"));
     setDescription(Texts.get("CreateANewSearchForm"));
     setSuperTypeInternal(m_abstractSearchForm);
-    setTargetPackage(DefaultTargetPackage.get(clientBundle, IScoutBundle.CLIENT_SEARCHFORMS));
+    setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_SEARCHFORMS));
   }
 
   @Override
@@ -91,7 +92,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     group.setText(Texts.get("SearchForm"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"), m_labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().getNlsProject(), Texts.get("Name"), m_labelColWidthPercent);
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

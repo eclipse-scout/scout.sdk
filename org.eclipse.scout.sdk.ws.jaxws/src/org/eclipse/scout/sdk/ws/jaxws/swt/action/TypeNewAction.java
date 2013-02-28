@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
+import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.swt.widgets.Shell;
 
@@ -59,7 +60,12 @@ public abstract class TypeNewAction extends AbstractLinkAction {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    m_createdType = openNewTypeDialog();
+    try {
+      m_createdType = openNewTypeDialog();
+    }
+    catch (JavaModelException e) {
+      throw new ExecutionException("", e);
+    }
     return null;
   }
 
@@ -67,7 +73,7 @@ public abstract class TypeNewAction extends AbstractLinkAction {
     m_bundle = bundle;
   }
 
-  protected IType openNewTypeDialog() {
+  protected IType openNewTypeDialog() throws JavaModelException {
     NewClassWizardPage page = new NewClassWizardPage();
     page.setDescription(getLabel());
     page.setEnclosingTypeSelection(false, false);
@@ -80,7 +86,7 @@ public abstract class TypeNewAction extends AbstractLinkAction {
       page.setPackageFragment(packageFragment, m_allowModifyPackageFragment);
     }
     else {
-      String rootPackageName = m_bundle.getRootPackageName();
+      String rootPackageName = m_bundle.getSymbolicName();
       page.setPackageFragmentRoot((IPackageFragmentRoot) m_bundle.getPackageFragment(rootPackageName).getParent(), true);
     }
     if (m_superTypeSignature != null) {
@@ -110,13 +116,8 @@ public abstract class TypeNewAction extends AbstractLinkAction {
         level.reconcile(m_createdType.getCompilationUnit(), new NullProgressMonitor());
         TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory)).invalidate();
       }
-      catch (JavaModelException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
       catch (CoreException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        JaxWsSdk.logError(e);
       }
       level.unregisterAll(new NullProgressMonitor());
 

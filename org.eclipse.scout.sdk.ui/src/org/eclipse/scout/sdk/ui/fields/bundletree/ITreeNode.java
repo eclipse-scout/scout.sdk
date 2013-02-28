@@ -32,7 +32,7 @@ public interface ITreeNode {
    * 
    * @return
    */
-  int getType();
+  String getType();
 
   /**
    * the display text for the current node.
@@ -115,7 +115,7 @@ public interface ITreeNode {
   /**
    * @return
    */
-  long getOrderNr();
+  int getOrderNr();
 
   /**
    * @param checkable

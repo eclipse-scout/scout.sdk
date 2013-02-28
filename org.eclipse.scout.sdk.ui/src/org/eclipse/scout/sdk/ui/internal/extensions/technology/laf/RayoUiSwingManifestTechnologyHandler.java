@@ -20,7 +20,8 @@ import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHan
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link RayoUiSwingManifestTechnologyHandler}</h3> ...
@@ -60,17 +61,21 @@ public class RayoUiSwingManifestTechnologyHandler extends AbstractScoutTechnolog
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    return getSelectionManifest(project.getUiSwingBundle(), RAYO_LAF_PLUGIN);
+  public TriState getSelection(IScoutBundle project) {
+    return getSelectionManifests(getSwingBundlesBelow(project), RAYO_LAF_PLUGIN);
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getUiSwingBundle() != null && project.getUiSwingBundle().getProject().exists();
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false) != null;
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeManifestFile(project.getUiSwingBundle(), list);
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
+    contributeManifestFiles(getSwingBundlesBelow(project), list);
+  }
+
+  private IScoutBundle[] getSwingBundlesBelow(IScoutBundle start) {
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
   }
 }

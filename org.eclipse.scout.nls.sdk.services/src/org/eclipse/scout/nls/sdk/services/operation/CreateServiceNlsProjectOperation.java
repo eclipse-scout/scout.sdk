@@ -131,7 +131,6 @@ public class CreateServiceNlsProjectOperation implements IOperation {
 
     // we have changed the NLS service hierarchy: clear the cache so that it will be re-created next time including our just created service.
     TypeUtility.getPrimaryTypeHierarchy(getSuperType()).invalidate();
-    getBundle().getScoutProject().clearNlsProjectCache();
 
     // wait until all events have been fired and handled
     ResourcesPlugin.getWorkspace().checkpoint(false);

@@ -19,7 +19,7 @@ public class NlsDocsTextPresenter extends NlsTextPresenter {
   @Override
   protected INlsProject resolveNlsProject(ConfigurationMethod method) {
     IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(method.getType());
-    return scoutBundle.getScoutProject().getDocsNlsProject();
+    return scoutBundle.getDocsNlsProject();
   }
 
   @Override

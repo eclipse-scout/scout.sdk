@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type;
 
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.IPropertyBeanFilter;

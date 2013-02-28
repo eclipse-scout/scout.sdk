@@ -14,7 +14,7 @@ import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
-import org.eclipse.scout.sdk.workspace.IScoutElement;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public interface IPage {
 
@@ -33,7 +33,7 @@ public interface IPage {
 
   int getOrder();
 
-  IScoutElement getScoutResource();
+  IScoutBundle getScoutResource();
 
   ScoutExplorerPart getOutlineView();
 

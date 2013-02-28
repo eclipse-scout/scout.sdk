@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -170,5 +171,10 @@ public class TypeUtilityTest extends AbstractScoutSdkTest {
       }
     }
     return null;
+  }
+
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
   }
 }

@@ -16,12 +16,13 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
@@ -45,10 +46,10 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
   private static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
 
-  public SourceBuilderWithProperties(final IType type) {
+  public SourceBuilderWithProperties(final IType type, IJavaProject targetProject) {
     super(ResourceUtility.getLineSeparator(type.getOpenable()));
     visitProperties(type);
-    addValidationRules(type);
+    addValidationRules(type, targetProject);
   }
 
   protected void visitProperties(IType type) {
@@ -141,7 +142,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
     return source.toString();
   }
 
-  protected void addValidationRules(IType type) {
+  protected void addValidationRules(IType type, IJavaProject targetProject) {
     // validation rules
     try {
       boolean replaceAnnotationPresent = ScoutTypeUtility.isReplaceAnnotationPresent(type);
@@ -193,7 +194,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
           }
         }
         if (list.size() > 0) {
-          ValidationRuleMethodOverrideBuilder builder = new ValidationRuleMethodOverrideBuilder(list, NL);
+          ValidationRuleMethodOverrideBuilder builder = new ValidationRuleMethodOverrideBuilder(list, NL, targetProject);
           builder.setJavaDoc(" /** " + NL + "   * list of derived validation rules." + NL + "*/");
           builder.addAnnotation(new AnnotationSourceBuilder("Ljava.lang.Override;"));
           builder.setFlags(Flags.AccProtected);
@@ -215,10 +216,12 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
   private static class ValidationRuleMethodOverrideBuilder extends MethodSourceBuilder {
     private final List<ValidationRuleMethod> m_methods;
+    private final IJavaProject m_targetProject;
 
-    public ValidationRuleMethodOverrideBuilder(List<ValidationRuleMethod> methods, String nl) {
+    public ValidationRuleMethodOverrideBuilder(List<ValidationRuleMethod> methods, String nl, IJavaProject targetProject) {
       super(nl);
       m_methods = methods;
+      m_targetProject = targetProject;
     }
 
     @Override
@@ -237,6 +240,10 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
             buf.append("/**");
             buf.append(NL);
             buf.append(" * XXX not processed ValidationRule(" + vm.getRuleName() + ")");
+            if (vm.getRuleGeneratedSourceCode() != null) {
+              buf.append(NL);
+              buf.append(" * '" + vm.getRuleGeneratedSourceCode() + "' is not accessible from here.");
+            }
             buf.append(NL);
             buf.append(" * generatedSourceCode: ");
             buf.append(generatedSourceCode);
@@ -289,13 +296,10 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
             return formDataFieldName + ".class";
           }
           //other client types are not supported
-          String fqn = refType.getFullyQualifiedName();
-          //XXX imo: aho, is there a better way to find out if targetValidator would accept that type in the import section?
-          //XXX aho: yes, follows soon: if(TypeUtility.isOnClasspath(refType, targetValidator.getTargetProject())){
-          if (fqn.indexOf(".client.") >= 0) {
+          if (!TypeUtility.isOnClasspath(refType, m_targetProject)) {
             return null;
           }
-          targetValidator.addImport(fqn);
+          targetValidator.addImport(refType.getFullyQualifiedName());
         }
       }
       return sourceSnippet;

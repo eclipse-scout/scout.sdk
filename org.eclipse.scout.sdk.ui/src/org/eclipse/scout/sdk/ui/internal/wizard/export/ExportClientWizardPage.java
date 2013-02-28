@@ -4,6 +4,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
@@ -22,7 +23,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -35,14 +35,14 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
   private final static String PROP_CLIENT_EXPORT_FOLDER = "clientExportFolder";
   private final static String PROP_PRODUCT_FILE_CLIENT = "clientProductFile";
 
-  private final IScoutProject m_scoutProject;
+  private final IScoutBundle m_scoutProject;
 
   private IStatus m_clientProductStatus = Status.OK_STATUS;
   private IStatus m_clientExportFolderStatus = Status.OK_STATUS;
   private ProductSelectionField m_clientProductField;
   private ResourceServletFolderSelectionField m_resourceFolderField;
 
-  public ExportClientWizardPage(IScoutProject scoutProject) {
+  public ExportClientWizardPage(IScoutBundle scoutProject) {
     super(ExportClientWizardPage.class.getName());
     m_scoutProject = scoutProject;
     setTitle(Texts.get("ExportWebClientArchive"));
@@ -51,7 +51,13 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    ITreeNode clientProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new P_ClientProductFilter(), false);
+    ITreeNode clientProductTreeRoot = null;
+    try {
+      clientProductTreeRoot = TreeUtility.createProductTree(getScoutProject(), new P_ClientProductFilter(), false);
+    }
+    catch (CoreException e1) {
+      ScoutSdkUi.logError("unable to create product file list", e1);
+    }
     m_clientProductField = new ProductSelectionField(parent, clientProductTreeRoot);
     m_clientProductField.setLabelText(Texts.get("ClientProductToInclude"));
     m_clientProductField.addProductSelectionListener(new IProductSelectionListener() {
@@ -145,7 +151,7 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
     return m_clientExportFolderStatus;
   }
 
-  public IScoutProject getScoutProject() {
+  public IScoutBundle getScoutProject() {
     return m_scoutProject;
   }
 
@@ -250,14 +256,7 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
   private class P_ClientProductFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case IScoutBundle.BUNDLE_UI_SWING:
-        case IScoutBundle.BUNDLE_UI_SWT:
-        case TreeUtility.TYPE_PRODUCT_NODE:
-          return true;
-        default:
-          return false;
-      }
+      return TreeUtility.isOneOf(node.getType(), IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT, TreeUtility.TYPE_PRODUCT_NODE);
     }
   }
 }

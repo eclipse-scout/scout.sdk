@@ -27,16 +27,15 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.IRuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>BcUtilities</h3> ...
@@ -138,17 +137,17 @@ public final class ScoutUtility {
   }
 
   public static void unregisterServiceProxy(IType interfaceType, IProgressMonitor monitor) throws CoreException {
-    IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(interfaceType.getJavaProject().getProject());
-    for (IScoutBundle clientBundle : interfaceBundle.getDependentBundles(ScoutBundleFilters.getClientFilter(), false)) {
-      ScoutUtility.unregisterServiceClass(clientBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName(), monitor);
+    IScoutBundle interfaceBundle = ScoutTypeUtility.getScoutBundle(interfaceType.getJavaProject());
+    for (IScoutBundle clientBundle : interfaceBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false)) {
+      unregisterServiceClass(clientBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName(), monitor);
     }
   }
 
   public static void unregisterServiceImplementation(IType serviceType, IProgressMonitor monitor) throws CoreException {
-    IScoutBundle implementationBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(serviceType.getJavaProject().getProject());
+    IScoutBundle implementationBundle = ScoutTypeUtility.getScoutBundle(serviceType.getJavaProject());
     ScoutUtility.unregisterServiceClass(implementationBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), monitor);
-    for (IScoutBundle serverBundle : implementationBundle.getRequiredBundles(ScoutBundleFilters.getServerFilter(), true)) {
-      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), serverBundle.getRootPackageName() + ".ServerSession", monitor);
+    for (IScoutBundle serverBundle : implementationBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true)) {
+      unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), serverBundle.getSymbolicName() + ".ServerSession", monitor);
     }
   }
 
@@ -457,7 +456,7 @@ public final class ScoutUtility {
       }
       buf.append(a[i]);
       if (i + 1 < a.length) {
-        buf.append("\n");
+        buf.append('\n');
       }
     }
     return buf.toString();
@@ -474,18 +473,18 @@ public final class ScoutUtility {
       }
       buf.append(s.substring(index));
       if (i + 1 < a.length) {
-        buf.append("\n");
+        buf.append('\n');
       }
     }
     return buf.toString();
   }
 
-  public static String[] getEntities(IScoutProject p) throws JavaModelException {
+  public static String[] getEntities(IScoutBundle p) throws JavaModelException {
     TreeSet<String> ret = new TreeSet<String>();
-    for (IScoutBundle b : p.getAllScoutBundles()) {
-      if (b.getType() == IScoutBundle.BUNDLE_CLIENT || b.getType() == IScoutBundle.BUNDLE_SHARED || b.getType() == IScoutBundle.BUNDLE_SERVER) {
-        String bundleName = b.getBundleName();
-        int bundleNameMin = bundleName.length() + 1;
+    for (IScoutBundle b : p.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED), true)) {
+      String bundleName = b.getSymbolicName();
+      int bundleNameMin = bundleName.length() + 1;
+      if (b.getJavaProject() != null) {
         for (IPackageFragmentRoot r : b.getJavaProject().getPackageFragmentRoots()) {
           for (IJavaElement je : r.getChildren()) {
             if (!je.isReadOnly() && je instanceof IPackageFragment) {

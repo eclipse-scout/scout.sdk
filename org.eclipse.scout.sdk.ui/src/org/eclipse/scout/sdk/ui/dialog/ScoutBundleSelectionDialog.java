@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.viewer.ScoutBundleLableProvider;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -41,15 +42,15 @@ public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
    * @param shell
    */
   public ScoutBundleSelectionDialog(Shell shell, boolean multiSelect) {
-    this(shell, ScoutSdkCore.getScoutWorkspace().getAllBundles(), multiSelect);
+    this(shell, ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter()), multiSelect);
   }
 
   public ScoutBundleSelectionDialog(Shell shell, IScoutBundle[] bundles, boolean multiSelect) {
     super(shell, multiSelect);
-    // XXX AHO
     setListLabelProvider(new ScoutBundleLableProvider());
     setDetailsLabelProvider(new ScoutBundleLableProvider());
     setInitialPattern("**");
+    setHelpAvailable(false);
     m_bundles = bundles;
   }
 
@@ -91,7 +92,7 @@ public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
   @Override
   public String getElementName(Object item) {
     if (item instanceof IScoutBundle) {
-      return ((IScoutBundle) item).getBundleName();
+      return ((IScoutBundle) item).getSymbolicName();
     }
     return null;
   }
@@ -121,7 +122,7 @@ public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
       String id = null;
       if (item instanceof IScoutBundle) {
         IScoutBundle project = (IScoutBundle) item;
-        id = project.getBundleName();
+        id = project.getSymbolicName();
       }
 
       return (matches(id));
@@ -160,7 +161,7 @@ public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
       if (o1 instanceof IScoutBundle && o2 instanceof IScoutBundle) {
         IScoutBundle ipmb1 = (IScoutBundle) o1;
         IScoutBundle ipmb2 = (IScoutBundle) o2;
-        return ipmb1.getBundleName().compareTo(ipmb2.getBundleName());
+        return ipmb1.getSymbolicName().compareTo(ipmb2.getSymbolicName());
       }
       return 0;
     }

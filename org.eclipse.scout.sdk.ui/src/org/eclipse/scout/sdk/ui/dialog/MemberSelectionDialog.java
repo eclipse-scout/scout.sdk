@@ -58,6 +58,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     m_title = title;
     m_listeners = new EventListenerList();
     setShellStyle(getShellStyle() | SWT.RESIZE);
+    setHelpAvailable(false);
   }
 
   @Override

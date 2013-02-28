@@ -10,96 +10,133 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace;
 
+/**
+ * <h3>{@link ScoutBundleFilters}</h3> Contains pre-defined scout bundle filters
+ * 
+ * @author mvi
+ * @since 3.9.0 23.02.2013
+ * @see IScoutBundleFilter
+ * @see IScoutBundle
+ * @see IScoutBundleGraph
+ */
 public final class ScoutBundleFilters {
+
+  private final static IScoutBundleFilter ROOT_BUNDLES = new IScoutBundleFilter() {
+    @Override
+    public boolean accept(IScoutBundle bundle) {
+      return bundle.getDirectParentBundles().size() == 0;
+    }
+  };
+
+  private final static IScoutBundleFilter ALL_BUNDLES = null;
+
+  private final static IScoutBundleFilter WORKSPACE_BUNDLES = new IScoutBundleFilter() {
+    @Override
+    public boolean accept(IScoutBundle bundle) {
+      return !bundle.isBinary();
+    }
+  };
 
   private ScoutBundleFilters() {
   }
 
-  public static IScoutBundleFilter getOnClasspath(final IScoutBundle refBundle) {
+  /**
+   * @return a filter that only returns bundles that have no parent (root bundles)
+   * @see IScoutBundle#getDirectParentBundles()
+   */
+  public static IScoutBundleFilter getRootBundlesFilter() {
+    return ROOT_BUNDLES;
+  }
+
+  /**
+   * @return a filter that returns all bundles. equal to use no filter (null).
+   */
+  public static IScoutBundleFilter getAllBundlesFilter() {
+    return ALL_BUNDLES;
+  }
+
+  /**
+   * @return a filter that returns all bundles that are in the current workspace (bundles from the target platform as
+   *         discarded)
+   * @see IScoutBundle#isBinary()
+   */
+  public static IScoutBundleFilter getWorkspaceBundlesFilter() {
+    return WORKSPACE_BUNDLES;
+  }
+
+  /**
+   * creates and returns a filter that only returns bundles matching certain types.<br>
+   * If no types are passed as filter, this filter returns no bundles.
+   * 
+   * @param acceptedTypes
+   *          the list of types that are accepted.
+   * @return a filter that only returns bundles that match the given types
+   * @see IScoutBundle#getType()
+   */
+  public static IScoutBundleFilter getBundlesOfTypeFilter(final String... acceptedTypes) {
     return new IScoutBundleFilter() {
       @Override
       public boolean accept(IScoutBundle bundle) {
-        return refBundle.isOnClasspath(bundle);
+        if (acceptedTypes == null || acceptedTypes.length < 1) {
+          return false;
+        }
+        for (String type : acceptedTypes) {
+          if (bundle.getType().equals(type)) {
+            return true;
+          }
+        }
+        return false;
       }
     };
   }
 
-  public static IScoutBundleFilter getUiSwingFilter() {
-    return new IScoutBundleFilter() {
-      @Override
-      public boolean accept(IScoutBundle bundle) {
-        return bundle.getType() == IScoutBundle.BUNDLE_UI_SWING;
-      }
-    };
+  /**
+   * Creates and returns a filter that only returns bundles that match all of the given filters.<br>
+   * The order of the filters matters: the filter stops evaluating subsequent filters as soon as the first filter does
+   * not accept a bundle. Therefore use strong and fast filters first!<br>
+   * If no subsequent filters are passed, this filter returns all bundles (no filtering).
+   * 
+   * @param filters
+   *          the subsequent filter to evaluate
+   * @return the created filter
+   * @see ScoutBundleFilters
+   * @see ScoutBundleFilters#getAllBundlesFilter()
+   */
+  public static IScoutBundleFilter getMultiFilterAnd(final IScoutBundleFilter... filters) {
+    return getMultiFilter(false, filters);
   }
 
-  public static IScoutBundleFilter getUiSwtFilter() {
-    return new IScoutBundleFilter() {
-      @Override
-      public boolean accept(IScoutBundle bundle) {
-        return bundle.getType() == IScoutBundle.BUNDLE_UI_SWT;
-      }
-    };
+  /**
+   * Creates and returns a filter that returns bundles that match at least one of the given filters.<br>
+   * The order of the filters matters: the filter stops evaluating subsequent filters as soon as the first filter
+   * accepts a bundle. Therefore use strong and fast filters first!<br>
+   * If no subsequent filters are passed, this filter returns all bundles (no filtering).
+   * 
+   * @param filters
+   *          the subsequent filter to evaluate
+   * @return the created filter
+   * @see ScoutBundleFilters
+   */
+  public static IScoutBundleFilter getMultiFilterOr(final IScoutBundleFilter... filters) {
+    return getMultiFilter(true, filters);
   }
 
-  public static IScoutBundleFilter getClientFilter() {
-    return new IScoutBundleFilter() {
-      @Override
-      public boolean accept(IScoutBundle bundle) {
-        return bundle.getType() == IScoutBundle.BUNDLE_CLIENT;
-      }
-    };
-  }
-
-  public static IScoutBundleFilter getSharedFilter() {
-    return new IScoutBundleFilter() {
-      @Override
-      public boolean accept(IScoutBundle bundle) {
-        return bundle.getType() == IScoutBundle.BUNDLE_SHARED;
-      }
-    };
-  }
-
-  public static IScoutBundleFilter getServerFilter() {
-    return new IScoutBundleFilter() {
-      @Override
-      public boolean accept(IScoutBundle bundle) {
-        return bundle.getType() == IScoutBundle.BUNDLE_SERVER;
-      }
-    };
-  }
-
-  public static IScoutBundleFilter getAcceptAllFilter() {
-    return new IScoutBundleFilter() {
-      @Override
-      public boolean accept(IScoutBundle bundle) {
-        return true;
-      }
-    };
-  }
-
-  public static IScoutBundleFilter getNameMatchingBundle(IScoutBundle refBundle, int bundleType) {
-    String bundleName = refBundle.getBundleName();
-    switch (bundleType) {
-      case IScoutBundle.BUNDLE_CLIENT:
-        bundleName = bundleName.replaceAll("^(.*\\.)(client|shared|server)(\\.[^.]*)$", "$1client$3");
-        break;
-      case IScoutBundle.BUNDLE_SHARED:
-        bundleName = bundleName.replaceAll("^(.*\\.)(client|shared|server)(\\.[^.]*)$", "$1shared$3");
-        break;
-      case IScoutBundle.BUNDLE_SERVER:
-        bundleName = bundleName.replaceAll("^(.*\\.)(client|shared|server)(\\.[^.]*)$", "$1server$3");
-        break;
-      default:
-        return null;
+  private static IScoutBundleFilter getMultiFilter(final boolean or, final IScoutBundleFilter... filters) {
+    if (filters == null || filters.length < 1) {
+      return getAllBundlesFilter();
     }
-    final String finalId = bundleName;
+
     return new IScoutBundleFilter() {
       @Override
       public boolean accept(IScoutBundle bundle) {
-        return bundle.getBundleName().equals(finalId);
+        for (IScoutBundleFilter f : filters) {
+          boolean accepted = f.accept(bundle);
+          if (or == accepted) {
+            return accepted;
+          }
+        }
+        return !or;
       }
     };
   }
-
 }

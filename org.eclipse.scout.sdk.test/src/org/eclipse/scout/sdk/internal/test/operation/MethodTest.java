@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -157,4 +158,8 @@ public class MethodTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(implMethod));
   }
 
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
+  }
 }

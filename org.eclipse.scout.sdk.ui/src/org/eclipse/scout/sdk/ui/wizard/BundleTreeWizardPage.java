@@ -124,7 +124,7 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
 
   }
 
-  public IScoutBundle[] getLocationBundles(int type, boolean visibleOnly, boolean checkedOnly) {
+  public IScoutBundle[] getLocationBundles(String type, boolean visibleOnly, boolean checkedOnly) {
     ITreeNode[] nodes = getTreeNodes(type, visibleOnly, checkedOnly);
     ArrayList<IScoutBundle> result = new ArrayList<IScoutBundle>();
     for (ITreeNode node : nodes) {
@@ -135,7 +135,7 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     return result.toArray(new IScoutBundle[result.size()]);
   }
 
-  public ITreeNode[] getTreeNodes(int type, boolean visibleOnly, boolean checkedOnly) {
+  public ITreeNode[] getTreeNodes(String type, boolean visibleOnly, boolean checkedOnly) {
     ArrayList<ITreeNode> result = new ArrayList<ITreeNode>();
     if (isControlCreated()) {
       ITreeNode[] nodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByType(type));
@@ -156,7 +156,7 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     return result.toArray(new ITreeNode[result.size()]);
   }
 
-  public IScoutBundle getLocationBundle(int type, boolean visibleOnly, boolean checkedOnly) {
+  public IScoutBundle getLocationBundle(String type, boolean visibleOnly, boolean checkedOnly) {
     ITreeNode node = getTreeNode(type, visibleOnly, checkedOnly);
     if (node != null) {
       try {
@@ -170,7 +170,7 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     return null;
   }
 
-  public ITreeNode getTreeNode(int type, boolean visibleOnly, boolean checkedOnly) {
+  public ITreeNode getTreeNode(String type, boolean visibleOnly, boolean checkedOnly) {
     ITreeNode node = null;
     if (isControlCreated()) {
       node = TreeUtility.findNode(m_rootNode, NodeFilters.getByType(type));
@@ -190,11 +190,11 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
    * @param nodeType
    * @return
    */
-  public String getTextOfNode(int nodeType) {
+  public String getTextOfNode(String nodeType) {
     return getTextOfNode(nodeType, true, true);
   }
 
-  public String getTextOfNode(int type, boolean visibleOnly, boolean checkedOnly) {
+  public String getTextOfNode(String type, boolean visibleOnly, boolean checkedOnly) {
     ITreeNode treeNode = getTreeNode(type, visibleOnly, checkedOnly);
     String text = null;
     if (treeNode != null) {

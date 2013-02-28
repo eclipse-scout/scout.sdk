@@ -38,4 +38,32 @@
             readOnly="false">
       </variable>
    </extension>
+   <extension
+         point="org.eclipse.scout.sdk.runtimeBundles">
+      <bundle
+            order="300"
+            symbolicName="org.eclipse.scout.rt.testing.ui.rap"
+            type="UI_RAP_TESTING">
+      </bundle>
+      <bundle
+            order="800"
+            symbolicName="org.eclipse.scout.rt.ui.rap"
+            type="UI_RAP">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.ui.rap.mobile">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.ui.rap.theme.rayo.mobile">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.ui.rap.theme.rayo">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.ui.rap.workbench">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.svg.ui.rap">
+      </bundle>
+   </extension>
 </plugin>

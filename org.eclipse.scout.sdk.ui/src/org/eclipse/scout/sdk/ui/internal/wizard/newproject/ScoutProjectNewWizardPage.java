@@ -20,8 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
-import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension;
-import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ICheckStateListener;
@@ -31,7 +30,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
@@ -59,7 +57,7 @@ import org.eclipse.swt.widgets.Label;
  */
 
 public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage implements IScoutProjectWizardPage {
-  private static final int TYPE_BUNDLE = 99;
+  private static final String TYPE_BUNDLE = "bundle";
 
   protected StyledTextField m_projectNameField;
   protected StyledTextField m_postFixField;
@@ -107,18 +105,21 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     });
     m_invisibleRootNode = buildBundleTree();
+    for (ScoutBundleUiExtension e : ScoutBundleExtensionPoint.getExtensions()) {
+      e.getNewScoutBundleHandler().init(getWizard(), e);
+    }
     m_bundleTree = new CheckableTree(parent, m_invisibleRootNode);
 
     m_bundleTree.addCheckSelectionListener(new ICheckStateListener() {
       @Override
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
         setProperty(PROP_SELECTED_BUNDLES, m_bundleTree.getCheckedNodes());
-        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
         if (!node.isEnabled()) {
           checkState = false;
         }
+        ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
         if (ext != null) {
-          ext.getBundleExtention().bundleSelectionChanged(getWizard(), checkState);
+          ext.getNewScoutBundleHandler().bundleSelectionChanged(getWizard(), checkState);
         }
 
         pingStateChanging();
@@ -141,8 +142,8 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   private ITreeNode buildBundleTree() {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
-    for (ScoutBundleExtension e : ScoutBundleExtensionPoint.getExtensions()) {
-      TreeUtility.createNode(rootNode, TYPE_BUNDLE, e.getBundleName(), ScoutSdkUi.getImageDescriptor(e.getIconPath()), e.getOrderNumber(), e);
+    for (ScoutBundleUiExtension e : ScoutBundleExtensionPoint.getExtensions()) {
+      TreeUtility.createNode(rootNode, TYPE_BUNDLE, e.getBundleName(), e.getIconPath(), e.getOrderNumber(), e);
     }
     return rootNode;
   }
@@ -158,7 +159,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       postfix = "." + pf;
     }
     for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
-      ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+      ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
       if (ext != null && node.isEnabled()) {
         node.setText(prefix + ext.getBundleName() + postfix);
       }
@@ -230,14 +231,15 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, isUseDefaultJdtPrefs());
 
     // go through all node extensions and put properties which node has been checked
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
+    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getAcceptAll());
     HashSet<String> checkedNodeExtensionIds = new HashSet<String>(nodes.length);
     for (ITreeNode node : nodes) {
-      if (m_bundleTree.isChecked(node) && node.isEnabled()) {
-        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
-        if (ext != null) {
-          checkedNodeExtensionIds.add(ext.getBundleID());
+      ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
+      if (ext != null) {
+        if (m_bundleTree.isChecked(node) && node.isEnabled() && node.isVisible()) {
+          checkedNodeExtensionIds.add(ext.getBundleId());
         }
+        ext.getNewScoutBundleHandler().putProperties(getWizard(), properties);
       }
     }
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_CHECKED_NODES, checkedNodeExtensionIds);
@@ -261,9 +263,9 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     multiStatus.add(getStatusProjectAlias());
     for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
       if (m_bundleTree.isChecked(node)) {
-        ScoutBundleExtension ext = (ScoutBundleExtension) node.getData();
+        ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
         if (ext != null) {
-          multiStatus.add(ext.getBundleExtention().getStatus(getWizard()));
+          multiStatus.add(ext.getNewScoutBundleHandler().getStatus(getWizard()));
         }
       }
     }
@@ -282,7 +284,15 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   protected IStatus getStatusProjectName() {
-    return JavaElementValidator.validateNewBundleName(getProjectName());
+    for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
+      if (node.isEnabled() && m_bundleTree.isChecked(node)) {
+        IStatus s = JavaElementValidator.validateNewBundleName(node.getText());
+        if (!s.isOK()) {
+          return s;
+        }
+      }
+    }
+    return Status.OK_STATUS;
   }
 
   protected IStatus getStatusProjectAlias() {
@@ -319,15 +329,16 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   @Override
-  public void setBundleNodeAvailable(boolean available, String... extensionIds) {
+  public void setBundleNodeAvailable(boolean enabled, boolean visible, String... extensionIds) {
     ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
     for (ITreeNode n : nodes) {
-      n.setEnabled(available);
+      n.setEnabled(enabled);
+      n.setVisible(visible);
     }
   }
 
   @Override
-  public boolean hasSelectedBundle(BundleTypes... types) {
+  public boolean hasSelectedBundle(String... types) {
     ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByBundleTypeFilter(types));
     for (ITreeNode n : nodes) {
       if (m_bundleTree.isChecked(n)) {
@@ -425,16 +436,10 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   private class P_InitialCheckNodesFilter implements ITreeNodeFilter {
-
     @Override
     public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case TYPE_BUNDLE:
-          return true;
-      }
-      return false;
+      return TYPE_BUNDLE.equals(node.getType());
     }
-
   } // end class P_InitialCheckNodesFilter
 
   private class P_NodeByExtensionIdFilter implements ITreeNodeFilter {
@@ -450,9 +455,9 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
     @Override
     public boolean accept(ITreeNode node) {
-      ScoutBundleExtension extension = (ScoutBundleExtension) node.getData();
+      ScoutBundleUiExtension extension = (ScoutBundleUiExtension) node.getData();
       if (extension != null) {
-        return m_ids.contains(extension.getBundleID());
+        return m_ids.contains(extension.getBundleId());
       }
       return false;
     }
@@ -460,11 +465,11 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   private class P_NodeByBundleTypeFilter implements ITreeNodeFilter {
 
-    private final HashSet<BundleTypes> m_types = new HashSet<IScoutBundleExtension.BundleTypes>();
+    private final HashSet<String> m_types = new HashSet<String>();
 
-    public P_NodeByBundleTypeFilter(BundleTypes... types) {
+    public P_NodeByBundleTypeFilter(String... types) {
       if (types != null) {
-        for (BundleTypes s : types) {
+        for (String s : types) {
           m_types.add(s);
         }
       }
@@ -472,7 +477,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
     @Override
     public boolean accept(ITreeNode node) {
-      ScoutBundleExtension extension = (ScoutBundleExtension) node.getData();
+      ScoutBundleUiExtension extension = (ScoutBundleUiExtension) node.getData();
       if (extension != null) {
         return m_types.contains(extension.getBundleType());
       }

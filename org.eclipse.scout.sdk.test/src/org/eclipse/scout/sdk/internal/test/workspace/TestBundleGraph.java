@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.test.workspace;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,7 +32,7 @@ public class TestBundleGraph extends AbstractScoutSdkTest {
   @Test
   public final void testCyclicDependencies() throws Exception {
     // will trigger the bundle-graph creation
-    ScoutSdkCore.getScoutWorkspace().getRootProjects();
+    ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());
   }
 
   @AfterClass

@@ -17,19 +17,24 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
+import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
+import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
+import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 
 /**
  * <h3>{@link OutlineTemplateOperation}</h3> ...
@@ -40,8 +45,6 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
 
   public final static String TEMPLATE_ID = "ID_OUTLINE_TEMPLATE";
-
-  private IScoutProject m_scoutProject;
 
   @Override
   public String getOperationName() {
@@ -55,21 +58,17 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
 
   @Override
   public void init() {
-    m_scoutProject = getScoutProject();
-  }
-
-  @Override
-  public void validate() throws IllegalArgumentException {
-    super.validate();
-    if (m_scoutProject == null) {
-      throw new IllegalArgumentException("scout project must not be null.");
-    }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ResourcesPlugin.getWorkspace().checkpoint(false);
-    IType desktopType = TypeUtility.getType(m_scoutProject.getClientBundle().getDefaultPackage(IScoutBundle.CLIENT_DESKTOP) + ".Desktop");
+    IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
+    final IScoutBundle client = bundleGraph.getBundle(getProperties().getProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, String.class));
+    final IScoutBundle server = bundleGraph.getBundle(getProperties().getProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, String.class));
+    final IScoutBundle shared = bundleGraph.getBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
+
+    IType desktopType = TypeUtility.getType(client.getDefaultPackage(IDefaultTargetPackage.CLIENT_DESKTOP) + ".Desktop");
     if (TypeUtility.exists(desktopType)) {
       MethodOverrideOperation execOpenOp = new MethodOverrideOperation(desktopType, "execOpened", false) {
         @Override
@@ -78,7 +77,7 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
           sourceBuilder.append("// outline tree\n");
           String treeFormRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.DefaultOutlineTreeForm));
           sourceBuilder.append(treeFormRef + " treeForm = new " + treeFormRef + "();\n");
-          ScoutIconDesc icon = m_scoutProject.getIconProvider().getIcon("eclipse_scout");
+          ScoutIconDesc icon = client.getIconProvider().getIcon("eclipse_scout");
           if (icon != null) {
             String iconsRef = validator.getTypeName(SignatureCache.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName()));
             sourceBuilder.append("treeForm.setIconId(" + iconsRef + "." + icon.getConstantField().getElementName() + ");\n");
@@ -108,34 +107,34 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
 
       // create the outline
       String name = "StandardOutline";
-      NlsEntry entry = new NlsEntry(name, getScoutProject().getNlsProject());
+      NlsEntry entry = new NlsEntry(name, client.getNlsProject());
       entry.addTranslation(Language.LANGUAGE_DEFAULT, "Standard");
-      getScoutProject().getNlsProject().updateRow(entry, monitor);
+      client.getNlsProject().updateRow(entry, monitor);
 
       OutlineNewOperation outlineOp = new OutlineNewOperation();
       outlineOp.setAddToDesktop(true);
-      outlineOp.setClientBundle(getScoutProject().getClientBundle());
+      outlineOp.setClientBundle(client);
       outlineOp.setDesktopType(desktopType);
       outlineOp.setFormatSource(false);
       outlineOp.setTypeName(name);
-      outlineOp.setPackageName(getScoutProject().getClientBundle().getDefaultPackage(IScoutBundle.CLIENT_OUTLINES));
+      outlineOp.setPackageName(client.getDefaultPackage(IDefaultTargetPackage.CLIENT_OUTLINES));
       outlineOp.setNlsEntry(entry);
       outlineOp.run(monitor, workingCopyManager);
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
 
-      if (getScoutProject().getServerBundle() != null && getScoutProject().getSharedBundle() != null) {
+      if (server != null && shared != null) {
         // create outline service
         ServiceNewOperation outlineServiceOp = new ServiceNewOperation();
-        outlineServiceOp.addProxyRegistrationBundle(getScoutProject().getClientBundle());
-        outlineServiceOp.addServiceRegistrationBundle(getScoutProject().getServerBundle());
-        outlineServiceOp.setImplementationBundle(getScoutProject().getServerBundle());
-        outlineServiceOp.setInterfaceBundle(getScoutProject().getSharedBundle());
+        outlineServiceOp.addProxyRegistrationBundle(client);
+        outlineServiceOp.addServiceRegistrationBundle(server);
+        outlineServiceOp.setImplementationBundle(server);
+        outlineServiceOp.setInterfaceBundle(shared);
         outlineServiceOp.setServiceInterfaceName("IStandardOutlineService");
-        outlineServiceOp.setServiceInterfacePackageName(getScoutProject().getSharedBundle().getDefaultPackage(IScoutBundle.SHARED_SERVICES));
+        outlineServiceOp.setServiceInterfacePackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES));
         outlineServiceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
         outlineServiceOp.setServiceName("StandardOutlineService");
-        outlineServiceOp.setServicePackageName(getScoutProject().getServerBundle().getDefaultPackage(IScoutBundle.SERVER_SERVICES));
-        outlineServiceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getScoutProject().getServerBundle().getJavaProject()));
+        outlineServiceOp.setServicePackageName(server.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES));
+        outlineServiceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, server.getJavaProject()));
         outlineServiceOp.run(monitor, workingCopyManager);
       }
     }

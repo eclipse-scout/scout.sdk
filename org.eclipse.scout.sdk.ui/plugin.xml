@@ -488,7 +488,6 @@
    <extension point="org.eclipse.scout.sdk.ui.contextMenu">
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.export.ExportScoutProjectAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.FormDataUpdateAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.ImportPluginAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.InstallClientSessionAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction"></contextMenu>
@@ -634,13 +633,13 @@
          </singlePart>
       </part>
       <part
-            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwtNodePage">
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwtNodePage">
          <singlePart
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
          </singlePart>
       </part>
       <part
-            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.UiSwingNodePage">
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwingNodePage">
          <singlePart
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
          </singlePart>
@@ -658,7 +657,7 @@
          </singlePart>
       </part>
       <part
-            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectNodePage">
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.BundleNodeGroupTablePage">
          <singlePart
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ScoutProjectPropertyPart">
          </singlePart>
@@ -716,43 +715,51 @@
          point="org.eclipse.scout.sdk.ui.scoutBundle">
       <bundleNode
             bundleName="ui.swing"
-            bundleType="GUI_Bundle"
-            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwingScoutBundleExtension"
+            bundleNewHandler="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwingScoutBundleExtension"
+            bundlePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwingNodePage"
+            bundleType="UI_SWING"
             icon="resources/icons/uiBundle.png"
             id="org.eclipse.scout.sdk.ui.UiSwingBundle"
-            orderNumber="10">
+            launcherIcon="resources/icons/swingLauncher.gif"
+            orderNumber="-510">
       </bundleNode>
       <bundleNode
             bundleName="ui.swt"
-            bundleType="GUI_Bundle"
-            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwtScoutBundleExtension"
+            bundleNewHandler="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwtScoutBundleExtension"
+            bundlePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwtNodePage"
+            bundleType="UI_SWT"
             icon="resources/icons/uiBundle.png"
             id="org.eclipse.scout.sdk.ui.UiSwtBundle"
-            orderNumber="20">
+            launcherIcon="resources/icons/swtLauncher.gif"
+            orderNumber="-500">
       </bundleNode>
       <bundleNode
             bundleName="client"
-            bundleType="Client_Bundle"
-            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ClientScoutBundleExtension"
+            bundleNewHandler="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ClientScoutBundleExtension"
+            bundlePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientNodePage"
+            bundleType="CLIENT"
             icon="resources/icons/clientBundle.png"
             id="org.eclipse.scout.sdk.ui.ClientBundle"
-            orderNumber="150">
+            orderNumber="-400">
       </bundleNode>
       <bundleNode
             bundleName="shared"
-            bundleType="Shared_Bundle"
-            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SharedScoutBundleExtension"
+            bundleNewHandler="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SharedScoutBundleExtension"
+            bundlePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedNodePage"
+            bundleType="SHARED"
             icon="resources/icons/sharedBundle.png"
             id="org.eclipse.scout.sdk.ui.SharedBundle"
-            orderNumber="250">
+            orderNumber="-300">
       </bundleNode>
       <bundleNode
             bundleName="server"
-            bundleType="Server_Bundle"
-            class="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ServerScoutBundleExtension"
+            bundleNewHandler="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ServerScoutBundleExtension"
+            bundlePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage"
+            bundleType="SERVER"
             icon="resources/icons/serverBundle.png"
             id="org.eclipse.scout.sdk.ui.ServerBundle"
-            orderNumber="350">
+            launcherIcon="resources/icons/serverLauncher.gif"
+            orderNumber="-200">
       </bundleNode>
    </extension>
    <extension

@@ -17,8 +17,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -31,7 +31,7 @@ import org.junit.Test;
  * <p>
  * <b>Reason:</b> Scout resolves the the hosting plug-in of a method by traversing the JDT's {@link IJavaElement}
  * hierarchy up to the root to find the project. After the java project has been found it is resolved to its appropriate
- * {@link IScoutProject}. This works fine for methods declared in classes belonging to a Scout bundle (i.e. client,
+ * {@link IScoutBundle}. This works fine for methods declared in classes belonging to a Scout bundle (i.e. client,
  * server or shared plug-in, that is visible in the Scout perspective). However, it does not always work for methods
  * (scout configuration or exec methods) that are yet not part of a Scout project class.
  * <p>
@@ -54,8 +54,8 @@ public class Bug87400Test extends AbstractScoutSdkTest {
     IType mainBox = form.getType("MainBox");
     Assert.assertNotNull(mainBox);
 
-    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(form).getBundleName());
-    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(mainBox).getBundleName());
+    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(form).getSymbolicName());
+    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(mainBox).getSymbolicName());
   }
 
   @Test
@@ -98,10 +98,15 @@ public class Bug87400Test extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(method));
     IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(method);
     Assert.assertNotNull(scoutBundle);
-    Assert.assertEquals("a.client", scoutBundle.getBundleName());
+    Assert.assertEquals("a.client", scoutBundle.getSymbolicName());
   }
 
   private IMethod getScoutMethod(String methodName, IType type) throws JavaModelException {
     return TypeUtility.getMethod(type, methodName);
+  }
+
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
   }
 }

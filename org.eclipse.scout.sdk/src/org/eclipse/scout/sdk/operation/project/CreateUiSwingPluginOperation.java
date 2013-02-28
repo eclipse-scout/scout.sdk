@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
@@ -76,8 +77,11 @@ public class CreateUiSwingPluginOperation extends AbstractCreateScoutBundleOpera
       prodProdInstallOp.run(monitor, workingCopyManager);
       getProperties().setProperty(PROP_PRODUCT_FILE_PROD, prodProdInstallOp.getCreatedFile());
 
-      // register development product as project launcher in project-property-part
-      SdkProperties.addProjectProductLauncher(getScoutProjectName(), devProdInstallOp.getCreatedFile());
+      IJavaProject shared = getCreatedBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
+      if (shared != null) {
+        // register development product as project launcher in project-property-part
+        SdkProperties.addProjectProductLauncher(shared.getElementName(), devProdInstallOp.getCreatedFile());
+      }
     }
     catch (MalformedURLException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));

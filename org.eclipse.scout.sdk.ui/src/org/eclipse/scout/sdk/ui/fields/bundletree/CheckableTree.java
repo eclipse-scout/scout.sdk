@@ -33,8 +33,6 @@ import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSource;
@@ -66,7 +64,7 @@ import org.eclipse.swt.widgets.TreeItem;
  * @since 1.0.8 29.01.2010
  */
 public class CheckableTree extends Composite {
-  public static final int TYPE_ROOT = -1;
+  public static final String TYPE_ROOT = "root";
   private static final int TEXT_MARGIN = 2;
 
   private final ITreeNode m_rootNode;
@@ -350,22 +348,6 @@ public class CheckableTree extends Composite {
 
   } // end class P_TreeModel
 
-  public static class P_DependentFilter implements IScoutBundleFilter {
-    private final int m_bundleType;
-
-    public P_DependentFilter(int bundleType) {
-      m_bundleType = bundleType;
-    }
-
-    @Override
-    public boolean accept(IScoutBundle bundle) {
-      if (m_bundleType == bundle.getType()) {
-        return true;
-      }
-      return false;
-    }
-  } // end class P_DependentFilter
-
   private class P_TreePaintListener implements Listener {
 
     @Override
@@ -522,7 +504,6 @@ public class CheckableTree extends Composite {
     @Override
     public void dragFinished(DragSourceEvent event) {
       m_viewer.refresh();
-      m_viewer.expandAll();
     }
   } // end class P_DragSourceListener
 
@@ -560,7 +541,6 @@ public class CheckableTree extends Composite {
         l.validateTarget(dndEvent);
       }
       return dndEvent.doit;
-
     }
 
     @Override
@@ -611,6 +591,5 @@ public class CheckableTree extends Composite {
         return LOCATION_NONE;
       }
     }
-
   } // end class P_DropTargetListener
 }

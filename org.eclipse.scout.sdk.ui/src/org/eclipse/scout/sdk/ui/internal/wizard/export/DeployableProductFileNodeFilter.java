@@ -15,18 +15,18 @@ public class DeployableProductFileNodeFilter implements ITreeNodeFilter {
   public final static String BUNDLE_ID_HTTP_REGISTRY = "org.eclipse.equinox.http.registry";
   public final static String BUNDLE_ID_HTTP_SERVLETBRIDGE = "org.eclipse.equinox.http.servletbridge";
 
-  private final int m_nodeType;
+  private final String m_nodeType;
 
-  public DeployableProductFileNodeFilter(int nodeType) {
+  public DeployableProductFileNodeFilter(String nodeType) {
     m_nodeType = nodeType;
   }
 
   @Override
   public boolean accept(ITreeNode node) {
-    if (node.getType() == m_nodeType) {
+    if (m_nodeType.equals(node.getType())) {
       return true;
     }
-    else if (node.getType() == TreeUtility.TYPE_PRODUCT_NODE) {
+    else if (TreeUtility.TYPE_PRODUCT_NODE.equals(node.getType())) {
       return getServletBridgeProductStatus((IFile) node.getData()).isOK();
     }
     else {

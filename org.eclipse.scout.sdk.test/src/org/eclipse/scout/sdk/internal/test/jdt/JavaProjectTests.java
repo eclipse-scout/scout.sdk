@@ -19,7 +19,8 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Test;
 
 /**
@@ -52,19 +53,24 @@ public class JavaProjectTests extends AbstractScoutSdkTest {
    */
   @Test
   public void testJavaProjectEquality() throws Exception {
-    IScoutProject module = ScoutProjectHelper.setupNewProject("a", false, true, false);
-    IJavaProject shared1 = module.getSharedBundle().getJavaProject();
-    assertTrue(shared1.exists());
-    clearWorkspace();
-    assertFalse(shared1.exists());
+    try {
+      IScoutBundle module = ScoutProjectHelper.setupNewProject("a", false, true, false);
+      IJavaProject shared1 = module.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true).getJavaProject();
+      assertTrue(shared1.exists());
+      clearWorkspace();
+      assertFalse(shared1.exists());
 
-    IScoutProject module2 = ScoutProjectHelper.setupNewProject("a", false, true, false);
-    IJavaProject shared2 = module2.getSharedBundle().getJavaProject();
-    assertTrue(shared2.exists());
-    assertTrue(shared1.exists());
-    assertNotSame(shared1, shared2);
-    assertTrue(shared1.equals(shared2));
-    clearWorkspace();
+      IScoutBundle module2 = ScoutProjectHelper.setupNewProject("a", false, true, false);
+      IJavaProject shared2 = module2.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true).getJavaProject();
+      assertTrue(shared2.exists());
+      assertTrue(shared1.exists());
+      assertNotSame(shared1, shared2);
+      assertTrue(shared1.equals(shared2));
+      clearWorkspace();
+    }
+    finally {
+      clearWorkspace();
+    }
   }
 
 }

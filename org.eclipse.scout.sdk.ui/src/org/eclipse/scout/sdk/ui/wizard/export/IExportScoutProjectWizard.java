@@ -3,11 +3,11 @@ package org.eclipse.scout.sdk.ui.wizard.export;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public interface IExportScoutProjectWizard extends IWizard {
 
-  IScoutProject getProject();
+  IScoutBundle getProject();
 
   IExportScoutProjectWizardPage getExportWizardPage();
 

@@ -28,7 +28,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusListener;
@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.Label;
 public class EntityTextField extends Composite {
 
   private final int m_labelPercentage;
-  private final IScoutProject m_project;
+  private final IScoutBundle m_project;
 
   private StyledText m_text;
   private Label m_label;
@@ -58,7 +58,7 @@ public class EntityTextField extends Composite {
   private P_EntityContentProvider m_contentProvider;
   private ContentProposalAdapter m_proposalAdapter;
 
-  public EntityTextField(Composite parent, String labelName, int labelPercentage, IScoutProject p) {
+  public EntityTextField(Composite parent, String labelName, int labelPercentage, IScoutBundle p) {
     super(parent, SWT.NONE);
     m_labelPercentage = labelPercentage;
     m_project = p;

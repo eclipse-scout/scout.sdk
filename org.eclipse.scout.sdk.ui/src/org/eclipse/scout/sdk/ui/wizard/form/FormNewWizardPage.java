@@ -17,8 +17,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
@@ -33,7 +35,6 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -82,11 +83,11 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_clientBundle = clientBundle;
     m_abstractForm = RuntimeClasses.getSuperType(RuntimeClasses.IForm, m_clientBundle.getJavaProject());
 
-    setTitle(Texts.get("Form"));
+    setTitle(Texts.get("CreateANewForm"));
     setDescription(Texts.get("CreateANewForm"));
-    setTargetPackage(DefaultTargetPackage.get(clientBundle, IScoutBundle.CLIENT_FORMS));
+    setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_FORMS));
     setSuperTypeInternal(m_abstractForm);
-    setCreateFormId(true);
+    setCreateFormId(false);
   }
 
   @Override
@@ -95,7 +96,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     Group group = new Group(p, SWT.SHADOW_ETCHED_IN);
     group.setText(Texts.get("Form"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"), labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().getNlsProject(), Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

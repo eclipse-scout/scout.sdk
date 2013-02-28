@@ -47,6 +47,7 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Assert;
 import org.osgi.framework.Bundle;
 
@@ -310,9 +311,9 @@ public abstract class AbstractScoutSdkTest {
   protected void printWorkspace(String title) {
     System.out.println("---print WS [" + title + "] ----");
     System.out.println("Bundles:");
-    for (IScoutBundle b : ScoutSdkCore.getScoutWorkspace().getAllBundles()) {
+    for (IScoutBundle b : ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter())) {
       if (b != null) {
-        System.out.println(" - " + b.getBundleName());
+        System.out.println(" - " + b.getSymbolicName());
       }
       else {
         System.out.println(" - Null bundle");

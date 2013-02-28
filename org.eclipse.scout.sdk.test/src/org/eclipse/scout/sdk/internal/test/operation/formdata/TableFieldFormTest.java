@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -110,7 +111,6 @@ public class TableFieldFormTest extends AbstractScoutSdkTest {
     // getValueAt
     IMethod getValueAT = TypeUtility.getMethod(tableField, "getValueAt");
     Assert.assertTrue(TypeUtility.exists(getValueAT));
-
   }
 
   @Test
@@ -123,4 +123,8 @@ public class TableFieldFormTest extends AbstractScoutSdkTest {
     Assert.assertTrue(methods[0].isConstructor());
   }
 
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
+  }
 }

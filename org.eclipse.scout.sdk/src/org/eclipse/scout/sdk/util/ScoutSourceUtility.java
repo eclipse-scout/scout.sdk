@@ -24,13 +24,13 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>BCSourceUtilities</h3> several source helper methods. Take a look at the public static methods.
+ * <h3>ScoutSourceUtility</h3> several source helper methods. Take a look at the public static methods.
  */
 public class ScoutSourceUtility {
 
@@ -53,11 +53,11 @@ public class ScoutSourceUtility {
     if (method == null || !method.exists()) {
       return name;
     }
-    IScoutBundle scoutBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
+    IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
     if (scoutBundle == null) {
       return name;
     }
-    INlsProject nlsProject = scoutBundle.findBestMatchNlsProject();
+    INlsProject nlsProject = scoutBundle.getNlsProject();
     if (nlsProject == null) {
       return name;
     }

@@ -24,7 +24,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.rap.RapRuntimeClasses;
+import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -43,7 +43,7 @@ public class ScoutRapTargetCreationOperation implements IOperation {
   private File m_destinationDir;
 
   public ScoutRapTargetCreationOperation() {
-    m_sourcePlugin = Platform.getBundle(RapRuntimeClasses.ScoutRapTargetPlugin);
+    m_sourcePlugin = Platform.getBundle(IScoutSdkRapConstants.ScoutRapTargetPlugin);
   }
 
   @Override
@@ -57,7 +57,7 @@ public class ScoutRapTargetCreationOperation implements IOperation {
       throw new IllegalArgumentException("the destination directory can not be null.");
     }
     if (getSourcePlugin() == null) {
-      throw new IllegalArgumentException("the plugin '" + RapRuntimeClasses.ScoutRapTargetPlugin + "' can not be found.");
+      throw new IllegalArgumentException("the plugin '" + IScoutSdkRapConstants.ScoutRapTargetPlugin + "' can not be found.");
     }
   }
 

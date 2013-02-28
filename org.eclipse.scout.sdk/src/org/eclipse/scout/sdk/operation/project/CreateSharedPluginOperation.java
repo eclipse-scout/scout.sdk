@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperation {
   public final static String PROP_BUNDLE_SHARED_NAME = "BUNDLE_SHARED_NAME";
+  public final static String PROP_TEXT_SERVICE_NAME = "TEXT_PROV_SVC_NAME";
 
   public final static String SHARED_PROJECT_NAME_SUFFIX = ".shared";
   public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.SharedBundle";

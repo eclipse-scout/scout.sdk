@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty;
 
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.BeanPropertyNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;

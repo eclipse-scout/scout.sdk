@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint.ExplorerPageExtension;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.menu.IContextMenuProvider;
-import org.eclipse.scout.sdk.workspace.IScoutElement;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 
@@ -71,7 +71,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public IScoutElement getScoutResource() {
+  public IScoutBundle getScoutResource() {
     if (getParent() != null) return getParent().getScoutResource();
     else return null;
   }

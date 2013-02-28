@@ -15,14 +15,15 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link Postgres9JdbcManifestTechnologyHandler}</h3> ...
@@ -67,17 +68,21 @@ public class Postgres9JdbcManifestTechnologyHandler extends AbstractScoutTechnol
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    return getSelectionManifest(project.getServerBundle(), POSTGRES_JDBC_PLUGIN);
+  public TriState getSelection(IScoutBundle project) {
+    return getSelectionManifests(getServerBundlesBelow(project), POSTGRES_JDBC_PLUGIN);
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getServerBundle() != null && project.getServerBundle().getProject().exists();
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false) != null;
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeManifestFile(project.getServerBundle(), list);
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
+    contributeManifestFiles(getServerBundlesBelow(project), list);
+  }
+
+  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

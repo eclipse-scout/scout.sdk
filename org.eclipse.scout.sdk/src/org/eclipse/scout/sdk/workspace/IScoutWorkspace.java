@@ -10,60 +10,35 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.scout.sdk.internal.workspace.ScoutProject;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 
 /**
- *
+ * The root of the scout SDK.
+ * 
+ * @see ScoutSdkCore#getScoutWorkspace()
  */
 public interface IScoutWorkspace {
   /**
+   * adds a new workspace listener to the scout workspace
+   * 
    * @param listener
+   * @see IScoutWorkspaceListener
    */
   void addWorkspaceListener(IScoutWorkspaceListener listener);
 
   /**
+   * removes a workspace listener from the scout workspace
+   * 
    * @param listener
+   * @see IScoutWorkspaceListener
    */
   void removeWorkspaceListener(IScoutWorkspaceListener listener);
 
   /**
-   * @return
+   * gets the bundle graph containing all scout bundles of the workspace and the target platform
+   * 
+   * @return the scout bundle graph
+   * @see IScoutBundleGraph
    */
-  IScoutBundle[] getAllBundles();
-
-  /**
-   * @param project
-   * @return
-   */
-  IScoutBundle getScoutBundle(IProject project);
-
-  IScoutProject[] getRootProjects();
-
-  /**
-   * @param scoutProject
-   * @return
-   */
-  IScoutProject getParentProject(ScoutProject scoutProject);
-
-  IScoutProject getScoutProject(IScoutBundle bundle);
-
-  /**
-   * @param scoutProject
-   * @return
-   */
-  IScoutProject[] getSubProjects(IScoutProject scoutProject);
-
-  /**
-   * @param projectName
-   * @return
-   */
-  IScoutProject findScoutProject(String projectName);
-
-  /**
-   * @param p
-   * @return
-   */
-  IScoutProject getScoutProject(IProject p);
-
+  IScoutBundleGraph getBundleGraph();
 }

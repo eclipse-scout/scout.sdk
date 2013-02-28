@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -82,4 +83,8 @@ public class Bug77596Test extends AbstractScoutSdkTest {
     Assert.assertTrue(sibling.getElementName().equals("isDataChangedTriggerDisabled"));
   }
 
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
+  }
 }

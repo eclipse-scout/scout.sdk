@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.plugin.IPluginElement;
@@ -27,7 +26,8 @@ import org.eclipse.pde.core.plugin.IPluginObject;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
@@ -35,8 +35,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
  * <h3>{@link ResourceServletFolderTree}</h3> ...
@@ -45,11 +43,11 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * @since 1.0.8 09.02.2011
  */
 public class ResourceServletFolderTree {
-  public static int NODE_TYPE_FOLDER = 129;
+  public final static String NODE_TYPE_FOLDER = "folder";
 
   private ITreeNode m_rootNode;
 
-  public ResourceServletFolderTree(IScoutProject project) {
+  public ResourceServletFolderTree(IScoutBundle project) {
     m_rootNode = TreeUtility.createBundleTree(project);
     initTree(m_rootNode);
   }
@@ -68,7 +66,7 @@ public class ResourceServletFolderTree {
   }
 
   private void findServletExtensions(ITreeNode curentNode, ArrayList<P_ResourceServletExtension> extensions) {
-    if (curentNode.getType() > 2 && curentNode.getType() < 8) {
+    if (curentNode.getData() instanceof IScoutBundle) {
       IScoutBundle bundle = (IScoutBundle) curentNode.getData();
       IPluginModelBase pluginModel = PluginRegistry.findModel(bundle.getProject());
       IPluginBase pluginBase = pluginModel.getPluginBase(false);
@@ -76,7 +74,7 @@ public class ResourceServletFolderTree {
         IPluginExtension[] exs = pluginBase.getExtensions();
         if (exs != null && exs.length > 0) {
           for (IPluginExtension e : exs) {
-            if (CompareUtility.equals("org.eclipse.equinox.http.registry.servlets", e.getPoint()) && e.getChildCount() > 0) {
+            if (CompareUtility.equals(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, e.getPoint()) && e.getChildCount() > 0) {
               for (IPluginObject po : e.getChildren()) {
                 if (po instanceof IPluginElement) {
                   IPluginElement pe = (IPluginElement) po;
@@ -143,32 +141,23 @@ public class ResourceServletFolderTree {
 
     @Override
     public boolean accept(ITreeNode node) {
-      switch (node.getType()) {
-        case IScoutBundle.BUNDLE_CLIENT:
-        case IScoutBundle.BUNDLE_UI_SWING:
-        case IScoutBundle.BUNDLE_UI_SWT:
-          node.setVisible(false);
-          break;
-        case IScoutBundle.BUNDLE_SHARED:
-        case IScoutBundle.BUNDLE_SERVER:
-          IScoutBundle bundle = (IScoutBundle) node.getData();
-          P_ResourceServletExtension ext = m_extensions.get(bundle.getBundleName());
-          if (ext != null) {
-            createChildNodes(node, ext);
-          }
-          else {
-            node.setVisible(false);
-          }
-          break;
-        default:
-          break;
+      if (!NODE_TYPE_FOLDER.equals(node.getType())) {
+        node.setVisible(false);
+      }
+      if (IScoutBundle.TYPE_SHARED.equals(node.getType()) || IScoutBundle.TYPE_SERVER.equals(node.getType())) {
+        IScoutBundle bundle = (IScoutBundle) node.getData();
+        P_ResourceServletExtension ext = m_extensions.get(bundle.getSymbolicName());
+        if (ext != null) {
+          node.setVisible(true);
+          createChildNodes(node, ext);
+        }
       }
       return true;
     }
 
     private void createChildNodes(ITreeNode node, P_ResourceServletExtension ext) {
-      setPathVisible(node);
       IScoutBundle scoutBundle = (IScoutBundle) node.getData();
+      setPathVisible(node);
       IFolder folder = scoutBundle.getProject().getFolder(new Path(ext.bundlePath));
       createNodeForFolder(node, folder);
     }
@@ -182,16 +171,10 @@ public class ResourceServletFolderTree {
 
     private void createNodeForFolder(ITreeNode parentNode, IFolder folder) {
       if (folder.exists()) {
-        TreeNode folderNode = new TreeNode(NODE_TYPE_FOLDER, folder.getProjectRelativePath().toString(), folder);
+        TreeNode folderNode = (TreeNode) TreeUtility.createNode(parentNode, NODE_TYPE_FOLDER, folder.getProjectRelativePath().toString(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FolderOpen), 0, folder);
         folderNode.setCheckable(false);
         folderNode.setBold(true);
-        ImageDescriptor img = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FolderOpen);
-        IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) folder.getAdapter(IWorkbenchAdapter.class);
-        if (wbAdapter != null) {
-          img = wbAdapter.getImageDescriptor(folder);
-        }
-        ((TreeNode) folderNode).setImage(img);
-        parentNode.addChild(folderNode);
+        folderNode.setVisible(true);
         try {
           for (IResource resource : folder.members()) {
             if (resource.getType() == IResource.FOLDER) {

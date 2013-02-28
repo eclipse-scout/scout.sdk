@@ -20,8 +20,10 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.CodeTypeNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
@@ -39,7 +41,6 @@ import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -77,7 +78,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   public CodeTypeNewWizardPage(IScoutBundle sharedBundle) {
     super(CodeTypeNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
-    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IScoutBundle.SHARED_SERVICES_CODE));
+    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_CODE));
     setTitle(Texts.get("NewCodeType"));
     setDescription(Texts.get("CreateANewCodeType"));
     m_defaultCodeType = RuntimeClasses.getSuperType(RuntimeClasses.ICodeType, m_sharedBundle.getJavaProject());
@@ -93,7 +94,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     int labelColWidthPercent = 20;
-    m_nextCodeIdField = new CodeIdField(parent, getSharedBundle().getScoutProject(), labelColWidthPercent);
+    m_nextCodeIdField = new CodeIdField(parent, getSharedBundle(), labelColWidthPercent);
     m_nextCodeIdField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -103,7 +104,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getSharedBundle().findBestMatchNlsProject(), Texts.get("Name"), labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getSharedBundle().getNlsProject(), Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

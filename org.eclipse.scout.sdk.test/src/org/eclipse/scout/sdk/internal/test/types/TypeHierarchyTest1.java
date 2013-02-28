@@ -14,8 +14,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.holders.IntegerHolder;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
@@ -28,6 +28,8 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -87,7 +89,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
         }
       }
     });
-    IScoutBundle client = ScoutSdkCore.getScoutWorkspace().getScoutBundle(project.getProject());
+    IScoutBundle client = ScoutTypeUtility.getScoutBundle(project.getProject());
     FormNewOperation formOp = new FormNewOperation();
     formOp.setTypeName("ANewForm");
     formOp.setPackage(client.getPackageName(".ui.forms"));
@@ -127,9 +129,9 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
         }
       }
     });
-    IScoutBundle clientBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(getProject(BUNDLE_NAME_CLIENT));
-    IScoutBundle sharedBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(getProject(BUNDLE_NAME_SHARED));
-    IScoutBundle serverBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(getProject(BUNDLE_NAME_SERVER));
+    IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_CLIENT));
+    IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SHARED));
+    IScoutBundle serverBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SERVER));
     ServiceNewOperation serviceOp = new ServiceNewOperation();
     serviceOp.addProxyRegistrationBundle(clientBundle);
     serviceOp.addServiceRegistrationBundle(serverBundle);
@@ -137,9 +139,9 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     serviceOp.setInterfaceBundle(sharedBundle);
     serviceOp.setServiceInterfaceName("ITestService");
     serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
-    serviceOp.setServiceInterfacePackageName(sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SERVICES) + ".notexisting");
+    serviceOp.setServiceInterfacePackageName(sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES) + ".notexisting");
     serviceOp.setServiceName("TestService");
-    serviceOp.setServicePackageName(serverBundle.getDefaultPackage(IScoutBundle.SERVER_SERVICES) + ".notexisting");
+    serviceOp.setServicePackageName(serverBundle.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES) + ".notexisting");
     serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
     OperationJob job = new OperationJob(serviceOp);
     job.schedule();
@@ -151,5 +153,10 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     }
     // expect created form
     Assert.assertEquals(5, serviceCountHolder.getValue().intValue());
+  }
+
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
   }
 }

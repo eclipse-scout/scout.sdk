@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -13,28 +13,38 @@ package org.eclipse.scout.sdk.workspace;
 import java.util.EventObject;
 
 /**
- *
+ * A Scout workspace event that occurred on a single scout bundle
+ * 
+ * @see IScoutWorkspace
+ * @see IScoutBundle
  */
 public class ScoutWorkspaceEvent extends EventObject {
   private static final long serialVersionUID = 1L;
 
+  /**
+   * A bundle has changed its properties or parent bundles
+   */
   public static final int TYPE_BUNDLE_CHANGED = 1;
-  public static final int TYPE_BUNDLE_ADDED = 2;
-  public static final int TYPE_BUNDLE_REMOVED = 3;
-
-  public static final int TYPE_PROJECT_CHANGED = 4;
-  public static final int TYPE_PROJECT_ADDED = 5;
-  public static final int TYPE_PROJECT_REMOVED = 6;
-
-  public static final int TYPE_WORKSPACE_INITIALIZED = 10;
-
-  private final IScoutElement m_scoutElement;
-  private final int m_type;
 
   /**
-   * @param source
+   * A bundle was newly added
    */
-  public ScoutWorkspaceEvent(IScoutWorkspace source, int type, IScoutElement scoutElement) {
+  public static final int TYPE_BUNDLE_ADDED = 2;
+
+  /**
+   * a bundle was removed
+   */
+  public static final int TYPE_BUNDLE_REMOVED = 3;
+
+  /**
+   * the workspace has been initialized the first time
+   */
+  public static final int TYPE_WORKSPACE_INITIALIZED = 10;
+
+  private final IScoutBundle m_scoutElement;
+  private final int m_type;
+
+  public ScoutWorkspaceEvent(IScoutWorkspace source, int type, IScoutBundle scoutElement) {
     super(source);
     m_type = type;
     m_scoutElement = scoutElement;
@@ -49,7 +59,12 @@ public class ScoutWorkspaceEvent extends EventObject {
     return m_type;
   }
 
-  public IScoutElement getScoutElement() {
+  /**
+   * gets the scout bundle that belongs to this event
+   * 
+   * @return
+   */
+  public IScoutBundle getScoutElement() {
     return m_scoutElement;
   }
 }

@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.pde.core.plugin.IExtensionsModelFactory;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -48,7 +49,7 @@ public class SwtPluginXmlUpgradeOperation extends AbstractScoutProjectNewOperati
 
     ResourcesPlugin.getWorkspace().checkpoint(false);
     PluginModelHelper pmh = new PluginModelHelper(m_project);
-    IPluginElement productExtension = pmh.PluginXml.getSimpleExtension("org.eclipse.core.runtime.products", "product");
+    IPluginElement productExtension = pmh.PluginXml.getSimpleExtension(IRuntimeClasses.EXTENSION_POINT_PRODUCTS, IRuntimeClasses.EXTENSION_ELEMENT_PRODUCT);
     if (productExtension != null) {
       IExtensionsModelFactory extensionFactory = productExtension.getPluginModel().getFactory();
       for (String[] kvp : additionalE4Properties) {

@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.helper;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -24,27 +26,29 @@ import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.PropertyMap;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Assert;
 
 /**
  *
  */
 public final class ScoutProjectHelper {
-  public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server, PropertyMap properties) throws Exception {
+  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, PropertyMap properties) throws Exception {
     return setupNewProject(projectName, client, shared, server, false, false, properties);
   }
 
-  public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server) throws Exception {
+  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server) throws Exception {
     return setupNewProject(projectName, client, shared, server, false, false);
   }
 
-  public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing) throws Exception {
+  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing) throws Exception {
     return setupNewProject(projectName, client, shared, server, uiSwt, uiSwing, new PropertyMap());
   }
 
-  public static IScoutProject setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing, PropertyMap properties) throws Exception {
+  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing, PropertyMap properties) throws Exception {
     // define settings what to create
+    properties.setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<IJavaProject>());
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, projectName);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, "");
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, "alias");
@@ -79,9 +83,9 @@ public final class ScoutProjectHelper {
     AbstractScoutSdkTest.buildWorkspace();
 
     // get scout workspace
-    IScoutProject[] rootProjects = ScoutSdkCore.getScoutWorkspace().getRootProjects();
+    IScoutBundle[] rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());
     Assert.assertEquals(1, rootProjects.length);
-    IScoutProject scoutProject = rootProjects[0];
+    IScoutBundle scoutProject = rootProjects[0];
     return scoutProject;
   }
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.util;
 import java.text.ParseException;
 import java.util.regex.Pattern;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 
 /**
@@ -100,6 +101,61 @@ public final class NamingUtility {
 
   public static String toJavaCamelCase(String input) {
     return toJavaCamelCase(input, true);
+  }
+
+  /**
+   * Method calculates the levenshtein distance, also known as string edit distance.
+   * 
+   * @param s1
+   *          The first string.
+   * @param s2
+   *          The second string.
+   * @return Amount of edit operations to transform s1 into s2.
+   */
+  public static int stringDistance(String s1, String s2) {
+    if (s1 == null || s2 == null || CompareUtility.equals(s1, s2)) {
+      return 0;
+    }
+
+    int l1 = s1.length();
+    int l2 = s2.length();
+
+    if (l1 == 0) {
+      return l2;
+    }
+    else if (l2 == 0) {
+      return l1;
+    }
+
+    int col0[] = new int[l1 + 1];
+    int col1[] = new int[l1 + 1];
+    int col[];
+
+    // indexes into strings s1 and s2
+    int i;
+    int j;
+    char jth;
+    int cost;
+
+    for (i = 0; i <= l1; i++) {
+      col0[i] = i;
+    }
+
+    for (j = 1; j <= l2; j++) {
+      jth = s2.charAt(j - 1);
+      col1[0] = j;
+
+      for (i = 1; i <= l1; i++) {
+        cost = s1.charAt(i - 1) == jth ? 0 : 1;
+        col1[i] = Math.min(Math.min(col1[i - 1] + 1, col0[i] + 1), col0[i - 1] + cost);
+      }
+
+      col = col0;
+      col0 = col1;
+      col1 = col;
+    }
+
+    return col0[l1];
   }
 
   /**

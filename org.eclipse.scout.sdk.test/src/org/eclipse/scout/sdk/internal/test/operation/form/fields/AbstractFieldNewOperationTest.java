@@ -13,6 +13,7 @@ import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 
@@ -66,6 +67,10 @@ public abstract class AbstractFieldNewOperationTest extends AbstractScoutSdkTest
       sw.write(buffer, 0, charsRead);
     }
     return sw.toString();
+  }
 
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
   }
 }

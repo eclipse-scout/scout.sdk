@@ -22,7 +22,6 @@ public final class JaxWsConstants {
   public static final IPath PATH_SUN_JAXWS = new Path("/WEB-INF/sun-jaxws.xml");
   public static final IPath PATH_BUILD_JAXWS = new Path("/WEB-INF/build/build-jaxws.xml");
   public static final String JAX_WS_ALIAS = "/jaxws";
-  public static final String SERVER_EXTENSION_POINT_SERVLETS = "org.eclipse.equinox.http.registry.servlets";
 
   public static final String SUFFIX_WS_PROVIDER = "WebService";
   public static final String SUFFIX_WS_CONSUMER = "WebServiceClient";

@@ -32,6 +32,7 @@
  <extension
        point="org.eclipse.scout.sdk.targetPackage">
     <targetPackage
+          bundleType="SHARED"
           default=".services.common.text"
           id="shared.services.textprovider">
     </targetPackage>

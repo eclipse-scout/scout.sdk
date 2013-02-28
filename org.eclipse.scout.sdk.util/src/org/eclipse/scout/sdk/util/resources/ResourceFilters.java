@@ -62,7 +62,6 @@ public class ResourceFilters {
 
   public static IResourceFilter getProductFilter() {
     return new IResourceFilter() {
-
       @Override
       public boolean accept(IResource resource) {
         return ResourceUtility.exists(resource) && resource.getType() == IResource.FILE

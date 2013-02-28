@@ -5,19 +5,14 @@
          point="org.eclipse.scout.sdk.ui.scoutBundle">
       <bundleNode
             bundleName="ui.rap"
-            bundleType="GUI_Bundle"
-            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle.RapScoutBundleExtension"
+            bundleNewHandler="org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle.RapScoutBundleExtension"
+            bundlePage="org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project.UiRapNodePage"
+            bundleType="UI_RAP"
             icon="resources/icons/uiBundle.png"
             id="org.eclipse.scout.sdk.ui.UiRapBundle"
-            orderNumber="30">
+            launcherIcon="resources/icons/rapLauncher.gif"
+            orderNumber="-520">
       </bundleNode>
-   </extension>
-   <extension
-         point="org.eclipse.scout.sdk.ui.explorerPage">
-      <pageFactory
-            factory="org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory"
-            parentPageId="org.eclipse.scout.sdk.page.ProjectNodePage">
-      </pageFactory>
    </extension>
    <extension
          point="org.eclipse.scout.sdk.ui.propertyViewPart">

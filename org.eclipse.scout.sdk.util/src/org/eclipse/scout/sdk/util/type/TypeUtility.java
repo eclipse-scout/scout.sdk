@@ -27,7 +27,6 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -555,22 +554,32 @@ public class TypeUtility {
     }
   }
 
-  public static boolean isOnClasspath(IMember member, IJavaProject project) {
-    if (member == null) {
+  /**
+   * checks whether element is on the classpath of the given project
+   * 
+   * @param element
+   *          the element to search
+   * @param project
+   *          the project classpath to search in
+   * @return true if element was found in the classpath of project
+   */
+  public static boolean isOnClasspath(IJavaElement element, IJavaProject project) {
+    if (element == null) {
       return false;
     }
-    if (member.isBinary()) {
-      return project.isOnClasspath(member);
+    if (project == null) {
+      return false;
     }
-    else if (member.getJavaProject() != null) {
-      if (member.getJavaProject().equals(project)) {
+    IJavaProject elemenProject = element.getJavaProject();
+    if (elemenProject != null) {
+      if (project.equals(elemenProject)) {
         return true;
       }
       else {
-        return project.isOnClasspath(member.getJavaProject());
+        return project.isOnClasspath(elemenProject);
       }
     }
-    return false;
+    return project.isOnClasspath(element);
   }
 
   /**

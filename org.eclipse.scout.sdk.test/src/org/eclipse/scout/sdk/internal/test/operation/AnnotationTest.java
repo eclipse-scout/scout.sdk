@@ -13,13 +13,14 @@ package org.eclipse.scout.sdk.internal.test.operation;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -67,4 +68,8 @@ public class AnnotationTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(JdtUtility.getAnnotation(method, RuntimeClasses.FormData)));
   }
 
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
+  }
 }

@@ -39,11 +39,19 @@ public final class NodeFilters {
     };
   }
 
-  public static ITreeNodeFilter getByType(final int type) {
+  public static ITreeNodeFilter getByType(final String... types) {
     return new ITreeNodeFilter() {
       @Override
       public boolean accept(ITreeNode node) {
-        return type == node.getType();
+        if (types == null || types.length < 1) {
+          return false;
+        }
+        for (String t : types) {
+          if (CompareUtility.equals(t, node.getType())) {
+            return true;
+          }
+        }
+        return false;
       }
     };
   }
@@ -61,7 +69,6 @@ public final class NodeFilters {
     return new ITreeNodeFilter() {
       @Override
       public boolean accept(ITreeNode node) {
-        // TODO eval null checkS
         return node != null && node.isVisible();
       }
     };

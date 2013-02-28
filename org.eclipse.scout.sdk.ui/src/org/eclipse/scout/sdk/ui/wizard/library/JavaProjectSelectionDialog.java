@@ -10,22 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.library;
 
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.ui.JavaElementLabelProvider;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -54,21 +55,22 @@ public class JavaProjectSelectionDialog extends FilteredItemsSelectionDialog {
     setListLabelProvider(new JavaElementLabelProvider());
     setDetailsLabelProvider(new JavaElementLabelProvider());
     setInitialPattern("**");
+    setHelpAvailable(false);
     m_javaProjects = projects;
   }
 
   public static IJavaProject[] getAllWorkspaceScoutProjects(boolean includeFragments) {
-    IProject[] workspaceProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    List<IJavaProject> plugins = new LinkedList<IJavaProject>();
-    for (IProject project : workspaceProjects) {
+    IScoutBundle[] bundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().
+        getBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleComparators.getSymbolicNameAscComparator());
+    List<IJavaProject> plugins = new ArrayList<IJavaProject>(bundles.length);
+    for (IScoutBundle project : bundles) {
       try {
-        if (project.exists() && project.isOpen() && project.hasNature(ScoutSdk.NATURE_ID) && !project.hasNature(ScoutSdk.LIBRARY_NATURE_ID)) {
-          IJavaProject jp = JavaCore.create(project);
-          plugins.add(jp);
+        if (!project.getProject().hasNature(ScoutSdk.LIBRARY_NATURE_ID)) {
+          plugins.add(project.getJavaProject());
         }
       }
       catch (CoreException e) {
-        ScoutSdkUi.logWarning("could not validate plugin '" + project.getName() + "'.", e);
+        ScoutSdkUi.logWarning("could not validate plugin '" + project.getSymbolicName() + "'.", e);
       }
     }
     return plugins.toArray(new IJavaProject[plugins.size()]);

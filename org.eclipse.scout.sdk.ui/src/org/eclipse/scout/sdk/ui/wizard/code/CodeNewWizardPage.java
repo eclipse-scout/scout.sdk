@@ -20,9 +20,8 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.CodeNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -40,7 +39,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -55,7 +54,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
+  private final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
 
   private String m_nextCodeId;
   private String m_nextCodeIdSource;
@@ -74,6 +73,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
+  private final IScoutBundle m_bundle;
   private IType m_createdCode;
 
   public CodeNewWizardPage(IType declaringType) {
@@ -81,6 +81,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewCode"));
     setDescription(Texts.get("CreateANewCode"));
     m_declaringType = declaringType;
+    m_bundle = ScoutTypeUtility.getScoutBundle(m_declaringType.getJavaProject());
     m_superType = RuntimeClasses.getSuperType(RuntimeClasses.ICode, m_declaringType.getJavaProject());
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
@@ -95,7 +96,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   protected void createContent(Composite parent) {
     int labelColWidthPercent = 20;
 
-    IScoutProject project = ScoutSdkCore.getScoutWorkspace().getScoutBundle(m_declaringType.getJavaProject().getProject()).getScoutProject();
+    IScoutBundle project = ScoutTypeUtility.getScoutBundle(m_declaringType.getJavaProject());
     m_nextCodeIdField = new CodeIdField(parent, project, labelColWidthPercent);
     m_nextCodeIdField.addModifyListener(new ModifyListener() {
       @Override
@@ -178,7 +179,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
           setStateChanging(true);
           m_genericSignature = (String) event.proposal;
           if (m_genericSignature != null && getNextCodeId() == null) {
-            setNextCodeId(CodeIdExtensionPoint.getNextCodeId(ScoutTypeUtility.getScoutProject(m_declaringType), getGenericSignature()));
+            setNextCodeId(CodeIdExtensionPoint.getNextCodeId(m_bundle, getGenericSignature()));
           }
         }
         finally {

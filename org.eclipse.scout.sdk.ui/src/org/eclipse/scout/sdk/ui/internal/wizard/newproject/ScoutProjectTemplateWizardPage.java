@@ -48,7 +48,7 @@ import org.eclipse.swt.widgets.Label;
 public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage {
 
   private FilteredTable m_table;
-//  private IScoutProjectTemplateOperation m_selectedTemplate;
+//  private IScoutElementTemplateOperation m_selectedTemplate;
   private Label m_descriptionLabel;
   private P_ContentProvider m_provider;
   private ProjectTemplateExtension m_selectedTemplate;

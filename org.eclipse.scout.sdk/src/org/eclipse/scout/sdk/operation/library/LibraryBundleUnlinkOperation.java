@@ -26,13 +26,12 @@ import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.ScoutResourceFilters;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.scout.sdk.workspace.resource.ScoutResourceFilters;
 
 /**
  * <h3>{@link LibraryBundleUnlinkOperation}</h3> ...
@@ -77,7 +76,7 @@ public class LibraryBundleUnlinkOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     Set<IFile> productsToCheck = new HashSet<IFile>();
-    Set<IScoutProject> checkedScoutProjects = new HashSet<IScoutProject>();
+    Set<IScoutBundle> checkedScoutProjects = new HashSet<IScoutBundle>();
     List<IPluginModelBase> allUnlinkedLibraries = new LinkedList<IPluginModelBase>();
     IScoutBundle bundle = getBundle();
     PluginModelHelper helper = new PluginModelHelper(bundle.getProject());
@@ -87,8 +86,8 @@ public class LibraryBundleUnlinkOperation implements IOperation {
     }
     helper.save();
     // grab product files
-    if (!checkedScoutProjects.contains(bundle.getScoutProject())) {
-      for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(bundle.getScoutProject()))) {
+    if (!checkedScoutProjects.contains(bundle)) {
+      for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(bundle))) {
         productsToCheck.add((IFile) productFile);
       }
     }
@@ -106,7 +105,6 @@ public class LibraryBundleUnlinkOperation implements IOperation {
       catch (CoreException e) {
         ScoutSdk.logError("error during checking product files.", e);
       }
-
     }
   }
 

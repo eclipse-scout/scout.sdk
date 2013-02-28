@@ -19,11 +19,11 @@ import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 
@@ -39,7 +39,7 @@ public final class ServletRegistrationUtility {
     if (bundle == null) {
       return null;
     }
-    if (bundle.getType() != IScoutBundle.BUNDLE_SERVER) {
+    if (IScoutBundle.TYPE_SERVER.equals(bundle.getType())) {
       return null;
     }
 
@@ -68,7 +68,7 @@ public final class ServletRegistrationUtility {
 
     Registration[] registrations = getJaxWsServletRegistrationsOnClasspath(bundle);
     for (Registration registration : registrations) {
-      if (registration.getBundle().getBundleName().equals(bundleName)) {
+      if (registration.getBundle().getSymbolicName().equals(bundleName)) {
         return registration;
       }
     }
@@ -82,12 +82,11 @@ public final class ServletRegistrationUtility {
     }
 
     // find required bundles with JAX-WS on classpath
-    return bundle.getRequiredBundles(new IScoutBundleFilter() {
-
+    return bundle.getParentBundles(new IScoutBundleFilter() {
       @Override
       public boolean accept(IScoutBundle candidate) {
         // ensure server bundle
-        if (candidate.getType() != IScoutBundle.BUNDLE_SERVER) {
+        if (!IScoutBundle.TYPE_SERVER.equals(candidate.getType())) {
           return false;
         }
         // check whether JAX-WS dependency is installed on bundle
@@ -109,11 +108,11 @@ public final class ServletRegistrationUtility {
     // filter bundles with JAX-WS servlet registration in plugin.xml
     Set<Registration> bundles = new HashSet<Registration>();
     for (IScoutBundle candidate : getJaxWsBundlesOnClasspath(bundle)) {
-      String extensionPoint = JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS;
+      String extensionPoint = IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS;
       HashMap<String, String> attributes = new HashMap<String, String>();
       attributes.put("class", TypeUtility.getType(JaxWsRuntimeClasses.JaxWsServlet).getFullyQualifiedName());
       PluginModelHelper h = new PluginModelHelper(candidate.getProject());
-      IPluginElement ex = h.PluginXml.getSimpleExtension(extensionPoint, "servlet", attributes);
+      IPluginElement ex = h.PluginXml.getSimpleExtension(extensionPoint, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
       if (ex == null) {
         continue;
       }

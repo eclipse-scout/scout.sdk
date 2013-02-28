@@ -20,13 +20,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.PlatformUI;
 
 public class OrganizeAllImportsAction extends AbstractScoutHandler {
-  private IScoutProject m_scoutProject;
+  private IScoutBundle m_scoutProject;
 
   public OrganizeAllImportsAction() {
     super(Texts.get("OrganizeAllImports"), null, null, false, Category.IMPORT);
@@ -37,7 +37,7 @@ public class OrganizeAllImportsAction extends AbstractScoutHandler {
     IWorkbenchPartSite site = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart().getSite();
     OrganizeImportsAction a = new OrganizeImportsAction(site);
     ArrayList<IJavaProject> list = new ArrayList<IJavaProject>();
-    for (IScoutBundle b : getScoutProject().getAllScoutBundles()) {
+    for (IScoutBundle b : getScoutProject().getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
       list.add(b.getJavaProject());
     }
     StructuredSelection sel = new StructuredSelection(list.toArray());
@@ -45,11 +45,11 @@ public class OrganizeAllImportsAction extends AbstractScoutHandler {
     return null;
   }
 
-  public IScoutProject getScoutProject() {
+  public IScoutBundle getScoutProject() {
     return m_scoutProject;
   }
 
-  public void setScoutProject(IScoutProject scoutProject) {
+  public void setScoutProject(IScoutBundle scoutProject) {
     m_scoutProject = scoutProject;
   }
 }

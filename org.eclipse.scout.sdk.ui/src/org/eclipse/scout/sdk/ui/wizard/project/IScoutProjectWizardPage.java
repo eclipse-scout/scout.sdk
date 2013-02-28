@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.ui.wizard.project;
 
 import java.beans.PropertyChangeListener;
 
-import org.eclipse.scout.sdk.ui.extensions.project.IScoutBundleExtension.BundleTypes;
-
 /**
  *
  */
@@ -28,13 +26,9 @@ public interface IScoutProjectWizardPage {
 
   void removePropertyChangeListener(PropertyChangeListener listener);
 
-  /**
-   * @param extensionIds
-   * @return
-   */
   boolean isBundleNodesSelected(String... extensionIds);
 
-  boolean hasSelectedBundle(BundleTypes... types);
+  boolean hasSelectedBundle(String... types);
 
   String getProjectName();
 
@@ -42,9 +36,5 @@ public interface IScoutProjectWizardPage {
 
   String getProjectNamePostfix();
 
-  /**
-   * @param available
-   * @param extensionIds
-   */
-  void setBundleNodeAvailable(boolean available, String... extensionIds);
+  void setBundleNodeAvailable(boolean available, boolean visible, String... extensionIds);
 }

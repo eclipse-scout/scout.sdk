@@ -5,11 +5,12 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler {
 
@@ -24,20 +25,23 @@ public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler 
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getClientBundle() != null && project.getClientBundle().getProject().exists() &&
-        project.getUiSwingBundle() != null && project.getUiSwingBundle().getProject().exists();
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false) != null;
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    return getSelectionProductFiles(project,
+  public TriState getSelection(IScoutBundle project) throws CoreException {
+    return getSelectionProductFiles(getSwingBundlesBelow(project),
         new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId},
         SvgClientTechnologyHandler.COMMON_SVG_PLUGINS, SWING_SVG_PLUGIN);
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeProductFiles(project, list, RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId);
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
+    contributeProductFiles(getSwingBundlesBelow(project), list, RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId);
+  }
+
+  private IScoutBundle[] getSwingBundlesBelow(IScoutBundle start) {
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
   }
 }

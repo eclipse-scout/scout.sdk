@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.extensions.ICodeIdParser;
 import org.eclipse.scout.sdk.ui.extensions.ICodeIdProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public final class CodeIdExtensionPoint {
 
@@ -135,7 +135,7 @@ public final class CodeIdExtensionPoint {
     return null;
   }
 
-  public static String getNextCodeId(IScoutProject projectGroup, String genericSignature) {
+  public static String getNextCodeId(IScoutBundle projectGroup, String genericSignature) {
     String value = null;
     ICodeIdProvider[] providers = getCodeIdProviderExtensions();
     for (ICodeIdProvider p : providers) {

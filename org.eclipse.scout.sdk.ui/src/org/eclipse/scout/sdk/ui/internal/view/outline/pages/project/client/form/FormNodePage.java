@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;

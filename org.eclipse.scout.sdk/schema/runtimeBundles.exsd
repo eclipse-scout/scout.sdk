@@ -1,0 +1,124 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="org.eclipse.scout.sdk" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appInfo>
+         <meta.schema plugin="org.eclipse.scout.sdk" id="runtimeBundles" name="runtimeBundles"/>
+      </appInfo>
+      <documentation>
+         Extension Point defining all Scout Runtime bundles and their possible type definition.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
+      <complexType>
+         <sequence minOccurs="0" maxOccurs="unbounded">
+            <element ref="bundle"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="bundle">
+      <annotation>
+         <documentation>
+            definition of a scout runtime bundle
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="symbolicName" type="string" use="required">
+            <annotation>
+               <documentation>
+                  the symbolic name of the scout runtime bundle (e.g. &apos;org.eclipse.scout.rt.client&apos;).
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="type" type="string">
+            <annotation>
+               <documentation>
+                  if the runtime bundle described by the symbolic name defines a scout bundle type, this type is defined here. The scout bundle graph will then use this type when calculating the graph nodes.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="order" type="string">
+            <annotation>
+               <documentation>
+                  must be given if &apos;type&apos; is given as well.
+defines the priority in which this type defining bundle should be parsed.
+E.g.:
+A bundle in the workspace having the following type defining dependencies:
+- org.eclipse.scout.rt.shared
+- org.eclipse.scout.rt.client
+In this case the client dependency is stronger than the shared dependency defining this bundle as type &apos;CLIENT&apos;.
+The bundle graph searches through the type defining bundles in ascending order. Therefore &apos;CLIENT&apos; must have a lower order than shared giving it a higher priority.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="since"/>
+      </appInfo>
+      <documentation>
+         3.9.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appInfo>
+         <meta.section type="examples"/>
+      </appInfo>
+      <documentation>
+         &lt;extension
+         point=&quot;org.eclipse.scout.sdk.runtimeBundles&quot;&gt;
+      &lt;bundle
+            order=&quot;1000&quot;
+            symbolicName=&quot;org.eclipse.scout.rt.client&quot;
+            type=&quot;CLIENT&quot;&gt;
+      &lt;/bundle&gt;
+      &lt;bundle
+            order=&quot;1200&quot;
+            symbolicName=&quot;org.eclipse.scout.rt.shared&quot;
+            type=&quot;SHARED&quot;&gt;
+      &lt;/bundle&gt;
+      &lt;bundle
+            symbolicName=&quot;org.eclipse.scout.commons&quot;&gt;
+      &lt;/bundle&gt;
+&lt;/extension&gt;
+      </documentation>
+   </annotation>
+
+
+
+
+</schema>

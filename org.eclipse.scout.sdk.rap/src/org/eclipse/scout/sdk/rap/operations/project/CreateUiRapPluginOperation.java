@@ -18,7 +18,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.operation.project.AbstractCreateScoutBundleOperation;
+import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
@@ -79,8 +81,11 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
       devProdInstallOp.run(monitor, workingCopyManager);
       getProperties().setProperty(PROP_PRODUCT_FILE_DEV, devProdInstallOp.getCreatedFile());
 
-      // register development product as project launcher in project-property-part
-      SdkProperties.addProjectProductLauncher(getScoutProjectName(), devProdInstallOp.getCreatedFile());
+      IJavaProject shared = getCreatedBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
+      if (shared != null) {
+        // register development product as project launcher in project-property-part
+        SdkProperties.addProjectProductLauncher(shared.getElementName(), devProdInstallOp.getCreatedFile());
+      }
 
       // prod product
       new InstallTextFileOperation("templates/ui.rap/products/production/config.ini", "products/production/config.ini", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);

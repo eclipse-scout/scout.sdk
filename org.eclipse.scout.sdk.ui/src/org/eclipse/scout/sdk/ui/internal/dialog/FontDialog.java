@@ -79,6 +79,7 @@ public class FontDialog extends TitleAreaDialog {
     m_title = title;
     m_message = message;
     setShellStyle(getShellStyle() | SWT.RESIZE);
+    setHelpAvailable(false);
     if (initialSpec == null) {
       m_fontSpec = new FontSpec();
     }

@@ -60,6 +60,7 @@ public class LicenseDialog extends TitleAreaDialog {
   public LicenseDialog(Shell parentShell, Map<String, License[]> iuToLicenses) {
     super(parentShell);
     setShellStyle(getShellStyle() | SWT.RESIZE);
+    setHelpAvailable(false);
     m_iuToLicenses = iuToLicenses;
     m_complete = false;
   }

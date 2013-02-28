@@ -18,8 +18,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
@@ -35,7 +37,6 @@ import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -67,7 +68,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     m_sharedBundle = sharedBundle;
     setTitle(Texts.get("NewPermission"));
     setDescription(Texts.get("CreateANewPermission"));
-    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IScoutBundle.SHARED_SECURITY));
+    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SECURITY));
     m_superType = basicHierarchyPermission;
   }
 

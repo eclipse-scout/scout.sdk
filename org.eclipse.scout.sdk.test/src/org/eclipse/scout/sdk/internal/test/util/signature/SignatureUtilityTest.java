@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.FullyQuallifiedValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;

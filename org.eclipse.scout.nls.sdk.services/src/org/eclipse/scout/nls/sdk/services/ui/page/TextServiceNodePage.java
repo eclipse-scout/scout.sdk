@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceDeleteAction;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.EditorSelectionVisitor;
@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>IconNodePage</h3> a node forks the Icon editor to open on selection.
@@ -40,14 +39,6 @@ public class TextServiceNodePage extends AbstractServiceNodePage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.TEXT_SERVICE_NODE_PAGE;
-  }
-
-  /**
-   * shared bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return super.getScoutResource();
   }
 
   @Override

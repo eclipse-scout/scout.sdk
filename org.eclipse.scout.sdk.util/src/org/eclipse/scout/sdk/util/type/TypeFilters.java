@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.util.type;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -78,11 +79,11 @@ public class TypeFilters {
   }
 
   public static ITypeFilter getRegexSimpleNameFilter(final String regex) {
+    final Pattern pat = Pattern.compile(regex);
     return new ITypeFilter() {
-
       @Override
       public boolean accept(IType type) {
-        return type.getElementName().matches(regex);
+        return pat.matcher(type.getElementName()).matches();
       }
     };
   }

@@ -28,14 +28,14 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 public class Technology implements Comparable<Technology> {
 
-  private final int TREE_TYPE_BUNDLE = 1;
-  private final int TREE_TYPE_RESOURCE = 2;
+  private final String TREE_TYPE_BUNDLE = "bundle";
+  private final String TREE_TYPE_RESOURCE = "resource";
 
   private final String m_id, m_name, m_category;
   private final ArrayList<IScoutTechnologyHandler> m_handlers;
@@ -68,7 +68,7 @@ public class Technology implements Comparable<Technology> {
     }
   }
 
-  public boolean setSelection(IScoutProject project, boolean selected) {
+  public boolean setSelection(IScoutBundle project, boolean selected) throws CoreException {
     // collect all resources from all handlers
     HashSet<IScoutTechnologyResource> allResources = new HashSet<IScoutTechnologyResource>();
     for (IScoutTechnologyHandler handler : getHandlers(project)) {
@@ -169,7 +169,7 @@ public class Technology implements Comparable<Technology> {
     return rootNode;
   }
 
-  private ITreeNode createNode(ITreeNode parent, int type, String text, boolean bold, boolean checkable, ImageDescriptor img, IScoutTechnologyResource data) {
+  private ITreeNode createNode(ITreeNode parent, String type, String text, boolean bold, boolean checkable, ImageDescriptor img, IScoutTechnologyResource data) {
     TreeNode node = new TreeNode(type, text, data);
     node.setCheckable(checkable);
     node.setBold(bold);
@@ -182,7 +182,7 @@ public class Technology implements Comparable<Technology> {
     return node;
   }
 
-  private List<IScoutTechnologyHandler> getHandlers(IScoutProject project) {
+  private List<IScoutTechnologyHandler> getHandlers(IScoutBundle project) {
     ArrayList<IScoutTechnologyHandler> ret = new ArrayList<IScoutTechnologyHandler>(m_handlers.size());
     for (IScoutTechnologyHandler h : m_handlers) {
       if (h.isActive(project)) {
@@ -192,11 +192,11 @@ public class Technology implements Comparable<Technology> {
     return ret;
   }
 
-  public boolean isActive(IScoutProject project) {
+  public boolean isActive(IScoutBundle project) {
     return getHandlers(project).size() > 0;
   }
 
-  public TriState getSelection(IScoutProject project) {
+  public TriState getSelection(IScoutBundle project) throws CoreException {
     List<IScoutTechnologyHandler> handlers = getHandlers(project);
     if (handlers.size() == 0) {
       throw new InvalidParameterException("At least one handler must be defined for a technology");
@@ -204,9 +204,18 @@ public class Technology implements Comparable<Technology> {
 
     TriState ret = handlers.get(0).getSelection(project);
     for (int i = 1; i < handlers.size(); i++) {
-      if (ret != handlers.get(i).getSelection(project)) {
-        return TriState.UNDEFINED;
+      TriState selection = handlers.get(i).getSelection(project);
+      if (selection != null) {
+        if (ret == null) {
+          ret = selection;
+        }
+        else if (ret != selection) {
+          return TriState.UNDEFINED;
+        }
       }
+    }
+    if (ret == null) {
+      return TriState.UNDEFINED;
     }
     return ret;
   }

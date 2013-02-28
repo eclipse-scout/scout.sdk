@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.viewer;
 
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.graphics.Image;
 
@@ -25,25 +27,16 @@ public class ScoutBundleLableProvider extends SearchRangeStyledLabelProvider {
 
   @Override
   public String getText(Object element) {
-    return ((IScoutBundle) element).getBundleName();
+    return ((IScoutBundle) element).getSymbolicName();
   }
 
   @Override
   public Image getImage(Object element) {
-    switch (((IScoutBundle) element).getType()) {
-      case IScoutBundle.BUNDLE_UI_SWING:
-        return ScoutSdkUi.getImage(ScoutSdkUi.SwingBundle);
-      case IScoutBundle.BUNDLE_UI_SWT:
-        return ScoutSdkUi.getImage(ScoutSdkUi.SwtBundle);
-      case IScoutBundle.BUNDLE_CLIENT:
-        return ScoutSdkUi.getImage(ScoutSdkUi.ClientBundle);
-      case IScoutBundle.BUNDLE_SHARED:
-        return ScoutSdkUi.getImage(ScoutSdkUi.SharedBundle);
-      case IScoutBundle.BUNDLE_SERVER:
-        return ScoutSdkUi.getImage(ScoutSdkUi.ServerBundle);
-      default:
-        // TODO default bundle img
-        return ScoutSdkUi.getImage(ScoutSdkUi.SharedBundle);
+    IScoutBundle bundle = (IScoutBundle) element;
+    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(bundle.getType());
+    if (uiExt != null) {
+      return ScoutSdkUi.getDefault().getImageRegistry().get(uiExt.getIconPath());
     }
+    return null;
   }
 }

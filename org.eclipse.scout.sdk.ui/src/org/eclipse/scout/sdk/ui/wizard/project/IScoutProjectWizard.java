@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.project;
 
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  *
@@ -30,5 +31,10 @@ public interface IScoutProjectWizard {
    * @param page
    */
   void addPage(IWizardPage page);
+
+  /**
+   * @return
+   */
+  IScoutBundle getScoutProject();
 
 }

@@ -19,8 +19,10 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.WizardNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
@@ -36,7 +38,6 @@ import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -69,7 +70,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     super(WizardNewWizardPage.class.getName());
     setTitle(Texts.get("NewWizard"));
     setDescription(Texts.get("CreateANewWizard"));
-    setTargetPackage(DefaultTargetPackage.get(clientBundle, IScoutBundle.CLIENT_WIZARDS));
+    setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_WIZARDS));
     m_clientBundle = clientBundle;
     m_abstractWizard = RuntimeClasses.getSuperType(RuntimeClasses.IWizard, clientBundle.getJavaProject());
     m_superType = m_abstractWizard;
@@ -79,7 +80,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
   protected void createContent(Composite parent) {
     int labelColWidthPercent = 20;
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().findBestMatchNlsProject(), Texts.get("Name"), labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().getNlsProject(), Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

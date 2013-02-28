@@ -6,8 +6,7 @@ package org.eclipse.scout.sdk.internal.test.types;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
@@ -15,6 +14,8 @@ import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -38,7 +39,7 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
     IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iformField);
     Assert.assertFalse(primaryFormFieldHierarchy.isCreated());
     IProject clientProject = getProject("test.client");
-    IScoutBundle clientBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(clientProject);
+    IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(clientProject);
     // create new MyAbstractFormField
     IType abstractMyStringField = createType(clientBundle, "AbstractMyStringField", "test.client.ui.custom.field");
     Assert.assertTrue(primaryFormFieldHierarchy.contains(abstractMyStringField));
@@ -74,5 +75,10 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
     OperationJob deleteJob = new OperationJob(deleteTypeOp);
     deleteJob.schedule();
     deleteJob.join();
+  }
+
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
   }
 }

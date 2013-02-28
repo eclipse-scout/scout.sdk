@@ -94,8 +94,8 @@ public interface IScoutPageConstants {
   String PERMISSION_NODE_PAGE = "org.eclipse.scout.sdk.page.PermissionNodePage";
   String PERMISSION_TABLE_PAGE = "org.eclipse.scout.sdk.page.PermissionTablePage";
   String PLANNER_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.PlannerFieldNodePage";
-  String PROJECT_NODE_PAGE = "org.eclipse.scout.sdk.page.ProjectNodePage";
   String PROJECT_TABLE_PAGE = "org.eclipse.scout.sdk.page.ProjectsTablePage";
+  String BUNDLE_NODE_GROUP_TABLE_PAGE = "org.eclipse.scout.sdk.page.BundleNodeGroupTablePage";
   String RADIO_BUTTON_GROUP_NODE_PAGE = "org.eclipse.scout.sdk.page.RadioButtonGroupNodePage";
 
   String SEQUENCE_BOX_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.SequenceBoxFieldNodePage";
@@ -128,6 +128,7 @@ public interface IScoutPageConstants {
   String TREE_BOX_NODE_PAGE = "org.eclipse.scout.sdk.page.TreeBoxNodePage";
   String TREE_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.TreeFieldNodePage";
   String TREE_NODE_PAGE = "org.eclipse.scout.sdk.page.TreeNodePage";
+  String SCOUT_BUNDLE_TABLE_PAGE = "org.eclipse.scout.sdk.page.ScoutBundleTablePage";
   String UI_SWING_NODE_PAGE = "org.eclipse.scout.sdk.page.UiSwingNodePage";
   String UI_SWT_NODE_PAGE = "org.eclipse.scout.sdk.page.UiSwtNodePage";
   String UNKNOWN_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.UnknownFieldNodePage";

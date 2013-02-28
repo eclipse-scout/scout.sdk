@@ -23,7 +23,6 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -152,15 +152,14 @@ public class HandlerTablePage extends AbstractPage {
   }
 
   private class P_TypeHierarchyChangedListener implements ITypeHierarchyChangedListener {
-
     @Override
     public void handleEvent(int eventType, IType type) {
       switch (eventType) {
-        // important: ignore CHANGE events to exclude marker updates
+      // important: ignore CHANGE events to exclude marker updates
         case POST_TYPE_REMOVING:
         case POST_TYPE_ADDING:
-          IScoutBundle bundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
-          if (bundle.getScoutProject() == getScoutResource().getScoutProject()) {
+          IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
+          if (bundle == getScoutResource()) {
             markStructureDirty();
           }
           break;

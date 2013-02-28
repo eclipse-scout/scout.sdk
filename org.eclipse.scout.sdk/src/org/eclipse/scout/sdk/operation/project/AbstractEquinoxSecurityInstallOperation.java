@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -47,14 +47,6 @@ public abstract class AbstractEquinoxSecurityInstallOperation extends AbstractSc
   @Override
   public String getOperationName() {
     return "Add platform dependent Equinox security fragments to product files.";
-  }
-
-  @Override
-  public void validate() throws IllegalArgumentException {
-    super.validate();
-    if (m_productFiles == null || m_productFiles.length < 1) {
-      throw new IllegalArgumentException("no product files found to install equinox security fragments.");
-    }
   }
 
   @Override

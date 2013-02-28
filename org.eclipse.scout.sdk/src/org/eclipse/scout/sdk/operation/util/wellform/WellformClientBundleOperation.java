@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
@@ -43,13 +43,13 @@ public class WellformClientBundleOperation implements IOperation {
   @Override
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
-    builder.append("Wellform '" + getBundle().getBundleName() + "'...");
+    builder.append("Wellform '" + getBundle().getSymbolicName() + "'...");
     return builder.toString();
   }
 
   @Override
   public void validate() throws IllegalArgumentException {
-    if (getBundle().getType() != IScoutBundle.BUNDLE_CLIENT) {
+    if (!getBundle().getType().equals(IScoutBundle.TYPE_CLIENT)) {
       throw new IllegalArgumentException("bundle must be a client bundle.");
     }
   }
@@ -110,7 +110,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform client sessions of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform client sessions of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -125,7 +125,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform desktops of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform desktops of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -140,7 +140,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform desktops of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform desktops of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -155,7 +155,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform forms of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform forms of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -170,7 +170,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform search forms of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform search forms of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -185,7 +185,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform wizards of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform wizards of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -200,7 +200,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform lookup calls of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform lookup calls of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -215,7 +215,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform pages of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform pages of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -230,7 +230,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform outlines of bundle '" + getBundle().getBundleName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform outlines of bundle '" + getBundle().getSymbolicName() + "'.", e);
     }
   }
 }

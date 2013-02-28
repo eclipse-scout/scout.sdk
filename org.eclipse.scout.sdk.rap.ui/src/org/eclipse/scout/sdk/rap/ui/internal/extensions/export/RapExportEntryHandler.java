@@ -8,18 +8,16 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.operation.export.ExportServerWarOperation;
-import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
+import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.rap.ui.internal.wizard.export.ExportRapWizardPage;
 import org.eclipse.scout.sdk.ui.extensions.export.IExportScoutProjectEntryHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class RapExportEntryHandler implements IExportScoutProjectEntryHandler {
-
-  public final static String ID = "ui.rap";
 
   public RapExportEntryHandler() {
   }
@@ -31,8 +29,7 @@ public class RapExportEntryHandler implements IExportScoutProjectEntryHandler {
 
   @Override
   public boolean isAvailable(IExportScoutProjectWizard wizard) {
-    IScoutBundle[] rapBundles = wizard.getProject().getAllBundles(UiRapBundleNodeFactory.BUNDLE_UI_RAP);
-    return rapBundles != null && rapBundles.length > 0;
+    return wizard.getProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutSdkRapConstants.TYPE_UI_RAP), true) != null;
   }
 
   @Override

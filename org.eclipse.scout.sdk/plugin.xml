@@ -2,23 +2,9 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="newProjectOperation" name="New Scout Project Operations" schema="schema/newProjectOperation.exsd"/>
-   <extension-point id="runtimeClass" name="runtimeClass" schema="schema/runtimeClass.exsd"/>
+   <extension-point id="runtimeClasses" name="runtimeClass" schema="schema/runtimeClasses.exsd"/>
    <extension-point id="targetPackage" name="targetPackage" schema="schema/targetPackage.exsd"/>
-   <extension
-         id="org.eclipse.scout.sdk.ScoutNature"
-         name="Scout Bundle"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run class="org.eclipse.scout.sdk.ScoutNature">
-         </run>
-      </runtime>
-      <requires-nature
-            id="org.eclipse.jdt.core.javanature">
-      </requires-nature>
-      <requires-nature
-            id="org.eclipse.pde.PluginNature">
-      </requires-nature>
-   </extension>
+   <extension-point id="runtimeBundles" name="runtimeBundles" schema="schema/runtimeBundles.exsd"/>
    <extension
          id="formPropertyBean"
          name="Scout Problem"
@@ -231,7 +217,7 @@
       </requires-nature>
    </extension>
    <extension
-         point="org.eclipse.scout.sdk.runtimeClass">
+         point="org.eclipse.scout.sdk.runtimeClasses">
       <element
             interface="org.eclipse.scout.rt.client.ui.form.fields.stringfield.IStringField">
          <default
@@ -710,87 +696,200 @@
          point="org.eclipse.scout.sdk.targetPackage">
       <targetPackage
             default=".ui.desktop"
+            bundleType="CLIENT"
             id="client.desktop">
       </targetPackage>
       <targetPackage
             default=".ui.desktop.outlines"
+            bundleType="CLIENT"
             id="client.outline">
       </targetPackage>
       <targetPackage
             default=".ui.desktop.outlines.pages"
+            bundleType="CLIENT"
             id="client.page">
       </targetPackage>
       <targetPackage
             default=""
+            bundleType="CLIENT"
             id="client.form">
       </targetPackage>
       <targetPackage
             default=".ui.template.formfield"
+            bundleType="CLIENT"
             id="client.template.formfield">
       </targetPackage>
       <targetPackage
             default=""
+            bundleType="CLIENT"
             id="client.searchform">
       </targetPackage>
       <targetPackage
             default=".ui.wizards"
+            bundleType="CLIENT"
             id="client.wizard">
       </targetPackage>
       <targetPackage
             default=".services"
+            bundleType="CLIENT"
             id="client.services">
       </targetPackage>
       <targetPackage
             default=".services.lookup"
+            bundleType="CLIENT"
             id="client.services.lookup">
       </targetPackage>
       <targetPackage
             default=".security"
+            bundleType="SHARED"
             id="shared.security">
       </targetPackage>
       <targetPackage
             default=".services"
+            bundleType="SHARED"
             id="shared.services">
       </targetPackage>
       <targetPackage
             default=".services.lookup"
+            bundleType="SHARED"
             id="shared.services.lookup">
       </targetPackage>
       <targetPackage
             default=".services.code"
+            bundleType="SHARED"
             id="shared.services.code">
       </targetPackage>
       <targetPackage
             default=".services.common.bookmark"
+            bundleType="SHARED"
             id="shared.services.bookmark">
       </targetPackage>
       <targetPackage
             default=".services.common.calendar"
+            bundleType="SHARED"
             id="shared.services.calendar">
       </targetPackage>
       <targetPackage
             default=".services"
+            bundleType="SERVER"
             id="server.services">
       </targetPackage>
       <targetPackage
             default=".services.lookup"
+            bundleType="SERVER"
             id="server.services.lookup">
       </targetPackage>
       <targetPackage
             default=".services.common.bookmark"
+            bundleType="SERVER"
             id="server.services.bookmark">
       </targetPackage>
       <targetPackage
             default=".services.common.calendar"
+            bundleType="SERVER"
             id="server.services.calendar">
       </targetPackage>
       <targetPackage
             default=".services.common.sql"
+            bundleType="SERVER"
             id="server.services.sql">
       </targetPackage>
       <targetPackage
             default=".services.common.smtp"
+            bundleType="SERVER"
             id="server.services.smtp">
       </targetPackage>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.runtimeBundles">
+      <bundle
+            order="100"
+            symbolicName="org.eclipse.scout.rt.testing.ui.swing"
+            type="UI_SWING_TESTING">
+      </bundle>
+      <bundle
+            order="200"
+            symbolicName="org.eclipse.scout.rt.testing.ui.swt"
+            type="UI_SWT_TESTING">
+      </bundle>
+      <bundle
+            order="400"
+            symbolicName="org.eclipse.scout.rt.testing.client"
+            type="CLIENT_TESTING">
+      </bundle>
+      <bundle
+            order="500"
+            symbolicName="org.eclipse.scout.rt.testing.server"
+            type="SERVER_TESTING">
+      </bundle>
+      <bundle
+            order="600"
+            symbolicName="org.eclipse.scout.rt.testing.shared"
+            type="SHARED_TESTING">
+      </bundle>
+      <bundle
+            order="700"
+            symbolicName="org.eclipse.scout.rt.ui.swing"
+            type="UI_SWING">
+      </bundle>
+      <bundle
+            order="900"
+            symbolicName="org.eclipse.scout.rt.ui.swt"
+            type="UI_SWT">
+      </bundle>
+      <bundle
+            order="1000"
+            symbolicName="org.eclipse.scout.rt.client"
+            type="CLIENT">
+      </bundle>
+      <bundle
+            order="1100"
+            symbolicName="org.eclipse.scout.rt.server"
+            type="SERVER">
+      </bundle>
+      <bundle
+            order="1200"
+            symbolicName="org.eclipse.scout.rt.shared"
+            type="SHARED">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.commons">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.http.servletfilter">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.jaxws216">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.net">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.client.mobile">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.extension.client">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.jdbc.derby">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.ui.svg.calendar">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.service">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.svg.client">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.svg.ui.swing">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.svg.ui.swt">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.svg.ui.swt">
+      </bundle>
    </extension>
 </plugin>

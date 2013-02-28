@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -21,9 +20,8 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
-import org.eclipse.scout.sdk.IRuntimeClasses;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -31,7 +29,8 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 @SuppressWarnings("restriction")
 public class ServiceNlsProjectProvider implements INlsProjectProvider {
@@ -275,45 +274,23 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
     String[] ret = new String[scoutBundles.length];
     for (int i = 0; i < scoutBundles.length; i++) {
-      ret[i] = scoutBundles[i].getBundleName();
+      ret[i] = scoutBundles[i].getSymbolicName();
     }
     return ret;
   }
 
-  private static void addBundlesRec(IScoutProject p, HashSet<IScoutBundle> collector) {
-    for (IScoutBundle b : p.getAllScoutBundles()) {
-      collector.add(b);
-    }
-    for (IScoutProject subP : p.getSubProjects()) {
-      addBundlesRec(subP, collector);
-    }
+  private static IScoutBundle[] getScoutBundlesForType(IType type) {
+    IScoutBundle b = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
+    return getParentSharedBundlesFor(b);
   }
 
-  private static IScoutBundle[] getScoutBundlesForType(IType type) {
-    IScoutBundle b = ScoutSdkCore.getScoutWorkspace().getScoutBundle(type.getJavaProject().getProject());
+  private static IScoutBundle[] getParentSharedBundlesFor(IScoutBundle b) {
     if (b != null) {
-      IScoutProject root = b.getScoutProject();
-      return getScoutBundlesForProject(root);
+      return b.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     }
     else {
       return null;
     }
-  }
-
-  private static IScoutBundle[] getScoutBundlesForProject(IScoutProject p) {
-    if (p == null) return null;
-    HashSet<IScoutBundle> collector = new HashSet<IScoutBundle>();
-
-    // find root scout project of the given project (may be a sub project).
-    IScoutProject root = p;
-    while (root.getParentProject() != null) {
-      root = root.getParentProject();
-    }
-
-    // collect all bundles that belong to the root project that belongs to the project p.
-    // assume that all these bundles together build the application so all text services of these projects should be available.
-    addBundlesRec(root, collector);
-    return collector.toArray(new IScoutBundle[collector.size()]);
   }
 
   private INlsProject getNlsProjectTree(IType type) throws CoreException {
@@ -357,9 +334,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         IType t1 = (IType) args[0];
         boolean returnDocServices = !(RuntimeClasses.TEXTS.equals(t1.getFullyQualifiedName()));
 
-        if (args[1] instanceof IScoutProject || args[1] == null) {
+        if (args[1] instanceof IScoutBundle || args[1] == null) {
           // all text services in the given project with given kind (texts or normal)
-          return getAllProjects(returnDocServices, getScoutBundlesForProject((IScoutProject) args[1]));
+          return getAllProjects(returnDocServices, getParentSharedBundlesFor((IScoutBundle) args[1]));
         }
         else if (args[1] instanceof IType) {
           // all text services with given kind available in the plugins defining the given type

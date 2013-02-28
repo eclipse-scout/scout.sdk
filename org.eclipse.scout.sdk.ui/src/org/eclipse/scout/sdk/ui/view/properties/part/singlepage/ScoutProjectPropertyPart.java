@@ -24,10 +24,11 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.dialog.ProductSelectionDialog;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ProjectVersionPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.TechnologyPresenter;
@@ -36,7 +37,7 @@ import org.eclipse.scout.sdk.ui.view.properties.part.Section;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
@@ -100,6 +101,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     };
     action.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolEdit));
     action.setToolTipText(Texts.get("EditContent"));
+    action.setText(Texts.get("EditContent"));
     toolBarManager.add(action);
     toolBarManager.update(true);
     linkSection.getUiSection().setTextClient(toolbar);
@@ -151,8 +153,8 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     techSection.setExpanded(wasSectionExpanded(SECTION_ID_TECHNOLOGY, true));
   }
 
-  protected IScoutProject getScoutProject() {
-    return (IScoutProject) getPage().getScoutResource();
+  protected IScoutBundle getScoutProject() {
+    return getPage().getScoutResource();
   }
 
   private void refreshProductLaunchPresenters(IFile[] productFiles) {
@@ -165,12 +167,15 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     TreeMap<CompositeObject, P_ProductFile> orderedProducts = new TreeMap<CompositeObject, P_ProductFile>();
     for (IFile productFile : productFiles) {
       if (productFile != null && productFile.exists()) {
-        IScoutBundle scoutBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(productFile.getProject());
+        IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(productFile.getProject());
         int productType = -1;
         if (scoutBundle != null) {
-          productType = scoutBundle.getType();
+          ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(scoutBundle.getType());
+          if (uiExt != null) {
+            productType = uiExt.getOrderNumber();
+          }
         }
-        orderedProducts.put(new CompositeObject(-productType, productFile.getName(), productFile), new P_ProductFile(productFile, scoutBundle));
+        orderedProducts.put(new CompositeObject(productType, productFile.getName(), productFile), new P_ProductFile(productFile, scoutBundle));
       }
     }
     for (Entry<CompositeObject, P_ProductFile> entry : orderedProducts.entrySet()) {
@@ -187,7 +192,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   @Override
   public void init(IMemento memento) {
-    refreshProductLaunchPresenters(SdkProperties.getProjectProductLaunchers(getScoutProject().getProjectName()));
+    refreshProductLaunchPresenters(SdkProperties.getProjectProductLaunchers(getScoutProject().getSymbolicName()));
   }
 
   @Override
@@ -196,7 +201,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     for (int i = 0; i < files.length; i++) {
       files[i] = m_launchPresenters.get(i).getProductFile();
     }
-    SdkProperties.saveProjectProductLaunchers(getScoutProject().getProjectName(), files);
+    SdkProperties.saveProjectProductLaunchers(getScoutProject().getSymbolicName(), files);
   }
 
   private class P_ProductFile {

@@ -686,31 +686,31 @@ public final class JaxWsSdkUtility {
   }
 
   public static String getRecommendedProviderImplPackageName(IScoutBundle bundle) {
-    return StringUtility.join(".", bundle.getBundleName(), "services", "ws", "provider");
+    return StringUtility.join(".", bundle.getSymbolicName(), "services", "ws", "provider");
   }
 
   public static String getRecommendedHandlerPackageName(IScoutBundle bundle) {
-    return StringUtility.join(".", bundle.getBundleName(), "services", "ws", "handler");
+    return StringUtility.join(".", bundle.getSymbolicName(), "services", "ws", "handler");
   }
 
   public static String getRecommendedConsumerImplPackageName(IScoutBundle bundle) {
-    return StringUtility.join(".", bundle.getBundleName(), "services", "ws", "consumer");
+    return StringUtility.join(".", bundle.getSymbolicName(), "services", "ws", "consumer");
   }
 
   public static String getRecommendedProviderSecurityPackageName(IScoutBundle bundle) {
-    return StringUtility.join(".", bundle.getBundleName(), "services", "ws", "provider", "security");
+    return StringUtility.join(".", bundle.getSymbolicName(), "services", "ws", "provider", "security");
   }
 
   public static String getRecommendedConsumerSecurityPackageName(IScoutBundle bundle) {
-    return StringUtility.join(".", bundle.getBundleName(), "services", "ws", "consumer", "security");
+    return StringUtility.join(".", bundle.getSymbolicName(), "services", "ws", "consumer", "security");
   }
 
   public static String getRecommendedSessionPackageName(IScoutBundle bundle) {
-    return StringUtility.join(".", bundle.getBundleName(), "services", "ws", "session");
+    return StringUtility.join(".", bundle.getSymbolicName(), "services", "ws", "session");
   }
 
   public static String getRecommendedTargetNamespace(IScoutBundle bundle, String serviceName) {
-    String[] segments = bundle.getBundleName().split("\\.");
+    String[] segments = bundle.getSymbolicName().split("\\.");
     String projectSuffex = null;
     for (int i = segments.length - 1; i >= 0; i--) {
       String segment = segments[i];

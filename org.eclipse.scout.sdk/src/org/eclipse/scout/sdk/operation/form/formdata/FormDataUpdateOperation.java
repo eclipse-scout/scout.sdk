@@ -19,7 +19,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -31,7 +32,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.osgi.framework.BundleContext;
@@ -60,7 +61,7 @@ public class FormDataUpdateOperation implements IOperation {
 
   @Override
   public String getOperationName() {
-    return "update form data for" + getType().getElementName() + "'...";
+    return "FormData update for '" + getType().getElementName() + "'.";
   }
 
   @Override
@@ -127,14 +128,15 @@ public class FormDataUpdateOperation implements IOperation {
         request = (ICreateFormDataRequest) bundleContext.getService(serviceReference);
       }
       if (!TypeUtility.exists(m_formDataType)) {
-        IScoutBundle sharedBundle = findSharedBundle(ScoutTypeUtility.getScoutProject(getType()));
+        IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getType().getJavaProject());
+        IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
         if (sharedBundle == null) {
           return;
         }
         String packageName = Signature.getSignatureQualifier(getFormDataAnnotation().getFormDataTypeSignature());
         if (StringUtility.isNullOrEmpty(packageName)) {
           if (sharedBundle != null) {
-            packageName = sharedBundle.getDefaultPackage(IScoutBundle.SHARED_SERVICES);
+            packageName = sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES);
           }
         }
         String simpleName = (Signature.getSignatureSimpleName(Signature.getTypeErasure(getFormDataAnnotation().getFormDataTypeSignature())));
@@ -199,7 +201,7 @@ public class FormDataUpdateOperation implements IOperation {
 
         try {
           ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
-          ITypeSourceBuilder sourceBuilder = FormDataUtility.getPrimaryTypeFormDataSourceBuilder(getFormDataAnnotation().getSuperTypeSignature(), getType(), hierarchy);
+          ITypeSourceBuilder sourceBuilder = FormDataUtility.getPrimaryTypeFormDataSourceBuilder(getFormDataAnnotation().getSuperTypeSignature(), getType(), hierarchy, m_formDataType.getJavaProject());
           sourceBuilder.setElementName(m_formDataType.getElementName());
           sourceBuilder.setSuperTypeSignature(FormDataUtility.getFormDataSuperTypeSignature(getFormDataAnnotation(), getType(), hierarchy));
           int flags = Flags.AccPublic;
@@ -269,16 +271,6 @@ public class FormDataUpdateOperation implements IOperation {
     catch (Exception e) {
       ScoutSdk.logError("could not update form data for '" + getType().getFullyQualifiedName() + "'.", e);
     }
-  }
-
-  private IScoutBundle findSharedBundle(IScoutProject project) {
-    if (project == null) {
-      return null;
-    }
-    if (project.getSharedBundle() == null) {
-      return findSharedBundle(project.getParentProject());
-    }
-    return project.getSharedBundle();
   }
 
   /**

@@ -237,7 +237,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
     m_defaultPackageNameNewType = defaultPackageNameNewType;
   }
 
-  protected IType openNewTypeDialog() {
+  protected IType openNewTypeDialog() throws JavaModelException {
     NewClassWizardPage page = new NewClassWizardPage();
     page.setDescription(Texts.get("CreateNewType"));
     page.setEnclosingTypeSelection(false, false);
@@ -256,7 +256,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
       page.setPackageFragment(packageFragment, true);
     }
     else {
-      String rootPackageName = m_bundle.getRootPackageName();
+      String rootPackageName = m_bundle.getSymbolicName();
       page.setPackageFragmentRoot((IPackageFragmentRoot) m_bundle.getPackageFragment(rootPackageName).getParent(), true);
     }
     if (m_superType != null) {
@@ -430,11 +430,11 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
           }
           String simpleName = Signature.getSimpleName(value);
           if (TypeUtility.existsType(value) &&
-                resource.getType() == IResource.FILE &&
-                resource.getFileExtension() != null &&
-                resource.getFileExtension().equalsIgnoreCase("java") &&
-                (resource.getName().endsWith(simpleName + ".java") ||
-                resource.getName().endsWith(simpleName + ".class"))) {
+              resource.getType() == IResource.FILE &&
+              resource.getFileExtension() != null &&
+              resource.getFileExtension().equalsIgnoreCase("java") &&
+              (resource.getName().endsWith(simpleName + ".java") ||
+              resource.getName().endsWith(simpleName + ".class"))) {
             IType type = TypeUtility.getType(getValue());
             ICompilationUnit cu = JavaCore.createCompilationUnitFrom((IFile) resource);
 

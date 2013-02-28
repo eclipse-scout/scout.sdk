@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public interface IScoutTechnologyHandler {
 
@@ -58,7 +58,7 @@ public interface IScoutTechnologyHandler {
    *          the corresponding scout project
    * @return true if this handler is the opinion the checkbox should be selected, false otherwise.
    */
-  TriState getSelection(IScoutProject project);
+  TriState getSelection(IScoutBundle project) throws CoreException;
 
   /**
    * gets all resources the user can choose from when modifying a technology.
@@ -67,7 +67,7 @@ public interface IScoutTechnologyHandler {
    *          the corresponding scout project
    * @return The resources that can be modified
    */
-  IScoutTechnologyResource[] getModifactionResourceCandidates(IScoutProject project);
+  IScoutTechnologyResource[] getModifactionResourceCandidates(IScoutBundle project) throws CoreException;
 
   /**
    * specifies if the handler is active. an inactive handler is never used. it cannot contribute resources and will not
@@ -77,5 +77,5 @@ public interface IScoutTechnologyHandler {
    *          the corresponding scout project
    * @return true if the handler should be used, false otherwise
    */
-  boolean isActive(IScoutProject project);
+  boolean isActive(IScoutBundle project);
 }

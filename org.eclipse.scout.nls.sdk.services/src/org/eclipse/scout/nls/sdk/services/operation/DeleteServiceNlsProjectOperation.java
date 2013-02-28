@@ -89,9 +89,6 @@ public class DeleteServiceNlsProjectOperation implements IOperation {
       del.setAdditionalResourcesToBeDeleted(filesToDelete.toArray(new IResource[filesToDelete.size()]));
       del.validate();
       del.run(monitor, workingCopyManager);
-
-      // we have changed the NLS service hierarchy: clear the cache so that it will be re-created next time without the one we just deleted.
-      getScoutBundle().getScoutProject().clearNlsProjectCache();
     }
     else {
       NlsCore.logWarning("Invalid Text Provider Service to be deleted. Cannot parse the resources.");

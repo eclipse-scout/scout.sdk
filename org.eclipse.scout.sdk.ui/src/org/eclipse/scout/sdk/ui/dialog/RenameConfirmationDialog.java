@@ -40,6 +40,7 @@ public class RenameConfirmationDialog extends TitleAreaDialog {
     m_title = title;
     m_message = message;
     setNotAllowedNames(new HashSet<String>());
+    setHelpAvailable(false);
     setShellStyle(getShellStyle() | SWT.RESIZE);
   }
 

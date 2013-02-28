@@ -11,53 +11,45 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNode;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.SearchFormTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.AllPagesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard.WizardTablePage;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
-public class ClientNodePage extends AbstractPage {
+public class ClientNodePage extends AbstractBundleNodeTablePage {
 
   private ICachedTypeHierarchy m_clientSessionHierarchy;
   private ICachedTypeHierarchy m_desktopHierarchy;
   private ICachedTypeHierarchy m_desktopExtensionHierarchy;
 
-  private final IScoutBundle m_clientProject;
-  private IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
-  private IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
-  private IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+  private final IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
+  private final IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
+  private final IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
 
-  public ClientNodePage(AbstractPage parent, IScoutBundle clientProject) {
-    setParent(parent);
-    m_clientProject = clientProject;
-    setName(getScoutResource().getSimpleName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientBundle));
+  public ClientNodePage(IPage parent, ScoutBundleNode node) {
+    super(parent, node);
   }
 
   @Override
   public String getPageId() {
     return IScoutPageConstants.CLIENT_NODE_PAGE;
-  }
-
-  @Override
-  public int getOrder() {
-    return 100;
   }
 
   @Override
@@ -77,23 +69,8 @@ public class ClientNodePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
-    return m_clientProject;
-  }
-
-  @Override
-  public boolean isFolder() {
-    return true;
-
-  }
-
-  @Override
-  public boolean isInitiallyLoaded() {
-    return true;
-  }
-
-  @Override
   public void loadChildrenImpl() {
+    super.loadChildrenImpl();
     if (m_clientSessionHierarchy == null) {
       m_clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
       m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());
@@ -111,9 +88,6 @@ public class ClientNodePage extends AbstractPage {
     if (clientSessions.length > 1) {
       ScoutSdkUi.logWarning("more than one client session found.");
     }
-    else if (clientSessions.length == 0) {
-      ScoutSdkUi.logWarning("no client session found.");
-    }
     for (IType clientSession : clientSessions) {
       new ClientSessionNodePage(this, clientSession);
     }
@@ -121,9 +95,6 @@ public class ClientNodePage extends AbstractPage {
     IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
     if (desktops.length > 1) {
       ScoutSdkUi.logWarning("more than one desktop found.");
-    }
-    else if (desktops.length == 0) {
-      ScoutSdkUi.logWarning(Texts.get("NoDesktopFound"));
     }
     for (IType desktop : desktops) {
       new DesktopNodePage(this, desktop);
@@ -151,14 +122,14 @@ public class ClientNodePage extends AbstractPage {
       new LibrariesTablePage(this, getScoutResource());
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getBundleName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
     }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, FormDataUpdateAction.class, InstallClientSessionAction.class};
+    return new Class[]{WellformAction.class, FormDataUpdateAction.class, InstallClientSessionAction.class, ScoutBundleNewAction.class};
   }
 
   @Override
@@ -171,6 +142,9 @@ public class ClientNodePage extends AbstractPage {
     }
     else if (menu instanceof InstallClientSessionAction) {
       ((InstallClientSessionAction) menu).init(m_clientSessionHierarchy, getScoutResource());
+    }
+    else if (menu instanceof ScoutBundleNewAction) {
+      ((ScoutBundleNewAction) menu).setScoutProject(getScoutResource());
     }
   }
 }

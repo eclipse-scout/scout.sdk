@@ -3,6 +3,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 import java.util.LinkedList;
 import java.util.TreeSet;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.TechnologyExtensionPoint;
@@ -10,7 +11,7 @@ import org.eclipse.scout.sdk.ui.internal.extensions.technology.ITechnologyListen
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.Technology;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
@@ -22,10 +23,10 @@ import org.eclipse.swt.widgets.Label;
 
 public class TechnologyPresenter extends AbstractPresenter {
 
-  private final IScoutProject m_scoutProject;
+  private final IScoutBundle m_scoutProject;
   private final LinkedList<P_TechnologyUiModel> m_techModels;
 
-  public TechnologyPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutProject scoutProject) {
+  public TechnologyPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutBundle scoutProject) {
     super(toolkit, parent);
     m_scoutProject = scoutProject;
     m_techModels = new LinkedList<P_TechnologyUiModel>();
@@ -79,7 +80,13 @@ public class TechnologyPresenter extends AbstractPresenter {
           @Override
           public void mouseDown(MouseEvent e) {
             checkbox.setEnabled(false);
-            boolean saved = tec.setSelection(m_scoutProject, !checkbox.getSelection());
+            boolean saved = false;
+            try {
+              saved = tec.setSelection(m_scoutProject, !checkbox.getSelection());
+            }
+            catch (CoreException e1) {
+              ScoutSdkUi.logError("Unable to change technology selection.", e1);
+            }
             if (!saved) {
               checkbox.setEnabled(true);
             }

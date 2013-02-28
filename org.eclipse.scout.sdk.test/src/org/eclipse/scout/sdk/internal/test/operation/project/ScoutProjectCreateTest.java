@@ -16,8 +16,8 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation;
@@ -30,7 +30,8 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,18 +51,18 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
   public void testCreateBundles() throws Exception {
     try {
       ScoutSdkCore.getScoutWorkspace();
-      IScoutProject project = ScoutProjectHelper.setupNewProject("org.eclipse.testapp", true, true, true, true, false);
+      IScoutBundle project = ScoutProjectHelper.setupNewProject("org.eclipse.testapp", true, true, true, true, false);
       int severity = ScoutSeverityManager.getInstance().getSeverityOf(ResourcesPlugin.getWorkspace().getRoot());
       Assert.assertTrue(severity < IMarker.SEVERITY_ERROR);
-      Assert.assertNotNull(project.getClientBundle());
-      Assert.assertNotNull(project.getSharedBundle());
-      Assert.assertNotNull(project.getServerBundle());
-      Assert.assertNotNull(project.getUiSwtBundle());
-      Assert.assertNull(project.getUiSwingBundle());
+      Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false));
+      Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true));
+      Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false));
+      Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWT), false));
+      Assert.assertNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false));
     }
     finally {
       clearWorkspace();
-      Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getRootProjects().length);
+      Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter()).length);
     }
   }
 
@@ -123,7 +124,7 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
     }
     finally {
       clearWorkspace();
-      Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getRootProjects().length);
+      Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter()).length);
     }
 
   }
@@ -153,7 +154,7 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
     }
     finally {
       clearWorkspace();
-      Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getRootProjects().length);
+      Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter()).length);
     }
   }
 }

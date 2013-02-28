@@ -22,13 +22,13 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
@@ -53,13 +53,13 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle must not be null");
     }
-    if (m_bundle.getType() != IScoutBundle.BUNDLE_SERVER) {
+    if (!IScoutBundle.TYPE_SERVER.equals(m_bundle.getType())) {
       throw new IllegalArgumentException("bundle must be SERVER bundle");
     }
     if (m_registrationBundle == null) {
       throw new IllegalArgumentException("servlet registration bundle must not be null");
     }
-    if (m_registrationBundle.getType() != IScoutBundle.BUNDLE_SERVER) {
+    if (!IScoutBundle.TYPE_SERVER.equals(m_registrationBundle.getType())) {
       throw new IllegalArgumentException("servlet registration bundle must be SERVER bundle");
     }
     if (!StringUtility.hasText(m_jaxWsAlias)) {
@@ -89,7 +89,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
       oldServletRegBundleName = xml.getAttribute(ServletRegistrationUtility.XML_NAME);
       xml.removeAttribute(ServletRegistrationUtility.XML_NAME);
     }
-    xml.setAttribute(ServletRegistrationUtility.XML_NAME, m_registrationBundle.getBundleName());
+    xml.setAttribute(ServletRegistrationUtility.XML_NAME, m_registrationBundle.getSymbolicName());
     ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xml.getDocument(), IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
 
     String jaxWsServletClass = TypeUtility.getType(JaxWsRuntimeClasses.JaxWsServlet).getFullyQualifiedName();
@@ -100,7 +100,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     PluginModelHelper h = new PluginModelHelper(m_registrationBundle.getProject());
     HashMap<String, String> attributes = new HashMap<String, String>();
     attributes.put("class", jaxWsServletClass);
-    IPluginElement ext = h.PluginXml.getSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+    IPluginElement ext = h.PluginXml.getSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
     String originalAlias = null;
     if (ext != null) {
       IPluginAttribute attribute = ext.getAttribute("alias");
@@ -110,11 +110,11 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     }
 
     // remove old servlet registration if servlet defining bundle is this bundle itself
-    if (CompareUtility.equals(oldServletRegBundleName, m_bundle.getBundleName())) {
+    if (CompareUtility.equals(oldServletRegBundleName, m_bundle.getSymbolicName())) {
       PluginModelHelper oldPluginHelper = new PluginModelHelper(m_bundle.getProject());
       attributes = new HashMap<String, String>();
       attributes.put("class", jaxWsServletClass);
-      oldPluginHelper.PluginXml.removeSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+      oldPluginHelper.PluginXml.removeSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
       oldPluginHelper.save();
     }
 
@@ -122,22 +122,21 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     attributes = new HashMap<String, String>();
     attributes.put("class", jaxWsServletClass);
     h = new PluginModelHelper(m_registrationBundle.getProject());
-    h.PluginXml.removeSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+    h.PluginXml.removeSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
     // add new registration
     attributes = new HashMap<String, String>();
     attributes.put("class", jaxWsServletClass);
     attributes.put("alias", alias);
-    h.PluginXml.addSimpleExtension(JaxWsConstants.SERVER_EXTENSION_POINT_SERVLETS, "servlet", attributes);
+    h.PluginXml.addSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
     h.save();
 
     // update sun-jaxws entries
     try {
       // iterate through all dependent bundles to find JAX-WS dependent bundles
-      IScoutBundle[] candidateBundles = m_registrationBundle.getDependentBundles(new IScoutBundleFilter() {
-
+      IScoutBundle[] candidateBundles = m_registrationBundle.getParentBundles(new IScoutBundleFilter() {
         @Override
         public boolean accept(IScoutBundle bundle) {
-          return bundle.getType() == IScoutBundle.BUNDLE_SERVER && TypeUtility.isOnClasspath(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator), bundle.getJavaProject()); // ensure JAX-WS installed on bundle
+          return IScoutBundle.TYPE_SERVER.equals(bundle.getType()) && TypeUtility.isOnClasspath(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator), bundle.getJavaProject()); // ensure JAX-WS installed on bundle
         }
       }, true);
 
@@ -148,7 +147,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
         if (JaxWsSdkUtility.exists(buildJaxWsResource.getFile()) &&
             JaxWsSdkUtility.exists(sunJaxWsResource.getFile())) {
           String bundleNameOfRegistration = ServletRegistrationUtility.getBuildJaxServletRegistrationBundleName(candidateBundle);
-          if (bundleNameOfRegistration != null && bundleNameOfRegistration.equals(m_registrationBundle.getBundleName())) {
+          if (bundleNameOfRegistration != null && bundleNameOfRegistration.equals(m_registrationBundle.getSymbolicName())) {
             ScoutXmlDocument sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
             if (sunJaxWsXmlDocument == null) {
               continue;
@@ -192,7 +191,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     return new IScoutBundleFilter() {
       @Override
       public boolean accept(IScoutBundle bundle) {
-        return bundle.getType() == IScoutBundle.BUNDLE_SERVER;
+        return IScoutBundle.TYPE_SERVER.equals(bundle.getType());
       }
     };
   }

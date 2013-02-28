@@ -18,8 +18,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
@@ -53,7 +53,7 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
   }
 
   protected void fillLinkSection(Composite parent) {
-    IScoutBundle bundle = (IScoutBundle) getPage().getScoutResource();
+    IScoutBundle bundle = getPage().getScoutResource();
     if (bundle != null) {
       IResource resource = bundle.getProject().findMember(SdkProperties.PRODUCT_FOLDER);
       if (resource != null && resource.exists() && resource.getType() == IResource.FOLDER) {
@@ -74,7 +74,6 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
         }
       }
     }
-
   }
 
   private class P_ProductResourceVisitor implements IResourceVisitor {
@@ -95,5 +94,4 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
       return m_productFiels.toArray(new IFile[m_productFiels.size()]);
     }
   }
-
 }

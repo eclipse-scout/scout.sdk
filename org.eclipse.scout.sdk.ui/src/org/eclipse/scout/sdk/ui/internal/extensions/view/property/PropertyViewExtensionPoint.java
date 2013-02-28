@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.view.property.IMultiPropertyViewPart;
 import org.eclipse.scout.sdk.ui.extensions.view.property.ISinglePropertyViewPart;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;

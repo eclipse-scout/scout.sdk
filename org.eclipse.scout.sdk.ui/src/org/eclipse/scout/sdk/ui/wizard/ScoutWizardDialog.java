@@ -39,6 +39,7 @@ public class ScoutWizardDialog extends WizardDialog implements IWizardPageContai
         }
       }
     });
+    setHelpAvailable(false);
   }
 
   /**

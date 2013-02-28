@@ -6,12 +6,12 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
+import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.export.ServerExportEntryHandler;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.AbstractExportProductWizardPage;
 import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWizardPage;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Composite;
 
 public class ExportRapWizardPage extends AbstractExportProductWizardPage {
@@ -19,8 +19,8 @@ public class ExportRapWizardPage extends AbstractExportProductWizardPage {
   private final static String SETTINGS_PRODUCT_FILE = "productFileRapSetting";
   private final static String SETTINGS_WAR_FILE_NAME = "warFileNameRapSetting";
 
-  public ExportRapWizardPage(IScoutProject scoutProject) {
-    super(scoutProject, ExportRapWizardPage.class.getName(), Texts.get("ExportRapWebArchive"), UiRapBundleNodeFactory.BUNDLE_UI_RAP,
+  public ExportRapWizardPage(IScoutBundle scoutProject) {
+    super(scoutProject, ExportRapWizardPage.class.getName(), Texts.get("ExportRapWebArchive"), IScoutSdkRapConstants.TYPE_UI_RAP,
         SETTINGS_PRODUCT_FILE, SETTINGS_WAR_FILE_NAME);
   }
 

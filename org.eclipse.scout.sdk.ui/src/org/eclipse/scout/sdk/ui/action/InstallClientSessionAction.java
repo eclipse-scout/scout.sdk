@@ -10,13 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
+import java.util.HashMap;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
+import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  *
@@ -35,7 +40,15 @@ public class InstallClientSessionAction extends AbstractOperationAction {
     if (clientSessionHierarchy != null) {
       IType[] clientSessions = clientSessionHierarchy.getAllClasses(TypeFilters.getClassesInProject(scoutResource.getJavaProject()), null);
       if (clientSessions.length == 0) {
-        setOperation(new InstallJavaFileOperation("templates/client/src/ClientSession.java", "ClientSession.java", scoutResource));
+
+        IScoutBundle shared = scoutResource.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+        if (shared != null) {
+          HashMap<String, String> props = new HashMap<String, String>(2);
+          props.put(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, shared.getSymbolicName());
+          props.put(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, scoutResource.getSymbolicName());
+
+          setOperation(new InstallJavaFileOperation("templates/client/src/ClientSession.java", "ClientSession.java", scoutResource, props));
+        }
       }
     }
   }

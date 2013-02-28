@@ -8,9 +8,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.util.PropertyMap;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.osgi.framework.Version;
 
 public abstract class AbstractScoutProjectNewOperation implements IScoutProjectNewOperation {
@@ -156,9 +154,5 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     else {
       return getProjectName() + " (" + getProjectNamePostfix() + ")";
     }
-  }
-
-  protected final IScoutProject getScoutProject() {
-    return ScoutSdkCore.getScoutWorkspace().findScoutProject(getScoutProjectName());
   }
 }

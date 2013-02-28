@@ -22,6 +22,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -64,11 +65,13 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
     IProject project = getCreatedProject();
+
     // src folder
-    IFolder folder = project.getFolder("src");
+    IFolder folder = project.getFolder(SdkProperties.DEFAULT_SOURCE_FOLDER_NAME);
     if (!folder.exists()) {
       ResourceUtility.mkdirs(folder, monitor);
     }
+
     // resources folder
     folder = project.getFolder("resources");
     if (isCreateResourcesFolder() && !folder.exists()) {
@@ -79,7 +82,7 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
     IPath path = project.getFullPath().append("bin");
     m_javaProject.setOutputLocation(path, null);
     IClasspathEntry[] entries = new IClasspathEntry[3];
-    IPath pathSrc = project.getFullPath().append("src");
+    IPath pathSrc = project.getFullPath().append(SdkProperties.DEFAULT_SOURCE_FOLDER_NAME);
     entries[0] = JavaCore.newSourceEntry(pathSrc);
     entries[1] = createJREEntry(m_execEnvId);
     entries[2] = createContainerEntry();
@@ -127,5 +130,4 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
   public boolean isCreateResourcesFolder() {
     return m_createResourcesFolder;
   }
-
 }

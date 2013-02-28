@@ -24,8 +24,8 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.ScoutFileLocator;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -35,27 +35,26 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.graphics.ImageData;
 
 public class ScoutProjectIcons implements IIconProvider {
 
-  protected static String[] PREDEFINED_EXTENSIONS = new String[]{"png", "ico", "gif"};
-  protected static String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
+  private final static String[] PREDEFINED_EXTENSIONS = new String[]{"png", "ico", "gif"};
+  private final static String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
+
+  private final Object cacheLock = new Object();
+  private final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
+  private final IScoutBundle m_bundle;
+  private final IPrimaryTypeTypeHierarchy m_iconsHierarchy;
 
   private HashMap<String, ScoutIconDesc> m_cachedIcons;
-  private Object cacheLock = new Object();
-
-  final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
-  private final IScoutProject m_scoutProject;
-
-  private IPrimaryTypeTypeHierarchy m_iconsHierarchy;
   private String[] m_baseUrls;
 
-  public ScoutProjectIcons(IScoutProject scoutProject) {
-    m_scoutProject = scoutProject;
+  public ScoutProjectIcons(IScoutBundle bundle) {
+    m_bundle = bundle;
     m_iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
     m_iconsHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
@@ -63,7 +62,6 @@ public class ScoutProjectIcons implements IIconProvider {
         clearCache();
       }
     });
-
   }
 
   @Override
@@ -81,9 +79,6 @@ public class ScoutProjectIcons implements IIconProvider {
   // internal cache methods
 
   private void clearCache() {
-    if (m_cachedIcons != null) {
-      m_cachedIcons.clear();
-    }
     m_cachedIcons = null;
   }
 
@@ -103,42 +98,32 @@ public class ScoutProjectIcons implements IIconProvider {
 
   private String[] buildBaseUrls() {
     List<String> projects = new ArrayList<String>();
-    IScoutBundle clientP = m_scoutProject.getClientBundle();
-    while (clientP != null) {
-      projects.add(clientP.getBundleName());
-      if (clientP.getScoutProject().getParentProject() != null) {
-        clientP = clientP.getScoutProject().getParentProject().getClientBundle();
-      }
-      else {
-        clientP = null;
-      }
+    for (IScoutBundle parentBundle : m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true)) {
+      projects.add(parentBundle.getSymbolicName());
     }
+
     projects.add(RuntimeClasses.ScoutClientBundleId);
     projects.add(RuntimeClasses.ScoutUiSwtBundleId);
     projects.add(RuntimeClasses.ScoutUiSwingBundleId);
-    // invert order
+
     String[] result = projects.toArray(new String[projects.size()]);
-    Arrays.sort(result, Collections.reverseOrder());
+    Arrays.sort(result, Collections.reverseOrder()); //TODO: correct to use natural ordering?
     return result;
   }
 
   protected void collectIconNames(Map<String, ScoutIconDesc> collector) {
-    // find best match shared bundle
-    IScoutProject project = m_scoutProject;
-    IScoutBundle sharedBundle = null;
-    while (sharedBundle == null && project != null) {
-      sharedBundle = project.getSharedBundle();
-      project = project.getParentProject();
-    }
-    if (sharedBundle != null) {
-      IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(sharedBundle));
-      if (iconTypes.length > 0) {
-        if (TypeUtility.exists(iconTypes[0])) {
-          try {
-            collectIconNamesOfType(iconTypes[0], collector);
-          }
-          catch (Exception e) {
-            e.printStackTrace();
+    IScoutBundle[] parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    for (IScoutBundle parentShared : parentSharedBundles) {
+      IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared));
+      if (iconTypes != null && iconTypes.length > 0) {
+        for (IType iconType : iconTypes) {
+          if (TypeUtility.exists(iconType)) {
+            try {
+              collectIconNamesOfType(iconType, collector);
+            }
+            catch (Exception e) {
+              ScoutSdk.logWarning("Unable to collect icon names for class '" + iconType.getFullyQualifiedName() + "'.", e);
+            }
           }
         }
       }
@@ -147,7 +132,7 @@ public class ScoutProjectIcons implements IIconProvider {
 
   protected void collectIconNamesOfType(IType iconType, Map<String, ScoutIconDesc> collector) throws JavaModelException, IllegalArgumentException {
     if (TypeUtility.exists(iconType)) {
-      boolean inherited = ScoutTypeUtility.getScoutProject(iconType) == m_scoutProject;
+      boolean inherited = ScoutTypeUtility.getScoutBundle(iconType) == m_bundle;
       for (IField field : iconType.getFields()) {
         if (Flags.isPublic(field.getFlags()) && field.getSource() != null && field.getSource().contains(" String ")) {
           String source = field.getSource();

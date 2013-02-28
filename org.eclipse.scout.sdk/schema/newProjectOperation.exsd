@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.scout.sdk" id="newProjectOperation" name="New Scout Project Operations"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         Extension Point to define operations that will be executed when a new Scout Project is beeing created.
       </documentation>
    </annotation>
 
@@ -48,11 +48,16 @@
    </element>
 
    <element name="operation">
+      <annotation>
+         <documentation>
+            Defines an operation that will be exectued when creating a new scout project
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The operation to execute
                </documentation>
                <appInfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation"/>
@@ -62,14 +67,15 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The id of the operation
                </documentation>
             </annotation>
          </attribute>
          <attribute name="referenceId" type="string">
             <annotation>
                <documentation>
-                  
+                  The parent id. this referenced operation (and all its parents) will be executed before/after (as defined in execAfterReference) this operation is started.
+This allows an operation to define a dependency. All operations will be executed in breadth first traversal.
                </documentation>
                <appInfo>
                   <meta.attribute kind="identifier" basedOn="org.eclipse.scout.sdk.newProjectOperation/operation/@id"/>
@@ -79,7 +85,7 @@
          <attribute name="execAfterReference" type="boolean" use="default" value="true">
             <annotation>
                <documentation>
-                  
+                  Specifies if this operation should be executed before or after operation referenced in &apos;referenceId&apos;.
                </documentation>
             </annotation>
          </attribute>
@@ -91,7 +97,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         3.8.0
       </documentation>
    </annotation>
 
@@ -100,27 +106,22 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;extension
+         point=&quot;org.eclipse.scout.sdk.newProjectOperation&quot;&gt;
+      &lt;operation
+            class=&quot;com.test.FirstOperation&quot;
+            id=&quot;create.partOne&quot;&gt;
+      &lt;/operation&gt;
+      &lt;operation
+            class=&quot;com.test.SecondOperation&quot;
+            id=&quot;create.partTwo&quot;
+            referenceId=&quot;create.partOne&quot;&gt;
+      &lt;/operation&gt;
+&lt;/extension&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiinfo"/>
-      </appInfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>

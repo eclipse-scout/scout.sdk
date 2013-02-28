@@ -19,7 +19,8 @@ import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHan
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class JaxWsServerManifestTechnologyHandler extends AbstractScoutTechnologyHandler {
 
@@ -36,17 +37,21 @@ public class JaxWsServerManifestTechnologyHandler extends AbstractScoutTechnolog
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    return getSelectionManifest(project.getServerBundle(), JAXWS_RUNTIME_PLUGIN);
+  public TriState getSelection(IScoutBundle project) {
+    return getSelectionManifests(getServerBundlesBelow(project), JAXWS_RUNTIME_PLUGIN);
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getServerBundle() != null && project.getServerBundle().getProject().exists();
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false) != null;
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeManifestFile(project.getServerBundle(), list);
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
+    contributeManifestFiles(getServerBundlesBelow(project), list);
+  }
+
+  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,7 +16,7 @@ import java.util.HashSet;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
@@ -31,8 +31,8 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public class WellformFormsOperation implements IOperation {
 
-  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
-  final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
+  private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
 
   private final IScoutBundle m_clientBundle;
   private IType[] m_forms;
@@ -48,7 +48,7 @@ public class WellformFormsOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
-    if (getClientBundle().getType() != IScoutBundle.BUNDLE_CLIENT) {
+    if (!getClientBundle().getType().equals(IScoutBundle.TYPE_CLIENT)) {
       throw new IllegalArgumentException("bundle must be a client bundle.");
     }
   }

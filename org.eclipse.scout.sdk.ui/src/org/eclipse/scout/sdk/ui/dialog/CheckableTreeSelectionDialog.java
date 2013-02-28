@@ -46,7 +46,7 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
 
   private ITreeNode m_rootNode;
   private CheckableTree m_tree;
-  private OptimisticLock m_uiLock = new OptimisticLock();
+  private final OptimisticLock m_uiLock = new OptimisticLock();
   private boolean m_complete;
 
   private String m_message, m_title;
@@ -62,6 +62,7 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
     m_message = message;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
+    setHelpAvailable(false);
     m_propertySupport = new BasicPropertySupport(this);
   }
 

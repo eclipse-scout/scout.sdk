@@ -17,9 +17,11 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.service.ParameterArgument;
 import org.eclipse.scout.sdk.operation.service.ServiceOperationNewOperation;
@@ -31,6 +33,7 @@ import org.eclipse.scout.sdk.ui.internal.fields.code.ReturnParameterField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -71,16 +74,17 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     m_operationNameField = new TextField(parent, 20);
     m_operationNameField.setLabelText(Texts.get("OperationName"));
     m_operationNameField.addModifyListener(new ModifyListener() {
-
       @Override
       public void modifyText(ModifyEvent e) {
         m_operationName = m_operationNameField.getText();
         pingStateChanging();
       }
     });
-    IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getScoutBundle(m_serviceInterface.getJavaProject().getProject());
 
-    m_returnParameterField = new ReturnParameterField(parent, 20, m_returnParameter, interfaceBundle.getSearchScope());
+    IScoutBundle interfaceBundle = ScoutTypeUtility.getScoutBundle(m_serviceInterface.getJavaProject());
+    IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{interfaceBundle.getJavaProject()});
+
+    m_returnParameterField = new ReturnParameterField(parent, 20, m_returnParameter, searchScope);
     m_returnParameterField.setLabel(Texts.get("ReturnType"));
     m_returnParameterField.addParameterFieldListener(new IParameterFieldListener() {
       @Override
@@ -90,7 +94,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_parameterArg1Field = new ParameterField(parent, m_parameterArg1, interfaceBundle.getSearchScope());
+    m_parameterArg1Field = new ParameterField(parent, m_parameterArg1, searchScope);
     m_parameterArg1Field.setLabelParameterName(Texts.get("NameArg") + " 1");
     m_parameterArg1Field.setLabelParameterType(Texts.get("Type"));
     m_parameterArg1Field.addParameterFieldListener(new IParameterFieldListener() {
@@ -101,7 +105,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_parameterArg2Field = new ParameterField(parent, m_parameterArg1, interfaceBundle.getSearchScope());
+    m_parameterArg2Field = new ParameterField(parent, m_parameterArg1, searchScope);
     m_parameterArg2Field.setLabelParameterName(Texts.get("NameArg") + "2");
     m_parameterArg2Field.setLabelParameterType(Texts.get("Type"));
     m_parameterArg2Field.addParameterFieldListener(new IParameterFieldListener() {
@@ -117,7 +121,6 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     m_returnParameterField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_parameterArg1Field.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_parameterArg2Field.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-
   }
 
   @Override

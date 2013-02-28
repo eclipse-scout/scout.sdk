@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedContextPropertyTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ServerSessionNodePage extends AbstractScoutTypePage {
 
@@ -51,28 +52,29 @@ public class ServerSessionNodePage extends AbstractScoutTypePage {
 
   @Override
   protected void loadChildrenImpl() {
-    IScoutBundle clientBundle = getScoutResource().getScoutProject().getClientBundle();
+    IScoutBundle sharedBundle = getScoutResource().getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    if (sharedBundle != null) {
+      IScoutBundle clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
+      if (clientBundle != null) {
+        // find client session
+        ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
+        ITypeFilter filter = TypeFilters.getClassesInProject(clientBundle.getJavaProject());
+        IType[] allClientSessions = clientSessionHierarchy.getAllSubtypes(iClientSession, filter, TypeComparators.getTypeNameComparator());
+        if (allClientSessions.length > 1) {
+          ScoutSdkUi.logError("a client bundle '" + clientBundle + "' can have in maximum 1 client session");
+        }
+        else if (allClientSessions.length == 1) {
+          IType clientSession = allClientSessions[0];
+          new SharedContextPropertyTablePage(this, clientSession, getType());
+        }
+        else {
+          ScoutSdkUi.logInfo("could not find a client session in bundle '" + clientBundle.getSymbolicName() + "'.");
+        }
 
-    if (clientBundle != null) {
-      // find client session
-      ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
-      ITypeFilter filter = TypeFilters.getClassesInProject(clientBundle.getJavaProject());
-      IType[] allClientSessions = clientSessionHierarchy.getAllSubtypes(iClientSession, filter, TypeComparators.getTypeNameComparator());
-      if (allClientSessions.length > 1) {
-        ScoutSdkUi.logError("a client bundle '" + clientBundle + "' can have in maximum 1 client session");
-      }
-      else if (allClientSessions.length == 1) {
-        IType clientSession = allClientSessions[0];
-        new SharedContextPropertyTablePage(this, clientSession, getType());
       }
       else {
-        ScoutSdkUi.logInfo("could not find a client session in bundle '" + clientBundle.getBundleName() + "'.");
+        ScoutSdkUi.logInfo("could not find a client bundle name-correspondig to '" + getScoutResource().getSymbolicName() + "'.");
       }
-
-    }
-    else {
-      ScoutSdkUi.logInfo("could not find a client bundle name-correspondig to '" + getScoutResource().getBundleName() + "'.");
     }
   }
-
 }

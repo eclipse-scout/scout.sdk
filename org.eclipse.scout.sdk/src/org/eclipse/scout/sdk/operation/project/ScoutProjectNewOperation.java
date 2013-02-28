@@ -164,13 +164,13 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   protected void putInitialProperties() {
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<IJavaProject>());
     getProperties().setProperty(IScoutProjectNewOperation.PROP_OS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_OS));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_WS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_WS));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_ARCH, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_ARCH));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_LOCALHOST, getHostName());
     getProperties().setProperty(IScoutProjectNewOperation.PROP_CURRENT_DATE, SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT).format(new Date()));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_USER_NAME, System.getProperty("user.name"));
+    getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, "Default");
   }
 
   private void execOperations(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, P_OperationElement[] ops) throws CoreException, IllegalArgumentException {

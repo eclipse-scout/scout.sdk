@@ -14,13 +14,18 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -77,9 +82,21 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
     }
   }
 
+  public static IPackageFragment getOrCreatePackageFragment(IJavaProject p, String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    IPackageFragment pck = null;
+    IPackageFragmentRoot root = p.findPackageFragmentRoot(new Path(IPath.SEPARATOR + p.getProject().getName() + IPath.SEPARATOR + SdkProperties.DEFAULT_SOURCE_FOLDER_NAME));
+    pck = root.getPackageFragment(packageName);
+    if ((pck == null || !pck.exists())) {
+      PackageNewOperation proc = new PackageNewOperation(p, SdkProperties.DEFAULT_SOURCE_FOLDER_NAME, packageName);
+      proc.run(monitor, workingCopyManager);
+      pck = proc.getCreatedPackageFragment();
+    }
+    return pck;
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IPackageFragment pck = getScoutBundle().getSpecificPackageFragment(getImplementationPackageName(), monitor, workingCopyManager);
+    IPackageFragment pck = getOrCreatePackageFragment(getScoutBundle().getJavaProject(), getImplementationPackageName(), monitor, workingCopyManager);
     // needed to ensure jdt events getting fired at this point. Otherwise some events getting lost.
     ResourcesPlugin.getWorkspace().checkpoint(false);
     ICompilationUnit icu = pck.getCompilationUnit(getTypeName() + ".java");

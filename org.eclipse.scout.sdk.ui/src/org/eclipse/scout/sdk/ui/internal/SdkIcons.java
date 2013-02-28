@@ -48,9 +48,6 @@ public interface SdkIcons {
   String LauncherSwt = "swtLauncher.gif";
   String LauncherSwing = "swingLauncher.gif";
 
-  //XXX RAP replace by better code
-  String LauncherRap = "rapLauncher.gif";
-
   String File = "file.gif";
   String FolderOpen = "folder_open.png";
   String Class = "class_obj.gif";

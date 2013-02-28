@@ -41,7 +41,6 @@ public class RenameDialog extends TitleAreaDialog {
 
   public RenameDialog(Shell parentShell, String title, String oldName, String readOnlySuffix) {
     this(parentShell, title, oldName, readOnlySuffix, null);
-
   }
 
   public RenameDialog(Shell parentShell, String title, String oldName, String readOnlySuffix, String readOnlyPrefix) {
@@ -53,6 +52,7 @@ public class RenameDialog extends TitleAreaDialog {
     m_readOnlySuffix = readOnlySuffix;
     m_readOnlyPrefix = readOnlyPrefix;
     setShellStyle(getShellStyle() | SWT.RESIZE);
+    setHelpAvailable(false);
     m_fieldToolkit = new FieldToolkit();
   }
 

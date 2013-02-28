@@ -44,6 +44,7 @@ import org.eclipse.scout.sdk.ui.viewer.ScoutBundleLableProvider;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.StyledText;
@@ -305,7 +306,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
       public void run() {
         // find all available bundles
         Set<IScoutBundle> alreadyAddedBundles = getLibraryUserBundles();
-        IScoutBundle[] workspaceBundles = ScoutSdkCore.getScoutWorkspace().getAllBundles();
+        IScoutBundle[] workspaceBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getWorkspaceBundlesFilter());
         List<IScoutBundle> plugins = new ArrayList<IScoutBundle>(workspaceBundles.length);
         for (IScoutBundle bundle : workspaceBundles) {
           if (!alreadyAddedBundles.contains(bundle)) {
@@ -566,7 +567,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
         return 1;
       }
       else {
-        return CompareUtility.compareTo(o1.getBundleName(), o2.getBundleName());
+        return CompareUtility.compareTo(o1.getSymbolicName(), o2.getSymbolicName());
       }
     }
   }

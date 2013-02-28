@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.sdk.ui.fields.TextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -103,7 +104,7 @@ public class ButtonGroup<T> extends Composite {
     if (m_buttons.size() > 0) {
       formData.top = new FormAttachment(m_buttons.get(m_buttons.size() - 1), 10);
     }
-    formData.left = new FormAttachment(40, 5);
+    formData.left = new FormAttachment(TextField.DEFAULT_LABEL_PERCENTAGE, 5);
     newButton.setLayoutData(formData);
 
     m_buttons.add(newButton);
@@ -189,6 +190,7 @@ public class ButtonGroup<T> extends Composite {
   /**
    *
    */
+  @SuppressWarnings("unchecked")
   private void fireSelectionChanged() {
     List<T> selection = getValues();
     for (IButtonGroupListener<T> l : m_eventListeners.getListeners(IButtonGroupListener.class)) {

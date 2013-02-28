@@ -16,14 +16,15 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link RayoUiSwingProdTechnologyHandler}</h3> ...
@@ -57,14 +58,14 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    TriState ret = getSelectionProductFiles(project,
+  public TriState getSelection(IScoutBundle project) throws CoreException {
+    TriState ret = getSelectionProductFiles(getSwingBundlesBelow(project),
         new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId},
         new String[]{RAYO_LAF_PLUGIN, RAYO_LAF_FRAGMENT});
 
-    P_TechProductFile[] productFiles = getFilteredProductFiles(project, new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId});
+    P_TechProductFile[] productFiles = getFilteredProductFiles(getSwingBundlesBelow(project), new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId});
     if (productFiles == null || productFiles.length == 0) {
-      return ret;
+      return null;
     }
 
     for (int i = 0; i < productFiles.length; i++) {
@@ -77,14 +78,13 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    return project.getClientBundle() != null && project.getClientBundle().getProject().exists() &&
-        project.getUiSwingBundle() != null && project.getUiSwingBundle().getProject().exists();
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false) != null;
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeProductFiles(project, list, RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId);
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
+    contributeProductFiles(getSwingBundlesBelow(project), list, RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId);
   }
 
   private boolean isRayoLafEnabledInConfigIni(IFile productFile) {
@@ -97,5 +97,9 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
       ScoutSdkUi.logError("cannot parse product file: " + productFile, e);
       return false;
     }
+  }
+
+  private IScoutBundle[] getSwingBundlesBelow(IScoutBundle start) {
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
   }
 }

@@ -14,6 +14,8 @@ import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportClientWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ClientExportEntryHandler implements IExportScoutProjectEntryHandler {
 
@@ -56,8 +58,7 @@ public class ClientExportEntryHandler implements IExportScoutProjectEntryHandler
 
   @Override
   public boolean isAvailable(IExportScoutProjectWizard wizard) {
-    return wizard.getProject().getClientBundle() != null &&
-        (wizard.getProject().getUiSwingBundle() != null || wizard.getProject().getUiSwtBundle() != null);
+    return wizard.getProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), true) != null;
   }
 
   @Override

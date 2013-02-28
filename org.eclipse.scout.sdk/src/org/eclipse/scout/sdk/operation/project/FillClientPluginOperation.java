@@ -21,6 +21,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillClientPluginOperation extends AbstractScoutProjectNewOperation {
 
+  public final static String PROP_INSTALL_CLIENT_SESSION = "INSTALL_CLIENT_SESSION";
+  public final static String PROP_INSTALL_DESKTOP_EXT = "INSTALL_DESKTOP_EXT";
+
   private IProject m_clientProject;
 
   @Override
@@ -47,13 +50,30 @@ public class FillClientPluginOperation extends AbstractScoutProjectNewOperation 
     }
   }
 
+  private boolean isInstallDesktopExtension() {
+    Boolean b = getProperties().getProperty(PROP_INSTALL_DESKTOP_EXT, Boolean.class);
+    return b != null && b.booleanValue();
+  }
+
+  private boolean isInstallClientSession() {
+    Boolean b = getProperties().getProperty(PROP_INSTALL_CLIENT_SESSION, Boolean.class);
+    return b == null || b.booleanValue();
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String destPathPref = "src/" + (m_clientProject.getName().replace('.', '/')) + "/";
     Map<String, String> props = getStringProperties();
     new InstallJavaFileOperation("templates/client/src/Activator.java", destPathPref + "Activator.java", m_clientProject, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/client/src/ClientSession.java", destPathPref + "ClientSession.java", m_clientProject, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/client/src/ui/desktop/Desktop.java", destPathPref + "ui/desktop/Desktop.java", m_clientProject, props).run(monitor, workingCopyManager);
+    if (isInstallClientSession()) {
+      new InstallJavaFileOperation("templates/client/src/ClientSession.java", destPathPref + "ClientSession.java", m_clientProject, props).run(monitor, workingCopyManager);
+    }
+    if (isInstallDesktopExtension()) {
+      new InstallJavaFileOperation("templates/client/src/ui/desktop/DesktopExtension.java", destPathPref + "ui/desktop/DesktopExtension.java", m_clientProject, props).run(monitor, workingCopyManager);
+    }
+    else {
+      new InstallJavaFileOperation("templates/client/src/ui/desktop/Desktop.java", destPathPref + "ui/desktop/Desktop.java", m_clientProject, props).run(monitor, workingCopyManager);
+    }
     m_clientProject.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 }

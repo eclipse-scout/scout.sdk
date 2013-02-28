@@ -19,8 +19,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -36,7 +38,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -81,7 +82,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   private EntityTextField m_entityField;
 
   // process members
-  private final IType m_abstractSqlLookupService;
+  private IType m_abstractSqlLookupService;
   private final IScoutBundle m_sharedBundle;
   private final IScoutBundle m_serverBundle;
 
@@ -89,12 +90,17 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     super(LookupCallNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
     m_serverBundle = serverBundle;
-    m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.ILookupService, sharedBundle.getJavaProject());
-    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IScoutBundle.SHARED_SERVICES_LOOKUP));
+    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_LOOKUP));
     setTitle(Texts.get("NewLookupCall"));
     setDescription(Texts.get("CreateANewLookupCall"));
-    setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
-    setServiceSuperTypeInternal(m_abstractSqlLookupService);
+    if (serverBundle != null) {
+      setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
+      m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.ILookupService, serverBundle.getJavaProject());
+      setServiceSuperTypeInternal(m_abstractSqlLookupService);
+    }
+    else {
+      setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.NO_SERVICE);
+    }
   }
 
   @Override
@@ -157,7 +163,9 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         protected Object[][] computeProposals() {
           List<Object> proposals = new ArrayList<Object>();
           proposals.add(abstractLookupService);
-          proposals.add(m_abstractSqlLookupService);
+          if (m_abstractSqlLookupService != null) {
+            proposals.add(m_abstractSqlLookupService);
+          }
           proposals.add(MoreElementsProposal.INSTANCE);
           ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
           IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());

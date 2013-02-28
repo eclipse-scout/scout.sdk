@@ -15,10 +15,10 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.SimpleScrolledComposite;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -106,7 +106,7 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
 
   @Override
   public void save() {
-    final HashSet<IScoutProject> modifiedProjects = new HashSet<IScoutProject>(1);
+    final HashSet<IScoutBundle> modifiedProjects = new HashSet<IScoutBundle>(1);
     visitCombos(new ISuperTypeComboVisitor() {
       @Override
       public void visit(Combo combo, String selectedValue, DefaultSuperClassModel model) {
@@ -121,12 +121,12 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
       }
     });
 
-    for (IScoutProject p : modifiedProjects) {
+    for (IScoutBundle p : modifiedProjects) {
       try {
         p.getPreferences().flush();
       }
       catch (BackingStoreException ex) {
-        ScoutSdkUi.logError("Unable to save new super type configuration for project '" + p.getProjectName() + "'.", ex);
+        ScoutSdkUi.logError("Unable to save new super type configuration for project '" + p.getSymbolicName() + "'.", ex);
       }
     }
   }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
+import java.util.HashSet;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -18,8 +20,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
@@ -33,7 +35,7 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
@@ -91,46 +93,50 @@ public class FormPropertyPart extends JdtTypePropertyPart {
           entityName = findEntityName(getPage().getType().getElementName());
         }
         if (!StringUtility.isNullOrEmpty(entityName)) {
+
           // form data
-          IScoutBundle clientBundle = getPage().getScoutResource();
-          IScoutProject scoutProject = clientBundle.getScoutProject();
-          IScoutBundle sharedBundle = scoutProject.getSharedBundle();
-          while (sharedBundle == null) {
-            scoutProject = scoutProject.getParentProject();
-            if (scoutProject == null) {
-              break;
-            }
-            sharedBundle = scoutProject.getSharedBundle();
+          IType form = getPage().getType();
+          IType formDataType = null;
+          try {
+            formDataType = ScoutTypeUtility.findFormDataForForm(form);
           }
-          if (sharedBundle != null) {
-            IType form = getPage().getType();
-            IType formDataType = null;
-            try {
-              formDataType = ScoutTypeUtility.findFormDataForForm(form);
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+          }
+          if (TypeUtility.exists(formDataType)) {
+            model.addGlobalLink(new TypeOpenLink(formDataType));
+          }
+
+          IScoutBundle client = getPage().getScoutResource();
+          IScoutBundle[] shareds = client.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+          IScoutBundle[] serversAndShareds = null;
+          if (shareds != null) {
+            HashSet<IScoutBundle> serversAndSharedsSet = new HashSet<IScoutBundle>();
+            for (IScoutBundle shared : shareds) {
+              serversAndSharedsSet.add(shared);
+              for (IScoutBundle server : shared.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false)) {
+                serversAndSharedsSet.add(server);
+              }
             }
-            catch (JavaModelException e) {
-              ScoutSdkUi.logError(e);
-            }
-            if (TypeUtility.exists(formDataType)) {
-              model.addGlobalLink(new TypeOpenLink(formDataType));
-            }
+            serversAndShareds = serversAndSharedsSet.toArray(new IScoutBundle[serversAndSharedsSet.size()]);
           }
           // service
           String formRegex = "(I)?" + entityName + "(Process)?" + SdkProperties.SUFFIX_SERVICE;
           ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
               TypeFilters.getRegexSimpleNameFilter(formRegex),
-              ScoutTypeFilters.getInScoutProject(clientBundle.getScoutProject())
+              ScoutTypeFilters.getInScoutBundles(serversAndShareds)
               );
           LinkGroup serviceGroup = model.getOrCreateGroup(Texts.get("Service"), 10);
           for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(iService).getAllSubtypes(iService, formFilter, TypeComparators.getTypeNameComparator())) {
             serviceGroup.addLink(new TypeOpenLink(candidate));
           }
+
           // permissions
           String permissionRegex = "(Create|Read|Update)" + entityName + SdkProperties.SUFFIX_PERMISSION;
           ITypeFilter filter = TypeFilters.getMultiTypeFilter(
               TypeFilters.getRegexSimpleNameFilter(permissionRegex),
               TypeFilters.getClassFilter(),
-              ScoutTypeFilters.getInScoutProject(clientBundle.getScoutProject())
+              ScoutTypeFilters.getInScoutBundles(shareds)
               );
           LinkGroup permissionGroup = model.getOrCreateGroup(Texts.get("PermissionTablePage"), 20);
           for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
@@ -158,7 +164,6 @@ public class FormPropertyPart extends JdtTypePropertyPart {
     };
     j.setSystem(true);
     j.schedule();
-
   }
 
   private String findEntityName(String serviceName) {

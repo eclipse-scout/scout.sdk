@@ -12,7 +12,8 @@ package org.eclipse.scout.sdk.ui.extensions.technology;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
+import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
@@ -50,20 +51,11 @@ public class ScoutTechnologyResource implements IScoutTechnologyResource {
 
   @Override
   public ImageDescriptor getBundleImage() {
-    switch (getBundle().getType()) {
-      case IScoutBundle.BUNDLE_CLIENT: {
-        return ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientBundle);
-      }
-      case IScoutBundle.BUNDLE_SERVER: {
-        return ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerBundle);
-      }
-      case IScoutBundle.BUNDLE_SHARED: {
-        return ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SharedBundle);
-      }
-      default: {
-        return ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SwingBundle);
-      }
+    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+    if (uiExt != null) {
+      return uiExt.getIconPath();
     }
+    return null;
   }
 
   @Override

@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.scout.sdk" id="targetPackage" name="targetPackage"/>
       </appInfo>
       <documentation>
-         [Enter description of this extension point.]
+         Extension Point to define target packages and their default value.
       </documentation>
    </annotation>
 
@@ -48,19 +48,34 @@
    </element>
 
    <element name="targetPackage">
+      <annotation>
+         <documentation>
+            defines a target package where new scout elements will be created.
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The id of the package to reference a package
                </documentation>
             </annotation>
          </attribute>
          <attribute name="default" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The default to use when nothing else is configured for a bundle.
                </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="bundleType" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Specifies for which type of bundle this package should be valid.
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.scout.sdk.runtimeBundles/bundle/@type"/>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>
@@ -71,7 +86,7 @@
          <meta.section type="since"/>
       </appInfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         3.9.0
       </documentation>
    </annotation>
 
@@ -80,27 +95,33 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         [Enter extension point usage example here.]
+         &lt;extension
+         point=&quot;org.eclipse.scout.sdk.targetPackage&quot;&gt;
+      &lt;targetPackage
+            default=&quot;.ui.desktop&quot;
+            bundleType=&quot;CLIENT&quot;
+            id=&quot;client.desktop&quot;&gt;
+      &lt;/targetPackage&gt;
+      &lt;targetPackage
+            default=&quot;.ui.desktop.outlines&quot;
+            bundleType=&quot;CLIENT&quot;
+            id=&quot;client.outline&quot;&gt;
+      &lt;/targetPackage&gt;
+      &lt;targetPackage
+            default=&quot;.ui.desktop.outlines.pages&quot;
+            bundleType=&quot;CLIENT&quot;
+            id=&quot;client.page&quot;&gt;
+      &lt;/targetPackage&gt;
+      &lt;targetPackage
+            default=&quot;&quot;
+            bundleType=&quot;CLIENT&quot;
+            id=&quot;client.form&quot;&gt;
+      &lt;/targetPackage&gt;
+&lt;/extension&gt;
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiinfo"/>
-      </appInfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>

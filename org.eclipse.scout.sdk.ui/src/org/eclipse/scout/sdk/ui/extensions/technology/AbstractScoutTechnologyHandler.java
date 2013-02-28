@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -25,7 +26,6 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.compatibility.License;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
-import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
@@ -35,9 +35,10 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceFilters;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractScoutTechnologyHandler}</h3> ...
@@ -58,23 +59,35 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   @Override
-  public IScoutTechnologyResource[] getModifactionResourceCandidates(IScoutProject project) {
+  public IScoutTechnologyResource[] getModifactionResourceCandidates(IScoutBundle project) throws CoreException {
     ArrayList<IScoutTechnologyResource> ret = new ArrayList<IScoutTechnologyResource>();
     contributeResources(project, ret);
     return ret.toArray(new IScoutTechnologyResource[ret.size()]);
   }
 
-  protected abstract void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list);
+  protected abstract void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException;
 
-  protected void contributeProductFiles(IScoutProject project, List<IScoutTechnologyResource> list, String... bundleFilter) {
+  protected void contributeProductFiles(IScoutBundle[] projects, List<IScoutTechnologyResource> list, String... bundleFilter) throws CoreException {
+    for (IScoutBundle e : projects) {
+      contributeProductFiles(e, list, bundleFilter);
+    }
+  }
+
+  private void contributeProductFiles(IScoutBundle project, List<IScoutTechnologyResource> list, String... bundleFilter) throws CoreException {
     contributeProductFiles(project, list, true, bundleFilter);
   }
 
-  protected void contributeProductFiles(IScoutProject project, List<IScoutTechnologyResource> list, boolean defaultSelection, String... bundleFilter) {
+  protected void contributeProductFiles(IScoutBundle project, List<IScoutTechnologyResource> list, boolean defaultSelection, String... bundleFilter) throws CoreException {
     P_TechProductFile[] productFiles = getFilteredProductFiles(project, bundleFilter);
     for (int i = 0; i < productFiles.length; i++) {
       P_TechProductFile prodFile = productFiles[i];
       list.add(new ScoutTechnologyResource(prodFile.bundle, prodFile.productFile, defaultSelection));
+    }
+  }
+
+  protected void contributeManifestFiles(IScoutBundle[] bundles, List<IScoutTechnologyResource> list) {
+    for (IScoutBundle bundle : bundles) {
+      contributeManifestFile(bundle, list);
     }
   }
 
@@ -85,6 +98,21 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
         list.add(res);
       }
     }
+  }
+
+  protected TriState getSelectionManifests(IScoutBundle[] projects, String... pluginIds) {
+    if (projects == null || projects.length == 0) {
+      return TriState.FALSE;
+    }
+
+    TriState ret = getSelectionManifest(projects[0], pluginIds);
+    for (int i = 1; i < projects.length; i++) {
+      TriState tmp = getSelectionManifest(projects[i], pluginIds);
+      if (tmp != ret) {
+        return TriState.UNDEFINED;
+      }
+    }
+    return ret;
   }
 
   protected TriState getSelectionManifest(IScoutBundle project, String... pluginIds) {
@@ -103,10 +131,30 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     return ret;
   }
 
-  protected TriState getSelectionProductFiles(IScoutProject project, String[] filterPluginIds, String[]... pluginIds) {
+  protected TriState getSelectionProductFiles(IScoutBundle[] projects, String[] filterPluginIds, String[]... pluginIds) throws CoreException {
+    if (projects == null || projects.length == 0) {
+      return TriState.FALSE;
+    }
+
+    TriState ret = getSelectionProductFiles(projects[0], filterPluginIds, pluginIds);
+    for (int i = 1; i < projects.length; i++) {
+      TriState tmp = getSelectionProductFiles(projects[i], filterPluginIds, pluginIds);
+      if (tmp != null) {
+        if (ret == null) {
+          ret = tmp;
+        }
+        else if (tmp != ret) {
+          return TriState.UNDEFINED;
+        }
+      }
+    }
+    return ret;
+  }
+
+  private TriState getSelectionProductFiles(IScoutBundle project, String[] filterPluginIds, String[]... pluginIds) throws CoreException {
     P_TechProductFile[] productFiles = getFilteredProductFiles(project, filterPluginIds);
     if (productFiles == null || productFiles.length == 0) {
-      return TriState.FALSE;
+      return null;
     }
 
     TriState ret = TriState.parseTriState(containsProductDependencies(productFiles[0].productFile, pluginIds));
@@ -182,23 +230,20 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
   }
 
-  protected P_TechProductFile[] getProductFiles(IScoutProject project) {
-    IFile[] productFiles = TreeUtility.getAllProductFiles(project);
-    ArrayList<P_TechProductFile> list = new ArrayList<P_TechProductFile>(productFiles.length);
-    for (int i = 0; i < productFiles.length; i++) {
-      final IFile prodFile = productFiles[i];
-      IScoutBundle[] b = project.getBundles(new IScoutBundleFilter() {
-        @Override
-        public boolean accept(IScoutBundle bundle) {
-          return bundle.getProject().equals(prodFile.getProject());
-        }
-      });
+  protected P_TechProductFile[] getProductFiles(IScoutBundle[] projects) throws CoreException {
+    ArrayList<P_TechProductFile> list = new ArrayList<P_TechProductFile>();
+    for (IScoutBundle element : projects) {
+      IResource[] productFiles = ResourceUtility.getAllResources(element.getProject(), ResourceFilters.getProductFilter());
+      for (int i = 0; i < productFiles.length; i++) {
+        final IResource prodFile = productFiles[i];
+        IScoutBundle b = ScoutTypeUtility.getScoutBundle(prodFile.getProject());
 
-      if (b != null && b.length > 0) {
-        P_TechProductFile tpf = new P_TechProductFile();
-        tpf.bundle = b[0];
-        tpf.productFile = prodFile;
-        list.add(tpf);
+        if (b != null) {
+          P_TechProductFile tpf = new P_TechProductFile();
+          tpf.bundle = b;
+          tpf.productFile = (IFile) prodFile;
+          list.add(tpf);
+        }
       }
     }
     return list.toArray(new P_TechProductFile[list.size()]);
@@ -208,8 +253,12 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     return new ScoutTechnologyResource(bundle, bundle.getProject().getFile(ICoreConstants.BUNDLE_FILENAME_DESCRIPTOR));
   }
 
-  protected P_TechProductFile[] getFilteredProductFiles(IScoutProject project, String... pluginFilter) {
-    P_TechProductFile[] candidates = getProductFiles(project);
+  protected P_TechProductFile[] getFilteredProductFiles(IScoutBundle project, String... pluginFilter) throws CoreException {
+    return getFilteredProductFiles(new IScoutBundle[]{project}, pluginFilter);
+  }
+
+  protected P_TechProductFile[] getFilteredProductFiles(IScoutBundle[] projects, String... pluginFilter) throws CoreException {
+    P_TechProductFile[] candidates = getProductFiles(projects);
     ArrayList<P_TechProductFile> ret = new ArrayList<P_TechProductFile>(candidates.length);
     for (P_TechProductFile candidate : candidates) {
       if (containsProductDependencies(candidate.productFile, pluginFilter)) {

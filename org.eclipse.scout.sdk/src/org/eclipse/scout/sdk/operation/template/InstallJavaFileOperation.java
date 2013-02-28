@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.template;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -24,7 +23,6 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.osgi.framework.Bundle;
@@ -33,19 +31,8 @@ import org.osgi.framework.Bundle;
  * Install java file from template
  */
 public class InstallJavaFileOperation extends InstallTextFileOperation {
-
-  public InstallJavaFileOperation(String srcPath, String rootPackageRelativeDestPath, IScoutBundle scoutBundle) {
-    this(srcPath, rootPackageRelativeDestPath, scoutBundle, createProperties(scoutBundle));
-  }
-
-  private static Map<String, String> createProperties(IScoutBundle scoutBundle) {
-    HashMap<String, String> ret = new HashMap<String, String>();
-    ret.put(IScoutProjectNewOperation.PROP_PROJECT_NAME, scoutBundle.getScoutProject().getProjectName());
-    return ret;
-  }
-
   public InstallJavaFileOperation(String srcPath, String rootPackageRelativeDestPath, IScoutBundle scoutBundle, Map<String, String> properties) {
-    this(srcPath, "src/" + (scoutBundle.getRootPackageName().replace('.', '/')) + "/" + rootPackageRelativeDestPath, scoutBundle.getProject(), properties);
+    this(srcPath, "src/" + (scoutBundle.getSymbolicName().replace('.', '/')) + "/" + rootPackageRelativeDestPath, scoutBundle.getProject(), properties);
   }
 
   public InstallJavaFileOperation(String srcPath, String destPath, IProject project, Map<String, String> properties) {

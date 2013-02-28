@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -87,7 +88,10 @@ public class FormWithGroupboxesTest extends AbstractScoutSdkTest {
     Assert.assertFalse(TypeUtility.exists(ignoredField));
     IMethod ignoredGetter = TypeUtility.getMethod(m_formData, "getIgnoredInteger");
     Assert.assertFalse(TypeUtility.exists(ignoredGetter));
-
   }
 
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
+  }
 }

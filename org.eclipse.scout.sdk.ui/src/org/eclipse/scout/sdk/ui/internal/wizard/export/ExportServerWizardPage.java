@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.widgets.Composite;
 
 public class ExportServerWizardPage extends AbstractExportProductWizardPage {
@@ -24,8 +24,8 @@ public class ExportServerWizardPage extends AbstractExportProductWizardPage {
   private final static String SETTINGS_PRODUCT_FILE = "productFileSetting";
   private final static String SETTINGS_WAR_FILE_NAME = "warFileNameSetting";
 
-  public ExportServerWizardPage(IScoutProject scoutProject) {
-    super(scoutProject, ExportServerWizardPage.class.getName(), Texts.get("ExportWebArchive"), IScoutBundle.BUNDLE_SERVER,
+  public ExportServerWizardPage(IScoutBundle scoutProject) {
+    super(scoutProject, ExportServerWizardPage.class.getName(), Texts.get("ExportWebArchive"), IScoutBundle.TYPE_SERVER,
         SETTINGS_PRODUCT_FILE, SETTINGS_WAR_FILE_NAME);
   }
 
@@ -43,11 +43,15 @@ public class ExportServerWizardPage extends AbstractExportProductWizardPage {
 
   private String findServerWarName() {
     String warName = null;
-    if (getScoutProject().getUiSwingBundle() != null) {
-      warName = findServerNameInClientBundle(getScoutProject().getUiSwingBundle());
+    IScoutBundle uiSwing = getScoutProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
+    if (uiSwing != null) {
+      warName = findServerNameInClientBundle(uiSwing);
     }
-    if (warName == null && getScoutProject().getUiSwtBundle() != null) {
-      warName = findServerNameInClientBundle(getScoutProject().getUiSwtBundle());
+    if (warName == null) {
+      IScoutBundle uiSwt = getScoutProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWT), true);
+      if (uiSwt != null) {
+        warName = findServerNameInClientBundle(uiSwt);
+      }
     }
     return warName;
   }

@@ -19,7 +19,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.BoxDeleteOperation;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldDeleteOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;

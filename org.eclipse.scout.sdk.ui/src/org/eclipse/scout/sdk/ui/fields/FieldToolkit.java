@@ -14,9 +14,11 @@ import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
@@ -34,7 +36,6 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
@@ -95,7 +96,9 @@ public class FieldToolkit {
     ProposalTextField field = createProposalField(parent, label, ProposalTextField.STYLE_DEFAULT, labelPercentage);
     SignatureLabelProvider labelProvider = new SignatureLabelProvider();
     field.setLabelProvider(labelProvider);
-    SignatureProposalProvider proposalProvider = new SignatureProposalProvider(bundle.getSearchScope(), labelProvider, mostlyUsed, false);
+
+    IJavaSearchScope jSearchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{bundle.getJavaProject()});
+    SignatureProposalProvider proposalProvider = new SignatureProposalProvider(jSearchScope, labelProvider, mostlyUsed, false);
     field.setContentProvider(proposalProvider);
     return field;
   }
@@ -129,18 +132,10 @@ public class FieldToolkit {
   }
 
   public EntityTextField createEntityTextField(Composite parent, String label, IScoutBundle b) {
-    return createEntityTextField(parent, label, b.getScoutProject());
+    return createEntityTextField(parent, label, b, TextField.DEFAULT_LABEL_PERCENTAGE);
   }
 
-  public EntityTextField createEntityTextField(Composite parent, String label, IScoutProject p) {
-    return createEntityTextField(parent, label, p, TextField.DEFAULT_LABEL_PERCENTAGE);
-  }
-
-  public EntityTextField createEntityTextField(Composite parent, String label, IScoutBundle b, int labelPercentage) {
-    return createEntityTextField(parent, label, b.getScoutProject(), labelPercentage);
-  }
-
-  public EntityTextField createEntityTextField(Composite parent, String label, IScoutProject p, int labelPercentage) {
+  public EntityTextField createEntityTextField(Composite parent, String label, IScoutBundle p, int labelPercentage) {
     EntityTextField text = new EntityTextField(parent, label, labelPercentage, p);
     return text;
   }

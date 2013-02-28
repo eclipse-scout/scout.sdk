@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
@@ -48,12 +48,12 @@ public class ResourceServletFolderSelectionField extends TextField {
 
   private Button m_popupButton;
   private IFolder m_folder;
-  private EventListenerList m_eventListeners;
-  private OptimisticLock m_inputLock = new OptimisticLock();
 
-  private ITreeNode m_rootNode;
+  private final EventListenerList m_eventListeners;
+  private final OptimisticLock m_inputLock = new OptimisticLock();
+  private final ITreeNode m_rootNode;
 
-  public ResourceServletFolderSelectionField(Composite parent, IScoutProject scoutProject) {
+  public ResourceServletFolderSelectionField(Composite parent, IScoutBundle scoutProject) {
     super(parent);
     m_eventListeners = new EventListenerList();
     m_rootNode = new ResourceServletFolderTree(scoutProject).getRootNode();
@@ -112,7 +112,7 @@ public class ResourceServletFolderSelectionField extends TextField {
     FormData labelData = new FormData();
     labelData.top = new FormAttachment(0, 4);
     labelData.left = new FormAttachment(0, 0);
-    labelData.right = new FormAttachment(40, 0);
+    labelData.right = new FormAttachment(getLabelPercentage(), 0);
     labelData.bottom = new FormAttachment(100, 0);
     label.setLayoutData(labelData);
 

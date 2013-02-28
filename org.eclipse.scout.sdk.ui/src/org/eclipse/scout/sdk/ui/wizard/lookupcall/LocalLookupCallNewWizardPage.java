@@ -18,8 +18,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.lookupcall.LocalLookupCallNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
@@ -39,7 +41,6 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.validation.JavaElementValidator;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -75,7 +76,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewLocalLookupCallNoPopup"));
     setDescription(Texts.get("CreateANewLocalLookupCall"));
     setLookupCallSuperTypeInternal(localLookupCall);
-    setTargetPackage(DefaultTargetPackage.get(client, IScoutBundle.CLIENT_SERVICES_LOOKUP));
+    setTargetPackage(DefaultTargetPackage.get(client, IDefaultTargetPackage.CLIENT_SERVICES_LOOKUP));
   }
 
   @Override

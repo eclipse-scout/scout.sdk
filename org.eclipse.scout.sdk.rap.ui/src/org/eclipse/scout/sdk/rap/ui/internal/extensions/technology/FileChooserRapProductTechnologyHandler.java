@@ -15,14 +15,13 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.RuntimeClasses;
-import org.eclipse.scout.sdk.rap.RapRuntimeClasses;
-import org.eclipse.scout.sdk.rap.ui.internal.extensions.UiRapBundleNodeFactory;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link FileChooserRapProductTechnologyHandler}</h3> ...
@@ -41,20 +40,23 @@ public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnol
   }
 
   @Override
-  public TriState getSelection(IScoutProject project) {
-    return getSelectionProductFiles(project,
-        new String[]{RuntimeClasses.ScoutClientBundleId, RapRuntimeClasses.ScoutUiRapBundleId},
+  public TriState getSelection(IScoutBundle project) throws CoreException {
+    return getSelectionProductFiles(getRapUiBundlesBelow(project),
+        new String[]{RuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
         RAP_FILE_CHOOSER_PLUGINS);
   }
 
   @Override
-  public boolean isActive(IScoutProject project) {
-    IScoutBundle[] rapBundles = project.getAllBundles(UiRapBundleNodeFactory.BUNDLE_UI_RAP);
-    return project.getClientBundle() != null && rapBundles != null && rapBundles.length > 0;
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutSdkRapConstants.TYPE_UI_RAP), false) != null;
   }
 
   @Override
-  protected void contributeResources(IScoutProject project, List<IScoutTechnologyResource> list) {
-    contributeProductFiles(project, list, RuntimeClasses.ScoutClientBundleId, RapRuntimeClasses.ScoutUiRapBundleId);
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
+    contributeProductFiles(getRapUiBundlesBelow(project), list, RuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
+  }
+
+  private IScoutBundle[] getRapUiBundlesBelow(IScoutBundle start) {
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutSdkRapConstants.TYPE_UI_RAP), true);
   }
 }

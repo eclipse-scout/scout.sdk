@@ -15,9 +15,11 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.SharedContextBeanPropertyNewOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
@@ -29,23 +31,11 @@ public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard 
 
   public SharedContextBeanPropertyNewWizard(IType serverSessionType, IType clientSessionType) {
     setWindowTitle(Texts.get("NewSharedContextProperty"));
-    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(ScoutSdkCore.getScoutWorkspace().getScoutBundle(serverSessionType.getJavaProject().getProject()).getSearchScope());
+    IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{serverSessionType.getJavaProject()});
+    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(searchScope);
 
     SharedContextBeanPropertyNewOperation op = new SharedContextBeanPropertyNewOperation(serverSessionType, clientSessionType);
     beanPropertyWizardPage.setOperation(op);
-    // IType[] serverSessions=SDE.getType(RuntimeClasses.IServerSession).getSubTypes(false,BCTypeFilters.getExistingNonAbstractClassesInProjectGroup(group));
-    // IType serverSession = null;
-    // if(serverSessions != null && serverSessions.length > 0){
-    // serverSession = serverSessions[0];
-    // }
-    // IType[] clientSessions=SDE.getType(RuntimeClasses.IClientSession).getSubTypes(false,BCTypeFilters.getExistingNonAbstractClassesInProjectGroup(group));
-    // IType clientSession = null;
-    // if(clientSessions != null && clientSessions.length > 0){
-    // clientSession = clientSessions[0];
-    // }
-    // op.setServerSessionType(serverSession);
-    // op.setClientSessionType(clientSession);
-    // beanPropertyWizardPage.setOperation(op);
 
     // find all used method names
     HashSet<String> notAllowedMethodNames = new HashSet<String>();
@@ -67,6 +57,5 @@ public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard 
     for (IMethod m : TypeUtility.getMethods(type, filter)) {
       collector.add(m.getElementName());
     }
-
   }
 }

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.dialog;
 import java.util.ArrayList;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -28,7 +29,8 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -43,7 +45,7 @@ import org.eclipse.swt.widgets.Shell;
  * @since 1.0.8 09.09.2010
  */
 public class ProductSelectionDialog extends TitleAreaDialog {
-  private IScoutProject m_project;
+  private IScoutBundle m_project;
   private ITreeNode m_rootNode;
   private CheckableTree m_tree;
   private IFile[] m_checkedFiles;
@@ -55,32 +57,48 @@ public class ProductSelectionDialog extends TitleAreaDialog {
   /**
    * @param parentShell
    */
-  public ProductSelectionDialog(Shell parentShell, IScoutProject project) {
+  public ProductSelectionDialog(Shell parentShell, IScoutBundle project) {
     this(parentShell, project, NodeFilters.getAcceptAll());
   }
 
-  public ProductSelectionDialog(Shell parentShell, IScoutProject project, ITreeNodeFilter visibleFilter) {
+  public ProductSelectionDialog(Shell parentShell, IScoutBundle project, ITreeNodeFilter visibleFilter) {
     super(parentShell);
     m_project = project;
     m_visibleNodeFilter = visibleFilter;
-    setTitle(Texts.get("ProductSelectionDialogTitle"));
     m_checkedFiles = new IFile[0];
     setShellStyle(getShellStyle() | SWT.RESIZE);
+    setHelpAvailable(false);
   }
 
   public ProductSelectionDialog(Shell parentShell, ITreeNode rootNode) {
     super(parentShell);
     m_rootNode = rootNode;
-    setTitle(Texts.get("ProductSelectionDialogTitle"));
     m_checkedFiles = new IFile[0];
     setShellStyle(getShellStyle() | SWT.RESIZE);
+    setHelpAvailable(false);
+  }
+
+  @Override
+  protected void configureShell(Shell newShell) {
+    super.configureShell(newShell);
+    newShell.setText(Texts.get("ProductSelectionDialogTitle"));
   }
 
   @Override
   protected Control createDialogArea(Composite parent) {
+    setTitle(Texts.get("ProductSelectionDialogTitle"));
+    setMessage(Texts.get("ChooseProducts"));
+
     Composite rootPane = new Composite(parent, SWT.NONE);
 
-    m_tree = new CheckableTree(rootPane, getRootNode());
+    ITreeNode root = null;
+    try {
+      root = getRootNode();
+    }
+    catch (CoreException e1) {
+      ScoutSdkUi.logError("unable to create product file list", e1);
+    }
+    m_tree = new CheckableTree(rootPane, root);
     m_tree.addCheckSelectionListener(new ICheckStateListener() {
       @Override
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
@@ -105,8 +123,9 @@ public class ProductSelectionDialog extends TitleAreaDialog {
 
   /**
    * @return the rootNode
+   * @throws CoreException
    */
-  public ITreeNode getRootNode() {
+  public ITreeNode getRootNode() throws CoreException {
     if (m_rootNode == null) {
       m_rootNode = TreeUtility.createProductTree(m_project, getVisibleNodeFilter(), isMultiSelectionMode());
     }

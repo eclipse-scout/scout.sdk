@@ -23,7 +23,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
  */
 public class TreeNode implements ITreeNode {
 
-  private final int m_type;
+  private final String m_type;
   private Object m_data;
   private String m_text;
   private boolean m_visible = true;
@@ -31,21 +31,20 @@ public class TreeNode implements ITreeNode {
   private boolean m_enabled = true;
   private boolean m_bold = false;
   private ImageDescriptor m_image;
-
-  private long m_orderNr = 0;
+  private int m_orderNr = 0;
 
   private ITreeNode m_parent;
   private List<ITreeNode> m_children = new ArrayList<ITreeNode>();
 
-  public TreeNode(int type) {
+  public TreeNode(String type) {
     this(type, null);
   }
 
-  public TreeNode(int type, String text) {
+  public TreeNode(String type, String text) {
     this(type, text, null);
   }
 
-  public TreeNode(int type, String text, Object data) {
+  public TreeNode(String type, String text, Object data) {
     m_type = type;
     m_data = data;
     m_text = text;
@@ -65,7 +64,7 @@ public class TreeNode implements ITreeNode {
    * @return the type
    */
   @Override
-  public int getType() {
+  public String getType() {
     return m_type;
   }
 
@@ -215,7 +214,7 @@ public class TreeNode implements ITreeNode {
    * @param orderNr
    *          the orderNr to set
    */
-  public void setOrderNr(long orderNr) {
+  public void setOrderNr(int orderNr) {
     m_orderNr = orderNr;
   }
 
@@ -223,7 +222,7 @@ public class TreeNode implements ITreeNode {
    * @return the orderNr
    */
   @Override
-  public long getOrderNr() {
+  public int getOrderNr() {
     return m_orderNr;
   }
 

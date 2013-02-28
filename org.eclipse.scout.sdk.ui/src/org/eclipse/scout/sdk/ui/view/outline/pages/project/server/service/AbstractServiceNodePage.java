@@ -32,7 +32,6 @@ import org.eclipse.scout.sdk.util.type.MethodComparators;
 import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * Page representing a service implementation
@@ -42,14 +41,6 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
   private final IType m_interfaceType;
   private final String m_readOnlySuffix;
   private P_ServiceMethodsListener m_serviceMethodListener;
-
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
 
   public AbstractServiceNodePage(AbstractPage parent, IType type, IType interfaceType, String readOnlySuffix) {
     setParent(parent);

@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -43,9 +43,9 @@ public class ProjectVersionPresenter extends AbstractPresenter {
   private ImageHyperlink m_applyVersionLink;
   private final HashMap<IProject, PluginModelHelper> m_bundles;
 
-  public ProjectVersionPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutProject scoutProject) {
+  public ProjectVersionPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutBundle scoutProject) {
     super(toolkit, parent);
-    IScoutBundle[] scoutBundles = scoutProject.getAllScoutBundles(); // do not include sub projects: they might have different versions
+    IScoutBundle[] scoutBundles = scoutProject.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
     m_bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.length);
     for (IScoutBundle sb : scoutBundles) {
       m_bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));

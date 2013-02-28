@@ -2,6 +2,6 @@
 <?eclipse version="3.4"?>
 <plugin>
    <extension point="org.eclipse.scout.service.services">
-      <service class="@@BUNDLE_SHARED_NAME@@.services.common.text.DefaultTextProviderService" factory="org.eclipse.scout.service.DefaultServiceFactory" />
+      <service class="@@BUNDLE_SHARED_NAME@@.services.common.text.@@TEXT_PROV_SVC_NAME@@TextProviderService" factory="org.eclipse.scout.service.DefaultServiceFactory" />
    </extension>
 </plugin>

@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.ui.extensions.preferences;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link TargetPackageModel}</h3> ...
@@ -24,12 +24,12 @@ public class TargetPackageModel implements Comparable<TargetPackageModel> {
 
   final String m_id;
   final String m_defaultVal;
-  final IScoutProject m_context;
+  final IScoutBundle m_context;
   String m_curVal;
   String m_group;
   String m_label;
 
-  TargetPackageModel(String id, String defaultVal, IScoutProject context) {
+  TargetPackageModel(String id, String defaultVal, IScoutBundle context) {
     m_id = id;
     m_defaultVal = defaultVal;
     m_context = context;

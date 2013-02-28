@@ -16,7 +16,10 @@ import java.util.Arrays;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.jdt.internal.ui.util.BusyIndicatorRunnableContext;
 import org.eclipse.jdt.ui.JavaUI;
@@ -205,8 +208,8 @@ public class WsStubWizardPage extends AbstractWorkspaceWizardPage {
   private IPackageFragment[] openBrowsePackagesDialog() {
     IPackageFragment[] packageFragments = null;
     IRunnableContext context = new BusyIndicatorRunnableContext();
-
-    SelectionDialog dialog = JavaUI.createPackageDialog(ScoutSdkUi.getShell(), context, m_bundle.getSearchScope(), false, true, null);
+    IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{m_bundle.getJavaProject()});
+    SelectionDialog dialog = JavaUI.createPackageDialog(ScoutSdkUi.getShell(), context, searchScope, false, true, null);
     dialog.setTitle(Texts.get("Package"));
     dialog.setMessage(Texts.get("ChoosePackageForImplementingClass"));
 

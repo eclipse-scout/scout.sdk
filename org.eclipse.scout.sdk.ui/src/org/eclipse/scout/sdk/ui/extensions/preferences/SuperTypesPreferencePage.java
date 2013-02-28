@@ -12,14 +12,15 @@ package org.eclipse.scout.sdk.ui.extensions.preferences;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.eclipse.scout.sdk.RuntimeClasses;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.preferences.IScoutProjectScrolledContent.IModelLoadProgressObserver;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link SuperTypesPreferencePage}</h3> ...
@@ -30,12 +31,13 @@ import org.eclipse.scout.sdk.workspace.IScoutProject;
 public class SuperTypesPreferencePage extends AbstractScoutProjectPreferencePage<SuperTypePreferenceScrolledContent, DefaultSuperClassModel> {
 
   public SuperTypesPreferencePage() {
-    super(Texts.get("ScoutSDKSuperTypePreferences"), SuperTypePreferenceScrolledContent.class);
+    super(Texts.get("ScoutSDKSuperTypePreferences"), SuperTypePreferenceScrolledContent.class,
+        IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED);
   }
 
   @Override
   protected void loadAllModels(IModelLoadProgressObserver<DefaultSuperClassModel> observer) {
-    for (Entry<IScoutProject, SuperTypePreferenceScrolledContent> e : getProjectModelMap().entrySet()) {
+    for (Entry<IScoutBundle, SuperTypePreferenceScrolledContent> e : getProjectModelMap().entrySet()) {
       List<DefaultSuperClassModel> list = new ArrayList<DefaultSuperClassModel>();
 
       Set<Entry<String, String>> configuredClasses = RuntimeClasses.getAllDefaults(e.getKey()).entrySet();
@@ -52,7 +54,17 @@ public class SuperTypesPreferencePage extends AbstractScoutProjectPreferencePage
   @Override
   protected int getTotalWork() {
     if (getProjectModelMap().size() > 0) {
-      return RuntimeClasses.getAllDefaults(getProjectModelMap().keySet().iterator().next()).size();
+      // collect one bundle for each type
+      HashMap<String, IScoutBundle> a = new HashMap<String, IScoutBundle>();
+      for (IScoutBundle b : getProjectModelMap().keySet()) {
+        a.put(b.getType(), b);
+      }
+
+      int work = 0;
+      for (IScoutBundle b : a.values()) {
+        work += RuntimeClasses.getAllDefaults(b).size();
+      }
+      return work;
     }
     return 0;
   }

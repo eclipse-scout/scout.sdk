@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -20,10 +22,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
@@ -35,6 +37,7 @@ import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
@@ -47,6 +50,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
 
   public ScoutProjectNewWizard() {
     setWindowTitle(Texts.get("NewScoutProjectNoPopup"));
+    setHelpAvailable(true);
   }
 
   @Override
@@ -64,6 +68,11 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
   }
 
   @Override
+  public IScoutBundle getScoutProject() {
+    return null;
+  }
+
+  @Override
   public IScoutProjectWizardPage getProjectWizardPage() {
     return m_page1;
   }
@@ -78,7 +87,6 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
     public P_PerformFinishJob(Display display) {
       super("Creating new Scout project...");
       m_display = display;
-
     }
 
     protected IScoutProjectNewOperation getFinishOperation() {
@@ -87,8 +95,11 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-      // collect UI properties over all pages of the wizard
+      // prepare the property container
       PropertyMap properties = new PropertyMap();
+      properties.setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<IJavaProject>());
+
+      // collect UI properties over all pages of the wizard
       for (IWizardPage p : getPages()) {
         if (p instanceof AbstractProjectNewWizardPage) {
           ((AbstractProjectNewWizardPage) p).putProperties(properties);
@@ -115,20 +126,23 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
         ScoutSdkUi.logError("error during waiting for auto build and refresh");
       }
 
-      // rebuild bundle graph (the target platform could have been changed -> this could change the node types).
-      ScoutWorkspace.getInstance().rebuildGraph();
+      switchPerspective();
+      return Status.OK_STATUS;
+    }
 
+    protected void switchPerspective() {
       // switch to scout perspective and expand scout explorer
-      m_display.asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          BasicNewProjectResourceWizard.updatePerspective(new P_ScoutPerspectiveConfigElement());
-          IScoutExplorerPart ex = ScoutSdkUi.getExplorer(true);
-          if (ex != null)
+      if (m_display != null && !m_display.isDisposed()) {
+        m_display.asyncExec(new Runnable() {
+          @Override
+          public void run() {
+            BasicNewProjectResourceWizard.updatePerspective(new P_ScoutPerspectiveConfigElement());
+            IScoutExplorerPart ex = ScoutSdkUi.getExplorer(true);
+            if (ex != null)
             ex.expandAndSelectProjectLevel();
           }
-      });
-      return Status.OK_STATUS;
+        });
+      }
     }
 
     public boolean scheduleAndWait(OperationJob job, long delay) {

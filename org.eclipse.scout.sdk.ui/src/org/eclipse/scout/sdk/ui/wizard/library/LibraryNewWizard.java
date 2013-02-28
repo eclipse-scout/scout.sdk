@@ -47,7 +47,7 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
           // recompute bundle name
           StringBuilder nameBuilder = new StringBuilder();
           if (getOwnerBundle() != null) {
-            String projectName = getOwnerBundle().getScoutProject().getProjectName();
+            String projectName = getOwnerBundle().getSymbolicName();
             if (StringUtility.hasText(projectName)) {
               nameBuilder.append(projectName).append(".");
             }

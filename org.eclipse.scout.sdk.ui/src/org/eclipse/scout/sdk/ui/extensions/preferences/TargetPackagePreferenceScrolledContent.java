@@ -17,17 +17,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.SimpleScrolledComposite;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.workspace.DefaultTargetPackage;
-import org.eclipse.scout.sdk.workspace.IScoutProject;
-import org.eclipse.swt.SWT;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.forms.events.ExpansionEvent;
-import org.eclipse.ui.forms.events.IExpansionListener;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.osgi.service.prefs.BackingStoreException;
 
@@ -72,31 +69,7 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
     c.setLayout(gl);
 
     for (TargetPackageModel entry : m_entries) {
-      ExpandableComposite ec = m_sections.get(entry.m_group);
-      if (ec == null) {
-        ec = new ExpandableComposite(c, SWT.NONE, ExpandableComposite.TWISTIE | ExpandableComposite.CLIENT_INDENT);
-        ec.setExpanded(true);
-        ec.setText(entry.m_group);
-        ec.setLayout(new GridLayout(1, false));
-        ec.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        ec.addExpansionListener(new IExpansionListener() {
-          @Override
-          public void expansionStateChanging(ExpansionEvent e) {
-          }
-
-          @Override
-          public void expansionStateChanged(ExpansionEvent e) {
-            reflow();
-          }
-        });
-        Composite client = new Composite(ec, SWT.NONE);
-        client.setLayout(new GridLayout(1, false));
-        ec.setClient(client);
-        m_sections.put(entry.m_group, ec);
-      }
-      Composite cc = (Composite) ec.getClient();
-
-      final EntityTextField txt = new EntityTextField(cc, entry.m_label, 40, entry.m_context);
+      EntityTextField txt = new EntityTextField(c, entry.m_label, 40, entry.m_context);
       txt.setText(entry.m_curVal);
       txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       m_allEntityTextFields.add(txt);
@@ -105,7 +78,7 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
 
   @Override
   public void save() {
-    final HashSet<IScoutProject> modifiedProjects = new HashSet<IScoutProject>(1);
+    final HashSet<IScoutBundle> modifiedProjects = new HashSet<IScoutBundle>(1);
     visitTextfields(new IPackageTextFieldVisitor() {
       @Override
       public void visit(EntityTextField txt, TargetPackageModel model) {
@@ -120,12 +93,12 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
       }
     });
 
-    for (IScoutProject p : modifiedProjects) {
+    for (IScoutBundle p : modifiedProjects) {
       try {
         p.getPreferences().flush();
       }
       catch (BackingStoreException ex) {
-        ScoutSdkUi.logError("Unable to save new default package configuration for project '" + p.getProjectName() + "'.", ex);
+        ScoutSdkUi.logError("Unable to save new default package configuration for project '" + p.getSymbolicName() + "'.", ex);
       }
     }
   }
