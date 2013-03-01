@@ -28,6 +28,11 @@ public class SmtpServiceNewAction extends AbstractWizardAction {
     super(Texts.get("Action_newTypeX", "SMTP Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), null, false, Category.NEW);
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public void setScoutBundle(IScoutBundle bundle) {
     m_bundle = bundle;
   }

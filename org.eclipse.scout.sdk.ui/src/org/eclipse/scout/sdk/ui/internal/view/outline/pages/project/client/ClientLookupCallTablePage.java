@@ -78,7 +78,7 @@ public class ClientLookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] lookupCalls = m_lookupCallHierarchy.getAllClasses(TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] lookupCalls = m_lookupCallHierarchy.getAllClasses(TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType lookupcall : lookupCalls) {
       new LookupCallNodePage(this, lookupcall);
     }
@@ -95,6 +95,7 @@ public class ClientLookupCallTablePage extends AbstractPage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformLookupCallsOperation(getScoutResource()));
+      action.setScoutBundle(getScoutResource());
       action.setLabel(Texts.get("WellformLookupCalls"));
     }
     else if (menu instanceof LocalLookupCallNewAction) {

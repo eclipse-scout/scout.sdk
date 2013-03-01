@@ -35,6 +35,11 @@ public class HandlerAddAction extends AbstractLinkAction {
     setToolTip(Texts.get("TooltipHandlerNew"));
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, ScoutXmlElement xmlHandlerChain) {
     m_bundle = bundle;
     m_sunJaxWsBean = sunJaxWsBean;

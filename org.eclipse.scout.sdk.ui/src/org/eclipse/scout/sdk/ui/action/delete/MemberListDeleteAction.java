@@ -60,6 +60,19 @@ public class MemberListDeleteAction extends AbstractScoutHandler {
     return null;
   }
 
+  @Override
+  public boolean isVisible() {
+    if (m_typesToDelete == null || m_typesToDelete.length < 1) {
+      return false;
+    }
+    for (IMember m : m_typesToDelete) {
+      if (!isEditable(m)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
   protected void collectAffectedMembers(List<IMember> members, List<IMember> selectedMembers) {
     if (getTypesToDelete() != null) {
       for (IMember t : getTypesToDelete()) {

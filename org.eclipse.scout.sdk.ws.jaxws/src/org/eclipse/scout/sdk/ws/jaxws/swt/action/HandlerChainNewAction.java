@@ -39,6 +39,11 @@ public class HandlerChainNewAction extends AbstractLinkAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     String handlerChainsQName = toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS);
     ScoutXmlElement xmlHandlerChains = m_sunJaxWsBean.getXml().getChild(handlerChainsQName);

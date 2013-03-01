@@ -76,7 +76,7 @@ public class PermissionTablePage extends AbstractPage {
       m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(basicPermission);
       m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());
+    ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
     IType[] permissions = m_basicPermissionHierarchy.getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator());
     for (IType type : permissions) {
       new PermissionNodePage(this, type);

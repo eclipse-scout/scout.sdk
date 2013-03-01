@@ -43,6 +43,11 @@ public class CreateTemplateAction extends AbstractScoutHandler {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     String name = "Abstract" + getType().getElementName();
     m_dialog = new TemplateFromFromFieldDialog(shell, name, getType());

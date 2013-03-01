@@ -95,6 +95,9 @@ public class ColumnTablePage extends AbstractPage {
     if (menu instanceof TableColumnNewAction) {
       ((TableColumnNewAction) menu).init(getColumnDeclaringType());
     }
+    else if (menu instanceof TableColumnWidthsPasteAction) {
+      ((TableColumnWidthsPasteAction) menu).init(this);
+    }
   }
 
   public IType getColumnDeclaringType() {

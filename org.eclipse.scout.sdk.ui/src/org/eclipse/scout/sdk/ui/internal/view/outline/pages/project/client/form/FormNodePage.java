@@ -96,7 +96,9 @@ public class FormNodePage extends AbstractScoutTypePage {
       ((FormDeleteAction) menu).setFormType(getType());
     }
     else if (menu instanceof WellformAction) {
-      ((WellformAction) menu).setOperation(new WellformScoutTypeOperation(getType(), true));
+      WellformAction action = (WellformAction) menu;
+      action.setScoutBundle(getScoutResource());
+      action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
     else if (menu instanceof FormDataUpdateAction) {
       ((FormDataUpdateAction) menu).setType(getType());

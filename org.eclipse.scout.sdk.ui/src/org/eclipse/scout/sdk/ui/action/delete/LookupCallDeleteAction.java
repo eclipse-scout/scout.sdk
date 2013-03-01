@@ -65,6 +65,11 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_lookupCall);
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteLookupCall"));
     m_confirmDialog.addMemberSelectionListener(new P_SelectionValidationListener());

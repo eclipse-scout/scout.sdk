@@ -101,7 +101,7 @@ public class WellformClientBundleOperation implements IOperation {
 
   protected void wellformClientSession(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType iClientSessions = TypeUtility.getType(RuntimeClasses.IClientSession);
-    IType[] clientSessions = TypeUtility.getPrimaryTypeHierarchy(iClientSessions).getAllSubtypes(iClientSessions, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+    IType[] clientSessions = TypeUtility.getPrimaryTypeHierarchy(iClientSessions).getAllSubtypes(iClientSessions, TypeFilters.getTypesInProject(getBundle().getJavaProject()));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(clientSessions, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -116,7 +116,7 @@ public class WellformClientBundleOperation implements IOperation {
 
   protected void wellformDesktop(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
-    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getTypesInProject(getBundle().getJavaProject()));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -131,7 +131,7 @@ public class WellformClientBundleOperation implements IOperation {
 
   protected void wellformDesktopExtension(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
-    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, TypeFilters.getTypesInProject(getBundle().getJavaProject()));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);

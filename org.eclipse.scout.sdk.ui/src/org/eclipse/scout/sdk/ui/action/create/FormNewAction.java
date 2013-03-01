@@ -36,4 +36,9 @@ public class FormNewAction extends AbstractWizardAction {
   protected IWizard getNewWizardInstance() {
     return new FormNewWizard(m_scoutBundle);
   }
+
+  @Override
+  public boolean isVisible() {
+    return !m_scoutBundle.isBinary();
+  }
 }

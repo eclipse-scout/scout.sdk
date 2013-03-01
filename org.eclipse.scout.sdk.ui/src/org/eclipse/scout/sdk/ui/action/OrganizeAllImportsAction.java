@@ -45,6 +45,11 @@ public class OrganizeAllImportsAction extends AbstractScoutHandler {
     return null;
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_scoutProject.isBinary();
+  }
+
   public IScoutBundle getScoutProject() {
     return m_scoutProject;
   }

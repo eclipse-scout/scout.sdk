@@ -27,7 +27,7 @@ public class FormDataUpdateAction extends AbstractOperationAction {
 
   @Override
   public boolean isVisible() {
-    return m_type != null && m_type.getDeclaringType() == null;
+    return m_type != null && m_type.getDeclaringType() == null && isEditable(m_type);
   }
 
   public void setType(IType type) {

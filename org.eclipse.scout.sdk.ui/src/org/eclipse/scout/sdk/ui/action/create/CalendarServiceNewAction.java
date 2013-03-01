@@ -34,6 +34,11 @@ public class CalendarServiceNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new CalendarServiceNewWizard(m_bundle);
   }

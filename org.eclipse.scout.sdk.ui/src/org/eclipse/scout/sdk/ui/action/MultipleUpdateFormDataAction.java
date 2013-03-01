@@ -30,18 +30,31 @@ import org.eclipse.swt.widgets.Shell;
 public class MultipleUpdateFormDataAction extends AbstractScoutHandler {
 
   private ITypeResolver m_typeResolver;
+  private IType[] m_types = null;
 
   public MultipleUpdateFormDataAction() {
     super(Texts.get("UpdateAllFormdatas"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
   }
 
   @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    IType[] types = new IType[0];
+  public boolean isVisible() {
     if (getTypeResolver() != null) {
-      types = getTypeResolver().getTypes();
+      m_types = getTypeResolver().getTypes();
     }
-    MultipleFormDataUpdateOperation op = new MultipleFormDataUpdateOperation(types);
+    if (m_types == null || m_types.length < 1) {
+      return false;
+    }
+    for (IType t : m_types) {
+      if (!isEditable(t)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    MultipleFormDataUpdateOperation op = new MultipleFormDataUpdateOperation(m_types);
     OperationJob job = new OperationJob(op);
     job.schedule();
     return null;

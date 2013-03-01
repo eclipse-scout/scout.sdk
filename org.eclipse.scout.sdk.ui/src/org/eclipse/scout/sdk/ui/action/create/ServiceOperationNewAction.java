@@ -32,6 +32,11 @@ public class ServiceOperationNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new ServiceOperationNewWizard(m_interfaceType, new IType[]{m_type});
   }

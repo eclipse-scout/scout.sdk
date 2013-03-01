@@ -81,7 +81,7 @@ public class AllPagesTablePage extends AbstractPage {
       m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_cachedTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] allPages = m_cachedTypeHierarchy.getAllClasses(TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] allPages = m_cachedTypeHierarchy.getAllClasses(TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     PageNodePageHelper.createRepresentationFor(this, allPages, m_cachedTypeHierarchy);
   }
 
@@ -95,6 +95,7 @@ public class AllPagesTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
+      action.setScoutBundle(getScoutResource());
       action.setOperation(new WellformPagesOperation(getScoutResource()));
       action.setLabel(Texts.get("Wellform all Pages..."));
     }

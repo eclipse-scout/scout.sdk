@@ -68,6 +68,11 @@ public class PropertyBeanDeleteAction extends AbstractScoutHandler {
     return m_beanDesc;
   }
 
+  @Override
+  public boolean isVisible() {
+    return m_beanDesc != null && isEditable(m_beanDesc.getDeclaringType());
+  }
+
   public void setBeanDesc(IPropertyBean beanDesc) {
     m_beanDesc = beanDesc;
   }

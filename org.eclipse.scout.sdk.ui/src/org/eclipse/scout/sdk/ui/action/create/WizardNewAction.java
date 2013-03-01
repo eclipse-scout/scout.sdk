@@ -32,6 +32,11 @@ public class WizardNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new WizardNewWizard(m_bundle);
   }

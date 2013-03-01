@@ -132,7 +132,6 @@ public class ServiceNewOperation implements IOperation {
         String serviceFactory = null;
         ITypeFilter sessionFilter = TypeFilters.getMultiTypeFilter(
             TypeFilters.getTypesOnClasspath(sb.getJavaProject()),
-            TypeFilters.getInWorkspaceFilter(),
             TypeFilters.getClassFilter()
             );
         if (sb.getType().equals(IScoutBundle.TYPE_CLIENT)) {

@@ -80,7 +80,7 @@ public class OutlineTablePage extends AbstractPage {
       m_outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] outlines = m_outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] outlines = m_outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType outline : outlines) {
       new OutlineNodePage(this, outline);
     }
@@ -100,6 +100,7 @@ public class OutlineTablePage extends AbstractPage {
     else if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setLabel(Texts.get("WellformAllOutlines"));
+      action.setScoutBundle(getScoutResource());
       action.setOperation(new WellformOutlinesOperation(getScoutResource()));
     }
   }

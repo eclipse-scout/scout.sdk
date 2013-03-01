@@ -32,7 +32,7 @@ public class PageLinkAction extends AbstractWizardAction {
 
   @Override
   public boolean isVisible() {
-    return !TypeUtility.exists(TypeUtility.getMethod(m_type, PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE));
+    return !m_scoutBundle.isBinary() && !TypeUtility.exists(TypeUtility.getMethod(m_type, PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE));
   }
 
   public void init(IScoutBundle scoutBundle, IType type) {

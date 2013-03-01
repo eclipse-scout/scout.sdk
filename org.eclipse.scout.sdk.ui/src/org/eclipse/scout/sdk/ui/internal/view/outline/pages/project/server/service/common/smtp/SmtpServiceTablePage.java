@@ -92,7 +92,7 @@ public class SmtpServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSMTPService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     return services;
   }
 

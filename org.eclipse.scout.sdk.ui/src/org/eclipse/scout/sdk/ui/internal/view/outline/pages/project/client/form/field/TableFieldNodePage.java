@@ -60,5 +60,8 @@ public class TableFieldNodePage extends AbstractFormFieldNodePage {
     if (menu instanceof FormFieldDeleteAction) {
       menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableFieldRemove));
     }
+    else if (menu instanceof TableColumnWidthsPasteAction) {
+      ((TableColumnWidthsPasteAction) menu).init(this);
+    }
   }
 }

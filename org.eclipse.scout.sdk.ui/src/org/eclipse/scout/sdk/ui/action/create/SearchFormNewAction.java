@@ -34,6 +34,11 @@ public class SearchFormNewAction extends AbstractWizardAction {
     super(Texts.get("CreateSearchForm"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchFormAdd), null, false, Category.NEW);
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_scoutRes.isBinary();
+  }
+
   public void init(IScoutBundle scoutRes) {
     init(null, scoutRes);
   }

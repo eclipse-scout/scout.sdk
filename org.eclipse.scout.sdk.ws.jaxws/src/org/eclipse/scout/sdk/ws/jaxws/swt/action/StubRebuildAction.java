@@ -77,6 +77,11 @@ public class StubRebuildAction extends AbstractLinkAction {
     return null;
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   private class P_OperationFinishedListener implements IOperationFinishedListener {
 
     @Override

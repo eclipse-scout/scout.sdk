@@ -5,7 +5,6 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.io.Reader;
 import java.util.HashMap;
-import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jdt.core.IType;
@@ -35,31 +34,27 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
   private static final String TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER = "COLUMN_COPY_CLIPBOARD_IDENTIFIER";
   private static final String COLUMN_WIDTH_METHOD_NAME = "getConfiguredWidth";
 
+  private IType m_type;
+  private HashMap<String, Integer> m_widthsMap;
+  private String m_errorTxt;
+
   public TableColumnWidthsPasteAction() {
     super(Texts.get("Action_PasteColumnWidths"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableColumn), "CTRL+V", false, Category.IMPORT);
   }
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) {
-    String content = getStringFromClipboard();
-    if (content != null && selection != null && selection.length == 1) {
-      if (!fastDetection(content)) {
-        showInfoMessageBox(shell, Texts.get("Action_PasteColumnWidths_InvalidClipboard"));
-        return null;
-      }
-
-      HashMap<String, Integer> map = parseContent(content, shell);
-
-      if (map != null) {
-        // determine columns table
-        IType tableType = determineTableType(selection[0], shell, map.keySet());
-        // correct abstract page selected?
-        if (tableType != null) {
-          changeColumnWidths(tableType, map);
-        }
-      }
-    }
+    changeColumnWidths(m_type, m_widthsMap);
     return null;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return isEditable(m_type) && m_widthsMap != null;
+  }
+
+  public void init(IPage origin) {
+    determineTableType(origin);
   }
 
   private boolean fastDetection(String content) {
@@ -96,7 +91,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
    *          Clipboard content
    * @return List of column names and their width
    */
-  private HashMap<String, Integer> parseContent(String content, Shell s) {
+  private HashMap<String, Integer> parseContent(String content) {
     HashMap<String, Integer> map = new HashMap<String, Integer>();
     try {
       // clean content
@@ -110,8 +105,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
           String[] parts = line.split("\t");
           Integer columnWidth = NumberUtility.nvl(new Integer(parts[1]), 0);
           if (columnWidth < 0) {
-            showInfoMessageBox(s, Texts.get("ColumnWidthPasteInvalidWidth", columnWidth.toString()));
-            return null;
+            columnWidth = 0;
           }
           map.put(parts[0], columnWidth);
         }
@@ -145,22 +139,16 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
     }
   }
 
-  private IType determineTableType(IPage page, Shell s, Set<String> classNames) {
-    IType tableType = null;
-
+  private void determineTableType(IPage page) {
     if (page instanceof ColumnTablePage) {
       // it's a column table page, so get the declaring type directly
-      tableType = ((ColumnTablePage) page).getColumnDeclaringType();
+      m_type = ((ColumnTablePage) page).getColumnDeclaringType();
     }
     else if (page instanceof PageWithTableNodePage) {
       // it's a abstract page with table
       IType[] tables = ScoutTypeUtility.getTables(((PageWithTableNodePage) page).getType());
       if (tables.length > 0) {
-        tableType = tables[0];
-      }
-      else {
-        ScoutSdkUi.logInfo(Texts.get("ColumnWidthPasteNoTableInPage"));
-        showInfoMessageBox(s, Texts.get("ColumnWidthPasteNoTableInPage"));
+        m_type = tables[0];
       }
     }
     else {
@@ -170,37 +158,29 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
         // table field node page
         IType[] tables = ScoutTypeUtility.getTables(((TableFieldNodePage) page).getType());
         if (tables.length > 0) {
-          tableType = tables[0];
-        }
-        else {
-          ScoutSdkUi.logInfo(Texts.get("ColumnWidthPasteNoTableInField"));
-          showInfoMessageBox(s, Texts.get("ColumnWidthPasteNoTableInField"));
+          m_type = tables[0];
         }
       }
       else if (page instanceof TableNodePage) {
         // table node page
-        tableType = ((TableNodePage) page).getType();
-      }
-      else {
-        // the page does not belong to one of the supported pages
-        ScoutSdkUi.logInfo(Texts.get("ColumnWidthPasteUnsupportedSelection"));
-        showInfoMessageBox(s, Texts.get("ColumnWidthPasteUnsupportedSelection"));
+        m_type = ((TableNodePage) page).getType();
       }
     }
 
-    if (tableType != null) {
-      // verify that correct table is selected (according to content of clipboard)
-      final String tableTypeClassName = tableType.getFullyQualifiedName();
-      for (String clazz : classNames) {
-        if (!clazz.startsWith(tableTypeClassName)) {
-          ScoutSdkUi.logInfo(Texts.get("ColumnWidthPasteDifferentTable", tableTypeClassName, clazz));
-          showInfoMessageBox(s, Texts.get("ColumnWidthPasteDifferentTable", tableTypeClassName, clazz));
-          tableType = null;
-          break;
+    String content = getStringFromClipboard();
+    if (content != null && fastDetection(content)) {
+      m_widthsMap = parseContent(content);
+      if (m_type != null && m_widthsMap != null) {
+        // verify that correct table is selected (according to content of clipboard)
+        final String tableTypeClassName = m_type.getFullyQualifiedName();
+        for (String clazz : m_widthsMap.keySet()) {
+          if (!clazz.startsWith(tableTypeClassName)) {
+            m_type = null;
+            m_widthsMap = null;
+            break;
+          }
         }
       }
     }
-
-    return tableType;
   }
 }

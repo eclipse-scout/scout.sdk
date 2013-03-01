@@ -40,6 +40,11 @@ public class WizardStepRenameAction extends AbstractRenameAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_wizardStep);
+  }
+
+  @Override
   protected IStatus validate(String newName) {
     IStatus inheritedStatus = getJavaNameStatus(newName);
     if (inheritedStatus.matches(IStatus.ERROR)) {

@@ -78,7 +78,7 @@ public class CodeTypeTablePage extends AbstractPage {
       m_codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
       m_codeTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());
+    ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
     IType[] codeTypes = m_codeTypeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
     for (IType codeType : codeTypes) {
       new CodeTypeNodePage(this, codeType);
@@ -95,6 +95,7 @@ public class CodeTypeTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
+      action.setScoutBundle(getScoutResource());
       action.setOperation(new WellformCodeTypesOperation(getScoutResource()));
       action.setLabel(Texts.get("WellformAllCodeTypes"));
     }

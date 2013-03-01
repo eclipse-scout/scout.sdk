@@ -33,6 +33,11 @@ public class BookmarkStorageServiceNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new BookmarkStorageServiceNewWizard(m_bundle);
   }

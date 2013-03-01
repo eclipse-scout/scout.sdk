@@ -52,7 +52,7 @@ public class WellformLookupCallsOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find types
     ICachedTypeHierarchy lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(lookupCall);
-    m_lookupCalls = lookupCallHierarchy.getAllSubtypes(lookupCall, TypeFilters.getClassesInProject(getBundle().getJavaProject()));
+    m_lookupCalls = lookupCallHierarchy.getAllSubtypes(lookupCall, TypeFilters.getTypesInProject(getBundle().getJavaProject()));
     // format types
     if (monitor.isCanceled()) {
       return;

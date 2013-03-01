@@ -51,6 +51,11 @@ public class BoxDeleteAction extends AbstractScoutHandler {
     return null;
   }
 
+  @Override
+  public boolean isVisible() {
+    return isEditable(m_boxType);
+  }
+
   protected void collectAffectedMembers(List<IMember> members, List<IMember> selectedMembers) {
     members.add(getBoxType());
     selectedMembers.add(getBoxType());

@@ -28,6 +28,11 @@ public class SqlServiceNewAction extends AbstractWizardAction {
     super(Texts.get("Action_newTypeX", "SQL Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SqlServiceAdd), null, false, Category.NEW);
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public void setScoutBundle(IScoutBundle bundle) {
     m_bundle = bundle;
   }

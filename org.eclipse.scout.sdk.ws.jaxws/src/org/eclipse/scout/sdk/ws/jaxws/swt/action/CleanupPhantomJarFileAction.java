@@ -64,6 +64,11 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     IFile[] phantomJarFiles = getPhantomJarFiles();
     if (phantomJarFiles.length == 0) {
@@ -150,7 +155,7 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
     Set<IFile> jarFiles = new HashSet<IFile>();
 
     IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient));
-    IType[] wsConsumerTypes = hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), TypeFilters.getClassesInProject(m_bundle.getJavaProject()));
+    IType[] wsConsumerTypes = hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), TypeFilters.getTypesInProject(m_bundle.getJavaProject()));
 
     for (IType consumerType : wsConsumerTypes) {
       if (!TypeUtility.exists(consumerType)) {

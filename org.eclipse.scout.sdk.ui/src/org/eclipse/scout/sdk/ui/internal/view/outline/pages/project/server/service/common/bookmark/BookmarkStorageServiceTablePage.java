@@ -92,7 +92,7 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iBookmarkStorageService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     return services;
   }
 

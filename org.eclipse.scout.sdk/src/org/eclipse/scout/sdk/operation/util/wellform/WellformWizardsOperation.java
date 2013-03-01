@@ -51,7 +51,7 @@ public class WellformWizardsOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find types
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
-    m_wizards = formHierarchy.getAllSubtypes(iWizard, TypeFilters.getClassesInProject(getClientBundle().getJavaProject()));
+    m_wizards = formHierarchy.getAllSubtypes(iWizard, TypeFilters.getTypesInProject(getClientBundle().getJavaProject()));
     // format types
     if (monitor.isCanceled()) {
       return;

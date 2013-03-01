@@ -69,4 +69,12 @@ public class TextServiceNodePage extends AbstractServiceNodePage {
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TextProviderServiceDeleteAction.class};
   }
+
+  @Override
+  public void prepareMenuAction(IScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof TextProviderServiceDeleteAction) {
+      ((TextProviderServiceDeleteAction) menu).addTextServiceToDelete(getType());
+    }
+  }
 }

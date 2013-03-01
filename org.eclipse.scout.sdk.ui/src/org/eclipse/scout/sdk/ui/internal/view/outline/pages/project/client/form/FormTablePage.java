@@ -91,10 +91,10 @@ public class FormTablePage extends AbstractPage {
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     IJavaProject javaProject = getScoutResource().getJavaProject();
-    IType[] searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(javaProject));
+    IType[] searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(javaProject));
     IType[] allForms = m_formHierarchy.getAllSubtypes(iForm,
         TypeFilters.getMultiTypeFilter(
-            TypeFilters.getClassesInProject(javaProject),
+            TypeFilters.getTypesInProject(javaProject),
             TypeFilters.getNotInTypes(searchForms)
             ),
         TypeComparators.getTypeNameComparator());
@@ -113,6 +113,7 @@ public class FormTablePage extends AbstractPage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformFormsOperation(getScoutResource()));
+      action.setScoutBundle(getScoutResource());
       action.setLabel(Texts.get("WellformAllForms"));
     }
     else if (menu instanceof FormNewAction) {

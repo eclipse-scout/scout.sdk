@@ -81,7 +81,7 @@ public class WizardTablePage extends AbstractPage {
       m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
       m_wizardHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     for (IType searchForm : searchForms) {
       new WizardNodePage(this, searchForm);
     }
@@ -91,6 +91,7 @@ public class WizardTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
+      action.setScoutBundle(getScoutResource());
       action.setLabel(Texts.get("WellformAllWizards"));
       action.setOperation(new WellformWizardsOperation(getScoutResource()));
     }

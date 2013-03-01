@@ -33,6 +33,11 @@ public class FormHandlerNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new FormHandlerNewWizard(m_type);
   }

@@ -36,6 +36,11 @@ public class FormFieldRenameAction extends AbstractRenameAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_formField);
+  }
+
+  @Override
   protected IStatus validate(String newName) {
     IStatus inheritedStatus = getJavaNameStatus(newName);
     if (inheritedStatus.matches(IStatus.ERROR)) {

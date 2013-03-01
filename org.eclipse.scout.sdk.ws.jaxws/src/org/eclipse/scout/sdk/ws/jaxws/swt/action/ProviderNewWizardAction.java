@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -36,6 +36,11 @@ public class ProviderNewWizardAction extends AbstractLinkAction {
 
   public void init(IScoutBundle bundle) {
     m_bundle = bundle;
+  }
+
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
   }
 
   @Override

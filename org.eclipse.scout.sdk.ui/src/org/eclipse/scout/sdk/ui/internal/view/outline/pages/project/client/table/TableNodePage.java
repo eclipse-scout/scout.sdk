@@ -55,4 +55,11 @@ public class TableNodePage extends AbstractScoutTypePage {
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{ShowJavaReferencesAction.class, TableColumnWidthsPasteAction.class};
   }
+
+  @Override
+  public void prepareMenuAction(IScoutHandler menu) {
+    if (menu instanceof TableColumnWidthsPasteAction) {
+      ((TableColumnWidthsPasteAction) menu).init(this);
+    }
+  }
 }

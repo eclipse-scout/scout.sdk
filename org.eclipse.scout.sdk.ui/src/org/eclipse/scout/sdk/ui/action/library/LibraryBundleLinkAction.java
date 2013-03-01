@@ -55,7 +55,7 @@ public class LibraryBundleLinkAction extends AbstractScoutHandler {
 
   @Override
   public boolean isVisible() {
-    return getLibraryUserBundle() != null;
+    return getLibraryUserBundle() != null && !getLibraryUserBundle().isBinary();
   }
 
   @Override

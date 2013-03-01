@@ -43,6 +43,11 @@ public class HandlerChainRemoveAction extends AbstractLinkAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     MessageBox messageBox = new MessageBox(ScoutSdkUi.getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
     messageBox.setMessage(Texts.get("QuestionRemoveHandlerChain"));

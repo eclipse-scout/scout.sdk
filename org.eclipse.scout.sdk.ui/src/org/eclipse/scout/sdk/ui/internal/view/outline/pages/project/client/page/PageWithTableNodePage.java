@@ -115,6 +115,9 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
     else if (menu instanceof WellformScoutTypeAction) {
       ((WellformScoutTypeAction) menu).setType(getType());
     }
+    else if (menu instanceof TableColumnWidthsPasteAction) {
+      ((TableColumnWidthsPasteAction) menu).init(this);
+    }
   }
 
   private class P_MethodChangedListener extends ElementChangedListenerEx {

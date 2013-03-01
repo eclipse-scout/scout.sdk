@@ -51,7 +51,7 @@ public class WellformOutlinesOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find types
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
-    m_outlines = formHierarchy.getAllSubtypes(iOutline, TypeFilters.getClassesInProject(getClientBundle().getJavaProject()));
+    m_outlines = formHierarchy.getAllSubtypes(iOutline, TypeFilters.getTypesInProject(getClientBundle().getJavaProject()));
     // format types
     if (monitor.isCanceled()) {
       return;

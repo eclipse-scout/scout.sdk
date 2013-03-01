@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -33,6 +33,11 @@ public class HandlerChainFilterEditAction extends AbstractLinkAction {
     super(Texts.get("EditFilter"), JaxWsSdk.getImageDescriptor(JaxWsIcons.Filter));
     setLinkText(Texts.get("EditFilter"));
     setToolTip(Texts.get("TooltipEditFilter"));
+  }
+
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
   }
 
   public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, ScoutXmlElement xmlHandlerChain) {

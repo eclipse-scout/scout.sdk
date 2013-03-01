@@ -45,6 +45,11 @@ public class ServiceRenameAction extends AbstractRenameAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_serviceImplementation) && isEditable(m_serviceInterface);
+  }
+
+  @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
     transaction.add(m_serviceImplementation, newName);
     if (TypeUtility.exists(m_serviceInterface) && !m_serviceInterface.isBinary()) {

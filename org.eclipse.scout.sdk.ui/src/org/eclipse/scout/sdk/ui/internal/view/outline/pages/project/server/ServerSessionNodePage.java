@@ -58,7 +58,7 @@ public class ServerSessionNodePage extends AbstractScoutTypePage {
       if (clientBundle != null) {
         // find client session
         ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
-        ITypeFilter filter = TypeFilters.getClassesInProject(clientBundle.getJavaProject());
+        ITypeFilter filter = TypeFilters.getTypesInProject(clientBundle.getJavaProject());
         IType[] allClientSessions = clientSessionHierarchy.getAllSubtypes(iClientSession, filter, TypeComparators.getTypeNameComparator());
         if (allClientSessions.length > 1) {
           ScoutSdkUi.logError("a client bundle '" + clientBundle + "' can have in maximum 1 client session");

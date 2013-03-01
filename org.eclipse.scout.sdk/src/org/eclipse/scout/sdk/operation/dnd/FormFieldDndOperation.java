@@ -57,7 +57,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
     org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(newFormField.getCompilationUnit());
     IType form = TypeUtility.getAncestor(newFormField, TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
-        TypeFilters.getToplevelTypeFilter()));
+        TypeFilters.getTopLevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {
       IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(form);

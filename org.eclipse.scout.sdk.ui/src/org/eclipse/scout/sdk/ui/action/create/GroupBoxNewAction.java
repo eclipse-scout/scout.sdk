@@ -32,6 +32,11 @@ public class GroupBoxNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     GroupBoxNewWizard wizard = new GroupBoxNewWizard();
     wizard.initWizard(m_type);

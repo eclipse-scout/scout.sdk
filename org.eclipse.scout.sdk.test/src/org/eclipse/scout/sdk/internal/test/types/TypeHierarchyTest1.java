@@ -71,7 +71,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     final IJavaProject project = JavaCore.create(getProject(BUNDLE_NAME_CLIENT));
     final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
     final IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    IType[] subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getClassesInProject(project));
+    IType[] subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getTypesInProject(project));
     Assert.assertEquals(1, subtypes.length);
     final IntegerHolder formCountHolder = new IntegerHolder(-1);
     formHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
@@ -81,7 +81,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
           case POST_TYPE_REMOVING:
           case POST_TYPE_ADDING:
           case POST_TYPE_CHANGED:
-            formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, TypeFilters.getClassesInProject(project)).length);
+            formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, TypeFilters.getTypesInProject(project)).length);
             synchronized (formCountHolder) {
               formCountHolder.notifyAll();
             }

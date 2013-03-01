@@ -33,6 +33,11 @@ public class DesktopMenuNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     DesktopMenuNewWizard wizard = new DesktopMenuNewWizard();
     wizard.initWizard(m_type);

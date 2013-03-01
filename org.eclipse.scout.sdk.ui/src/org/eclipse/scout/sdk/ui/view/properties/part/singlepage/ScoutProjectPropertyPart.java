@@ -72,12 +72,14 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     filterSection.setExpanded(wasSectionExpanded(SECTION_ID_FILTER, false));
 
     // version
-    ISection versionSection = createSection(SECTION_ID_VERSION, Texts.get("ProjectVersion"));
-    ProjectVersionPresenter versionPresenter = new ProjectVersionPresenter(getFormToolkit(), versionSection.getSectionClient(), getScoutProject());
-    GridData versionLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    versionLayoutData.widthHint = 200;
-    versionPresenter.getContainer().setLayoutData(versionLayoutData);
-    versionSection.setExpanded(wasSectionExpanded(SECTION_ID_VERSION, true));
+    if (!getScoutProject().isBinary()) {
+      ISection versionSection = createSection(SECTION_ID_VERSION, Texts.get("ProjectVersion"));
+      ProjectVersionPresenter versionPresenter = new ProjectVersionPresenter(getFormToolkit(), versionSection.getSectionClient(), getScoutProject());
+      GridData versionLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+      versionLayoutData.widthHint = 200;
+      versionPresenter.getContainer().setLayoutData(versionLayoutData);
+      versionSection.setExpanded(wasSectionExpanded(SECTION_ID_VERSION, true));
+    }
 
     // product launchers
     Section linkSection = (Section) createSection(SECTION_ID_PRODUCT_LAUNCHER, Texts.get("ProductLauncher"));
@@ -108,49 +110,51 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     linkSection.setExpanded(wasSectionExpanded(SECTION_ID_PRODUCT_LAUNCHER, true));
 
     // technologies
-    Section techSection = (Section) createSection(SECTION_ID_TECHNOLOGY, Texts.get("Technologies"));
-    final TechnologyPresenter techPresenter = new TechnologyPresenter(getFormToolkit(), techSection.getSectionClient(), getScoutProject());
-    GridData techLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    techLayoutData.widthHint = 200;
-    techPresenter.getContainer().setLayoutData(techLayoutData);
+    if (!getScoutProject().isBinary()) {
+      Section techSection = (Section) createSection(SECTION_ID_TECHNOLOGY, Texts.get("Technologies"));
+      final TechnologyPresenter techPresenter = new TechnologyPresenter(getFormToolkit(), techSection.getSectionClient(), getScoutProject());
+      GridData techLayoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+      techLayoutData.widthHint = 200;
+      techPresenter.getContainer().setLayoutData(techLayoutData);
 
-    // load technologies lazy
-    final ProgressIndicator indicator = new ProgressIndicator(techPresenter.getContainer(), SWT.INDETERMINATE | SWT.SMOOTH);
-    indicator.beginAnimatedTask();
-    GridData indicatorData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    indicatorData.horizontalSpan = 2;
-    indicatorData.heightHint = 5;
-    indicator.setLayoutData(indicatorData);
-    Job j = new Job("load technologies...") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        if (techPresenter != null && !techPresenter.isDisposed()) {
-          try {
-            techPresenter.loadModel();
-          }
-          finally {
-            if (techPresenter.getContainer() != null && !techPresenter.getContainer().isDisposed()) {
-              techPresenter.getContainer().getDisplay().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  if (techPresenter != null && !techPresenter.isDisposed()) {
-                    techPresenter.createContent();
-                    indicator.dispose();
-                    getForm().layout(true, true);
-                    getForm().updateToolBar();
-                    getForm().reflow(true);
+      // load technologies lazy
+      final ProgressIndicator indicator = new ProgressIndicator(techPresenter.getContainer(), SWT.INDETERMINATE | SWT.SMOOTH);
+      indicator.beginAnimatedTask();
+      GridData indicatorData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+      indicatorData.horizontalSpan = 2;
+      indicatorData.heightHint = 5;
+      indicator.setLayoutData(indicatorData);
+      Job j = new Job("load technologies...") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          if (techPresenter != null && !techPresenter.isDisposed()) {
+            try {
+              techPresenter.loadModel();
+            }
+            finally {
+              if (techPresenter.getContainer() != null && !techPresenter.getContainer().isDisposed()) {
+                techPresenter.getContainer().getDisplay().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                    if (techPresenter != null && !techPresenter.isDisposed()) {
+                      techPresenter.createContent();
+                      indicator.dispose();
+                      getForm().layout(true, true);
+                      getForm().updateToolBar();
+                      getForm().reflow(true);
+                    }
                   }
-                }
-              });
+                });
+              }
             }
           }
+          return Status.OK_STATUS;
         }
-        return Status.OK_STATUS;
-      }
-    };
-    j.setSystem(true);
-    j.schedule();
-    techSection.setExpanded(wasSectionExpanded(SECTION_ID_TECHNOLOGY, true));
+      };
+      j.setSystem(true);
+      j.schedule();
+      techSection.setExpanded(wasSectionExpanded(SECTION_ID_TECHNOLOGY, true));
+    }
   }
 
   protected IScoutBundle getScoutProject() {

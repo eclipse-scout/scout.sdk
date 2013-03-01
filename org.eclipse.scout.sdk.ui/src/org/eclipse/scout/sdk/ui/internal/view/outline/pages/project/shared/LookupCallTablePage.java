@@ -76,7 +76,7 @@ public class LookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(lookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());
+    ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
     IType[] lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(lookupCall, filter, TypeComparators.getTypeNameComparator());
     for (IType type : lookupCallTypes) {
       new LookupCallNodePage(this, type);

@@ -33,6 +33,11 @@ public class WsConsumerDeleteAction extends AbstractScoutHandler {
     super("Delete...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolRemove), "Delete", false, Category.DELETE);
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public void init(IScoutBundle bundle, IType type, BuildJaxWsBean buildJaxWsBean) {
     setLabel(Texts.get("Action_deleteTypeX", "'" + type.getElementName() + "'"));
     m_bundle = bundle;

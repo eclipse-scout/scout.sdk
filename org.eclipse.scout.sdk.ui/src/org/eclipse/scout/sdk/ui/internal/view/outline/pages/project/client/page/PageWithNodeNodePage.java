@@ -77,7 +77,9 @@ public class PageWithNodeNodePage extends AbstractScoutTypePage {
   public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof WellformAction) {
-      ((WellformAction) menu).setOperation(new WellformScoutTypeOperation(getType(), true));
+      WellformAction action = (WellformAction) menu;
+      action.setScoutBundle(getScoutResource());
+      action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
     else if (menu instanceof DeleteAction) {
       DeleteAction action = (DeleteAction) menu;

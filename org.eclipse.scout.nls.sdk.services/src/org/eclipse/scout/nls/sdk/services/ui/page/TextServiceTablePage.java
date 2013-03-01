@@ -73,7 +73,7 @@ public class TextServiceTablePage extends AbstractPage {
     }
     try {
       IType[] services = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
-      ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());
+      ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
       for (IType type : services) {
         if (filter.accept(type)) {
           new TextServiceNodePage(this, type);

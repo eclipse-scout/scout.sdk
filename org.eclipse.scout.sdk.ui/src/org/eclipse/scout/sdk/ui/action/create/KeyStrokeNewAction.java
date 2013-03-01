@@ -30,6 +30,11 @@ public class KeyStrokeNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new KeyStrokeNewWizard(m_type);
   }

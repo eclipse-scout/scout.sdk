@@ -33,6 +33,11 @@ public class CodeNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     CodeNewWizard wizard = new CodeNewWizard();
     wizard.initWizard(m_type);

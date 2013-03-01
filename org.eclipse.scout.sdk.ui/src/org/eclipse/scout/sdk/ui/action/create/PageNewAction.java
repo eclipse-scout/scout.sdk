@@ -30,8 +30,9 @@ public class PageNewAction extends AbstractWizardAction {
 
   @Override
   public boolean isVisible() {
-    if (getType() == null) return true;
-    return !TypeUtility.exists(TypeUtility.getMethod(getType(), PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE));
+    boolean isEditable = !m_scoutBundle.isBinary();
+    if (getType() == null) return isEditable;
+    return isEditable && !TypeUtility.exists(TypeUtility.getMethod(getType(), PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE));
   }
 
   public IType getType() {

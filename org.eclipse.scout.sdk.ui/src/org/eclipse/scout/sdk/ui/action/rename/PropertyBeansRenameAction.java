@@ -36,6 +36,19 @@ public class PropertyBeansRenameAction extends AbstractRenameAction {
   }
 
   @Override
+  public boolean isVisible() {
+    if (m_propertyBeanDescriptors == null || m_propertyBeanDescriptors.length < 1) {
+      return false;
+    }
+    for (IPropertyBean p : m_propertyBeanDescriptors) {
+      if (!isEditable(p.getDeclaringType())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
     String oldNameLower = getBeanName(getOldName(), false);
     String oldNameUpper = getBeanName(getOldName(), true);

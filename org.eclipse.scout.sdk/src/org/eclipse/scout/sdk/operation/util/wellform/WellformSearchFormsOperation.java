@@ -52,7 +52,7 @@ public class WellformSearchFormsOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find all forms
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    m_searchForms = formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getClientBundle().getJavaProject()));
+    m_searchForms = formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(getClientBundle().getJavaProject()));
     // format forms
     if (monitor.isCanceled()) {
       return;

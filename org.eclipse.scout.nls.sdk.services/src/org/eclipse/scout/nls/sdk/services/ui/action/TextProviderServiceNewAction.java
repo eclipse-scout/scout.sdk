@@ -31,6 +31,11 @@ public class TextProviderServiceNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     TextServiceTablePage page = (TextServiceTablePage) selection[0]; // size must be one -> no multi select allowed.
     m_bundle = page.getScoutResource();

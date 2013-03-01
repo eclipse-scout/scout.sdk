@@ -89,7 +89,7 @@ public class SearchFormTablePage extends AbstractPage {
       m_searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);
       m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
     return searchForms;
   }
 
@@ -104,6 +104,7 @@ public class SearchFormTablePage extends AbstractPage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformSearchFormsOperation(getScoutResource()));
+      action.setScoutBundle(getScoutResource());
       action.setLabel(Texts.get("WellformAllSearchForms"));
     }
     else if (menu instanceof SearchFormNewAction) {

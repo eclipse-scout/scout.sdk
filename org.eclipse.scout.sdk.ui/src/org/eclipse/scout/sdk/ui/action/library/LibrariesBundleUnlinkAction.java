@@ -53,7 +53,6 @@ public class LibrariesBundleUnlinkAction extends AbstractScoutHandler {
       public void run() {
         unlinkLibraries();
       }
-
     });
     return null;
   }
@@ -65,6 +64,19 @@ public class LibrariesBundleUnlinkAction extends AbstractScoutHandler {
       job.addOperation(op);
     }
     job.schedule();
+  }
+
+  @Override
+  public boolean isVisible() {
+    if (m_libraries.size() < 1) {
+      return false;
+    }
+    for (IScoutBundle b : m_libraries.keySet()) {
+      if (b.isBinary()) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

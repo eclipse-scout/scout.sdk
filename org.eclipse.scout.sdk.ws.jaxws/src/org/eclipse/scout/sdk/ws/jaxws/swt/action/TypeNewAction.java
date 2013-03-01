@@ -69,6 +69,11 @@ public abstract class TypeNewAction extends AbstractLinkAction {
     return null;
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public void init(IScoutBundle bundle) {
     m_bundle = bundle;
   }

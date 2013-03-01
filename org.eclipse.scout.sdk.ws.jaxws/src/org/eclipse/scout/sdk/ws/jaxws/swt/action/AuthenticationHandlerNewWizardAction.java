@@ -77,6 +77,11 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
     return null;
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public int getResult() {
     return m_result;
   }

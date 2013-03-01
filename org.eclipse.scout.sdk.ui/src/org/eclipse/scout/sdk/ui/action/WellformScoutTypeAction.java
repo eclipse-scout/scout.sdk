@@ -24,7 +24,7 @@ public class WellformScoutTypeAction extends WellformAction {
 
   @Override
   public boolean isVisible() {
-    return !TypeUtility.exists(TypeUtility.getMethod(m_type, PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE));
+    return isEditable(m_type) && !TypeUtility.exists(TypeUtility.getMethod(m_type, PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE));
   }
 
   public void setType(IType type) {

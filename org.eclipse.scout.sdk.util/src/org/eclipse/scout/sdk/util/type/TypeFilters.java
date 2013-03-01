@@ -16,7 +16,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -88,18 +87,6 @@ public class TypeFilters {
     };
   }
 
-  public static ITypeFilter getCompilationUnitFilter(final ICompilationUnit icu) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType type) {
-        if (!type.isBinary()) {
-          return icu.equals(type.getCompilationUnit());
-        }
-        return false;
-      }
-    };
-  }
-
   public static ITypeFilter getInnerTypeFilter(final IType type) {
     return new ITypeFilter() {
       @Override
@@ -120,25 +107,24 @@ public class TypeFilters {
   public static ITypeFilter getTypesInProjects(IJavaProject[] projects) {
     final HashSet<IJavaProject> finalProjects = new HashSet<IJavaProject>(Arrays.asList(projects));
     return new ITypeFilter() {
-
       @Override
       public boolean accept(IType candidate) {
-        if (!TypeUtility.exists(candidate) || candidate.isBinary()) {
+        if (!TypeUtility.exists(candidate)) {
           return false;
         }
-        return finalProjects.contains(candidate.getJavaProject()) && isClass(candidate);
+        return isClass(candidate) && finalProjects.contains(candidate.getJavaProject());
       }
     };
   }
 
-  public static ITypeFilter getClassesInProject(final IJavaProject project) {
+  public static ITypeFilter getTypesInProject(final IJavaProject project) {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType candidate) {
-        if (candidate == null || !candidate.exists() || candidate.isBinary()) {
+        if (!TypeUtility.exists(candidate)) {
           return false;
         }
-        return candidate.getJavaProject().equals(project) && isClass(candidate);
+        return isClass(candidate) && candidate.getJavaProject().equals(project);
       }
     };
   }
@@ -157,7 +143,6 @@ public class TypeFilters {
 
   public static ITypeFilter getInWorkspaceFilter() {
     return new ITypeFilter() {
-
       @Override
       public boolean accept(IType type) {
         return !type.isBinary() && !type.isReadOnly();
@@ -165,7 +150,7 @@ public class TypeFilters {
     };
   }
 
-  public static ITypeFilter getToplevelTypeFilter() {
+  public static ITypeFilter getTopLevelTypeFilter() {
     return new ITypeFilter() {
 
       @Override
@@ -179,7 +164,7 @@ public class TypeFilters {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType candidate) {
-        if (candidate == null || !candidate.exists() || candidate.isBinary()) {
+        if (!TypeUtility.exists(candidate)) {
           return false;
         }
         IType candidateDeclaringType = candidate.getDeclaringType();

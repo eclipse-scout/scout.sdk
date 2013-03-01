@@ -25,6 +25,11 @@ public class WizardStepNewAction extends AbstractWizardAction {
     super(Texts.get("Action_newTypeX", "Wizard step"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStepAdd), null, false, Category.NEW);
   }
 
+  @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
   public void init(IType type) {
     m_type = type;
   }

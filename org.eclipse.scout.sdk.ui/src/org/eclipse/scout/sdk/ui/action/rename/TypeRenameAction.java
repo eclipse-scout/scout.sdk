@@ -27,6 +27,11 @@ public class TypeRenameAction extends AbstractRenameAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IStatus validate(String newName) {
     IStatus inheritedStatus = getJavaNameStatus(newName);
     if (inheritedStatus.matches(IStatus.ERROR)) {

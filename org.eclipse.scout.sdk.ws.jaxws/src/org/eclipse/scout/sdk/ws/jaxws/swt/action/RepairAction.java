@@ -72,6 +72,11 @@ public class RepairAction extends AbstractLinkAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     IMarkerCommand[] markerCommands = MarkerUtility.getMarkerCommands(m_markerGroupUUID, m_bundle);
 

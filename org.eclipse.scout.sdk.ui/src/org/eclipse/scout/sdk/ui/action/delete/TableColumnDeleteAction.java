@@ -37,6 +37,19 @@ public class TableColumnDeleteAction extends AbstractScoutHandler {
   }
 
   @Override
+  public boolean isVisible() {
+    if (m_tableColumns == null || m_tableColumns.size() < 1) {
+      return false;
+    }
+    for (IType col : m_tableColumns) {
+      if (!isEditable(col)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
     if (m_tableColumns.size() == 1) {

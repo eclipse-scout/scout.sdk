@@ -33,6 +33,11 @@ public class ClientServiceNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_scoutBundle.isBinary();
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new ClientServiceNewWizard(m_scoutBundle);
   }

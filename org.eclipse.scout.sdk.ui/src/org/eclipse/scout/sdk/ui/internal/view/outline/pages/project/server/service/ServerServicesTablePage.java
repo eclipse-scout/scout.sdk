@@ -100,16 +100,16 @@ public class ServerServicesTablePage extends AbstractPage {
     }
 
     IJavaProject javaProject = getScoutResource().getJavaProject();
-    IType[] sqlServices = m_serviceHierarchy.getAllSubtypes(iSqlService, TypeFilters.getClassesInProject(javaProject));
-    IType[] bookmarkServices = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, TypeFilters.getClassesInProject(javaProject));
-    IType[] calendarServices = m_serviceHierarchy.getAllSubtypes(iCalendarService, TypeFilters.getClassesInProject(javaProject));
-    IType[] smtpServices = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getClassesInProject(javaProject));
-    IType[] accessControlServices = m_serviceHierarchy.getAllSubtypes(iAccessControlService, TypeFilters.getClassesInProject(javaProject));
-    IType[] lookupServices = m_serviceHierarchy.getAllSubtypes(iLookupService, TypeFilters.getClassesInProject(javaProject));
+    IType[] sqlServices = m_serviceHierarchy.getAllSubtypes(iSqlService, TypeFilters.getTypesInProject(javaProject));
+    IType[] bookmarkServices = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, TypeFilters.getTypesInProject(javaProject));
+    IType[] calendarServices = m_serviceHierarchy.getAllSubtypes(iCalendarService, TypeFilters.getTypesInProject(javaProject));
+    IType[] smtpServices = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getTypesInProject(javaProject));
+    IType[] accessControlServices = m_serviceHierarchy.getAllSubtypes(iAccessControlService, TypeFilters.getTypesInProject(javaProject));
+    IType[] lookupServices = m_serviceHierarchy.getAllSubtypes(iLookupService, TypeFilters.getTypesInProject(javaProject));
 
     IType[] services = m_serviceHierarchy.getAllSubtypes(iService,
         TypeFilters.getMultiTypeFilter(
-            TypeFilters.getClassesInProject(javaProject),
+            TypeFilters.getTypesInProject(javaProject),
             TypeFilters.getNotInTypes(sqlServices, bookmarkServices, calendarServices, smtpServices, accessControlServices, lookupServices)
             ), TypeComparators.getTypeNameComparator());
 

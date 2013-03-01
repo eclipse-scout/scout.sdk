@@ -693,7 +693,7 @@ public class ScoutTypeUtility extends TypeUtility {
   public static IMethod getFormFieldGetterMethod(final IType formField, ITypeHierarchy hierarchy) {
     IType form = TypeUtility.getAncestor(formField, TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
-        TypeFilters.getToplevelTypeFilter()));
+        TypeFilters.getTopLevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {
 

@@ -49,6 +49,11 @@ public class OutlineDeleteAction extends AbstractScoutHandler {
     return null;
   }
 
+  @Override
+  public boolean isVisible() {
+    return isEditable(m_outlineType);
+  }
+
   public void setOutlineType(IType outlineType) {
     m_outlineType = outlineType;
   }

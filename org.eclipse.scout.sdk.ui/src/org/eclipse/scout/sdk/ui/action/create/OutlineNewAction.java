@@ -35,6 +35,11 @@ public class OutlineNewAction extends AbstractWizardAction {
     m_bundle = b;
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public void init(IScoutBundle b, IType t) {
     m_bundle = b;
     m_type = t;

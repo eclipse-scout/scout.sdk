@@ -51,7 +51,7 @@ public class WellformCodeTypesOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find all forms
     ICachedTypeHierarchy codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
-    m_codeTypes = codeTypeHierarchy.getAllSubtypes(iCodeType, TypeFilters.getClassesInProject(getSharedBundle().getJavaProject()));
+    m_codeTypes = codeTypeHierarchy.getAllSubtypes(iCodeType, TypeFilters.getTypesInProject(getSharedBundle().getJavaProject()));
     // format forms
     if (monitor.isCanceled()) {
       return;

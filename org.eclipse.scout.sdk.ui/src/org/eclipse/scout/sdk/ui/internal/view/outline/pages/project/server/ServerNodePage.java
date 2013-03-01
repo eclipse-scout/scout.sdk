@@ -62,7 +62,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
     try {
-      ITypeFilter filter = TypeFilters.getClassesInProject(getScoutResource().getJavaProject());
+      ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
       IType[] serverSessions = m_serverSessionHierarchy.getAllSubtypes(iServerSession, filter, TypeComparators.getTypeNameComparator());
       if (serverSessions.length > 1) {
         ScoutSdkUi.logError("The server bundle '" + getScoutResource().getSymbolicName() + "' can have in maximum 1 server session.");
@@ -102,7 +102,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
 
   protected IType[] resolveServices() {
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    IType[] services = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    IType[] services = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
     return services;
   }
 
@@ -115,7 +115,9 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
-      ((WellformAction) menu).setOperation(new WellformServerBundleOperation(getScoutResource()));
+      WellformAction action = (WellformAction) menu;
+      action.setScoutBundle(getScoutResource());
+      action.setOperation(new WellformServerBundleOperation(getScoutResource()));
     }
     else if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {

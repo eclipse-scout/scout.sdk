@@ -139,7 +139,7 @@ public class FormFieldNewOperation implements IOperation {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
       form = TypeUtility.getAncestor(getCreatedFormField(), TypeFilters.getMultiTypeFilterOr(
           TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
-          TypeFilters.getToplevelTypeFilter()));
+          TypeFilters.getTopLevelTypeFilter()));
     }
 
     if (TypeUtility.exists(form)) {

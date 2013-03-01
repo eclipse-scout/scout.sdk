@@ -37,6 +37,19 @@ public class WizardStepDeleteAction extends AbstractScoutHandler {
   }
 
   @Override
+  public boolean isVisible() {
+    if (m_wizardSteps.size() < 1) {
+      return false;
+    }
+    for (IType t : m_wizardSteps) {
+      if (!isEditable(t)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
     if (m_wizardSteps.size() == 1) {

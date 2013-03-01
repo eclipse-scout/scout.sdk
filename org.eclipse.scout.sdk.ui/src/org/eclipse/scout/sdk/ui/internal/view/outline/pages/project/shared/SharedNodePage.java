@@ -48,7 +48,7 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
     super.loadChildrenImpl();
     if (getScoutResource().getIconProvider() != null) {
       ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
-      IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()), null);
+      IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), null);
       if (iconTypes.length > 0) {
         new IconNodePage(this, iconTypes[0]);
       }
@@ -74,6 +74,7 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
+      action.setScoutBundle(getScoutResource());
       action.setLabel(Texts.get("WellformSharedBundle"));
       action.setOperation(new WellformSharedBundleOperation(getScoutResource()));
     }

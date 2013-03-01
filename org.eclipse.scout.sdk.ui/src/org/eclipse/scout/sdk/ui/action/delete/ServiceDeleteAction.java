@@ -39,6 +39,11 @@ public class ServiceDeleteAction extends AbstractScoutHandler {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_serviceImplementation) && isEditable(m_serviceInterface);
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     m_confirmDialog = new MemberSelectionDialog(shell, getLabel());
     ArrayList<IMember> members = new ArrayList<IMember>();

@@ -15,6 +15,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -27,8 +28,19 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class WellformAction extends AbstractOperationAction {
 
+  private IScoutBundle m_bundle;
+
   public WellformAction() {
     super(Texts.get("Wellform"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
+  }
+
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  public void setScoutBundle(IScoutBundle b) {
+    m_bundle = b;
   }
 
   @Override

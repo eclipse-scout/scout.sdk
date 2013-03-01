@@ -108,7 +108,7 @@ public class SearchFormPresenter extends AbstractTypeProposalPresenter {
     private void ensureCache() {
       if (m_proposals == null) {
         if (getMethod() != null) {
-          m_proposals = TypeUtility.getPrimaryTypeHierarchy(iSearchForm).getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getMethod().getType().getJavaProject()),
+          m_proposals = TypeUtility.getPrimaryTypeHierarchy(iSearchForm).getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(getMethod().getType().getJavaProject()),
               TypeComparators.getTypeNameComparator());
         }
         else {

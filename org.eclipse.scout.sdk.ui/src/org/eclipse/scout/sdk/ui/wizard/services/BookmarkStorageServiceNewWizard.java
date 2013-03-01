@@ -155,7 +155,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
 
       IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
       ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
-      IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, TypeFilters.getClassesInProject(m_operation.getImplementationBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+      IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, TypeFilters.getTypesInProject(m_operation.getImplementationBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
 
       if (serverSessions != null && serverSessions.length == 1) {
         final IType serverSessionType = serverSessions[0];

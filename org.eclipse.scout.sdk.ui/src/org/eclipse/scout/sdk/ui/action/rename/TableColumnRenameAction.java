@@ -40,6 +40,11 @@ public class TableColumnRenameAction extends AbstractRenameAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_tableColumn);
+  }
+
+  @Override
   protected IStatus validate(String newName) {
     IStatus inheritedStatus = getJavaNameStatus(newName);
     if (inheritedStatus.matches(IStatus.ERROR)) {

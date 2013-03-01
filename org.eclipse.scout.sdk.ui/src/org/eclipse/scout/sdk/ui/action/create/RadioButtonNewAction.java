@@ -33,6 +33,11 @@ public class RadioButtonNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     RadioButtonNewWizard wizard = new RadioButtonNewWizard();
     wizard.initWizard(m_type);

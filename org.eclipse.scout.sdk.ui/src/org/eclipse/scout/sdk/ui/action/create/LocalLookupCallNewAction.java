@@ -28,6 +28,11 @@ public class LocalLookupCallNewAction extends AbstractWizardAction {
     super(Texts.get("NewLocalLookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LookupCallAdd), null, false, Category.NEW);
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_scoutBundle.isBinary();
+  }
+
   public void setScoutBundle(IScoutBundle scoutBundle) {
     m_scoutBundle = scoutBundle;
   }

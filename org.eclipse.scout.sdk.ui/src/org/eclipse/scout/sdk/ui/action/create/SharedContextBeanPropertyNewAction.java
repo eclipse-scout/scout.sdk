@@ -35,6 +35,11 @@ public class SharedContextBeanPropertyNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_clientSession) && isEditable(m_serverSession);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new SharedContextBeanPropertyNewWizard(m_serverSession, m_clientSession);
   }

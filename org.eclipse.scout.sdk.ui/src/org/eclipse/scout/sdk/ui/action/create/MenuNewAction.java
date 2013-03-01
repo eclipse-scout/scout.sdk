@@ -32,6 +32,11 @@ public class MenuNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     MenuNewWizard wizard = new MenuNewWizard();
     wizard.initWizard(m_type);

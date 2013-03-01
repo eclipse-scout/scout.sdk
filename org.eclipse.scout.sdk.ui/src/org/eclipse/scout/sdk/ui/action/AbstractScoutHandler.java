@@ -15,10 +15,14 @@ import java.util.Iterator;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.handlers.HandlerUtil;
 
@@ -154,4 +158,12 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
 
   @Override
   public abstract Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException;
+
+  protected boolean isEditable(IJavaElement element) {
+    if (!TypeUtility.exists(element)) {
+      return false;
+    }
+    IScoutBundle b = ScoutTypeUtility.getScoutBundle(element);
+    return b != null && !b.isBinary();
+  }
 }

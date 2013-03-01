@@ -51,7 +51,7 @@ public class WellformPagesOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find types
     ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
-    m_pages = hierarchy.getAllSubtypes(iPage, TypeFilters.getClassesInProject(getClientBundle().getJavaProject()));
+    m_pages = hierarchy.getAllSubtypes(iPage, TypeFilters.getTypesInProject(getClientBundle().getJavaProject()));
     // format types
     if (monitor.isCanceled()) {
       return;

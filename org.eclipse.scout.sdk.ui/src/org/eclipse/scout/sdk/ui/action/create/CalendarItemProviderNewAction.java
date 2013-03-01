@@ -33,6 +33,11 @@ public class CalendarItemProviderNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new CalendarItemProviderNewWizard(m_type);
   }

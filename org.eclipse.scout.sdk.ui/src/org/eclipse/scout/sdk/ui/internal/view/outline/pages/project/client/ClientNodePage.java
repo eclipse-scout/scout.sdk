@@ -84,7 +84,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     // client session
-    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
     if (clientSessions.length > 1) {
       ScoutSdkUi.logWarning("more than one client session found.");
     }
@@ -92,7 +92,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new ClientSessionNodePage(this, clientSession);
     }
     // desktop
-    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
     if (desktops.length > 1) {
       ScoutSdkUi.logWarning("more than one desktop found.");
     }
@@ -100,7 +100,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new DesktopNodePage(this, desktop);
     }
     // desktop extension
-    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, TypeFilters.getClassesInProject(getScoutResource().getJavaProject()));
+    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
     for (IType desktopExtension : desktopExtensions) {
       new DesktopExtensionNodePage(this, desktopExtension);
     }
@@ -135,7 +135,9 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
-      ((WellformAction) menu).setOperation(new WellformClientBundleOperation(getScoutResource()));
+      WellformAction action = (WellformAction) menu;
+      action.setOperation(new WellformClientBundleOperation(getScoutResource()));
+      action.setScoutBundle(getScoutResource());
     }
     else if (menu instanceof FormDataUpdateAction) {
       ((FormDataUpdateAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutResource()));

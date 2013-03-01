@@ -32,6 +32,11 @@ public class AttributeNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new AttributeNewWizard(m_type);
   }

@@ -29,6 +29,11 @@ public class LookupServiceNewAction extends AbstractWizardAction {
     super(Texts.get("Action_newTypeX", "Lookup Service"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS), null, false, Category.NEW);
   }
 
+  @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
   public void setScoutBundle(IScoutBundle bundle) {
     m_bundle = bundle;
   }

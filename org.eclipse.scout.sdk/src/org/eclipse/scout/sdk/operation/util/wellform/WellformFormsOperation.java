@@ -57,9 +57,9 @@ public class WellformFormsOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find all forms
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    IType[] searchForms = formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getClassesInProject(getClientBundle().getJavaProject()));
+    IType[] searchForms = formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(getClientBundle().getJavaProject()));
     ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getClassesInProject(getClientBundle().getJavaProject()),
+        TypeFilters.getTypesInProject(getClientBundle().getJavaProject()),
         TypeFilters.getNotInTypes(new HashSet<IType>(Arrays.asList(searchForms)))
         );
     m_forms = formHierarchy.getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator());

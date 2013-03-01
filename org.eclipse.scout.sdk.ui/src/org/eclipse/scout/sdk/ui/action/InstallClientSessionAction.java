@@ -37,16 +37,14 @@ public class InstallClientSessionAction extends AbstractOperationAction {
   }
 
   public void init(ICachedTypeHierarchy clientSessionHierarchy, IScoutBundle scoutResource) {
-    if (clientSessionHierarchy != null) {
-      IType[] clientSessions = clientSessionHierarchy.getAllClasses(TypeFilters.getClassesInProject(scoutResource.getJavaProject()), null);
+    if (clientSessionHierarchy != null && !scoutResource.isBinary()) {
+      IType[] clientSessions = clientSessionHierarchy.getAllClasses(TypeFilters.getTypesInProject(scoutResource.getJavaProject()), null);
       if (clientSessions.length == 0) {
-
         IScoutBundle shared = scoutResource.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
         if (shared != null) {
           HashMap<String, String> props = new HashMap<String, String>(2);
           props.put(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, shared.getSymbolicName());
           props.put(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, scoutResource.getSymbolicName());
-
           setOperation(new InstallJavaFileOperation("templates/client/src/ClientSession.java", "ClientSession.java", scoutResource, props));
         }
       }

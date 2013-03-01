@@ -24,6 +24,11 @@ public class ToolbuttonNewAction extends AbstractWizardAction {
     super(Texts.get("Action_newTypeX", "Tool item"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ButtonAdd), null, false, Category.NEW);
   }
 
+  @Override
+  public boolean isVisible() {
+    return isEditable(m_type);
+  }
+
   public void init(IType t) {
     m_type = t;
   }

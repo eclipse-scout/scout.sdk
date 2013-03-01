@@ -67,6 +67,11 @@ public class FormDeleteAction extends AbstractScoutHandler {
   }
 
   @Override
+  public boolean isVisible() {
+    return isEditable(m_formType);
+  }
+
+  @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("Action_deleteTypeX", getFormType().getElementName()));
     m_confirmDialog.addMemberSelectionListener(new P_SelectionValidationListener());

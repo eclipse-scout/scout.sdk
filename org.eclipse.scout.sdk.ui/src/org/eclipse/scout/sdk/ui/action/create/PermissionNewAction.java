@@ -33,6 +33,11 @@ public class PermissionNewAction extends AbstractWizardAction {
   }
 
   @Override
+  public boolean isVisible() {
+    return !m_bundle.isBinary();
+  }
+
+  @Override
   protected IWizard getNewWizardInstance() {
     return new PermissionNewWizard(m_bundle);
   }
