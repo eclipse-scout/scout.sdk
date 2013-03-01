@@ -4,9 +4,9 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
 import @@BUNDLE_SWT_NAME@@.Activator;
 
-public class SearchView extends AbstractScoutView {
+public class SouthView extends AbstractScoutView {
 
-  public SearchView() {
+  public SouthView() {
   }
 
   @Override

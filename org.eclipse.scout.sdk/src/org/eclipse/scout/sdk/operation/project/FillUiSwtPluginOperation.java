@@ -70,11 +70,14 @@ public class FillUiSwtPluginOperation extends AbstractScoutProjectNewOperation {
 
     // views
     new InstallJavaFileOperation("templates/ui.swt/src/views/CenterView.java", destPathPref + "views/CenterView.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/DetailView.java", destPathPref + "views/DetailView.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/views/EastView.java", destPathPref + "views/EastView.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/OutlineView.java", destPathPref + "views/OutlineView.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/TableView.java", destPathPref + "views/TableView.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/ui.swt/src/views/SearchView.java", destPathPref + "views/SearchView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/NorthEastView.java", destPathPref + "views/NorthEastView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/NorthView.java", destPathPref + "views/NorthView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/NorthWestView.java", destPathPref + "views/NorthWestView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/SouthEastView.java", destPathPref + "views/SouthEastView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/SouthView.java", destPathPref + "views/SouthView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/SouthWestView.java", destPathPref + "views/SouthWestView.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/views/WestView.java", destPathPref + "views/WestView.java", m_project, props).run(monitor, workingCopyManager);
 
     // application
     new InstallJavaFileOperation("templates/ui.swt/src/application/Application.java", destPathPref + "application/Application.java", m_project, props).run(monitor, workingCopyManager);
@@ -82,6 +85,7 @@ public class FillUiSwtPluginOperation extends AbstractScoutProjectNewOperation {
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationWorkbenchAdvisor.java", destPathPref + "application/ApplicationWorkbenchAdvisor.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/application/ApplicationWorkbenchWindowAdvisor.java", destPathPref + "application/ApplicationWorkbenchWindowAdvisor.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/ui.swt/src/application/menu/DesktopMenuBar.java", destPathPref + "application/menu/DesktopMenuBar.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/ui.swt/src/application/button/CoolbarButton.java", destPathPref + "application/button/CoolbarButton.java", m_project, props).run(monitor, workingCopyManager);
 
     m_project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }

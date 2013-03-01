@@ -4,9 +4,9 @@ import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.window.desktop.view.AbstractScoutView;
 import @@BUNDLE_SWT_NAME@@.Activator;
 
-public class TableView extends AbstractScoutView {
+public class SouthEastView extends AbstractScoutView {
 
-  public TableView() {
+  public SouthEastView() {
   }
 
   @Override

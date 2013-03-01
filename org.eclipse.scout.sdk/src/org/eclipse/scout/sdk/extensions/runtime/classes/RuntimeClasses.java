@@ -88,7 +88,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
                     }
                   }
                   else {
-                    ScoutSdk.logWarning("Super type definition (interface='" + interf + "', default='" + def + "') is not valid. Types could not be found.");
+                    ScoutSdk.logInfo("Super type definition (interface='" + interf + "', default='" + def + "') may not be valid. Types could not be found.");
                   }
                 }
               }

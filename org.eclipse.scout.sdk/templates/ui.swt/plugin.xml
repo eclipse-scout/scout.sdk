@@ -4,28 +4,16 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="@@BUNDLE_SWT_NAME@@.perspective.Perspective"
-            fixed="true"
+            fixed="false"
+            icon="resources/icons/eclipse_scout.gif"
             id="@@BUNDLE_SWT_NAME@@.perspective.Perspective"
             name="@@ALIAS@@"/>
    </extension>
    <extension
             point="org.eclipse.ui.views">
          <view
-               class="@@BUNDLE_SWT_NAME@@.views.OutlineView"
-               id="@@BUNDLE_SWT_NAME@@.views.OutlineView"
-               name="OutlineView"
-               icon="resources/icons/eclipse_scout.gif"
-               restorable="true">
-         </view>
-         <view
-               class="@@BUNDLE_SWT_NAME@@.views.DetailView"
-               id="@@BUNDLE_SWT_NAME@@.views.DetailView"
-               name="DetailView"
-               icon="resources/icons/eclipse_scout.gif"
-               restorable="true">
-         </view>
-         <view
                allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
                class="@@BUNDLE_SWT_NAME@@.views.CenterView"
                icon="resources/icons/eclipse_scout.gif"
                id="@@BUNDLE_SWT_NAME@@.views.CenterView"
@@ -33,34 +21,90 @@
                restorable="true">
          </view>
          <view
-               class="@@BUNDLE_SWT_NAME@@.views.TableView"
-               id="@@BUNDLE_SWT_NAME@@.views.TableView"
-               name="Table View"
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.WestView"
                icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.WestView"
+               name="West view"
                restorable="true">
          </view>
          <view
-               class="@@BUNDLE_SWT_NAME@@.views.SearchView"
-               id="@@BUNDLE_SWT_NAME@@.views.SearchView"
-               name="Search View"
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.NorthView"
                icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.NorthView"
+               name="North view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.NorthWestView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.NorthWestView"
+               name="North west view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.NorthEastView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.NorthEastView"
+               name="North east view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.EastView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.EastView"
+               name="East view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.SouthView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.SouthView"
+               name="South view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.SouthWestView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.SouthWestView"
+               name="South west view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="@@BUNDLE_SWT_NAME@@.viewCategory"
+               class="@@BUNDLE_SWT_NAME@@.views.SouthEastView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="@@BUNDLE_SWT_NAME@@.views.SouthEastView"
+               name="South east view"
                restorable="true">
          </view>
      	 <view
-            category="org.eclipse.ui"
-            class="org.eclipse.ui.ExtensionFactory:progressView"
-            icon="resources/icons/progress_view.gif"
-            id="org.eclipse.ui.views.ProgressView"
-            name="Progress View"
-            restorable="true">
+               allowMultiple="false"
+               category="org.eclipse.ui"
+               class="org.eclipse.ui.ExtensionFactory:progressView"
+               icon="resources/icons/progress_view.gif"
+               id="org.eclipse.ui.views.ProgressView"
+               name="Progress View"
+               restorable="true">
          </view>
-         <view
-             class="@@BUNDLE_SWT_NAME@@.views.EastView"
-             icon="resources/icons/eclipse_scout.gif"
-             id="@@BUNDLE_SWT_NAME@@.views.EastView"
-             name="East View"
-             restorable="true">
-         </view>
+         <category
+               id="@@BUNDLE_SWT_NAME@@.viewCategory"
+               name="@@ALIAS@@">
+         </category>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
@@ -68,12 +112,12 @@
             class="@@BUNDLE_SWT_NAME@@.SwtStartup">
       </startup>
    </extension>
-     <extension id="application" name="Application" point="org.eclipse.core.runtime.applications">
-    <application>
-      <run class="@@BUNDLE_SWT_NAME@@.application.Application"/>
-    </application>
-  </extension>
-  <extension
+   <extension id="application" name="Application" point="org.eclipse.core.runtime.applications">
+      <application>
+         <run class="@@BUNDLE_SWT_NAME@@.application.Application"/>
+      </application>
+   </extension>
+   <extension
          point="org.eclipse.ui.editors">
       <editor
             class="@@BUNDLE_SWT_NAME@@.editor.ScoutEditorPart"
@@ -83,9 +127,9 @@
             matchingStrategy="org.eclipse.scout.rt.ui.swt.window.desktop.editor.ScoutEditorMatchingStrategy"
             name="ScoutEditorPart">
       </editor>
-  </extension>
-  <extension id="product" point="org.eclipse.core.runtime.products">
-    <product
+   </extension>
+   <extension id="product" point="org.eclipse.core.runtime.products">
+      <product
           application="@@BUNDLE_SWT_NAME@@.application"
           name="">
        <property
@@ -94,84 +138,17 @@
        <property
           name="windowImages"
           value="resources/icons/eclipseScout16x16.gif,resources/icons/eclipseScout32x32.gif"/>
-    </product>
-  </extension>
-  <extension
+      </product>
+   </extension>
+   <extension
         point="org.eclipse.ui.menus">
-     <menuContribution
+      <menuContribution
            allPopups="false"
            locationURI="menu:org.eclipse.ui.main.menu">
         <dynamic
               class="@@BUNDLE_SWT_NAME@@.application.menu.DesktopMenuBar"
               id="org.eclipse.scout.swt.menu.dynamic">
         </dynamic>
-     </menuContribution>
-  </extension>
-  <extension
-             point="org.eclipse.ui.perspectiveExtensions">
-          <perspectiveExtension
-                targetID="@@BUNDLE_SWT_NAME@@.perspective.Perspective">
-             <view
-                   closeable="false"
-                   id="@@BUNDLE_SWT_NAME@@.views.OutlineView"
-                   minimized="false"
-                   relationship="left"
-                   relative="org.eclipse.ui.editorss"
-                   visible="false">
-             </view>
-             <view
-                   closeable="true"
-                   id="@@BUNDLE_SWT_NAME@@.views.EastView"
-                   minimized="false"
-                   ratio="0.75"
-                   relationship="right"
-                   relative="@@BUNDLE_SWT_NAME@@.views.OutlineView"
-                   visible="false">
-             </view>
-             <view
-                   closeable="false"
-                   id="@@BUNDLE_SWT_NAME@@.views.TableView"
-                   minimized="false"
-                   ratio="0.25"
-                   relationship="right"
-                   relative="@@BUNDLE_SWT_NAME@@.views.OutlineView"
-                   visible="false">
-             </view>
-             <view
-                   closeable="false"
-                   id="@@BUNDLE_SWT_NAME@@.views.DetailView"
-                   minimized="false"
-                   ratio="0.25"
-                   relationship="bottom"
-                   relative="@@BUNDLE_SWT_NAME@@.views.TableView"
-                   visible="false">
-             </view>
-             <view
-                   closeable="false"
-                   id="@@BUNDLE_SWT_NAME@@.views.SearchView"
-                   minimized="false"
-                   ratio="0.66"
-                   relationship="bottom"
-                   relative="@@BUNDLE_SWT_NAME@@.views.TableView"
-                   visible="false">
-             </view>
-             <view
-                   closeable="true"
-                   id="@@BUNDLE_SWT_NAME@@.views.CenterView"
-                   minimized="false"
-                   relationship="stack"
-                   relative="@@BUNDLE_SWT_NAME@@.views.TableView"
-                   visible="false">
-             </view>
-             <view
-                   closeable="true"
-                   id="org.eclipse.ui.views.ProgressView"
-                   minimized="false"
-                   ratio="0.75"
-                   relationship="bottom"
-                   relative="@@BUNDLE_SWT_NAME@@.views.EastView"
-                   visible="false">
-             </view>
-          </perspectiveExtension>
+      </menuContribution>
    </extension>
 </plugin>

@@ -17,14 +17,6 @@ public class Activator implements BundleActivator{
   // the plugin id
   public static final String BUNDLE_ID = "@@BUNDLE_SWT_NAME@@";
 
-  // all view ID's commodity to access.
-  public static final String CENTER_VIEW_ID = CenterView.class.getName();
-  public static final String DETAIL_VIEW_ID = DetailView.class.getName();
-  public static final String EAST_VIEW_ID = EastView.class.getName();
-  public static final String OUTLINE_VIEW_ID = OutlineView.class.getName();
-  public static final String TABLE_VIEW_ID = TableView.class.getName();
-  public static final String SEARCH_VIEW_ID = SearchView.class.getName();
-
   private ISwtEnvironment m_environment;
 
   // the shared instance
