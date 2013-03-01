@@ -38,7 +38,7 @@ import org.osgi.framework.Bundle;
  */
 public class ScoutRapTargetCreationOperation implements IOperation {
 
-  private final static String SCOUT_RAP_TARGET_PLUGIN_SUB_DIR = "resources";
+  private final static String SCOUT_RAP_TARGET_PLUGIN_SUB_DIR = "resources/org.eclipse.scout.rt.rap.target.repo";
   private final Bundle m_sourcePlugin;
   private File m_destinationDir;
 

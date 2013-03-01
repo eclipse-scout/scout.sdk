@@ -65,7 +65,8 @@ public class RapTargetNewWizard extends AbstractWorkspaceWizard {
       scoutRapTargetExtractOp.run(monitor, workingCopyManager);
 
       // set the environment variable
-      RapTargetVariable.get().setValue(extractFolder);
+      File f = new File(extractFolder);
+      RapTargetVariable.get().setValue(f.toURI().toString());
     }
     return true;
   }

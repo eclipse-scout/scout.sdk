@@ -25,8 +25,8 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
   public static final String UPDATE_SITE_URL = "http://download.eclipse.org/releases/kepler";
   public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.feature.group";
   public static final String SCOUT_RT_FEATURE = "org.eclipse.scout.rt.feature.group";
-  public static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.runtime.feature.group";
-  public static final String ECLIPSE_RT_RAP_REQUIREMENTS_FEATURE = "org.eclipse.rap.runtime.requirements.feature.group";
+  public static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.feature.feature.group";
+  public static final String ECLIPSE_RT_RAP_REQUIREMENTS_FEATURE = "org.eclipse.rap.equinox.target.feature.feature.group";
   public static final String ECLIPSE_PLATFORM_FEATURE = "org.eclipse.platform.feature.group";
   public static final String ECLIPSE_RPC_FEATURE = "org.eclipse.rcp.feature.group";
   public static final String ECLIPSE_RPC_E4_FEATURE = "org.eclipse.e4.rcp.feature.group";
@@ -136,11 +136,14 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       scoutRapTargetExtractOp.validate();
       scoutRapTargetExtractOp.run(monitor, workingCopyManager);
 
-      op.addRunningEclipseEntries();
-      op.addLocalDirectory(RAP_TARGET_VARIABLE);
-
       // set the environment variable
-      RapTargetVariable.get().setValue(getExtractTargetFolder());
+      File f = new File(getExtractTargetFolder());
+      RapTargetVariable.get().setValue(f.toURI().toString());
+
+      op.addRunningEclipseEntries();
+      op.addUpdateSite(RAP_TARGET_VARIABLE, ECLIPSE_RT_RAP_FEATURE);
+      op.addUpdateSite(RAP_TARGET_VARIABLE, SCOUT_RT_RAP_FEATURE);
+
     }
     op.validate();
     op.run(monitor, workingCopyManager);

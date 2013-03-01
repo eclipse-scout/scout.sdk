@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.core.variables.VariablesPlugin;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
@@ -151,15 +152,16 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
     });
   }
 
-  public void addUpdateSite(final String locationUrl, final String featureId) throws CoreException {
+  public void addUpdateSite(String locationUrl, final String featureId) throws CoreException {
+    final String uri = VariablesPlugin.getDefault().getStringVariableManager().performStringSubstitution(locationUrl);
     ITargetEntryContributor entry = new ITargetEntryContributor() {
       @Override
       public void contributeXml(StringBuilder sb, IProgressMonitor monitor) throws CoreException {
         try {
-          String version = P2Utility.getLatestVersion(featureId, new URI(locationUrl), monitor);
+          String version = P2Utility.getLatestVersion(featureId, new URI(uri), monitor);
           sb.append("<location includeAllPlatforms=\"false\" includeConfigurePhase=\"true\" includeMode=\"slicer\" includeSource=\"true\" type=\"InstallableUnit\">\n");
           sb.append("<unit id=\"" + featureId + "\" version=\"" + version + "\"/>\n");
-          sb.append("<repository location=\"" + locationUrl + "\"/>\n");
+          sb.append("<repository location=\"" + uri + "\"/>\n");
           sb.append("</location>\n");
         }
         catch (URISyntaxException e) {
