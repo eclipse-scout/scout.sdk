@@ -34,7 +34,7 @@ public interface IMarketplaceConstants {
   final static String POSTGRES_JDBC_FRAGMENT = "org.postgres.postgres9.jdbc.fragment";
 
   final static String DERBY_JDBC_PLUGIN = "org.eclipse.scout.rt.jdbc.derby";
-  final static String DERBY_JDBC_FRAGMENT = "org.apache.derby.jdbc_1082.fragment";
+  final static String DERBY_JDBC_FRAGMENT = "org.apache.derby.jdbc_1091.fragment";
 
   final static String SCOUT_RAYO_LAF_FEATURE = "com.bsiag.scout.rt.ui.swing.laf.rayo.feature.group";
   final static String RAYO_LAF_PLUGIN = "com.bsiag.scout.rt.ui.swing.rayo";
