@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -28,6 +27,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>FormTablePage</h3> ...
@@ -90,13 +90,10 @@ public class FormTablePage extends AbstractPage {
       m_formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IJavaProject javaProject = getScoutResource().getJavaProject();
-    IType[] searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(javaProject));
+    IScoutBundle sb = getScoutResource();
+    IType[] searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(sb));
     IType[] allForms = m_formHierarchy.getAllSubtypes(iForm,
-        TypeFilters.getMultiTypeFilter(
-            TypeFilters.getTypesInProject(javaProject),
-            TypeFilters.getNotInTypes(searchForms)
-            ),
+        TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getTypesInScoutBundles(sb), TypeFilters.getNotInTypes(searchForms)),
         TypeComparators.getTypeNameComparator());
 
     return allForms;

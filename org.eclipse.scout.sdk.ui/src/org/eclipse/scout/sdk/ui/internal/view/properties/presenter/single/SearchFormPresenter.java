@@ -26,8 +26,10 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProv
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
@@ -108,7 +110,8 @@ public class SearchFormPresenter extends AbstractTypeProposalPresenter {
     private void ensureCache() {
       if (m_proposals == null) {
         if (getMethod() != null) {
-          m_proposals = TypeUtility.getPrimaryTypeHierarchy(iSearchForm).getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(getMethod().getType().getJavaProject()),
+          IScoutBundle sb = ScoutTypeUtility.getScoutBundle(getMethod().getType());
+          m_proposals = TypeUtility.getPrimaryTypeHierarchy(iSearchForm).getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(sb),
               TypeComparators.getTypeNameComparator());
         }
         else {

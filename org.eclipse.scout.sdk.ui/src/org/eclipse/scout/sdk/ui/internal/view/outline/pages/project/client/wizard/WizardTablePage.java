@@ -22,10 +22,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>WizardTablePage</h3> ...
@@ -81,7 +81,7 @@ public class WizardTablePage extends AbstractPage {
       m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
       m_wizardHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     for (IType searchForm : searchForms) {
       new WizardNodePage(this, searchForm);
     }

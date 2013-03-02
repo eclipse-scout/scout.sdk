@@ -145,7 +145,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   @Override
   public void setPage(IPage page) {
     super.setPage(page);
-    m_icuNotSyncStatus = new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, Texts.get("SaveTheFile", getPage().getType().getResource().getName()));
+    m_icuNotSyncStatus = new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, Texts.get("SaveTheFile", getPage().getType().getPath().toOSString()));
   }
 
   @Override
@@ -236,7 +236,12 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
 
     try {
-      setCompilationUnitDirty(getPage().getType().getCompilationUnit().isWorkingCopy() && getPage().getType().getCompilationUnit().getBuffer().hasUnsavedChanges());
+      if (getPage().getType().getCompilationUnit() == null) {
+        setCompilationUnitDirty(false);
+      }
+      else {
+        setCompilationUnitDirty(getPage().getType().getCompilationUnit().isWorkingCopy() && getPage().getType().getCompilationUnit().getBuffer().hasUnsavedChanges());
+      }
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logWarning("could not determ working copy '" + getPage().getType().getElementName() + "'.");
@@ -438,7 +443,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       presenter.getContainer().setLayoutData(layoutData);
-      presenter.setEnabled(!isDirty());
+      presenter.setEnabled(!isDirty() && !getPage().getType().isReadOnly());
       m_methodPresenters.put(method.getMethodName(), presenter);
     }
     else {
@@ -463,7 +468,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       presenter.getContainer().setLayoutData(layoutData);
-      presenter.setEnabled(!isDirty());
+      presenter.setEnabled(!isDirty() && !getPage().getType().isReadOnly());
       m_methodPresenters.put(method.getMethodName(), presenter);
     }
     return presenter;
@@ -492,7 +497,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
             if (getForm() != null && !getForm().isDisposed()) {
               m_saveButton.setEnabled(dirty);
               for (AbstractMethodPresenter p : m_methodPresenters.values()) {
-                p.setEnabled(!dirty);
+                p.setEnabled(!dirty && !getPage().getType().isReadOnly());
               }
               if (dirty) {
                 addStatus(m_icuNotSyncStatus);

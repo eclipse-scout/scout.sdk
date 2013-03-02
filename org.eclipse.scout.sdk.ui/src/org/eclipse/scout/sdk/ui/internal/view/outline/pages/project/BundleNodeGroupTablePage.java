@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
 import java.util.Arrays;
 
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.formdata.ScoutBundlesUpdateFormDataOperation;
@@ -26,8 +25,6 @@ import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -112,14 +109,8 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   protected IType[] resolveServices() {
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     IScoutBundle[] serverBundles = getScoutResource().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
-    IJavaProject[] serverProjects = new IJavaProject[serverBundles.length];
-    for (int i = 0; i < serverProjects.length; i++) {
-      serverProjects[i] = serverBundles[i].getJavaProject();
-    }
 
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(),
-        ScoutTypeFilters.getTypesInProjects(serverProjects));
-    IType[] services = serviceHierarchy.getAllSubtypes(iService, filter);
+    IType[] services = serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(serverBundles));
     return services;
   }
 

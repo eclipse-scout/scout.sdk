@@ -22,10 +22,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>AllPagesTablePage</h3> ...
@@ -81,7 +81,7 @@ public class AllPagesTablePage extends AbstractPage {
       m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_cachedTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] allPages = m_cachedTypeHierarchy.getAllClasses(TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] allPages = m_cachedTypeHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     PageNodePageHelper.createRepresentationFor(this, allPages, m_cachedTypeHierarchy);
   }
 

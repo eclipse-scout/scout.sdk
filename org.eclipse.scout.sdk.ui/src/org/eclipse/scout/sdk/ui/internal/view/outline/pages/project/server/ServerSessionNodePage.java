@@ -20,11 +20,11 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ServerSessionNodePage extends AbstractScoutTypePage {
 
@@ -58,7 +58,7 @@ public class ServerSessionNodePage extends AbstractScoutTypePage {
       if (clientBundle != null) {
         // find client session
         ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
-        ITypeFilter filter = TypeFilters.getTypesInProject(clientBundle.getJavaProject());
+        ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(clientBundle);
         IType[] allClientSessions = clientSessionHierarchy.getAllSubtypes(iClientSession, filter, TypeComparators.getTypeNameComparator());
         if (allClientSessions.length > 1) {
           ScoutSdkUi.logError("a client bundle '" + clientBundle + "' can have in maximum 1 client session");

@@ -20,10 +20,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class PermissionTablePage extends AbstractPage {
 
@@ -76,7 +76,7 @@ public class PermissionTablePage extends AbstractPage {
       m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(basicPermission);
       m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
+    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
     IType[] permissions = m_basicPermissionHierarchy.getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator());
     for (IType type : permissions) {
       new PermissionNodePage(this, type);

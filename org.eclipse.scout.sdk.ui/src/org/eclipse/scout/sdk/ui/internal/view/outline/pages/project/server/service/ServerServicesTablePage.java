@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service;
 
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -26,6 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ServerServicesTablePage extends AbstractPage {
 
@@ -99,17 +99,17 @@ public class ServerServicesTablePage extends AbstractPage {
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
 
-    IJavaProject javaProject = getScoutResource().getJavaProject();
-    IType[] sqlServices = m_serviceHierarchy.getAllSubtypes(iSqlService, TypeFilters.getTypesInProject(javaProject));
-    IType[] bookmarkServices = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, TypeFilters.getTypesInProject(javaProject));
-    IType[] calendarServices = m_serviceHierarchy.getAllSubtypes(iCalendarService, TypeFilters.getTypesInProject(javaProject));
-    IType[] smtpServices = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getTypesInProject(javaProject));
-    IType[] accessControlServices = m_serviceHierarchy.getAllSubtypes(iAccessControlService, TypeFilters.getTypesInProject(javaProject));
-    IType[] lookupServices = m_serviceHierarchy.getAllSubtypes(iLookupService, TypeFilters.getTypesInProject(javaProject));
+    IScoutBundle sb = getScoutResource();
+    IType[] sqlServices = m_serviceHierarchy.getAllSubtypes(iSqlService, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    IType[] bookmarkServices = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    IType[] calendarServices = m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    IType[] smtpServices = m_serviceHierarchy.getAllSubtypes(iSMTPService, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    IType[] accessControlServices = m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    IType[] lookupServices = m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getTypesInScoutBundles(sb));
 
     IType[] services = m_serviceHierarchy.getAllSubtypes(iService,
         TypeFilters.getMultiTypeFilter(
-            TypeFilters.getTypesInProject(javaProject),
+            ScoutTypeFilters.getTypesInScoutBundles(sb),
             TypeFilters.getNotInTypes(sqlServices, bookmarkServices, calendarServices, smtpServices, accessControlServices, lookupServices)
             ), TypeComparators.getTypeNameComparator());
 

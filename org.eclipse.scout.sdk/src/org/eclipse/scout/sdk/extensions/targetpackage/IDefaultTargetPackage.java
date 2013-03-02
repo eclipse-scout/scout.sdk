@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.extensions.targetpackage;
 
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+
 /**
  * <h3>{@link IDefaultTargetPackage}</h3> Specifies package identifiers to be used by IScoutBundle.getPackageName().
  * Must match the id's of the org.eclipse.scout.sdk.targetPackage extensions.

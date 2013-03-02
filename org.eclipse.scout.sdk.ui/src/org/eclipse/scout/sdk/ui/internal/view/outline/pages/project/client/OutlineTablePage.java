@@ -21,10 +21,10 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>OutlineTablePage</h3> ...
@@ -80,7 +80,7 @@ public class OutlineTablePage extends AbstractPage {
       m_outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] outlines = m_outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] outlines = m_outlineHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     for (IType outline : outlines) {
       new OutlineNodePage(this, outline);
     }

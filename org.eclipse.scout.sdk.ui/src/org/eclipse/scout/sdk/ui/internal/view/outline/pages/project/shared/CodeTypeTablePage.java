@@ -23,10 +23,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class CodeTypeTablePage extends AbstractPage {
   final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
@@ -78,7 +78,7 @@ public class CodeTypeTablePage extends AbstractPage {
       m_codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
       m_codeTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
+    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
     IType[] codeTypes = m_codeTypeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
     for (IType codeType : codeTypes) {
       new CodeTypeNodePage(this, codeType);

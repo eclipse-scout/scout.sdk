@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class LookupServiceTablePage extends AbstractPage {
 
@@ -87,7 +88,7 @@ public class LookupServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iLookupService, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     return services;
   }
 

@@ -206,7 +206,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       BindingFileNewAction d = new BindingFileNewAction();
       d.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource());
       presenter = new ActionPresenter(getSection(SECTION_ID_STUB_PROPERTIES).getSectionClient(), d, getFormToolkit());
-      presenter.setEnabled(getPage().getBuildJaxWsBean() != null);
+      presenter.setEnabled(getPage().getBuildJaxWsBean() != null && !getPage().getType().isReadOnly());
       gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       gd.horizontalAlignment = SWT.RIGHT;
       presenter.getContainer().setLayoutData(gd);

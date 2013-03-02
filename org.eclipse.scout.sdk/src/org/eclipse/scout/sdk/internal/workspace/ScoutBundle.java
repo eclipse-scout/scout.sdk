@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -39,7 +40,6 @@ import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -70,6 +70,7 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 public class ScoutBundle implements IScoutBundle {
 
   private final static Pattern REGEX_LEADING_DOTS = Pattern.compile("^\\.*");
+  private final static IPath WORKSPACE_LOCATION = ResourcesPlugin.getWorkspace().getRoot().getRawLocation();
 
   private final Set<IPluginModelBase> m_allDependencies;
   private final Set<IPluginModelBase> m_directDependencies;
@@ -82,6 +83,7 @@ public class ScoutBundle implements IScoutBundle {
   private final IProject m_project;
   private final IPluginModelBase m_pluginModelBase;
   private final String m_symbolicName;
+  private final IPath m_installLocation;
   private final boolean m_isFragment;
   private final boolean m_isBinary;
   private final String m_id;
@@ -105,6 +107,7 @@ public class ScoutBundle implements IScoutBundle {
     m_javaProject = getJavaProject(bundle);
     m_isBinary = getJavaProject() == null;
     m_project = isBinary() ? null : getJavaProject().getProject();
+    m_installLocation = new Path(bundle.getInstallLocation()); // created from Path.toOSString()
     m_symbolicName = bundle.getBundleDescription().getSymbolicName();
     m_defaultComparator = ScoutBundleComparators.getSymbolicNameLevenshteinDistanceComparator(m_symbolicName);
     m_isFragment = bundle.getBundleDescription().getHost() != null;
@@ -234,7 +237,12 @@ public class ScoutBundle implements IScoutBundle {
   @Override
   public boolean contains(IJavaElement e) {
     if (!TypeUtility.exists(e)) return false;
-    return CompareUtility.equals(e.getJavaProject(), getJavaProject());
+    IPath elementPath = e.getPath();
+    IPackageFragmentRoot pckRoot = (IPackageFragmentRoot) e.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
+    if (!pckRoot.isArchive()) {
+      elementPath = WORKSPACE_LOCATION.append(elementPath);
+    }
+    return m_installLocation.isPrefixOf(elementPath);
   }
 
   @Override

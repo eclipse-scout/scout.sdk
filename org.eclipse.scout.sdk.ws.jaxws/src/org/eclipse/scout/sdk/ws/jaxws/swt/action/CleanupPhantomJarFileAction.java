@@ -27,10 +27,10 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -155,7 +155,7 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
     Set<IFile> jarFiles = new HashSet<IFile>();
 
     IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient));
-    IType[] wsConsumerTypes = hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), TypeFilters.getTypesInProject(m_bundle.getJavaProject()));
+    IType[] wsConsumerTypes = hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getTypesInScoutBundles(m_bundle));
 
     for (IType consumerType : wsConsumerTypes) {
       if (!TypeUtility.exists(consumerType)) {

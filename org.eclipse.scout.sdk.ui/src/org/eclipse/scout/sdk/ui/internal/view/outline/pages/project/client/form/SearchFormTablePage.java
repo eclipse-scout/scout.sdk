@@ -23,10 +23,10 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>SearchFormTablePage</h3> ...
@@ -89,7 +89,7 @@ public class SearchFormTablePage extends AbstractPage {
       m_searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);
       m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     return searchForms;
   }
 

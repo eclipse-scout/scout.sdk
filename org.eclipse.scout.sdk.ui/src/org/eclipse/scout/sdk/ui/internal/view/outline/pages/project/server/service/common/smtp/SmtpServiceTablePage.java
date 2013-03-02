@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>SmtpServiceTablePage</h3> ...
@@ -92,7 +93,7 @@ public class SmtpServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSMTPService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iSMTPService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     return services;
   }
 

@@ -41,12 +41,12 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
@@ -155,7 +155,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
 
       IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
       ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
-      IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, TypeFilters.getTypesInProject(m_operation.getImplementationBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+      IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, ScoutTypeFilters.getTypesInScoutBundles(m_operation.getImplementationBundle()), TypeComparators.getTypeNameComparator());
 
       if (serverSessions != null && serverSessions.length == 1) {
         final IType serverSessionType = serverSessions[0];

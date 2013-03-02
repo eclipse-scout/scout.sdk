@@ -29,9 +29,9 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard.WizardTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ClientNodePage extends AbstractBundleNodeTablePage {
 
@@ -84,7 +84,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     // client session
-    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
+    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()));
     if (clientSessions.length > 1) {
       ScoutSdkUi.logWarning("more than one client session found.");
     }
@@ -92,7 +92,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new ClientSessionNodePage(this, clientSession);
     }
     // desktop
-    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
+    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()));
     if (desktops.length > 1) {
       ScoutSdkUi.logWarning("more than one desktop found.");
     }
@@ -100,7 +100,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new DesktopNodePage(this, desktop);
     }
     // desktop extension
-    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
+    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()));
     for (IType desktopExtension : desktopExtensions) {
       new DesktopExtensionNodePage(this, desktopExtension);
     }

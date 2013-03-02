@@ -15,11 +15,11 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -103,7 +103,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    IType[] wsConsumerTypes = m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] wsConsumerTypes = m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     for (IType consumerType : wsConsumerTypes) {
       new WebServiceConsumerNodePage(this, consumerType);
     }

@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -69,9 +70,10 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
   @Test
   public void testFormHierarchy() throws Exception {
     final IJavaProject project = JavaCore.create(getProject(BUNDLE_NAME_CLIENT));
+    final IScoutBundle sb = ScoutTypeUtility.getScoutBundle(project);
     final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
     final IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    IType[] subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getTypesInProject(project));
+    IType[] subtypes = formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb));
     Assert.assertEquals(1, subtypes.length);
     final IntegerHolder formCountHolder = new IntegerHolder(-1);
     formHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
@@ -81,7 +83,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
           case POST_TYPE_REMOVING:
           case POST_TYPE_ADDING:
           case POST_TYPE_CHANGED:
-            formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, TypeFilters.getTypesInProject(project)).length);
+            formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb)).length);
             synchronized (formCountHolder) {
               formCountHolder.notifyAll();
             }

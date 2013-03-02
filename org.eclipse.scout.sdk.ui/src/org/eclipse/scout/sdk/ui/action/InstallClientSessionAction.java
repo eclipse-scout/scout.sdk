@@ -18,10 +18,10 @@ import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  *
@@ -38,7 +38,7 @@ public class InstallClientSessionAction extends AbstractOperationAction {
 
   public void init(ICachedTypeHierarchy clientSessionHierarchy, IScoutBundle scoutResource) {
     if (clientSessionHierarchy != null && !scoutResource.isBinary()) {
-      IType[] clientSessions = clientSessionHierarchy.getAllClasses(TypeFilters.getTypesInProject(scoutResource.getJavaProject()), null);
+      IType[] clientSessions = clientSessionHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(scoutResource), null);
       if (clientSessions.length == 0) {
         IScoutBundle shared = scoutResource.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
         if (shared != null) {

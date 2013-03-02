@@ -20,10 +20,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class LookupCallTablePage extends AbstractPage {
   final IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
@@ -76,7 +76,7 @@ public class LookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(lookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
+    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
     IType[] lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(lookupCall, filter, TypeComparators.getTypeNameComparator());
     for (IType type : lookupCallTypes) {
       new LookupCallNodePage(this, type);

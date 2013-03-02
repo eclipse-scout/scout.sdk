@@ -27,6 +27,47 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
  */
 public class TypeFilters {
 
+  private final static ITypeFilter INTERFACE_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType candidate) {
+      try {
+        int flags = candidate.getFlags();
+        return Flags.isInterface(flags) && !Flags.isDeprecated(flags);
+      }
+      catch (JavaModelException e) {
+        SdkUtilActivator.logWarning("could not evalutate flags of type '" + candidate.getFullyQualifiedName() + "'.", e);
+        return false;
+      }
+    }
+  };
+  private final static ITypeFilter EXISTS_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType type) {
+      return TypeUtility.exists(type);
+    }
+  };
+  private final static ITypeFilter CLASS_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType candidate) {
+      return isClass(candidate);
+    }
+  };
+  private final static ITypeFilter TOP_LEVEL_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType type) {
+      return TypeUtility.exists(type) && !TypeUtility.exists(type.getDeclaringType());
+    }
+  };
+  private final static ITypeFilter IN_WORKSPACE_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType type) {
+      return !type.isBinary() && !type.isReadOnly();
+    }
+  };
+
+  protected TypeFilters() {
+  }
+
   public static ITypeFilter invertFilter(final ITypeFilter filter) {
     return new ITypeFilter() {
       @Override
@@ -69,7 +110,6 @@ public class TypeFilters {
 
   public static ITypeFilter getElementNameFilter(final String typeName) {
     return new ITypeFilter() {
-
       @Override
       public boolean accept(IType type) {
         return type.getElementName().equals(typeName);
@@ -104,31 +144,6 @@ public class TypeFilters {
     };
   }
 
-  public static ITypeFilter getTypesInProjects(IJavaProject[] projects) {
-    final HashSet<IJavaProject> finalProjects = new HashSet<IJavaProject>(Arrays.asList(projects));
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType candidate) {
-        if (!TypeUtility.exists(candidate)) {
-          return false;
-        }
-        return isClass(candidate) && finalProjects.contains(candidate.getJavaProject());
-      }
-    };
-  }
-
-  public static ITypeFilter getTypesInProject(final IJavaProject project) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType candidate) {
-        if (!TypeUtility.exists(candidate)) {
-          return false;
-        }
-        return isClass(candidate) && candidate.getJavaProject().equals(project);
-      }
-    };
-  }
-
   public static ITypeFilter getTypesOnClasspath(final IJavaProject project) {
     return new ITypeFilter() {
       @Override
@@ -142,22 +157,11 @@ public class TypeFilters {
   }
 
   public static ITypeFilter getInWorkspaceFilter() {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType type) {
-        return !type.isBinary() && !type.isReadOnly();
-      }
-    };
+    return IN_WORKSPACE_FILTER;
   }
 
   public static ITypeFilter getTopLevelTypeFilter() {
-    return new ITypeFilter() {
-
-      @Override
-      public boolean accept(IType type) {
-        return TypeUtility.exists(type) && !TypeUtility.exists(type.getDeclaringType());
-      }
-    };
+    return TOP_LEVEL_FILTER;
   }
 
   public static ITypeFilter getInnerClasses(final IType declaringType) {
@@ -215,21 +219,11 @@ public class TypeFilters {
   }
 
   public static ITypeFilter getClassFilter() {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType candidate) {
-        return isClass(candidate);
-      }
-    };
+    return CLASS_FILTER;
   }
 
   public static ITypeFilter getExistingFilter() {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType type) {
-        return type != null && type.exists();
-      }
-    };
+    return EXISTS_FILTER;
   }
 
   public static ITypeFilter getNotInTypes(IType[]... excludedTypes) {
@@ -269,19 +263,7 @@ public class TypeFilters {
   }
 
   public static ITypeFilter getInterfaceFilter() {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType candidate) {
-        try {
-          int flags = candidate.getFlags();
-          return Flags.isInterface(flags) && !Flags.isDeprecated(flags);
-        }
-        catch (JavaModelException e) {
-          SdkUtilActivator.logWarning("could not evalutate flags of type '" + candidate.getFullyQualifiedName() + "'.", e);
-          return false;
-        }
-      }
-    };
+    return INTERFACE_FILTER;
   }
 
   protected static boolean isClass(IType type) {

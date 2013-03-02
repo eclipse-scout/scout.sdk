@@ -22,10 +22,10 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.Looku
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ClientLookupCallTablePage extends AbstractPage {
   final IType localLookupCall = TypeUtility.getType(RuntimeClasses.LocalLookupCall);
@@ -78,7 +78,7 @@ public class ClientLookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] lookupCalls = m_lookupCallHierarchy.getAllClasses(TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), TypeComparators.getTypeNameComparator());
+    IType[] lookupCalls = m_lookupCallHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
     for (IType lookupcall : lookupCalls) {
       new LookupCallNodePage(this, lookupcall);
     }

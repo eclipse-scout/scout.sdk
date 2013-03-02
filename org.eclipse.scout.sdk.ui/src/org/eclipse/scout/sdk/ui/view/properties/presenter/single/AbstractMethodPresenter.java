@@ -242,6 +242,9 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
         m_errorContent.setEnabled(enabled);
       }
       m_deleteButton.setEnabled(enabled);
+      if (m_labelLink != null) {
+        m_labelLink.setEnabled(true); // always allowed to click the label
+      }
     }
   }
 

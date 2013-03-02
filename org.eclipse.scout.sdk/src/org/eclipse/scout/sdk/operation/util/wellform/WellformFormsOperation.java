@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  *
@@ -57,9 +58,9 @@ public class WellformFormsOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find all forms
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    IType[] searchForms = formHierarchy.getAllSubtypes(iSearchForm, TypeFilters.getTypesInProject(getClientBundle().getJavaProject()));
+    IType[] searchForms = formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
     ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getTypesInProject(getClientBundle().getJavaProject()),
+        ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()),
         TypeFilters.getNotInTypes(new HashSet<IType>(Arrays.asList(searchForms)))
         );
     m_forms = formHierarchy.getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator());

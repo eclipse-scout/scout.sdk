@@ -23,9 +23,9 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBund
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNode;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>SharedNodePage</h3> ...
@@ -48,7 +48,7 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
     super.loadChildrenImpl();
     if (getScoutResource().getIconProvider() != null) {
       ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
-      IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()), null);
+      IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), null);
       if (iconTypes.length > 0) {
         new IconNodePage(this, iconTypes[0]);
       }

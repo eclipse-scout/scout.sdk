@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.laf;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -19,7 +18,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
@@ -38,12 +36,12 @@ import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
@@ -161,14 +159,10 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
 
   private IType[] getSwingEnvironments(IScoutBundle bundle) {
     IScoutBundle[] swingBundles = bundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
-    ArrayList<IJavaProject> projects = new ArrayList<IJavaProject>(swingBundles.length);
-    for (IScoutBundle swingChild : swingBundles) {
-      projects.add(swingChild.getJavaProject());
-    }
     IType baseType = TypeUtility.getType(RuntimeClasses.ISwingEnvironment);
     if (TypeUtility.exists(baseType)) {
       IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(baseType);
-      return hierarchy.getAllSubtypes(baseType, TypeFilters.getTypesInProjects(projects.toArray(new IJavaProject[projects.size()])));
+      return hierarchy.getAllSubtypes(baseType, ScoutTypeFilters.getTypesInScoutBundles(swingBundles));
     }
     return new IType[]{};
   }

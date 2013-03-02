@@ -29,10 +29,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>ServerNodePage</h3> ...
@@ -62,7 +62,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
     try {
-      ITypeFilter filter = TypeFilters.getTypesInProject(getScoutResource().getJavaProject());
+      ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
       IType[] serverSessions = m_serverSessionHierarchy.getAllSubtypes(iServerSession, filter, TypeComparators.getTypeNameComparator());
       if (serverSessions.length > 1) {
         ScoutSdkUi.logError("The server bundle '" + getScoutResource().getSymbolicName() + "' can have in maximum 1 server session.");
@@ -102,7 +102,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
 
   protected IType[] resolveServices() {
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    IType[] services = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getTypesInProject(getScoutResource().getJavaProject()));
+    IType[] services = serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()));
     return services;
   }
 
