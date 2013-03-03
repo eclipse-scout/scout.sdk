@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -91,14 +90,9 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
-  @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof CredentialValidationStrategyNewAction) {
-      ((CredentialValidationStrategyNewAction) menu).init(getScoutResource());
+      ((CredentialValidationStrategyNewAction) menu).init(getScoutBundle());
     }
   }
 
@@ -118,7 +112,7 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
     List<IType> types = new ArrayList<IType>();
     try {
       for (IType type : m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy))) {
-        if (TypeUtility.isOnClasspath(type, getScoutResource().getJavaProject()) &&
+        if (TypeUtility.isOnClasspath(type, getScoutBundle().getJavaProject()) &&
             !type.isInterface() && !Flags.isAbstract(type.getFlags()) && !Signature.getQualifier(type.getFullyQualifiedName()).contains("internal")) {
           types.add(type);
         }

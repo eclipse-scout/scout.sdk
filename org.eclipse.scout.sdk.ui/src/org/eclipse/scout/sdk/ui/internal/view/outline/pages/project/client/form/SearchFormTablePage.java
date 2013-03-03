@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -68,14 +67,6 @@ public class SearchFormTablePage extends AbstractPage {
     return IScoutPageConstants.SEARCH_TABLE_PAGE;
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     for (IType searchForm : resolveSearchForms()) {
@@ -89,7 +80,7 @@ public class SearchFormTablePage extends AbstractPage {
       m_searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);
       m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     return searchForms;
   }
 
@@ -103,20 +94,20 @@ public class SearchFormTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformSearchFormsOperation(getScoutResource()));
-      action.setScoutBundle(getScoutResource());
+      action.setOperation(new WellformSearchFormsOperation(getScoutBundle()));
+      action.setScoutBundle(getScoutBundle());
       action.setLabel(Texts.get("WellformAllSearchForms"));
     }
     else if (menu instanceof SearchFormNewAction) {
-      ((SearchFormNewAction) menu).init(getScoutResource());
+      ((SearchFormNewAction) menu).init(getScoutBundle());
     }
     else if (menu instanceof MultipleUpdateFormDataAction) {
-      ((MultipleUpdateFormDataAction) menu).setTypeResolver(new ITypeResolver() {
+      ((MultipleUpdateFormDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
           return resolveSearchForms();
         }
-      });
+      }, getScoutBundle());
     }
   }
 }

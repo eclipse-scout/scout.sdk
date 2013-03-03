@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.ui.action.rename.TableColumnRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class ColumnNodePage extends AbstractScoutTypePage {
 
@@ -34,14 +33,6 @@ public class ColumnNodePage extends AbstractScoutTypePage {
   @Override
   protected String getMethodNameForTranslatedText() {
     return "getConfiguredHeaderText";
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @SuppressWarnings("unchecked")

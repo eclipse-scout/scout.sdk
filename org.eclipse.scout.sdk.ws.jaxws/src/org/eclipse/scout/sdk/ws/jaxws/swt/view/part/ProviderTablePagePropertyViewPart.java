@@ -27,7 +27,7 @@ public class ProviderTablePagePropertyViewPart extends AbstractSinglePageSection
 
   @Override
   protected void init() {
-    m_bundle = getPage().getScoutResource();
+    m_bundle = getPage().getScoutBundle();
   }
 
   @Override

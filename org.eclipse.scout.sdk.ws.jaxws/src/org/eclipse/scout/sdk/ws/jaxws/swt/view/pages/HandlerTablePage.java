@@ -89,14 +89,9 @@ public class HandlerTablePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
-  @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof HandlerNewWizardAction) {
-      ((HandlerNewWizardAction) menu).init(getScoutResource());
+      ((HandlerNewWizardAction) menu).init(getScoutBundle());
     }
   }
 
@@ -120,7 +115,7 @@ public class HandlerTablePage extends AbstractPage {
           if (!candidate.isClass() || candidate.isInterface() || Flags.isAbstract(candidate.getFlags())) {
             return false;
           }
-          if (!TypeUtility.isOnClasspath(candidate, getScoutResource().getJavaProject())) {
+          if (!TypeUtility.isOnClasspath(candidate, getScoutBundle().getJavaProject())) {
             return false;
           }
           return true;
@@ -159,7 +154,7 @@ public class HandlerTablePage extends AbstractPage {
         case POST_TYPE_REMOVING:
         case POST_TYPE_ADDING:
           IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
-          if (bundle == getScoutResource()) {
+          if (bundle == getScoutBundle()) {
             markStructureDirty();
           }
           break;

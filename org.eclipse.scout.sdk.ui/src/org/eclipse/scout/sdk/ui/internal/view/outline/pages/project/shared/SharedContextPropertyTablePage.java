@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.PropertyBean;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>SharedContextPropertyTablePage</h3> ...
@@ -61,14 +60,6 @@ public class SharedContextPropertyTablePage extends AbstractPage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.SHARED_CONTEXT_PROPERTY_TABLE_PAGE;
-  }
-
-  /**
-   * shared bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

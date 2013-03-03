@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuT
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>CalendarItemProviderNodePage</h3> ...
@@ -30,14 +29,6 @@ public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
   public CalendarItemProviderNodePage() {
     super(SdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProvider));
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

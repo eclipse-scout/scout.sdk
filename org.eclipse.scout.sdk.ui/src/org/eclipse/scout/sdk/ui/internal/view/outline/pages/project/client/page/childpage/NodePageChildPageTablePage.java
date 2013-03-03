@@ -27,7 +27,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -62,14 +61,6 @@ public class NodePageChildPageTablePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return true;
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override
@@ -110,10 +101,10 @@ public class NodePageChildPageTablePage extends AbstractPage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof PageLinkAction) {
-      ((PageLinkAction) menu).init(getScoutResource(), getNodePageType());
+      ((PageLinkAction) menu).init(getScoutBundle(), getNodePageType());
     }
     else if (menu instanceof PageNewAction) {
-      ((PageNewAction) menu).init(getScoutResource(), getNodePageType());
+      ((PageNewAction) menu).init(getScoutBundle(), getNodePageType());
     }
   }
 

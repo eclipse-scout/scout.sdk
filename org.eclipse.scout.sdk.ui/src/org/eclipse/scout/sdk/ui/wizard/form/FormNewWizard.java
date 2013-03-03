@@ -90,7 +90,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     if (clientBundle != null) {
       sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
       if (sharedBundle != null) {
-        serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
+        serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), clientBundle, false);
       }
     }
 
@@ -280,6 +280,10 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     @Override
     public void validateTarget(DndEvent dndEvent) {
       if (dndEvent.targetParent == null) {
+        dndEvent.doit = false;
+        return;
+      }
+      if (dndEvent.targetParent.getData() instanceof IScoutBundle && ((IScoutBundle) dndEvent.targetParent.getData()).isBinary()) {
         dndEvent.doit = false;
         return;
       }

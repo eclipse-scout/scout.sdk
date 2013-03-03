@@ -71,8 +71,8 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
-    if (getParent() != null) return getParent().getScoutResource();
+  public IScoutBundle getScoutBundle() {
+    if (getParent() != null) return getParent().getScoutBundle();
     else return null;
   }
 

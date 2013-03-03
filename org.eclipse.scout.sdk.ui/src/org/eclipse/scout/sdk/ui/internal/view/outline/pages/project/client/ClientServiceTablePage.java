@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ClientServiceTablePage extends AbstractPage {
@@ -64,21 +63,13 @@ public class ClientServiceTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     if (m_servieHierarchy == null) {
       m_servieHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
       m_servieHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] serviceTypes = m_servieHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] serviceTypes = m_servieHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType type : serviceTypes) {
       IType serviceInterface = null;
       IType[] interfaces = m_servieHierarchy.getSuperInterfaces(type, TypeFilters.getElementNameFilter("I" + type.getElementName()));
@@ -98,6 +89,6 @@ public class ClientServiceTablePage extends AbstractPage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    ((ClientServiceNewAction) menu).setScoutBundle(getScoutResource());
+    ((ClientServiceNewAction) menu).setScoutBundle(getScoutBundle());
   }
 }

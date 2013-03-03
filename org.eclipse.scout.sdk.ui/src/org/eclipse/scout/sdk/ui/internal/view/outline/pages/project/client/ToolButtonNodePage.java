@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class ToolButtonNodePage extends AbstractScoutTypePage {
 
@@ -38,14 +37,6 @@ public class ToolButtonNodePage extends AbstractScoutTypePage {
   @Override
   protected String getMethodNameForTranslatedText() {
     return "getConfiguredText";
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @SuppressWarnings("unchecked")

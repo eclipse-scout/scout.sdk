@@ -56,7 +56,7 @@ public class AuthenticationHandlerNodePagePropertyViewPart extends AbstractSingl
 
   @Override
   protected void init() {
-    m_bundle = getPage().getScoutResource();
+    m_bundle = getPage().getScoutBundle();
     m_presenterListener = new P_PresenterListener();
     m_pageLoadedListener = new P_PageLoadedListener();
     m_severityListener = new P_ScoutSeverityListener();

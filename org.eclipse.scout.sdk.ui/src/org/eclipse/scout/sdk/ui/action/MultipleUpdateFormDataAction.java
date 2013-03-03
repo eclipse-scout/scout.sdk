@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.ui.action;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.MultipleFormDataUpdateOperation;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 public class MultipleUpdateFormDataAction extends AbstractScoutHandler {
 
   private ITypeResolver m_typeResolver;
-  private IType[] m_types = null;
+  private IScoutBundle m_bundle;
 
   public MultipleUpdateFormDataAction() {
     super(Texts.get("UpdateAllFormdatas"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
@@ -38,36 +38,19 @@ public class MultipleUpdateFormDataAction extends AbstractScoutHandler {
 
   @Override
   public boolean isVisible() {
-    if (getTypeResolver() != null) {
-      m_types = getTypeResolver().getTypes();
-    }
-    if (m_types == null || m_types.length < 1) {
-      return false;
-    }
-    for (IType t : m_types) {
-      if (!isEditable(t)) {
-        return false;
-      }
-    }
-    return true;
+    return m_typeResolver != null && m_bundle != null && !m_bundle.isBinary();
   }
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    MultipleFormDataUpdateOperation op = new MultipleFormDataUpdateOperation(m_types);
+    MultipleFormDataUpdateOperation op = new MultipleFormDataUpdateOperation(m_typeResolver.getTypes());
     OperationJob job = new OperationJob(op);
     job.schedule();
     return null;
   }
 
-  /**
-   * @return the typeResolver
-   */
-  public ITypeResolver getTypeResolver() {
-    return m_typeResolver;
-  }
-
-  public void setTypeResolver(ITypeResolver typeResolver) {
+  public void init(ITypeResolver typeResolver, IScoutBundle bundle) {
     m_typeResolver = typeResolver;
+    m_bundle = bundle;
   }
 }

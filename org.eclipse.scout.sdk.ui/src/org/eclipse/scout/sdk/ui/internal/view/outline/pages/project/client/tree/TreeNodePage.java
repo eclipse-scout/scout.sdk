@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class TreeNodePage extends AbstractScoutTypePage {
 
@@ -44,14 +43,6 @@ public class TreeNodePage extends AbstractScoutTypePage {
   @Override
   protected String getMethodNameForTranslatedText() {
     return "getConfiguredTitle";
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @SuppressWarnings("unchecked")

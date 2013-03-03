@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -100,14 +99,9 @@ public class AuthenticationHandlerTablePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
-  @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof AuthenticationHandlerNewWizardAction) {
-      ((AuthenticationHandlerNewWizardAction) menu).init(getScoutResource(), m_webserviceEnum);
+      ((AuthenticationHandlerNewWizardAction) menu).init(getScoutBundle(), m_webserviceEnum);
     }
   }
 
@@ -127,7 +121,7 @@ public class AuthenticationHandlerTablePage extends AbstractPage {
     List<IType> types = new ArrayList<IType>();
     try {
       for (IType type : m_hierarchy.getAllSubtypes(m_superInterfaceType)) {
-        if (TypeUtility.isOnClasspath(type, getScoutResource().getJavaProject()) && !type.isInterface() && !Flags.isAbstract(type.getFlags()) && !Signature.getQualifier(type.getFullyQualifiedName()).contains("internal")) {
+        if (TypeUtility.isOnClasspath(type, getScoutBundle().getJavaProject()) && !type.isInterface() && !Flags.isAbstract(type.getFlags()) && !Signature.getQualifier(type.getFullyQualifiedName()).contains("internal")) {
           if (type.getDeclaringType() != null && type.getDeclaringType().equals(m_superInterfaceType)) {
             // skip NONE authentication
             continue;

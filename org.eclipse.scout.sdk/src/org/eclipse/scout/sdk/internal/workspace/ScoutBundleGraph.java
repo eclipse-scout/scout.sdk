@@ -19,12 +19,15 @@ import java.util.TreeSet;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleComparator;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
@@ -34,11 +37,13 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 /**
  * Scout Bundle graph implementation
  */
+@SuppressWarnings("restriction")
 public class ScoutBundleGraph implements IScoutBundleGraph {
   private final Set<String> m_dependencyIssues;
   private final ReentrantReadWriteLock m_lock;
 
   private Map<String /*symbolic name*/, ScoutBundle> m_bundleGraph;
+  private Map<IPath, IPluginModelBase> m_targetPlatformBundles;
 
   public ScoutBundleGraph() {
     m_dependencyIssues = new HashSet<String>();
@@ -71,6 +76,8 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
 
       m_bundleGraph = newGraph;
 
+      m_targetPlatformBundles = getTargetPlatformBundles();
+
       if (eventCollector != null) {
         collectDeltas(eventCollector, m_bundleGraph, oldGraph);
       }
@@ -82,6 +89,17 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
 
   public String[] getDependencyIssues() {
     return m_dependencyIssues.toArray(new String[m_dependencyIssues.size()]);
+  }
+
+  public String getContributingBundleSymbolicName(IJavaElement element) {
+    IPluginModelBase externalPlugin = m_targetPlatformBundles.get(element.getPath());
+    if (externalPlugin != null) {
+      return externalPlugin.getBundleDescription().getSymbolicName();
+    }
+    else {
+      // it is not external. there exists a java project.
+      return element.getJavaProject().getElementName();
+    }
   }
 
   @Override
@@ -121,13 +139,17 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
 
   @Override
   public IScoutBundle getBundle(IJavaElement je) {
-    if (je instanceof IJavaProject) {
-      return getBundle(((IJavaProject) je).getElementName());
-    }
-    if (je == null) {
+    if (!TypeUtility.exists(je)) {
       return null;
     }
-    return getBundle(je.getJavaProject().getElementName());
+
+    try {
+      m_lock.readLock().lock();
+      return getBundleNoLock(getContributingBundleSymbolicName(je));
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
   }
 
   @Override
@@ -142,11 +164,24 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   public IScoutBundle getBundle(String symbolicName) {
     try {
       m_lock.readLock().lock();
-      return m_bundleGraph.get(symbolicName);
+      return getBundleNoLock(symbolicName);
     }
     finally {
       m_lock.readLock().unlock();
     }
+  }
+
+  private IScoutBundle getBundleNoLock(String symbolicName) {
+    return m_bundleGraph.get(symbolicName);
+  }
+
+  private static Map<IPath, IPluginModelBase> getTargetPlatformBundles() {
+    IPluginModelBase[] externalModels = PDECore.getDefault().getModelManager().getExternalModels();
+    Map<IPath, IPluginModelBase> result = new HashMap<IPath, IPluginModelBase>(externalModels.length);
+    for (IPluginModelBase externalBundle : externalModels) {
+      result.put(new Path(externalBundle.getInstallLocation()), externalBundle);
+    }
+    return result;
   }
 
   private static void printAsTree(Map<String, ScoutBundle> graph) {

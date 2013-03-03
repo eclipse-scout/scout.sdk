@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.servi
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class CommonServicesNodePage extends AbstractPage {
 
@@ -38,14 +37,6 @@ public class CommonServicesNodePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return true;
-  }
-
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

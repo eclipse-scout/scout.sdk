@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>IconNodePage</h3> a node forks the Icon editor to open on selection.
@@ -35,14 +34,6 @@ public class IconNodePage extends AbstractPage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.ICON_NODE_PAGE;
-  }
-
-  /**
-   * shared bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

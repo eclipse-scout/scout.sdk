@@ -246,7 +246,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return CONTINUE;
     }
     else if (page instanceof AbstractBundleNodeTablePage) {
-      return visitBundleNodePage(((AbstractBundleNodeTablePage) page).getScoutResource());
+      return visitBundleNodePage(((AbstractBundleNodeTablePage) page).getScoutBundle());
     }
     else if (page instanceof ClientSessionNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);

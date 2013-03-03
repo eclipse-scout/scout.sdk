@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -69,14 +68,6 @@ public class SqlServiceTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   protected void loadChildrenImpl() {
     for (IType service : resolveServices()) {
@@ -94,7 +85,7 @@ public class SqlServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSqlService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iSqlService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iSqlService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     return services;
   }
 
@@ -115,7 +106,7 @@ public class SqlServiceTablePage extends AbstractPage {
       });
     }
     else if (menu instanceof SqlServiceNewAction) {
-      ((SqlServiceNewAction) menu).setScoutBundle(getScoutResource());
+      ((SqlServiceNewAction) menu).setScoutBundle(getScoutBundle());
     }
   }
 }

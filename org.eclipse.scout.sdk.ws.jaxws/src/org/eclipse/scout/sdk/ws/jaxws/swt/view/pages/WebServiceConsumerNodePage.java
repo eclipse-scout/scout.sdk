@@ -87,7 +87,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     setType(type);
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.WebserviceConsumer));
 
-    m_bundle = getScoutResource();
+    m_bundle = getScoutBundle();
     m_markerGroupUUID = UUID.randomUUID().toString();
 
     m_wsdlResource = new WsdlResource(m_bundle);
@@ -227,11 +227,6 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_typeChangedListener);
 
     super.unloadPage();
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

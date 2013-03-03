@@ -102,7 +102,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.WebserviceProvider));
 
     m_alias = alias;
-    m_bundle = getScoutResource();
+    m_bundle = getScoutBundle();
     m_markerGroupUUID = UUID.randomUUID().toString();
     m_wsdlResource = new WsdlResource(m_bundle);
     m_wsdlResourceListener = new P_WsdlResourceListener();
@@ -254,11 +254,6 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     JaxWsSdk.getDefault().unregisterPage(WebServiceProviderNodePage.class, this);
 
     super.unloadPage();
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

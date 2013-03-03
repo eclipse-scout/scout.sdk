@@ -42,17 +42,9 @@ public class ServerSessionNodePage extends AbstractScoutTypePage {
     return IScoutPageConstants.SERVER_SESSION_NODE_PAGE;
   }
 
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   protected void loadChildrenImpl() {
-    IScoutBundle sharedBundle = getScoutResource().getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    IScoutBundle sharedBundle = getScoutBundle().getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
     if (sharedBundle != null) {
       IScoutBundle clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       if (clientBundle != null) {
@@ -73,7 +65,7 @@ public class ServerSessionNodePage extends AbstractScoutTypePage {
 
       }
       else {
-        ScoutSdkUi.logInfo("could not find a client bundle name-correspondig to '" + getScoutResource().getSymbolicName() + "'.");
+        ScoutSdkUi.logInfo("could not find a client bundle name-correspondig to '" + getScoutBundle().getSymbolicName() + "'.");
       }
     }
   }

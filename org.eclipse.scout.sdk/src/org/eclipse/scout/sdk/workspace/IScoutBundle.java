@@ -110,6 +110,32 @@ public interface IScoutBundle {
 
   /**
    * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
+   * maybe myself recursively. It returns the first parent bundle (or maybe myself) according to the given filter.<br>
+   * If multiple bundles matching the filter are found on the nearest level, the one having the most similar name to
+   * the symbolic name of the given reference bundle is returned according to the levenshtein distance.
+   * 
+   * @param filter
+   *          The filter to decide which of the parent bundles will be considered as candidates to be returned.
+   * @param reference
+   *          The reference bundle to which the match with the most similar name should be returned.
+   * @param includeThis
+   *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
+   *          matches the filter).
+   * @return The scout bundle on the nearest level matching the given filter.
+   * @see IScoutBundleFilter
+   * @see ScoutBundleFilters
+   * @see IScoutBundleComparator
+   * @see ScoutBundleComparators
+   * @see NamingUtility#stringDistance(String, String)
+   * @see <a
+   *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
+   * @see <a
+   *      href="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</a>
+   */
+  IScoutBundle getParentBundle(IScoutBundleFilter filter, IScoutBundle reference, boolean includeThis);
+
+  /**
+   * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
    * maybe myself recursively. It returns the first parent bundle (or maybe myself) according to the given filter and
    * comparator.
    * 
@@ -173,6 +199,32 @@ public interface IScoutBundle {
    *      href="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</a>
    */
   IScoutBundle getChildBundle(IScoutBundleFilter filter, boolean includeThis);
+
+  /**
+   * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and
+   * maybe myself recursively. It returns the first child bundle (or maybe myself) according to the given filter.<br>
+   * If multiple bundles matching the filter are found on the nearest level, the one having the most similar name to
+   * the symbolic name of the given reference bundle is returned according to the levenshtein distance.
+   * 
+   * @param filter
+   *          The filter to decide which of the child bundles will be considered as candidates to be returned.
+   * @param reference
+   *          The reference bundle to which the match with the most similar name should be returned.
+   * @param includeThis
+   *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
+   *          matches the filter).
+   * @return The scout bundle on the nearest level matching the given filter.
+   * @see IScoutBundleFilter
+   * @see ScoutBundleFilters
+   * @see IScoutBundleComparator
+   * @see ScoutBundleComparators
+   * @see NamingUtility#stringDistance(String, String)
+   * @see <a
+   *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
+   * @see <a
+   *      href="http://en.wikipedia.org/wiki/Levenshtein_distance">http://en.wikipedia.org/wiki/Levenshtein_distance</a>
+   */
+  IScoutBundle getChildBundle(IScoutBundleFilter filter, IScoutBundle reference, boolean includeThis);
 
   /**
    * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and

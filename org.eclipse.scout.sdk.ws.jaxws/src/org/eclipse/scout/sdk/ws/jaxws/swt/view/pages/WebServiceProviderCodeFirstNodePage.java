@@ -76,7 +76,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
 
     m_sunJaxWsBean = sunJaxWsBean;
     m_alias = sunJaxWsBean.getAlias();
-    m_bundle = getScoutResource();
+    m_bundle = getScoutBundle();
     m_markerGroupUUID = UUID.randomUUID().toString();
 
     m_sunJaxWsResourceListener = new P_SunJaxWsResourceListener();
@@ -188,11 +188,6 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
     JaxWsSdk.getDefault().unregisterPage(WebServiceProviderNodePage.class, this);
 
     super.unloadPage();
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

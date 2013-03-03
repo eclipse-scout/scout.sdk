@@ -158,7 +158,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
   }
 
   protected IScoutBundle getScoutProject() {
-    return getPage().getScoutResource();
+    return getPage().getScoutBundle();
   }
 
   private void refreshProductLaunchPresenters(IFile[] productFiles) {

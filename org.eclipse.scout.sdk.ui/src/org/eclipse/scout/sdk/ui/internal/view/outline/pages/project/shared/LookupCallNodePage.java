@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class LookupCallNodePage extends AbstractScoutTypePage {
 
@@ -42,14 +41,6 @@ public class LookupCallNodePage extends AbstractScoutTypePage {
   @Override
   public void loadChildrenImpl() {
     new BeanPropertyTablePage(this, getType());
-  }
-
-  /**
-   * shared bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @SuppressWarnings("unchecked")

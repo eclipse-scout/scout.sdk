@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link TemplateTablePage}</h3> ...
@@ -42,11 +41,6 @@ public class TemplateTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     new FormTemplateTablePage(this);
     new FormFieldTemplateTablePage(this);
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

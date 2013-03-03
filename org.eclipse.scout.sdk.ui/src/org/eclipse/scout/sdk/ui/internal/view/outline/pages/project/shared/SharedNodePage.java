@@ -46,9 +46,9 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
   @Override
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
-    if (getScoutResource().getIconProvider() != null) {
+    if (getScoutBundle().getIconProvider() != null) {
       ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
-      IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), null);
+      IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), null);
       if (iconTypes.length > 0) {
         new IconNodePage(this, iconTypes[0]);
       }
@@ -60,13 +60,13 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
       new LookupCallTablePage(this);
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("could not create LookupCallTablePage in project '" + getScoutResource().getSymbolicName() + "'", e);
+      ScoutSdkUi.logWarning("could not create LookupCallTablePage in project '" + getScoutBundle().getSymbolicName() + "'", e);
     }
     try {
-      new LibrariesTablePage(this, getScoutResource());
+      new LibrariesTablePage(this, getScoutBundle());
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -74,12 +74,12 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutResource());
+      action.setScoutBundle(getScoutBundle());
       action.setLabel(Texts.get("WellformSharedBundle"));
-      action.setOperation(new WellformSharedBundleOperation(getScoutResource()));
+      action.setOperation(new WellformSharedBundleOperation(getScoutBundle()));
     }
     else if (menu instanceof ScoutBundleNewAction) {
-      ((ScoutBundleNewAction) menu).setScoutProject(getScoutResource());
+      ((ScoutBundleNewAction) menu).setScoutProject(getScoutBundle());
     }
   }
 

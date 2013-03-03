@@ -70,14 +70,6 @@ public class FormTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     for (IType t : resolveForms()) {
@@ -90,7 +82,7 @@ public class FormTablePage extends AbstractPage {
       m_formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IScoutBundle sb = getScoutResource();
+    IScoutBundle sb = getScoutBundle();
     IType[] searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(sb));
     IType[] allForms = m_formHierarchy.getAllSubtypes(iForm,
         TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getTypesInScoutBundles(sb), TypeFilters.getNotInTypes(searchForms)),
@@ -109,20 +101,20 @@ public class FormTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformFormsOperation(getScoutResource()));
-      action.setScoutBundle(getScoutResource());
+      action.setOperation(new WellformFormsOperation(getScoutBundle()));
+      action.setScoutBundle(getScoutBundle());
       action.setLabel(Texts.get("WellformAllForms"));
     }
     else if (menu instanceof FormNewAction) {
-      ((FormNewAction) menu).setScoutBundle(getScoutResource());
+      ((FormNewAction) menu).setScoutBundle(getScoutBundle());
     }
     else if (menu instanceof MultipleUpdateFormDataAction) {
-      ((MultipleUpdateFormDataAction) menu).setTypeResolver(new ITypeResolver() {
+      ((MultipleUpdateFormDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
           return resolveForms();
         }
-      });
+      }, getScoutBundle());
     }
   }
 }

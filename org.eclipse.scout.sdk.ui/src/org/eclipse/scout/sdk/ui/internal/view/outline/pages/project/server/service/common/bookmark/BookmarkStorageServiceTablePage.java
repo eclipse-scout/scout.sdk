@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -68,14 +67,6 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     for (IType service : resolveServices()) {
@@ -93,7 +84,7 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iBookmarkStorageService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     return services;
   }
 
@@ -114,7 +105,7 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
       });
     }
     else if (menu instanceof BookmarkStorageServiceNewAction) {
-      ((BookmarkStorageServiceNewAction) menu).setScoutBundle(getScoutResource());
+      ((BookmarkStorageServiceNewAction) menu).setScoutBundle(getScoutBundle());
     }
   }
 }

@@ -27,7 +27,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -77,7 +76,7 @@ public class FormTemplateTablePage extends AbstractPage {
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        ScoutTypeFilters.getInScoutBundles(getScoutResource()),
+        ScoutTypeFilters.getInScoutBundles(getScoutBundle()),
         TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic)
         );
     IType[] allSubtypes = m_formHierarchy.getAllSubtypes(iForm, filter, TypeComparators.getTypeNameComparator());
@@ -87,12 +86,12 @@ public class FormTemplateTablePage extends AbstractPage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof MultipleUpdateFormDataAction) {
-      ((MultipleUpdateFormDataAction) menu).setTypeResolver(new ITypeResolver() {
+      ((MultipleUpdateFormDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
           return resolveFormTemplates();
         }
-      });
+      }, getScoutBundle());
     }
   }
 
@@ -100,14 +99,6 @@ public class FormTemplateTablePage extends AbstractPage {
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{MultipleUpdateFormDataAction.class};
-  }
-
-  /**
-   * @return the client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

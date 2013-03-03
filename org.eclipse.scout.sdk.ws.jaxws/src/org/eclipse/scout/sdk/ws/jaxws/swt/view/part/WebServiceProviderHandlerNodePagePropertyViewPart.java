@@ -64,7 +64,7 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
 
   @Override
   protected void init() {
-    m_bundle = getPage().getScoutResource();
+    m_bundle = getPage().getScoutBundle();
     m_sectionsIdentifiers = new HashSet<String>();
     m_handlerPresenters = new ArrayList<TypePresenter>();
 

@@ -38,7 +38,7 @@ public class TextProviderServiceNewAction extends AbstractWizardAction {
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     TextServiceTablePage page = (TextServiceTablePage) selection[0]; // size must be one -> no multi select allowed.
-    m_bundle = page.getScoutResource();
+    m_bundle = page.getScoutBundle();
     return super.execute(shell, selection, event);
   }
 

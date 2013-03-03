@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypeOrderChangedPageDirt
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -66,14 +65,6 @@ public class CalendarItemProviderTablePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return true;
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

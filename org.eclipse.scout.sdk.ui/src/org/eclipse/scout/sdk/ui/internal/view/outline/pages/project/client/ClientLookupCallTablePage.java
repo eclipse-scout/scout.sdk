@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ClientLookupCallTablePage extends AbstractPage {
@@ -59,14 +58,6 @@ public class ClientLookupCallTablePage extends AbstractPage {
     return IScoutPageConstants.CLIENT_LOOKUP_CALL_TABLE_PAGE;
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public boolean isFolder() {
     return true;
@@ -78,7 +69,7 @@ public class ClientLookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] lookupCalls = m_lookupCallHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] lookupCalls = m_lookupCallHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType lookupcall : lookupCalls) {
       new LookupCallNodePage(this, lookupcall);
     }
@@ -94,12 +85,12 @@ public class ClientLookupCallTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformLookupCallsOperation(getScoutResource()));
-      action.setScoutBundle(getScoutResource());
+      action.setOperation(new WellformLookupCallsOperation(getScoutBundle()));
+      action.setScoutBundle(getScoutBundle());
       action.setLabel(Texts.get("WellformLookupCalls"));
     }
     else if (menu instanceof LocalLookupCallNewAction) {
-      ((LocalLookupCallNewAction) menu).setScoutBundle(getScoutResource());
+      ((LocalLookupCallNewAction) menu).setScoutBundle(getScoutBundle());
     }
   }
 }

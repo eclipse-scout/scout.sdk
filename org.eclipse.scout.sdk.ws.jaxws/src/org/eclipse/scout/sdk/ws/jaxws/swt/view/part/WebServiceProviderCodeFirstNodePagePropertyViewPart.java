@@ -75,7 +75,7 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
 
   @Override
   protected void init() {
-    m_bundle = getPage().getScoutResource();
+    m_bundle = getPage().getScoutBundle();
     m_presenterListener = new P_PresenterListener();
     m_severityListener = new P_ScoutSeverityListener();
     m_pageLoadedListener = new P_PageLoadedListener();

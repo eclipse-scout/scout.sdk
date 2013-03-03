@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -68,14 +67,6 @@ public class CalendarServiceTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     for (IType service : resolveServices()) {
@@ -93,7 +84,7 @@ public class CalendarServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCalendarService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     return services;
   }
 
@@ -114,7 +105,7 @@ public class CalendarServiceTablePage extends AbstractPage {
       });
     }
     else if (menu instanceof CalendarServiceNewAction) {
-      ((CalendarServiceNewAction) menu).setScoutBundle(getScoutResource());
+      ((CalendarServiceNewAction) menu).setScoutBundle(getScoutBundle());
     }
   }
 }

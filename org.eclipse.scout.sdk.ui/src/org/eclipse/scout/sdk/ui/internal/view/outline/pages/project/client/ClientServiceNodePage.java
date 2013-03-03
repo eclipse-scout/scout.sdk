@@ -21,21 +21,12 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class ClientServiceNodePage extends AbstractServiceNodePage {
 
   public ClientServiceNodePage(AbstractPage parent, IType type, IType interfaceType) {
     super(parent, type, interfaceType, SdkProperties.SUFFIX_SERVICE);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Service));
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @SuppressWarnings("unchecked")

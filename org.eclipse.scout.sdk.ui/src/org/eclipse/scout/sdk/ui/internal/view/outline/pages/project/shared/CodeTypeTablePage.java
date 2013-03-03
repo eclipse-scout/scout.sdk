@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class CodeTypeTablePage extends AbstractPage {
@@ -64,21 +63,13 @@ public class CodeTypeTablePage extends AbstractPage {
     super.refresh(clearCache);
   }
 
-  /**
-   * shared bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     if (m_codeTypeHierarchy == null) {
       m_codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
       m_codeTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
+    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
     IType[] codeTypes = m_codeTypeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
     for (IType codeType : codeTypes) {
       new CodeTypeNodePage(this, codeType);
@@ -95,12 +86,12 @@ public class CodeTypeTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutResource());
-      action.setOperation(new WellformCodeTypesOperation(getScoutResource()));
+      action.setScoutBundle(getScoutBundle());
+      action.setOperation(new WellformCodeTypesOperation(getScoutBundle()));
       action.setLabel(Texts.get("WellformAllCodeTypes"));
     }
     else if (menu instanceof CodeTypeNewAction) {
-      ((CodeTypeNewAction) menu).setScoutBundle(getScoutResource());
+      ((CodeTypeNewAction) menu).setScoutBundle(getScoutBundle());
     }
   }
 }

@@ -84,7 +84,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     // client session
-    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()));
+    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
     if (clientSessions.length > 1) {
       ScoutSdkUi.logWarning("more than one client session found.");
     }
@@ -92,7 +92,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new ClientSessionNodePage(this, clientSession);
     }
     // desktop
-    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()));
+    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
     if (desktops.length > 1) {
       ScoutSdkUi.logWarning("more than one desktop found.");
     }
@@ -100,7 +100,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new DesktopNodePage(this, desktop);
     }
     // desktop extension
-    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()));
+    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
     for (IType desktopExtension : desktopExtensions) {
       new DesktopExtensionNodePage(this, desktopExtension);
     }
@@ -119,10 +119,10 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
     new AllPagesTablePage(this);
     new TemplateTablePage(this);
     try {
-      new LibrariesTablePage(this, getScoutResource());
+      new LibrariesTablePage(this, getScoutBundle());
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutResource().getSymbolicName() + "'.", e);
+      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutBundle().getSymbolicName() + "'.", e);
     }
   }
 
@@ -136,17 +136,17 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformClientBundleOperation(getScoutResource()));
-      action.setScoutBundle(getScoutResource());
+      action.setOperation(new WellformClientBundleOperation(getScoutBundle()));
+      action.setScoutBundle(getScoutBundle());
     }
     else if (menu instanceof FormDataUpdateAction) {
-      ((FormDataUpdateAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutResource()));
+      ((FormDataUpdateAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutBundle()));
     }
     else if (menu instanceof InstallClientSessionAction) {
-      ((InstallClientSessionAction) menu).init(m_clientSessionHierarchy, getScoutResource());
+      ((InstallClientSessionAction) menu).init(m_clientSessionHierarchy, getScoutBundle());
     }
     else if (menu instanceof ScoutBundleNewAction) {
-      ((ScoutBundleNewAction) menu).setScoutProject(getScoutResource());
+      ((ScoutBundleNewAction) menu).setScoutProject(getScoutBundle());
     }
   }
 }

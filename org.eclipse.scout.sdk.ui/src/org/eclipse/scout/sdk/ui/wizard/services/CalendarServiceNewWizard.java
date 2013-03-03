@@ -82,7 +82,7 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
     if (serverBundle != null) {
       sharedBundle = serverBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
       if (sharedBundle != null) {
-        clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
+        clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), serverBundle, false);
       }
     }
 
@@ -189,6 +189,10 @@ public class CalendarServiceNewWizard extends AbstractWorkspaceWizard {
     @Override
     public void validateTarget(DndEvent dndEvent) {
       if (dndEvent.targetParent == null) {
+        dndEvent.doit = false;
+        return;
+      }
+      if (dndEvent.targetParent.getData() instanceof IScoutBundle && ((IScoutBundle) dndEvent.targetParent.getData()).isBinary()) {
         dndEvent.doit = false;
         return;
       }

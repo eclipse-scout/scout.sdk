@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -58,14 +57,6 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return true;
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override
@@ -101,10 +92,10 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof PageLinkAction) {
-      ((PageLinkAction) menu).init(getScoutResource(), getOutlineType());
+      ((PageLinkAction) menu).init(getScoutBundle(), getOutlineType());
     }
     else if (menu instanceof PageNewAction) {
-      ((PageNewAction) menu).init(getScoutResource(), getOutlineType());
+      ((PageNewAction) menu).init(getScoutBundle(), getOutlineType());
     }
   }
 

@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class LookupCallTablePage extends AbstractPage {
@@ -57,14 +56,6 @@ public class LookupCallTablePage extends AbstractPage {
     return IScoutPageConstants.LOOKUP_CALL_TABLE_PAGE;
   }
 
-  /**
-   * shared bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public boolean isFolder() {
     return true;
@@ -76,7 +67,7 @@ public class LookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(lookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
+    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
     IType[] lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(lookupCall, filter, TypeComparators.getTypeNameComparator());
     for (IType type : lookupCallTypes) {
       new LookupCallNodePage(this, type);
@@ -91,6 +82,6 @@ public class LookupCallTablePage extends AbstractPage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    ((LookupCallNewAction) menu).setScoutBundle(getScoutResource());
+    ((LookupCallNewAction) menu).setScoutBundle(getScoutBundle());
   }
 }

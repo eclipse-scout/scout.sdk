@@ -73,14 +73,6 @@ public class ServerServicesTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     for (IType service : resolveServices()) {
@@ -99,7 +91,7 @@ public class ServerServicesTablePage extends AbstractPage {
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
 
-    IScoutBundle sb = getScoutResource();
+    IScoutBundle sb = getScoutBundle();
     IType[] sqlServices = m_serviceHierarchy.getAllSubtypes(iSqlService, ScoutTypeFilters.getTypesInScoutBundles(sb));
     IType[] bookmarkServices = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(sb));
     IType[] calendarServices = m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(sb));
@@ -133,7 +125,7 @@ public class ServerServicesTablePage extends AbstractPage {
       });
     }
     else if (menu instanceof ProcessServiceNewAction) {
-      ((ProcessServiceNewAction) menu).setScoutBundle(getScoutResource());
+      ((ProcessServiceNewAction) menu).setScoutBundle(getScoutBundle());
     }
   }
 }

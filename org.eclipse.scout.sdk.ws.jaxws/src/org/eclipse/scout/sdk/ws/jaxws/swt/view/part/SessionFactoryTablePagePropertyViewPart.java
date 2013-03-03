@@ -29,7 +29,7 @@ public class SessionFactoryTablePagePropertyViewPart extends AbstractSinglePageS
 
   @Override
   protected void init() {
-    m_bundle = getPage().getScoutResource();
+    m_bundle = getPage().getScoutBundle();
   }
 
   @Override

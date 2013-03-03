@@ -17,7 +17,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link LibraryNodePage}</h3> ...
@@ -41,11 +40,6 @@ public class LibraryNodePage extends AbstractPage {
     return IScoutPageConstants.LIBRARIES_NODE_PAGE;
   }
 
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
@@ -56,7 +50,7 @@ public class LibraryNodePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu.getClass() == LibrariesBundleUnlinkAction.class) {
       LibrariesBundleUnlinkAction unlinkAction = (LibrariesBundleUnlinkAction) menu;
-      unlinkAction.addLibraryToRemove(getScoutResource(), getPluginModel());
+      unlinkAction.addLibraryToRemove(getScoutBundle(), getPluginModel());
     }
     else {
       super.prepareMenuAction(menu);

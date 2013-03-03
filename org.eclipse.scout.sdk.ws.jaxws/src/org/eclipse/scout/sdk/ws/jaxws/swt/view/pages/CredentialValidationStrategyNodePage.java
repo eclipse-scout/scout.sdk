@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -40,7 +40,7 @@ public class CredentialValidationStrategyNodePage extends AbstractPage {
       setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.CredentialValidationStrategy));
     }
 
-    m_bundle = getScoutResource();
+    m_bundle = getScoutBundle();
   }
 
   @Override
@@ -99,11 +99,6 @@ public class CredentialValidationStrategyNodePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return false;
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   public IType getType() {

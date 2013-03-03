@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -67,21 +66,13 @@ public class AllPagesTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     if (m_cachedTypeHierarchy == null) {
       m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_cachedTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] allPages = m_cachedTypeHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] allPages = m_cachedTypeHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     PageNodePageHelper.createRepresentationFor(this, allPages, m_cachedTypeHierarchy);
   }
 
@@ -95,12 +86,12 @@ public class AllPagesTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutResource());
-      action.setOperation(new WellformPagesOperation(getScoutResource()));
+      action.setScoutBundle(getScoutBundle());
+      action.setOperation(new WellformPagesOperation(getScoutBundle()));
       action.setLabel(Texts.get("Wellform all Pages..."));
     }
     else if (menu instanceof PageNewAction) {
-      ((PageNewAction) menu).init(getScoutResource());
+      ((PageNewAction) menu).init(getScoutBundle());
     }
   }
 }

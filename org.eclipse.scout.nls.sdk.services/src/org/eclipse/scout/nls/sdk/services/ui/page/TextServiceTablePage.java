@@ -15,7 +15,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class TextServiceTablePage extends AbstractPage {
@@ -46,11 +45,6 @@ public class TextServiceTablePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
-  @Override
   public String getPageId() {
     return IScoutPageConstants.TEXT_SERVICE_TABLE_PAGE;
   }
@@ -73,7 +67,7 @@ public class TextServiceTablePage extends AbstractPage {
     }
     try {
       IType[] services = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
-      ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
+      ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
       for (IType type : services) {
         if (filter.accept(type)) {
           new TextServiceNodePage(this, type);

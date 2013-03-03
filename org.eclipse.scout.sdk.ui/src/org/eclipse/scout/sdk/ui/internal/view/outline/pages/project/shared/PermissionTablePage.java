@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class PermissionTablePage extends AbstractPage {
@@ -62,21 +61,13 @@ public class PermissionTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * shared bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     if (m_basicPermissionHierarchy == null) {
       m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(basicPermission);
       m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutResource());
+    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
     IType[] permissions = m_basicPermissionHierarchy.getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator());
     for (IType type : permissions) {
       new PermissionNodePage(this, type);
@@ -91,6 +82,6 @@ public class PermissionTablePage extends AbstractPage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    ((PermissionNewAction) menu).setScoutBundle(getScoutResource());
+    ((PermissionNewAction) menu).setScoutBundle(getScoutBundle());
   }
 }

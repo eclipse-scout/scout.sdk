@@ -30,7 +30,7 @@ public class AuthenticationHandlerTablePagePropertyViewPart extends AbstractSing
 
   @Override
   protected void init() {
-    m_bundle = getPage().getScoutResource();
+    m_bundle = getPage().getScoutBundle();
   }
 
   @Override

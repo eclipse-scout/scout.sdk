@@ -23,7 +23,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ProjectScope;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -70,7 +69,6 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 public class ScoutBundle implements IScoutBundle {
 
   private final static Pattern REGEX_LEADING_DOTS = Pattern.compile("^\\.*");
-  private final static IPath WORKSPACE_LOCATION = ResourcesPlugin.getWorkspace().getRoot().getRawLocation();
 
   private final Set<IPluginModelBase> m_allDependencies;
   private final Set<IPluginModelBase> m_directDependencies;
@@ -83,10 +81,10 @@ public class ScoutBundle implements IScoutBundle {
   private final IProject m_project;
   private final IPluginModelBase m_pluginModelBase;
   private final String m_symbolicName;
-  private final IPath m_installLocation;
   private final boolean m_isFragment;
   private final boolean m_isBinary;
   private final String m_id;
+  private final int m_hash;
 
   private IEclipsePreferences m_projectPreferences;
   private Holder<INlsProject> m_nlsProjectHolder;
@@ -107,11 +105,11 @@ public class ScoutBundle implements IScoutBundle {
     m_javaProject = getJavaProject(bundle);
     m_isBinary = getJavaProject() == null;
     m_project = isBinary() ? null : getJavaProject().getProject();
-    m_installLocation = new Path(bundle.getInstallLocation()); // created from Path.toOSString()
     m_symbolicName = bundle.getBundleDescription().getSymbolicName();
     m_defaultComparator = ScoutBundleComparators.getSymbolicNameLevenshteinDistanceComparator(m_symbolicName);
     m_isFragment = bundle.getBundleDescription().getHost() != null;
     m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + m_isFragment + "@binary=" + m_isBinary + "}";
+    m_hash = m_id.hashCode();
 
     m_nlsProjectHolder = null;
     m_docsNlsProjectHolder = null;
@@ -154,7 +152,7 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public int hashCode() {
-    return toString().hashCode();
+    return m_hash;
   }
 
   @Override
@@ -188,6 +186,12 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   @Override
+  public IScoutBundle getChildBundle(IScoutBundleFilter filter, IScoutBundle reference, boolean includeThis) {
+    IScoutBundleComparator c = ScoutBundleComparators.getSymbolicNameLevenshteinDistanceComparator(reference.getSymbolicName());
+    return getChildBundle(filter, c, includeThis);
+  }
+
+  @Override
   public IScoutBundle getChildBundle(IScoutBundleFilter filter, IScoutBundleComparator comparator, boolean includeThis) {
     P_SingleBundleByLevelCollector bundleCollector = new P_SingleBundleByLevelCollector(filter, comparator);
     visit(bundleCollector, includeThis, false);
@@ -204,6 +208,12 @@ public class ScoutBundle implements IScoutBundle {
   @Override
   public IScoutBundle getParentBundle(IScoutBundleFilter filter, boolean includeThis) {
     return getParentBundle(filter, m_defaultComparator, includeThis);
+  }
+
+  @Override
+  public IScoutBundle getParentBundle(IScoutBundleFilter filter, IScoutBundle reference, boolean includeThis) {
+    IScoutBundleComparator c = ScoutBundleComparators.getSymbolicNameLevenshteinDistanceComparator(reference.getSymbolicName());
+    return getParentBundle(filter, c, includeThis);
   }
 
   @Override
@@ -237,12 +247,8 @@ public class ScoutBundle implements IScoutBundle {
   @Override
   public boolean contains(IJavaElement e) {
     if (!TypeUtility.exists(e)) return false;
-    IPath elementPath = e.getPath();
-    IPackageFragmentRoot pckRoot = (IPackageFragmentRoot) e.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
-    if (!pckRoot.isArchive()) {
-      elementPath = WORKSPACE_LOCATION.append(elementPath);
-    }
-    return m_installLocation.isPrefixOf(elementPath);
+    String contributingBundle = ScoutWorkspace.getInstance().getBundleGraphInternal().getContributingBundleSymbolicName(e);
+    return m_symbolicName.equals(contributingBundle);
   }
 
   @Override

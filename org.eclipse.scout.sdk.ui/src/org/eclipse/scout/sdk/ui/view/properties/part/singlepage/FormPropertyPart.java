@@ -107,7 +107,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
             model.addGlobalLink(new TypeOpenLink(formDataType));
           }
 
-          IScoutBundle client = getPage().getScoutResource();
+          IScoutBundle client = getPage().getScoutBundle();
           IScoutBundle[] shareds = client.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
           IScoutBundle[] serversAndShareds = null;
           if (shareds != null) {

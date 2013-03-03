@@ -33,7 +33,7 @@ public interface IPage {
 
   int getOrder();
 
-  IScoutBundle getScoutResource();
+  IScoutBundle getScoutBundle();
 
   ScoutExplorerPart getOutlineView();
 

@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class LookupServiceTablePage extends AbstractPage {
@@ -63,14 +62,6 @@ public class LookupServiceTablePage extends AbstractPage {
     super.refresh(clearCache);
   }
 
-  /**
-   * server bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     for (IType service : resolveAllLookupServices()) {
@@ -88,7 +79,7 @@ public class LookupServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] services = m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     return services;
   }
 
@@ -109,7 +100,7 @@ public class LookupServiceTablePage extends AbstractPage {
       });
     }
     else if (menu instanceof LookupServiceNewAction) {
-      ((LookupServiceNewAction) menu).setScoutBundle(getScoutResource());
+      ((LookupServiceNewAction) menu).setScoutBundle(getScoutBundle());
     }
   }
 }

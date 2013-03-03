@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class MenuNodePage extends AbstractScoutTypePage {
@@ -50,14 +49,6 @@ public class MenuNodePage extends AbstractScoutTypePage {
   @Override
   protected String getMethodNameForTranslatedText() {
     return "getConfiguredText";
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

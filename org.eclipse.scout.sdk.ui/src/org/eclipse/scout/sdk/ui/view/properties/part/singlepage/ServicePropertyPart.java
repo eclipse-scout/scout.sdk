@@ -76,7 +76,7 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
         ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
             TypeFilters.getRegexSimpleNameFilter(formRegex),
             TypeFilters.getClassFilter(),
-            ScoutTypeFilters.getInScoutBundles(getPage().getScoutResource().getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false))
+            ScoutTypeFilters.getInScoutBundles(getPage().getScoutBundle().getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false))
             );
         LinkGroup formGroup = model.getOrCreateGroup(Texts.get("Form"), 10);
         for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(iForm).getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator())) {
@@ -89,7 +89,7 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
       ITypeFilter filter = TypeFilters.getMultiTypeFilter(
           TypeFilters.getRegexSimpleNameFilter(permissionRegex),
           TypeFilters.getClassFilter(),
-          ScoutTypeFilters.getInScoutBundles(getPage().getScoutResource().getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false))
+          ScoutTypeFilters.getInScoutBundles(getPage().getScoutBundle().getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false))
           );
       LinkGroup permissionGroup = model.getOrCreateGroup(Texts.get("PermissionTablePage"), 20);
       for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {

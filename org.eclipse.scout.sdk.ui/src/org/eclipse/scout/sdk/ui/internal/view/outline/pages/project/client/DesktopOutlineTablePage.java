@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -53,14 +52,6 @@ public class DesktopOutlineTablePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return true;
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   /**
@@ -117,7 +108,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    ((OutlineNewAction) menu).init(getScoutResource(), getDesktopType());
+    ((OutlineNewAction) menu).init(getScoutBundle(), getDesktopType());
   }
 
   private class P_MethodListener implements IJavaResourceChangedListener {

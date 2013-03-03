@@ -45,7 +45,7 @@ public class WebServiceProviderTablePage extends AbstractPage {
     setName(Texts.get("Services"));
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsIcons.WebserviceProviderFolder));
 
-    m_bundle = getScoutResource();
+    m_bundle = getScoutBundle();
 
     m_resourceListener = new P_SunJaxWsResourceListener();
     getSunJaxWsResource().addResourceListener(m_resourceListener);
@@ -59,11 +59,6 @@ public class WebServiceProviderTablePage extends AbstractPage {
   @Override
   public boolean isFolder() {
     return true;
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

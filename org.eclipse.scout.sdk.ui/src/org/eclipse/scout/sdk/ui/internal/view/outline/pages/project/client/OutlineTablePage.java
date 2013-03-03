@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -61,14 +60,6 @@ public class OutlineTablePage extends AbstractPage {
     return IScoutPageConstants.OUTLINE_TABLE_PAGE;
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public boolean isFolder() {
     return true;
@@ -80,7 +71,7 @@ public class OutlineTablePage extends AbstractPage {
       m_outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] outlines = m_outlineHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] outlines = m_outlineHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType outline : outlines) {
       new OutlineNodePage(this, outline);
     }
@@ -95,13 +86,13 @@ public class OutlineTablePage extends AbstractPage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof OutlineNewAction) {
-      ((OutlineNewAction) menu).init(getScoutResource());
+      ((OutlineNewAction) menu).init(getScoutBundle());
     }
     else if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setLabel(Texts.get("WellformAllOutlines"));
-      action.setScoutBundle(getScoutResource());
-      action.setOperation(new WellformOutlinesOperation(getScoutResource()));
+      action.setScoutBundle(getScoutBundle());
+      action.setOperation(new WellformOutlinesOperation(getScoutBundle()));
     }
   }
 }

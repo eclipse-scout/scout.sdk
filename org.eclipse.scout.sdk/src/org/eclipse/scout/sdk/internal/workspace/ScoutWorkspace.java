@@ -62,6 +62,10 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     return m_bundleGraph;
   }
 
+  public ScoutBundleGraph getBundleGraphInternal() {
+    return m_bundleGraph;
+  }
+
   public void rebuildGraph() {
     ScoutWorkspaceEventList eventCollector = new ScoutWorkspaceEventList(this);
     m_bundleGraph.build(eventCollector);

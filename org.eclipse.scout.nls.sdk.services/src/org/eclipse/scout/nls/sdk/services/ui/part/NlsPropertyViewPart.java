@@ -50,7 +50,7 @@ public class NlsPropertyViewPart extends JdtTypePropertyPart {
   protected void fillLinkSection(Composite parent) {
     // model
     LinksPresenterModel model = new LinksPresenterModel();
-    IScoutBundle bundle = getPage().getScoutResource();
+    IScoutBundle bundle = getPage().getScoutBundle();
     if (bundle != null) {
       IType serviceType = getPage().getType();
       if (TypeUtility.exists(serviceType)) {

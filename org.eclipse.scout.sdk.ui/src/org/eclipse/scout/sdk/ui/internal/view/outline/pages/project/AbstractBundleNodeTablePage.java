@@ -54,7 +54,7 @@ public abstract class AbstractBundleNodeTablePage extends AbstractPage {
   }
 
   @Override
-  public final IScoutBundle getScoutResource() {
+  public final IScoutBundle getScoutBundle() {
     return m_bundle.getScoutBundle();
   }
 }

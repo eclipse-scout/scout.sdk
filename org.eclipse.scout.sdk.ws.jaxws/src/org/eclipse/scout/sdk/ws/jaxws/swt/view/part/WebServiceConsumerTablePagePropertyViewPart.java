@@ -37,7 +37,7 @@ public class WebServiceConsumerTablePagePropertyViewPart extends AbstractSingleP
 
   @Override
   protected void init() {
-    m_bundle = getPage().getScoutResource();
+    m_bundle = getPage().getScoutBundle();
   }
 
   @Override

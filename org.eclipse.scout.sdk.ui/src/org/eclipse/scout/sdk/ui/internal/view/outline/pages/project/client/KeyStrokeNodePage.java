@@ -18,7 +18,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class KeyStrokeNodePage extends AbstractScoutTypePage {
 
@@ -30,14 +29,6 @@ public class KeyStrokeNodePage extends AbstractScoutTypePage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.KEY_STROKE_NODE_PAGE;
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

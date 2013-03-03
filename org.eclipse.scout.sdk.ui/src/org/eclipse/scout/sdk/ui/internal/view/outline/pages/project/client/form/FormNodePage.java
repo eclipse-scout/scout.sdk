@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanProper
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -97,7 +96,7 @@ public class FormNodePage extends AbstractScoutTypePage {
     }
     else if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutResource());
+      action.setScoutBundle(getScoutBundle());
       action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
     else if (menu instanceof FormDataUpdateAction) {
@@ -105,17 +104,8 @@ public class FormNodePage extends AbstractScoutTypePage {
     }
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public boolean isFolder() {
     return false;
   }
-
 }

@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class CodeTypeNodePage extends AbstractScoutTypePage {
@@ -43,11 +42,6 @@ public class CodeTypeNodePage extends AbstractScoutTypePage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.CODE_TYPE_NODE_PAGE;
-  }
-
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

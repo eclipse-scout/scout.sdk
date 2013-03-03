@@ -44,7 +44,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
     setName(Texts.get("Services"));
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsIcons.WebserviceConsumerFolder));
 
-    m_bundle = getScoutResource();
+    m_bundle = getScoutBundle();
 
     m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
     m_hierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient));
@@ -84,14 +84,9 @@ public class WebServiceConsumerTablePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
-  @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof ConsumerNewWizardAction) {
-      ((ConsumerNewWizardAction) menu).init(getScoutResource());
+      ((ConsumerNewWizardAction) menu).init(getScoutBundle());
     }
   }
 
@@ -103,7 +98,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    IType[] wsConsumerTypes = m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] wsConsumerTypes = m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType consumerType : wsConsumerTypes) {
       new WebServiceConsumerNodePage(this, consumerType);
     }
@@ -122,7 +117,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
         case POST_TYPE_REMOVING:
         case POST_TYPE_ADDING:
           IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
-          if (bundle == getScoutResource()) {
+          if (bundle == getScoutBundle()) {
             markStructureDirty();
           }
           break;

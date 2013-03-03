@@ -78,7 +78,7 @@ public class LibrariesTablePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
+  public IScoutBundle getScoutBundle() {
     return m_ownerBundle;
   }
 
@@ -91,8 +91,8 @@ public class LibrariesTablePage extends AbstractPage {
     try {
       // find library projects
       List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>(3);
-      if (getScoutResource() != null) {
-        PluginModelHelper helper = new PluginModelHelper(getScoutResource().getProject());
+      if (getScoutBundle() != null) {
+        PluginModelHelper helper = new PluginModelHelper(getScoutBundle().getProject());
         IPluginImport[] allDependencies = helper.Manifest.getAllDependencies();
         Set<String> dependencyIds = new HashSet<String>(allDependencies.length);
         for (IPluginImport dependency : allDependencies) {
@@ -139,10 +139,10 @@ public class LibrariesTablePage extends AbstractPage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof LibraryBundleNewAction) {
-      ((LibraryBundleNewAction) menu).setOwnerBundle((IScoutBundle) getScoutResource());
+      ((LibraryBundleNewAction) menu).setOwnerBundle((IScoutBundle) getScoutBundle());
     }
     else if (menu instanceof LibraryBundleLinkAction) {
-      ((LibraryBundleLinkAction) menu).setLibraryUserBundle(getScoutResource());
+      ((LibraryBundleLinkAction) menu).setLibraryUserBundle(getScoutBundle());
     }
     super.prepareMenuAction(menu);
   }

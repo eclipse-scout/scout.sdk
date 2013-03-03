@@ -152,6 +152,10 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
         dndEvent.doit = false;
         return;
       }
+      if (dndEvent.targetParent.getData() instanceof IScoutBundle && ((IScoutBundle) dndEvent.targetParent.getData()).isBinary()) {
+        dndEvent.doit = false;
+        return;
+      }
       if (dndEvent.operation == DND.DROP_COPY) {
         validateDropCopy(dndEvent);
       }

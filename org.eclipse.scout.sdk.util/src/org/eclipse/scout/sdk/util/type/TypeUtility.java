@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -564,12 +565,20 @@ public class TypeUtility {
    * @return true if element was found in the classpath of project
    */
   public static boolean isOnClasspath(IJavaElement element, IJavaProject project) {
-    if (element == null) {
+    if (!TypeUtility.exists(element)) {
       return false;
     }
-    if (project == null) {
+    if (!TypeUtility.exists(project)) {
       return false;
     }
+
+    if (element instanceof IMember) {
+      IMember member = (IMember) element;
+      if (member.isBinary()) {
+        return project.isOnClasspath(member);
+      }
+    }
+
     IJavaProject elemenProject = element.getJavaProject();
     if (elemenProject != null) {
       if (project.equals(elemenProject)) {

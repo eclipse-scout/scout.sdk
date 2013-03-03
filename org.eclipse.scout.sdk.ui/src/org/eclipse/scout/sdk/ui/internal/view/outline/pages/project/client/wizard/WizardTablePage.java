@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -67,21 +66,13 @@ public class WizardTablePage extends AbstractPage {
     return true;
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   public void loadChildrenImpl() {
     if (m_wizardHierarchy == null) {
       m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
       m_wizardHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getTypesInScoutBundles(getScoutResource()), TypeComparators.getTypeNameComparator());
+    IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType searchForm : searchForms) {
       new WizardNodePage(this, searchForm);
     }
@@ -91,12 +82,12 @@ public class WizardTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutResource());
+      action.setScoutBundle(getScoutBundle());
       action.setLabel(Texts.get("WellformAllWizards"));
-      action.setOperation(new WellformWizardsOperation(getScoutResource()));
+      action.setOperation(new WellformWizardsOperation(getScoutBundle()));
     }
     else if (menu instanceof WizardNewAction) {
-      ((WizardNewAction) menu).setScoutResource(getScoutResource());
+      ((WizardNewAction) menu).setScoutResource(getScoutBundle());
     }
   }
 

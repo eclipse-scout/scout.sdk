@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>PageWithNodeNodePage</h3> ...
@@ -52,14 +51,6 @@ public class PageWithNodeNodePage extends AbstractScoutTypePage {
     return "getConfiguredTitle";
   }
 
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
-  }
-
   @Override
   protected void loadChildrenImpl() {
     new BeanPropertyTablePage(this, getType());
@@ -78,7 +69,7 @@ public class PageWithNodeNodePage extends AbstractScoutTypePage {
     super.prepareMenuAction(menu);
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutResource());
+      action.setScoutBundle(getScoutBundle());
       action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
     else if (menu instanceof DeleteAction) {

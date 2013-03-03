@@ -32,7 +32,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
 import org.eclipse.scout.sdk.util.jdt.ElementChangedListenerEx;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -58,14 +57,6 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
   @Override
   protected String getMethodNameForTranslatedText() {
     return "getConfiguredTitle";
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override
@@ -110,7 +101,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
       action.setName(getName());
     }
     else if (menu instanceof SearchFormNewAction) {
-      ((SearchFormNewAction) menu).init(getType(), getScoutResource());
+      ((SearchFormNewAction) menu).init(getType(), getScoutBundle());
     }
     else if (menu instanceof WellformScoutTypeAction) {
       ((WellformScoutTypeAction) menu).setType(getType());

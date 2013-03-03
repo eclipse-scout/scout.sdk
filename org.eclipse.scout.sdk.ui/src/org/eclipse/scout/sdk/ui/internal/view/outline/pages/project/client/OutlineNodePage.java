@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>OutlineNodePage</h3> ...
@@ -47,14 +46,6 @@ public class OutlineNodePage extends AbstractScoutTypePage {
   @Override
   public boolean isFolder() {
     return false;
-  }
-
-  /**
-   * client bundle
-   */
-  @Override
-  public IScoutBundle getScoutResource() {
-    return (IScoutBundle) super.getScoutResource();
   }
 
   @Override

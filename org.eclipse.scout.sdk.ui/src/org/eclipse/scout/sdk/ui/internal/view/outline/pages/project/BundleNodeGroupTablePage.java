@@ -61,7 +61,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   }
 
   @Override
-  public IScoutBundle getScoutResource() {
+  public IScoutBundle getScoutBundle() {
     return m_group.getDefiningBundle().getScoutBundle();
   }
 
@@ -85,10 +85,10 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof OrganizeAllImportsAction) {
-      ((OrganizeAllImportsAction) menu).setScoutProject(getScoutResource());
+      ((OrganizeAllImportsAction) menu).setScoutProject(getScoutBundle());
     }
     else if (menu instanceof FormDataUpdateAction) {
-      ((FormDataUpdateAction) menu).setOperation(new ScoutBundlesUpdateFormDataOperation(getScoutResource()));
+      ((FormDataUpdateAction) menu).setOperation(new ScoutBundlesUpdateFormDataOperation(getScoutBundle()));
     }
     else if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
@@ -99,16 +99,16 @@ public class BundleNodeGroupTablePage extends AbstractPage {
       });
     }
     else if (menu instanceof ExportScoutProjectAction) {
-      ((ExportScoutProjectAction) menu).setScoutProject(getScoutResource());
+      ((ExportScoutProjectAction) menu).setScoutProject(getScoutBundle());
     }
     else if (menu instanceof ScoutBundleNewAction) {
-      ((ScoutBundleNewAction) menu).setScoutProject(getScoutResource());
+      ((ScoutBundleNewAction) menu).setScoutProject(getScoutBundle());
     }
   }
 
   protected IType[] resolveServices() {
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    IScoutBundle[] serverBundles = getScoutResource().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
+    IScoutBundle[] serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
 
     IType[] services = serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(serverBundles));
     return services;
