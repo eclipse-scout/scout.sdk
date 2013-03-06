@@ -13,7 +13,6 @@ package org.eclipse.scout.nls.sdk.services.ui.action;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.scout.nls.sdk.services.ui.page.TextServiceTablePage;
 import org.eclipse.scout.nls.sdk.services.ui.wizard.NewNlsServiceWizard;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
@@ -37,13 +36,15 @@ public class TextProviderServiceNewAction extends AbstractWizardAction {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    TextServiceTablePage page = (TextServiceTablePage) selection[0]; // size must be one -> no multi select allowed.
-    m_bundle = page.getScoutBundle();
     return super.execute(shell, selection, event);
   }
 
   @Override
   protected IWizard getNewWizardInstance() {
     return new NewNlsServiceWizard(m_bundle);
+  }
+
+  public void setScoutBundle(IScoutBundle sb) {
+    m_bundle = sb;
   }
 }

@@ -84,4 +84,12 @@ public class TextServiceTablePage extends AbstractPage {
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TextProviderServiceNewAction.class};
   }
+
+  @Override
+  public void prepareMenuAction(IScoutHandler menu) {
+    super.prepareMenuAction(menu);
+    if (menu instanceof TextProviderServiceNewAction) {
+      ((TextProviderServiceNewAction) menu).setScoutBundle(getScoutBundle());
+    }
+  }
 }
