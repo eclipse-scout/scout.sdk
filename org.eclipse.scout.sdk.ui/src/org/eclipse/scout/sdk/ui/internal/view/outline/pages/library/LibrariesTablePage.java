@@ -139,7 +139,7 @@ public class LibrariesTablePage extends AbstractPage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof LibraryBundleNewAction) {
-      ((LibraryBundleNewAction) menu).setOwnerBundle((IScoutBundle) getScoutBundle());
+      ((LibraryBundleNewAction) menu).setOwnerBundle(getScoutBundle());
     }
     else if (menu instanceof LibraryBundleLinkAction) {
       ((LibraryBundleLinkAction) menu).setLibraryUserBundle(getScoutBundle());
