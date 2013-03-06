@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 
 public class ProjectsTablePage extends AbstractPage {
 
-  private IScoutWorkspaceListener m_workspaceListener = new IScoutWorkspaceListener() {
+  private final IScoutWorkspaceListener m_workspaceListener = new IScoutWorkspaceListener() {
     @Override
     public void workspaceChanged(ScoutWorkspaceEvent event) {
       switch (event.getType()) {
@@ -35,10 +35,14 @@ public class ProjectsTablePage extends AbstractPage {
     }
   }; // end IScoutWorkspaceListener
 
+  private final ScoutBundleTreeModel m_uiModel;
+
   public ProjectsTablePage(IPage parent) {
     setParent(parent);
     setName(Texts.get("RootNodeName"));
     ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
+    m_uiModel = new ScoutBundleTreeModel();
+    m_uiModel.build(false);
   }
 
   @Override
@@ -57,10 +61,14 @@ public class ProjectsTablePage extends AbstractPage {
   }
 
   @Override
+  public void refresh(boolean clearCache) {
+    m_uiModel.build(true);
+    super.refresh(clearCache);
+  }
+
+  @Override
   public void loadChildrenImpl() {
-    ScoutBundleTreeModel model = new ScoutBundleTreeModel();
-    model.build();
-    for (ScoutBundleNodeGroup g : model.getRoots()) {
+    for (ScoutBundleNodeGroup g : m_uiModel.getRoots()) {
       new BundleNodeGroupTablePage(this, g);
     }
   }

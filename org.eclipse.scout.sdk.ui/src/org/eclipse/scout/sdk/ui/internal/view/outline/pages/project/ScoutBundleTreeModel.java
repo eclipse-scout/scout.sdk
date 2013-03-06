@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
+import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -32,7 +33,10 @@ public class ScoutBundleTreeModel {
 
   private Set<ScoutBundleNodeGroup> m_model;
 
-  public void build() {
+  public void build(boolean forceGraphRebuild) {
+    if (forceGraphRebuild) {
+      ScoutWorkspace.getInstance().rebuildGraph();
+    }
     m_model = buildProjectGraph();
   }
 
