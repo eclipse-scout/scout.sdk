@@ -100,11 +100,13 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
 
     InstallTargetPlatformFileOperation op = new InstallTargetPlatformFileOperation(m_project);
     if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING) {
-      // existing local RAP target
-      op.addLocalDirectory(RAP_TARGET_VARIABLE);
-
       // set the environment variable
-      RapTargetVariable.get().setValue(getLocalTargetFolder());
+      File f = new File(getLocalTargetFolder());
+      RapTargetVariable.get().setValue(f.toURI().toString());
+
+      // existing local RAP target
+      op.addUpdateSite(RAP_TARGET_VARIABLE, ECLIPSE_RT_RAP_FEATURE);
+      op.addUpdateSite(RAP_TARGET_VARIABLE, SCOUT_RT_RAP_FEATURE);
 
       // try to detect if the given folder is a complete platform or only contains the rap plugins
       if (!isPluginAvailable(getLocalTargetFolder(), "org.eclipse.platform_") || !isPluginAvailable(getLocalTargetFolder(), "org.eclipse.help.ui_")) {

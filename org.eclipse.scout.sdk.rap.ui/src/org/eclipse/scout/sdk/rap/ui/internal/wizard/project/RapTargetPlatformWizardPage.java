@@ -55,8 +55,8 @@ import org.osgi.framework.Version;
 
 public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
-  private static final String RAP_RUNTIME_FEATURE_PREFIX = "org.eclipse.rap.runtime_1.5";
-  private static final String RAP_RWT_PLUGIN_PREFIX = "org.eclipse.rap.rwt_1.5";
+  private static final String RAP_RUNTIME_FEATURE_PREFIX = "org.eclipse.rap.feature_";
+  private static final String RAP_RWT_PLUGIN_PREFIX = "org.eclipse.rap.rwt_";
   private static final String RAP_TARGET_DEFAULT_SUB_FOLDER = "rap_target";
 
   private static final String PROP_TARGET_STRATEGY = "propTargetStrategy";

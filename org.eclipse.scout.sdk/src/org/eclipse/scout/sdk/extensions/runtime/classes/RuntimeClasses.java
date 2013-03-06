@@ -81,14 +81,9 @@ public final class RuntimeClasses implements IRuntimeClasses {
                 for (IConfigurationElement defaultElement : element.getChildren(TAG_DEFAULT_NAME)) {
                   String def = defaultElement.getAttribute(ATTRIB_DEFAULT_CLASS);
                   Double prio = -parseDouble(defaultElement.getAttribute(ATTRIB_DEFAULT_PRIO));
-                  if (TypeUtility.existsType(def)) {
-                    String existing = curDefaults.put(prio, def);
-                    if (existing != null) {
-                      ScoutSdk.logWarning("Multiple super type definitions with the same priority found for interface '" + interf + "'.");
-                    }
-                  }
-                  else {
-                    ScoutSdk.logInfo("Super type definition (interface='" + interf + "', default='" + def + "') may not be valid. Types could not be found.");
+                  String existing = curDefaults.put(prio, def);
+                  if (existing != null) {
+                    ScoutSdk.logWarning("Multiple super type definitions with the same priority found for interface '" + interf + "'.");
                   }
                 }
               }

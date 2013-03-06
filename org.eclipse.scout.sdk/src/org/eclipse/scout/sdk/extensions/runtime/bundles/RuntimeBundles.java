@@ -68,7 +68,7 @@ public final class RuntimeBundles {
             for (IConfigurationElement element : elements) {
               if (TAG_NAME.equals(element.getName())) {
                 String symbolicName = element.getAttribute(ATTRIB_NAME);
-                if (StringUtility.hasText(symbolicName) && PluginRegistry.findModel(symbolicName) != null) {
+                if (StringUtility.hasText(symbolicName)) {
                   all.add(symbolicName);
 
                   String order = element.getAttribute(ATTRIB_ORDER);
@@ -85,7 +85,7 @@ public final class RuntimeBundles {
                   }
                 }
                 else {
-                  // RT bundle could not be found.
+                  ScoutSdk.logWarning("No symbolic name defined for extension '" + element.getNamespaceIdentifier() + "'.");
                 }
               }
             }
