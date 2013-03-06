@@ -37,7 +37,7 @@ public class LibraryBundleNewAction extends AbstractWizardAction {
 
   @Override
   public boolean isVisible() {
-    return !m_ownerBundle.isBinary();
+    return m_ownerBundle == null || !m_ownerBundle.isBinary();
   }
 
   @Override
