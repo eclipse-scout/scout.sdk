@@ -575,7 +575,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   }
 
   private void initOfferedTargetStrategies(TARGET_STRATEGY[] offeredTargetStrategies) {
-    boolean isRapTargetPluginAvailable = PlatformVersionUtility.isLatest() && Platform.getBundle(IScoutSdkRapConstants.ScoutRapTargetPlugin) != null;
+    boolean isRapTargetPluginAvailable = Platform.getBundle(IScoutSdkRapConstants.ScoutRapTargetPlugin) != null;
 
     if (!isRapTargetPluginAvailable) {
       // the rap target plugin is not installed: filter the strategy out if it is in the list
