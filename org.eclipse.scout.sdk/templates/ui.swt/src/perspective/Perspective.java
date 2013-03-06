@@ -65,7 +65,9 @@ public class Perspective implements IPerspectiveFactory {
     folder.addPlaceholder(IProgressConstants.PROGRESS_VIEW_ID);
 
     IViewLayout outlineLayout = layout.getViewLayout(NorthWestView.class.getName());
-    outlineLayout.setCloseable(false);
-    outlineLayout.setMoveable(false);
+    if(outlineLayout != null) {
+      outlineLayout.setCloseable(false);
+      outlineLayout.setMoveable(false);
+    }
   }
 }
