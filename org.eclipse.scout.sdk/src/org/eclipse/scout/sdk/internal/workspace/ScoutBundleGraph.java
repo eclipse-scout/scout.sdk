@@ -50,11 +50,11 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
     m_lock = new ReentrantReadWriteLock(true);
   }
 
-  public void build() {
+  void build() {
     build(null);
   }
 
-  public void build(ScoutWorkspaceEventList eventCollector) {
+  void build(ScoutWorkspaceEventList eventCollector) {
     final Map<String, ScoutBundle> oldGraph = m_bundleGraph;
     try {
       m_lock.writeLock().lock();
