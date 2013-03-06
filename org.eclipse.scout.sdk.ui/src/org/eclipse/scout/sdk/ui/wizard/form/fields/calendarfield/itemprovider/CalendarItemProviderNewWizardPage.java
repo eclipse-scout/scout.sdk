@@ -48,7 +48,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
   private final IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
 
   private String m_typeName;

@@ -49,7 +49,6 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
   private Hyperlink m_labelLink;
   private Composite m_body;
   private MethodErrorPresenterContent m_errorContent;
-  private CustomTooltip m_tooltip;
   private HashMap<String, MethodBean<T>> m_methodSources = new HashMap<String, MethodBean<T>>();
 
   public AbstractMultiMethodPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
@@ -106,7 +105,7 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
     m_errorContent = new MethodErrorPresenterContent(parent, getToolkit());
     m_body = getToolkit().createComposite(parent);
     m_labelLink = getToolkit().createHyperlink(m_body, "", SWT.NONE);
-    m_tooltip = new CustomTooltip(m_labelLink, false);
+    new CustomTooltip(m_labelLink, false);
     Control content = createContent(m_body);
 
     // layout

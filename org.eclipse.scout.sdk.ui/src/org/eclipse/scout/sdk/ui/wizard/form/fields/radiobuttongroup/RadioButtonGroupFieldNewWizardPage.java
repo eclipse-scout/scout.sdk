@@ -51,8 +51,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
-
   private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;

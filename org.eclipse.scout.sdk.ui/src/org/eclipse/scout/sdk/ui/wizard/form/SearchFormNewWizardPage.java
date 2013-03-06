@@ -58,7 +58,6 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   public static final String PROP_TABLE_PAGE = "tablePage";
   public static final String PROP_TARGET_PACKAGE = "targetPackage";
 
-  private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
   private final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
   private final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);

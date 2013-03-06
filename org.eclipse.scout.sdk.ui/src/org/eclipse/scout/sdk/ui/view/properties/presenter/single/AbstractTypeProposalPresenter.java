@@ -14,14 +14,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -69,21 +65,4 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
     }
     new OperationJob(op).schedule();
   }
-
-  @Override
-  protected void createContextMenu(MenuManager manager) {
-    super.createContextMenu(manager);
-    if (getCurrentSourceValue() != null) {
-      final IType t = getCurrentSourceValue();
-      if (t != null) {
-        manager.add(new Action(Texts.get("GoTo") + t.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
-          @Override
-          public void run() {
-            showJavaElementInEditor(t);
-          }
-        });
-      }
-    }
-  }
-
 }

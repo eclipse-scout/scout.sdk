@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.ui.extensions.preferences;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -37,13 +35,11 @@ import org.osgi.service.prefs.BackingStoreException;
 public class TargetPackagePreferenceScrolledContent implements IScoutProjectScrolledContent<TargetPackageModel> {
 
   private final List<EntityTextField> m_allEntityTextFields;
-  private final Map<String, ExpandableComposite> m_sections;
   private List<TargetPackageModel> m_entries;
   private SimpleScrolledComposite m_scrollArea;
 
   public TargetPackagePreferenceScrolledContent() {
     m_allEntityTextFields = new ArrayList<EntityTextField>();
-    m_sections = new HashMap<String, ExpandableComposite>();
   }
 
   @Override

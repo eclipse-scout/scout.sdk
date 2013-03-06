@@ -11,13 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.action.LegacyOperationAction;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -26,12 +20,10 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
 
 /**
  * <h3>AbstractProposalPresenter</h3> ...
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractProposalPresenter<T extends Object> extends AbstractMethodPresenter {
 
   private ProposalTextField m_proposalField;
@@ -52,16 +44,6 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
     m_proposalField.setEnabled(false);
     P_ProposalFieldListener listener = new P_ProposalFieldListener();
     m_proposalField.addProposalAdapterListener(listener);
-    MenuManager manager = new MenuManager();
-    Menu menu = manager.createContextMenu(m_proposalField);
-    manager.addMenuListener(new IMenuListener() {
-      @Override
-      public void menuAboutToShow(IMenuManager managerInside) {
-        managerInside.removeAll();
-        createContextMenu((MenuManager) managerInside);
-      }
-    });
-    m_proposalField.setMenu(menu);
     return m_proposalField;
   }
 
@@ -142,12 +124,6 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
     return m_proposalField;
   }
 
-  protected void createContextMenu(MenuManager manager) {
-    if (getMethod().isImplemented()) {
-      manager.add(new LegacyOperationAction(Texts.get("SetDefaultValue"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
-    }
-  }
-
   private class P_ProposalFieldListener implements IProposalAdapterListener {
     @Override
     @SuppressWarnings("unchecked")
@@ -167,6 +143,5 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
         storeValueLock.release();
       }
     }
-
-  } // end class P_TextListener
+  } // end class P_ProposalFieldListener
 }

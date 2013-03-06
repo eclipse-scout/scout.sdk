@@ -13,13 +13,7 @@ package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.IMenuListener;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.action.LegacyOperationAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
@@ -28,13 +22,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 
 /**
  * <h3>AbstractValuePresenter</h3> ...
  */
-@SuppressWarnings("deprecation")
 public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter {
 
   private Text m_textComponent;
@@ -55,17 +47,6 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
     m_textComponent.addListener(SWT.FocusIn, listener);
     m_textComponent.addListener(SWT.FocusOut, listener);
     m_textComponent.addListener(SWT.Verify, listener);
-    MenuManager manager = new MenuManager();
-    manager.setRemoveAllWhenShown(true);
-    Menu menu = manager.createContextMenu(m_textComponent);
-    manager.addMenuListener(new IMenuListener() {
-      @Override
-      public void menuAboutToShow(IMenuManager managerInside) {
-        managerInside.removeAll();
-        createContextMenu((MenuManager) managerInside);
-      }
-    });
-    m_textComponent.setMenu(menu);
     return m_textComponent;
   }
 
@@ -169,12 +150,6 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
 
   public Text getTextComponent() {
     return m_textComponent;
-  }
-
-  protected void createContextMenu(MenuManager manager) {
-    if (getMethod() != null && getMethod().isImplemented()) {
-      manager.add(new LegacyOperationAction(Texts.get("SetDefaultValue"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo), new ScoutMethodDeleteOperation(getMethod().peekMethod())));
-    }
   }
 
   private class P_TextListener implements Listener {

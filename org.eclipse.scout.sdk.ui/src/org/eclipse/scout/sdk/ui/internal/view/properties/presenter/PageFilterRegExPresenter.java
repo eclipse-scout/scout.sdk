@@ -20,14 +20,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 public class PageFilterRegExPresenter extends AbstractPresenter {
 
   private EnableRegExProperty m_prop;
   private Button m_field;
-  private Label m_label;
 
   public PageFilterRegExPresenter(PropertyViewFormToolkit toolkit, Composite parent, EnableRegExProperty prop) {
     super(toolkit, parent);
@@ -37,7 +35,7 @@ public class PageFilterRegExPresenter extends AbstractPresenter {
   }
 
   protected void createContent(Composite parent) {
-    m_label = getToolkit().createLabel(parent, Texts.get("UseRegEx"));
+    getToolkit().createLabel(parent, Texts.get("UseRegEx"));
     m_field = getToolkit().createButton(parent, "", SWT.CHECK);
     m_field.setSelection(m_prop.isRegExFilter());
     GridData gd = new GridData(GridData.FILL_HORIZONTAL);

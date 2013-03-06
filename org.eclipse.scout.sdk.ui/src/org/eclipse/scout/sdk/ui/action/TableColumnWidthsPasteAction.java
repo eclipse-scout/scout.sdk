@@ -25,8 +25,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
@@ -36,7 +34,6 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private IType m_type;
   private HashMap<String, Integer> m_widthsMap;
-  private String m_errorTxt;
 
   public TableColumnWidthsPasteAction() {
     super(Texts.get("Action_PasteColumnWidths"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableColumn), "CTRL+V", false, Category.IMPORT);
@@ -118,12 +115,6 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
       // just no processing afterwards
       return null;
     }
-  }
-
-  private void showInfoMessageBox(Shell s, String message) {
-    MessageBox msgBox = new MessageBox(s, SWT.OK | SWT.ICON_INFORMATION);
-    msgBox.setMessage(message);
-    msgBox.open();
   }
 
   private void changeColumnWidths(IType tableType, HashMap<String, Integer> map) {

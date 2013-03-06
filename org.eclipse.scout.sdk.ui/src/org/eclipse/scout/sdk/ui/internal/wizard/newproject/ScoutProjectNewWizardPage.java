@@ -167,9 +167,11 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
     m_bundleTree.getTreeViewer().refresh();
     String alias = "";
-    int dotIndex = getProjectName().lastIndexOf('.');
-    if (dotIndex > 0 && dotIndex < getProjectName().length() - 1) {
-      alias = getProjectName().substring(dotIndex + 1);
+    if (getProjectName() != null) {
+      int dotIndex = getProjectName().lastIndexOf('.');
+      if (dotIndex > 0 && dotIndex < getProjectName().length() - 1) {
+        alias = getProjectName().substring(dotIndex + 1);
+      }
     }
     if (pf != null && pf.length() > 1) {
       alias = alias + Character.toUpperCase(pf.charAt(0)) + pf.substring(1);

@@ -53,11 +53,9 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
   private final ProcessServiceNewWizardPage m_serviceNewWizardPage;
   private final ProcessServiceNewOperation m_operation;
   private final ITreeNode m_locationWizardPageRoot;
-  private final IScoutBundle m_serverBundle;
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewProcessService"));
-    m_serverBundle = serverBundle;
     m_operation = new ProcessServiceNewOperation();
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 

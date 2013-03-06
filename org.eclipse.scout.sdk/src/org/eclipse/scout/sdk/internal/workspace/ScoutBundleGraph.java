@@ -45,7 +45,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   private Map<String /*symbolic name*/, ScoutBundle> m_bundleGraph;
   private Map<IPath, IPluginModelBase> m_targetPlatformBundles;
 
-  public ScoutBundleGraph() {
+  ScoutBundleGraph() {
     m_dependencyIssues = new HashSet<String>();
     m_lock = new ReentrantReadWriteLock(true);
   }
@@ -87,11 +87,11 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
     }
   }
 
-  public String[] getDependencyIssues() {
+  String[] getDependencyIssues() {
     return m_dependencyIssues.toArray(new String[m_dependencyIssues.size()]);
   }
 
-  public String getContributingBundleSymbolicName(IJavaElement element) {
+  String getContributingBundleSymbolicName(IJavaElement element) {
     IPluginModelBase externalPlugin = m_targetPlatformBundles.get(element.getPath());
     if (externalPlugin != null) {
       return externalPlugin.getBundleDescription().getSymbolicName();
@@ -265,19 +265,4 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
       }
     }
   }
-
-  /**
-   * checks if 'value' is one of the items in 'list'. to check equality the equals method is used.
-   */
-  private static <T> boolean contains(T[] list, T value) {
-    if (list != null) {
-      for (T t : list) {
-        if (CompareUtility.equals(t, value)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
 }

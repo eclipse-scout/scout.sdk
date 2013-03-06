@@ -171,27 +171,6 @@ public class LibraryBundleCreateOperation implements IOperation {
     }
   }
 
-  private void createLibFolder(IProject project, PluginModelHelper helper, IProgressMonitor monitor) throws CoreException {
-    IFolder libFolder = project.getFolder("lib");
-    libFolder.create(true, false, monitor);
-    for (File libFile : getLibraryFiles()) {
-      IFile file = libFolder.getFile(libFile.getName());
-      try {
-        file.create(new FileInputStream(libFile), IFile.FORCE, monitor);
-        helper.BuildProperties.addBinaryBuildEntry(file);
-        helper.Manifest.addClasspathEntry(file);
-      }
-      catch (IOException e) {
-        ScoutSdk.logError("could not create '" + file.getName() + "' in '" + libFolder.getProjectRelativePath() + "'.", e);
-      }
-    }
-  }
-
-  private void createUnpackedLibraries(IProject project, PluginModelHelper helper, IProgressMonitor monitor) {
-    // TODO not yet implemented
-    ScoutSdk.logError("an unpacked library creation is not yet implemented.");
-  }
-
   protected void processLibraryUserBundles(IProject libraryBundle) throws CoreException {
     Set<IScoutBundle> libraryUserBundles = getLibraryUserBundles();
     if (libraryUserBundles != null) {

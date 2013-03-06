@@ -86,8 +86,8 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   private String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
   private TreeViewer m_viewer;
   private ViewContentProvider m_viewContentProvider;
-  // init/update
   private DirtyUpdateManager m_dirtyManager;
+  private IScoutWorkspaceListener m_workspaceListener;
 
   // filtering
   private Object m_pageFilterCacheLock = new Object();
@@ -121,7 +121,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   @Override
   public void createPartControl(final Composite parent) {
     Tree tree = new Tree(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-    // XXX use drag and drop support
+
     m_viewer = new TreeViewer(tree);
     m_viewer.addFilter(new P_PageFilter());
 
@@ -151,7 +151,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     IContextService serivce = (IContextService) getSite().getService(IContextService.class);
     serivce.activateContext("org.eclipse.scout.sdk.explorer.context");
 
-    ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(new IScoutWorkspaceListener() {
+    m_workspaceListener = new IScoutWorkspaceListener() {
       @Override
       public void workspaceChanged(ScoutWorkspaceEvent event) {
         switch (event.getType()) {
@@ -160,9 +160,10 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
             break;
           }
         }
-
       }
-    });
+    };
+
+    ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
     expandAndSelectProjectLevel();
   }
 
@@ -232,6 +233,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     if (m_linkWithEditorAction != null) {
       m_linkWithEditorAction.dispose();
     }
+    ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(m_workspaceListener);
     super.dispose();
   }
 

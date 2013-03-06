@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.compiler.CharOperation;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.StringUtility;
@@ -25,10 +23,8 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
-import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -61,41 +57,6 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
       getProposalField().setInput(null);
     }
     super.init(method);
-  }
-
-  @Override
-  protected void createContextMenu(MenuManager manager) {
-    super.createContextMenu(manager);
-    if (getCurrentSourceValue() != null) {
-      final IType lc = getCurrentSourceValue();
-      if (lc != null) {
-        String entityName = NamingUtility.removeSuffixes(lc.getElementName(), "Call");
-        String lookupServiceFqn = lc.getPackageFragment().getElementName() + ".I" + entityName + "Service";
-        if (TypeUtility.existsType(lookupServiceFqn)) {
-          final IType lookupServiceInterface = TypeUtility.getType(lookupServiceFqn);
-          if (lookupServiceInterface != null) {
-            manager.add(new Action("Go to " + lookupServiceInterface.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
-              @Override
-              public void run() {
-                showJavaElementInEditor(lookupServiceInterface);
-              }
-            });
-          }
-        }
-        String serviceFqn = lc.getPackageFragment().getElementName().replace(".shared.", ".server.") + "." + entityName + "Service";
-        if (TypeUtility.existsType(serviceFqn)) {
-          final IType lookupServiceImplementation = TypeUtility.getType(serviceFqn);
-          if (lookupServiceImplementation != null) {
-            manager.add(new Action("Go to " + lookupServiceImplementation.getElementName(), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.StatusInfo)) {
-              @Override
-              public void run() {
-                showJavaElementInEditor(lookupServiceImplementation);
-              }
-            });
-          }
-        }
-      }
-    }
   }
 
   /**

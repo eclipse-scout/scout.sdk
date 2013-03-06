@@ -52,7 +52,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iListBox = TypeUtility.getType(RuntimeClasses.IListBox);
   private final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
 
   private INlsEntry m_nlsName;
