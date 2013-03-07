@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.preferences.IScoutProjectScrolledContent.IModelLoadProgressObserver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -60,7 +61,11 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
   public AbstractScoutProjectPreferencePage(String desc, Class<T> contentClass, String... scoutBundleTypes) {
     setDescription(desc);
 
-    IScoutBundle[] rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getBundlesOfTypeFilter(scoutBundleTypes));
+    IScoutBundleFilter projectFilter = ScoutBundleFilters.getMultiFilterAnd(
+        ScoutBundleFilters.getWorkspaceBundlesFilter(),
+        ScoutBundleFilters.getBundlesOfTypeFilter(scoutBundleTypes));
+    IScoutBundle[] rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(projectFilter);
+
     m_projectSettings = new HashMap<IScoutBundle, T>(rootProjects.length);
     for (IScoutBundle p : rootProjects) {
       try {
