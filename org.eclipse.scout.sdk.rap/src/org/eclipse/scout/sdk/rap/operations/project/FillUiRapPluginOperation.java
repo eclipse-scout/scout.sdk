@@ -101,12 +101,11 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
     InstallTargetPlatformFileOperation op = new InstallTargetPlatformFileOperation(m_project);
     if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING) {
       // set the environment variable
-      File f = new File(getLocalTargetFolder());
-      RapTargetVariable.get().setValue(f.toURI().toString());
+      RapTargetVariable.get().setValue(getLocalTargetFolder());
 
       // existing local RAP target
-      op.addUpdateSite(RAP_TARGET_VARIABLE, ECLIPSE_RT_RAP_FEATURE);
-      op.addUpdateSite(RAP_TARGET_VARIABLE, SCOUT_RT_RAP_FEATURE);
+      op.addLocalDirectory(RAP_TARGET_VARIABLE);
+      op.addLocalDirectory(RAP_TARGET_VARIABLE);
 
       // try to detect if the given folder is a complete platform or only contains the rap plugins
       if (!isPluginAvailable(getLocalTargetFolder(), "org.eclipse.platform_") || !isPluginAvailable(getLocalTargetFolder(), "org.eclipse.help.ui_")) {
@@ -139,12 +138,11 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       scoutRapTargetExtractOp.run(monitor, workingCopyManager);
 
       // set the environment variable
-      File f = new File(getExtractTargetFolder());
-      RapTargetVariable.get().setValue(f.toURI().toString());
+      RapTargetVariable.get().setValue(getExtractTargetFolder());
 
       op.addRunningEclipseEntries();
-      op.addUpdateSite(RAP_TARGET_VARIABLE, ECLIPSE_RT_RAP_FEATURE);
-      op.addUpdateSite(RAP_TARGET_VARIABLE, SCOUT_RT_RAP_FEATURE);
+      op.addLocalDirectory(RAP_TARGET_VARIABLE);
+      op.addLocalDirectory(RAP_TARGET_VARIABLE);
 
     }
     op.validate();
