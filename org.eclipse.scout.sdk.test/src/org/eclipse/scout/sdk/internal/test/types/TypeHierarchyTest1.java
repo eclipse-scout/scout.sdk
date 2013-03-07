@@ -78,16 +78,10 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     final IntegerHolder formCountHolder = new IntegerHolder(-1);
     formHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
-      public void handleEvent(int eventType, IType type) {
-        switch (eventType) {
-          case POST_TYPE_REMOVING:
-          case POST_TYPE_ADDING:
-          case POST_TYPE_CHANGED:
-            formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb)).length);
-            synchronized (formCountHolder) {
-              formCountHolder.notifyAll();
-            }
-            break;
+      public void hierarchyInvalidated() {
+        formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb)).length);
+        synchronized (formCountHolder) {
+          formCountHolder.notifyAll();
         }
       }
     });
@@ -118,16 +112,10 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     final IntegerHolder serviceCountHolder = new IntegerHolder(-1);
     serviceHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
-      public void handleEvent(int eventType, IType type) {
-        switch (eventType) {
-          case POST_TYPE_REMOVING:
-          case POST_TYPE_ADDING:
-          case POST_TYPE_CHANGED:
-            serviceCountHolder.setValue(serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter()).length);
-            synchronized (serviceCountHolder) {
-              serviceCountHolder.notifyAll();
-            }
-            break;
+      public void hierarchyInvalidated() {
+        serviceCountHolder.setValue(serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter()).length);
+        synchronized (serviceCountHolder) {
+          serviceCountHolder.notifyAll();
         }
       }
     });

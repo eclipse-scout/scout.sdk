@@ -33,30 +33,18 @@ public class CachedTypeHierarchy extends TypeHierarchy implements ICachedTypeHie
 
   @Override
   public void invalidate() {
+    boolean wasCreated = m_created;
     m_created = false;
+
+    if (wasCreated) {
+      // the hierarchy has changed from created (valid) to invalid.
+      fireHierarchyChanged();
+    }
   }
 
-  void handleTypeAdding(IType type) {
-    fireHierarchyChanged(ITypeHierarchyChangedListener.PRE_TYPE_ADDING, type);
-    invalidate();
-    fireHierarchyChanged(ITypeHierarchyChangedListener.POST_TYPE_ADDING, type);
-  }
-
-  void handleTypeChanged(IType type) {
-    fireHierarchyChanged(ITypeHierarchyChangedListener.PRE_TYPE_CHANGED, type);
-    invalidate();
-    fireHierarchyChanged(ITypeHierarchyChangedListener.POST_TYPE_CHANGED, type);
-  }
-
-  void handleTypeRemoving(IType type) {
-    fireHierarchyChanged(ITypeHierarchyChangedListener.PRE_TYPE_REMOVING, type);
-    invalidate();
-    fireHierarchyChanged(ITypeHierarchyChangedListener.POST_TYPE_REMOVING, type);
-  }
-
-  private void fireHierarchyChanged(int type, IType affectedType) {
+  private void fireHierarchyChanged() {
     for (ITypeHierarchyChangedListener l : m_hierarchyListeners.getListeners(ITypeHierarchyChangedListener.class)) {
-      l.handleEvent(type, affectedType);
+      l.hierarchyInvalidated();
     }
   }
 

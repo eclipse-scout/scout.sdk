@@ -22,14 +22,8 @@ public class PageDirtyListener implements ITypeHierarchyChangedListener {
   }
 
   @Override
-  public void handleEvent(int eventType, IType type) {
-    switch (eventType) {
-      case POST_TYPE_REMOVING:
-      case POST_TYPE_ADDING:
-      case POST_TYPE_CHANGED:
-        m_page.markStructureDirty();
-        break;
-    }
+  public void hierarchyInvalidated() {
+    m_page.markStructureDirty();
   }
 
   public void typeChanged(IType type, int eventType, IJavaElement modification) {

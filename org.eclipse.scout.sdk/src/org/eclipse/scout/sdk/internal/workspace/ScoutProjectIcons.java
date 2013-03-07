@@ -58,7 +58,7 @@ public class ScoutProjectIcons implements IIconProvider {
     m_iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
     m_iconsHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
-      public void handleEvent(int eventType, IType type) {
+      public void hierarchyInvalidated() {
         clearCache();
       }
     });

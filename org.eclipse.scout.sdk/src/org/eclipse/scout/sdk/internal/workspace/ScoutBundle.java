@@ -32,17 +32,16 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -56,9 +55,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleComparator;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
-import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
-import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 
 /**
  * <h3>{@link ScoutBundle}</h3> ...
@@ -85,14 +82,13 @@ public class ScoutBundle implements IScoutBundle {
   private final boolean m_isBinary;
   private final String m_id;
   private final int m_hash;
+  private final ITypeHierarchyChangedListener m_textProvidersChangedListener;
 
   private IEclipsePreferences m_projectPreferences;
   private Holder<INlsProject> m_nlsProjectHolder;
   private Holder<INlsProject> m_docsNlsProjectHolder;
   private IIconProvider m_iconProvider;
   private IPackageFragmentRoot m_rootPackage;
-  private ITypeHierarchyChangedListener m_textProvidersChangedListener;
-  private IScoutWorkspaceListener m_bundleRemovedListener;
 
   public ScoutBundle(IPluginModelBase bundle) {
     m_pluginModelBase = bundle;
@@ -111,12 +107,14 @@ public class ScoutBundle implements IScoutBundle {
     m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + m_isFragment + "@binary=" + m_isBinary + "}";
     m_hash = m_id.hashCode();
 
+    IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
+    m_textProvidersChangedListener = new P_TextProviderServiceHierarchyChangedListener(this);
+    pth.addHierarchyListener(m_textProvidersChangedListener);
+
     m_nlsProjectHolder = null;
     m_docsNlsProjectHolder = null;
     m_projectPreferences = null;
     m_iconProvider = null;
-    m_textProvidersChangedListener = null;
-    m_bundleRemovedListener = null;
     m_rootPackage = null;
   }
 
@@ -287,16 +285,6 @@ public class ScoutBundle implements IScoutBundle {
       }
     }
     return m_docsNlsProjectHolder.getValue();
-  }
-
-  private void registerTextProviderServiceHierarchyListener() {
-    if (m_textProvidersChangedListener == null) {
-      IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
-      m_textProvidersChangedListener = new P_TextProviderServiceHierarchyChangedListener(this);
-      pth.addHierarchyListener(m_textProvidersChangedListener);
-      m_bundleRemovedListener = new P_BundleRemovedWorkspaceListener(this);
-      ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_bundleRemovedListener);
-    }
   }
 
   @Override
@@ -612,7 +600,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_TextProviderServiceHierarchyChangedListener implements ITypeHierarchyChangedListener {
+  private static class P_TextProviderServiceHierarchyChangedListener implements ITypeHierarchyChangedListener, WeakEventListener {
     private ScoutBundle m_observer;
 
     private P_TextProviderServiceHierarchyChangedListener(ScoutBundle observer) {
@@ -620,7 +608,7 @@ public class ScoutBundle implements IScoutBundle {
     }
 
     @Override
-    public void handleEvent(int eventType, IType type) {
+    public void hierarchyInvalidated() {
       synchronized (m_observer) {
         m_observer.m_nlsProjectHolder = null;
         m_observer.m_docsNlsProjectHolder = null;
@@ -635,28 +623,6 @@ public class ScoutBundle implements IScoutBundle {
     private P_TraverseComposite(ScoutBundle bundle, int level) {
       m_level = level;
       m_bundle = bundle;
-    }
-  }
-
-  private static class P_BundleRemovedWorkspaceListener implements IScoutWorkspaceListener {
-    private ScoutBundle m_observer;
-
-    private P_BundleRemovedWorkspaceListener(ScoutBundle observer) {
-      m_observer = observer;
-    }
-
-    @Override
-    public void workspaceChanged(ScoutWorkspaceEvent event) {
-      if (event.getScoutElement() == m_observer && event.getType() == ScoutWorkspaceEvent.TYPE_BUNDLE_REMOVED) {
-        synchronized (m_observer) {
-          m_observer.m_iconProvider = null;
-          IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
-          pth.removeHierarchyListener(m_observer.m_textProvidersChangedListener);
-          m_observer.m_textProvidersChangedListener = null;
-          ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(this);
-          m_observer.m_bundleRemovedListener = null;
-        }
-      }
     }
   }
 }

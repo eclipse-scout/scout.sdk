@@ -104,7 +104,7 @@ public interface ITypeHierarchy {
    * @param potentialSubtypes
    * @return true if one of the potentialSubtypes is a subtype of the given type
    */
-  boolean containsInSubhierarchy(IType type, IType[] potentialSubtypes);
+  boolean containsInSubHierarchy(IType type, IType[] potentialSubtypes);
 
   /**
    * @see ITypeHierarchy#getAllSuperclasses(IType, ITypeFilter, Comparator)

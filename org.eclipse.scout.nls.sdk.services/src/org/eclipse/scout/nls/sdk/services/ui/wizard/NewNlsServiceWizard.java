@@ -18,6 +18,7 @@ public class NewNlsServiceWizard extends AbstractWorkspaceWizard {
     m_bundle = b;
     m_op = new CreateServiceNlsProjectOperation();
     m_page1 = new NewTextProviderServiceWizardPage(m_bundle);
+    setWindowTitle("Create a new Text Provider Service");
     addPage(m_page1);
   }
 

@@ -116,35 +116,35 @@ public final class HierarchyCache implements IHierarchyCache {
 
   private void handleTypeChange(IType t, ITypeHierarchy superTypeHierarchy) {
     try {
-      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
+      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
       if (!TypeUtility.exists(t.getDeclaringType())) {
         synchronized (m_cacheLock) {
           hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
         }
       }
+
       if (hierarchies.size() > 0) {
         for (CachedTypeHierarchy h : hierarchies) {
           if (h.isCreated()) {
             IType[] superTypes = superTypeHierarchy.getSupertypes(t);
-            if (h.contains(t)) {
-              if (!h.containsInSubhierarchy(h.getType(), superTypes)) {
-                // remove
-                h.handleTypeRemoving(t);
 
+            if (h.contains(t)) {
+              if (!h.containsInSubHierarchy(h.getType(), superTypes)) {
+                // remove
+                h.invalidate();
               }
               else {
                 IType[] hierarchySuperTypes = h.getSubtypes(t);
                 if (!TypeUtility.equalTypes(hierarchySuperTypes, superTypes)) {
                   // changed
-                  h.handleTypeChanged(t);
+                  h.invalidate();
                 }
               }
             }
             else {
-              if (h.containsInSubhierarchy(h.getType(), superTypes)) {
+              if (h.containsInSubHierarchy(h.getType(), superTypes)) {
                 // add
-                h.handleTypeAdding(t);
-
+                h.invalidate();
               }
             }
           }
@@ -161,7 +161,7 @@ public final class HierarchyCache implements IHierarchyCache {
    */
   private void handleTypeRemoved(IType type) {
     try {
-      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
+      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
       synchronized (m_cacheLock) {
         hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
       }
@@ -172,12 +172,11 @@ public final class HierarchyCache implements IHierarchyCache {
           for (IType candidate : allTypes) {
             if (compilationUnitFilter.accept(candidate)) {
               // remove
-              h.handleTypeRemoving(candidate);
+              h.invalidate();
               break;
             }
           }
         }
-
       }
     }
     catch (Exception e) {
@@ -188,7 +187,7 @@ public final class HierarchyCache implements IHierarchyCache {
   private void handleJavaElementRemoved(IJavaElement element) {
     if (element.getElementType() < IJavaElement.TYPE) {
       try {
-        ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
+        ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
         synchronized (m_cacheLock) {
           hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
         }
@@ -202,7 +201,7 @@ public final class HierarchyCache implements IHierarchyCache {
             IType[] allTypes = h.getJdtHierarchy().getAllTypes();
             for (IType candidate : allTypes) {
               if (TypeUtility.isAncestor(element, candidate)) {
-                h.handleTypeRemoving(candidate);
+                h.invalidate();
               }
             }
           }
@@ -244,7 +243,7 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   public void clearCache() {
-    ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>();
+    ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
     synchronized (m_cacheLock) {
       hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
       m_cachedPrimaryTypeHierarchies.clear();
