@@ -111,7 +111,7 @@ public class WebServiceProviderTablePage extends AbstractPage {
   }
 
   private List<ScoutXmlElement> getEndpoints() {
-    if (m_sunJaxWsXml.getRoot() == null) {
+    if (m_sunJaxWsXml == null || m_sunJaxWsXml.getRoot() == null) {
       return Collections.emptyList();
     }
     return m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT));
