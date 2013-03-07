@@ -27,9 +27,9 @@
    </vm>
 
    <plugins>
-      <plugin id="@@BUNDLE_CLIENT_NAME@@" fragment=""/>
-      <plugin id="@@BUNDLE_SHARED_NAME@@" fragment=""/>
-      <plugin id="@@BUNDLE_SWING_NAME@@" fragment=""/>
+      <plugin id="@@BUNDLE_CLIENT_NAME@@"/>
+      <plugin id="@@BUNDLE_SHARED_NAME@@"/>
+      <plugin id="@@BUNDLE_SWING_NAME@@"/>
       <plugin id="javax.xml"/>
       <plugin id="org.eclipse.core.contenttype"/>
       <plugin id="org.eclipse.core.jobs"/>

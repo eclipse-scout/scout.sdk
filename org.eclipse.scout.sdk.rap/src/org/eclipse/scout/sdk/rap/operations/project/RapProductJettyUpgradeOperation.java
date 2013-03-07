@@ -10,7 +10,7 @@ import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.util.JettyProductFileUpgradeOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOperation {
+public class RapProductJettyUpgradeOperation extends AbstractScoutProjectNewOperation {
 
   private IFile[] m_rapProdFiles;
 

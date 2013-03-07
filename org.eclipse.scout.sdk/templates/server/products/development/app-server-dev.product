@@ -28,8 +28,8 @@
    </vm>
 
    <plugins>
-      <plugin id="@@BUNDLE_SERVER_NAME@@" fragment=""/>
-      <plugin id="@@BUNDLE_SHARED_NAME@@" fragment=""/>
+      <plugin id="@@BUNDLE_SERVER_NAME@@"/>
+      <plugin id="@@BUNDLE_SHARED_NAME@@"/>
       <plugin id="javax.xml"/>
       <plugin id="javax.servlet"/>
       <plugin id="org.apache.commons.codec"/>

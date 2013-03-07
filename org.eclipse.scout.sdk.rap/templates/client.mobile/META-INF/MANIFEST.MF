@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Client Mobile
+Bundle-SymbolicName: @@BUNDLE_MOBILE_CLIENT_NAME@@;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: @@BUNDLE_MOBILE_CLIENT_NAME@@.Activator
+Bundle-Vendor: Eclipse Scout Project
+Require-Bundle: org.eclipse.core.runtime,
+ @@BUNDLE_CLIENT_NAME@@,
+ @@BUNDLE_SHARED_NAME@@,
+ org.eclipse.scout.rt.client.mobile,
+ org.eclipse.scout.rt.extension.client,
+ org.eclipse.scout.rt.client.mobile,
+ org.eclipse.scout.svg.client
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Export-Package: @@BUNDLE_MOBILE_CLIENT_NAME@@,
+ @@BUNDLE_MOBILE_CLIENT_NAME@@.ui.desktop

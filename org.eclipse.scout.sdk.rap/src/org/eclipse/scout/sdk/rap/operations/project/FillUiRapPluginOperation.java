@@ -105,7 +105,6 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
 
       // existing local RAP target
       op.addLocalDirectory(RAP_TARGET_VARIABLE);
-      op.addLocalDirectory(RAP_TARGET_VARIABLE);
 
       // try to detect if the given folder is a complete platform or only contains the rap plugins
       if (!isPluginAvailable(getLocalTargetFolder(), "org.eclipse.platform_") || !isPluginAvailable(getLocalTargetFolder(), "org.eclipse.help.ui_")) {
@@ -141,7 +140,6 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       RapTargetVariable.get().setValue(getExtractTargetFolder());
 
       op.addRunningEclipseEntries();
-      op.addLocalDirectory(RAP_TARGET_VARIABLE);
       op.addLocalDirectory(RAP_TARGET_VARIABLE);
 
     }

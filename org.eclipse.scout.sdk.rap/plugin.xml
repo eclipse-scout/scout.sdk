@@ -9,6 +9,16 @@
             referenceId="create.client">
       </operation>
       <operation
+            class="org.eclipse.scout.sdk.rap.operations.project.CreateMobileClientPluginOperation"
+            id="create.client.mobile"
+            referenceId="create.ui.rap">
+      </operation>
+      <operation
+            class="org.eclipse.scout.sdk.rap.operations.project.RapProductMobileAddOperation"
+            id="finalize.ui.rap.products.mobile"
+            referenceId="create.client.mobile">
+      </operation>
+      <operation
             class="org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation"
             id="fill.ui.rap"
             referenceId="create.ui.rap">
@@ -19,12 +29,12 @@
             referenceId="fill.ui.rap">
       </operation>
       <operation
-            class="org.eclipse.scout.sdk.rap.operations.project.RapProductFileUpgradeOperation"
+            class="org.eclipse.scout.sdk.rap.operations.project.RapProductJettyUpgradeOperation"
             id="finalize.ui.rap.products"
             referenceId="fill.ui.rap">
       </operation>
       <operation
-            class="org.eclipse.scout.sdk.rap.operations.project.RapProductFileFillOperation"
+            class="org.eclipse.scout.sdk.rap.operations.project.RapProductEquinoxSecurityInstallOperation"
             execAfterReference="true"
             id="fill.ui.rap.product"
             referenceId="fill.ui.rap">

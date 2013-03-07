@@ -73,6 +73,8 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
       String destPathPref = "src/" + (getCreatedProject().getName().replace('.', '/')) + "/";
       new InstallJavaFileOperation("templates/ui.rap/src/Activator.java", destPathPref + "Activator.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
       new InstallJavaFileOperation("templates/ui.rap/src/StandaloneRwtEnvironment.java", destPathPref + "StandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
+      new InstallJavaFileOperation("templates/ui.rap/src/MobileStandaloneRwtEnvironment.java", destPathPref + "MobileStandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
+      new InstallJavaFileOperation("templates/ui.rap/src/TabletStandaloneRwtEnvironment.java", destPathPref + "TabletStandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
 
       // dev product
       new InstallTextFileOperation("templates/ui.rap/products/development/config.ini", "products/development/config.ini", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);

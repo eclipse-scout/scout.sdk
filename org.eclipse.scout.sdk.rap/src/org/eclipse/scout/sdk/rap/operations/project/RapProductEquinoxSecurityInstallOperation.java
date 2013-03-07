@@ -16,12 +16,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.scout.sdk.operation.project.AbstractEquinoxSecurityInstallOperation;
 
 /**
- * <h3>{@link RapProductFileFillOperation}</h3> ...
+ * <h3>{@link RapProductEquinoxSecurityInstallOperation}</h3> ...
  * 
  * @author mvi
  * @since 3.8.0 10.12.2012
  */
-public class RapProductFileFillOperation extends AbstractEquinoxSecurityInstallOperation {
+public class RapProductEquinoxSecurityInstallOperation extends AbstractEquinoxSecurityInstallOperation {
 
   @Override
   public boolean isRelevant() {

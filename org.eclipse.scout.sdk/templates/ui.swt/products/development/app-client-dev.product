@@ -27,9 +27,9 @@
    </vm>
 
    <plugins>
-      <plugin id="@@BUNDLE_CLIENT_NAME@@" fragment=""/>
-      <plugin id="@@BUNDLE_SHARED_NAME@@" fragment=""/>
-      <plugin id="@@BUNDLE_SWT_NAME@@" fragment=""/>
+      <plugin id="@@BUNDLE_CLIENT_NAME@@"/>
+      <plugin id="@@BUNDLE_SHARED_NAME@@"/>
+      <plugin id="@@BUNDLE_SWT_NAME@@"/>
       <plugin id="com.ibm.icu"/>
       <plugin id="org.eclipse.compare.core"/>
       <plugin id="org.eclipse.core.commands"/>

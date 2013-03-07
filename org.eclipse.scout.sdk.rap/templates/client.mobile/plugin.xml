@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.scout.rt.extension.client.desktopExtensions">
+      <desktopExtension
+            active="true"
+            class="@@BUNDLE_MOBILE_CLIENT_NAME@@.ui.desktop.DesktopExtension">
+      </desktopExtension>
+      <desktopExtension
+            active="true"
+            class="org.eclipse.scout.rt.client.mobile.ui.desktop.DeviceTransformationDesktopExtension">
+      </desktopExtension>
+   </extension>
+</plugin>
