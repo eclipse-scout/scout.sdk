@@ -22,4 +22,13 @@ public class DesktopMenuBar extends CompoundContributionItem {
     }
     return new IContributionItem[0];
   }
+
+  @Override
+  public boolean isDirty() {
+    boolean isDirty = super.isDirty();
+    if (!isDirty && getParent() instanceof IMenuManager) {
+      isDirty = ((IMenuManager)getParent()).isDirty();
+    }
+    return isDirty;
+  }
 }
