@@ -53,6 +53,8 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
 
   public final static String TEMPLATE_ID = "ID_SINGLE_FORM_TEMPLATE";
 
+  public final static String FORM_NAME = "DesktopForm";
+
   @Override
   public String getOperationName() {
     return "Apply single form template...";
@@ -69,15 +71,13 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    String formName = "DesktopForm";
-
     IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     final IScoutBundle client = bundleGraph.getBundle(getProperties().getProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, String.class));
     final IScoutBundle server = bundleGraph.getBundle(getProperties().getProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, String.class));
     final IScoutBundle shared = bundleGraph.getBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
 
     // formdata
-    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(formName + "Data", shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES), shared);
+    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(FORM_NAME + "Data", shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES), shared);
     formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
     formDataOp.run(monitor, workingCopyManager);
     IType formData = formDataOp.getCreatedType();
@@ -96,7 +96,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     formOp.setCreateButtonCancel(false);
     formOp.setCreateButtonOk(false);
     formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, client.getJavaProject()));
-    formOp.setTypeName(formName);
+    formOp.setTypeName(FORM_NAME);
     formOp.setFormatSource(false);
     formOp.run(monitor, workingCopyManager);
     final IType form = formOp.getCreatedFormType();
@@ -216,7 +216,10 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
-          sourceBuilder.append("// desktop form\n");
+          sourceBuilder.append("//If it is a mobile or tablet device, the DesktopExtension in the mobile plugin takes care of starting the correct forms.\n");
+          sourceBuilder.append("if (!UserAgentUtility.isDesktopDevice()) {\n");
+          sourceBuilder.append("  return;\n");
+          sourceBuilder.append("}\n");
           String treeFormRef = validator.getTypeName(SignatureCache.createTypeSignature(form.getFullyQualifiedName()));
           sourceBuilder.append(treeFormRef + " desktopForm = new " + treeFormRef + "();\n");
           ScoutIconDesc icn = client.getIconProvider().getIcon("eclipse_scout");

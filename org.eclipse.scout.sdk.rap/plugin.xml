@@ -14,6 +14,21 @@
             referenceId="create.ui.rap">
       </operation>
       <operation
+            class="org.eclipse.scout.sdk.rap.operations.project.template.MobileDesktopExtensionInstallOperation"
+            id="template.mobile.desktop.extension"
+            referenceId="create.client.mobile">
+      </operation>
+      <operation
+            class="org.eclipse.scout.sdk.rap.operations.project.template.OutlineTemplateHomeFormCreateOperation"
+            id="template.outline.mobile.home.form"
+            referenceId="create.client.mobile">
+      </operation>
+      <operation
+            class="org.eclipse.scout.sdk.rap.operations.project.template.SingleFormTemplateHomeFormCreateOperation"
+            id="template.singleform.mobile.home.form"
+            referenceId="create.client.mobile">
+      </operation>
+      <operation
             class="org.eclipse.scout.sdk.rap.operations.project.RapProductMobileAddOperation"
             id="finalize.ui.rap.products.mobile"
             referenceId="create.client.mobile">

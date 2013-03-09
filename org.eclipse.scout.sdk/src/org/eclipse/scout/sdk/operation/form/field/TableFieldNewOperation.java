@@ -47,6 +47,7 @@ public class TableFieldNewOperation implements IOperation {
   private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
+  private String m_tableSuperTypeSignature;
   private IJavaElement m_sibling;
   private IJavaElement m_getterMethodSibling;
   private IType m_formType;
@@ -60,6 +61,7 @@ public class TableFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     // default
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITableField, getDeclaringType().getJavaProject()));
+    setTableSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -118,7 +120,7 @@ public class TableFieldNewOperation implements IOperation {
 
   private IType createTable(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE, getCreatedField(), false);
-    tableNewOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
+    tableNewOp.setSuperTypeSignature(getTableSuperTypeSignature());
     tableNewOp.addTypeModifier(Flags.AccPublic);
     AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
     orderAnnotOp.addParameter("10.0");
@@ -211,5 +213,13 @@ public class TableFieldNewOperation implements IOperation {
 
   public IMethod getCreatedFieldGetterMethod() {
     return m_createdFieldGetterMethod;
+  }
+
+  public String getTableSuperTypeSignature() {
+    return m_tableSuperTypeSignature;
+  }
+
+  public void setTableSuperTypeSignature(String tableSuperTypeSignature) {
+    m_tableSuperTypeSignature = tableSuperTypeSignature;
   }
 }

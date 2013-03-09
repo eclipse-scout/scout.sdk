@@ -1,3 +1,4 @@
+<<<<<<< Upstream, based on branch 'master' of ssh://mvilliger@git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
@@ -13,3 +14,15 @@
       </desktopExtension>
    </extension>
 </plugin>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.scout.rt.extension.client.desktopExtensions">
+      <desktopExtension
+            active="true"
+            class="org.eclipse.scout.rt.client.mobile.ui.desktop.DeviceTransformationDesktopExtension">
+      </desktopExtension>
+   </extension>
+</plugin>
+>>>>>>> 0b0261a Support for Scout Mobile UI

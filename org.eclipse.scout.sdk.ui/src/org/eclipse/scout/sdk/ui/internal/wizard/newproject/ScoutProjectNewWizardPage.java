@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -149,19 +150,10 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   }
 
   private void updateBundleNames() {
-    String prefix = "";
-    if (!StringUtility.isNullOrEmpty(getProjectName())) {
-      prefix = getProjectName() + ".";
-    }
-    String postfix = "";
-    String pf = getProjectNamePostfix();
-    if (!StringUtility.isNullOrEmpty(pf)) {
-      postfix = "." + pf;
-    }
     for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
       ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
       if (ext != null && node.isEnabled()) {
-        node.setText(prefix + ext.getBundleName() + postfix);
+        node.setText(AbstractScoutProjectNewOperation.getPluginName(getProjectName(), getProjectNamePostfix(), ext.getBundleName()));
       }
     }
 
@@ -173,8 +165,12 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
         alias = getProjectName().substring(dotIndex + 1);
       }
     }
-    if (pf != null && pf.length() > 1) {
-      alias = alias + Character.toUpperCase(pf.charAt(0)) + pf.substring(1);
+    String pf = getProjectNamePostfix();
+    if (pf != null) {
+      pf = pf.trim();
+      if (pf.length() > 1) {
+        alias += Character.toUpperCase(pf.charAt(0)) + pf.substring(1);
+      }
     }
     m_projectAliasNameField.setText(alias);
   }

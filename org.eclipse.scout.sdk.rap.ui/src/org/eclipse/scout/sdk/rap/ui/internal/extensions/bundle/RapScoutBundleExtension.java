@@ -16,8 +16,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
+import org.eclipse.scout.sdk.rap.operations.project.CreateMobileClientPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.ui.internal.wizard.project.RapTargetPlatformWizardPage;
 import org.eclipse.scout.sdk.ui.extensions.bundle.INewScoutBundleHandler;
@@ -26,6 +28,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.osgi.framework.Version;
@@ -54,8 +57,18 @@ public class RapScoutBundleExtension implements INewScoutBundleHandler {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoRapWithoutClient"));
       }
     }
-    if (m_rapUiSelected && PlatformVersionUtility.getPlatformVersion().compareTo(new Version(3, 6, 0)) < 0) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoRapBeforeHelios"));
+    if (m_rapUiSelected) {
+
+      String clientMobileBundleName = AbstractScoutProjectNewOperation.getPluginName(wizard.getProjectWizardPage().getProjectName(), wizard.getProjectWizardPage().getProjectNamePostfix(),
+          CreateMobileClientPluginOperation.MOBILE_CLIENT_PROJECT_NAME_SUFFIX);
+      IStatus s = JavaElementValidator.validateNewBundleName(clientMobileBundleName);
+      if (!s.isOK()) {
+        return s;
+      }
+
+      if (PlatformVersionUtility.getPlatformVersion().compareTo(new Version(3, 6, 0)) < 0) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoRapBeforeHelios"));
+      }
     }
     return Status.OK_STATUS;
   }

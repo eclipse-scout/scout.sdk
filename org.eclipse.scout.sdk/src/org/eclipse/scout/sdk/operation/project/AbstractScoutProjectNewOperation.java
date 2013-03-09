@@ -79,13 +79,21 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
   }
 
   protected final String getPluginName(String pluginSuffix) {
+    return getPluginName(getProjectName(), getProjectNamePostfix(), pluginSuffix);
+  }
+
+  public static String getPluginName(String name, String postfix, String pluginSuffix) {
     final String DELIM = ".";
-    pluginSuffix = pluginSuffix.trim();
+    if (pluginSuffix == null) {
+      pluginSuffix = "";
+    }
+    else {
+      pluginSuffix = pluginSuffix.trim();
+    }
     if (pluginSuffix.length() > 0 && !pluginSuffix.startsWith(DELIM)) {
       pluginSuffix = DELIM + pluginSuffix;
     }
 
-    String postfix = getProjectNamePostfix();
     if (postfix == null) {
       postfix = "";
     }
@@ -96,7 +104,14 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
       }
     }
 
-    return getProjectName().trim() + pluginSuffix + postfix;
+    if (name == null) {
+      name = "";
+    }
+    else {
+      name = name.trim();
+    }
+
+    return name + pluginSuffix + postfix;
   }
 
   @Override

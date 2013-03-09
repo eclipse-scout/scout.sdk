@@ -241,6 +241,12 @@
          </default>
       </element>
       <element
+            interface="org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension">
+         <default
+               class="org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension">
+         </default>
+      </element>
+      <element
             interface="org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService">
          <default
                class="org.eclipse.scout.rt.server.services.common.bookmark.AbstractSqlBookmarkStorageService">

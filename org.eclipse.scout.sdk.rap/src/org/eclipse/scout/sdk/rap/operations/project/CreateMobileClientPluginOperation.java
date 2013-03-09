@@ -60,10 +60,8 @@ public class CreateMobileClientPluginOperation extends AbstractCreateScoutBundle
 
     String destPathPref = "src/" + (getCreatedProject().getName().replace('.', '/')) + "/";
     new InstallJavaFileOperation("templates/client.mobile/src/Activator.java", destPathPref + "Activator.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/client.mobile/src/ui/desktop/DesktopExtension.java", destPathPref + "ui/desktop/DesktopExtension.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/client.mobile/src/ui/desktop/HomeForm.java", destPathPref + "ui/desktop/HomeForm.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
 
-    // Add texts used by mobile UI
+    // Add logoff texts
     String sharedBundleName = getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class);
     IScoutBundle shared = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(sharedBundleName);
 
