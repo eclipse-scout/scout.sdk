@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -35,14 +36,10 @@ public class ProjectsTablePage extends AbstractPage {
     }
   }; // end IScoutWorkspaceListener
 
-  private final ScoutBundleTreeModel m_uiModel;
-
   public ProjectsTablePage(IPage parent) {
     setParent(parent);
     setName(Texts.get("RootNodeName"));
     ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
-    m_uiModel = new ScoutBundleTreeModel();
-    m_uiModel.build(false);
   }
 
   @Override
@@ -62,13 +59,17 @@ public class ProjectsTablePage extends AbstractPage {
 
   @Override
   public void refresh(boolean clearCache) {
-    m_uiModel.build(true);
+    if (clearCache) {
+      ScoutWorkspace.getInstance().rebuildGraph();
+    }
     super.refresh(clearCache);
   }
 
   @Override
   public void loadChildrenImpl() {
-    for (ScoutBundleNodeGroup g : m_uiModel.getRoots()) {
+    ScoutBundleTreeModel uiModel = new ScoutBundleTreeModel();
+    uiModel.build();
+    for (ScoutBundleNodeGroup g : uiModel.getRoots()) {
       new BundleNodeGroupTablePage(this, g);
     }
   }

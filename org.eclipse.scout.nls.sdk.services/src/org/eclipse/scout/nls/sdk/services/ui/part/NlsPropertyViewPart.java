@@ -55,9 +55,11 @@ public class NlsPropertyViewPart extends JdtTypePropertyPart {
       IType serviceType = getPage().getType();
       if (TypeUtility.exists(serviceType)) {
         IFile typeFile = (IFile) serviceType.getResource();
-        FileOpenLink link = new FileOpenLink(typeFile, 10, NlsEditor.EDITOR_ID);
-        link.setName(Texts.get("OpenNlsEditor"));
-        model.addGlobalLink(link);
+        if (typeFile != null) {
+          FileOpenLink link = new FileOpenLink(typeFile, 10, NlsEditor.EDITOR_ID);
+          link.setName(Texts.get("OpenNlsEditor"));
+          model.addGlobalLink(link);
+        }
       }
     }
     // ui

@@ -92,12 +92,16 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   }
 
   String getContributingBundleSymbolicName(IJavaElement element) {
-    IPluginModelBase externalPlugin = m_targetPlatformBundles.get(element.getPath());
-    if (externalPlugin != null) {
+    if (element.getResource() == null) {
+      // external
+      IPluginModelBase externalPlugin = m_targetPlatformBundles.get(element.getPath());
+      if (externalPlugin == null) {
+        return null; // java elements not contributed by a bundle (e.g. from the java RT or another jar).
+      }
       return externalPlugin.getBundleDescription().getSymbolicName();
     }
     else {
-      // it is not external. there exists a java project.
+      // the element is in the workspace. there exists a java project.
       return element.getJavaProject().getElementName();
     }
   }
@@ -176,10 +180,10 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   }
 
   private static Map<IPath, IPluginModelBase> getTargetPlatformBundles() {
-    IPluginModelBase[] externalModels = PDECore.getDefault().getModelManager().getExternalModels();
-    Map<IPath, IPluginModelBase> result = new HashMap<IPath, IPluginModelBase>(externalModels.length);
-    for (IPluginModelBase externalBundle : externalModels) {
-      result.put(new Path(externalBundle.getInstallLocation()), externalBundle);
+    IPluginModelBase[] models = PDECore.getDefault().getModelManager().getExternalModels();
+    Map<IPath, IPluginModelBase> result = new HashMap<IPath, IPluginModelBase>(models.length);
+    for (IPluginModelBase p : models) {
+      result.put(new Path(p.getInstallLocation()), p);
     }
     return result;
   }
