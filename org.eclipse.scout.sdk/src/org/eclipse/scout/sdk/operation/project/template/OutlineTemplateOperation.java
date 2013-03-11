@@ -74,6 +74,10 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder sourceBuilder = new StringBuilder();
+          sourceBuilder.append("//If it is a mobile or tablet device, the DesktopExtension in the mobile plugin takes care of starting the correct forms.\n");
+          sourceBuilder.append("if (!UserAgentUtility.isDesktopDevice()) {\n");
+          sourceBuilder.append("  return;\n");
+          sourceBuilder.append("}\n\n");
           sourceBuilder.append("// outline tree\n");
           String treeFormRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.DefaultOutlineTreeForm));
           sourceBuilder.append(treeFormRef + " treeForm = new " + treeFormRef + "();\n");
