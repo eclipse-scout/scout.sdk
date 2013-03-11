@@ -20,10 +20,14 @@ import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.IPluginObject;
+import org.eclipse.pde.internal.core.ICoreConstants;
+import org.eclipse.pde.internal.core.bundle.BundlePluginBase;
 import org.eclipse.pde.internal.core.ibundle.IBundlePlugin;
 import org.eclipse.pde.internal.core.ibundle.IManifestHeader;
 import org.eclipse.pde.internal.core.text.bundle.BundleClasspathHeader;
 import org.eclipse.pde.internal.core.text.bundle.ExportPackageHeader;
+import org.eclipse.pde.internal.core.text.bundle.ImportPackageHeader;
+import org.eclipse.pde.internal.core.text.bundle.ImportPackageObject;
 import org.eclipse.pde.internal.core.text.bundle.RequireBundleHeader;
 import org.eclipse.scout.commons.CompareUtility;
 import org.osgi.framework.Constants;
@@ -270,8 +274,53 @@ public class PluginModelHelper {
       return existsExportPackage(packageName, expHeader);
     }
 
+    /**
+     * Checks whether the given package name is already imported.<br>
+     * Any version constraints are ignored when checking if the import exists.
+     * 
+     * @param packageName
+     *          The package name to check.
+     * @return true, if the given package is exported, false otherwise.
+     */
+    public boolean existsImportPackage(String packageName) {
+      if (packageName == null || packageName.length() < 1) return false;
+      ImportPackageHeader impHeader = getImportPackageHeader();
+      return existsImportPackage(packageName, impHeader);
+    }
+
+    private boolean existsImportPackage(String packageName, ImportPackageHeader impHeader) {
+      return impHeader.getPackage(packageName) != null;
+    }
+
     private boolean existsExportPackage(String packageName, ExportPackageHeader expHeader) {
       return expHeader.getPackage(packageName) != null;
+    }
+
+    /**
+     * Adds the given fully qualified package to the imported packages of the bundle associated with this helper.<br>
+     * If an import for the given package already exists, this method does nothing (only the package name is
+     * considered).
+     * 
+     * @param pck
+     *          The package. E.g.: org.eclipse.scout.rt.client
+     * @param version
+     *          The version constraint for the given import package. E.g.: [1.1.0,2.0.0)
+     */
+    public void addImportPackage(String pck, String version) {
+      if (pck == null || pck.length() < 1) return;
+      synchronized (m_model.getProject()) {
+        if (!existsImportPackage(pck)) {
+          ImportPackageHeader impHeader = getImportPackageHeader();
+          ImportPackageObject obj = new ImportPackageObject(impHeader, pck, version, getVersionAttribute());
+          impHeader.addPackage(obj);
+          setEntryValue(Constants.IMPORT_PACKAGE, impHeader.getValue());
+        }
+      }
+    }
+
+    private String getVersionAttribute() {
+      int manifestVersion = BundlePluginBase.getBundleManifestVersion(m_model.getBundle());
+      return (manifestVersion < 2) ? ICoreConstants.PACKAGE_SPECIFICATION_VERSION : Constants.VERSION_ATTRIBUTE;
     }
 
     /**
@@ -330,9 +379,28 @@ public class PluginModelHelper {
       setEntryValue(Constants.EXPORT_PACKAGE, expHeader.getValue());
     }
 
+    /**
+     * Removes the given package from the imported packages list of the project associated with this helper.<br>
+     * This method does nothing if the give package is null or empty.
+     * 
+     * @param packageName
+     *          The fully qualified name of the package
+     */
+    public void removeImportPackage(String packageName) {
+      if (packageName == null || packageName.length() < 1) return;
+      ImportPackageHeader impHeader = getImportPackageHeader();
+      impHeader.removePackage(packageName);
+      setEntryValue(Constants.IMPORT_PACKAGE, impHeader.getValue());
+    }
+
     private ExportPackageHeader getExportPackageHeader() {
       IManifestHeader header = m_model.getBundle().getManifestHeader(Constants.EXPORT_PACKAGE);
       return (ExportPackageHeader) m_model.getBundleModel().getFactory().createHeader(Constants.EXPORT_PACKAGE, getHeaderValue(header));
+    }
+
+    private ImportPackageHeader getImportPackageHeader() {
+      IManifestHeader header = m_model.getBundle().getManifestHeader(Constants.IMPORT_PACKAGE);
+      return (ImportPackageHeader) m_model.getBundleModel().getFactory().createHeader(Constants.IMPORT_PACKAGE, getHeaderValue(header));
     }
 
     private BundleClasspathHeader getBundleClasspathHeader() {

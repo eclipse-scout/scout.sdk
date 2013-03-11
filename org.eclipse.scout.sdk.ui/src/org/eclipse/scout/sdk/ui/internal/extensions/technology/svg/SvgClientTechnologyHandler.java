@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   private final static String CLIENT_SVG_BUNDLE_NAME = "org.eclipse.scout.svg.client";
+  private final static String W3C_DOM_SVG_PACKAGE = "org.w3c.dom.svg";
 
   public final static String[] COMMON_SVG_PLUGINS = new String[]{
       "org.apache.batik.bridge",
@@ -51,6 +52,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, CLIENT_SVG_BUNDLE_NAME);
+    selectionChangedManifestImportPackage(resources, selected, new String[]{W3C_DOM_SVG_PACKAGE}, new String[]{"[1.1.0,2.0.0)"});
   }
 
   @Override
@@ -65,7 +67,15 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   @Override
   public TriState getSelection(IScoutBundle project) {
-    return getSelectionManifests(getClientBundlesBelow(project), CLIENT_SVG_BUNDLE_NAME);
+    IScoutBundle[] clientBundlesBelow = getClientBundlesBelow(project);
+    TriState t1 = getSelectionManifests(clientBundlesBelow, CLIENT_SVG_BUNDLE_NAME);
+    TriState t2 = getSelectionManifestsImportPackage(clientBundlesBelow, W3C_DOM_SVG_PACKAGE);
+    if (t1.equals(t2)) {
+      return t1;
+    }
+    else {
+      return TriState.UNDEFINED;
+    }
   }
 
   @Override

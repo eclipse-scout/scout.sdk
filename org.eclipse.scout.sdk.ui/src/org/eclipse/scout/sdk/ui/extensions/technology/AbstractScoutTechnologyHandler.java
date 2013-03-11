@@ -100,6 +100,37 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
   }
 
+  protected TriState getSelectionManifestsImportPackage(IScoutBundle[] projects, String... importPackages) {
+    if (projects == null || projects.length == 0) {
+      return TriState.FALSE;
+    }
+
+    TriState ret = getSelectionManifestsImportPackage(projects[0], importPackages);
+    for (int i = 1; i < projects.length; i++) {
+      TriState tmp = getSelectionManifestsImportPackage(projects[i], importPackages);
+      if (tmp != ret) {
+        return TriState.UNDEFINED;
+      }
+    }
+    return ret;
+  }
+
+  protected TriState getSelectionManifestsImportPackage(IScoutBundle project, String... importPackages) {
+    if (importPackages == null || importPackages.length == 0) {
+      return TriState.FALSE;
+    }
+
+    PluginModelHelper pluginModel = new PluginModelHelper(project.getProject());
+    TriState ret = TriState.parseTriState(pluginModel.Manifest.existsImportPackage(importPackages[0]));
+    for (int i = 1; i < importPackages.length; i++) {
+      TriState tmp = TriState.parseTriState(pluginModel.Manifest.existsImportPackage(importPackages[i]));
+      if (tmp != ret) {
+        return TriState.UNDEFINED;
+      }
+    }
+    return ret;
+  }
+
   protected TriState getSelectionManifests(IScoutBundle[] projects, String... pluginIds) {
     if (projects == null || projects.length == 0) {
       return TriState.FALSE;
@@ -206,6 +237,21 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
         }
         else {
           pluginModel.Manifest.removeDependency(pluginId);
+        }
+      }
+      pluginModel.save();
+    }
+  }
+
+  protected void selectionChangedManifestImportPackage(IScoutTechnologyResource[] resources, boolean selected, String[] packages, String[] versions) throws CoreException {
+    for (IScoutTechnologyResource r : resources) {
+      PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getProject());
+      for (int i = 0; i < Math.min(packages.length, versions.length); i++) {
+        if (selected) {
+          pluginModel.Manifest.addImportPackage(packages[i], versions[i]);
+        }
+        else {
+          pluginModel.Manifest.removeImportPackage(packages[i]);
         }
       }
       pluginModel.save();
