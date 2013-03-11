@@ -148,7 +148,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    WizardStepNewOperation operation = new WizardStepNewOperation(m_declaringType);
+    WizardStepNewOperation operation = new WizardStepNewOperation(m_declaringType, true);
 
     // write back members
     if (getNlsName() != null) {

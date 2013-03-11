@@ -162,15 +162,36 @@ public class TypeUtility {
    * 
    * @param elements
    * @return
+   * @throws JavaModelException
    */
   public static ITypeHierarchy getLocalTypeHierarchy(IJavaElement... elements) {
     IRegion region = JavaCore.newRegion();
     if (elements != null) {
       for (IJavaElement e : elements) {
+        if (e.getElementType() == IJavaElement.TYPE) {
+          IType t = (IType) e;
+          if (t.isBinary()) {
+            // binary types do not include their inner types because these inner types belong to their own class file
+            // solution: add them manually
+            addBinaryInnerTypesToRegionRec(t, region);
+          }
+        }
         region.add(e);
       }
     }
     return TypeCacheAccessor.getHierarchyCache().getLocalHierarchy(region);
+  }
+
+  private static void addBinaryInnerTypesToRegionRec(IType declaringType, IRegion region) {
+    try {
+      for (IType child : declaringType.getTypes()) {
+        region.add(child);
+        addBinaryInnerTypesToRegionRec(child, region);
+      }
+    }
+    catch (JavaModelException e) {
+      SdkUtilActivator.logError("Unable to get inner types of type '" + declaringType.getFullyQualifiedName() + "'.", e);
+    }
   }
 
   public static ITypeHierarchy getLocalTypeHierarchy(IRegion region) {

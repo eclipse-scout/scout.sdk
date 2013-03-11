@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * <h3>OutlineTablePage</h3> ...
  */
 public class OutlineTablePage extends AbstractPage {
-  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
   private ICachedTypeHierarchy m_outlineHierarchy;
 
   public OutlineTablePage(AbstractPage parent) {

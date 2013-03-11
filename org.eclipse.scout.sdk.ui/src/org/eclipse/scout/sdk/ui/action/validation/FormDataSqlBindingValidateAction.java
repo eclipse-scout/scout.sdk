@@ -53,7 +53,7 @@ public class FormDataSqlBindingValidateAction extends AbstractScoutHandler {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    Job j = new Job("Validate formdata sql bindings") {
+    Job j = new Job("Validate FormData SQL Bindings") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         try {

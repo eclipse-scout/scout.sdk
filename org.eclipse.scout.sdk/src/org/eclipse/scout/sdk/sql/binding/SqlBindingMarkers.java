@@ -32,12 +32,9 @@ public class SqlBindingMarkers {
 
   public static void removeMarkers(IResource resource) {
     try {
-//      IMarker[] existingMarkers = resource.findMarkers(MARKER_ID, true, IResource.DEPTH_ONE);
-//      for (IMarker m : existingMarkers) {
-//        m.delete();
-//
-//      }
-      resource.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ZERO);
+      if (resource != null) {
+        resource.deleteMarkers(MARKER_ID, true, IResource.DEPTH_ZERO);
+      }
     }
     catch (CoreException e) {
       ScoutSdk.logError("could not remove sql bind markers of '" + resource.getName() + "'.", e);

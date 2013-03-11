@@ -65,46 +65,48 @@ public class ResourceServletFolderTree {
     TreeUtility.findNodes(rootNode, new P_FolderTreeBuilder(extensions.toArray(new P_ResourceServletExtension[extensions.size()])));
   }
 
-  private void findServletExtensions(ITreeNode curentNode, ArrayList<P_ResourceServletExtension> extensions) {
-    if (curentNode.getData() instanceof IScoutBundle) {
-      IScoutBundle bundle = (IScoutBundle) curentNode.getData();
-      IPluginModelBase pluginModel = PluginRegistry.findModel(bundle.getProject());
-      IPluginBase pluginBase = pluginModel.getPluginBase(false);
-      if (pluginBase != null) {
-        IPluginExtension[] exs = pluginBase.getExtensions();
-        if (exs != null && exs.length > 0) {
-          for (IPluginExtension e : exs) {
-            if (CompareUtility.equals(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, e.getPoint()) && e.getChildCount() > 0) {
-              for (IPluginObject po : e.getChildren()) {
-                if (po instanceof IPluginElement) {
-                  IPluginElement pe = (IPluginElement) po;
-                  if (CompareUtility.equals(RuntimeClasses.ResourceServlet, pe.getAttribute("class").getValue()) && pe.getChildCount() > 0) {
-                    P_ResourceServletExtension ext = new P_ResourceServletExtension();
-                    for (IPluginObject resourceServletPo : pe.getChildren()) {
-                      if (resourceServletPo instanceof IPluginElement && CompareUtility.equals(resourceServletPo.getName(), "init-param")) {
-                        IPluginElement resourceServletPe = (IPluginElement) resourceServletPo;
-                        IPluginAttribute[] atts = resourceServletPe.getAttributes();
-                        if (atts != null) {
-                          HashMap<String, String> props = new HashMap<String, String>(2);
-                          for (IPluginAttribute at : atts) {
-                            props.put(at.getName(), at.getValue());
-                          }
-                          String name = props.get("name");
-                          String value = props.get("value");
-                          if (!StringUtility.isNullOrEmpty(name) && !StringUtility.isNullOrEmpty(value)) {
-                            if (CompareUtility.equals(name, "bundle-name")) {
-                              ext.bundleName = value;
+  private void findServletExtensions(ITreeNode currentNode, ArrayList<P_ResourceServletExtension> extensions) {
+    if (currentNode.getData() instanceof IScoutBundle) {
+      IScoutBundle bundle = (IScoutBundle) currentNode.getData();
+      if (!bundle.isBinary()) {
+        IPluginModelBase pluginModel = PluginRegistry.findModel(bundle.getProject());
+        IPluginBase pluginBase = pluginModel.getPluginBase(false);
+        if (pluginBase != null) {
+          IPluginExtension[] exs = pluginBase.getExtensions();
+          if (exs != null && exs.length > 0) {
+            for (IPluginExtension e : exs) {
+              if (CompareUtility.equals(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, e.getPoint()) && e.getChildCount() > 0) {
+                for (IPluginObject po : e.getChildren()) {
+                  if (po instanceof IPluginElement) {
+                    IPluginElement pe = (IPluginElement) po;
+                    if (CompareUtility.equals(RuntimeClasses.ResourceServlet, pe.getAttribute("class").getValue()) && pe.getChildCount() > 0) {
+                      P_ResourceServletExtension ext = new P_ResourceServletExtension();
+                      for (IPluginObject resourceServletPo : pe.getChildren()) {
+                        if (resourceServletPo instanceof IPluginElement && CompareUtility.equals(resourceServletPo.getName(), "init-param")) {
+                          IPluginElement resourceServletPe = (IPluginElement) resourceServletPo;
+                          IPluginAttribute[] atts = resourceServletPe.getAttributes();
+                          if (atts != null) {
+                            HashMap<String, String> props = new HashMap<String, String>(2);
+                            for (IPluginAttribute at : atts) {
+                              props.put(at.getName(), at.getValue());
                             }
-                            if (CompareUtility.equals(name, "bundle-path")) {
-                              ext.bundlePath = value;
+                            String name = props.get("name");
+                            String value = props.get("value");
+                            if (!StringUtility.isNullOrEmpty(name) && !StringUtility.isNullOrEmpty(value)) {
+                              if (CompareUtility.equals(name, "bundle-name")) {
+                                ext.bundleName = value;
+                              }
+                              if (CompareUtility.equals(name, "bundle-path")) {
+                                ext.bundlePath = value;
+                              }
                             }
                           }
-                        }
 
+                        }
                       }
-                    }
-                    if (ext.isValid()) {
-                      extensions.add(ext);
+                      if (ext.isValid()) {
+                        extensions.add(ext);
+                      }
                     }
                   }
                 }
@@ -115,7 +117,7 @@ public class ResourceServletFolderTree {
       }
     }
 
-    for (ITreeNode cn : curentNode.getChildren()) {
+    for (ITreeNode cn : currentNode.getChildren()) {
       findServletExtensions(cn, extensions);
     }
   }

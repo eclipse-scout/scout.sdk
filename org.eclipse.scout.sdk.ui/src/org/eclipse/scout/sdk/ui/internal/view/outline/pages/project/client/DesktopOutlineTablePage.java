@@ -31,8 +31,9 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>DesktopOutlineTablePage</h3> ...
  */
 public class DesktopOutlineTablePage extends AbstractPage {
-  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
-  final String getConfiguredOutlines = "getConfiguredOutlines";
+  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+  private final String getConfiguredOutlines = "getConfiguredOutlines";
+
   private IType m_desktopType;
   private P_MethodListener m_methodListener;
   private ICachedTypeHierarchy m_outlineTypeHierarchy;
@@ -96,7 +97,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
       }
     }
     catch (Exception e) {
-      ScoutSdkUi.logError("error during loading children of '" + getClass().getName() + "'", e);
+      ScoutSdkUi.logError("error during loading children of '" + getClass().getName() + "'.", e);
     }
   }
 

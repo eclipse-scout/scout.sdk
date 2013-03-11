@@ -91,7 +91,7 @@ public class LibrariesTablePage extends AbstractPage {
     try {
       // find library projects
       List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>(3);
-      if (getScoutBundle() != null) {
+      if (getScoutBundle() != null && !getScoutBundle().isBinary()) {
         PluginModelHelper helper = new PluginModelHelper(getScoutBundle().getProject());
         IPluginImport[] allDependencies = helper.Manifest.getAllDependencies();
         Set<String> dependencyIds = new HashSet<String>(allDependencies.length);

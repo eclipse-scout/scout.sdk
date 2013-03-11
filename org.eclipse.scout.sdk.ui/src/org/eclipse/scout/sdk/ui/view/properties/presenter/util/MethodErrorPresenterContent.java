@@ -219,7 +219,7 @@ public class MethodErrorPresenterContent extends Composite {
       return null;
     }
     String newBody = ScoutSourceUtility.removeLeadingCommentAndAnnotationLines(methodBody);
-    String newLine = ResourceUtility.getLineSeparator(getMethod().getType().getCompilationUnit());
+    String newLine = ResourceUtility.getLineSeparator(getMethod().getType().getOpenable());
     newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody, newLine);
     newBody = newBody.replaceAll("\t", SdkProperties.TAB);
     return newBody;

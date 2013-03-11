@@ -42,18 +42,26 @@ public class ExportServerWizardPage extends AbstractExportProductWizardPage {
   }
 
   private String findServerWarName() {
-    String warName = null;
-    IScoutBundle uiSwing = getScoutProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
-    if (uiSwing != null) {
-      warName = findServerNameInClientBundle(uiSwing);
-    }
-    if (warName == null) {
-      IScoutBundle uiSwt = getScoutProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWT), true);
-      if (uiSwt != null) {
-        warName = findServerNameInClientBundle(uiSwt);
+    IScoutBundle[] uiSwingBundles = getScoutProject().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
+    for (IScoutBundle uiSwing : uiSwingBundles) {
+      if (uiSwing != null && !uiSwing.isBinary()) {
+        String warName = findServerNameInClientBundle(uiSwing);
+        if (StringUtility.hasText(warName)) {
+          return warName;
+        }
       }
     }
-    return warName;
+
+    IScoutBundle[] uiSwtBundles = getScoutProject().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWT), true);
+    for (IScoutBundle uiSwt : uiSwtBundles) {
+      if (uiSwt != null && !uiSwt.isBinary()) {
+        String warName = findServerNameInClientBundle(uiSwt);
+        if (StringUtility.hasText(warName)) {
+          return warName;
+        }
+      }
+    }
+    return null;
   }
 
   private String findServerNameInClientBundle(IScoutBundle bundle) {

@@ -157,7 +157,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     if (superTypeProp != null) {
       m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
-
+    m_operation.setFormatSource(true);
     m_operation.run(monitor, workingCopyManager);
     return true;
   }

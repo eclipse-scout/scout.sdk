@@ -90,8 +90,10 @@ public class FormDataSqlBindingValidator {
     SqlBindingMarkers.removeMarkers(service.getResource());
     for (IMethod serviceMethod : service.getMethods()) {
       try {
-        MethodSqlBindingModel processServiceMethod = processServiceMethod(serviceMethod, monitor);
-        SqlBindingMarkers.setMarkers(processServiceMethod);
+        if (serviceMethod.getSource() != null) {
+          MethodSqlBindingModel processServiceMethod = processServiceMethod(serviceMethod, monitor);
+          SqlBindingMarkers.setMarkers(processServiceMethod);
+        }
       }
       catch (Exception e) {
         ScoutSdk.logWarning("could not process method '" + serviceMethod.getElementName() + "' on type '" + service.getFullyQualifiedName() + "'.", e);

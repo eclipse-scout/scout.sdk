@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
  */
 public class FormHandlerTablePage extends AbstractPage {
 
-  final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
+  private final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   private final IType m_formType;

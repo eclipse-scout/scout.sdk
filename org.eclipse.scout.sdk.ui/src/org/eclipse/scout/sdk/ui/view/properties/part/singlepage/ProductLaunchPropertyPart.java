@@ -54,7 +54,7 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
 
   protected void fillLinkSection(Composite parent) {
     IScoutBundle bundle = getPage().getScoutBundle();
-    if (bundle != null) {
+    if (bundle != null && !bundle.isBinary()) {
       IResource resource = bundle.getProject().findMember(SdkProperties.PRODUCT_FOLDER);
       if (resource != null && resource.exists() && resource.getType() == IResource.FOLDER) {
         // spider products
