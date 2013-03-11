@@ -48,6 +48,7 @@ public class DesktopNodePage extends AbstractScoutTypePage {
     new DesktopMenuTablePage(this, getType());
     new DesktopOutlineTablePage(this, getType());
     new ToolButtonTablePage(this, getType());
+    new KeyStrokeTablePage(this, getType());
   }
 
   @SuppressWarnings("unchecked")

@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>KeyStrokesTablePage</h3> ...
  */
 public class KeyStrokeTablePage extends AbstractPage {
-  final IType iKeyStrokeType = TypeUtility.getType(RuntimeClasses.IKeyStroke);
+  private final IType iKeyStrokeType = TypeUtility.getType(RuntimeClasses.IKeyStroke);
 
   private final IType m_declaringType;
 

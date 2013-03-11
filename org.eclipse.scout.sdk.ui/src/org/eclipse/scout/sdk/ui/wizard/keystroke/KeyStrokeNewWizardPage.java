@@ -70,7 +70,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
     m_abstractKeyStroke = RuntimeClasses.getSuperType(RuntimeClasses.IKeyStroke, m_declaringType.getJavaProject());
     m_superType = m_abstractKeyStroke;
-    setOperation(new KeyStrokeNewOperation(m_declaringType));
+    setOperation(new KeyStrokeNewOperation(m_declaringType, true));
   }
 
   @Override
