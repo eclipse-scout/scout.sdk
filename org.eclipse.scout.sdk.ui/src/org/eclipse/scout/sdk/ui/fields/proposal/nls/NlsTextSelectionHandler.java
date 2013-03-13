@@ -30,9 +30,6 @@ public class NlsTextSelectionHandler implements IProposalSelectionHandler {
   private final INlsProject m_nlsProject;
 
   public NlsTextSelectionHandler(INlsProject nlsProject) {
-    if (nlsProject == null) {
-      throw new IllegalArgumentException("nls project must not be null!");
-    }
     m_nlsProject = nlsProject;
   }
 

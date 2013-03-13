@@ -72,9 +72,6 @@ public class FieldToolkit {
   }
 
   public ProposalTextField createNlsProposalTextField(Composite parent, INlsProject nlsProject, String label, int labelPercentage) {
-    if (nlsProject == null) {
-      throw new IllegalArgumentException("nlsProject can not be null!");
-    }
     ProposalTextField field = createProposalField(parent, label, ProposalTextField.STYLE_DEFAULT, labelPercentage);
     NlsTextLabelProvider labelProvider = new NlsTextLabelProvider(nlsProject);
     field.setLabelProvider(labelProvider);
