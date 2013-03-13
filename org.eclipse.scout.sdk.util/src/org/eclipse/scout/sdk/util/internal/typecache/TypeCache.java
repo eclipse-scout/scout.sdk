@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
@@ -48,8 +47,6 @@ public final class TypeCache implements ITypeCache {
   private final Object m_cacheLock;
   private HashMap<String, ArrayList<IType>> m_cache;
   private P_ResourceListener m_resourceChangeListener;
-
-  private final static Pattern DOLLAR_REMOVE_REGEX = Pattern.compile("\\$");
 
   public static TypeCache getInstance() {
     return INSTANCE;
@@ -99,7 +96,7 @@ public final class TypeCache implements ITypeCache {
         return types.get(0);
       }
       if (types.size() > 1) {
-        SdkUtilActivator.logWarning("found more than one type matches for '" + fullyQualifiedName + "' (matches: '" + types.size() + "').");
+        SdkUtilActivator.logWarning("found more than one type match for '" + fullyQualifiedName + "' (matches: '" + types.size() + "').");
         return types.get(0);
       }
     }
@@ -119,7 +116,7 @@ public final class TypeCache implements ITypeCache {
     if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
       return null;
     }
-    fullyQualifiedName = DOLLAR_REMOVE_REGEX.matcher(fullyQualifiedName).replaceAll("\\.");
+    fullyQualifiedName = fullyQualifiedName.replace('$', '.');
     ArrayList<IType> types = null;
     synchronized (m_cacheLock) {
       types = m_cache.get(fullyQualifiedName);
