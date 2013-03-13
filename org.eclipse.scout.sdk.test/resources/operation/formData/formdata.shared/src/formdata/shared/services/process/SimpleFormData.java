@@ -1,7 +1,6 @@
 package formdata.shared.services.process;
 
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
-import java.util.Map;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.fields.composer.AbstractComposerData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
@@ -78,7 +77,7 @@ public class SimpleFormData extends AbstractFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(Map<String, Object> ruleMap) {
+    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.ZERO_NULL_EQUALITY, true);
     }
@@ -94,7 +93,7 @@ public class SimpleFormData extends AbstractFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(Map<String, Object> ruleMap) {
+    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }

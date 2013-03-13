@@ -25,6 +25,7 @@ public class FieldSourceBuilder implements ISourceBuilder {
 
   private String m_elementName;
   private String m_signature;
+  private String m_assignment;
   private int m_flags;
 
   public FieldSourceBuilder() {
@@ -50,8 +51,14 @@ public class FieldSourceBuilder implements ISourceBuilder {
     if (Flags.isFinal(getFlags())) {
       builder.append("final ");
     }
-    builder.append(SignatureUtility.getTypeReference(getSignature(), validator) + " ");
-    builder.append(getElementName() + ";");
+    builder.append(SignatureUtility.getTypeReference(getSignature(), validator));
+    builder.append(" ");
+    builder.append(getElementName());
+    if (getAssignment() != null) {
+      builder.append(" = ");
+      builder.append(getAssignment());
+    }
+    builder.append(";");
     return builder.toString();
   }
 
@@ -75,6 +82,14 @@ public class FieldSourceBuilder implements ISourceBuilder {
 
   public void setSignature(String signature) {
     m_signature = signature;
+  }
+
+  public String getAssignment() {
+    return m_assignment;
+  }
+
+  public void setAssignment(String assignment) {
+    m_assignment = assignment;
   }
 
   public int getFlags() {

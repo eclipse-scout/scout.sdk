@@ -202,10 +202,20 @@ public class ScoutTypeUtility extends TypeUtility {
     if (!TypeUtility.exists(primaryType)) {
       return null;
     }
-    IType formDataType = primaryType.getType(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(formField.getElementName()), true));
-    if (TypeUtility.exists(formDataType)) {
-      return formDataType;
+
+    org.eclipse.jdt.core.ITypeHierarchy primaryTypeHierarchy = primaryType.newSupertypeHierarchy(null);
+
+    if (primaryTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractFormFieldData))) {
+      return primaryType;
     }
+    else if (primaryTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractFormData))) {
+      // search field data within form data
+      IType formDataType = primaryType.getType(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(formField.getElementName()), true));
+      if (TypeUtility.exists(formDataType)) {
+        return formDataType;
+      }
+    }
+
     return null;
   }
 

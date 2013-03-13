@@ -31,9 +31,15 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @since 3.8.2
  */
 public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
-  private static final String TABLE_ROW_BEAN_SUFFIX = "RowData";
+  private static final String TABLE_COLUMN_PROPERTY_CONSTANT_NAME_PREFIX = "PROP_";
+  private static final String TABLE_ROW_BEAN_BANE_SUFFIX = "RowData";
+  private static final String STRING_SIGNATURE = Signature.createTypeSignature("String", false);
+
   private final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
   private final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
+
+  /** counter used for sorting method sub-builders. */
+  private int m_methodSortCounter = 0;
 
   public TableFieldBeanSourceBuilder(IType tableField, ITypeHierarchy hierarchy) {
     super(tableField);
@@ -100,31 +106,41 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
           continue;
         }
 
-        String upperColName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(column.getElementName()), true);
-        String lowerColName = FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(column.getElementName()), false);
+        String fieldNameWithoutSuffix = FormDataUtility.getFieldNameWithoutSuffix(column.getElementName());
+        String upperColName = FormDataUtility.getBeanName(fieldNameWithoutSuffix, true);
+        String constantColName = TABLE_COLUMN_PROPERTY_CONSTANT_NAME_PREFIX + FormDataUtility.getConstantName(upperColName);
+        String lowerColName = FormDataUtility.getBeanName(fieldNameWithoutSuffix, false);
         String methodParameterName = FormDataUtility.getValidMethodParameterName(lowerColName);
         String propertyName = "m_" + methodParameterName;
         String colSignature = getColumnSignature(column, hierarchy);
+
+        // property constant
+        FieldSourceBuilder propConstant = new FieldSourceBuilder();
+        propConstant.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+        propConstant.setElementName(constantColName);
+        propConstant.setSignature(STRING_SIGNATURE);
+        propConstant.setAssignment("\"" + lowerColName + "\"");
+        tableBeanBuilder.addBuilder(propConstant, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 1, i, 0, propConstant));
 
         // property
         FieldSourceBuilder prop = new FieldSourceBuilder();
         prop.setElementName(propertyName);
         prop.setSignature(colSignature);
-        tableBeanBuilder.addBuilder(prop, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 1, i, 0, prop));
-
-        // setter
-        MethodSourceBuilder propSetter = new MethodSourceBuilder(NL);
-        propSetter.setElementName("set" + upperColName);
-        propSetter.addParameter(new MethodParameter(colSignature, methodParameterName));
-        propSetter.setSimpleBody(propertyName + " = " + methodParameterName + ";");
-        tableBeanBuilder.addBuilder(propSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, i, 2, propSetter));
+        tableBeanBuilder.addBuilder(prop, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, i, 0, prop));
 
         // getter
         MethodSourceBuilder propGetter = new MethodSourceBuilder(NL);
         propGetter.setSimpleBody("return " + propertyName + ";");
         propGetter.setElementName("get" + upperColName);
         propGetter.setReturnSignature(colSignature);
-        tableBeanBuilder.addBuilder(propGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 2, i, 2, propGetter));
+        tableBeanBuilder.addBuilder(propGetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, i, 1, propGetter));
+
+        // setter
+        MethodSourceBuilder propSetter = new MethodSourceBuilder(NL);
+        propSetter.setElementName("set" + upperColName);
+        propSetter.addParameter(new MethodParameter(colSignature, methodParameterName));
+        propSetter.setSimpleBody(propertyName + " = " + methodParameterName + ";");
+        tableBeanBuilder.addBuilder(propSetter, new CompositeObject(CATEGORY_TYPE_TABLE_COLUMN, 3, i, 2, propSetter));
       }
       catch (JavaModelException e) {
         ScoutSdk.logWarning("could not add column '" + column.getFullyQualifiedName() + "' to form data.", e);
@@ -141,13 +157,7 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
     setRows.setElementName("setRows");
     setRows.addParameter(new MethodParameter(tableBeanArraySignature, "rows"));
     setRows.setSimpleBody("super.setRows(rows);");
-    addBuilder(setRows, CATEGORY_MEHTOD);
-
-    // rowAt
-    MethodSourceBuilder rowAt = addMethodOverride("rowAt");
-    rowAt.setReturnSignature(tableBeanSignature);
-    rowAt.addParameter(new MethodParameter(Signature.SIG_INT, "idx"));
-    rowAt.setSimpleBody("return (" + tableRowBeanName + ") super.rowAt(idx);");
+    addMethodBuilder(setRows);
 
     // addRow
     MethodSourceBuilder addRow = addMethodOverride("addRow");
@@ -160,6 +170,12 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
     addRowWithRowState.addParameter(new MethodParameter(Signature.SIG_INT, "rowState"));
     addRowWithRowState.setSimpleBody("return (" + tableRowBeanName + ") super.addRow(rowState);");
 
+    // rowAt
+    MethodSourceBuilder rowAt = addMethodOverride("rowAt");
+    rowAt.setReturnSignature(tableBeanSignature);
+    rowAt.addParameter(new MethodParameter(Signature.SIG_INT, "idx"));
+    rowAt.setSimpleBody("return (" + tableRowBeanName + ") super.rowAt(idx);");
+    
     // createRow
     MethodSourceBuilder createRow = addMethodOverride("createRow");
     createRow.setReturnSignature(tableBeanSignature);
@@ -177,7 +193,7 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
       // use table fields name
       tableRowBeanName = FormDataUtility.getFieldNameWithoutSuffix(table.getDeclaringType().getElementName());
     }
-    tableRowBeanName = tableRowBeanName + TABLE_ROW_BEAN_SUFFIX;
+    tableRowBeanName = tableRowBeanName + TABLE_ROW_BEAN_BANE_SUFFIX;
     return tableRowBeanName;
   }
 
@@ -192,8 +208,18 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
     MethodSourceBuilder method = new MethodSourceBuilder(NL);
     method.setElementName(methodName);
     method.addAnnotation(new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName(), true)));
-    addBuilder(method, CATEGORY_MEHTOD);
+    addMethodBuilder(method);
     return method;
+  }
+
+  /**
+   * Adds the given method builder to this {@link TableFieldBeanSourceBuilder} and ensures, that the generated methods
+   * are sorted in the same order they are added.
+   * 
+   * @param methodBuilder
+   */
+  private void addMethodBuilder(MethodSourceBuilder methodBuilder) {
+    addBuilder(methodBuilder, new CompositeObject(CATEGORY_MEHTOD, m_methodSortCounter++, methodBuilder.getElementName(), methodBuilder));
   }
 
   /**
