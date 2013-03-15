@@ -36,6 +36,18 @@ public abstract class AbstractPersonTableField extends AbstractBeanTableField<Ab
       return getColumnSet().getColumnByClass(FemaleColumn.class);
     }
 
+    public BooleanColumn getBooleanColumn() {
+      return getColumnSet().getColumnByClass(BooleanColumn.class);
+    }
+
+    public AssertColumn getAssertColumn() {
+      return getColumnSet().getColumnByClass(AssertColumn.class);
+    }
+
+    public SwitchColumn getSwitchColumn() {
+      return getColumnSet().getColumnByClass(SwitchColumn.class);
+    }
+
     @Order(10)
     public class PersonIdColumn extends AbstractStringColumn {
     }
@@ -46,6 +58,18 @@ public abstract class AbstractPersonTableField extends AbstractBeanTableField<Ab
 
     @Order(30)
     public class FemaleColumn extends AbstractBooleanColumn {
+    }
+
+    @Order(40)
+    public class BooleanColumn extends AbstractBooleanColumn {
+    }
+
+    @Order(50)
+    public class AssertColumn extends AbstractBooleanColumn {
+    }
+
+    @Order(60)
+    public class SwitchColumn extends AbstractBooleanColumn {
     }
   }
 }

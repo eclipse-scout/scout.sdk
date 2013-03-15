@@ -49,12 +49,18 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
     public AbstractPersonTableRowData() {
     }
 
-    public static final String PROP_PERSON_ID = "personId";
-    public static final String PROP_NAME = "name";
-    public static final String PROP_FEMALE = "female";
+    public static final String personId = "personId";
+    public static final String name = "name";
+    public static final String female = "female";
+    public static final String boolean_ = "boolean";
+    public static final String assert_ = "assert";
+    public static final String switch_ = "switch";
     private String m_personId;
     private String m_name;
     private Boolean m_female;
+    private Boolean m_booleanValue;
+    private Boolean m_assertValue;
+    private Boolean m_switchValue;
 
     public String getPersonId() {
       return m_personId;
@@ -78,6 +84,30 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
 
     public void setFemale(Boolean female) {
       m_female = female;
+    }
+
+    public Boolean getBoolean() {
+      return m_booleanValue;
+    }
+
+    public void setBoolean(Boolean booleanValue) {
+      m_booleanValue = booleanValue;
+    }
+
+    public Boolean getAssert() {
+      return m_assertValue;
+    }
+
+    public void setAssert(Boolean assertValue) {
+      m_assertValue = assertValue;
+    }
+
+    public Boolean getSwitch() {
+      return m_switchValue;
+    }
+
+    public void setSwitch(Boolean switchValue) {
+      m_switchValue = switchValue;
     }
   }
 }

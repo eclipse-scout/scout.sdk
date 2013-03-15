@@ -49,9 +49,9 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
     public AbstractAddressTableRowData() {
     }
 
-    public static final String PROP_ADDRESS_ID = "addressId";
-    public static final String PROP_STREET = "street";
-    public static final String PROP_PO_BOX_ADDRESS = "poBoxAddress";
+    public static final String addressId = "addressId";
+    public static final String street = "street";
+    public static final String poBoxAddress = "poBoxAddress";
     private String m_addressId;
     private String m_street;
     private Boolean m_poBoxAddress;

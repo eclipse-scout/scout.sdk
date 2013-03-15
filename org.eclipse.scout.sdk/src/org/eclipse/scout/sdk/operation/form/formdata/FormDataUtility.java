@@ -234,10 +234,20 @@ public class FormDataUtility {
   }
 
   public static String getValidMethodParameterName(String parameterName) {
-    if (keyWords.contains(parameterName.toLowerCase())) {
+    if (isReservedJavaKeyword(parameterName)) {
       return parameterName + "Value";
     }
     return parameterName;
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given word is a reserved java keyword. Otherwise <code>false</code>.
+   * @throws NullPointerException
+   *           if the given word is <code>null</code>.
+   * @since 3.8.3
+   */
+  public static boolean isReservedJavaKeyword(String word) {
+    return keyWords.contains(word.toLowerCase());
   }
 
   public static String createCompilationUnitSource(ITypeSourceBuilder builder, String packageName, IJavaProject project, IProgressMonitor monitor) throws CoreException, BadLocationException {

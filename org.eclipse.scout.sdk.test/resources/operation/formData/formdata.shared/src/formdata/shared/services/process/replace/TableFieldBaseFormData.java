@@ -78,7 +78,7 @@ public class TableFieldBaseFormData extends AbstractFormData {
       public AddressTableRowData() {
       }
 
-      public static final String PROP_CITY = "city";
+      public static final String city = "city";
       private String m_city;
 
       public String getCity() {
@@ -211,8 +211,8 @@ public class TableFieldBaseFormData extends AbstractFormData {
       public TableRowData() {
       }
 
-      public static final String PROP_FIRST = "first";
-      public static final String PROP_SECOND = "second";
+      public static final String first = "first";
+      public static final String second = "second";
       private String m_first;
       private String m_second;
 

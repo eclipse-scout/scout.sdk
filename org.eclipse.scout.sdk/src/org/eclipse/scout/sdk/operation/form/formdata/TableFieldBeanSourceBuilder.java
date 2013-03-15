@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @since 3.8.2
  */
 public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
-  private static final String TABLE_COLUMN_PROPERTY_CONSTANT_NAME_PREFIX = "PROP_";
+  private static final String TABLE_COLUMN_PROPERTY_CONSTANT_NAME_SUFFIX = "_";
   private static final String TABLE_ROW_BEAN_BANE_SUFFIX = "RowData";
   private static final String STRING_SIGNATURE = Signature.createTypeSignature("String", false);
 
@@ -126,7 +126,6 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
 
         String fieldNameWithoutSuffix = FormDataUtility.getFieldNameWithoutSuffix(column.getElementName());
         String upperColName = FormDataUtility.getBeanName(fieldNameWithoutSuffix, true);
-        String constantColName = TABLE_COLUMN_PROPERTY_CONSTANT_NAME_PREFIX + FormDataUtility.getConstantName(upperColName);
         String lowerColName = FormDataUtility.getBeanName(fieldNameWithoutSuffix, false);
         String methodParameterName = FormDataUtility.getValidMethodParameterName(lowerColName);
         String propertyName = "m_" + methodParameterName;
@@ -135,6 +134,10 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
         // property constant
         FieldSourceBuilder propConstant = new FieldSourceBuilder();
         propConstant.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+        String constantColName = lowerColName;
+        if (FormDataUtility.isReservedJavaKeyword(constantColName)) {
+          constantColName += TABLE_COLUMN_PROPERTY_CONSTANT_NAME_SUFFIX;
+        }
         propConstant.setElementName(constantColName);
         propConstant.setSignature(STRING_SIGNATURE);
         propConstant.setAssignment("\"" + lowerColName + "\"");

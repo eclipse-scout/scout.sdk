@@ -77,7 +77,7 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public TableExRowData() {
       }
 
-      public static final String PROP_SINGLE = "single";
+      public static final String single = "single";
       private String m_single;
 
       public String getSingle() {
@@ -137,7 +137,7 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public ExtendedAddressRowData() {
       }
 
-      public static final String PROP_STATE = "state";
+      public static final String state = "state";
       private String m_state;
 
       public String getState() {
@@ -197,7 +197,7 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public ExtendedPersonTableRowData() {
       }
 
-      public static final String PROP_LAST_NAME = "lastName";
+      public static final String lastName = "lastName";
       private String m_lastName;
 
       public String getLastName() {
@@ -257,7 +257,7 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public NoTableExtendedRowData() {
       }
 
-      public static final String PROP_NEW = "new";
+      public static final String new_ = "new";
       private String m_newValue;
 
       public String getNew() {
@@ -317,7 +317,7 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       public TableExRowData() {
       }
 
-      public static final String PROP_BOOLEAN = "boolean";
+      public static final String boolean_ = "boolean";
       private Boolean m_booleanValue;
 
       public Boolean getBoolean() {
