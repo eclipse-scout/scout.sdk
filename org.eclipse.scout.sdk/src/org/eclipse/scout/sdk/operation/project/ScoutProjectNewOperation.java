@@ -22,6 +22,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
@@ -35,6 +38,8 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   private final static String EXT_ATTR_ID_NAME = "id";
   private final static String EXT_ATTR_REF_NAME = "referenceId";
   private final static String EXT_ATTR_REF_TYPE_NAME = "execAfterReference";
+  private final static String EXEC_ENV_PREFIX = "JavaSE-";
+  private final static String MIN_JVM_VERSION = "1.6";
 
   public ScoutProjectNewOperation() {
   }
@@ -163,7 +168,23 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
   }
 
+  protected String computeExecutionEnvironment() {
+
+    String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
+    IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
+    for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
+      String executionEnvId = env.getId();
+      if (executionEnvId.startsWith(EXEC_ENV_PREFIX) && env.isStrictlyCompatible(defaultVm)) {
+        if (executionEnvId.compareTo(execEnv) > 0) {
+          execEnv = executionEnvId; // take the newest
+        }
+      }
+    }
+    return execEnv;
+  }
+
   protected void putInitialProperties() {
+    getProperties().setProperty(IScoutProjectNewOperation.PROP_EXEC_ENV, computeExecutionEnvironment());
     getProperties().setProperty(IScoutProjectNewOperation.PROP_OS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_OS));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_WS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_WS));
     getProperties().setProperty(IScoutProjectNewOperation.PROP_ARCH, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_ARCH));

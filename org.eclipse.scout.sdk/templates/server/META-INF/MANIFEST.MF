@@ -16,4 +16,4 @@ Export-Package: @@BUNDLE_SERVER_NAME@@
 Bundle-ClassPath: .
 Import-Package: javax.servlet;version="2.4.0",
  javax.servlet.http;version="2.4.0"
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: @@EXECUTION_ENVIRONMENT@@

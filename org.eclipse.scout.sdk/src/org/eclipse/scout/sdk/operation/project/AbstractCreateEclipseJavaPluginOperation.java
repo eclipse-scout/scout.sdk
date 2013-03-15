@@ -31,25 +31,15 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractCreateEclipseProjectOperation {
 
-  private String m_execEnvId;
   private IJavaProject m_javaProject;
   private boolean m_createResourcesFolder = false;
 
   @SuppressWarnings("restriction")
   public AbstractCreateEclipseJavaPluginOperation() {
     super();
-    m_execEnvId = "JavaSE-1.6";
     addNature(org.eclipse.pde.internal.core.natures.PDE.PLUGIN_NATURE);
     addNature(JavaCore.NATURE_ID);
     m_createResourcesFolder = true;
-  }
-
-  public void setExecutionEnvironment(String s) {
-    m_execEnvId = s;
-  }
-
-  public String getExecutionEnvironment() {
-    return m_execEnvId;
   }
 
   @Override
@@ -84,7 +74,7 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
     IClasspathEntry[] entries = new IClasspathEntry[3];
     IPath pathSrc = project.getFullPath().append(SdkProperties.DEFAULT_SOURCE_FOLDER_NAME);
     entries[0] = JavaCore.newSourceEntry(pathSrc);
-    entries[1] = createJREEntry(m_execEnvId);
+    entries[1] = createJREEntry(getExecutionEnvironment());
     entries[2] = createContainerEntry();
     m_javaProject.setRawClasspath(entries, null);
 

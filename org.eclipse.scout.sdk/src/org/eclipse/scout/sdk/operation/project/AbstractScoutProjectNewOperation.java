@@ -158,6 +158,10 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     return getProperties().getProperty(PROP_USER_NAME, String.class);
   }
 
+  protected final String getExecutionEnvironment() {
+    return getProperties().getProperty(PROP_EXEC_ENV, String.class);
+  }
+
   protected final Version getTargetPlatformVersion() {
     return getProperties().getProperty(PROP_TARGET_PLATFORM_VERSION, Version.class);
   }

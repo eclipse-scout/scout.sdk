@@ -24,6 +24,7 @@ public interface IScoutProjectNewOperation extends IOperation {
   String PROP_LOCALHOST = "LOCALHOST";
   String PROP_CURRENT_DATE = "CURRENT_DATE";
   String PROP_USER_NAME = "USER_NAME";
+  String PROP_EXEC_ENV = "EXECUTION_ENVIRONMENT";
 
   /**
    * 1. step for an operation in the project creation pipeline: the properties are set

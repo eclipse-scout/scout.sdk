@@ -16,5 +16,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.ui.rap.theme.rayo,
  org.eclipse.scout.rt.client.mobile
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: @@EXECUTION_ENVIRONMENT@@
 Scout-Project: org.eclipse.scout.rt

@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.osgi.framework.Constants;
 
 /**
  * <h3>{@link ScoutProjectAddOperation}</h3> ...
@@ -58,6 +59,17 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
     if (m_project == null) {
       throw new IllegalArgumentException("null project not allowed");
     }
+  }
+
+  @SuppressWarnings("deprecation")
+  @Override
+  protected String computeExecutionEnvironment() {
+    PluginModelHelper pmh = new PluginModelHelper(m_project.getSymbolicName());
+    String execEnv = pmh.Manifest.getEntry(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT);
+    if (execEnv != null) {
+      return execEnv;
+    }
+    return super.computeExecutionEnvironment();
   }
 
   @Override
