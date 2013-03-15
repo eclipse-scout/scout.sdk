@@ -36,7 +36,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.egit.ui.UIPreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -48,6 +48,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.preferences.ScopedPreferenceStore;
 import org.junit.Assert;
 import org.osgi.framework.Bundle;
 
@@ -57,12 +58,16 @@ public abstract class AbstractScoutSdkTest {
 
   protected static void showEgitMessageBoxes(boolean show) {
     try {
-      IPreferenceStore store = org.eclipse.egit.ui.Activator.getDefault().getPreferenceStore();
-      store.setValue(UIPreferences.SHOW_DETACHED_HEAD_WARNING, show);
-      store.setValue(UIPreferences.SHOW_GIT_PREFIX_WARNING, show);
-      store.setValue(UIPreferences.SHOW_HOME_DIR_WARNING, show);
-      store.setValue(UIPreferences.SHOW_INITIAL_CONFIG_DIALOG, show);
-      store.setValue(UIPreferences.SHOW_REBASE_CONFIRM, show);
+      // preference store as defined in org.eclipse.ui.plugin.AbstractUIPlugin.getPreferenceStore()
+      @SuppressWarnings("deprecation")
+      IPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), "org.eclipse.egit.ui");
+
+      // following constants are coming from class org.eclipse.egit.ui.UIPreferences:
+      store.setValue("show_detached_head_warning", show);
+      store.setValue("show_git_prefix_warning", show);
+      store.setValue("show_home_drive_warning", show);
+      store.setValue("show_initial_config_dialog", show);
+      store.setValue("show_rebase_confirm", show);
     }
     catch (Throwable e) {
       //NOP
