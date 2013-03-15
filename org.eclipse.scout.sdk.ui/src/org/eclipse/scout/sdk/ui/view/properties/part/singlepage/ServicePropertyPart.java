@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
@@ -68,15 +69,17 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
       model.addGlobalLink(new TypeOpenLink(getPage().getType()));
       entityName = findEntityName(getPage().getType().getElementName());
     }
-    if (!StringUtility.isNullOrEmpty(entityName)) {
 
+    if (!StringUtility.isNullOrEmpty(entityName)) {
       // form
-      if (TypeUtility.exists(iForm)) /* can be null on a server-only-project (bugzilla ticket 325428) */{
+      if (TypeUtility.exists(iForm) && getPage().getInterfaceType() != null) /* can be null on a server-only-project (bugzilla ticket 325428) */{
         String formRegex = entityName + SdkProperties.SUFFIX_FORM;
+        IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(getPage().getInterfaceType());
+
         ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
             TypeFilters.getRegexSimpleNameFilter(formRegex),
             TypeFilters.getClassFilter(),
-            ScoutTypeFilters.getInScoutBundles(getPage().getScoutBundle().getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false))
+            ScoutTypeFilters.getInScoutBundles(interfaceBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false))
             );
         LinkGroup formGroup = model.getOrCreateGroup(Texts.get("Form"), 10);
         for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(iForm).getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator())) {
@@ -110,6 +113,12 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
     }
     if (serviceName.endsWith(SdkProperties.SUFFIX_ACCESS_CONTROL_SERVICE)) {
       return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_ACCESS_CONTROL_SERVICE + "$", "$1");
+    }
+    if (serviceName.endsWith(SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE + "$", "$1");
+    }
+    if (serviceName.endsWith(SdkProperties.SUFFIX_LOOKUP_SERVICE)) {
+      return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_SERVICE + "$", "$1");
     }
     if (serviceName.endsWith(SdkProperties.SUFFIX_CALENDAR_SERVICE)) {
       return serviceName.replaceAll("^(.*)" + SdkProperties.SUFFIX_CALENDAR_SERVICE + "$", "$1");

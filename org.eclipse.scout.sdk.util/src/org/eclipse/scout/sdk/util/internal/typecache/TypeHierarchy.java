@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.util.internal.typecache;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,7 +23,7 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
- *
+ * Type Hierarchy implementation
  */
 public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.ITypeHierarchy {
 
@@ -36,7 +37,6 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   TypeHierarchy(IType type, ITypeHierarchy jdtHierarchy) {
     setJdtHierarchy(jdtHierarchy);
     m_type = type;
-
   }
 
   @Override
@@ -85,22 +85,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getAllClasses(ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] classes = m_hierarchy.getAllClasses();
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : classes) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(classes, filter, comparator);
   }
 
   @Override
@@ -117,22 +102,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getAllInterfaces(ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getAllInterfaces();
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   @Override
@@ -152,7 +122,6 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
       }
     }
     return false;
-
   }
 
   @Override
@@ -166,25 +135,10 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   }
 
   @Override
-  public IType[] getAllSubtypes(IType type, ITypeFilter filter, Comparator<IType> typeComparator) {
+  public IType[] getAllSubtypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] subtypes = m_hierarchy.getAllSubtypes(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : subtypes) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (typeComparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(typeComparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(subtypes, filter, comparator);
   }
 
   @Override
@@ -201,22 +155,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getAllSuperclasses(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getAllSuperclasses(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   @Override
@@ -233,22 +172,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getAllSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getAllSuperInterfaces(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   @Override
@@ -265,22 +189,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getAllSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getAllSupertypes(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   /**
@@ -301,22 +210,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getAllTypes(ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getAllTypes();
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   /**
@@ -338,22 +232,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getSubclasses(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getSubclasses(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   @Override
@@ -370,22 +249,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getSubtypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getSubtypes(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   /**
@@ -422,22 +286,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getSuperInterfaces(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
-    for (IType candidate : types) {
-      if (TypeUtility.exists(candidate)) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
-        }
-      }
-    }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return getTypesFilteredAndSorted(types, filter, comparator);
   }
 
   /**
@@ -459,22 +308,25 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType[] getSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     revalidate(null);
     IType[] types = m_hierarchy.getSupertypes(type);
-    HashSet<IType> unsortedResult = new HashSet<IType>();
+    return getTypesFilteredAndSorted(types, filter, comparator);
+  }
+
+  private static IType[] getTypesFilteredAndSorted(IType[] types, ITypeFilter filter, Comparator<IType> comparator) {
+    Set<IType> result = null;
+    if (comparator == null) {
+      result = new HashSet<IType>();
+    }
+    else {
+      result = new TreeSet<IType>(comparator);
+    }
+
     for (IType candidate : types) {
       if (TypeUtility.exists(candidate)) {
         if (filter == null || filter.accept(candidate)) {
-          unsortedResult.add(candidate);
+          result.add(candidate);
         }
       }
     }
-    if (comparator != null) {
-      TreeSet<IType> sortedResult = new TreeSet<IType>(comparator);
-      sortedResult.addAll(unsortedResult);
-      return sortedResult.toArray(new IType[sortedResult.size()]);
-    }
-    else {
-      return unsortedResult.toArray(new IType[unsortedResult.size()]);
-    }
+    return result.toArray(new IType[result.size()]);
   }
-
 }

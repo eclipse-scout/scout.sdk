@@ -101,28 +101,30 @@ public class SharedContextPropertyTablePage extends AbstractPage {
 
     @Override
     public boolean accept(IMethod candidate) {
-      if (TypeUtility.exists(candidate) && !candidate.isBinary()) {
+      if (TypeUtility.exists(candidate)) {
         try {
           String source = candidate.getSource();
-          if (source.contains("setSharedContextVariable")) {
-            String propName = candidate.getElementName();
-            propName = propName.replaceFirst("^set", "");
-            PropertyBean bean = m_beans.get(propName);
-            if (bean == null) {
-              bean = new PropertyBean(candidate.getDeclaringType(), propName);
-              m_beans.put(propName, bean);
+          if (source != null) {
+            if (source.contains("setSharedContextVariable")) {
+              String propName = candidate.getElementName();
+              propName = propName.replaceFirst("^set", "");
+              PropertyBean bean = m_beans.get(propName);
+              if (bean == null) {
+                bean = new PropertyBean(candidate.getDeclaringType(), propName);
+                m_beans.put(propName, bean);
+              }
+              bean.setWriteMethod(candidate);
             }
-            bean.setWriteMethod(candidate);
-          }
-          else if (source.contains("getSharedContextVariable")) {
-            String propName = candidate.getElementName();
-            propName = propName.replaceFirst("^(get|is)", "");
-            PropertyBean bean = m_beans.get(propName);
-            if (bean == null) {
-              bean = new PropertyBean(candidate.getDeclaringType(), propName);
-              m_beans.put(propName, bean);
+            else if (source.contains("getSharedContextVariable")) {
+              String propName = candidate.getElementName();
+              propName = propName.replaceFirst("^(get|is)", "");
+              PropertyBean bean = m_beans.get(propName);
+              if (bean == null) {
+                bean = new PropertyBean(candidate.getDeclaringType(), propName);
+                m_beans.put(propName, bean);
+              }
+              bean.setReadMethod(candidate);
             }
-            bean.setReadMethod(candidate);
           }
         }
         catch (JavaModelException e) {
