@@ -56,7 +56,7 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
     if (!TypeUtility.exists(table)) {
       addAbstractMethodImplementations();
     }
-    else if (hierarchy.contains(table)) {
+    else if (tableField.equals(table.getDeclaringType())) {
       visitTable(table, hierarchy);
     }
   }
