@@ -18,5 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.equinox.p2.metadata,
  org.eclipse.equinox.p2.operations;resolution:=optional,
  org.eclipse.equinox.p2.repository,
- org.eclipse.equinox.p2.ui
+ org.eclipse.equinox.p2.ui,
+ org.eclipse.jdt.launching,
+ org.eclipse.core.variables
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

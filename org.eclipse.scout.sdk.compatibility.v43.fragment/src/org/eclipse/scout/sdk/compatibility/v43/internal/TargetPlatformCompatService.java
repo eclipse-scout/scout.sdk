@@ -31,7 +31,7 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
     def.resolve(monitor);
     if (loadPlatform) {
       LoadTargetDefinitionJob loadJob = new LoadTargetDefinitionJob(def);
-      loadJob.runInWorkspace(monitor);
+      loadJob.run(monitor);
     }
   }
 

@@ -9,7 +9,7 @@ public class SdkLogManager {
 
   private static final String LOG_LEVEL_SUFFIX = ".loglevel";
 
-  private int m_loglevel;
+  private final int m_logLevel;
   private final Plugin m_plugin;
 
   public SdkLogManager(Plugin p) {
@@ -22,30 +22,21 @@ public class SdkLogManager {
 
   public SdkLogManager(Plugin p, int logLevel) {
     m_plugin = p;
-    m_loglevel = logLevel;
+    m_logLevel = logLevel;
   }
 
-  private LogStatus createLogStatus(int severity, String message, Throwable t) {
-    return new LogStatus(m_plugin.getClass(), severity, m_plugin.getBundle().getSymbolicName(), message, t);
-  }
-
-  private LogStatus createLogStatus(IStatus log) {
-    if (log instanceof LogStatus) {
-      return (LogStatus) log;
+  protected IStatus createStatus(int severity, String message, Throwable t) {
+    String msg = message;
+    if (msg == null) {
+      msg = "";
     }
-    else {
-      return new LogStatus(m_plugin.getClass(), log.getSeverity(), log.getPlugin(), log.getMessage(), log.getException());
-    }
+    return new LogStatus(getPlugin().getClass(), severity, getPlugin().getBundle().getSymbolicName(), msg, t);
   }
 
-  private void logImpl(LogStatus log) {
-    if ((log.getSeverity() & m_loglevel) != 0) {
-      m_plugin.getLog().log(log);
+  private void logImpl(IStatus log) {
+    if ((log.getSeverity() & getLogLevel()) != 0) {
+      getPlugin().getLog().log(log);
     }
-  }
-
-  public void log(IStatus log) {
-    logImpl(createLogStatus(log));
   }
 
   public void logInfo(Throwable t) {
@@ -57,10 +48,7 @@ public class SdkLogManager {
   }
 
   public void logInfo(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    logImpl(createLogStatus(IStatus.INFO, message, t));
+    logImpl(createStatus(IStatus.INFO, message, t));
   }
 
   public void logWarning(String message) {
@@ -72,10 +60,7 @@ public class SdkLogManager {
   }
 
   public void logWarning(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    logImpl(createLogStatus(IStatus.WARNING, message, t));
+    logImpl(createStatus(IStatus.WARNING, message, t));
   }
 
   public void logError(Throwable t) {
@@ -87,10 +72,7 @@ public class SdkLogManager {
   }
 
   public void logError(String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    logImpl(createLogStatus(IStatus.ERROR, message, t));
+    logImpl(createStatus(IStatus.ERROR, message, t));
   }
 
   /**
@@ -114,19 +96,14 @@ public class SdkLogManager {
    * @param t
    */
   public void log(int logLevel, String message, Throwable t) {
-    if (message == null) {
-      message = "";
-    }
-    logImpl(createLogStatus(logLevel, message, t));
+    logImpl(createStatus(logLevel, message, t));
   }
 
   private static String getLogLevelProperty(Plugin p) {
     if (p != null && p.getBundle() != null) {
       return getLogLevelProperty(p.getBundle().getBundleContext());
     }
-    else {
-      return null;
-    }
+    return null;
   }
 
   private static String getLogLevelProperty(BundleContext context) {
@@ -149,5 +126,13 @@ public class SdkLogManager {
       }
     }
     return level;
+  }
+
+  protected int getLogLevel() {
+    return m_logLevel;
+  }
+
+  protected Plugin getPlugin() {
+    return m_plugin;
   }
 }
