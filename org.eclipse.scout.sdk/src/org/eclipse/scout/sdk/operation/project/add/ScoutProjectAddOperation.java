@@ -64,10 +64,12 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
   @SuppressWarnings("deprecation")
   @Override
   protected String computeExecutionEnvironment() {
-    PluginModelHelper pmh = new PluginModelHelper(m_project.getSymbolicName());
-    String execEnv = pmh.Manifest.getEntry(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT);
-    if (execEnv != null) {
-      return execEnv;
+    if (!m_project.isBinary()) {
+      PluginModelHelper pmh = new PluginModelHelper(m_project.getProject());
+      String execEnv = pmh.Manifest.getEntry(Constants.BUNDLE_REQUIREDEXECUTIONENVIRONMENT);
+      if (execEnv != null) {
+        return execEnv;
+      }
     }
     return super.computeExecutionEnvironment();
   }
