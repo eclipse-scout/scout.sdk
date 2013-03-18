@@ -25,7 +25,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
   @Override
   public void initialize(IWorkbenchConfigurer configurer) {
     super.initialize(configurer);
-    configurer.setExitOnLastWindowClose(false);
+    configurer.setExitOnLastWindowClose(true);
     configurer.setSaveAndRestore(false);
   }
 }
