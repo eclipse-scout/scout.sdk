@@ -62,6 +62,7 @@ public class TableFieldExForm extends TableFieldBaseForm {
 
     public class TableEx extends Table {
 
+      @Order(10)
       public class SingleColumn extends AbstractStringColumn {
 
       }
@@ -77,7 +78,28 @@ public class TableFieldExForm extends TableFieldBaseForm {
 
     public class Table extends AbstractTable {
 
+      @Order(10)
       public class NewColumn extends AbstractStringColumn {
+
+      }
+    }
+  }
+
+  @Replace
+  public class ExtendedAddressField extends TableFieldBaseForm.MainBox.AddressTableField {
+
+    public ExtendedAddressField(TableFieldBaseForm.MainBox container) {
+      container.super();
+    }
+
+    public class Table extends TableFieldBaseForm.MainBox.AddressTableField.Table {
+
+      public StateColumn getStateColumn() {
+        return getColumnSet().getColumnByClass(StateColumn.class);
+      }
+
+      @Order(40)
+      public class StateColumn extends AbstractStringColumn {
 
       }
     }

@@ -22,6 +22,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
+import formdata.client.ui.template.formfield.AbstractAddressTableField;
 import formdata.shared.services.process.replace.TableFieldBaseFormData;
 
 @FormData(value = TableFieldBaseFormData.class, sdkCommand = SdkCommand.CREATE)
@@ -67,5 +68,22 @@ public class TableFieldBaseForm extends AbstractForm {
     @FormData(sdkCommand = SdkCommand.USE, value = AbstractTableFieldBeanData.class)
     public class NoTableField extends AbstractTableField<ITable> {
     }
+
+    @Order(40.0)
+    public class AddressTableField extends AbstractAddressTableField {
+
+      public class Table extends AbstractAddressTableField.Table {
+
+        public CityColumn getCityColumn() {
+          return getColumnSet().getColumnByClass(CityColumn.class);
+        }
+
+        @Order(50)
+        public class CityColumn extends AbstractStringColumn {
+
+        }
+      }
+    }
+
   }
 }
