@@ -45,6 +45,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Shell;
@@ -132,8 +133,9 @@ public class FormDeleteAction extends AbstractScoutHandler {
     }
 
     if (m_processServiceInterface != null && m_processServiceImplementation == null) {
-      IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(getFormType().getJavaProject());
-      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(bundle), TypeFilters.getClassFilter());
+      IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(m_processServiceInterface);
+      IScoutBundle[] visibleServers = sharedBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
+      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(visibleServers), TypeFilters.getClassFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().matches(formName + "(Process)?" + SdkProperties.SUFFIX_SERVICE)) {
           m_processServiceImplementation = candidate;
