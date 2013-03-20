@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * creates a swing application plugin with an application and a product
- * depends on a bsi case client project with a ClientSession object
+ * depends on a scout client project with a ClientSession object
  * for example
  * com.google.rcp.ui.swing
  */

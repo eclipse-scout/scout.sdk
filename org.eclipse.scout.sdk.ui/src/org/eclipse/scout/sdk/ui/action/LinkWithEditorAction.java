@@ -40,7 +40,7 @@ import org.eclipse.ui.progress.UIJob;
 
 /**
  * <h3>LinkWithEditorAction</h3> This action is used for enable or disable the selection in the compilation unit
- * editor to the bsi case outline.
+ * editor to the scout explorer.
  */
 public class LinkWithEditorAction extends Action {
   private static final long BRIEF_DELAY = 100;

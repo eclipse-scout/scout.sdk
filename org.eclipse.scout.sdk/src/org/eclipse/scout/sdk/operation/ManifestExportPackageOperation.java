@@ -20,8 +20,8 @@ import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>ManifestExportPackageOperation</h3> BSI CASE keeps the manifest exported packages part updated. This Operation
- * is used to add/remove exported packages from the manifest.
+ * <h3>ManifestExportPackageOperation</h3> Scout SDK keeps the manifest exported packages part updated.
+ * This Operation is used to add/remove exported packages from the manifest.
  */
 public class ManifestExportPackageOperation implements IOperation {
   public static final int TYPE_REMOVE = 1 << 1;
