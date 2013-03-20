@@ -897,5 +897,18 @@
       <bundle
             symbolicName="org.eclipse.scout.svg.ui.swt">
       </bundle>
+      <!-- may be installed from the marketplace. -->
+      <bundle
+            symbolicName="com.bsiag.scout.rt.server.jdbc.mysql5117">
+      </bundle>
+      <bundle
+            symbolicName="com.bsiag.scout.rt.server.jdbc.oracle11g2">
+      </bundle>
+      <bundle
+            symbolicName="com.bsiag.scout.rt.server.jdbc.postgres9">
+      </bundle>
+      <bundle
+            symbolicName="com.bsiag.scout.rt.ui.swing.rayo">
+      </bundle>
    </extension>
 </plugin>
