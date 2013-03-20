@@ -84,11 +84,11 @@ public final class SignatureUtility {
     return getResolvedSignature(signature, signatureOwner, null);
   }
 
-  public static boolean endsWith(String stringToSearchIn, char charToFind) {
+  private static boolean endsWith(String stringToSearchIn, char charToFind) {
     return stringToSearchIn != null && !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(stringToSearchIn.length() - 1) == charToFind;
   }
 
-  public static boolean startsWith(String stringToSearchIn, char charToFind) {
+  private static boolean startsWith(String stringToSearchIn, char charToFind) {
     return stringToSearchIn != null && !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(0) == charToFind;
   }
 
@@ -278,7 +278,7 @@ public final class SignatureUtility {
         String[] typeArguments = Signature.getTypeArguments(signature);
         signature = Signature.getTypeErasure(signature);
         signature = SIG_REPLACEMENT_REGEX.matcher(signature).replaceAll(".");
-        if (signature.startsWith("Q")) {
+        if (startsWith(signature, Signature.C_UNRESOLVED)) {
           if (signatureOwner != null) {
             // unresolved
             String[][] resolvedTypeName = signatureOwner.resolveType(Signature.getSignatureSimpleName(signature));
@@ -300,14 +300,14 @@ public final class SignatureUtility {
           sigBuilder.append(validator.getTypeName(signature));
         }
         if (typeArguments != null && typeArguments.length > 0) {
-          sigBuilder.append("<");
+          sigBuilder.append(Signature.C_GENERIC_START);
           for (int i = 0; i < typeArguments.length; i++) {
             if (i > 0) {
               sigBuilder.append(", ");
             }
             sigBuilder.append(getTypeReference(typeArguments[i], signatureOwner, contextType, validator));
           }
-          sigBuilder.append(">");
+          sigBuilder.append(Signature.C_GENERIC_END);
         }
         break;
     }

@@ -137,23 +137,6 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     }
   }
 
-  // protected String getBeanTypeName(IScoutType sessionType, boolean createImports, IProgressMonitor monitor) throws CoreException{
-  // StringBuffer source=new StringBuffer();
-  // if(m_beanType.getType()==IBcElementProposal.TYPE_PRIMITIVE){
-  // source.append(((IPrimitiveTypeProposal)m_beanType).getPrimitiveName());
-  // }
-  // else if(m_beanType.getType()==IBcElementProposal.TYPE_BCTYPE){
-  // IBCTypeProposal bcTypeProp=(IBCTypeProposal)m_beanType;
-  // source.append(bcTypeProp.getBcType().getSimpleName());
-  // sessionType.createImport(bcTypeProp.getBcType().getFullyQualifiedName(), monitor);
-  // if(bcTypeProp.getBcType().isGenericType()&&getBeanGenericType()!=null){
-  // source.append("<"+m_beanGenericType.getBcType().getSimpleName()+">");
-  // sessionType.createImport(m_beanGenericType.getBcType().getFullyQualifiedName(), monitor);
-  // }
-  // }
-  // return source.toString();
-  // }
-
   public IType getClientSession() {
     return m_clientSession;
   }

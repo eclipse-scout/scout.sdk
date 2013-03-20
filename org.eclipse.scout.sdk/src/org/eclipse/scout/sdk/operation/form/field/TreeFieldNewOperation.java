@@ -80,20 +80,6 @@ public class TreeFieldNewOperation implements IOperation {
 
     m_createdTree = createTree(monitor, workingCopyManager);
 
-    // generic type
-    /*Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
-    Matcher matcher = p.matcher(getCreatedField().getSource());
-    if (matcher.find()) {
-      Document doc = new Document(getCreatedField().getSource());
-      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + SdkProperties.TYPE_NAME_TREEFIELD_TREE + ">");
-      try {
-        genericEdit.apply(doc);
-        ScoutTypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
-      }
-      catch (Exception e) {
-        ScoutSdk.logWarning("could not set the generic type of the tree field.", e);
-      }
-    }*/
     if (isFormatSource()) {
       // format
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedField(), true);

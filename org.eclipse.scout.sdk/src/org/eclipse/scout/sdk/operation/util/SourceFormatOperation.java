@@ -96,6 +96,9 @@ public class SourceFormatOperation implements IOperation {
     catch (MalformedTreeException e) {
       ScoutSdk.logError(e);
     }
+    catch (IllegalArgumentException e) {
+      ScoutSdk.logError(e);
+    }
     catch (BadLocationException e) {
       ScoutSdk.logError(e);
     }

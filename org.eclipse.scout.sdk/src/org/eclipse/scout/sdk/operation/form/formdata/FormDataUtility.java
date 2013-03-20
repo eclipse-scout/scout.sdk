@@ -29,6 +29,8 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -50,6 +52,7 @@ public class FormDataUtility {
   private final static Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
   private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
   private final static Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
+
   static {
     keyWords.add("abstract");
     keyWords.add("assert");
@@ -158,27 +161,27 @@ public class FormDataUtility {
         try {
           String genericTypeSig = computeFormFieldGenericType(type, hierarchy);
           if (genericTypeSig != null) {
-            superTypeSignature = superTypeSignature.replaceAll("\\;$", "<" + genericTypeSig + ">;");
+            superTypeSignature = Regex.REGEX_SEMI_COLOLN_END.matcher(superTypeSignature).replaceAll(Signature.C_GENERIC_START + genericTypeSig + Signature.C_GENERIC_END + ";");
           }
         }
         catch (JavaModelException e) {
           ScoutSdk.logError("could not find generic type for form data of type '" + type.getFullyQualifiedName() + "'.");
         }
       }
-
     }
     return superTypeSignature;
   }
 
   public static String getFieldNameWithoutSuffix(String s) {
-    if (s.endsWith("Field")) {
-      s = s.replaceAll("Field$", "");
+
+    if (s.endsWith(SdkProperties.SUFFIX_FORM_FIELD)) {
+      s = s.replaceAll(SdkProperties.SUFFIX_FORM_FIELD + "$", "");
     }
-    else if (s.endsWith("Button")) {
-      s = s.replaceAll("Button$", "");
+    else if (s.endsWith(SdkProperties.SUFFIX_BUTTON)) {
+      s = s.replaceAll(SdkProperties.SUFFIX_BUTTON + "$", "");
     }
-    else if (s.endsWith("Column")) {
-      s = s.replaceAll("Column$", "");
+    else if (s.endsWith(SdkProperties.SUFFIX_TABLE_COLUMN)) {
+      s = s.replaceAll(SdkProperties.SUFFIX_TABLE_COLUMN + "$", "");
     }
     return s;
   }
@@ -343,13 +346,13 @@ public class FormDataUtility {
       signatureBuilder.append(workingSig);
       String[] typeArguments = Signature.getTypeArguments(signature);
       if (typeArguments.length > 0) {
-        signatureBuilder.append("<");
+        signatureBuilder.append(Signature.C_GENERIC_START);
         for (int i = 0; i < typeArguments.length; i++) {
           signatureBuilder.append(getResolvedGenericTypeSignature(typeArguments[i], type));
         }
-        signatureBuilder.append(">");
+        signatureBuilder.append(Signature.C_GENERIC_END);
       }
-      signatureBuilder.append(";");
+      signatureBuilder.append(Signature.C_SEMICOLON);
     }
     return signatureBuilder.toString();
   }

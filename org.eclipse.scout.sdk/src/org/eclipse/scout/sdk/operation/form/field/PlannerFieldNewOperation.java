@@ -10,32 +10,24 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.field;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.text.Document;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.eclipse.text.edits.InsertEdit;
 
 /**
  * <h3>PlannerFieldNewOperation</h3> ...
@@ -72,11 +64,17 @@ public class PlannerFieldNewOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
     newOp.setTypeName(getTypeName());
-    newOp.setSuperTypeSignature(getSuperTypeSignature());
+
+    String superTypeName = Signature.toString(getSuperTypeSignature());
+    superTypeName += "<" + getTypeName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE + "," +
+        getTypeName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP + ", " + Long.class.getName() + ", " + Long.class.getName() + ">";
+
+    newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName));
     newOp.setSiblingField(getSibling());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdField = newOp.getCreatedFormField();
+
     if (getNlsEntry() != null) {
       NlsTextMethodUpdateOperation labelOp = new NlsTextMethodUpdateOperation(getCreatedField(), NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL);
       labelOp.setNlsEntry(getNlsEntry());
@@ -90,20 +88,6 @@ public class PlannerFieldNewOperation implements IOperation {
     // planner field activity map
     m_createdActivityMapType = createActivityMap(monitor, workingCopyManager);
 
-    // generic type
-    Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
-    Matcher matcher = p.matcher(getCreatedField().getSource());
-    if (matcher.find()) {
-      Document doc = new Document(getCreatedField().getSource());
-      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedField().getElementName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE + "," + getCreatedField().getElementName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP + ">");
-      try {
-        genericEdit.apply(doc);
-        ScoutTypeUtility.setSource(getCreatedField(), doc.get(), workingCopyManager, monitor);
-      }
-      catch (Exception e) {
-        ScoutSdk.logWarning("could not set the generic type of the calendar field.", e);
-      }
-    }
     if (isFormatSource()) {
       // format
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedField(), true);
@@ -117,16 +101,16 @@ public class PlannerFieldNewOperation implements IOperation {
     plannerTableOp.setTypeModifiers(Flags.AccPublic);
     plannerTableOp.setSibling(null);
     plannerTableOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
-    AnnotationCreateOperation calendarAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
-    calendarAnnotOp.addParameter("10.0");
-    plannerTableOp.addAnnotation(calendarAnnotOp);
+    plannerTableOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
     plannerTableOp.validate();
     plannerTableOp.run(monitor, manager);
     IType createdType = plannerTableOp.getCreatedType();
+
     MethodOverrideOperation autoResizeColumnMehtodOp = new MethodOverrideOperation(createdType, "getConfiguredAutoResizeColumns", false);
     autoResizeColumnMehtodOp.setSimpleBody("return true;");
     autoResizeColumnMehtodOp.validate();
     autoResizeColumnMehtodOp.run(monitor, manager);
+
     MethodOverrideOperation sortEnabledMethodOp = new MethodOverrideOperation(createdType, "getConfiguredSortEnabled", false);
     sortEnabledMethodOp.setSimpleBody("return false;");
     sortEnabledMethodOp.validate();
@@ -139,12 +123,13 @@ public class PlannerFieldNewOperation implements IOperation {
     InnerTypeNewOperation activityMapOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP, getCreatedField(), false);
     activityMapOp.setTypeModifiers(Flags.AccPublic);
     activityMapOp.setSibling(null);
-    activityMapOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IActivityMap, getDeclaringType().getJavaProject()));
-    AnnotationCreateOperation activityMapOrderOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
-    activityMapOrderOp.addParameter("10.0");
-    activityMapOp.addAnnotation(activityMapOrderOp);
+
+    String superTypeName = RuntimeClasses.getSuperTypeName(RuntimeClasses.IActivityMap, getDeclaringType().getJavaProject()) + Signature.C_GENERIC_START + Long.class.getName() + ", " + Long.class.getName() + Signature.C_GENERIC_END;
+    activityMapOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName));
+    activityMapOp.addAnnotation(new OrderAnnotationCreateOperation(null, 20.0));
     activityMapOp.validate();
     activityMapOp.run(monitor, manager);
+
     return activityMapOp.getCreatedType();
   }
 

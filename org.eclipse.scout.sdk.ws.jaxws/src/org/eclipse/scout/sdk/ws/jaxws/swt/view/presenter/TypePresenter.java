@@ -380,7 +380,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
         typeArguments = StringUtility.join(",", typeArguments, SignatureUtil.stripSignatureToFQN(typeArgument));
       }
       if (typeArguments != null) {
-        typeSignature = typeSignature + "<" + typeArguments + ">";
+        typeSignature = typeSignature + Signature.C_GENERIC_START + typeArguments + Signature.C_GENERIC_END;
       }
     }
 

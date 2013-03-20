@@ -143,24 +143,7 @@ public class CreateTemplateOperation implements IOperation {
     };
 
     String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
-    /*if (!StringUtility.isNullOrEmpty(superclassTypeSignature)) {
-      StringBuilder superclassSignatureBuilder = new StringBuilder(Signature.getTypeErasure(superclassTypeSignature));
-      String[] typeParameters = Signature.getTypeArguments(superclassTypeSignature);
-      if (typeParameters.length > 0) {
-        superclassSignatureBuilder.replace(superclassSignatureBuilder.length() - 1, superclassSignatureBuilder.length(), "<");
-        for (int i = 0; i < typeParameters.length; i++) {
-          IType parameterType = TypeUtility.getTypeBySignature(typeParameters[i]);
-          if (TypeUtility.exists(parameterType) && parameterType.getParent().equals(getFormField())) {
-            superclassSignatureBuilder.append(Signature.createTypeSignature(getTemplateName() + "." + parameterType.getElementName(), false));
-            if (i < typeParameters.length - 1) {
-              superclassSignatureBuilder.append(",");
-            }
-          }
-        }
-        superclassSignatureBuilder.append(">;");
-      }*/
     op.setSuperTypeSignature(superclassTypeSignature);
-    //}
     op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
     IScoutBundle sharedBundle = getTemplateBundle().getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
     if (isCreateExternalFormData() && sharedBundle != null) {

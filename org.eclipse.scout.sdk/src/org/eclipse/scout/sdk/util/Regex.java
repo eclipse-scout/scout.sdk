@@ -37,6 +37,8 @@ public class Regex {
 
   public static final Pattern REGEX_FIELD_DECLARATION = Pattern.compile("\\s*(@Deprecated){0,1}\\s*(public|private|protected)?\\s*(final\\s*|static\\s*|transient\\s*|volatile\\s*){0,4}([a-zA-Z0-9_]*(<([a-zA-Z0-9_]|(,\\s*))*>)?)\\s*([a-zA-Z0-9_]*)(\\s*=\\s*(.*))?\\s*;.*", Pattern.DOTALL);
 
+  public static final Pattern REGEX_SEMI_COLOLN_END = Pattern.compile("\\;$");
+
   /**
    * @param fieldSource
    *          something like public static String ICON_A = "aIcon";

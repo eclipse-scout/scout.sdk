@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -25,11 +26,12 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperties {
-  final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
-  final IType iTableField = TypeUtility.getType(RuntimeClasses.ITableField);
-  final IType iComposerField = TypeUtility.getType(RuntimeClasses.IComposerField);
-  final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
-  final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
+
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iTableField = TypeUtility.getType(RuntimeClasses.ITableField);
+  private final IType iComposerField = TypeUtility.getType(RuntimeClasses.IComposerField);
+  private final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
+  private final IType iRadioButtonGroup = TypeUtility.getType(RuntimeClasses.IRadioButtonGroup);
 
   public CompositePrimaryTypeSourceBuilder(IType type, IJavaProject targetProject) {
     this(type, targetProject, TypeUtility.getLocalTypeHierarchy(type));
@@ -87,7 +89,7 @@ public class CompositePrimaryTypeSourceBuilder extends SourceBuilderWithProperti
             if (TypeUtility.isGenericType(superType)) {
               String genericTypeSig = org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility.computeFormFieldGenericType(formField, formFieldHierarchy);
               if (genericTypeSig != null) {
-                superTypeSignature = superTypeSignature.replaceAll("\\;$", "<" + genericTypeSig + ">;");
+                superTypeSignature = Regex.REGEX_SEMI_COLOLN_END.matcher(superTypeSignature).replaceAll(Signature.C_GENERIC_START + genericTypeSig + Signature.C_GENERIC_END + ";");
               }
             }
           }
