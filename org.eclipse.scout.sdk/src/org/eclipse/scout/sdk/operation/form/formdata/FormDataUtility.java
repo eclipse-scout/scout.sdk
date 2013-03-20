@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.operation.form.formdata;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,6 +35,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -48,63 +48,9 @@ import org.eclipse.text.edits.MultiTextEdit;
  */
 public class FormDataUtility {
 
-  private final static HashSet<String> keyWords = new HashSet<String>();
   private final static Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
   private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
   private final static Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
-
-  static {
-    keyWords.add("abstract");
-    keyWords.add("assert");
-    keyWords.add("boolean");
-    keyWords.add("break");
-    keyWords.add("byte");
-    keyWords.add("case");
-    keyWords.add("catch");
-    keyWords.add("char");
-    keyWords.add("class");
-    keyWords.add("const");
-    keyWords.add("continue");
-    keyWords.add("default");
-    keyWords.add("do");
-    keyWords.add("double");
-    keyWords.add("else");
-    keyWords.add("enum");
-    keyWords.add("extends");
-    keyWords.add("final");
-    keyWords.add("finally");
-    keyWords.add("float");
-    keyWords.add("for");
-    keyWords.add("goto");
-    keyWords.add("if");
-    keyWords.add("implements");
-    keyWords.add("import");
-    keyWords.add("instanceof");
-    keyWords.add("int");
-    keyWords.add("interface");
-    keyWords.add("long");
-    keyWords.add("native");
-    keyWords.add("new");
-    keyWords.add("package");
-    keyWords.add("private");
-    keyWords.add("protected");
-    keyWords.add("public");
-    keyWords.add("return");
-    keyWords.add("short");
-    keyWords.add("static");
-    keyWords.add("strictfp");
-    keyWords.add("super");
-    keyWords.add("switch");
-    keyWords.add("synchronized");
-    keyWords.add("this");
-    keyWords.add("throw");
-    keyWords.add("throws");
-    keyWords.add("transient");
-    keyWords.add("try");
-    keyWords.add("void");
-    keyWords.add("volatile");
-    keyWords.add("while");
-  }
 
   public static ITypeSourceBuilder getPrimaryTypeFormDataSourceBuilder(String superTypeSignature, IType formField, ITypeHierarchy hierarchy, IJavaProject targetProject) {
     ITypeSourceBuilder builder = null;
@@ -238,7 +184,7 @@ public class FormDataUtility {
   }
 
   public static String getValidMethodParameterName(String parameterName) {
-    if (keyWords.contains(parameterName.toLowerCase())) {
+    if (JavaElementValidator.getJavaKeyWords().contains(parameterName.toLowerCase())) {
       return parameterName + "Value";
     }
     return parameterName;
