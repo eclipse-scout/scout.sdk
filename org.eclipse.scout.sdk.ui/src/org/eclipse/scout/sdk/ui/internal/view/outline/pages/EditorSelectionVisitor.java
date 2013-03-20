@@ -451,7 +451,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
   }
 
   private int visitBundleNodePage(IScoutBundle bundle) {
-    if (bundle.getProject().exists(getCurrentElement().getResource().getProjectRelativePath())) {
+    if (bundle.contains(getCurrentElement())) {
       return CONTINUE_BRANCH;
     }
     return CANCEL_SUBTREE;

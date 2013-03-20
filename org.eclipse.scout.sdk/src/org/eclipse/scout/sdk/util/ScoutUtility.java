@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -34,6 +35,7 @@ import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -481,16 +483,36 @@ public final class ScoutUtility {
 
   public static String[] getEntities(IScoutBundle p) throws JavaModelException {
     TreeSet<String> ret = new TreeSet<String>();
-    for (IScoutBundle b : p.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED), true)) {
-      String bundleName = b.getSymbolicName();
-      int bundleNameMin = bundleName.length() + 1;
-      if (b.getJavaProject() != null) {
+    IScoutBundle[] roots = p.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
+    IScoutBundleFilter workspaceClientSharedServerFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(),
+        ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+    for (IScoutBundle root : roots) {
+      for (IScoutBundle b : root.getChildBundles(workspaceClientSharedServerFilter, true)) {
         for (IPackageFragmentRoot r : b.getJavaProject().getPackageFragmentRoots()) {
-          for (IJavaElement je : r.getChildren()) {
-            if (!je.isReadOnly() && je instanceof IPackageFragment) {
-              String pckName = je.getElementName();
-              if (pckName.startsWith(bundleName) && pckName.length() > bundleNameMin) {
-                ret.add(pckName.substring(bundleNameMin));
+          String bundleName = null;
+          if (r.isExternal()) {
+            bundleName = r.getElementName();
+            int versionPos = bundleName.indexOf('_');
+            if (versionPos > 0) {
+              bundleName = bundleName.substring(0, versionPos);
+            }
+            if (ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(bundleName) == null) {
+              // not a scout bundle. we are not interested
+              bundleName = null;
+            }
+          }
+          else {
+            // its me
+            bundleName = b.getSymbolicName();
+          }
+          if (bundleName != null) {
+            int bundleNameMin = bundleName.length() + 1;
+            for (IJavaElement je : r.getChildren()) {
+              if (je instanceof IPackageFragment) {
+                String pckName = je.getElementName();
+                if (pckName.startsWith(bundleName) && pckName.length() > bundleNameMin) {
+                  ret.add(pckName.substring(bundleNameMin));
+                }
               }
             }
           }
