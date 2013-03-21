@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -18,6 +21,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -32,26 +36,38 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @since 3.8.2
  */
 public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
-  private static final String TABLE_COLUMN_PROPERTY_CONSTANT_NAME_PREFIX = "PROP_";
+  private static final String TABLE_COLUMN_PROPERTY_CONSTANT_NAME_SUFFIX = "_";
   private static final String TABLE_ROW_BEAN_BANE_SUFFIX = "RowData";
   private static final String STRING_SIGNATURE = Signature.createTypeSignature("String", false);
 
   private final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
+  private final IType iTableField = TypeUtility.getType(RuntimeClasses.ITableField);
   private final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
 
   /** counter used for sorting method sub-builders. */
   private int m_methodSortCounter = 0;
 
+  /** list of additional imports required by the generated code. */
+  private final List<String> m_additionalImports = new ArrayList<String>();
+
   public TableFieldBeanSourceBuilder(IType tableField, ITypeHierarchy hierarchy, IJavaProject targetProject) {
     super(tableField, targetProject);
     // find table
     IType table = findTable(tableField, hierarchy);
-    if (TypeUtility.exists(table)) {
+    if (!TypeUtility.exists(table)) {
+      addAbstractMethodImplementations();
+    }
+    else if (tableField.equals(table.getDeclaringType())) {
       visitTable(table, hierarchy);
     }
-    else {
-      visitTable(null, hierarchy);
+  }
+
+  @Override
+  public String createSource(IImportValidator validator) throws JavaModelException {
+    for (String additionalImport : m_additionalImports) {
+      validator.addImport(additionalImport);
     }
+    return super.createSource(validator);
   }
 
   private IType findTable(IType tableField, ITypeHierarchy hierarchy) {
@@ -64,28 +80,30 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
         return tables[0];
       }
       else {
-        return findTable(hierarchy.getSuperclass(tableField), hierarchy);
+        IType superType = hierarchy.getSuperclass(tableField);
+        if (TypeUtility.exists(superType) && hierarchy.isSubtype(iTableField, superType)) {
+          ITypeHierarchy superTypeHierarchy = TypeUtility.getLocalTypeHierarchy(superType);
+          return findTable(superType, superTypeHierarchy);
+        }
       }
     }
     return null;
   }
 
+  protected void addAbstractMethodImplementations() {
+    // createRow
+    String simpleTableRowDataName = RuntimeClasses.AbstractTableRowData.substring(RuntimeClasses.AbstractTableRowData.lastIndexOf(".") + 1);
+    MethodSourceBuilder createRow = addMethodOverride("createRow");
+    createRow.setReturnSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTableRowData, true));
+    createRow.setSimpleBody("return new " + simpleTableRowDataName + "() {private static final long serialVersionUID = 1L;};");
+
+    // getRowType
+    MethodSourceBuilder getRowType = addMethodOverride("getRowType");
+    getRowType.setReturnSignature(Signature.createTypeSignature(Class.class.getName() + "<? extends " + RuntimeClasses.AbstractTableRowData + ">", true));
+    getRowType.setSimpleBody("return " + simpleTableRowDataName + ".class;");
+  }
+
   protected void visitTable(IType table, ITypeHierarchy hierarchy) {
-    if (table == null) {
-      // createRow
-      String simpleTableRowDataName = RuntimeClasses.AbstractTableRowData.substring(RuntimeClasses.AbstractTableRowData.lastIndexOf(".") + 1);
-      MethodSourceBuilder createRow = addMethodOverride("createRow");
-      createRow.setReturnSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTableRowData, true));
-      createRow.setSimpleBody("return new " + simpleTableRowDataName + "() {private static final long serialVersionUID = 1L;};");
-
-      // getRowType
-      MethodSourceBuilder getRowType = addMethodOverride("getRowType");
-      getRowType.setReturnSignature(Signature.createTypeSignature(Class.class.getName() + "<? extends " + RuntimeClasses.AbstractTableRowData + ">", true));
-      getRowType.setSimpleBody("return " + simpleTableRowDataName + ".class;");
-
-      return;
-    }
-
     final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(iColumn, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
 
     // table bean
@@ -109,7 +127,6 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
 
         String fieldNameWithoutSuffix = FormDataUtility.getFieldNameWithoutSuffix(column.getElementName());
         String upperColName = FormDataUtility.getBeanName(fieldNameWithoutSuffix, true);
-        String constantColName = TABLE_COLUMN_PROPERTY_CONSTANT_NAME_PREFIX + FormDataUtility.getConstantName(upperColName);
         String lowerColName = FormDataUtility.getBeanName(fieldNameWithoutSuffix, false);
         String methodParameterName = FormDataUtility.getValidMethodParameterName(lowerColName);
         String propertyName = "m_" + methodParameterName;
@@ -118,6 +135,10 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
         // property constant
         FieldSourceBuilder propConstant = new FieldSourceBuilder();
         propConstant.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+        String constantColName = lowerColName;
+        if (FormDataUtility.isReservedJavaKeyword(constantColName)) {
+          constantColName += TABLE_COLUMN_PROPERTY_CONSTANT_NAME_SUFFIX;
+        }
         propConstant.setElementName(constantColName);
         propConstant.setSignature(STRING_SIGNATURE);
         propConstant.setAssignment("\"" + lowerColName + "\"");
@@ -176,7 +197,7 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
     rowAt.setReturnSignature(tableBeanSignature);
     rowAt.addParameter(new MethodParameter(Signature.SIG_INT, "idx"));
     rowAt.setSimpleBody("return (" + tableRowBeanName + ") super.rowAt(idx);");
-    
+
     // createRow
     MethodSourceBuilder createRow = addMethodOverride("createRow");
     createRow.setReturnSignature(tableBeanSignature);
@@ -267,6 +288,7 @@ public class TableFieldBeanSourceBuilder extends SourceBuilderWithProperties {
           String parentTableRowBeanName = getTableRowBeanName(parentTable);
           IType parentTableBeanData = formDataType.getType(parentTableRowBeanName);
           if (TypeUtility.exists(parentTableBeanData)) {
+            m_additionalImports.add(formDataType.getFullyQualifiedName());
             return Signature.createTypeSignature(parentTableBeanData.getTypeQualifiedName(), false);
           }
         }

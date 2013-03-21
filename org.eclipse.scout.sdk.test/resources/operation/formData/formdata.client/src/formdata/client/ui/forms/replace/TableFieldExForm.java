@@ -19,6 +19,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBooleanColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 
+import formdata.client.ui.template.formfield.AbstractPersonTableField;
 import formdata.shared.services.process.replace.TableFieldExFormData;
 
 /**
@@ -101,6 +102,21 @@ public class TableFieldExForm extends TableFieldBaseForm {
       @Order(40)
       public class StateColumn extends AbstractStringColumn {
 
+      }
+    }
+  }
+
+  @Replace
+  public class ExtendedPersonTableField extends TableFieldBaseForm.MainBox.PersonTableField {
+
+    public ExtendedPersonTableField(TableFieldBaseForm.MainBox container) {
+      container.super();
+    }
+
+    public class Table extends AbstractPersonTableField.Table {
+
+      @Order(40)
+      public class LastName extends AbstractStringColumn {
       }
     }
   }

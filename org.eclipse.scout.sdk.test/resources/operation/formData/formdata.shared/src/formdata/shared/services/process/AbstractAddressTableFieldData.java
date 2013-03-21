@@ -19,11 +19,6 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
   }
 
   @Override
-  public AbstractAddressTableRowData rowAt(int idx) {
-    return (AbstractAddressTableRowData) super.rowAt(idx);
-  }
-
-  @Override
   public AbstractAddressTableRowData addRow() {
     return (AbstractAddressTableRowData) super.addRow();
   }
@@ -31,6 +26,11 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
   @Override
   public AbstractAddressTableRowData addRow(int rowState) {
     return (AbstractAddressTableRowData) super.addRow(rowState);
+  }
+
+  @Override
+  public AbstractAddressTableRowData rowAt(int idx) {
+    return (AbstractAddressTableRowData) super.rowAt(idx);
   }
 
   @Override
@@ -49,9 +49,9 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
     public AbstractAddressTableRowData() {
     }
 
-    public static final java.lang.String PROP_ADDRESS_ID = "addressId";
-    public static final java.lang.String PROP_STREET = "street";
-    public static final java.lang.String PROP_PO_BOX_ADDRESS = "poBoxAddress";
+    public static final String addressId = "addressId";
+    public static final String street = "street";
+    public static final String poBoxAddress = "poBoxAddress";
     private String m_addressId;
     private String m_street;
     private Boolean m_poBoxAddress;
