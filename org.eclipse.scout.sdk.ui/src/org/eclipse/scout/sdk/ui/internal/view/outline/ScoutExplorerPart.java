@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.ui.action.AbstractFilterMenuContributionItem;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
 import org.eclipse.scout.sdk.ui.action.ScoutBundlePresentationActionGroup;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport.BundlePresentation;
 import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndPasteSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
@@ -183,14 +184,24 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
             return CONTINUE;
           }
           else if (page instanceof ProjectsTablePage) {
+            expandedPages.add(page); // top level workspace bundle group
             return CONTINUE;
           }
-          else if (page instanceof BundleNodeGroupTablePage && page.getParent() instanceof ProjectsTablePage) {
-            expandedPages.add(page); // top level bundle group
+          else if (page instanceof BundleNodeGroupTablePage && (page.getParent() instanceof ProjectsTablePage ||
+              page.getParent().getScoutBundle().isBinary())) {
+            expandedPages.add(page); // top level workspace bundle group
             return CONTINUE;
           }
           else if (page instanceof AbstractBundleNodeTablePage) {
-            expandedPages.add(page); // first level bundle below top level bundle group
+            if (page.getScoutBundle() != null && page.getScoutBundle().isBinary()) {
+              if (BundlePresentation.Hierarchical.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+                expandedPages.add(page);
+              }
+              return CONTINUE; // don't expand binary bundles
+            }
+            if (!BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+              expandedPages.add(page); // first workspace bundle level
+            }
             return CANCEL_SUBTREE;
           }
           else {
