@@ -39,6 +39,13 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
@@ -164,42 +171,53 @@ public class ScoutTypeUtility extends TypeUtility {
     return types.toArray(new IType[types.size()]);
   }
 
-  public static IType[] getTypeOccurenceInMethod(IMethod method) {
-    try {
-      String source = method.getSource();
-      if (source != null) {
-        return getTypeOccurenceInSnippet(method, source);
-      }
+  public static IType[] getTypeOccurenceInMethod(final IMethod member) throws JavaModelException {
+    ISourceRange r = member.getSourceRange();
+    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    parser.setKind(ASTParser.K_COMPILATION_UNIT);
+    parser.setCompilerOptions(member.getJavaProject().getOptions(true));
+    parser.setIgnoreMethodBodies(false);
+    parser.setSourceRange(r.getOffset(), r.getLength());
+    parser.setResolveBindings(true);
+    if (member.isBinary()) {
+      parser.setSource(member.getClassFile());
     }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("could not get source of method '" + method.getElementName() + "'.", e);
+    else {
+      parser.setSource(member.getCompilationUnit());
     }
-    return new IType[0];
-  }
+    ASTNode ast = parser.createAST(null);
 
-  public static IType[] getTypeOccurenceInSnippet(IMember container, String snippet) {
-    ArrayList<IType> types = new ArrayList<IType>();
-    try {
-      Matcher matcher = Regex.REGEX_METHOD_CLASS_TYPE_OCCURRENCES.matcher(snippet);
-      while (matcher.find()) {
-        try {
-          String resolvedSignature = SignatureUtility.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), container.getDeclaringType());
-          if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
-            String pck = org.eclipse.jdt.core.Signature.getSignatureQualifier(resolvedSignature);
-            String simpleName = org.eclipse.jdt.core.Signature.getSignatureSimpleName(resolvedSignature);
-            if (!StringUtility.isNullOrEmpty(pck) && !StringUtility.isNullOrEmpty(simpleName)) {
-              types.add(TypeUtility.getType(pck + "." + simpleName));
-            }
+    final HashSet<IType> types = new HashSet<IType>();
+    ast.accept(new ASTVisitor() {
+
+      private boolean process = false;
+
+      @Override
+      public boolean visit(MethodDeclaration node) {
+        process = node.resolveBinding().getJavaElement().equals(member);
+        return process;
+      }
+
+      @Override
+      public void endVisit(MethodDeclaration node) {
+        process = false;
+      }
+
+      @Override
+      public boolean visit(TypeLiteral node) {
+        if (!process) {
+          return false;
+        }
+        ITypeBinding b = node.getType().resolveBinding();
+        if (b != null) {
+          IJavaElement e = b.getJavaElement();
+          if (TypeUtility.exists(e) && e.getElementType() == IJavaElement.TYPE) {
+            types.add((IType) e);
           }
         }
-        catch (JavaModelException e) {
-          ScoutSdk.logWarning("could not resolve type reference '" + matcher.group(1) + "' in method '" + container.getElementName() + "'", e);
-        }
+        return false;
       }
-    }
-    catch (Exception e) {
-      ScoutSdk.logWarning("could not get source of method '" + container.getElementName() + "'.", e);
-    }
+    });
     return types.toArray(new IType[types.size()]);
   }
 

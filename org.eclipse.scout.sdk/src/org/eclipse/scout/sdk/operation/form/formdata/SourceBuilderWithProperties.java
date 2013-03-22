@@ -288,7 +288,7 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
     private String filterGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
       if (sourceSnippet != null) {
-        IType[] refTypes = ScoutTypeUtility.getTypeOccurenceInSnippet(sourceMethod, sourceSnippet);
+        IType[] refTypes = ScoutTypeUtility.getTypeOccurenceInMethod(sourceMethod);
         for (IType refType : refTypes) {
           //if the type is a form field type it is transformed to the corresponding form data field
           ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);

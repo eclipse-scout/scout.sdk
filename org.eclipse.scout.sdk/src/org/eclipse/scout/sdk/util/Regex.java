@@ -26,7 +26,6 @@ public class Regex {
   public static final Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\{\\s*return\\s*\"(.*)\"\\s*\\;\\s*\\}", Pattern.DOTALL);
   public static final Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("\\{\\s*return\\s*(" + RuntimeClasses.TEXTS + "|TEXTS|Texts|ScoutTexts)\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*\\;\\s*\\}", Pattern.DOTALL);
 
-  public static final Pattern REGEX_METHOD_CLASS_TYPE_OCCURRENCES = Pattern.compile("([a-zA-Z0-9_.$]+)\\.class", Pattern.DOTALL);
   public static final Pattern REGEX_METHOD_NEW_TYPE_OCCURRENCES = Pattern.compile("\\s*new\\s*([^\\(]*)\\([^\\)]*\\)\\s*", Pattern.DOTALL);
   public static final Pattern REGEX_METHOD_DEFINITION = Pattern.compile("[ \\t]*(public|protected|private)?\\s*(static)?\\s*(void|[^\\s]*)\\s*[^\\s\\(]*\\s*\\([^\\)]*\\)\\s*\\{", Pattern.DOTALL);
 
