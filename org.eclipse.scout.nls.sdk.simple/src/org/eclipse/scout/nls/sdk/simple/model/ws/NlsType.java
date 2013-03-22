@@ -38,6 +38,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  */
 public class NlsType implements INlsType {
 
+  public static final char FOLDER_SEGMENT_SEPARATOR = '/';
   public static final String RESOURCE_BUNDLE_FIELD_NAME = "RESOURCE_BUNDLE_NAME";
   public static final String PROP_TRANSLATION_FOLDER_NAME = "translationFolderName";
   public static final String PROP_TRANSLATION_FILE_PREFIX = "translationFilePrefix";
@@ -99,7 +100,7 @@ public class NlsType implements INlsType {
         String filePrefix = splitedValue[splitedValue.length - 1];
         String folderName = "";
         for (int i = 0; i < splitedValue.length - 1; i++) {
-          folderName = folderName + "/" + splitedValue[i];
+          folderName = folderName + FOLDER_SEGMENT_SEPARATOR + splitedValue[i];
         }
         setTranslationFolderName(folderName);
         setTranslationFilePrefix(filePrefix);

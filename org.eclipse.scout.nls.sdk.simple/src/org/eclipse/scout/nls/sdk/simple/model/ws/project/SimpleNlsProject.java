@@ -13,13 +13,9 @@ package org.eclipse.scout.nls.sdk.simple.model.ws.project;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -28,9 +24,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
@@ -48,11 +46,11 @@ import org.eclipse.scout.nls.sdk.simple.ui.dialog.language.TranslationFileNewMod
 import org.eclipse.scout.nls.sdk.ui.action.INewLanguageContext;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.widgets.Shell;
-import org.osgi.framework.Bundle;
 
 /**
- *
+ * nls project that can handle properties files.
  */
+@SuppressWarnings("restriction")
 public class SimpleNlsProject extends AbstractNlsProject {
   private NlsType m_nlsClass;
   private PropertyChangeListener m_nlsClassPropertyListener;
@@ -70,38 +68,15 @@ public class SimpleNlsProject extends AbstractNlsProject {
   @Override
   public ITranslationResource[] loadTranslationResources() throws CoreException {
     if (getNlsType().getType().isReadOnly()) {
-      // find bundle
-      String bundleId = getPluginId(getNlsType().getType());
-      if (bundleId == null) {
-        NlsCore.logWarning("could not find bundle: " + bundleId);
+      IPackageFragmentRoot r = (IPackageFragmentRoot) getNlsType().getType().getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
+      if (r == null) {
+        NlsCore.logWarning("Could not find text resource for type '" + getNlsType().getType().getFullyQualifiedName() + "'.");
         return new ITranslationResource[]{};
       }
-      return loadTranslationFilesFromPlatform(getNlsType(), bundleId);
-
+      return loadTranslationFilesFromPlatform(getNlsType(), r);
     }
     else {
       return loadTranslationFilesWorkspace(getNlsType());
-    }
-  }
-
-  private String getPluginId(IJavaElement type) {
-    if (type.isReadOnly()) {
-      IJavaElement root = type.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
-      String bundleId = null;
-      if (root != null) {
-        Matcher matcher = PATTERN.matcher(root.getElementName());
-        if (matcher.matches()) {
-          bundleId = matcher.group(1);
-        }
-        else if ("bin".equals(root.getElementName())) {
-          // special case when debugging
-          bundleId = root.getPath().toFile().getParentFile().getName();
-        }
-      }
-      return bundleId;
-    }
-    else {
-      return type.getAncestor(IJavaElement.JAVA_PROJECT).getElementName();
     }
   }
 
@@ -123,35 +98,37 @@ public class SimpleNlsProject extends AbstractNlsProject {
     return translationFiles.toArray(new ITranslationResource[translationFiles.size()]);
   }
 
-  private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, String bundleId) throws CoreException {
+  private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, IPackageFragmentRoot r) throws CoreException {
     ArrayList<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
-    //TODO [mvi]: Platform.getBundle does not find bundles set by a .target file. find other possibility to get the resource?
-    Bundle b = Platform.getBundle(bundleId);
-    if (b == null) {
-      NlsCore.logWarning("Bundle " + bundleId + " could not be found in the platform. Will be ignored.");
+    char delim = '.';
+    String path = nlsType.getTranslationsFolderName().replace(NlsType.FOLDER_SEGMENT_SEPARATOR, delim);
+    String d = "" + delim;
+    if (path.startsWith(d)) {
+      path = path.substring(d.length());
+    }
+
+    IPackageFragment textFolder = r.getPackageFragment(path);
+    if (textFolder == null) {
+      NlsCore.logWarning("Folder '" + nlsType.getTranslationsFolderName() + "' could not be found in '" + r.getElementName() + "'. Will be ignored.");
     }
     else {
-      Enumeration eee = b.findEntries(nlsType.getTranslationsFolderName(), nlsType.getTranslationsPrefix() + "*.properties", false);
-      if (eee != null) {
-        while (eee.hasMoreElements()) {
-          Object o = eee.nextElement();
-          if (o instanceof URL) {
-            InputStream is = null;
-            URL url = (URL) o;
-            try {
-              is = url.openStream();
-              translationFiles.add(new PlatformTranslationFile(is, NlsSdkSimple.getLanguage(url.getFile())));
-            }
-            catch (IOException e) {
-              NlsCore.logError("could not load NLS files of bundle '" + bundleId + "'", e);
-            }
-            finally {
-              if (is != null) {
-                try {
-                  is.close();
-                }
-                catch (Exception e) {
-                }
+      for (Object o : textFolder.getNonJavaResources()) {
+        if (o instanceof JarEntryFile) {
+          JarEntryFile f = (JarEntryFile) o;
+          InputStream is = null;
+          try {
+            is = f.getContents();
+            translationFiles.add(new PlatformTranslationFile(is, NlsSdkSimple.getLanguage(f.getName())));
+          }
+          catch (Exception e) {
+            NlsCore.logError("Could not load NLS files of bundle '" + r.getElementName() + "'.", e);
+          }
+          finally {
+            if (is != null) {
+              try {
+                is.close();
+              }
+              catch (Exception e) {
               }
             }
           }
