@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
@@ -37,26 +37,26 @@ public class ScoutBundleTreeModel {
   }
 
   public ScoutBundleNodeGroup[] getRoots() {
-    ScoutBundleNodeGroup[] ret = m_model.toArray(new ScoutBundleNodeGroup[m_model.size()]);
-    Arrays.sort(ret);
-    return ret;
+    return m_model.toArray(new ScoutBundleNodeGroup[m_model.size()]);
   }
 
   private ScoutBundleNodeGroup createProjects(IScoutBundle bundle, String curType) {
-    if (curType.equals(bundle.getType())) {
+    if (curType.equals(bundle.getType()) && ScoutExplorerSettingsBundleFilter.get().accept(bundle)) {
       ScoutBundleUiExtension extension = ScoutBundleExtensionPoint.getExtension(bundle.getType());
       if (extension != null) {
         ScoutBundleNodeGroup sbg = new ScoutBundleNodeGroup(new ScoutBundleNode(bundle, extension));
         for (IScoutBundle child : bundle.getDirectChildBundles()) {
-          ScoutBundleNodeGroup childProject = createProjects(child, curType);
-          if (childProject == null) {
-            ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(child.getType());
-            if (childExt != null) {
-              sbg.addChildBundle(new ScoutBundleNode(child, childExt));
+          if (ScoutExplorerSettingsBundleFilter.get().accept(child)) {
+            ScoutBundleNodeGroup childProject = createProjects(child, curType);
+            if (childProject == null) {
+              ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(child.getType());
+              if (childExt != null) {
+                sbg.addChildBundle(new ScoutBundleNode(child, childExt));
+              }
             }
-          }
-          else {
-            sbg.addChildGroup(childProject);
+            else {
+              sbg.addChildGroup(childProject);
+            }
           }
         }
         return sbg;
@@ -82,12 +82,13 @@ public class ScoutBundleTreeModel {
   }
 
   private Set<ScoutBundleNodeGroup> buildProjectGraph() {
-    Set<ScoutBundleNodeGroup> scoutProjects = new HashSet<ScoutBundleNodeGroup>();
+    Set<ScoutBundleNodeGroup> scoutProjects = new TreeSet<ScoutBundleNodeGroup>();
     String[] types = RuntimeBundles.getTypes();
 
     for (int i = types.length - 1; i >= 0; i--) {
       // create projects recursively
-      for (IScoutBundle root : ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter())) {
+      for (IScoutBundle root : ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(
+          ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutExplorerSettingsBundleFilter.get()), ScoutBundleComparators.getSymbolicNameAscComparator())) {
         ScoutBundleNodeGroup sbg = createProjects(root, types[i]);
         if (sbg != null) {
           scoutProjects.add(sbg);

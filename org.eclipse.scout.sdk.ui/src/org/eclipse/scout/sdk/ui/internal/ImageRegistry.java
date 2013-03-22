@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
 
-  private HashMap<ImageDescriptor, Image> fRegistry = new HashMap<ImageDescriptor, Image>(10);
+  private HashMap<ImageDescriptor, Image> m_registry = new HashMap<ImageDescriptor, Image>();
   private final Display m_device;
 
   public ImageRegistry(Display device) {
@@ -30,11 +30,11 @@ public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
   @Override
   public void dispose() {
     super.dispose();
-    for (Iterator iter = fRegistry.values().iterator(); iter.hasNext();) {
+    for (Iterator iter = m_registry.values().iterator(); iter.hasNext();) {
       Image image = (Image) iter.next();
       image.dispose();
     }
-    fRegistry.clear();
+    m_registry.clear();
   }
 
   /**
@@ -48,13 +48,13 @@ public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
   public Image get(ImageDescriptor descriptor) {
     if (descriptor == null) descriptor = ImageDescriptor.getMissingImageDescriptor();
 
-    Image result = fRegistry.get(descriptor);
+    Image result = m_registry.get(descriptor);
     if (result != null) {
       return result;
     }
     result = descriptor.createImage(m_device);
     if (result != null) {
-      fRegistry.put(descriptor, result);
+      m_registry.put(descriptor, result);
     }
     return result;
   }

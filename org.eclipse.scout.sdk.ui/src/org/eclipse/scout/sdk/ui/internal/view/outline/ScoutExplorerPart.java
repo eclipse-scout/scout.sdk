@@ -44,7 +44,10 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.action.AbstractFilterMenuContributionItem;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
+import org.eclipse.scout.sdk.ui.action.ScoutBundlePresentationActionGroup;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndPasteSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
@@ -139,12 +142,13 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     m_viewer.setContentProvider(m_viewContentProvider);
     m_viewer.setSorter(null);
     m_viewer.setInput(new InvisibleRootNode(this));
+    createToolbar();
     hookDragAndDrop(m_viewer);
     hookContextMenu();
     hookSelectionAction();
     hookDoubleClickAction();
     hookKeyActions();
-    createToolbar();
+    hookViewSiteMenu();
     // add context help
     PlatformUI.getWorkbench().getHelpSystem().setHelp(tree, ScoutSdkUi.PLUGIN_ID + ".doc.outline");
 
@@ -312,6 +316,28 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     mgr.add(m_linkWithEditorAction);
     mgr.add(new org.eclipse.jdt.internal.ui.actions.CollapseAllAction(getTreeViewer()));
 
+  }
+
+  @SuppressWarnings("restriction")
+  private void hookViewSiteMenu() {
+    IMenuManager mgr = getViewSite().getActionBars().getMenuManager();
+    mgr.add(m_linkWithEditorAction);
+    mgr.add(new org.eclipse.jdt.internal.ui.actions.CollapseAllAction(getTreeViewer()));
+    mgr.add(new Separator());
+    mgr.add(new AbstractFilterMenuContributionItem(Texts.get("ShowFragments"), ScoutExplorerSettingsSupport.get().isShowFragments()) {
+      @Override
+      protected void run(boolean selected) {
+        ScoutExplorerSettingsSupport.get().setShowFragments(selected);
+      }
+    });
+    mgr.add(new AbstractFilterMenuContributionItem(Texts.get("ShowExternalBundles"), ScoutExplorerSettingsSupport.get().isShowBinaryBundles()) {
+      @Override
+      protected void run(boolean selected) {
+        ScoutExplorerSettingsSupport.get().setShowBinaryBundles(selected);
+      }
+    });
+    mgr.add(new Separator());
+    mgr.add(new ScoutBundlePresentationActionGroup());
   }
 
   private void hookContextMenu() {

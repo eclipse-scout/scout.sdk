@@ -329,5 +329,9 @@ public interface SdkIcons {
   String UnknownField = FormField; // TODO
   String UnknownFieldAdd = ToolAdd; // TODO
   String UnknownFieldRemove = ToolRemove; // TODO
+
+  String BundlePresentationGrouped = "presentation_grouped.gif";
+  String BundlePresentationHierarchical = "presentation_hierarchical.gif";
+  String BundlePresentationFlat = "presentation_flat.gif";
 //CHECKSTYLE:ON
 }

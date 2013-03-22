@@ -35,7 +35,7 @@ public class ScoutBundleLableProvider extends SearchRangeStyledLabelProvider {
     IScoutBundle bundle = (IScoutBundle) element;
     ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(bundle.getType());
     if (uiExt != null) {
-      return ScoutSdkUi.getDefault().getImageRegistry().get(uiExt.getIconPath());
+      return ScoutSdkUi.getDefault().getImageRegistry().get(uiExt.getIcon());
     }
     return null;
   }

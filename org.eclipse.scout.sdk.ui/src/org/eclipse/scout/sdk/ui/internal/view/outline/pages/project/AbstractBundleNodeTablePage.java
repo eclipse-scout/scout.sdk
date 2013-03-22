@@ -28,7 +28,7 @@ public abstract class AbstractBundleNodeTablePage extends AbstractPage {
     m_bundle = bundle;
     setParent(parentPage);
     setName(m_bundle.getSymbolicName());
-    setImageDescriptor(m_bundle.getUiExtension().getIconPath());
+    setImageDescriptor(m_bundle.getUiExtension().getIcon());
   }
 
   @Override

@@ -104,7 +104,7 @@ public class ScoutBundle implements IScoutBundle {
     m_symbolicName = bundle.getBundleDescription().getSymbolicName();
     m_defaultComparator = ScoutBundleComparators.getSymbolicNameLevenshteinDistanceComparator(m_symbolicName);
     m_isFragment = bundle.getBundleDescription().getHost() != null;
-    m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + m_isFragment + "@binary=" + m_isBinary + "}";
+    m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + isFragment() + "@binary=" + m_isBinary + "}";
     m_hash = m_id.hashCode();
 
     IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
@@ -337,6 +337,11 @@ public class ScoutBundle implements IScoutBundle {
   @Override
   public boolean isBinary() {
     return m_isBinary;
+  }
+
+  @Override
+  public boolean isFragment() {
+    return m_isFragment;
   }
 
   public IPluginModelBase getPluginModelBase() {

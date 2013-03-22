@@ -25,6 +25,7 @@ public class ScoutBundleUiExtension {
   private INewScoutBundleHandler m_bundleExtention;
   private Class<? extends IPage> m_bundlePageClass;
   private ImageDescriptor m_icon;
+  private ImageDescriptor m_binaryIcon;
   private ImageDescriptor m_launcherIcon;
   private String m_bundleType;
 
@@ -60,11 +61,11 @@ public class ScoutBundleUiExtension {
     return m_bundleExtention;
   }
 
-  public void setIconPath(ImageDescriptor icon) {
+  public void setIcon(ImageDescriptor icon) {
     m_icon = icon;
   }
 
-  public ImageDescriptor getIconPath() {
+  public ImageDescriptor getIcon() {
     return m_icon;
   }
 

@@ -356,4 +356,11 @@ public interface IScoutBundle {
    */
   boolean isBinary();
 
+  /**
+   * Gets if this is a fragment bundle or not.
+   * 
+   * @return true if it is a fragment
+   */
+  boolean isFragment();
+
 }

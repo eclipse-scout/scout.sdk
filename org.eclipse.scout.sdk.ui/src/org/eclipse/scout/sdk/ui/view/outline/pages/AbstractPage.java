@@ -39,6 +39,7 @@ import org.eclipse.swt.graphics.Point;
  */
 public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
+  private final static Point ICON_SIZE = new Point(16, 16);
   private String m_name;
   private Map<CompositeObject, IPage> m_children;
   private IPage m_parent;
@@ -265,7 +266,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   public final Image getImage() {
     ImageDescriptor baseDesc = getBaseImageDescriptor();
     int flags = 0;
-    Point size = new Point(16, 16);
+
     int quality = getQuality();
     switch (quality) {
       case IMarker.SEVERITY_ERROR: {
@@ -277,7 +278,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
         break;
       }
     }
-    JavaElementImageDescriptor desc = new JavaElementImageDescriptor(baseDesc, flags, size);
+    JavaElementImageDescriptor desc = new JavaElementImageDescriptor(baseDesc, flags, ICON_SIZE);
     return ScoutSdkUi.getImage(desc);
   }
 

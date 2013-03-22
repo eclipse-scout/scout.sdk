@@ -82,7 +82,7 @@ public final class ScoutBundleExtensionPoint {
 
                 String icon = element.getAttribute(attributeIcon);
                 if (StringUtility.hasText(icon)) {
-                  extensionPoint.setIconPath(AbstractUIPlugin.imageDescriptorFromPlugin(contribPlugin, icon));
+                  extensionPoint.setIcon(AbstractUIPlugin.imageDescriptorFromPlugin(contribPlugin, icon));
                 }
 
                 String launcherIcon = element.getAttribute(attributeLauncherIcon);

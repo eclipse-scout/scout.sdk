@@ -102,7 +102,7 @@ public class TreeUtility {
         TreeNode childNode = new TreeNode(b.getType(), b.getSymbolicName(), b);
         childNode.setOrderNr(Integer.MAX_VALUE - Math.abs(uiExt.getOrderNumber())); // ensure the bundle nodes are at the end of all other nodes on the same level
         childNode.setBold(true);
-        childNode.setImage(uiExt.getIconPath());
+        childNode.setImage(uiExt.getIcon());
         if (filter.accept(childNode)) {
           node.addChild(childNode);
           childNode.setParent(node);
@@ -154,7 +154,7 @@ public class TreeUtility {
           bundleNode = new TreeNode(bundle.getType(), bundle.getSymbolicName(), bundle);
           ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(bundle.getType());
           if (uiExt != null) {
-            bundleNode.setImage(uiExt.getIconPath());
+            bundleNode.setImage(uiExt.getIcon());
             bundleNode.setOrderNr(uiExt.getOrderNumber());
           }
           bundleNode.setCheckable(false);

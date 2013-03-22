@@ -53,7 +53,7 @@ public class ScoutTechnologyResource implements IScoutTechnologyResource {
   public ImageDescriptor getBundleImage() {
     ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
     if (uiExt != null) {
-      return uiExt.getIconPath();
+      return uiExt.getIcon();
     }
     return null;
   }

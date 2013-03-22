@@ -60,8 +60,8 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
   @Override
   public Image getImage(Object obj) {
     if (obj instanceof AbstractPage) {
-      AbstractPage m = (AbstractPage) obj;
-      return m.getImage();
+      AbstractPage p = (AbstractPage) obj;
+      return p.getImage();
     }
     else {
       return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ELEMENT);
@@ -75,9 +75,12 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
 
   @Override
   public Color getForeground(Object element) {
-    // if(element instanceof AbstractPage){
-    // return ((AbstractPage)element).getTextColor();
-    // }
+    if (element instanceof IPage) {
+      IPage p = (IPage) element;
+      if (p.getScoutBundle() != null && p.getScoutBundle().isBinary()) {
+        return ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+      }
+    }
     return null;
   }
 

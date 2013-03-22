@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * <h3>{@link ScoutBundleFilters}</h3> Contains pre-defined scout bundle filters
  * 
@@ -99,8 +102,8 @@ public final class ScoutBundleFilters {
    * @param filters
    *          the subsequent filter to evaluate
    * @return the created filter
+   * @see IScoutBundleFilter
    * @see ScoutBundleFilters
-   * @see ScoutBundleFilters#getAllBundlesFilter()
    */
   public static IScoutBundleFilter getMultiFilterAnd(final IScoutBundleFilter... filters) {
     return getMultiFilter(false, filters);
@@ -115,6 +118,7 @@ public final class ScoutBundleFilters {
    * @param filters
    *          the subsequent filter to evaluate
    * @return the created filter
+   * @see IScoutBundleFilter
    * @see ScoutBundleFilters
    */
   public static IScoutBundleFilter getMultiFilterOr(final IScoutBundleFilter... filters) {
@@ -138,5 +142,77 @@ public final class ScoutBundleFilters {
         return !or;
       }
     };
+  }
+
+  /**
+   * Creates and returns a filter that returns all bundles except the ones provided in the list.
+   * 
+   * @param list
+   *          The list of excluded bundles.
+   * @return the created filter
+   * @see IScoutBundleFilter
+   */
+  public static IScoutBundleFilter getNotInListFilter(IScoutBundle... list) {
+    if (list == null || list.length < 1) {
+      return ALL_BUNDLES;
+    }
+    HashSet<IScoutBundle> set = new HashSet<IScoutBundle>(list.length);
+    for (IScoutBundle b : list) {
+      set.add(b);
+    }
+    return getNotInListFilter(set);
+  }
+
+  /**
+   * Creates and returns a filter that returns all bundles except the ones provided in the list.
+   * 
+   * @param list
+   *          The list of excluded bundles.
+   * @return the created filter
+   * @see IScoutBundleFilter
+   */
+  public static IScoutBundleFilter getNotInListFilter(final Set<IScoutBundle> list) {
+    if (list == null || list.size() < 1) {
+      return ALL_BUNDLES;
+    }
+    return new IScoutBundleFilter() {
+      @Override
+      public boolean accept(IScoutBundle bundle) {
+        return !list.contains(bundle);
+      }
+    };
+  }
+
+  /**
+   * Creates and returns a filter that returns all bundles that
+   * <ol>
+   * <li>fulfill the given filter and</li>
+   * <li>have no direct parent that also fulfills the filter</li>
+   * </ol>
+   * 
+   * @param filter
+   *          the filter to use as criteria
+   * @return the created filter
+   * @see IScoutBundleFilter
+   */
+  public static IScoutBundleFilter getFilteredRootBundlesFilter(final IScoutBundleFilter filter) {
+    return new IScoutBundleFilter() {
+      @Override
+      public boolean accept(IScoutBundle bundle) {
+        if (filter.accept(bundle)) {
+          return !hasParent(bundle, filter);
+        }
+        return false;
+      }
+    };
+  }
+
+  private static boolean hasParent(IScoutBundle b, IScoutBundleFilter filter) {
+    for (IScoutBundle parent : b.getDirectParentBundles()) {
+      if (filter.accept(parent)) {
+        return true;
+      }
+    }
+    return false;
   }
 }
