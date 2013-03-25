@@ -192,4 +192,11 @@ public interface INlsProject {
    * @return a new key. it is guaranteed, that this key does not exist in this project at the time of key generation.
    */
   String generateNewKey(String baseText);
+
+  /**
+   * specifies if this project contains read-only resources or not.
+   * 
+   * @return true if this project contains at least one read-only resource.
+   */
+  boolean isReadOnly();
 }

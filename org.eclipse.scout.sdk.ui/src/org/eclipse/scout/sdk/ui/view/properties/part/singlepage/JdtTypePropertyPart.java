@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import java.util.HashMap;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -23,7 +21,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -61,6 +58,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Primit
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.SearchFormPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.StringPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.VerticalAglinmentPresenter;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
@@ -73,6 +71,8 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Font;
@@ -82,15 +82,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.ui.part.FileEditorInput;
 
 /**
  * <h3>JdtTypePropertyPart</h3> ...
@@ -152,23 +147,18 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   protected Control createHead(Composite parent) {
     Composite headArea = getFormToolkit().createComposite(parent);
     Hyperlink title = getFormToolkit().createHyperlink(headArea, getPage().getName(), SWT.WRAP);
-    title.setFont(new Font(parent.getDisplay(), parent.getFont().getFontData()[0].getName(), 12, SWT.NORMAL));
+    final Font titleFont = new Font(parent.getDisplay(), parent.getFont().getFontData()[0].getName(), 12, SWT.NORMAL);
+    title.setFont(titleFont);
     title.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
-        try {
-          IResource r = getPage().getType().getCompilationUnit().getResource();
-          if (r instanceof IFile) {
-            IFile f = (IFile) r;
-            String editorId = IDE.getEditorDescriptor(f).getId();
-            IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-            IEditorPart editorPart = activePage.openEditor(new FileEditorInput(f), editorId, true, IWorkbenchPage.MATCH_ID | IWorkbenchPage.MATCH_INPUT);
-            JavaUI.revealInEditor(editorPart, (IJavaElement) getPage().getType());
-          }
-        }
-        catch (Exception e1) {
-          ScoutSdkUi.logError("could not open '" + getPage().getType().getElementName() + "' in editor.", e1);
-        }
+        UiUtility.showJavaElementInEditor(getPage().getType(), true);
+      }
+    });
+    title.addDisposeListener(new DisposeListener() {
+      @Override
+      public void widgetDisposed(DisposeEvent e) {
+        titleFont.dispose();
       }
     });
 

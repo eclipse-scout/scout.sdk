@@ -41,16 +41,18 @@ public class NlsTableCursor {
   private final Table m_table;
   private final TableCursor m_cursor;
   private final List<INlsTableCursorManangerListener> m_listeners;
+  private final NlsTable m_nlsTable;
 
   private NlsTableInputValidator m_inputValidator;
   private boolean m_renaming;
   private TableTextEditor m_editingText;
 
-  public NlsTableCursor(Table table) {
+  public NlsTableCursor(Table table, NlsTable nlsTable) {
     m_table = table;
     m_cursor = new TableCursor(m_table, SWT.NONE);
     m_cursor.setBackgroundMode(SWT.INHERIT_FORCE);
     m_listeners = new ArrayList<INlsTableCursorManangerListener>();
+    m_nlsTable = nlsTable;
 
     m_cursor.addFocusListener(new FocusAdapter() {
       @Override
@@ -199,6 +201,11 @@ public class NlsTableCursor {
     }
     if (m_cursor.getColumn() < NlsTable.AMOUNT_UTILITY_COLS) {
       return;
+    }
+    if (m_nlsTable.getModel() != null && m_nlsTable.getModel().getProjects() != null) {
+      if (m_nlsTable.getModel().getProjects().isReadOnly()) {
+        return;
+      }
     }
     createEditableTextInternal(input);
   }

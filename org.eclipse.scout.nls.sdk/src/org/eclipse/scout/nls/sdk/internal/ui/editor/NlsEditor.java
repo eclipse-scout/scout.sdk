@@ -75,6 +75,9 @@ public class NlsEditor extends MultiPageEditorPart {
       if (input instanceof FileEditorInput) {
         nlsProjects = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{((FileEditorInput) input).getFile()});
       }
+      else if (input instanceof NlsTypeEditorInput) {
+        nlsProjects = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{((NlsTypeEditorInput) input).getType()});
+      }
 
       if (nlsProjects != null) {
         setPartName(nlsProjects.getName());

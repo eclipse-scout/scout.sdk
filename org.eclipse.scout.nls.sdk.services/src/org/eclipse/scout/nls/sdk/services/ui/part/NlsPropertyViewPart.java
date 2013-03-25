@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.services.ui.part;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.internal.ui.editor.NlsEditor;
+import org.eclipse.scout.nls.sdk.internal.ui.editor.NlsTypeEditorInput;
 import org.eclipse.scout.nls.sdk.services.ui.page.TextServiceNodePage;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
+import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.TypeOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.JdtTypePropertyPart;
@@ -24,6 +25,9 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>UnknownPropertyViewPart</h3> ...
@@ -52,14 +56,22 @@ public class NlsPropertyViewPart extends JdtTypePropertyPart {
     LinksPresenterModel model = new LinksPresenterModel();
     IScoutBundle bundle = getPage().getScoutBundle();
     if (bundle != null) {
-      IType serviceType = getPage().getType();
+      final IType serviceType = getPage().getType();
       if (TypeUtility.exists(serviceType)) {
-        IFile typeFile = (IFile) serviceType.getResource();
-        if (typeFile != null) {
-          FileOpenLink link = new FileOpenLink(typeFile, 10, NlsEditor.EDITOR_ID);
-          link.setName(Texts.get("OpenNlsEditor"));
-          model.addGlobalLink(link);
-        }
+        TypeOpenLink link = new TypeOpenLink(serviceType) {
+          @Override
+          public void execute() {
+            IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+            try {
+              activePage.openEditor(new NlsTypeEditorInput(serviceType), NlsEditor.EDITOR_ID, true, IWorkbenchPage.MATCH_ID | IWorkbenchPage.MATCH_INPUT);
+            }
+            catch (PartInitException e) {
+              ScoutSdkUi.logError("Unable to open NLS editor for type '" + serviceType.getFullyQualifiedName() + "'.", e);
+            }
+          }
+        };
+        link.setName(Texts.get("OpenNlsEditor"));
+        model.addGlobalLink(link);
       }
     }
     // ui

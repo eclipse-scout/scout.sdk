@@ -36,7 +36,7 @@ public class TranslationNewAction extends AbstractWorkspaceAction {
     m_context = null;
     m_project = project;
     m_shell = s;
-    setEnabled(project != null);
+    setEnabled(project != null && !project.isReadOnly());
   }
 
   @Override

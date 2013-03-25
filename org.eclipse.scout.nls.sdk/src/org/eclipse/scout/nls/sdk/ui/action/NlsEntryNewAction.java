@@ -13,10 +13,8 @@ package org.eclipse.scout.nls.sdk.ui.action;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsEntryNewDialog;
-import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.nls.sdk.model.workspace.translationResource.ITranslationResource;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -41,19 +39,16 @@ public class NlsEntryNewAction extends AbstractWorkspaceAction {
     m_project = project;
     m_showProjectList = showProjectList;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.TextAdd));
-    setEnabled(project != null);
+    setEnabled(project != null && !project.isReadOnly());
   }
 
   @Override
   protected boolean interactWithUi() {
-    for (Language l : m_project.getAllLanguages()) {
-      ITranslationResource resource = m_project.getTranslationResource(l);
-      if (resource != null && resource.isReadOnly()) {
-        MessageBox box = new MessageBox(m_parentShell, SWT.ICON_INFORMATION | SWT.OK);
-        box.setMessage("The NLS Project is read-only. Check that you have a valid NLS Project in your workspace.");
-        box.open();
-        return false;
-      }
+    if (m_project.isReadOnly()) {
+      MessageBox box = new MessageBox(m_parentShell, SWT.ICON_INFORMATION | SWT.OK);
+      box.setMessage("The NLS Project is read-only. Check that you have a valid NLS Project in your workspace.");
+      box.open();
+      return false;
     }
 
     if (m_initialEntry == null) {

@@ -103,7 +103,7 @@ public class NlsTable extends Composite {
     m_table.setHeaderVisible(true);
     m_table.setLinesVisible(true);
 
-    m_cursorManager = new NlsTableCursor(m_table);
+    m_cursorManager = new NlsTableCursor(m_table, this);
     m_cursorManager.addCursorMangerListener(new INlsTableCursorManangerListener() {
       @Override
       public void textChangend(INlsEntry row, int i, String string) {
@@ -208,6 +208,10 @@ public class NlsTable extends Composite {
 
   private Language getLanguageOfTableColumn(int columnIndex) {
     return m_tableModel.getProjects().getAllLanguages()[columnIndex - (INDEX_COLUMN_KEYS + 1)];
+  }
+
+  public NlsTableModel getModel() {
+    return m_tableModel;
   }
 
   public void setModel(NlsTableModel model) {

@@ -78,6 +78,17 @@ public abstract class AbstractNlsProject implements INlsProject {
     m_entries = null;
   }
 
+  @Override
+  public boolean isReadOnly() {
+    for (Language l : getAllLanguages()) {
+      ITranslationResource resource = getTranslationResource(l);
+      if (resource != null && resource.isReadOnly()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /**
    * Provides all languages supported by this project and all its ancestors.
    * 
