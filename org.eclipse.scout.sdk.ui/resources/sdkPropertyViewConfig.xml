@@ -284,6 +284,9 @@
 		<config name="getConfiguredLabelWidthInPixel" type="Advanced" category="Layout" />
 		<config name="getConfiguredLabelHorizontalAlignment" type="Advanced" category="Layout" />
 		<config name="getConfiguredLabelVisible" type="Advanced" category="Layout" />
+		<config name="getConfiguredLabelForegroundColor" type="Advanced" category="Appearance" />
+		<config name="getConfiguredLabelBackgroundColor" type="Advanced" category="Appearance" />
+		<config name="getConfiguredLabelFont" type="Advanced" category="Appearance" />
 		<config name="getConfiguredEnabled" type="Advanced" category="Behavior" />
 		<config name="getConfiguredVisible" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMandatory" type="Normal" category="Behavior" />
@@ -470,6 +473,7 @@
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField">
 		<config name="getConfiguredGridH" type="Normal" category="Layout" />
 		<config name="getConfiguredGridW" type="Normal" category="Layout" />
+		<config name="getConfiguredSplitterPosition" type="Advanced" category="Layout" />
 		<config name="getConfiguredMiniCalendarCount" type="Advanced" category="Appearance" />
 		<config name="execLoadResourceTableData" type="Advanced" category="Data" />
 		<config name="execPopulateResourceTable" type="Advanced" category="BusinessLogic" />
