@@ -139,16 +139,18 @@ public final class ScoutUtility {
   }
 
   public static void unregisterServiceProxy(IType interfaceType, IProgressMonitor monitor) throws CoreException {
-    IScoutBundle interfaceBundle = ScoutTypeUtility.getScoutBundle(interfaceType.getJavaProject());
-    for (IScoutBundle clientBundle : interfaceBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false)) {
+    IScoutBundle interfaceBundle = ScoutTypeUtility.getScoutBundle(interfaceType);
+    for (IScoutBundle clientBundle : interfaceBundle.getChildBundles(
+        ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT)), true)) {
       unregisterServiceClass(clientBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName(), monitor);
     }
   }
 
   public static void unregisterServiceImplementation(IType serviceType, IProgressMonitor monitor) throws CoreException {
-    IScoutBundle implementationBundle = ScoutTypeUtility.getScoutBundle(serviceType.getJavaProject());
+    IScoutBundle implementationBundle = ScoutTypeUtility.getScoutBundle(serviceType);
     ScoutUtility.unregisterServiceClass(implementationBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), monitor);
-    for (IScoutBundle serverBundle : implementationBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true)) {
+    for (IScoutBundle serverBundle : implementationBundle.getParentBundles(
+        ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER)), true)) {
       unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), serverBundle.getSymbolicName() + ".ServerSession", monitor);
     }
   }
@@ -159,7 +161,7 @@ public final class ScoutUtility {
 
   public static void unregisterServiceClass(IProject project, String extensionPoint, String elemType, String className, String requiredSessionClass, IProgressMonitor monitor) throws CoreException {
     PluginModelHelper h = new PluginModelHelper(project);
-    HashMap<String, String> attributes = new HashMap<String, String>();
+    HashMap<String, String> attributes = new HashMap<String, String>(1);
     attributes.put("class", className);
     h.PluginXml.removeSimpleExtension(extensionPoint, elemType, attributes);
     h.save();
