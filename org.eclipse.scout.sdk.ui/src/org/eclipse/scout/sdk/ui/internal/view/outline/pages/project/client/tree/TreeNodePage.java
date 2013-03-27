@@ -14,6 +14,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -32,7 +34,6 @@ public class TreeNodePage extends AbstractScoutTypePage {
     setParent(parent);
     setType(type);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Tree));
-
   }
 
   @Override
@@ -43,6 +44,12 @@ public class TreeNodePage extends AbstractScoutTypePage {
   @Override
   protected String getMethodNameForTranslatedText() {
     return "getConfiguredTitle";
+  }
+
+  @Override
+  protected void loadChildrenImpl() {
+    new KeyStrokeTablePage(this, getType());
+    new MenuTablePage(this, getType());
   }
 
   @SuppressWarnings("unchecked")

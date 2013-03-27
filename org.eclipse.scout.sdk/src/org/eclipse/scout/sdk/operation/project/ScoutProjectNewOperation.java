@@ -130,12 +130,12 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   private static void formatProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaProject p) throws CoreException {
     for (IPackageFragment pck : p.getPackageFragments()) {
       for (ICompilationUnit u : pck.getCompilationUnits()) {
-        if (u.isWorkingCopy()) {
+
+        if (!workingCopyManager.register(u, monitor)) {
+          // it is already registered. perform a reconcile.
           workingCopyManager.reconcile(u, monitor);
         }
-        else {
-          workingCopyManager.register(u, monitor);
-        }
+
         JavaElementFormatOperation fo = new JavaElementFormatOperation(u, true);
         fo.validate();
         fo.run(monitor, workingCopyManager);

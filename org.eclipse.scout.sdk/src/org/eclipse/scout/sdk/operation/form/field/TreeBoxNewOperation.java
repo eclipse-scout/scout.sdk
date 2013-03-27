@@ -12,14 +12,18 @@ package org.eclipse.scout.sdk.operation.form.field;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
+import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -33,7 +37,9 @@ public class TreeBoxNewOperation implements IOperation {
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
   private IJavaElement m_sibling;
+
   private IType m_createdField;
+  private IType m_createdTree;
 
   public TreeBoxNewOperation(IType declaringType) {
     m_declaringType = declaringType;
@@ -60,6 +66,9 @@ public class TreeBoxNewOperation implements IOperation {
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdField = newOp.getCreatedFormField();
+
+    m_createdTree = createTree(monitor, workingCopyManager);
+
     if (getNlsEntry() != null) {
       NlsTextMethodUpdateOperation labelOp = new NlsTextMethodUpdateOperation(getCreatedField(), NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL, false);
       labelOp.setNlsEntry(getNlsEntry());
@@ -75,6 +84,16 @@ public class TreeBoxNewOperation implements IOperation {
     }
   }
 
+  private IType createTree(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    InnerTypeNewOperation treeNewOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_TREEBOX_TREE, getCreatedField(), false);
+    treeNewOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITree, getDeclaringType().getJavaProject()));
+    treeNewOp.addTypeModifier(Flags.AccPublic);
+    treeNewOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
+    treeNewOp.validate();
+    treeNewOp.run(monitor, manager);
+    return treeNewOp.getCreatedType();
+  }
+
   @Override
   public String getOperationName() {
     return "New tree field";
@@ -82,6 +101,10 @@ public class TreeBoxNewOperation implements IOperation {
 
   public IType getCreatedField() {
     return m_createdField;
+  }
+
+  public IType getCreatedTree() {
+    return m_createdTree;
   }
 
   public IType getDeclaringType() {

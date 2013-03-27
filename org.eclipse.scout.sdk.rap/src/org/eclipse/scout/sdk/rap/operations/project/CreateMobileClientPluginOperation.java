@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.rap.operations.project;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -52,7 +51,7 @@ public class CreateMobileClientPluginOperation extends AbstractCreateScoutBundle
     super.run(monitor, workingCopyManager);
     IProject project = getCreatedProject();
     getProperties().setProperty(PROP_MOBILE_BUNDLE_CLIENT_NAME, getSymbolicName());
-    Bundle uiRapBundle = Platform.getBundle(ScoutSdkRap.PLUGIN_ID);
+    Bundle uiRapBundle = ScoutSdkRap.getDefault().getBundle();
 
     new InstallTextFileOperation("templates/client.mobile/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/client.mobile/plugin.xml", "plugin.xml", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);

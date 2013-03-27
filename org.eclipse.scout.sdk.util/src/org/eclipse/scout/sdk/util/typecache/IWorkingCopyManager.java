@@ -16,16 +16,8 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.WorkingCopyOwner;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 
 public interface IWorkingCopyManager {
-
-  /**
-   * The working copy owner for all scout operations
-   */
-  public static final WorkingCopyOwner ScoutWorkingCopyOwner = new WorkingCopyOwner() {
-  };
 
   /**
    * Register compilation unit BEFORE doing changes on it.
@@ -33,18 +25,38 @@ public interface IWorkingCopyManager {
    * Compilation unit may be registered multiple times
    * 
    * @param icu
+   *          The compilation unit to register
+   * @param monitor
+   *          a progress monitor used to report progress while opening this compilation unit or null if no progress
+   *          should be reported
+   * @return true if the given compilation unit was newly registered with this call, false if it was already registered
+   * @throws JavaModelException
+   *           if the compilation unit could not become a working copy
+   * @throws IllegalArgumentException
+   *           if the given compilation unit is read only.
    */
-  void register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException;
+  boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException;
 
   /**
    * Unregister compilation unit AFTER doing changes on it.
-   * Commits and discards working copy at the first invokation.
+   * Commits and discards working copy at the first invocation.
    * Compilation unit may be unregistered multiple times
    * 
    * @param icu
+   *          The compilation unit to unregister
+   * @param monitor
+   *          a progress monitor used to report progress while opening this compilation unit or null if no progress
+   *          should be reported
    */
   void unregister(ICompilationUnit icu, IProgressMonitor monitor);
 
+  /**
+   * unregisters all working copies managed by this instance.
+   * 
+   * @param monitor
+   *          a progress monitor used to report progress while opening this compilation unit or null if no progress
+   *          should be reported
+   */
   void unregisterAll(IProgressMonitor monitor);
 
   /**
@@ -53,8 +65,15 @@ public interface IWorkingCopyManager {
    * {@link IType#createMethod(String, IJavaElement, boolean, IProgressMonitor)} or
    * {@link IType#createField(String, IJavaElement, boolean, IProgressMonitor)}
    * 
-   * @throws JavaModelException
+   * @param icu
+   *          The compilation unit to reconcile.
+   * @param monitor
+   *          a progress monitor used to report progress while opening this compilation unit or null if no progress
+   *          should be reported
+   * @throws CoreException
+   *           if the contents of the original element cannot be accessed. Reasons include:
+   *           The original Java element does not exist or the given compilation unit is not registered in this manager.
    */
-  CompilationUnit reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException;
+  void reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException;
 
 }

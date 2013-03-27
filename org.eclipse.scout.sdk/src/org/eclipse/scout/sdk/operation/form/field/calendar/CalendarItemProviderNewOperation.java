@@ -18,10 +18,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -65,9 +64,7 @@ public class CalendarItemProviderNewOperation implements IOperation {
     InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     tableNewOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendarItemProvider, getDeclaringType().getJavaProject()));
     tableNewOp.addTypeModifier(Flags.AccPublic);
-    AnnotationCreateOperation orderAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
-    orderAnnotOp.addParameter("10.0");
-    tableNewOp.addAnnotation(orderAnnotOp);
+    tableNewOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
     tableNewOp.validate();
     tableNewOp.run(monitor, workingCopyManager);
     m_createdField = tableNewOp.getCreatedType();

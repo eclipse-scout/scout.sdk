@@ -23,7 +23,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaElement;
@@ -317,7 +316,7 @@ public class JavadocTooltip extends AbstractTooltip {
   }
 
   private static String loadStyleSheet() {
-    Bundle bundle = Platform.getBundle(JavaPlugin.getPluginId());
+    Bundle bundle = JavaPlugin.getDefault().getBundle();
     URL styleSheetURL = bundle.getEntry("/JavadocViewStyleSheet.css"); //$NON-NLS-1$
     if (styleSheetURL == null) return null;
 

@@ -16,7 +16,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.operation.project.AbstractCreateScoutBundleOperation;
@@ -59,7 +58,7 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
     IProject project = getCreatedProject();
     getProperties().setProperty(PROP_BUNDLE_RAP_NAME, getSymbolicName());
     try {
-      Bundle uiRapBundle = Platform.getBundle(ScoutSdkRap.PLUGIN_ID);
+      Bundle uiRapBundle = ScoutSdkRap.getDefault().getBundle();
       new InstallTextFileOperation("templates/ui.rap/META-INF/MANIFEST.MF", "META-INF/MANIFEST.MF", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
       new InstallTextFileOperation("templates/ui.rap/plugin.xml", "plugin.xml", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
       new InstallTextFileOperation("templates/ui.rap/build.properties", "build.properties", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);

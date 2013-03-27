@@ -24,12 +24,11 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -96,9 +95,7 @@ public class CalendarFieldNewOperation implements IOperation {
     calendarOp.setTypeModifiers(Flags.AccPublic);
     calendarOp.setSibling(null);
     calendarOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendar, getDeclaringType().getJavaProject()));
-    AnnotationCreateOperation calendarAnnotOp = new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.Order));
-    calendarAnnotOp.addParameter("10.0");
-    calendarOp.addAnnotation(calendarAnnotOp);
+    calendarOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
     calendarOp.validate();
     calendarOp.run(monitor, workingCopyManager);
     // generic on calendar field

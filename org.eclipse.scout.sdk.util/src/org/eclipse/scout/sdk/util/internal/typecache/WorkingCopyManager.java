@@ -21,8 +21,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.compiler.SourceElementParser;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
@@ -37,14 +35,14 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 @SuppressWarnings("restriction")
 public class WorkingCopyManager implements IWorkingCopyManager {
 
-  private Object LOCK = new Object();
+  private final Object LOCK = new Object();
   private List<ICompilationUnit> m_workingCopies = new ArrayList<ICompilationUnit>();
 
   public WorkingCopyManager() {
   }
 
   @Override
-  public void register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
+  public boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
     if (icu.isReadOnly()) {
       throw new IllegalArgumentException("try to get a working copy of the read only icu '" + icu.getElementName() + "'.");
     }
@@ -52,8 +50,10 @@ public class WorkingCopyManager implements IWorkingCopyManager {
       if (!m_workingCopies.contains(icu)) {
         icu.becomeWorkingCopy(monitor);
         m_workingCopies.add(icu);
+        return true;
       }
     }
+    return false;
   }
 
   @Override
@@ -106,13 +106,12 @@ public class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   @Override
-  public CompilationUnit reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
+  public void reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
     synchronized (LOCK) {
       if (!m_workingCopies.contains(icu)) {
         throw new CoreException(new ScoutStatus("compilation unit " + icu.getElementName() + " has not been registered"));
       }
-      return icu.reconcile(AST.JLS3, true, icu.getOwner(), monitor);
+      icu.reconcile(ICompilationUnit.NO_AST, true, icu.getOwner(), monitor);
     }
   }
-
 }
