@@ -64,7 +64,7 @@ public class SqlBindProposal implements ICompletionProposal, ICompletionProposal
 
   @Override
   public String getDisplayString() {
-    return getCompletionText();
+    return getElementName();
   }
 
   @Override
@@ -80,7 +80,7 @@ public class SqlBindProposal implements ICompletionProposal, ICompletionProposal
   @Override
   public void apply(IDocument document, char trigger, int offset) {
     int offDiff = offset - m_offset;
-    ReplaceEdit replaceEdit = new ReplaceEdit(m_offset - m_prefix.length(), m_prefix.length() + offDiff, getCompletionText());
+    ReplaceEdit replaceEdit = new ReplaceEdit(m_offset - m_prefix.length(), m_prefix.length() + offDiff, getElementName());
     try {
       replaceEdit.apply(document);
     }
@@ -136,16 +136,7 @@ public class SqlBindProposal implements ICompletionProposal, ICompletionProposal
 
   @Override
   public CharSequence getPrefixCompletionText(IDocument document, int completionOffset) {
-    return getCompletionText();
-  }
-
-  private String getCompletionText() {
-    String simpleName = getElementName();
-    if (simpleName.length() > 1) {
-      simpleName = Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
-    }
-    return simpleName;
-
+    return getElementName();
   }
 
   /**

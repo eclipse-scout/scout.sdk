@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.sql;
 
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,9 +45,9 @@ import org.eclipse.swt.graphics.Image;
  * @since 1.0.8 09.02.2010
  */
 public class SqlBindCompletionProposalProcessor {
-  final IType AbstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
-  final IType AbstractFormFieldData = TypeUtility.getType(RuntimeClasses.AbstractFormFieldData);
-  final IType AbstractPropertyData = TypeUtility.getType(RuntimeClasses.AbstractPropertyData);
+  private final IType AbstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
+  private final IType AbstractFormFieldData = TypeUtility.getType(RuntimeClasses.AbstractFormFieldData);
+  private final IType AbstractPropertyData = TypeUtility.getType(RuntimeClasses.AbstractPropertyData);
 
   private final Image m_image;
   private static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
@@ -73,13 +74,15 @@ public class SqlBindCompletionProposalProcessor {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formData);
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
         if (t.getElementName().toLowerCase().startsWith(prefix.toLowerCase())) {
-          SqlBindProposal prop = new SqlBindProposal(t.getElementName(), prefix, context.getInvocationOffset(), m_image);
+          String propName = getBeanName(t.getElementName());
+          SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
           result.put(prop.getDisplayString(), prop);
+          addInnerTypesInSuperClasses(t, t.newSupertypeHierarchy(null), result, prefix, propName + ".", context);
         }
       }
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
         String propName = t.getElementName();
-        propName = propName.replaceAll("Property$", "");
+        propName = getBeanName(propName.replaceAll("Property$", ""));
         if (propName.toLowerCase().startsWith(prefix.toLowerCase())) {
           SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
           result.put(prop.getDisplayString(), prop);
@@ -91,6 +94,28 @@ public class SqlBindCompletionProposalProcessor {
       ScoutSdkUi.logWarning("error during creating sql copletion.", e);
     }
     return NO_PROPOSALS;
+  }
+
+  private String getBeanName(String elementName) {
+    if (elementName == null) {
+      return null;
+    }
+    if (elementName.length() > 1) {
+      return Character.toLowerCase(elementName.charAt(0)) + elementName.substring(1);
+    }
+    return elementName.toLowerCase();
+  }
+
+  private void addInnerTypesInSuperClasses(IType baseType, org.eclipse.jdt.core.ITypeHierarchy baseTypeSuperHierarchy, Map<String, ICompletionProposal> collector,
+      String prefix, String namePrefix, JavaContentAssistInvocationContext context) throws JavaModelException {
+    for (IType superClass : baseTypeSuperHierarchy.getAllSuperclasses(baseType)) {
+      ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(superClass);
+      for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
+        SqlBindProposal prop = new SqlBindProposal(namePrefix + getBeanName(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
+        collector.put(prop.getDisplayString(), prop);
+        addInnerTypesInSuperClasses(innerType, innerType.newSupertypeHierarchy(null), collector, prefix, prop.getDisplayString() + ".", context);
+      }
+    }
   }
 
   private boolean isSqlStatementLocation(ITextViewer viewer, int offset) throws BadLocationException {
