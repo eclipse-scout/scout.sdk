@@ -19,14 +19,18 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.util.ScoutResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.swt.SWT;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
@@ -101,8 +105,13 @@ public class TreeUtility {
       if (uiExt != null) {
         TreeNode childNode = new TreeNode(b.getType(), b.getSymbolicName(), b);
         childNode.setOrderNr(Integer.MAX_VALUE - Math.abs(uiExt.getOrderNumber())); // ensure the bundle nodes are at the end of all other nodes on the same level
-        childNode.setBold(true);
-        childNode.setImage(uiExt.getIcon());
+        childNode.setBold(false);
+        ImageDescriptor icon = uiExt.getIcon();
+        if (b.isBinary()) {
+          icon = ScoutSdkUi.getImageDescriptor(icon, SdkIcons.BinaryDecorator, IDecoration.BOTTOM_LEFT);
+          childNode.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+        }
+        childNode.setImage(icon);
         if (filter.accept(childNode)) {
           node.addChild(childNode);
           childNode.setParent(node);
@@ -124,10 +133,15 @@ public class TreeUtility {
   }
 
   public static ITreeNode createNode(ITreeNode parentNode, String type, String name, ImageDescriptor img, int orderNr, Object data) {
+    return createNode(parentNode, type, name, img, orderNr, data, true);
+  }
+
+  public static ITreeNode createNode(ITreeNode parentNode, String type, String name, ImageDescriptor img, int orderNr, Object data, boolean bold) {
     TreeNode node = new TreeNode(type, name);
     node.setData(data);
     node.setOrderNr(orderNr);
     node.setImage(img);
+    node.setBold(bold);
     node.setCheckable(true);
     node.setParent(parentNode);
     parentNode.addChild(node);

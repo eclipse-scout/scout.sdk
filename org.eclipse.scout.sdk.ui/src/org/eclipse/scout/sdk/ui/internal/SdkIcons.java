@@ -333,5 +333,7 @@ public interface SdkIcons {
   String BundlePresentationGrouped = "presentation_grouped.gif";
   String BundlePresentationHierarchical = "presentation_hierarchical.gif";
   String BundlePresentationFlat = "presentation_flat.gif";
+
+  String BinaryDecorator = "binary_decoration.png";
 //CHECKSTYLE:ON
 }

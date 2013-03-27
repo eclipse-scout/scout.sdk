@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Color;
 
 /**
  * <h3>TreeNode</h3> ...
@@ -32,6 +33,8 @@ public class TreeNode implements ITreeNode {
   private boolean m_bold = false;
   private ImageDescriptor m_image;
   private int m_orderNr = 0;
+  private Color m_foreground;
+  private Color m_background;
 
   private ITreeNode m_parent;
   private List<ITreeNode> m_children = new ArrayList<ITreeNode>();
@@ -224,6 +227,26 @@ public class TreeNode implements ITreeNode {
   @Override
   public int getOrderNr() {
     return m_orderNr;
+  }
+
+  @Override
+  public Color getForeground() {
+    return m_foreground;
+  }
+
+  @Override
+  public void setForeground(Color foreground) {
+    m_foreground = foreground;
+  }
+
+  @Override
+  public Color getBackground() {
+    return m_background;
+  }
+
+  @Override
+  public void setBackground(Color background) {
+    m_background = background;
   }
 
 }

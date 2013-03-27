@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -28,7 +32,12 @@ public abstract class AbstractBundleNodeTablePage extends AbstractPage {
     m_bundle = bundle;
     setParent(parentPage);
     setName(m_bundle.getSymbolicName());
-    setImageDescriptor(m_bundle.getUiExtension().getIcon());
+
+    ImageDescriptor icon = m_bundle.getUiExtension().getIcon();
+    if (bundle.getScoutBundle().isBinary()) {
+      icon = ScoutSdkUi.getImageDescriptor(icon, SdkIcons.BinaryDecorator, IDecoration.BOTTOM_LEFT);
+    }
+    setImageDescriptor(icon);
   }
 
   @Override

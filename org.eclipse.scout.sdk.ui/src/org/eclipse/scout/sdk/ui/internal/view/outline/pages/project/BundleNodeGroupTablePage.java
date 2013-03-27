@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 import java.util.Arrays;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.formdata.ScoutBundlesUpdateFormDataOperation;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
@@ -23,6 +25,7 @@ import org.eclipse.scout.sdk.ui.action.export.ExportScoutProjectAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -47,7 +50,12 @@ public class BundleNodeGroupTablePage extends AbstractPage {
     m_group = group;
     setParent(parentPage);
     setName(group.getGroupName());
-    setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ScoutProject));
+
+    ImageDescriptor icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ScoutProject);
+    if (group.isBinary()) {
+      icon = ScoutSdkUi.getImageDescriptor(icon, SdkIcons.BinaryDecorator, IDecoration.BOTTOM_LEFT);
+    }
+    setImageDescriptor(icon);
   }
 
   @Override

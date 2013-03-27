@@ -144,7 +144,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
     for (ScoutBundleUiExtension e : ScoutBundleExtensionPoint.getExtensions()) {
-      TreeUtility.createNode(rootNode, TYPE_BUNDLE, e.getBundleName(), e.getIcon(), e.getOrderNumber(), e);
+      TreeUtility.createNode(rootNode, TYPE_BUNDLE, e.getBundleName(), e.getIcon(), e.getOrderNumber(), e, false);
     }
     return rootNode;
   }

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.bundletree;
 import java.util.List;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Color;
 
 /**
  * <h3>ITreeNode</h3> ...
@@ -121,5 +122,27 @@ public interface ITreeNode {
    * @param checkable
    */
   void setCheckable(boolean checkable);
+
+  /**
+   * @return the foreground color of this node
+   */
+  Color getForeground();
+
+  /**
+   * @param foreground
+   *          the new foreground
+   */
+  void setForeground(Color foreground);
+
+  /**
+   * @return the background color of this node
+   */
+  Color getBackground();
+
+  /**
+   * @param background
+   *          the new background color of this node
+   */
+  void setBackground(Color background);
 
 }

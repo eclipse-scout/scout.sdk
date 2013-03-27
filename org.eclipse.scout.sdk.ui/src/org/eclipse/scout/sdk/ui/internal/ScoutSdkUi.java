@@ -17,12 +17,13 @@ import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ColorRegistry;
-import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
@@ -312,13 +313,13 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   }
 
   /**
-   * Returns the image for the given composite descriptor.
+   * Returns the image for the given descriptor.
    */
-  public static Image getImage(CompositeImageDescriptor imageDescriptor) {
+  public static Image getImage(ImageDescriptor imageDescriptor) {
     return getDefault().getImageImpl(imageDescriptor);
   }
 
-  private Image getImageImpl(CompositeImageDescriptor imageDescriptor) {
+  private Image getImageImpl(ImageDescriptor imageDescriptor) {
     return getImageRegistry().get(imageDescriptor);
   }
 
@@ -346,11 +347,50 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
    * To get a cached image with one of the extensions [gif | png | jpg]
    * 
    * @param name
-   *          the name without extension located under resources/icons e.g. "person"
+   *          the file name (with or without extension) located under resources/icons
    * @return the cached image
    */
   public static ImageDescriptor getImageDescriptor(String name) {
     return getDefault().getImageDescriptorImpl(name);
+  }
+
+  /**
+   * @param imageName
+   *          the file name (with or without extension) of the base image located under resources/icons
+   * @param decorationImageName
+   *          the file name (with or without extension) of the decoration image located under resources/icons
+   * @param quadrant
+   *          specifies where on the base image the decoration should be placed (one of {@link IDecoration#TOP_LEFT},
+   *          {@link IDecoration#TOP_RIGHT}, {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT} or
+   *          {@link IDecoration#UNDERLAY})
+   * @return
+   */
+  public static ImageDescriptor getImageDescriptor(String imageName, String decorationImageName, int quadrant) {
+    ImageDescriptor baseIcon = getImageDescriptor(imageName);
+    return getImageDescriptor(baseIcon, decorationImageName, quadrant);
+  }
+
+  /**
+   * @param baseIcon
+   *          base icon on which the decoration should be placed.
+   * @param decorationImageName
+   *          the file name (with or without extension) of the decoration image located under resources/icons
+   * @param quadrant
+   *          specifies where on the base image the decoration should be placed (one of {@link IDecoration#TOP_LEFT},
+   *          {@link IDecoration#TOP_RIGHT}, {@link IDecoration#BOTTOM_LEFT}, {@link IDecoration#BOTTOM_RIGHT} or
+   *          {@link IDecoration#UNDERLAY})
+   * @return
+   */
+  public static ImageDescriptor getImageDescriptor(ImageDescriptor baseIcon, String decorationImageName, int quadrant) {
+    // get the base image
+    Image baseImage = ScoutSdkUi.getImage(baseIcon);
+
+    // get the decoration image
+    ImageDescriptor decorationIcon = ScoutSdkUi.getImageDescriptor(decorationImageName);
+
+    // combine
+    ImageDescriptor decoratedIcon = new DecorationOverlayIcon(baseImage, decorationIcon, quadrant);
+    return decoratedIcon;
   }
 
   private ImageDescriptor getImageDescriptorImpl(String name) {

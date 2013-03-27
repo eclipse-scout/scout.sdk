@@ -98,6 +98,20 @@ public class ScoutBundleNodeGroup implements Comparable<ScoutBundleNodeGroup> {
     return false;
   }
 
+  /**
+   * gets if all bundles directly contained in this group are binary.
+   * 
+   * @return true if all bundles in this group are binary.
+   */
+  public boolean isBinary() {
+    for (ScoutBundleNode b : m_childBundles) {
+      if (!b.getScoutBundle().isBinary()) {
+        return false;
+      }
+    }
+    return m_childBundles.size() > 0; // empty group is not binary
+  }
+
   @Override
   public int hashCode() {
     return m_definingBundle.hashCode();

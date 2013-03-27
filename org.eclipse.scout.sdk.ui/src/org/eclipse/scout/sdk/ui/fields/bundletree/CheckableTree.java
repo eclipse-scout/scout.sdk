@@ -21,6 +21,7 @@ import java.util.TreeMap;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -45,6 +46,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Image;
@@ -284,7 +286,7 @@ public class CheckableTree extends Composite {
     return nodes.values().toArray(new ITreeNode[nodes.values().size()]);
   }
 
-  public class P_TreeModel extends LabelProvider implements ITreeContentProvider, IFontProvider {
+  public class P_TreeModel extends LabelProvider implements ITreeContentProvider, IFontProvider, IColorProvider {
 
     private Font m_boldFont;
 
@@ -344,6 +346,16 @@ public class CheckableTree extends Composite {
         return m_boldFont;
       }
       return null;
+    }
+
+    @Override
+    public Color getForeground(Object element) {
+      return ((ITreeNode) element).getForeground();
+    }
+
+    @Override
+    public Color getBackground(Object element) {
+      return ((ITreeNode) element).getBackground();
     }
 
   } // end class P_TreeModel
