@@ -55,8 +55,7 @@ import org.osgi.framework.Version;
 
 public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
-  private static final String RAP_RUNTIME_FEATURE_PREFIX = "org.eclipse.rap.feature_";
-  private static final String RAP_RWT_PLUGIN_PREFIX = "org.eclipse.rap.rwt_";
+  private static final String[] RAP_PLUGIN_DETECTION_PREFIXES = new String[]{"org.eclipse.rap.rwt_2", "org.eclipse.scout.rt.ui.rap_3.9", "org.eclipse.scout.rt.ui.rap.mobile_3.9"};
   private static final String RAP_TARGET_DEFAULT_SUB_FOLDER = "rap_target";
 
   private static final String PROP_TARGET_STRATEGY = "propTargetStrategy";
@@ -503,29 +502,22 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       }
       else {
         try {
-          File featuresFolder = new File(new File(getLocalTargetFolder()), "features");
-          if (featuresFolder.exists()) {
-            // try to find e.g. org.eclipse.rap.runtime_1.5.0.20111024-0120 feature
-            String[] featureNames = featuresFolder.list(new FilenameFilter() {
-              @Override
-              public boolean accept(File dir, String name) {
-                return name.startsWith(RAP_RUNTIME_FEATURE_PREFIX);
-              }
-            });
-            if (featureNames.length == 1) {
-              return Status.OK_STATUS;
-            }
-          }
-          // fallback try to find e.g. 'org.eclipse.rap.rwt_1.5.0.201110241651.jar' plugin
+          // try to find rap-rt, scout-rap-rt and scout-mobile-rt plugins
           File pluginsFolder = new File(new File(getLocalTargetFolder()), "plugins");
           if (pluginsFolder.exists()) {
             String[] pluginNames = pluginsFolder.list(new FilenameFilter() {
               @Override
               public boolean accept(File dir, String name) {
-                return name.startsWith(RAP_RWT_PLUGIN_PREFIX);
+                String n = name.toLowerCase().trim();
+                for (String s : RAP_PLUGIN_DETECTION_PREFIXES) {
+                  if (n.startsWith(s) && n.endsWith(".jar")) {
+                    return true;
+                  }
+                }
+                return false;
               }
             });
-            if (pluginNames.length == 1) {
+            if (pluginNames.length == RAP_PLUGIN_DETECTION_PREFIXES.length) {
               return Status.OK_STATUS;
             }
           }
