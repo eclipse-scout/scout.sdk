@@ -31,7 +31,7 @@ public class ExportRapWizardPage extends AbstractExportProductWizardPage {
     if (!StringUtility.hasText(m_warFileName.getModifiableText())) {
       String alias = getWizard().getProjectAlias();
       if (StringUtility.hasText(alias)) {
-        m_warFileName.setText(alias + "_web");
+        m_warFileName.setText(alias);
       }
     }
   }

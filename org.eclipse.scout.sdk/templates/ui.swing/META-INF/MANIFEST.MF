@@ -5,8 +5,6 @@ Bundle-SymbolicName: @@BUNDLE_SWING_NAME@@;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: @@BUNDLE_SWING_NAME@@.Activator
 Bundle-ActivationPolicy: lazy
-Scout-Project: @@GROUP@@
-Scout-Project-Alias: @@ALIAS@@
 Require-Bundle: org.eclipse.scout.rt.ui.swing,
  @@BUNDLE_CLIENT_NAME@@;visibility:=reexport,
  @@BUNDLE_SHARED_NAME@@,
