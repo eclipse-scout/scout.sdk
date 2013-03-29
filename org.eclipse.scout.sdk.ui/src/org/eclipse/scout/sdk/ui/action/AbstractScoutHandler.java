@@ -163,6 +163,9 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
     if (!TypeUtility.exists(element)) {
       return false;
     }
+    if (element.isReadOnly()) {
+      return false;
+    }
     IScoutBundle b = ScoutTypeUtility.getScoutBundle(element);
     return b != null && !b.isBinary();
   }

@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.ProgressIndicator;
@@ -34,6 +35,7 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
@@ -51,9 +53,9 @@ import org.eclipse.swt.widgets.Composite;
 public class FormPropertyPart extends JdtTypePropertyPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
-  final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
-  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-  final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
+  private final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
+  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+  private final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
 
   @Override
   protected void createSections() {
@@ -93,9 +95,26 @@ public class FormPropertyPart extends JdtTypePropertyPart {
           entityName = findEntityName(getPage().getType().getElementName());
         }
         if (!StringUtility.isNullOrEmpty(entityName)) {
+          IType form = getPage().getType();
+          // super form class
+          try {
+            ITypeHierarchy formSuperTypeHierarchy = ScoutTypeUtility.getSuperTypeHierarchy(form);
+            IType formSuperClass = formSuperTypeHierarchy.getSuperclass(form);
+
+            if (TypeUtility.exists(formSuperClass)) {
+              int flags = formSuperClass.getFlags();
+              if (!Flags.isAbstract(flags) && !Flags.isInterface(flags)) {
+                TypeOpenLink lnk = new TypeOpenLink(formSuperClass);
+                lnk.setName(formSuperClass.getElementName());
+                model.addGlobalLink(lnk);
+              }
+            }
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+          }
 
           // form data
-          IType form = getPage().getType();
           IType formDataType = null;
           try {
             formDataType = ScoutTypeUtility.findFormDataForForm(form);
@@ -120,6 +139,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
             }
             serversAndShareds = serversAndSharedsSet.toArray(new IScoutBundle[serversAndSharedsSet.size()]);
           }
+
           // service
           String formRegex = "(I)?" + entityName + "(Process)?" + SdkProperties.SUFFIX_SERVICE;
           ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
@@ -154,7 +174,6 @@ public class FormPropertyPart extends JdtTypePropertyPart {
                 getForm().layout(true, true);
                 getForm().updateToolBar();
                 getForm().reflow(true);
-
               }
             }
           });

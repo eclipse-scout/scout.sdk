@@ -51,6 +51,7 @@ import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -85,6 +86,16 @@ public class ScoutTypeUtility extends TypeUtility {
   private ScoutTypeUtility() {
   }
 
+  /**
+   * Returns the immediate member types declared by the given type which are sub-types of the given super-type. The
+   * results is sorted using the order annotation of the types.
+   * 
+   * @param declaringType
+   *          The type whose immediate inner types should be returned.
+   * @param superType
+   *          The super-type for which all returned types must be a sub-type.
+   * @return the immediate member types declared by the given type which are sub-types of the given super-type.
+   */
   public static IType[] getInnerTypesOrdered(IType declaringType, IType superType) {
     return getInnerTypesOrdered(declaringType, superType, ScoutTypeComparators.getOrderAnnotationComparator());
   }
@@ -250,11 +261,10 @@ public class ScoutTypeUtility extends TypeUtility {
 
   /**
    * @return Returns <code>true</code> if the given type exists and if it is annotated with an
-   *         {@link RuntimeClasses#Replace} annotation.
-   * @since 3.8.2
+   *         {@link IRuntimeClasses#Replace} annotation.
    */
-  public static boolean isReplaceAnnotationPresent(IType type) {
-    IAnnotation annotation = JdtUtility.getAnnotation(type, RuntimeClasses.Replace);
+  public static boolean isReplaceAnnotationPresent(IAnnotatable element) {
+    IAnnotation annotation = JdtUtility.getAnnotation(element, RuntimeClasses.Replace);
     return TypeUtility.exists(annotation);
   }
 

@@ -97,17 +97,17 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     if (sharedBundle != null) {
       ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
       // formData
-      TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, Texts.get("LookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class)).setEnabled(false);
+      TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, Texts.get("LookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1).setEnabled(false);
       if (serverBundle != null) {
         // service interface
-        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface)).setEnabled(false);
+        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), 2).setEnabled(false);
       }
     }
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class)).setEnabled(false);
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public)).setEnabled(false);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1).setEnabled(false);
+      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2).setEnabled(false);
     }
 
     return rootNode;

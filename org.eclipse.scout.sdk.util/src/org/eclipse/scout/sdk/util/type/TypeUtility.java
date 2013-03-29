@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -119,28 +120,52 @@ public class TypeUtility {
     return getInnerTypes(type, filter, null);
   }
 
+  /**
+   * Returns the immediate member types declared by the given type. The results is filtered using the given filter and
+   * sorted using the given comparator.
+   * 
+   * @param type
+   *          The type whose immediate inner types should be returned.
+   * @param filter
+   *          the filter to apply or null
+   * @param comparator
+   *          the comparator to sort the result or null
+   * @return the immediate inner types declared in the given type.
+   */
   public static IType[] getInnerTypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
-    Collection<IType> unsortedTypes = new ArrayList<IType>();
+    Set<IType> result = null;
+    if (comparator == null) {
+      result = new HashSet<IType>();
+    }
+    else {
+      result = new TreeSet<IType>(comparator);
+    }
+
     try {
       for (IType subType : type.getTypes()) {
         if (filter == null || filter.accept(subType)) {
-          unsortedTypes.add(subType);
+          result.add(subType);
         }
       }
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not get inner types of '" + type.getFullyQualifiedName() + "'", e);
     }
-    if (comparator == null) {
-      return unsortedTypes.toArray(new IType[unsortedTypes.size()]);
-    }
-    else {
-      TreeSet<IType> sortedTypes = new TreeSet<IType>(comparator);
-      sortedTypes.addAll(unsortedTypes);
-      return sortedTypes.toArray(new IType[sortedTypes.size()]);
-    }
+    return result.toArray(new IType[result.size()]);
   }
 
+  /**
+   * Returns the immediate member types declared by the given type which are sub-types of the given super-type. The
+   * results is sorted using the given comparator.
+   * 
+   * @param declaringType
+   *          The type whose immediate inner types should be returned.
+   * @param superType
+   *          The super-type for which all returned types must be a sub-type.
+   * @param comparator
+   *          the comparator to sort the result.
+   * @return the immediate member types declared by the given type which are sub-types of the given super-type.
+   */
   public static IType[] getInnerTypesOrdered(IType declaringType, IType superType, Comparator<IType> comparator) {
     ITypeHierarchy combinedTypeHierarchy = getLocalTypeHierarchy(declaringType);
     IType[] allSubtypes = TypeUtility.getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(superType, combinedTypeHierarchy), comparator);

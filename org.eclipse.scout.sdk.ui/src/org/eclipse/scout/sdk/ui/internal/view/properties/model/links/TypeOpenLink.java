@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,6 @@ public class TypeOpenLink extends AbstractLink {
       ScoutSdkUi.logWarning("could not read flags of java element '" + m_type.getElementName() + "'.", e);
     }
     setImage(img);
-
   }
 
   /**
@@ -59,7 +58,5 @@ public class TypeOpenLink extends AbstractLink {
     catch (Exception ex) {
       ScoutSdkUi.logWarning("could not open java element '" + getType().getFullyQualifiedName() + "' in editor.", ex);
     }
-
   }
-
 }

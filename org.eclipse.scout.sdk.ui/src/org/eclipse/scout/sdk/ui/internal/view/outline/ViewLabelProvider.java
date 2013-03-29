@@ -31,8 +31,6 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
   private Composite m_parent;
   private Font m_fontPlain;// always null
   private Font m_fontPlainItalic;
-  private Font m_fontBold;
-  private Font m_fontBoldItalic;
   private final ScoutExplorerPart m_explorerPart;
 
   public ViewLabelProvider(Composite parent, ScoutExplorerPart explorerPart) {
@@ -90,39 +88,23 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
     if (element instanceof IPage) {
       IPage p = (IPage) element;
       IPageFilter filter = m_explorerPart.getPageFilter(p);
-      if (p.isFolder()) {
-        if (filter == null || filter.isEmpty()) {
-          return m_fontPlain;
-        }
-        else {
-          return m_fontPlainItalic;
-        }
+      if (filter == null || filter.isEmpty()) {
+        return m_fontPlain;
       }
       else {
-        if (filter == null || filter.isEmpty()) {
-          return m_fontBold;
-        }
-        else {
-          return m_fontBoldItalic;
-        }
+        return m_fontPlainItalic;
       }
     }
     return null;
   }
 
   private void ensureFontCache() {
-    if (m_fontBold == null || m_fontBoldItalic == null || m_fontPlainItalic == null) {
+    if (m_fontPlainItalic == null) {
       try {
         Font f = m_parent.getFont();
         if (f != null) {
           FontData[] d = f.getFontData();
           if (d != null && d.length > 0) {
-            if (m_fontBold == null) {
-              m_fontBold = new Font(f.getDevice(), d[0].getName(), d[0].getHeight(), SWT.BOLD);
-            }
-            if (m_fontBoldItalic == null) {
-              m_fontBoldItalic = new Font(f.getDevice(), d[0].getName(), d[0].getHeight(), SWT.BOLD | SWT.ITALIC);
-            }
             if (m_fontPlainItalic == null) {
               m_fontPlainItalic = new Font(f.getDevice(), d[0].getName(), d[0].getHeight(), SWT.ITALIC);
             }
