@@ -20,13 +20,22 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.util.NamingUtility;
 
 /**
- * <h3>{@link IScoutBundle}</h3> Represents a plug-in having a dependency on scout runtime bundles.
+ * <h3>{@link IScoutBundle}</h3><br>
+ * Represents a plug-in having a dependency on scout runtime bundles.<br>
+ * <br>
+ * Do not hold references to IScoutBundle instances without handling the corresponding scout workspace events: If the
+ * bundle model (e.g. a manifest file or the target platform) changes in the workspace, this may trigger a complete
+ * re-build of the scout bundle graph. On a re-build all existing scout bundle instances are discarded and replaced by
+ * new instances matching the new workspace situation. Ensure to listen for the corresponding scout workspace events
+ * (see {@link IScoutWorkspace} and {@link IScoutWorkspaceListener} acquired from {@link ScoutSdkCore}) to replace your
+ * instances when necessary.
  * 
  * @author mvi
  * @since 3.9.0 27.02.2013

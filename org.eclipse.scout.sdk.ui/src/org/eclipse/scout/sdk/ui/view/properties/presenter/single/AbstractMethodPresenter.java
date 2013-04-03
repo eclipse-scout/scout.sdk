@@ -238,11 +238,11 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   @Override
   public void setEnabled(boolean enabled) {
     if (!isDisposed()) {
-      if (m_errorContent != null) {
+      if (m_errorContent != null && !m_errorContent.isDisposed()) {
         m_errorContent.setEnabled(enabled);
       }
       m_deleteButton.setEnabled(enabled);
-      if (m_labelLink != null) {
+      if (m_labelLink != null && !m_labelLink.isDisposed()) {
         m_labelLink.setEnabled(true); // always allowed to click the label
       }
     }
