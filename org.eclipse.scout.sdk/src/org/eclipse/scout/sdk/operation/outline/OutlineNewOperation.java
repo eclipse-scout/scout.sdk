@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.outline;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -39,6 +39,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -158,13 +159,13 @@ public class OutlineNewOperation implements IOperation {
             matcher = Pattern.compile("\\s*return\\s*new\\s*Class\\[\\]\\{([a-zA-Z0-9\\.\\,\\s\\_\\-]*)\\}\\s*\\;", Pattern.MULTILINE).matcher(methodBody.get());
             if (matcher.find()) {
               String list = matcher.group(1).trim();
-              boolean appendComma = !list.endsWith(",");
+              boolean appendComma = !list.endsWith(",") && !(list.length() == 0);
               int pos = matcher.end(1);
               String addSource = validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName())) + ".class";
               if (methodBody.get().contains(addSource)) {
                 return;
               }
-              InsertEdit edit = new InsertEdit(pos, (appendComma ? ", " : "") + "\n" + addSource);
+              InsertEdit edit = new InsertEdit(pos, (appendComma ? ", " : "") + addSource);
               try {
                 edit.apply(methodBody);
               }
@@ -187,12 +188,8 @@ public class OutlineNewOperation implements IOperation {
         @Override
         protected String createMethodBody(IImportValidator validator) throws JavaModelException {
           StringBuilder builder = new StringBuilder();
-          String arrayListRef = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
           String outlineRef = validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName()));
-          String iOutlineRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.IOutline));
-          builder.append(arrayListRef + "<Class<? extends " + iOutlineRef + ">> outlines = new " + arrayListRef + "<Class<? extends " + iOutlineRef + ">>();\n");
-          builder.append("outlines.add(" + outlineRef + ".class);\n");
-          builder.append("return outlines.toArray(new Class[outlines.size()]);");
+          builder.append("return new Class[]{" + outlineRef + ".class};");
           return builder.toString();
         }
       };
@@ -218,12 +215,21 @@ public class OutlineNewOperation implements IOperation {
       }
     }
 
+    ITypeHierarchy desktopSuperHierarchy = TypeUtility.getSuperTypeHierarchy(getDesktopType());
+    final boolean isExtension = desktopSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension));
     OrderedInnerTypeNewOperation outlineButtonOp = new OrderedInnerTypeNewOperation(className, getDesktopType(), false) {
       @Override
       protected void createContent(StringBuilder source, IImportValidator validator) {
         source.append("public ");
         source.append(className);
-        source.append("() { super(Desktop.this, ");
+        source.append("() { super(");
+        if (isExtension) {
+          source.append("getCoreDesktop()");
+        }
+        else {
+          source.append("Desktop.this");
+        }
+        source.append(", ");
         source.append(validator.getTypeName(SignatureCache.createTypeSignature(OutlineNewOperation.this.getTypeName())));
         source.append(".class); }");
       }

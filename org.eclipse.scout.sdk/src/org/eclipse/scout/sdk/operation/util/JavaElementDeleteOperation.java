@@ -89,6 +89,7 @@ public class JavaElementDeleteOperation implements IOperation {
     for (ICompilationUnit icu : icuForOrganizeImports) {
       OrganizeImportOperation op = new OrganizeImportOperation(icu);
       op.run(monitor, workingCopyManager);
+      workingCopyManager.reconcile(icu, monitor);
     }
   }
 

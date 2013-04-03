@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.outline;
 
+import java.util.HashSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,14 +48,27 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class OutlineDeleteOperation extends JavaElementDeleteOperation {
 
+  private final IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
+  private final IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+
   private final IType[] m_desktops;
   private final IType m_outline;
 
   public OutlineDeleteOperation(IType outlineType) {
-    IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
     IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
+    IPrimaryTypeTypeHierarchy pthExt = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
+
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(outlineType.getJavaProject()), TypeFilters.getInWorkspaceFilter());
-    m_desktops = pth.getAllSubtypes(iDesktop, filter);
+
+    HashSet<IType> desktopsAndDesktopExtensions = new HashSet<IType>();
+    for (IType desktop : pth.getAllSubtypes(iDesktop, filter)) {
+      desktopsAndDesktopExtensions.add(desktop);
+    }
+    for (IType desktopExtension : pthExt.getAllSubtypes(iDesktopExtension, filter)) {
+      desktopsAndDesktopExtensions.add(desktopExtension);
+    }
+
+    m_desktops = desktopsAndDesktopExtensions.toArray(new IType[desktopsAndDesktopExtensions.size()]);
     m_outline = outlineType;
     setMembers(new IJavaElement[]{m_outline});
   }
@@ -65,12 +79,9 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
 
     for (IType desktop : m_desktops) {
       workingCopyManager.register(desktop.getCompilationUnit(), monitor);
+
       removeOutlineFromDesktop(desktop, monitor, workingCopyManager);
 
-      /*JavaElementFormatOperation desktopFormatOp = new JavaElementFormatOperation(desktop, true);
-      desktopFormatOp.validate();
-      desktopFormatOp.run(monitor, workingCopyManager);
-      */
       SourceFormatOperation op = new SourceFormatOperation(desktop);
       op.validate();
       op.run(monitor, workingCopyManager);
