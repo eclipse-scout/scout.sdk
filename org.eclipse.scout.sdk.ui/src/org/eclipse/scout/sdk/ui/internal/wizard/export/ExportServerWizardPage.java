@@ -35,7 +35,7 @@ public class ExportServerWizardPage extends AbstractExportProductWizardPage {
     if (!StringUtility.hasText(m_warFileName.getModifiableText())) {
       String warName = findServerWarName();
       if (warName == null) {
-        warName = getWizard().getProjectAlias();
+        warName = getWizard().getProjectAlias() + "_server";
       }
       m_warFileName.setText(warName);
     }
