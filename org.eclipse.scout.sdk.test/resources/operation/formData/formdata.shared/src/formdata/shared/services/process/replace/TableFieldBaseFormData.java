@@ -1,6 +1,7 @@
 package formdata.shared.services.process.replace;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+import formdata.shared.services.process.AbstractPersonTableFieldData;
 import formdata.shared.services.process.AbstractAddressTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
@@ -23,6 +24,10 @@ public class TableFieldBaseFormData extends AbstractFormData {
     return getFieldByClass(NoTable.class);
   }
 
+  public PersonTable getPersonTable() {
+    return getFieldByClass(PersonTable.class);
+  }
+
   public Table getTable() {
     return getFieldByClass(Table.class);
   }
@@ -43,11 +48,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
-    public AddressTableRowData rowAt(int idx) {
-      return (AddressTableRowData) super.rowAt(idx);
-    }
-
-    @Override
     public AddressTableRowData addRow() {
       return (AddressTableRowData) super.addRow();
     }
@@ -55,6 +55,11 @@ public class TableFieldBaseFormData extends AbstractFormData {
     @Override
     public AddressTableRowData addRow(int rowState) {
       return (AddressTableRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public AddressTableRowData rowAt(int idx) {
+      return (AddressTableRowData) super.rowAt(idx);
     }
 
     @Override
@@ -73,7 +78,7 @@ public class TableFieldBaseFormData extends AbstractFormData {
       public AddressTableRowData() {
       }
 
-      public static final String PROP_CITY = "city";
+      public static final String city = "city";
       private String m_city;
 
       public String getCity() {
@@ -102,11 +107,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
-    public EmptyTableRowData rowAt(int idx) {
-      return (EmptyTableRowData) super.rowAt(idx);
-    }
-
-    @Override
     public EmptyTableRowData addRow() {
       return (EmptyTableRowData) super.addRow();
     }
@@ -114,6 +114,11 @@ public class TableFieldBaseFormData extends AbstractFormData {
     @Override
     public EmptyTableRowData addRow(int rowState) {
       return (EmptyTableRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public EmptyTableRowData rowAt(int idx) {
+      return (EmptyTableRowData) super.rowAt(idx);
     }
 
     @Override
@@ -153,6 +158,13 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
   }
 
+  public static class PersonTable extends AbstractPersonTableFieldData {
+    private static final long serialVersionUID = 1L;
+
+    public PersonTable() {
+    }
+  }
+
   public static class Table extends AbstractTableFieldBeanData {
     private static final long serialVersionUID = 1L;
 
@@ -169,11 +181,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
-    public TableRowData rowAt(int idx) {
-      return (TableRowData) super.rowAt(idx);
-    }
-
-    @Override
     public TableRowData addRow() {
       return (TableRowData) super.addRow();
     }
@@ -181,6 +188,11 @@ public class TableFieldBaseFormData extends AbstractFormData {
     @Override
     public TableRowData addRow(int rowState) {
       return (TableRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public TableRowData rowAt(int idx) {
+      return (TableRowData) super.rowAt(idx);
     }
 
     @Override
@@ -199,8 +211,8 @@ public class TableFieldBaseFormData extends AbstractFormData {
       public TableRowData() {
       }
 
-      public static final String PROP_FIRST = "first";
-      public static final String PROP_SECOND = "second";
+      public static final String first = "first";
+      public static final String second = "second";
       private String m_first;
       private String m_second;
 

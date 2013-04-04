@@ -23,6 +23,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 import formdata.client.ui.template.formfield.AbstractAddressTableField;
+import formdata.client.ui.template.formfield.AbstractPersonTableField;
 import formdata.shared.services.process.replace.TableFieldBaseFormData;
 
 @FormData(value = TableFieldBaseFormData.class, sdkCommand = SdkCommand.CREATE)
@@ -85,5 +86,8 @@ public class TableFieldBaseForm extends AbstractForm {
       }
     }
 
+    @Order(40.0)
+    public class PersonTableField extends AbstractPersonTableField {
+    }
   }
 }
