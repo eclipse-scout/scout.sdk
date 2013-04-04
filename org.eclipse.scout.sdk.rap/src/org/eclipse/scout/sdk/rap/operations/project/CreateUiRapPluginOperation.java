@@ -69,6 +69,8 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
       new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/html-styles.css", project, "web-resources/html-styles.css").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/loading.gif", project, "web-resources/loading.gif").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/startup-body.html", project, "web-resources/startup-body.html").run(monitor, workingCopyManager);
+      new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/logout.html", project, "web-resources/logout.html").run(monitor, workingCopyManager);
+
       String destPathPref = "src/" + (getCreatedProject().getName().replace('.', '/')) + "/";
       new InstallJavaFileOperation("templates/ui.rap/src/Activator.java", destPathPref + "Activator.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
       new InstallJavaFileOperation("templates/ui.rap/src/StandaloneRwtEnvironment.java", destPathPref + "StandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
