@@ -26,8 +26,11 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
+import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
+import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.PlatformUI;
 
 public class ProjectsTablePage extends AbstractPage {
 
@@ -49,7 +52,23 @@ public class ProjectsTablePage extends AbstractPage {
     public void propertyChange(PropertyChangeEvent event) {
       if (ScoutExplorerSettingsSupport.PREF_BUNDLE_DISPLAY_STYLE_KEY.equals(event.getProperty()) ||
           ScoutExplorerSettingsSupport.PREF_SHOW_FRAGMENTS_KEY.equals(event.getProperty()) ||
-          ScoutExplorerSettingsSupport.PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty())) {
+          ScoutExplorerSettingsSupport.PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty()) ||
+          ScoutExplorerSettingsSupport.PREF_HIDDEN_BUNDLES_TYPES.equals(event.getProperty())) {
+        markStructureDirty();
+      }
+      else if (ScoutExplorerSettingsSupport.PREF_HIDDEN_WORKING_SETS.equals(event.getProperty()) ||
+          ScoutExplorerSettingsSupport.PREF_WORKING_SETS_ORDER.equals(event.getProperty())) {
+        if (ScoutExplorerSettingsSupport.BundlePresentation.WorkingSet.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+          markStructureDirty();
+        }
+      }
+    }
+  }; // end IPropertyChangeListener
+
+  private final IPropertyChangeListener m_workingSetConfigChangeListener = new IPropertyChangeListener() {
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+      if (ScoutExplorerSettingsSupport.BundlePresentation.WorkingSet.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
         markStructureDirty();
       }
     }
@@ -60,12 +79,14 @@ public class ProjectsTablePage extends AbstractPage {
     setName(Texts.get("RootNodeName"));
     ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
     ScoutSdkUi.getDefault().getPreferenceStore().addPropertyChangeListener(m_explorerConfigChangeListener);
+    PlatformUI.getWorkbench().getWorkingSetManager().addPropertyChangeListener(m_workingSetConfigChangeListener);
   }
 
   @Override
   public void unloadPage() {
     ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(m_workspaceListener);
     ScoutSdkUi.getDefault().getPreferenceStore().removePropertyChangeListener(m_explorerConfigChangeListener);
+    PlatformUI.getWorkbench().getWorkingSetManager().removePropertyChangeListener(m_workingSetConfigChangeListener);
   }
 
   @Override
@@ -82,24 +103,33 @@ public class ProjectsTablePage extends AbstractPage {
   public void refresh(boolean clearCache) {
     if (clearCache) {
       ScoutWorkspace.getInstance().rebuildGraph();
+      // here the graph is rebuilt asynchronously. on completion the table page is refreshed because m_workspaceListener is fired.
     }
-    super.refresh(clearCache);
+    else {
+      super.refresh(clearCache);
+    }
   }
 
   @Override
   public void loadChildrenImpl() {
     if (ScoutExplorerSettingsSupport.BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       // flat display
-      IScoutBundle[] allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutExplorerSettingsBundleFilter.get());
+      IScoutBundle[] allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutExplorerSettingsBundleFilter.get(), ScoutBundleComparators.getSymbolicNameAscComparator());
       for (IScoutBundle b : allBundles) {
-        createBundlePage(b);
+        createBundlePage(this, b);
       }
     }
     else if (ScoutExplorerSettingsSupport.BundlePresentation.Hierarchical.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       // hierarchical display
       for (IScoutBundle root : ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(
-          ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutExplorerSettingsBundleFilter.get()))) {
-        createBundlePage(root);
+          ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutExplorerSettingsBundleFilter.get()), ScoutBundleComparators.getSymbolicNameAscComparator())) {
+        createBundlePage(this, root);
+      }
+    }
+    else if (ScoutExplorerSettingsSupport.BundlePresentation.WorkingSet.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+      // show working sets
+      for (IWorkingSet ws : ScoutExplorerSettingsSupport.get().getScoutWorkingSets(false)) {
+        new ScoutWorkingSetTablePage(this, ws);
       }
     }
     else {
@@ -112,11 +142,13 @@ public class ProjectsTablePage extends AbstractPage {
     }
   }
 
-  private void createBundlePage(IScoutBundle b) {
-    ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(b.getType());
-    if (childExt != null) {
-      ScoutBundleNode rootNode = new ScoutBundleNode(b, childExt);
-      rootNode.createBundlePage(this);
+  public static void createBundlePage(IPage parentPage, IScoutBundle b) {
+    if (b != null) {
+      ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(b.getType());
+      if (childExt != null) {
+        ScoutBundleNode rootNode = new ScoutBundleNode(b, childExt);
+        rootNode.createBundlePage(parentPage);
+      }
     }
   }
 

@@ -36,7 +36,11 @@ public class ScoutExplorerSettingsBundleFilter implements IScoutBundleFilter {
     if (bundle == null) {
       return false;
     }
-    return acceptBinaryBundleFilter(bundle) && acceptFragmentFilter(bundle);
+    return acceptBinaryBundleFilter(bundle) && acceptFragmentFilter(bundle) && acceptBundleTypesFilter(bundle);
+  }
+
+  private boolean acceptBundleTypesFilter(IScoutBundle bundle) {
+    return !ScoutExplorerSettingsSupport.get().isBundleTypeHidden(bundle.getType());
   }
 
   private boolean acceptBinaryBundleFilter(IScoutBundle bundle) {

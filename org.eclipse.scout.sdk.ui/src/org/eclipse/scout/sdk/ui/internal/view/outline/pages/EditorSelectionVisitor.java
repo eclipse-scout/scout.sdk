@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTab
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.BundleNodeGroupTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutWorkingSetTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientLookupCallTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientServiceNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.ClientServiceTablePage;
@@ -247,6 +248,9 @@ public class EditorSelectionVisitor implements INodeVisitor {
     }
     else if (page instanceof AbstractBundleNodeTablePage) {
       return visitBundleNodePage(((AbstractBundleNodeTablePage) page).getScoutBundle());
+    }
+    else if (page instanceof ScoutWorkingSetTablePage) {
+      return CONTINUE;
     }
     else if (page instanceof ClientSessionNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);

@@ -928,4 +928,30 @@
             technology="scout.technology.laf.rayo">
       </handler>
    </extension>
+   <extension
+         point="org.eclipse.ui.workingSets">
+      <workingSet
+            icon="resources/icons/scoutWorkingSet.png"
+            id="org.eclipse.scout.sdk.ui.workingSet"
+            name="Scout Bundles"
+            pageClass="org.eclipse.scout.sdk.ui.workingset.ScoutWorkingSetWizardPage">
+      </workingSet>
+   </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.eclipse.scout.sdk.ui.workingset.ScoutBundleWorkingSetFactory"
+            id="org.eclipse.scout.sdk.ui.workingset.factory">
+      </factory>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.scout.sdk.workspace.IScoutBundle"
+            class="org.eclipse.scout.sdk.ui.workingset.ScoutBundleAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.IPersistableElement">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

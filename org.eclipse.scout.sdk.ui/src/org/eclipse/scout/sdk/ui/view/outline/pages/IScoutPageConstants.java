@@ -98,6 +98,7 @@ public interface IScoutPageConstants {
   String BUNDLE_NODE_GROUP_TABLE_PAGE = "org.eclipse.scout.sdk.page.BundleNodeGroupTablePage";
   String RADIO_BUTTON_GROUP_NODE_PAGE = "org.eclipse.scout.sdk.page.RadioButtonGroupNodePage";
 
+  String SCOUT_WORKING_SET_TABLE_PAGE = "org.eclipse.scout.sdk.page.ScoutWorkingSetTablePage";
   String SEQUENCE_BOX_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.SequenceBoxFieldNodePage";
   String SERVER_NODE_PAGE = "org.eclipse.scout.sdk.page.ServerNodePage";
   String SERVER_SESSION_NODE_PAGE = "org.eclipse.scout.sdk.page.ServerSessionNodePage";

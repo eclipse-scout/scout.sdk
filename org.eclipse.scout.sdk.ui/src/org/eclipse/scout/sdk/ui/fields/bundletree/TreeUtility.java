@@ -101,24 +101,38 @@ public class TreeUtility {
 
   private static void recAddChildNodes(ITreeNode node, Set<? extends IScoutBundle> bundles, ITreeNodeFilter filter) {
     for (IScoutBundle b : bundles) {
-      ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(b.getType());
-      if (uiExt != null) {
-        TreeNode childNode = new TreeNode(b.getType(), b.getSymbolicName(), b);
-        childNode.setOrderNr(Integer.MAX_VALUE - Math.abs(uiExt.getOrderNumber())); // ensure the bundle nodes are at the end of all other nodes on the same level
-        childNode.setBold(false);
-        ImageDescriptor icon = uiExt.getIcon();
-        if (b.isBinary()) {
-          icon = ScoutSdkUi.getImageDescriptor(icon, SdkIcons.BinaryDecorator, IDecoration.BOTTOM_LEFT);
-          childNode.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
-        }
-        childNode.setImage(icon);
-        if (filter.accept(childNode)) {
-          node.addChild(childNode);
-          childNode.setParent(node);
-          recAddChildNodes(childNode, b.getDirectChildBundles(), filter);
-        }
+      ITreeNode childNode = createBundleTreeNode(node, b, filter);
+      if (childNode != null) {
+        recAddChildNodes(childNode, b.getDirectChildBundles(), filter);
       }
     }
+  }
+
+  public static ITreeNode createBundleTreeNode(ITreeNode parent, IScoutBundle b) {
+    return createBundleTreeNode(parent, b, null);
+  }
+
+  private static ITreeNode createBundleTreeNode(ITreeNode parent, IScoutBundle b, ITreeNodeFilter filter) {
+    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(b.getType());
+    TreeNode childNode = null;
+    if (uiExt != null) {
+      childNode = new TreeNode(b.getType(), b.getSymbolicName(), b);
+      childNode.setOrderNr(Integer.MAX_VALUE - Math.abs(uiExt.getOrderNumber())); // ensure the bundle nodes are at the end of all other nodes on the same level
+      if (filter != null && !filter.accept(childNode)) {
+        return null; // the created node does not match the filter
+      }
+
+      childNode.setBold(false);
+      ImageDescriptor icon = uiExt.getIcon();
+      if (b.isBinary()) {
+        icon = ScoutSdkUi.getImageDescriptor(icon, SdkIcons.BinaryDecorator, IDecoration.BOTTOM_LEFT);
+        childNode.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW));
+      }
+      childNode.setImage(icon);
+      parent.addChild(childNode);
+      childNode.setParent(parent);
+    }
+    return childNode;
   }
 
   public static ITreeNode createNode(ITreeNode parentNode, String type, String name, ImageDescriptor img) {

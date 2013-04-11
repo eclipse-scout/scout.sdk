@@ -29,6 +29,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
   private final P_GroupedPresentationAction m_grouped;
   private final P_HierarchicalPresentationAction m_hierarchical;
   private final P_FlatPresentationAction m_flat;
+  private final P_WorkingSetPresentationAction m_workingSet;
 
   public ScoutBundlePresentationActionGroup() {
     super(Texts.get("ScoutBundlePresentation"));
@@ -36,15 +37,18 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
     m_grouped = new P_GroupedPresentationAction();
     m_hierarchical = new P_HierarchicalPresentationAction();
     m_flat = new P_FlatPresentationAction();
+    m_workingSet = new P_WorkingSetPresentationAction();
 
     BundlePresentation initial = ScoutExplorerSettingsSupport.get().getBundlePresentation();
     m_grouped.setChecked(BundlePresentation.Grouped.equals(initial));
     m_hierarchical.setChecked(BundlePresentation.Hierarchical.equals(initial));
     m_flat.setChecked(BundlePresentation.Flat.equals(initial));
+    m_workingSet.setChecked(BundlePresentation.WorkingSet.equals(initial));
 
     add(m_grouped);
     add(m_hierarchical);
     add(m_flat);
+    add(m_workingSet);
   }
 
   private class P_GroupedPresentationAction extends Action {
@@ -58,6 +62,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
       P_GroupedPresentationAction.this.setChecked(true);
       m_hierarchical.setChecked(false);
       m_flat.setChecked(false);
+      m_workingSet.setChecked(false);
       ScoutExplorerSettingsSupport.get().setBundlePresentation(BundlePresentation.Grouped);
     }
   }
@@ -73,6 +78,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
       P_HierarchicalPresentationAction.this.setChecked(true);
       m_grouped.setChecked(false);
       m_flat.setChecked(false);
+      m_workingSet.setChecked(false);
       ScoutExplorerSettingsSupport.get().setBundlePresentation(BundlePresentation.Hierarchical);
     }
   }
@@ -88,7 +94,24 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
       P_FlatPresentationAction.this.setChecked(true);
       m_grouped.setChecked(false);
       m_hierarchical.setChecked(false);
+      m_workingSet.setChecked(false);
       ScoutExplorerSettingsSupport.get().setBundlePresentation(BundlePresentation.Flat);
+    }
+  }
+
+  private class P_WorkingSetPresentationAction extends Action {
+    private P_WorkingSetPresentationAction() {
+      super(Texts.get("WorkingSets"));
+      setImageDescriptor(ScoutSdkUi.getImageDescriptor(SdkIcons.ScoutWorkingSet));
+    }
+
+    @Override
+    public void run() {
+      P_WorkingSetPresentationAction.this.setChecked(true);
+      m_grouped.setChecked(false);
+      m_hierarchical.setChecked(false);
+      m_flat.setChecked(false);
+      ScoutExplorerSettingsSupport.get().setBundlePresentation(BundlePresentation.WorkingSet);
     }
   }
 }

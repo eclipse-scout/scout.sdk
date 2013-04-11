@@ -114,11 +114,6 @@ public interface ITreeNode {
   void setEnabled(boolean enabled);
 
   /**
-   * @return
-   */
-  int getOrderNr();
-
-  /**
    * @param checkable
    */
   void setCheckable(boolean checkable);
@@ -144,5 +139,16 @@ public interface ITreeNode {
    *          the new background color of this node
    */
   void setBackground(Color background);
+
+  /**
+   * @return the order of this node
+   */
+  int getOrderNr();
+
+  /**
+   * @param orderNr
+   *          the new order of this node.
+   */
+  void setOrderNr(int orderNr);
 
 }

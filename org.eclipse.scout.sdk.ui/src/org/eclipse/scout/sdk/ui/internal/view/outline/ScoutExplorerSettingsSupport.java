@@ -10,10 +10,23 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.ui.IWorkingSet;
+import org.eclipse.ui.IWorkingSetManager;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link ScoutExplorerSettingsSupport}</h3>
@@ -28,16 +41,23 @@ public final class ScoutExplorerSettingsSupport {
   public static enum BundlePresentation {
     Grouped,
     Hierarchical,
-    Flat
+    Flat,
+    WorkingSet
   }
+
+  public final static String SCOUT_WOKRING_SET_ID = "org.eclipse.scout.sdk.ui.workingSet";
 
   public final static String PREF_BUNDLE_DISPLAY_STYLE_KEY = "org.eclipse.scout.sdk.ui.view.scoutExplorer.bundleDisplayStyle";
   public final static String PREF_SHOW_FRAGMENTS_KEY = "org.eclipse.scout.sdk.view.ui.scoutExplorer.showFragments";
   public final static String PREF_SHOW_BINARY_BUNDLES_KEY = "org.eclipse.scout.sdk.ui.view.scoutExplorer.showBinaryBundles";
+  public final static String PREF_HIDDEN_BUNDLES_TYPES = "org.eclipse.scout.sdk.ui.view.scoutExplorer.hiddenBundleTypes";
+  public final static String PREF_HIDDEN_WORKING_SETS = "org.eclipse.scout.sdk.ui.view.scoutExplorer.hiddenWorkingSets";
+  public final static String PREF_WORKING_SETS_ORDER = "org.eclipse.scout.sdk.ui.view.scoutExplorer.workingSetsOrder";
 
   private final static String DISPLAY_STYLE_GROUPED = "grouped"; // default
   private final static String DISPLAY_STYLE_HIERARCHICAL = "hierarchical";
   private final static String DISPLAY_STYLE_FLAT = "flat";
+  private final static String DISPLAY_STYLE_WORKING_SET = "workingSet";
 
   private final static String SHOW_FRAGMENTS_ENABLED = "true";
   private final static String SHOW_FRAGMENTS_DISABLED = "false"; // default
@@ -45,22 +65,30 @@ public final class ScoutExplorerSettingsSupport {
   private final static String SHOW_BINARY_BUNDLES_ENABLED = "true"; // default
   private final static String SHOW_BINARY_BUNDLES_DISABLED = "false";
 
+  private final static char DELIMITER = ',';
+
   private BundlePresentation m_bundlePresentation;
   private boolean m_showFragments;
   private boolean m_showBinaryBundles;
+  private Set<String> m_hiddenBundleTypes;
+  private Set<String> m_hiddenWorkingSets;
+  private String[] m_workingSetsOrder;
 
   public static ScoutExplorerSettingsSupport get() {
     return INSTANCE;
   }
 
   private ScoutExplorerSettingsSupport() {
-    IPreferenceStore preferenceStore = ScoutSdkUi.getDefault().getPreferenceStore();
+    IPreferenceStore preferenceStore = getStore();
     preferenceStore.addPropertyChangeListener(new IPropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent event) {
         if (PREF_BUNDLE_DISPLAY_STYLE_KEY.equals(event.getProperty()) ||
             PREF_SHOW_FRAGMENTS_KEY.equals(event.getProperty()) ||
-            PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty())) {
+            PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty()) ||
+            PREF_HIDDEN_BUNDLES_TYPES.equals(event.getProperty()) ||
+            PREF_HIDDEN_WORKING_SETS.equals(event.getProperty()) ||
+            PREF_WORKING_SETS_ORDER.equals(event.getProperty())) {
           readFromStore();
         }
       }
@@ -68,8 +96,8 @@ public final class ScoutExplorerSettingsSupport {
     readFromStore();
   }
 
-  private void readFromStore() {
-    IPreferenceStore preferenceStore = ScoutSdkUi.getDefault().getPreferenceStore();
+  private synchronized void readFromStore() {
+    IPreferenceStore preferenceStore = getStore();
 
     String displayStyle = preferenceStore.getString(PREF_BUNDLE_DISPLAY_STYLE_KEY);
     setBundlePresentation(parseBundlePresentation(displayStyle));
@@ -79,6 +107,58 @@ public final class ScoutExplorerSettingsSupport {
 
     String showBinaryBundles = preferenceStore.getString(PREF_SHOW_BINARY_BUNDLES_KEY);
     setShowBinaryBundles(!SHOW_BINARY_BUNDLES_DISABLED.equals(showBinaryBundles));
+
+    m_hiddenBundleTypes = parseListProperty(PREF_HIDDEN_BUNDLES_TYPES);
+
+    m_hiddenWorkingSets = parseListProperty(PREF_HIDDEN_WORKING_SETS);
+
+    Set<String> list = parseListProperty(PREF_WORKING_SETS_ORDER);
+    m_workingSetsOrder = list.toArray(new String[list.size()]);
+  }
+
+  private static Set<String> parseListProperty(String propertyName) {
+    String prop = getStore().getString(propertyName);
+    String[] tokens = null;
+    if (StringUtility.hasText(prop)) {
+      tokens = prop.split("" + DELIMITER);
+    }
+    return toSet(tokens);
+  }
+
+  private static Set<String> toSet(String[] elements) {
+    Set<String> items = new LinkedHashSet<String>();
+    if (elements != null && elements.length > 0) {
+      for (String s : elements) {
+        if (StringUtility.hasText(s)) {
+          items.add(s.trim());
+        }
+      }
+    }
+    return items;
+  }
+
+  private static void storeListProperty(Iterable<String> oldItems, Iterable<String> newItems, String propertyName) {
+    if (CompareUtility.equals(oldItems, newItems)) {
+      return;
+    }
+
+    StringBuilder sb = new StringBuilder();
+    for (String s : newItems) {
+      if (StringUtility.hasText(s)) {
+        sb.append(s.trim());
+        sb.append(DELIMITER);
+      }
+    }
+
+    // remove ending delimiter if existing
+    if (sb.length() > 1) {
+      int lastPos = sb.length() - 1;
+      if (DELIMITER == sb.charAt(lastPos)) {
+        sb.deleteCharAt(lastPos);
+      }
+    }
+
+    persist(propertyName, sb.toString(), oldItems, newItems);
   }
 
   private static BundlePresentation parseBundlePresentation(String input) {
@@ -87,6 +167,9 @@ public final class ScoutExplorerSettingsSupport {
     }
     else if (DISPLAY_STYLE_HIERARCHICAL.equals(input)) {
       return BundlePresentation.Hierarchical;
+    }
+    else if (DISPLAY_STYLE_WORKING_SET.equals(input)) {
+      return BundlePresentation.WorkingSet;
     }
     return BundlePresentation.Grouped;
   }
@@ -98,54 +181,147 @@ public final class ScoutExplorerSettingsSupport {
     else if (BundlePresentation.Hierarchical.equals(input)) {
       return DISPLAY_STYLE_HIERARCHICAL;
     }
+    else if (BundlePresentation.WorkingSet.equals(input)) {
+      return DISPLAY_STYLE_WORKING_SET;
+    }
     return DISPLAY_STYLE_GROUPED;
   }
 
-  public BundlePresentation getBundlePresentation() {
+  private static IPreferenceStore getStore() {
+    return ScoutSdkUi.getDefault().getPreferenceStore();
+  }
+
+  private static void persist(String key, String value, Object oldVal, Object newVal) {
+    IPreferenceStore preferenceStore = getStore();
+    preferenceStore.putValue(key, value);
+    preferenceStore.firePropertyChangeEvent(key, oldVal, newVal);
+    // the store is automatically saved on workspace shutdown
+  }
+
+  public synchronized BundlePresentation getBundlePresentation() {
     return m_bundlePresentation;
   }
 
-  public void setBundlePresentation(BundlePresentation bundlePresentation) {
+  public synchronized void setBundlePresentation(BundlePresentation bundlePresentation) {
     BundlePresentation old = m_bundlePresentation;
     m_bundlePresentation = bundlePresentation;
 
     if (old != m_bundlePresentation) {
-      IPreferenceStore preferenceStore = ScoutSdkUi.getDefault().getPreferenceStore();
-      preferenceStore.putValue(PREF_BUNDLE_DISPLAY_STYLE_KEY, getBundlePresentationString(m_bundlePresentation));
-      preferenceStore.firePropertyChangeEvent(PREF_BUNDLE_DISPLAY_STYLE_KEY, old, m_bundlePresentation);
-      // the store is automatically saved on workspace shutdown
+      persist(PREF_BUNDLE_DISPLAY_STYLE_KEY, getBundlePresentationString(m_bundlePresentation), old, m_bundlePresentation);
     }
   }
 
-  public boolean isShowFragments() {
+  public synchronized boolean isShowFragments() {
     return m_showFragments;
   }
 
-  public void setShowFragments(boolean showFragments) {
+  public synchronized void setShowFragments(boolean showFragments) {
     boolean old = m_showFragments;
     m_showFragments = showFragments;
 
     if (old != m_showFragments) {
-      IPreferenceStore preferenceStore = ScoutSdkUi.getDefault().getPreferenceStore();
-      preferenceStore.putValue(PREF_SHOW_FRAGMENTS_KEY, showFragments ? SHOW_FRAGMENTS_ENABLED : SHOW_FRAGMENTS_DISABLED);
-      preferenceStore.firePropertyChangeEvent(PREF_SHOW_FRAGMENTS_KEY, old, m_showFragments);
-      // the store is automatically saved on workspace shutdown
+      persist(PREF_SHOW_FRAGMENTS_KEY, showFragments ? SHOW_FRAGMENTS_ENABLED : SHOW_FRAGMENTS_DISABLED, old, m_showFragments);
     }
   }
 
-  public boolean isShowBinaryBundles() {
+  public synchronized boolean isShowBinaryBundles() {
     return m_showBinaryBundles;
   }
 
-  public void setShowBinaryBundles(boolean showBinaryBundles) {
+  public synchronized void setShowBinaryBundles(boolean showBinaryBundles) {
     boolean old = m_showBinaryBundles;
     m_showBinaryBundles = showBinaryBundles;
 
     if (old != m_showBinaryBundles) {
-      IPreferenceStore preferenceStore = ScoutSdkUi.getDefault().getPreferenceStore();
-      preferenceStore.putValue(PREF_SHOW_BINARY_BUNDLES_KEY, m_showBinaryBundles ? SHOW_BINARY_BUNDLES_ENABLED : SHOW_BINARY_BUNDLES_DISABLED);
-      preferenceStore.firePropertyChangeEvent(PREF_SHOW_BINARY_BUNDLES_KEY, old, m_showBinaryBundles);
-      // the store is automatically saved on workspace shutdown
+      persist(PREF_SHOW_BINARY_BUNDLES_KEY, m_showBinaryBundles ? SHOW_BINARY_BUNDLES_ENABLED : SHOW_BINARY_BUNDLES_DISABLED, old, m_showBinaryBundles);
     }
+  }
+
+  public synchronized boolean isBundleTypeHidden(String type) {
+    return m_hiddenBundleTypes.contains(type);
+  }
+
+  public synchronized void addHiddenBundleType(String type) {
+    Set<String> old = new HashSet<String>(m_hiddenBundleTypes);
+    boolean added = m_hiddenBundleTypes.add(type);
+    if (added) {
+      storeListProperty(old, m_hiddenBundleTypes, PREF_HIDDEN_BUNDLES_TYPES);
+    }
+  }
+
+  public synchronized void removeHiddenBundleType(String type) {
+    Set<String> old = new HashSet<String>(m_hiddenBundleTypes);
+    boolean removed = m_hiddenBundleTypes.remove(type);
+    if (removed) {
+      storeListProperty(old, m_hiddenBundleTypes, PREF_HIDDEN_BUNDLES_TYPES);
+    }
+  }
+
+  public synchronized void setWorkingSetsOrder(IWorkingSet[] order) {
+    String[] oldOrder = m_workingSetsOrder;
+    String[] newOrder = new String[order.length];
+    for (int i = 0; i < newOrder.length; i++) {
+      newOrder[i] = order[i].getName();
+    }
+
+    if (CompareUtility.notEquals(oldOrder, newOrder)) {
+      m_workingSetsOrder = newOrder;
+      storeListProperty(toList(oldOrder), toList(m_workingSetsOrder), PREF_WORKING_SETS_ORDER);
+    }
+  }
+
+  private static <T> List<T> toList(T[] elements) {
+    ArrayList<T> result = new ArrayList<T>();
+    if (elements != null && elements.length > 0) {
+      for (T e : elements) {
+        result.add(e);
+      }
+    }
+    return result;
+  }
+
+  private int getOrder(String workingSetName) {
+    for (int i = 0; i < m_workingSetsOrder.length; i++) {
+      if (CompareUtility.equals(m_workingSetsOrder[i], workingSetName)) {
+        return i;
+      }
+    }
+    return Integer.MAX_VALUE; // if undefined, put them to the end
+  }
+
+  public synchronized void setHiddenScoutWorkingSets(IWorkingSet[] hiddenSets) {
+    Set<String> old = new HashSet<String>(m_hiddenWorkingSets);
+    Set<String> newHidden = new HashSet<String>(hiddenSets.length);
+    for (IWorkingSet s : hiddenSets) {
+      newHidden.add(s.getName());
+    }
+
+    if (CompareUtility.notEquals(old, newHidden)) {
+      m_hiddenWorkingSets = newHidden;
+      storeListProperty(old, m_hiddenWorkingSets, PREF_HIDDEN_WORKING_SETS);
+    }
+  }
+
+  public synchronized IWorkingSet[] getScoutWorkingSets(boolean includeHidden) {
+    IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
+    IWorkingSet[] allWorkingSets = workingSetManager.getAllWorkingSets();
+    HashSet<IWorkingSet> result = new HashSet<IWorkingSet>(allWorkingSets.length);
+    for (IWorkingSet ws : allWorkingSets) {
+      if (ws.isVisible() && SCOUT_WOKRING_SET_ID.equals(ws.getId())) {
+        if (includeHidden || !m_hiddenWorkingSets.contains(ws.getName())) {
+          result.add(ws);
+        }
+      }
+    }
+    IWorkingSet[] array = result.toArray(new IWorkingSet[result.size()]);
+    Arrays.sort(array, new Comparator<IWorkingSet>() {
+      @Override
+      public int compare(IWorkingSet o1, IWorkingSet o2) {
+        int order1 = getOrder(o1.getName());
+        int order2 = getOrder(o2.getName());
+        return order1 - order2;
+      }
+    });
+    return array;
   }
 }

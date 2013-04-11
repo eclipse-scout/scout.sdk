@@ -213,17 +213,11 @@ public class TreeNode implements ITreeNode {
     return m_checkable;
   }
 
-  /**
-   * @param orderNr
-   *          the orderNr to set
-   */
+  @Override
   public void setOrderNr(int orderNr) {
     m_orderNr = orderNr;
   }
 
-  /**
-   * @return the orderNr
-   */
   @Override
   public int getOrderNr() {
     return m_orderNr;
