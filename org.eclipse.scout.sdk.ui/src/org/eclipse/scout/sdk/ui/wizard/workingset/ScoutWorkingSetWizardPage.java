@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.ui.workingset;
+package org.eclipse.scout.sdk.ui.wizard.workingset;
 
 import java.util.ArrayList;
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.workingset;
+package org.eclipse.scout.sdk.ui.internal.dialog.workingset;
 
 import java.util.HashMap;
 import java.util.HashSet;

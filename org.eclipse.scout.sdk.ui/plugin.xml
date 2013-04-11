@@ -934,7 +934,7 @@
             icon="resources/icons/scoutWorkingSet.png"
             id="org.eclipse.scout.sdk.ui.workingSet"
             name="Scout Bundles"
-            pageClass="org.eclipse.scout.sdk.ui.workingset.ScoutWorkingSetWizardPage">
+            pageClass="org.eclipse.scout.sdk.ui.wizard.workingset.ScoutWorkingSetWizardPage">
       </workingSet>
    </extension>
    <extension

@@ -51,6 +51,7 @@ Export-Package: org.eclipse.scout.sdk.ui,
  org.eclipse.scout.sdk.ui.fields.tooltip,
  org.eclipse.scout.sdk.ui.internal,
  org.eclipse.scout.sdk.ui.internal.dialog,
+ org.eclipse.scout.sdk.ui.internal.dialog.workingset,
  org.eclipse.scout.sdk.ui.internal.extensions,
  org.eclipse.scout.sdk.ui.internal.extensions.bundle,
  org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.sql,
@@ -172,6 +173,8 @@ Export-Package: org.eclipse.scout.sdk.ui,
  org.eclipse.scout.sdk.ui.wizard.tablecolumn,
  org.eclipse.scout.sdk.ui.wizard.toolbutton,
  org.eclipse.scout.sdk.ui.wizard.wizard,
- org.eclipse.scout.sdk.ui.wizard.wizard.step
+ org.eclipse.scout.sdk.ui.wizard.wizard.step,
+ org.eclipse.scout.sdk.ui.wizard.workingset,
+ org.eclipse.scout.sdk.ui.workingset
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
