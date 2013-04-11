@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class PermissionTablePage extends AbstractPage {
 
-  final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
   private ICachedTypeHierarchy m_basicPermissionHierarchy;
 
   public PermissionTablePage(AbstractPage parent) {
@@ -63,6 +62,8 @@ public class PermissionTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
+
     if (m_basicPermissionHierarchy == null) {
       m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(basicPermission);
       m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());

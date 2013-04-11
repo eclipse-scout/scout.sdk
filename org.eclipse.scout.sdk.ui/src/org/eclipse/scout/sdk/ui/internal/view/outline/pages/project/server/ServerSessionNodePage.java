@@ -28,8 +28,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ServerSessionNodePage extends AbstractScoutTypePage {
 
-  final IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
-
   public ServerSessionNodePage(IPage parent, IType type) {
     setParent(parent);
     setType(type);
@@ -49,6 +47,7 @@ public class ServerSessionNodePage extends AbstractScoutTypePage {
       IScoutBundle clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       if (clientBundle != null) {
         // find client session
+        IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
         ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
         ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(clientBundle);
         IType[] allClientSessions = clientSessionHierarchy.getAllSubtypes(iClientSession, filter, TypeComparators.getTypeNameComparator());

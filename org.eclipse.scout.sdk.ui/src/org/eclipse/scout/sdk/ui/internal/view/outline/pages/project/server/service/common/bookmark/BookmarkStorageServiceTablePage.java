@@ -31,8 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class BookmarkStorageServiceTablePage extends AbstractPage {
 
-  final IType iBookmarkStorageService = TypeUtility.getType(RuntimeClasses.IBookmarkStorageService);
-  ICachedTypeHierarchy m_serviceHierarchy;
+  private ICachedTypeHierarchy m_serviceHierarchy;
 
   public BookmarkStorageServiceTablePage(AbstractPage parent) {
     setParent(parent);
@@ -80,6 +79,7 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
+    IType iBookmarkStorageService = TypeUtility.getType(RuntimeClasses.IBookmarkStorageService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iBookmarkStorageService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

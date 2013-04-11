@@ -28,9 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
  */
 public class FormHandlerTablePage extends AbstractPage {
 
-  private final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
   private InnerTypePageDirtyListener m_innerTypeListener;
-
   private final IType m_formType;
 
   public FormHandlerTablePage(AbstractPage parent, IType formType) {
@@ -61,6 +59,8 @@ public class FormHandlerTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
+
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormHandler);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getFormType(), m_innerTypeListener);

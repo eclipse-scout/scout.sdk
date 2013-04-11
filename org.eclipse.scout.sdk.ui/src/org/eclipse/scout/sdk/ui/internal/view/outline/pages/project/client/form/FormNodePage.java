@@ -36,7 +36,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class FormNodePage extends AbstractScoutTypePage {
 
-  protected final IType iGroupBox = TypeUtility.getType(RuntimeClasses.IGroupBox);
   private InnerTypePageDirtyListener m_mainBoxListener;
 
   public FormNodePage(AbstractPage parent, IType type) {
@@ -66,12 +65,13 @@ public class FormNodePage extends AbstractScoutTypePage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iGroupBox = TypeUtility.getType(RuntimeClasses.IGroupBox);
+
     if (m_mainBoxListener == null) {
       m_mainBoxListener = new InnerTypePageDirtyListener(this, iGroupBox);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_mainBoxListener);
     }
     new BeanPropertyTablePage(this, getType());
-    // find all main boxes
 
     for (IType mainBoxType : ScoutTypeUtility.getInnerTypesOrdered(getType(), iGroupBox)) {
       MainBoxNodePage mainBoxNodePage = new MainBoxNodePage();

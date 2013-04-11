@@ -32,8 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class SqlServiceTablePage extends AbstractPage {
 
-  final IType iSqlService = TypeUtility.getType(RuntimeClasses.ISqlService);
-  ICachedTypeHierarchy m_serviceHierarchy;
+  private ICachedTypeHierarchy m_serviceHierarchy;
 
   public SqlServiceTablePage(IPage parent) {
     setParent(parent);
@@ -81,6 +80,7 @@ public class SqlServiceTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
+    IType iSqlService = TypeUtility.getType(RuntimeClasses.ISqlService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSqlService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

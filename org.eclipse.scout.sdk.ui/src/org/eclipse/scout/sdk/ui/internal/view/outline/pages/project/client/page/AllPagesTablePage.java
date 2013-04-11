@@ -30,8 +30,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * <h3>AllPagesTablePage</h3> ...
  */
 public class AllPagesTablePage extends AbstractPage {
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
-
   private ICachedTypeHierarchy m_cachedTypeHierarchy;
 
   public AllPagesTablePage(IPage parent) {
@@ -68,6 +66,8 @@ public class AllPagesTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+
     if (m_cachedTypeHierarchy == null) {
       m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_cachedTypeHierarchy.addHierarchyListener(getPageDirtyListener());

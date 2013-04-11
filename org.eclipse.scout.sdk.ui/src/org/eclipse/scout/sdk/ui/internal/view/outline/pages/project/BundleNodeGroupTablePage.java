@@ -44,8 +44,6 @@ public class BundleNodeGroupTablePage extends AbstractPage {
 
   private ScoutBundleNodeGroup m_group;
 
-  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-
   public BundleNodeGroupTablePage(AbstractPage parentPage, ScoutBundleNodeGroup group) {
     m_group = group;
     setParent(parentPage);
@@ -115,6 +113,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
+    IType iService = TypeUtility.getType(RuntimeClasses.IService);
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     IScoutBundle[] serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
 

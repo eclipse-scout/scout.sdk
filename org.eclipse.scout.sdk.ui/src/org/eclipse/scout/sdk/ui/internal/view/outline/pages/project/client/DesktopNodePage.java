@@ -34,11 +34,6 @@ public class DesktopNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public boolean isInitiallyLoaded() {
-    return true;
-  }
-
-  @Override
   public boolean isFolder() {
     return false;
   }

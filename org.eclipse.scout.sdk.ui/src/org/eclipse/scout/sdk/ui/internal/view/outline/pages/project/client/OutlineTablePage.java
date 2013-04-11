@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * <h3>OutlineTablePage</h3> ...
  */
 public class OutlineTablePage extends AbstractPage {
-  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
   private ICachedTypeHierarchy m_outlineHierarchy;
 
   public OutlineTablePage(AbstractPage parent) {
@@ -67,6 +66,8 @@ public class OutlineTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+
     if (m_outlineHierarchy == null) {
       m_outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineHierarchy.addHierarchyListener(getPageDirtyListener());

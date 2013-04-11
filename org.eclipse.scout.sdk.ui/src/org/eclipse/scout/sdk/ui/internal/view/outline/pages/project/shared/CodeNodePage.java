@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class CodeNodePage extends AbstractScoutTypePage {
-  final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public CodeNodePage(IPage parent, IType type) {
@@ -60,15 +59,12 @@ public class CodeNodePage extends AbstractScoutTypePage {
   @Override
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
+      IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCode);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
-//    ITypeHierarchy codeHierarchy = TypeUtility.getTypeHierarchyPrimaryTypes(iCode).combinedTypeHierarchy(getType());
-//    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-//        TypeFilters.getSubtypeFilter(iCode, codeHierarchy),
-//        TypeFilters.getClassFilter());
 
-    IType[] codes = ScoutTypeUtility.getCodes(getType());//TypeUtility.getInnerTypes(getType(), filter, TypeComparators.getOrderAnnotationComparator());
+    IType[] codes = ScoutTypeUtility.getCodes(getType());
     for (IType code : codes) {
       new CodeNodePage(this, code);
     }

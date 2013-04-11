@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class WizardTablePage extends AbstractPage {
 
-  final IType iWizard = TypeUtility.getType(RuntimeClasses.IWizard);
   private ICachedTypeHierarchy m_wizardHierarchy;
 
   public WizardTablePage(IPage parent) {
@@ -68,6 +67,8 @@ public class WizardTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iWizard = TypeUtility.getType(RuntimeClasses.IWizard);
+
     if (m_wizardHierarchy == null) {
       m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
       m_wizardHierarchy.addHierarchyListener(getPageDirtyListener());

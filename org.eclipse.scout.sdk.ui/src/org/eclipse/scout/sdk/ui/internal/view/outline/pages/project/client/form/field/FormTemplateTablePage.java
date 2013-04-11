@@ -36,8 +36,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * @since 1.0.8 11.09.2010
  */
 public class FormTemplateTablePage extends AbstractPage {
-
-  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
   private ICachedTypeHierarchy m_formHierarchy;
 
   public FormTemplateTablePage(IPage parent) {
@@ -71,6 +69,8 @@ public class FormTemplateTablePage extends AbstractPage {
   }
 
   protected IType[] resolveFormTemplates() {
+    IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+
     if (m_formHierarchy == null) {
       m_formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());

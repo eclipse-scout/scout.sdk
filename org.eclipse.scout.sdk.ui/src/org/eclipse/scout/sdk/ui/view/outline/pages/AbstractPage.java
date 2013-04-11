@@ -86,7 +86,6 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public String getName() {
-
     return m_name;
   }
 

@@ -72,10 +72,4 @@ public class CommonServicesNodePage extends AbstractPage {
       ScoutSdkUi.logWarning("could not create 'AccessControlServiceTablePage'.", e);
     }
   }
-
-  @Override
-  public boolean isInitiallyLoaded() {
-    return true;
-  }
-
 }

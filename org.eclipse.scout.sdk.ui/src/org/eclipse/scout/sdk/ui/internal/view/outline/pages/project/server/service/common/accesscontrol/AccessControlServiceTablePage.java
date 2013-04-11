@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class AccessControlServiceTablePage extends AbstractPage {
 
-  private final IType iAccessControlService = TypeUtility.getType(RuntimeClasses.IAccessControlService);
   private ICachedTypeHierarchy m_serviceHierarchy;
 
   public AccessControlServiceTablePage(AbstractPage parent) {
@@ -78,6 +77,7 @@ public class AccessControlServiceTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
+    IType iAccessControlService = TypeUtility.getType(RuntimeClasses.IAccessControlService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iAccessControlService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

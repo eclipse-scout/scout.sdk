@@ -30,9 +30,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class ColumnTablePage extends AbstractPage {
 
-  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
   private IType m_columnDeclaringType;
-
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public ColumnTablePage(IPage parent, IType columnDeclaringType) {
@@ -65,6 +63,7 @@ public class ColumnTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
+      IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iColumn);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getColumnDeclaringType(), m_innerTypeListener);
     }

@@ -43,28 +43,34 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractFilterMenuContributionItem;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
 import org.eclipse.scout.sdk.ui.action.ScoutBundlePresentationActionGroup;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.SdkIcons;
+import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport.BundlePresentation;
 import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndPasteSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.FilterOutlineJob;
-import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineProcess;
+import org.eclipse.scout.sdk.ui.internal.view.outline.job.LoadInitialOutlineJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.BundleNodeGroupTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutWorkingSetTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.ui.workingset.ConfigureScoutWorkingSetsDialog;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 import org.eclipse.swt.SWT;
@@ -90,8 +96,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   private String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
   private TreeViewer m_viewer;
   private ViewContentProvider m_viewContentProvider;
-  private DirtyUpdateManager m_dirtyManager;
   private IScoutWorkspaceListener m_workspaceListener;
+  private final DirtyUpdateManager m_dirtyManager;
+  private final HashSet<IContributionItem> m_debugMenus;
 
   // filtering
   private Object m_pageFilterCacheLock = new Object();
@@ -100,7 +107,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   private boolean m_linkingEnabled;
   private LinkWithEditorAction m_linkWithEditorAction;
   private P_ReloadNodeJob m_reloadJob = new P_ReloadNodeJob();
-  private HashSet<IContributionItem> m_debugMenus;
 
   /**
    * The constructor.
@@ -161,7 +167,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       public void workspaceChanged(ScoutWorkspaceEvent event) {
         switch (event.getType()) {
           case ScoutWorkspaceEvent.TYPE_WORKSPACE_INITIALIZED: {
-            new LoadInitialOutlineProcess(ScoutExplorerPart.this).schedule();
+            new LoadInitialOutlineJob(ScoutExplorerPart.this).schedule();
             break;
           }
         }
@@ -169,13 +175,13 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     };
 
     ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
-    expandAndSelectProjectLevel();
   }
 
   @Override
   public void expandAndSelectProjectLevel() {
     try {
       m_viewContentProvider.setLoadSync(true);
+      final Holder<IPage> firstBundleGroup = new Holder<IPage>(IPage.class, null);
       final ArrayList<IPage> expandedPages = new ArrayList<IPage>();
       INodeVisitor visitor = new INodeVisitor() {
         @Override
@@ -187,21 +193,29 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
             expandedPages.add(page); // top level workspace bundle group
             return CONTINUE;
           }
-          else if (page instanceof BundleNodeGroupTablePage && (page.getParent() instanceof ProjectsTablePage ||
-              page.getParent().getScoutBundle().isBinary())) {
-            expandedPages.add(page); // top level workspace bundle group
+          else if (page instanceof BundleNodeGroupTablePage) {
+            if (page.getParent() instanceof ProjectsTablePage || page.getParent().getScoutBundle().isBinary()) {
+              expandedPages.add(page);
+            }
+            if (!page.getScoutBundle().isBinary() && firstBundleGroup.getValue() == null) {
+              firstBundleGroup.setValue(page);
+            }
             return CONTINUE;
           }
           else if (page instanceof AbstractBundleNodeTablePage) {
-            if (page.getScoutBundle() != null && page.getScoutBundle().isBinary()) {
-              if (BundlePresentation.Hierarchical.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+            if (page.getScoutBundle() != null) {
+              if ((!page.getScoutBundle().isBinary() && !BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) ||
+                  (page.getScoutBundle().isBinary() && BundlePresentation.Hierarchical.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()))) {
                 expandedPages.add(page);
               }
-              return CONTINUE; // don't expand binary bundles
+              if (page.getScoutBundle().isBinary()) {
+                return CONTINUE;
+              }
             }
-            if (!BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
-              expandedPages.add(page); // first workspace bundle level
-            }
+            return CANCEL_SUBTREE;
+          }
+          else if (page instanceof ScoutWorkingSetTablePage) {
+            expandedPages.add(page);
             return CANCEL_SUBTREE;
           }
           else {
@@ -212,7 +226,12 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       getRootPage().accept(visitor);
       if (expandedPages.size() > 0) {
         m_viewer.setExpandedElements(expandedPages.toArray(new IPage[expandedPages.size()]));
-        m_viewer.setSelection(new StructuredSelection(expandedPages.get(0)));
+        if (firstBundleGroup.getValue() == null) {
+          m_viewer.setSelection(new StructuredSelection(expandedPages.get(0)));
+        }
+        else {
+          m_viewer.setSelection(new StructuredSelection(firstBundleGroup.getValue()));
+        }
       }
     }
     finally {
@@ -228,6 +247,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   @Override
   public void init(IViewSite site, IMemento memento) throws PartInitException {
     super.init(site, memento);
+
     if (memento != null) {
       Integer linkingEnabledInteger = memento.getInteger(LINKING_ENABLED);
       boolean linkingEnabled = (linkingEnabledInteger != null) ? linkingEnabledInteger
@@ -238,9 +258,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   }
 
   @Override
-  public void saveState(IMemento aMemento) {
-    aMemento.putInteger(LINKING_ENABLED, (m_linkingEnabled) ? 1 : 0);
-    super.saveState(aMemento);
+  public void saveState(IMemento memento) {
+    memento.putInteger(LINKING_ENABLED, (m_linkingEnabled) ? 1 : 0);
+    super.saveState(memento);
   }
 
   @Override
@@ -266,7 +286,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
    * The page is added to the dirty structure pages list.
    * A {@link RefreshOutlineSubTreeJob} is queued after some time to reload the affected nodes
    */
-  public void markStructureDirty(AbstractPage newPage) {
+  public void markStructureDirty(IPage newPage) {
     m_dirtyManager.notifyStructureDirty(newPage);
   }
 
@@ -326,7 +346,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     m_linkWithEditorAction.updateLinkingEnabled(isLinkingEnabled());
     mgr.add(m_linkWithEditorAction);
     mgr.add(new org.eclipse.jdt.internal.ui.actions.CollapseAllAction(getTreeViewer()));
-
   }
 
   @SuppressWarnings("restriction")
@@ -335,6 +354,32 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     mgr.add(m_linkWithEditorAction);
     mgr.add(new org.eclipse.jdt.internal.ui.actions.CollapseAllAction(getTreeViewer()));
     mgr.add(new Separator());
+
+    mgr.add(new Action(Texts.get("ConfigureScoutWorkingSets") + "...", ScoutSdkUi.getImageDescriptor(SdkIcons.ScoutWorkingSet)) {
+      @Override
+      public void run() {
+        ConfigureScoutWorkingSetsDialog d = new ConfigureScoutWorkingSetsDialog(getSite().getShell());
+        d.open();
+      }
+    });
+    mgr.add(new Separator());
+
+    MenuManager bundleTypes = new MenuManager(Texts.get("BundleTypes"));
+    for (ScoutBundleUiExtension e : ScoutBundleExtensionPoint.getExtensions()) {
+      final String bundleType = e.getBundleType();
+      bundleTypes.add(new AbstractFilterMenuContributionItem(e.getBundleName(), !ScoutExplorerSettingsSupport.get().isBundleTypeHidden(bundleType)) {
+        @Override
+        protected void run(boolean selected) {
+          if (selected) {
+            ScoutExplorerSettingsSupport.get().removeHiddenBundleType(bundleType);
+          }
+          else {
+            ScoutExplorerSettingsSupport.get().addHiddenBundleType(bundleType);
+          }
+        }
+      });
+    }
+    mgr.add(bundleTypes);
     mgr.add(new AbstractFilterMenuContributionItem(Texts.get("ShowFragments"), ScoutExplorerSettingsSupport.get().isShowFragments()) {
       @Override
       protected void run(boolean selected) {
@@ -348,6 +393,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       }
     });
     mgr.add(new Separator());
+
     mgr.add(new ScoutBundlePresentationActionGroup());
   }
 
@@ -644,6 +690,11 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     public InvisibleRootNode(ScoutExplorerPart explorerPart) {
       m_explorerPart = explorerPart;
       loadChildren();
+    }
+
+    @Override
+    public boolean isInitiallyLoaded() {
+      return true;
     }
 
     @Override

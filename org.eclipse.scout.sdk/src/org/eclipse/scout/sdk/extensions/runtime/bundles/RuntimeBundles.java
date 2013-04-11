@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
@@ -133,7 +134,7 @@ public final class RuntimeBundles {
     if (bundle == null) {
       return null;
     }
-    ScoutBundle tmp = new ScoutBundle(bundle); // temporary instance to get all dependencies
+    ScoutBundle tmp = new ScoutBundle(bundle, new NullProgressMonitor()); // temporary instance to get all dependencies
     return getBundleType(tmp);
   }
 

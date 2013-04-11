@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * <h3>SearchFormTablePage</h3> ...
  */
 public class SearchFormTablePage extends AbstractPage {
-  final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
   private ICachedTypeHierarchy m_searchFormHierarchy;
 
   public SearchFormTablePage(AbstractPage parent) {
@@ -76,6 +75,8 @@ public class SearchFormTablePage extends AbstractPage {
   }
 
   protected IType[] resolveSearchForms() {
+    IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
+
     if (m_searchFormHierarchy == null) {
       m_searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);
       m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());

@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class CodeTypeNodePage extends AbstractScoutTypePage {
 
-  final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public CodeTypeNodePage(IPage parent, IType type) {
@@ -61,6 +60,7 @@ public class CodeTypeNodePage extends AbstractScoutTypePage {
   @Override
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
+      IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCode);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }

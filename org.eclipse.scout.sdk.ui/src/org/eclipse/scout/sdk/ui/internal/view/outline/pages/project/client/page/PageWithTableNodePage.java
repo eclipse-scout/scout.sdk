@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
@@ -39,8 +38,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class PageWithTableNodePage extends AbstractScoutTypePage {
   public final static String METHOD_EXEC_CREATE_CHILD_PAGE = "execCreateChildPage";
-  final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
-
   private P_MethodChangedListener m_methodChangedListener;
 
   public PageWithTableNodePage(IPage parent, IType type) {

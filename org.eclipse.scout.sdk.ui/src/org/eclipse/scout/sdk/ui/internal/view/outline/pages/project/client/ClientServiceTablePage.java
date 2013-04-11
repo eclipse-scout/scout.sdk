@@ -27,7 +27,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ClientServiceTablePage extends AbstractPage {
 
-  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
   private ICachedTypeHierarchy m_servieHierarchy;
 
   public ClientServiceTablePage(IPage parentPage) {
@@ -65,6 +64,8 @@ public class ClientServiceTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iService = TypeUtility.getType(RuntimeClasses.IService);
+
     if (m_servieHierarchy == null) {
       m_servieHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
       m_servieHierarchy.addHierarchyListener(getPageDirtyListener());

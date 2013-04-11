@@ -31,8 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>DesktopOutlineTablePage</h3> ...
  */
 public class DesktopOutlineTablePage extends AbstractPage {
-  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
-  private final String getConfiguredOutlines = "getConfiguredOutlines";
+  private final static String GET_CONFIGURED_OUTLINES = "getConfiguredOutlines";
 
   private IType m_desktopType;
   private P_MethodListener m_methodListener;
@@ -77,6 +76,8 @@ public class DesktopOutlineTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+
     if (m_outlineTypeHierarchy == null) {
       m_outlineTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineTypeHierarchy.addHierarchyListener(getPageDirtyListener());
@@ -86,7 +87,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
       TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getDesktopType(), m_methodListener);
     }
     try {
-      IMethod outlinesMethod = TypeUtility.getMethod(getDesktopType(), getConfiguredOutlines);
+      IMethod outlinesMethod = TypeUtility.getMethod(getDesktopType(), GET_CONFIGURED_OUTLINES);
       if (outlinesMethod != null) {
         IType[] outlineCandidates = ScoutTypeUtility.getTypeOccurenceInMethod(outlinesMethod);
         for (IType candidate : outlineCandidates) {
@@ -115,7 +116,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
   private class P_MethodListener implements IJavaResourceChangedListener {
     @Override
     public void handleEvent(JdtEvent event) {
-      if (event.getElement().getElementName().equals(getConfiguredOutlines)) {
+      if (event.getElement().getElementName().equals(GET_CONFIGURED_OUTLINES)) {
         markStructureDirty();
       }
     }

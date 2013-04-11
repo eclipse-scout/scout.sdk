@@ -34,8 +34,6 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
-  protected IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
-
   private InnerTypePageDirtyListener m_innerTypeListener;
   private InnerTypeOrderChangedPageDirtyListener m_orderChangedListener;
 
@@ -68,6 +66,8 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
 
   @Override
   protected void loadChildrenImpl() {
+    IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormField);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
@@ -78,6 +78,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
     }
 
     new KeyStrokeTablePage(this, getType());
+
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
     IType[] allSubtypes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iFormField, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType t : allSubtypes) {

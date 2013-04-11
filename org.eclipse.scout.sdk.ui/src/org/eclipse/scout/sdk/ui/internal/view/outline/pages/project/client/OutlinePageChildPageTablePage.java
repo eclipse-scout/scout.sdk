@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePageHelper;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.NodePageChildPageTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -32,8 +33,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>OutlinePageChildPageTablePage</h3> all child pages of a outline
  */
 public class OutlinePageChildPageTablePage extends AbstractPage {
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
-
   private final IType m_outlineType;
   private P_MethodListener m_methodListener;
 
@@ -67,18 +66,15 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
     super.unloadPage();
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.scout.sde.ui.view.outline.pages.AbstractPage#loadChildrenImpl()
-   */
   @Override
   protected void loadChildrenImpl() {
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
       TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getOutlineType(), m_methodListener);
     }
-    IMethod createChildPagesMethod = TypeUtility.getMethod(getOutlineType(), "execCreateChildPages");
+    IMethod createChildPagesMethod = TypeUtility.getMethod(getOutlineType(), NodePageChildPageTablePage.EXEC_CREATE_CHILD_PAGES);
     if (TypeUtility.exists(createChildPagesMethod)) {
+      IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
       PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethod), TypeUtility.getPrimaryTypeHierarchy(iPage));
     }
   }
@@ -106,7 +102,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   private class P_MethodListener implements IJavaResourceChangedListener {
     @Override
     public void handleEvent(JdtEvent event) {
-      if (event.getElement().getElementName().equals("execCreateChildPages")) {
+      if (event.getElement().getElementName().equals(NodePageChildPageTablePage.EXEC_CREATE_CHILD_PAGES)) {
         markStructureDirty();
       }
     }

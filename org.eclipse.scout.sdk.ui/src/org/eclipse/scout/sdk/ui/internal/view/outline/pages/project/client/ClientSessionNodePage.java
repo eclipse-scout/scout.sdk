@@ -33,11 +33,6 @@ public class ClientSessionNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public boolean isInitiallyLoaded() {
-    return true;
-  }
-
-  @Override
   public void loadChildrenImpl() {
   }
 

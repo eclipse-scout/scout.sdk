@@ -29,12 +29,8 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>CalendarItemProducerTablePage</h3> ...
  */
 public class CalendarItemProviderTablePage extends AbstractPage {
-
-  final IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
-
   private InnerTypePageDirtyListener m_innerTypeListener;
   private InnerTypeOrderChangedPageDirtyListener m_orderChangedListener;
-
   private final IType m_calendarType;
 
   public CalendarItemProviderTablePage(IPage parent, IType calendarType) {
@@ -69,6 +65,8 @@ public class CalendarItemProviderTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
+
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCalendarItemProvider);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);

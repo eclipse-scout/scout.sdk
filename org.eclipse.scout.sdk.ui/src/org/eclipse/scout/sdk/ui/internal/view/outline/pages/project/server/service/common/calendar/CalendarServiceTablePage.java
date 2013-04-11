@@ -31,8 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class CalendarServiceTablePage extends AbstractPage {
 
-  final IType iCalendarService = TypeUtility.getType(RuntimeClasses.ICalendarService);
-  ICachedTypeHierarchy m_serviceHierarchy;
+  private ICachedTypeHierarchy m_serviceHierarchy;
 
   public CalendarServiceTablePage(AbstractPage parent) {
     setParent(parent);
@@ -80,6 +79,7 @@ public class CalendarServiceTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
+    IType iCalendarService = TypeUtility.getType(RuntimeClasses.ICalendarService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCalendarService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

@@ -39,10 +39,6 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   private ICachedTypeHierarchy m_desktopHierarchy;
   private ICachedTypeHierarchy m_desktopExtensionHierarchy;
 
-  private final IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
-  private final IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
-  private final IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
-
   public ClientNodePage(IPage parent, ScoutBundleNode node) {
     super(parent, node);
   }
@@ -71,6 +67,10 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   @Override
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
+    IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
+    IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
+    IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+
     if (m_clientSessionHierarchy == null) {
       m_clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
       m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());

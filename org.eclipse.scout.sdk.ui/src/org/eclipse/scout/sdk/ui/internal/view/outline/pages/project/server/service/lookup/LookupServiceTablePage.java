@@ -28,8 +28,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class LookupServiceTablePage extends AbstractPage {
 
-  final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
-  ICachedTypeHierarchy m_serviceHierarchy;
+  private ICachedTypeHierarchy m_serviceHierarchy;
 
   public LookupServiceTablePage(AbstractPage parent) {
     setParent(parent);
@@ -75,6 +74,8 @@ public class LookupServiceTablePage extends AbstractPage {
   }
 
   protected IType[] resolveAllLookupServices() {
+    IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
+
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

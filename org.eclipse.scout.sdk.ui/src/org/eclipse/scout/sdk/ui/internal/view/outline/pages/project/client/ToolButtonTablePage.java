@@ -31,8 +31,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
  */
 public class ToolButtonTablePage extends AbstractPage {
 
-  final IType iToolButton = TypeUtility.getType(RuntimeClasses.IToolButton);
-
   private InnerTypePageDirtyListener m_toolButtonChangedListener;
   private final IType m_declaringType;
 
@@ -71,6 +69,8 @@ public class ToolButtonTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iToolButton = TypeUtility.getType(RuntimeClasses.IToolButton);
+
     if (m_toolButtonChangedListener == null) {
       m_toolButtonChangedListener = new InnerTypePageDirtyListener(this, iToolButton);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_toolButtonChangedListener);

@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 public class WizardStepTablePage extends AbstractPage {
 
   private final IType m_wizardType;
-  final IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public WizardStepTablePage(IPage parent, IType wizardType) {
@@ -62,6 +61,8 @@ public class WizardStepTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
+
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iWizardStep);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getWizardType(), m_innerTypeListener);

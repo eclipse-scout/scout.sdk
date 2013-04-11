@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.workspace;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -41,7 +42,7 @@ import org.eclipse.scout.sdk.util.NamingUtility;
  * @since 3.9.0 27.02.2013
  * @see IScoutBundleGraph
  */
-public interface IScoutBundle {
+public interface IScoutBundle extends IAdaptable {
 
   final String TYPE_CLIENT = "CLIENT";
   final String TYPE_SHARED = "SHARED";
@@ -77,9 +78,8 @@ public interface IScoutBundle {
 
   /**
    * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
-   * maybe myself
-   * recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered by level.
-   * Within a level the order of the bundles is undefined.
+   * maybe myself recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered
+   * by level (the closest level first). Within a level the order of the bundles is undefined.
    * 
    * @param filter
    *          The filter to decide which of the parent bundles will be returned.
@@ -169,9 +169,8 @@ public interface IScoutBundle {
 
   /**
    * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and
-   * maybe myself
-   * recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered by level.
-   * Within a level the order of the bundles is undefined.
+   * maybe myself recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered
+   * by level (closest level first). Within a level the order of the bundles is undefined.
    * 
    * @param filter
    *          The filter to decide which of the child bundles will be returned.

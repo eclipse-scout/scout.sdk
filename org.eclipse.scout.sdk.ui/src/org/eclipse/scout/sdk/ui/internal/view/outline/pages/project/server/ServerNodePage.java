@@ -38,14 +38,10 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * <h3>ServerNodePage</h3> ...
  */
 public class ServerNodePage extends AbstractBundleNodeTablePage {
-  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-  private final IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
-  private final ICachedTypeHierarchy m_serverSessionHierarchy;
+  private ICachedTypeHierarchy m_serverSessionHierarchy;
 
   public ServerNodePage(IPage parent, ScoutBundleNode node) {
     super(parent, node);
-    m_serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
-    m_serverSessionHierarchy.addHierarchyListener(getPageDirtyListener());
   }
 
   @Override
@@ -55,12 +51,23 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
 
   @Override
   public void unloadPage() {
-    m_serverSessionHierarchy.removeHierarchyListener(getPageDirtyListener());
+    if (m_serverSessionHierarchy != null) {
+      m_serverSessionHierarchy.removeHierarchyListener(getPageDirtyListener());
+      m_serverSessionHierarchy = null;
+    }
   }
 
   @Override
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
+
+    IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
+
+    if (m_serverSessionHierarchy == null) {
+      m_serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
+      m_serverSessionHierarchy.addHierarchyListener(getPageDirtyListener());
+    }
+
     try {
       ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
       IType[] serverSessions = m_serverSessionHierarchy.getAllSubtypes(iServerSession, filter, TypeComparators.getTypeNameComparator());
@@ -101,6 +108,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   }
 
   protected IType[] resolveServices() {
+    IType iService = TypeUtility.getType(RuntimeClasses.IService);
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     IType[] services = serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
     return services;

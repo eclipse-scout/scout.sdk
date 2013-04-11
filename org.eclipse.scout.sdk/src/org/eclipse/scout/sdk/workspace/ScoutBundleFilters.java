@@ -40,6 +40,13 @@ public final class ScoutBundleFilters {
     }
   };
 
+  private final static IScoutBundleFilter NO_FRAGMENTS = new IScoutBundleFilter() {
+    @Override
+    public boolean accept(IScoutBundle bundle) {
+      return !bundle.isFragment();
+    }
+  };
+
   private ScoutBundleFilters() {
   }
 
@@ -65,6 +72,14 @@ public final class ScoutBundleFilters {
    */
   public static IScoutBundleFilter getWorkspaceBundlesFilter() {
     return WORKSPACE_BUNDLES;
+  }
+
+  /**
+   * @return a filter that returns all bundles that are no fragments.
+   * @see IScoutBundle#isFragment()
+   */
+  public static IScoutBundleFilter getNoFragmentsFilter() {
+    return NO_FRAGMENTS;
   }
 
   /**
@@ -179,6 +194,45 @@ public final class ScoutBundleFilters {
       @Override
       public boolean accept(IScoutBundle bundle) {
         return !list.contains(bundle);
+      }
+    };
+  }
+
+  /**
+   * Creates and returns a filter that returns all bundles except the ones with given symbolic names.
+   * 
+   * @param symbolicNames
+   *          The bundle symbolic names to exclude from the result
+   * @return the created filter
+   * @see IScoutBundleFilter
+   */
+  public static IScoutBundleFilter getNotInSymbolicNameListFilter(String... symbolicNames) {
+    if (symbolicNames == null || symbolicNames.length < 1) {
+      return ALL_BUNDLES;
+    }
+    HashSet<String> set = new HashSet<String>(symbolicNames.length);
+    for (String name : symbolicNames) {
+      set.add(name);
+    }
+    return getNotInSymbolicNameListFilter(set);
+  }
+
+  /**
+   * Creates and returns a filter that returns all bundles except the ones with given symbolic names.
+   * 
+   * @param symbolicNames
+   *          The bundle symbolic names to exclude from the result
+   * @return the created filter
+   * @see IScoutBundleFilter
+   */
+  public static IScoutBundleFilter getNotInSymbolicNameListFilter(final Set<String> symbolicNames) {
+    if (symbolicNames == null || symbolicNames.size() < 1) {
+      return ALL_BUNDLES;
+    }
+    return new IScoutBundleFilter() {
+      @Override
+      public boolean accept(IScoutBundle bundle) {
+        return !symbolicNames.contains(bundle.getSymbolicName());
       }
     };
   }

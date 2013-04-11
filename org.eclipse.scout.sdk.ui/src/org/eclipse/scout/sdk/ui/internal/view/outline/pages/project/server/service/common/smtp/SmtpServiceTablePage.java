@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class SmtpServiceTablePage extends AbstractPage {
 
-  private final IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
   private ICachedTypeHierarchy m_serviceHierarchy;
 
   public SmtpServiceTablePage(AbstractPage parent) {
@@ -80,6 +79,7 @@ public class SmtpServiceTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
+    IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSMTPService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

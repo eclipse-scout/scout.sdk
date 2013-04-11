@@ -33,10 +33,9 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>NodePageChildPageTablePage</h3> all child pages of a page with nodes
  */
 public class NodePageChildPageTablePage extends AbstractPage {
-  static final String execCreateChildPages = "execCreateChildPages";
+  public static final String EXEC_CREATE_CHILD_PAGES = "execCreateChildPages";
 
   private final IType m_nodePageType;
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private ICachedTypeHierarchy m_iPageTypeHierarchy;
   private P_MethodListener m_methodListener;
 
@@ -78,6 +77,8 @@ public class NodePageChildPageTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
+    IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+
     if (m_iPageTypeHierarchy == null) {
       m_iPageTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_iPageTypeHierarchy.addHierarchyListener(getPageDirtyListener());
@@ -86,7 +87,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
       m_methodListener = new P_MethodListener();
       TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getNodePageType(), m_methodListener);
     }
-    IMethod createChildPagesMethods = TypeUtility.getMethod(getNodePageType(), execCreateChildPages);
+    IMethod createChildPagesMethods = TypeUtility.getMethod(getNodePageType(), EXEC_CREATE_CHILD_PAGES);
     if (TypeUtility.exists(createChildPagesMethods)) {
       PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethods), m_iPageTypeHierarchy);
     }
@@ -115,7 +116,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
   private class P_MethodListener implements IJavaResourceChangedListener {
     @Override
     public void handleEvent(JdtEvent event) {
-      if (event.getElement().getElementName().equals(execCreateChildPages)) {
+      if (event.getElement().getElementName().equals(EXEC_CREATE_CHILD_PAGES)) {
         markStructureDirty();
       }
     }

@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePageHelper;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -33,9 +34,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>TablePageChildPageTablePage</h3> all child pages of a page with table
  */
 public class TablePageChildPageTablePage extends AbstractPage {
-  static final String execCreateChildPage = "execCreateChildPage";
-
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private ICachedTypeHierarchy m_iPageTypeHierarchy;
   private P_MethodListener m_methodListener;
 
@@ -79,6 +77,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     if (m_iPageTypeHierarchy == null) {
+      IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
       m_iPageTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_iPageTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
@@ -86,7 +85,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
       m_methodListener = new P_MethodListener();
       TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getTablePageType(), m_methodListener);
     }
-    IMethod createChildPageMethod = TypeUtility.getMethod(getTablePageType(), "execCreateChildPage");
+    IMethod createChildPageMethod = TypeUtility.getMethod(getTablePageType(), PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE);
     if (TypeUtility.exists(createChildPageMethod)) {
       PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPageMethod), m_iPageTypeHierarchy);
     }
@@ -95,7 +94,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    IMethod createChildPageMethod = TypeUtility.getMethod(getTablePageType(), "execCreateChildPage");
+    IMethod createChildPageMethod = TypeUtility.getMethod(getTablePageType(), PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE);
     if (!TypeUtility.exists(createChildPageMethod)) {
       return new Class[]{PageLinkAction.class, PageNewAction.class};
     }
@@ -119,7 +118,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
   private class P_MethodListener implements IJavaResourceChangedListener {
     @Override
     public void handleEvent(JdtEvent event) {
-      if (event.getElement().getElementName().equals(execCreateChildPage)) {
+      if (event.getElement().getElementName().equals(PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE)) {
         markStructureDirty();
       }
     }

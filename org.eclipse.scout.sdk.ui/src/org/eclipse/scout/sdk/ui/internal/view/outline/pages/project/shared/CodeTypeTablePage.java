@@ -28,8 +28,6 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class CodeTypeTablePage extends AbstractPage {
-  final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
-
   private ICachedTypeHierarchy m_codeTypeHierarchy;
 
   public CodeTypeTablePage(IPage parent) {
@@ -65,6 +63,8 @@ public class CodeTypeTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
+
     if (m_codeTypeHierarchy == null) {
       m_codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
       m_codeTypeHierarchy.addHierarchyListener(getPageDirtyListener());

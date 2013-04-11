@@ -29,7 +29,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class MenuTablePage extends AbstractPage {
 
-  final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
   private final IType m_declaringType;
   private InnerTypePageDirtyListener m_menuChangedListener;
 
@@ -69,6 +68,7 @@ public class MenuTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_menuChangedListener == null) {
+      IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
       m_menuChangedListener = new InnerTypePageDirtyListener(this, iMenuType);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_menuChangedListener);
     }

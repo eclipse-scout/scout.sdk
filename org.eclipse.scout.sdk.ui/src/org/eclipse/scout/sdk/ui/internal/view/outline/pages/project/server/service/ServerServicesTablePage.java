@@ -29,15 +29,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ServerServicesTablePage extends AbstractPage {
 
-  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-
-  private final IType iSqlService = TypeUtility.getType(RuntimeClasses.ISqlService);
-  private final IType iBookmarkStorageService = TypeUtility.getType(RuntimeClasses.IBookmarkStorageService);
-  private final IType iCalendarService = TypeUtility.getType(RuntimeClasses.ICalendarService);
-  private final IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
-  private final IType iAccessControlService = TypeUtility.getType(RuntimeClasses.IAccessControlService);
-  private final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
-
   private ICachedTypeHierarchy m_serviceHierarchy;
 
   public ServerServicesTablePage(AbstractPage parent) {
@@ -86,6 +77,15 @@ public class ServerServicesTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
+
+    IType iService = TypeUtility.getType(RuntimeClasses.IService);
+    IType iSqlService = TypeUtility.getType(RuntimeClasses.ISqlService);
+    IType iBookmarkStorageService = TypeUtility.getType(RuntimeClasses.IBookmarkStorageService);
+    IType iCalendarService = TypeUtility.getType(RuntimeClasses.ICalendarService);
+    IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
+    IType iAccessControlService = TypeUtility.getType(RuntimeClasses.IAccessControlService);
+    IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
+
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

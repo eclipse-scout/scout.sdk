@@ -11,9 +11,12 @@
 package org.eclipse.scout.sdk.internal.test.workspace;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.internal.workspace.ScoutBundleGraph;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -32,7 +35,11 @@ public class TestBundleGraph extends AbstractScoutSdkTest {
   @Test
   public final void testCyclicDependencies() throws Exception {
     // will trigger the bundle-graph creation
-    ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());
+    IScoutBundle[] bundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());
+    Assert.assertEquals(5, bundles.length); // all bundles are root bundles because the cycles are broken by the graph
+
+    ScoutBundleGraph g = (ScoutBundleGraph) ScoutSdkCore.getScoutWorkspace().getBundleGraph();
+    Assert.assertEquals(5, g.getDependencyIssues().length);
   }
 
   @AfterClass

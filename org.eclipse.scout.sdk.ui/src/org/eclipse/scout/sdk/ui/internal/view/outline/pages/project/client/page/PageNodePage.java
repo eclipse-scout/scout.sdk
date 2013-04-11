@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
@@ -21,13 +20,11 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>PageWithTableNodePage</h3> ...
  */
 public class PageNodePage extends AbstractScoutTypePage {
-  final IType iTable = TypeUtility.getType(RuntimeClasses.ITable);
 
   public PageNodePage(IPage parent, IType type) {
     setParent(parent);

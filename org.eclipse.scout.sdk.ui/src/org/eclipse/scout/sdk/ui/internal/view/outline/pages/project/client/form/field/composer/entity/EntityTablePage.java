@@ -32,9 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class EntityTablePage extends AbstractPage {
 
-  protected final IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
   private final IType m_declaringType;
-
   private InnerTypePageDirtyListener m_entityChangedListener;
 
   public EntityTablePage(IPage parent, IType declaringType) {
@@ -67,6 +65,7 @@ public class EntityTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     if (m_entityChangedListener == null) {
+      IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
       m_entityChangedListener = new InnerTypePageDirtyListener(this, iComposerEntity);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
     }

@@ -29,8 +29,6 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class MenuNodePage extends AbstractScoutTypePage {
-  final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
-
   private InnerTypePageDirtyListener m_menuChangedListener;
 
   public MenuNodePage(IPage parentPage, IType menuType) {
@@ -38,7 +36,6 @@ public class MenuNodePage extends AbstractScoutTypePage {
     setParent(parentPage);
     setType(menuType);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Menu));
-
   }
 
   @Override
@@ -62,6 +59,8 @@ public class MenuNodePage extends AbstractScoutTypePage {
 
   @Override
   public void loadChildrenImpl() {
+    IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
+
     if (m_menuChangedListener == null) {
       m_menuChangedListener = new InnerTypePageDirtyListener(this, iMenuType);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_menuChangedListener);

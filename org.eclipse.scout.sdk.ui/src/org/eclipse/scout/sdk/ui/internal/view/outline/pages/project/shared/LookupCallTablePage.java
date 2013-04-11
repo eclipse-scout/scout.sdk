@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class LookupCallTablePage extends AbstractPage {
-  final IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
   private ICachedTypeHierarchy m_lookupCallHierarchy;
 
   public LookupCallTablePage(AbstractPage parent) {
@@ -63,6 +62,8 @@ public class LookupCallTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
+    IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
+
     if (m_lookupCallHierarchy == null) {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(lookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());

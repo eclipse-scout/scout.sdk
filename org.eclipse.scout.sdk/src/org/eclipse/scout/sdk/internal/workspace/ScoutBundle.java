@@ -22,22 +22,31 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IParent;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -67,6 +76,13 @@ public class ScoutBundle implements IScoutBundle {
 
   private final static Pattern REGEX_LEADING_DOTS = Pattern.compile("^\\.*");
 
+  /**
+   * bundles that will stop the dependency tree processing. when one of these is found, the children are no longer
+   * followed. This is to increase performance for bundles which are known to be not of interest.
+   */
+  private final static Object[] EXCLUDED_BUNDLE_SYMBOLIC_NAMES = new String[]{"org.eclipse.core.runtime", "org.eclipse.equinox.http.registry",
+      "org.eclipse.equinox.common", "org.eclipse.core.net", "org.eclipse.equinox.security"};
+
   private final Set<IPluginModelBase> m_allDependencies;
   private final Set<IPluginModelBase> m_directDependencies;
   private final Set<ScoutBundle> m_parentBundles;
@@ -82,20 +98,20 @@ public class ScoutBundle implements IScoutBundle {
   private final boolean m_isBinary;
   private final String m_id;
   private final int m_hash;
-  private final ITypeHierarchyChangedListener m_textProvidersChangedListener;
 
+  private ITypeHierarchyChangedListener m_textProvidersChangedListener;
   private IEclipsePreferences m_projectPreferences;
   private Holder<INlsProject> m_nlsProjectHolder;
   private Holder<INlsProject> m_docsNlsProjectHolder;
   private IIconProvider m_iconProvider;
   private IPackageFragmentRoot m_rootPackage;
 
-  public ScoutBundle(IPluginModelBase bundle) {
+  public ScoutBundle(IPluginModelBase bundle, IProgressMonitor monitor) {
     m_pluginModelBase = bundle;
     m_parentBundles = new HashSet<ScoutBundle>();
     m_childBundles = new HashSet<ScoutBundle>();
     m_dependencyIssues = new HashSet<String>();
-    m_allDependencies = getAllDependenciesImpl(bundle);
+    m_allDependencies = getAllDependenciesImpl(bundle, monitor);
     m_directDependencies = getDirectDependenciesImpl(bundle);
     m_type = RuntimeBundles.getBundleType(this);
     m_javaProject = getJavaProject(bundle);
@@ -106,10 +122,6 @@ public class ScoutBundle implements IScoutBundle {
     m_isFragment = bundle.getBundleDescription().getHost() != null;
     m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + isFragment() + "@binary=" + m_isBinary + "}";
     m_hash = m_id.hashCode();
-
-    IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService));
-    m_textProvidersChangedListener = new P_TextProviderServiceHierarchyChangedListener(this);
-    pth.addHierarchyListener(m_textProvidersChangedListener);
 
     m_nlsProjectHolder = null;
     m_docsNlsProjectHolder = null;
@@ -255,6 +267,7 @@ public class ScoutBundle implements IScoutBundle {
       synchronized (this) {
         if (m_nlsProjectHolder == null) {
           try {
+            registerNlsServiceListener();
             m_nlsProjectHolder = new Holder<INlsProject>(INlsProject.class, null);
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.TEXTS), this});
             m_nlsProjectHolder.setValue(nlsProject);
@@ -274,6 +287,7 @@ public class ScoutBundle implements IScoutBundle {
       synchronized (this) {
         if (m_docsNlsProjectHolder == null) {
           try {
+            registerNlsServiceListener();
             m_docsNlsProjectHolder = new Holder<INlsProject>(INlsProject.class, null);
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.IDocumentationTextProviderService), this});
             m_docsNlsProjectHolder.setValue(nlsProject);
@@ -344,6 +358,26 @@ public class ScoutBundle implements IScoutBundle {
     return m_isFragment;
   }
 
+  @Override
+  public Object getAdapter(Class adapter) {
+    if (IScoutBundle.class == adapter || IAdaptable.class == adapter || ScoutBundle.class == adapter) {
+      return this;
+    }
+    if (!isBinary()) {
+      if (IResource.class == adapter || ISchedulingRule.class == adapter) {
+        return getProject();
+      }
+      if (IJavaProject.class == adapter || IParent.class == adapter || IJavaElement.class == adapter || IOpenable.class == adapter) {
+        return getJavaProject();
+      }
+    }
+    if (IPluginModelBase.class == adapter) {
+      return getPluginModelBase();
+    }
+
+    return Platform.getAdapterManager().getAdapter(this, adapter);
+  }
+
   public IPluginModelBase getPluginModelBase() {
     return m_pluginModelBase;
   }
@@ -354,6 +388,17 @@ public class ScoutBundle implements IScoutBundle {
     }
     else {
       breadthFirstTraverse(visitor, up, up ? m_parentBundles : m_childBundles);
+    }
+  }
+
+  private void registerNlsServiceListener() {
+    if (m_textProvidersChangedListener == null) {
+      IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+      if (TypeUtility.exists(abstractDynamicNlsTextProviderService)) {
+        IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
+        m_textProvidersChangedListener = new P_TextProviderServiceHierarchyChangedListener(this);
+        pth.addHierarchyListener(m_textProvidersChangedListener);
+      }
     }
   }
 
@@ -455,29 +500,47 @@ public class ScoutBundle implements IScoutBundle {
     return m_dependencyIssues;
   }
 
-  private Set<IPluginModelBase> getAllDependenciesImpl(IPluginModelBase bundle) {
+  private Set<IPluginModelBase> getAllDependenciesImpl(IPluginModelBase bundle, IProgressMonitor monitor) {
     Set<IPluginModelBase> collector = new HashSet<IPluginModelBase>();
     Stack<IPluginModelBase> dependencyStack = new Stack<IPluginModelBase>();
     Set<String> messageCollector = new HashSet<String>();
-    collectDependencies(bundle, collector, dependencyStack, messageCollector, true);
+    collectDependencies(bundle, collector, dependencyStack, messageCollector, true, monitor);
     getDependencyIssues().addAll(messageCollector);
     return collector;
+  }
+
+  private synchronized void clearNlsCache() {
+    m_nlsProjectHolder = null;
+    m_docsNlsProjectHolder = null;
+    if (m_textProvidersChangedListener != null) {
+      IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+      if (TypeUtility.exists(abstractDynamicNlsTextProviderService)) {
+        IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
+        pth.removeHierarchyListener(m_textProvidersChangedListener);
+      }
+      m_textProvidersChangedListener = null; // weak listener. will be collected when this instance holds no reference anymore.
+    }
   }
 
   private static Set<IPluginModelBase> getDirectDependenciesImpl(IPluginModelBase bundle) {
     Set<IPluginModelBase> bd = new HashSet<IPluginModelBase>();
     Stack<IPluginModelBase> dependencyStack = new Stack<IPluginModelBase>();
-    collectDependencies(bundle, bd, dependencyStack, null, false);
+    collectDependencies(bundle, bd, dependencyStack, null, false, null);
     return bd;
   }
 
-  private static void collectDependencies(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec) {
+  private static void collectDependencies(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec, IProgressMonitor monitor) {
     if (bundle != null && bundle.getBundleDescription() != null) {
       for (BundleSpecification dependency : bundle.getBundleDescription().getRequiredBundles()) {
-        if (!bundle.getBundleDescription().getSymbolicName().equals(dependency.getName())) { // ignore dependencies on the bundle itself
-          IPluginModelBase model = PluginRegistry.findModel(dependency.getName());
-          if (model != null) {
-            addDependency(model, collector, dependencyStack, messageCollector, rec);
+        if (monitor != null && monitor.isCanceled()) {
+          return;
+        }
+        if (!CompareUtility.isOneOf(dependency.getName(), EXCLUDED_BUNDLE_SYMBOLIC_NAMES)) { // exclusions (performance)
+          if (!bundle.getBundleDescription().getSymbolicName().equals(dependency.getName())) { // ignore dependencies on the bundle itself
+            IPluginModelBase model = PluginRegistry.findModel(dependency.getName());
+            if (model != null) {
+              addDependency(model, collector, dependencyStack, messageCollector, rec, monitor);
+            }
           }
         }
       }
@@ -487,17 +550,16 @@ public class ScoutBundle implements IScoutBundle {
           // it is a fragment: the dependencies of the host are also present.
           IPluginModelBase model = PluginRegistry.findModel(host.getSymbolicName());
           if (model != null) {
-            addDependency(model, collector, dependencyStack, messageCollector, rec);
+            addDependency(model, collector, dependencyStack, messageCollector, rec, monitor);
           }
         }
       }
     }
   }
 
-  private static void addDependency(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec) {
-    // dependency loop detection & prevention
+  private static boolean handleDependencyCycle(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector) {
     if (dependencyStack.contains(bundle)) {
-      // a dependency loop was detected: log the loop and stop processing of this part of the dependency graph
+      // a dependency loop was detected: log the loop
       StringBuilder loopMsg = new StringBuilder(Texts.get("DependencyLoopDetected"));
       loopMsg.append(":\n");
       boolean loopBeginFound = false;
@@ -513,6 +575,15 @@ public class ScoutBundle implements IScoutBundle {
       }
       loopMsg.append(bundle.getBundleDescription().getSymbolicName());
       messageCollector.add(loopMsg.toString());
+      return true; // cycle found
+    }
+    return false; // no cycle found
+  }
+
+  private static void addDependency(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec, IProgressMonitor monitor) {
+    // dependency loop detection & prevention
+    if (handleDependencyCycle(bundle, collector, dependencyStack, messageCollector)) {
+      // cycle found and corrected: stop processing of this part of the dependency graph
       return;
     }
 
@@ -521,7 +592,7 @@ public class ScoutBundle implements IScoutBundle {
     try {
       dependencyStack.push(bundle);
       if (rec && !RuntimeBundles.containsTypeDefiningBundle(bundle.getBundleDescription())) {
-        collectDependencies(bundle, collector, dependencyStack, messageCollector, rec);
+        collectDependencies(bundle, collector, dependencyStack, messageCollector, rec, monitor);
       }
     }
     finally {
@@ -614,10 +685,7 @@ public class ScoutBundle implements IScoutBundle {
 
     @Override
     public void hierarchyInvalidated() {
-      synchronized (m_observer) {
-        m_observer.m_nlsProjectHolder = null;
-        m_observer.m_docsNlsProjectHolder = null;
-      }
+      m_observer.clearNlsCache();
     }
   }
 

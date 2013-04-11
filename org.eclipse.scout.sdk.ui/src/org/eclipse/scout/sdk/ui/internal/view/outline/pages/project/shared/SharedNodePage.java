@@ -32,8 +32,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class SharedNodePage extends AbstractBundleNodeTablePage {
 
-  private final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
-
   public SharedNodePage(IPage parent, ScoutBundleNode node) {
     super(parent, node);
   }
@@ -46,7 +44,9 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
   @Override
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
+
     if (getScoutBundle().getIconProvider() != null) {
+      IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
       ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
       IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), null);
       if (iconTypes.length > 0) {

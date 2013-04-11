@@ -19,10 +19,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>UiSwtNodePage</h3> ...
+ * <h3>AbstractBundleNodeTablePage</h3>
  * 
  * @author Andreas Hoegger
- * @since 1.0.8 09.02.2010
+ * @since 3.9.0
  */
 public abstract class AbstractBundleNodeTablePage extends AbstractPage {
 

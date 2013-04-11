@@ -152,6 +152,9 @@ public final class JdtUtility {
   }
 
   public static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {
+    if (element == null) {
+      return null;
+    }
     switch (element.getElementType()) {
       case IJavaElement.COMPILATION_UNIT:
         ICompilationUnit icu = (ICompilationUnit) element;

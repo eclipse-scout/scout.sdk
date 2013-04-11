@@ -28,10 +28,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>KeyStrokesTablePage</h3> ...
  */
 public class KeyStrokeTablePage extends AbstractPage {
-  private final IType iKeyStrokeType = TypeUtility.getType(RuntimeClasses.IKeyStroke);
-
   private final IType m_declaringType;
-
   private InnerTypePageDirtyListener m_keystrokeChangedListener;
 
   public KeyStrokeTablePage(IPage parentPage, IType declaringType) {
@@ -63,6 +60,7 @@ public class KeyStrokeTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_keystrokeChangedListener == null) {
+      IType iKeyStrokeType = TypeUtility.getType(RuntimeClasses.IKeyStroke);
       m_keystrokeChangedListener = new InnerTypePageDirtyListener(this, iKeyStrokeType);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
     }

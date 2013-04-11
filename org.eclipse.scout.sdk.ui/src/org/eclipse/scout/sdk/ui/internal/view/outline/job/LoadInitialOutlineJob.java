@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.job;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -21,20 +22,16 @@ import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-public class LoadInitialOutlineProcess extends AbstractWorkspaceBlockingJob {
+public class LoadInitialOutlineJob extends AbstractWorkspaceBlockingJob {
   private ScoutExplorerPart m_view;
 
-  public LoadInitialOutlineProcess(ScoutExplorerPart view) {
-    super("Loading outline");
+  public LoadInitialOutlineJob(ScoutExplorerPart view) {
+    super(Texts.get("LoadingScoutExplorer") + "...");
     m_view = view;
   }
 
-  public String getProcessName() {
-    return "Loading outline";
-  }
-
   @Override
-  protected void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void run(final IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     Control c = m_view.getTreeViewer().getControl();
     if (c.isDisposed()) return;
     //
@@ -58,8 +55,20 @@ public class LoadInitialOutlineProcess extends AbstractWorkspaceBlockingJob {
       display.asyncExec(new Runnable() {
         @Override
         public void run() {
+          if (monitor.isCanceled()) {
+            return;
+          }
+
+          m_view.expandAndSelectProjectLevel();
+          if (monitor.isCanceled()) {
+            return;
+          }
+
           m_view.getTreeViewer().refresh();
-          expandLoadedNodeRec(rootPage);
+          if (monitor.isCanceled()) {
+            return;
+          }
+
           m_view.getViewContentProvider().setAutoLoadChildren(true);
           m_view.getTreeViewer().getControl().setCursor(null);
           waitCursor.dispose();
@@ -73,6 +82,9 @@ public class LoadInitialOutlineProcess extends AbstractWorkspaceBlockingJob {
    */
   private void loadNodeRec(IPage page, IProgressMonitor monitor) {
     if (page.isInitiallyLoaded()) {
+      if (monitor.isCanceled()) {
+        return;
+      }
       monitor.subTask("Loading " + page.getName() + "...");
       if (!page.isChildrenLoaded()) {
         page.loadChildren();
@@ -80,21 +92,10 @@ public class LoadInitialOutlineProcess extends AbstractWorkspaceBlockingJob {
       // load children
       for (IPage childPage : page.getChildArray()) {
         loadNodeRec(childPage, monitor);
-      }
-      monitor.subTask("Loading complete");
-    }
-  }
-
-  /**
-   * must be running in gui thread
-   */
-  private void expandLoadedNodeRec(IPage page) {
-    if (page.isChildrenLoaded()) {
-      m_view.getTreeViewer().setExpandedState(page, true);
-      for (IPage ch : page.getChildArray()) {
-        expandLoadedNodeRec(ch);
+        if (monitor.isCanceled()) {
+          return;
+        }
       }
     }
   }
-
 }
