@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.sql;
 
-import java.util.Map;
+import java.util.HashSet;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,6 +50,8 @@ public class SqlBindCompletionProposalProcessor {
   private final IType AbstractPropertyData = TypeUtility.getType(RuntimeClasses.AbstractPropertyData);
 
   private final Image m_image;
+  private static final Pattern REGEX_QUOTES = Pattern.compile("\\\"");
+  private static final Pattern REGEX_BIND = Pattern.compile(".*\\:[A-Za-z0-9\\._-]*$");
   private static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
   private static final IContextInformation[] NO_CONTEXTS = new IContextInformation[0];
 
@@ -70,25 +72,29 @@ public class SqlBindCompletionProposalProcessor {
         return NO_PROPOSALS;
       }
       String prefix = getPrefix(context.getViewer(), context.getInvocationOffset());
-      TreeMap<String, ICompletionProposal> result = new TreeMap<String, ICompletionProposal>();
+      HashSet<ICompletionProposal> collector = new HashSet<ICompletionProposal>();
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formData);
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
-        if (t.getElementName().toLowerCase().startsWith(prefix.toLowerCase())) {
-          String propName = getBeanName(t.getElementName());
-          SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
-          result.put(prop.getDisplayString(), prop);
-          addInnerTypesInSuperClasses(t, t.newSupertypeHierarchy(null), result, prefix, propName + ".", context);
-        }
+        String propName = getBeanName(t.getElementName());
+        SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
+        collector.add(prop);
+        addInnerTypesInSuperClasses(t, t.newSupertypeHierarchy(null), collector, prefix, propName + ".", context);
       }
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
         String propName = t.getElementName();
         propName = getBeanName(propName.replaceAll("Property$", ""));
-        if (propName.toLowerCase().startsWith(prefix.toLowerCase())) {
-          SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
-          result.put(prop.getDisplayString(), prop);
+        SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
+        collector.add(prop);
+      }
+
+      TreeMap<String, ICompletionProposal> sorted = new TreeMap<String, ICompletionProposal>();
+      for (ICompletionProposal p : collector) {
+        if (p.getDisplayString().toLowerCase().startsWith(prefix.toLowerCase())) {
+          sorted.put(p.getDisplayString(), p);
         }
       }
-      return result.values().toArray(new ICompletionProposal[result.values().size()]);
+
+      return sorted.values().toArray(new ICompletionProposal[sorted.values().size()]);
     }
     catch (Exception e) {
       ScoutSdkUi.logWarning("error during creating sql copletion.", e);
@@ -106,13 +112,13 @@ public class SqlBindCompletionProposalProcessor {
     return elementName.toLowerCase();
   }
 
-  private void addInnerTypesInSuperClasses(IType baseType, org.eclipse.jdt.core.ITypeHierarchy baseTypeSuperHierarchy, Map<String, ICompletionProposal> collector,
+  private void addInnerTypesInSuperClasses(IType baseType, org.eclipse.jdt.core.ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector,
       String prefix, String namePrefix, JavaContentAssistInvocationContext context) throws JavaModelException {
     for (IType superClass : baseTypeSuperHierarchy.getAllSuperclasses(baseType)) {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(superClass);
       for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
         SqlBindProposal prop = new SqlBindProposal(namePrefix + getBeanName(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
-        collector.put(prop.getDisplayString(), prop);
+        collector.add(prop);
         addInnerTypesInSuperClasses(innerType, innerType.newSupertypeHierarchy(null), collector, prefix, prop.getDisplayString() + ".", context);
       }
     }
@@ -125,13 +131,13 @@ public class SqlBindCompletionProposalProcessor {
     }
     IRegion lineInfo = doc.getLineInformationOfOffset(offset);
     String linePart = doc.get(lineInfo.getOffset(), offset - lineInfo.getOffset());
-    Matcher m = Pattern.compile("\\\"").matcher(linePart);
+    Matcher m = REGEX_QUOTES.matcher(linePart);
     boolean stringLocation = false;
     while (m.find()) {
       stringLocation = !stringLocation;
     }
     if (stringLocation) {
-      stringLocation = linePart.matches(".*\\:[A-Za-z0-9_-]*$");
+      stringLocation = REGEX_BIND.matcher(linePart).matches();
     }
     return stringLocation;
   }
@@ -162,7 +168,7 @@ public class SqlBindCompletionProposalProcessor {
     }
 
     int length = 0;
-    while (--offset >= 0 && Character.isLetterOrDigit(doc.getChar(offset))) {
+    while (--offset >= 0 && (Character.isLetterOrDigit(doc.getChar(offset)) || doc.getChar(offset) == '.' || doc.getChar(offset) == '_' || doc.getChar(offset) == '-')) {
       length++;
     }
     return doc.get(offset + 1, length);
