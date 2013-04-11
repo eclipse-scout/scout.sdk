@@ -10,16 +10,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.internal.core.PDECore;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
@@ -60,22 +61,23 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @return
    * @throws JavaModelException
    */
-  private static IType[] getRegisteredTextProviderTypes(Boolean returnDocServices, String[] projectFilter) throws JavaModelException {
+  private static IType[] getRegisteredTextProviderTypes(Boolean returnDocServices, final String[] projectFilter) throws JavaModelException {
 
     class TextProviderService {
       private final IType textProvider;
-      private final IJavaProject project;
+      private final String contributingBundleName;
 
       private TextProviderService(IType t) {
         textProvider = t;
-        project = t.getJavaProject();
+        IScoutBundle b = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(t);
+        contributingBundleName = b == null ? "" : b.getSymbolicName();
       }
 
       @Override
       public int hashCode() {
         int ret = 1;
         ret = ret * 27 + textProvider.getFullyQualifiedName().hashCode();
-        ret = ret * 19 + project.getElementName().hashCode();
+        ret = ret * 19 + contributingBundleName.hashCode();
         return ret;
       }
 
@@ -84,7 +86,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         if (obj instanceof TextProviderService) {
           TextProviderService o = (TextProviderService) obj;
           return textProvider.getFullyQualifiedName().equals(o.textProvider.getFullyQualifiedName()) &&
-              project.getElementName().equals(o.project.getElementName());
+              contributingBundleName.equals(o.contributingBundleName);
         }
         else {
           return false;
@@ -94,9 +96,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
     class TextProviderServiceDeclaration {
       private final TextProviderService svc;
-      private final float prio;
+      private final double prio;
 
-      private TextProviderServiceDeclaration(TextProviderService s, float p) {
+      private TextProviderServiceDeclaration(TextProviderService s, double p) {
         svc = s;
         prio = p;
       }
@@ -150,11 +152,22 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
 
     // we have ensured that every service is registered with its highest prio -> sort all services by prio
+    // use the level distance as second criteria
     TextProviderServiceDeclaration[] sortedArrayHighestPrioFirst = result.values().toArray(new TextProviderServiceDeclaration[result.size()]);
     Arrays.sort(sortedArrayHighestPrioFirst, new Comparator<TextProviderServiceDeclaration>() {
       @Override
       public int compare(TextProviderServiceDeclaration o1, TextProviderServiceDeclaration o2) {
-        return new Float(o2.prio).compareTo(new Float(o1.prio));
+        if (o2.prio != o1.prio) {
+          return Double.valueOf(o2.prio).compareTo(Double.valueOf(o1.prio));
+        }
+
+        int i1 = getIndexOf(o1.svc.contributingBundleName, projectFilter);
+        int i2 = getIndexOf(o2.svc.contributingBundleName, projectFilter);
+        if (i1 != i2) {
+          return Integer.valueOf(i1).compareTo(Integer.valueOf(i2));
+        }
+
+        return o1.svc.textProvider.getElementName().compareTo(o2.svc.textProvider.getElementName());
       }
     });
 
@@ -164,6 +177,17 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       returnValueSorted[i] = sortedArrayHighestPrioFirst[i].svc.textProvider;
     }
     return returnValueSorted;
+  }
+
+  private static int getIndexOf(String searchEleemnt, String[] list) {
+    if (list != null && list.length > 0) {
+      for (int i = 0; i < list.length; i++) {
+        if (CompareUtility.equals(searchEleemnt, list[i])) {
+          return i;
+        }
+      }
+    }
+    return -1;
   }
 
   private static boolean acceptsFilter(Boolean returnDocServices, String[] projects, IType candidate) throws JavaModelException {
