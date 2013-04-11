@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.jface.viewers.ISelection;
@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.EditorSelectionVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IFileEditorInput;
@@ -47,7 +48,7 @@ public class LinkWithEditorAction extends Action {
   private P_PropertyListener m_propertyListener;
   private P_JavaEditorSelectionListener m_javaEditorSelectionListener;
   private final ScoutExplorerPart m_viewPart;
-  private P_IcuSelection m_currentIcuSelection;
+  private IJavaElement m_currentSelection;
   private P_UpdateSelectionJob m_updateSelectionJob;
 
   public LinkWithEditorAction(ScoutExplorerPart viewPart) {
@@ -81,13 +82,14 @@ public class LinkWithEditorAction extends Action {
     m_viewPart.setLinkingEnabled(isChecked());
   }
 
-  public P_IcuSelection getCurrentIcuSelection() {
-    return m_currentIcuSelection;
+  public IJavaElement getCurrentSelection() {
+    return m_currentSelection;
   }
 
-  public void setCurrentIcuSelection(P_IcuSelection currentIcuSelection) {
-    m_currentIcuSelection = currentIcuSelection;
-    if (isChecked()) {
+  public void setCurrentSelection(IJavaElement currentSelection) {
+    IJavaElement oldSelection = m_currentSelection;
+    m_currentSelection = currentSelection;
+    if (isChecked() && CompareUtility.notEquals(oldSelection, m_currentSelection)) {
       m_updateSelectionJob.schedule(BRIEF_DELAY);
     }
   }
@@ -111,42 +113,36 @@ public class LinkWithEditorAction extends Action {
   } // end class P_PropertyListener
 
   private class P_JavaEditorSelectionListener implements ISelectionListener {
-    private ISelection m_lastSelection;
 
+    @SuppressWarnings("restriction")
     @Override
     public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-      if (JavaUI.ID_CU_EDITOR.equals(part.getSite().getId())) {
-        if (part instanceof IEditorPart) {
-          IEditorInput editorInput = ((IEditorPart) part).getEditorInput();
-          if (editorInput instanceof IFileEditorInput && selection instanceof ITextSelection) {
-            if (CompareUtility.equals(m_lastSelection, selection)) {
-              return;
+      if (part instanceof IEditorPart) {
+        IEditorInput editorInput = ((IEditorPart) part).getEditorInput();
+        if (selection instanceof ITextSelection) {
+          if (editorInput instanceof IFileEditorInput) {
+            IFileEditorInput fileInput = (IFileEditorInput) editorInput;
+            try {
+              IJavaElement element = JdtUtility.findJavaElement(fileInput.getFile(), (ITextSelection) selection);
+              if (TypeUtility.exists(element)) {
+                setCurrentSelection(element);
+              }
             }
-            m_lastSelection = selection;
-            setCurrentIcuSelection(new P_IcuSelection(((IFileEditorInput) editorInput).getFile(), (ITextSelection) selection));
+            catch (JavaModelException e) {
+              ScoutSdkUi.logWarning("Unable to calculate the selected java element.", e);
+            }
+          }
+          else if (editorInput instanceof org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput) {
+            org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput binaryInput = (org.eclipse.jdt.internal.ui.javaeditor.IClassFileEditorInput) editorInput;
+            IType type = binaryInput.getClassFile().getType();
+            if (TypeUtility.exists(type)) {
+              setCurrentSelection(type);
+            }
           }
         }
       }
     }
   }// end class P_JavaEditorSelectionListener
-
-  private class P_IcuSelection {
-    private final ITextSelection m_selection;
-    private final IFile m_javaFile;
-
-    public P_IcuSelection(IFile javaFile, ITextSelection selection) {
-      m_javaFile = javaFile;
-      m_selection = selection;
-    }
-
-    public ITextSelection getSelection() {
-      return m_selection;
-    }
-
-    public IFile getJavaFile() {
-      return m_javaFile;
-    }
-  } // end class P_IcuSelection
 
   private class P_UpdateSelectionJob extends UIJob {
 
@@ -156,7 +152,7 @@ public class LinkWithEditorAction extends Action {
 
     @Override
     public IStatus runInUIThread(IProgressMonitor monitor) {
-      if (!m_viewPart.getTreeViewer().getTree().isDisposed() && m_currentIcuSelection != null) {
+      if (!m_viewPart.getTreeViewer().getTree().isDisposed() && TypeUtility.exists(getCurrentSelection())) {
         SafeRunner.run(new ISafeRunnable() {
           @Override
           public void run() throws Exception {
@@ -165,8 +161,8 @@ public class LinkWithEditorAction extends Action {
             if (selection != null && selection.size() > 0) {
               startPage = (IPage) selection.getFirstElement();
             }
-            IJavaElement element = JdtUtility.findJavaElement(m_currentIcuSelection.getJavaFile(), m_currentIcuSelection.getSelection());
-            EditorSelectionVisitor visitor = new EditorSelectionVisitor(element);
+
+            EditorSelectionVisitor visitor = new EditorSelectionVisitor(getCurrentSelection());
             IPage nodeToSelect = null;
             nodeToSelect = visitor.findPageToSelect(startPage);
             if (nodeToSelect != null) {
