@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.rap.operations.project;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -63,19 +64,44 @@ public class ScoutRapTargetCreationOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    IOUtility.deleteDirectory(getDestinationDirectory());
-    Enumeration urls = getSourcePlugin().findEntries(SCOUT_RAP_TARGET_PLUGIN_SUB_DIR, "*", true);
-    if (urls != null) {
-      while (urls.hasMoreElements()) {
-        Object url = urls.nextElement();
-        if (url instanceof URL) {
-          extract((URL) url);
+    try {
+      final String suffix = ".jar";
+      IOUtility.deleteDirectory(getDestinationDirectory());
+      Enumeration urls = getSourcePlugin().findEntries(SCOUT_RAP_TARGET_PLUGIN_SUB_DIR, "*", true);
+      if (urls != null) {
+        while (urls.hasMoreElements()) {
+          Object url = urls.nextElement();
+          if (url instanceof URL) {
+            extract((URL) url);
+          }
         }
       }
+
+      File featuresFolder = new File(getDestinationDirectory(), "features");
+      if (featuresFolder.exists()) {
+        File[] featureJars = featuresFolder.listFiles(new FilenameFilter() {
+          @Override
+          public boolean accept(File dir, String name) {
+            return name.toLowerCase().endsWith(suffix);
+          }
+        });
+
+        for (File jar : featureJars) {
+          File dest = new File(featuresFolder, jar.getName().substring(0, jar.getName().length() - suffix.length()));
+          ResourceUtility.extractZip(jar, dest);
+          IOUtility.deleteFile(jar.getAbsolutePath());
+        }
+      }
+
+      IOUtility.deleteFile(new File(getDestinationDirectory().getAbsolutePath(), "artifacts.jar").getAbsolutePath());
+      IOUtility.deleteFile(new File(getDestinationDirectory().getAbsolutePath(), "content.jar").getAbsolutePath());
+    }
+    catch (IOException e) {
+      ScoutSdkRap.logError("Unable to create new Scout RAP target.", e);
     }
   }
 
-  private void extract(URL source) {
+  private void extract(URL source) throws IOException {
     InputStream in = null;
     OutputStream out = null;
     try {
@@ -92,9 +118,6 @@ public class ScoutRapTargetCreationOperation implements IOperation {
         in = source.openStream();
         ResourceUtility.copy(in, out);
       }
-    }
-    catch (IOException e) {
-      ScoutSdkRap.logError("could not extract file '" + source + "'.", e);
     }
     finally {
       if (in != null) {

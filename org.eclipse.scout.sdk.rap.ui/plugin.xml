@@ -60,4 +60,10 @@
             class="org.eclipse.scout.sdk.rap.ui.internal.RapStartup">
       </startup>
    </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.contextMenu">
+      <contextMenu
+            class="org.eclipse.scout.sdk.rap.ui.internal.action.RapTargetNewAction">
+      </contextMenu>
+   </extension>
 </plugin>

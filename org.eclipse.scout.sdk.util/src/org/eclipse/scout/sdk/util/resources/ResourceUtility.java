@@ -12,9 +12,11 @@ package org.eclipse.scout.sdk.util.resources;
 
 import java.awt.Desktop;
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -24,6 +26,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.core.resources.IContainer;
@@ -345,6 +348,48 @@ public final class ResourceUtility {
       // fallback: copy file
       FileUtility.copyFile(from, new File(destFolder, from.getName()));
       IOUtility.deleteFile(from.getAbsolutePath());
+    }
+  }
+
+  public static void extractZip(File zipFile, File destinationFolder) throws IOException {
+    ZipInputStream zipInputStream = null;
+    ZipEntry zipEntry;
+    try {
+      zipInputStream = new ZipInputStream(new BufferedInputStream(new FileInputStream(zipFile)));
+      zipEntry = zipInputStream.getNextEntry();
+      while (zipEntry != null) {
+        if (!zipEntry.isDirectory()) {
+          String entryName = zipEntry.getName();
+
+          File destFile = new File(destinationFolder, entryName);
+          destFile.getParentFile().mkdirs();
+          OutputStream fos = null;
+          try {
+            fos = new BufferedOutputStream(new FileOutputStream(destFile));
+            copy(zipInputStream, fos);
+          }
+          finally {
+            if (fos != null) {
+              try {
+                fos.close();
+              }
+              catch (Exception e) {
+              }
+            }
+          }
+        }
+        zipInputStream.closeEntry();
+        zipEntry = zipInputStream.getNextEntry();
+      }
+    }
+    finally {
+      if (zipInputStream != null) {
+        try {
+          zipInputStream.close();
+        }
+        catch (Exception e) {
+        }
+      }
     }
   }
 
