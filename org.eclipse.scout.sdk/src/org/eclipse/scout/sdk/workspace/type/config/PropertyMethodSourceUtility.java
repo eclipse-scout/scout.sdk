@@ -414,16 +414,15 @@ public final class PropertyMethodSourceUtility {
         String fieldName = matcher.group(3);
         typeName = typeName.substring(0, typeName.length() - 1);
         IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName);
-        // if(iconsType==null){
-        // iconsType = ScoutTypes.getType(method.findBestMatchSharedBundle().getPackageNameIconConstant() + ".Icons");
-        // }
         if (TypeUtility.exists(iconsType)) {
           ITypeHierarchy iconsSuperTypeHierarchy = iconsType.newSupertypeHierarchy(null);
           while (TypeUtility.exists(iconsType)) {
             IField field = iconsType.getField(fieldName);
             if (TypeUtility.exists(field)) {
-              String source = field.getSource();
-              return Regex.getIconSimpleNameFromFieldSource(source);
+              Object val = TypeUtility.getFieldConstant(field);
+              if (val instanceof String) {
+                return val.toString();
+              }
             }
             iconsType = iconsSuperTypeHierarchy.getSuperclass(iconsType);
           }

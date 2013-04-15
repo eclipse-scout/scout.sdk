@@ -24,13 +24,12 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ScoutFileLocator;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.Regex;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
@@ -91,14 +90,14 @@ public class ScoutProjectIcons implements IIconProvider {
         for (ScoutIconDesc desc : collector.values()) {
           findIconInProject(desc);
         }
-        m_cachedIcons = new HashMap<String, ScoutIconDesc>(collector);// collector.toArray(new BCIcon[collector.size()]);
+        m_cachedIcons = new HashMap<String, ScoutIconDesc>(collector);
       }
     }
   }
 
   private String[] buildBaseUrls() {
     List<String> projects = new ArrayList<String>();
-    for (IScoutBundle parentBundle : m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true)) {
+    for (IScoutBundle parentBundle : m_bundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true)) {
       projects.add(parentBundle.getSymbolicName());
     }
 
@@ -112,7 +111,7 @@ public class ScoutProjectIcons implements IIconProvider {
   }
 
   protected void collectIconNames(Map<String, ScoutIconDesc> collector) {
-    IScoutBundle[] parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    IScoutBundle[] parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     for (IScoutBundle parentShared : parentSharedBundles) {
       IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared));
       if (iconTypes != null && iconTypes.length > 0) {
@@ -132,23 +131,13 @@ public class ScoutProjectIcons implements IIconProvider {
 
   protected void collectIconNamesOfType(IType iconType, Map<String, ScoutIconDesc> collector) throws JavaModelException, IllegalArgumentException {
     if (TypeUtility.exists(iconType)) {
-      boolean inherited = ScoutTypeUtility.getScoutBundle(iconType) == m_bundle;
+      boolean inherited = CompareUtility.notEquals(ScoutTypeUtility.getScoutBundle(iconType), m_bundle);
       for (IField field : iconType.getFields()) {
         if (Flags.isPublic(field.getFlags()) && field.getSource() != null && field.getSource().contains(" String ")) {
-          String source = field.getSource();
-          String iconDeclaration = ScoutUtility.removeComments(source);
-          try {
-            String iconSimpleName = Regex.getFieldDeclarationRightHandSide(iconDeclaration);
-            if (iconSimpleName.startsWith("\"")) {
-              iconSimpleName = iconSimpleName.substring(1);
-            }
-            if (iconSimpleName.endsWith("\"")) {
-              iconSimpleName = iconSimpleName.substring(0, iconSimpleName.length() - 1);
-            }
-            collector.put(iconSimpleName, new ScoutIconDesc(field.getElementName(), Regex.getIconSimpleName(iconSimpleName), field, inherited));
-          }
-          catch (Exception e) {
-            ScoutSdk.logError(e);
+          Object fieldConstant = TypeUtility.getFieldConstant(field);
+          if (fieldConstant instanceof String) {
+            String iconName = fieldConstant.toString();
+            collector.put(iconName, new ScoutIconDesc(field.getElementName(), iconName, field, inherited));
           }
         }
       }

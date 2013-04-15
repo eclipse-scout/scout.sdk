@@ -20,28 +20,6 @@ import org.junit.Test;
 public class RegexTest {
 
   @Test
-  public void testRegexFieldDeclaration_validFieldDeclarations() {
-    checkVariableDeclarationRightHandSide("int i = 5;", "5");
-    checkVariableDeclarationRightHandSide("  int     i    =     5     ;", "5");
-    checkVariableDeclarationRightHandSide("@Deprecated private int i = 5;", "5");
-    checkVariableDeclarationRightHandSide("private int i = 5;", "5");
-    checkVariableDeclarationRightHandSide("private static String foo = \"String\";", "\"String\"");
-    checkVariableDeclarationRightHandSide("private final static String foo = \"test string with \\\" \";", "\"test string with \\\" \"");
-    checkVariableDeclarationRightHandSide("private final static Map<String, Integer> foo = new HashMap<String, Integer>();", "new HashMap<String, Integer>()");
-    checkVariableDeclarationRightHandSide("private final static volatile transient Map<String, Integer> foo = new HashMap<String, Integer>();", "new HashMap<String, Integer>()");
-    checkVariableDeclarationRightHandSide("private String s;", null);
-    checkVariableDeclarationRightHandSide("public static final String docOut=\"docOut\";  //TODO: [jbr] use inverse icon", "\"docOut\"");
-    checkVariableDeclarationRightHandSide("public static final String docOut=\"docOut;\";  //TODO: [jbr] use inverse icon", "\"docOut;\"");
-    checkVariableDeclarationRightHandSide("public static final String docOut=\"docOut;\";  /* TODO: \n[jbr] use inverse icon*/", "\"docOut;\"");
-    checkVariableDeclarationRightHandSide("private String s = \"first \" + \" second part\";", "\"first \" + \" second part\"");
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void testRegexFieldDeclaration_invalidFieldDeclaration() {
-    checkVariableDeclarationRightHandSide("private int i j = 5;", "5");
-  }
-
-  @Test
   public void testMethodPresenterValue() {
     checkMethodPresenter("{ int a=0; return abcdefg.aaa; } ", "abcdefg.aaa");
     checkMethodPresenter("{ int a=0; return \"abcdefg;aaa\"; } ", "\"abcdefg;aaa\"");
@@ -61,10 +39,6 @@ public class RegexTest {
     if (found) {
       Assert.assertEquals(expectedVal, m.group(1).trim());
     }
-  }
-
-  private void checkVariableDeclarationRightHandSide(String fieldDeclaration, String expectedRightHandSide) {
-    Assert.assertEquals(expectedRightHandSide, Regex.getFieldDeclarationRightHandSide(fieldDeclaration));
   }
 
   @Test
