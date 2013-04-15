@@ -66,7 +66,7 @@ public final class ScoutBundleFilters {
   }
 
   /**
-   * @return a filter that returns all bundles that are in the current workspace (bundles from the target platform as
+   * @return a filter that returns all bundles that are in the current workspace (bundles from the target platform are
    *         discarded)
    * @see IScoutBundle#isBinary()
    */
@@ -233,6 +233,24 @@ public final class ScoutBundleFilters {
       @Override
       public boolean accept(IScoutBundle bundle) {
         return !symbolicNames.contains(bundle.getSymbolicName());
+      }
+    };
+  }
+
+  /**
+   * Creates and returns a filter that returns all bundles that are NOT accepted by the given filter.
+   * 
+   * @param originalFilter
+   *          The original filter that should be inverted.
+   * @return the created filter (inverted version of the given filter).
+   * @see IScoutBundleFilter
+   * @see ScoutBundleFilters
+   */
+  public static IScoutBundleFilter getInvertedFilter(final IScoutBundleFilter originalFilter) {
+    return new IScoutBundleFilter() {
+      @Override
+      public boolean accept(IScoutBundle bundle) {
+        return !originalFilter.accept(bundle);
       }
     };
   }
