@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.TextField;
+import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -61,20 +62,43 @@ public class NewScoutWorkingSetDialog extends Dialog {
     return ret;
   }
 
-  private boolean isValid(String txt) {
-    boolean valid = StringUtility.hasText(txt);
-    if (valid && m_existingSets != null && m_existingSets.length > 0) {
-      for (String s : m_existingSets) {
+  private static boolean isValid(String txt, String[] usedNames) {
+    if (!isValid(txt)) {
+      return false;
+    }
+
+    // working set must not exist yet
+    if (usedNames != null && usedNames.length > 0) {
+      for (String s : usedNames) {
         if (CompareUtility.equals(txt, s)) {
           return false;
         }
       }
-
-      if (PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(txt) != null) {
-        return false;
-      }
     }
-    return valid;
+
+    return true;
+  }
+
+  public static boolean isValid(String txt) {
+    if (!StringUtility.hasText(txt)) {
+      return false;
+    }
+
+    // working set must not exist yet
+    if (PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(txt) != null) {
+      return false;
+    }
+
+    // name cannot contain the delimiter used to persist the sets
+    if (txt.indexOf(ScoutExplorerSettingsSupport.DELIMITER) >= 0) {
+      return false;
+    }
+
+    // other working set name is reserved
+    if (ScoutExplorerSettingsSupport.OTHER_PROJECTS_WORKING_SET_NAME.equals(txt)) {
+      return false;
+    }
+    return true;
   }
 
   @Override
@@ -85,7 +109,7 @@ public class NewScoutWorkingSetDialog extends Dialog {
       @Override
       public void modifyText(ModifyEvent e) {
         String newText = f.getText();
-        boolean valid = isValid(newText);
+        boolean valid = isValid(newText, m_existingSets);
         if (valid) {
           m_propertySupport.setProperty(PROP_WORKING_SET_NAME, newText.trim());
         }

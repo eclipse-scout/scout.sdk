@@ -154,7 +154,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
       }
       m_availableBundlesTree.getTreeViewer().refresh();
       if (m_removeWorkingSetButton != null && !m_removeWorkingSetButton.isDisposed()) {
-        m_removeWorkingSetButton.setEnabled(set != null);
+        m_removeWorkingSetButton.setEnabled(set != null && !ScoutExplorerSettingsSupport.OTHER_PROJECTS_WORKING_SET_NAME.equals(set));
       }
 
       String[] sets = getAllWorkingSets();
@@ -163,6 +163,9 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
       }
       if (m_workingSetUpButton != null && !m_workingSetUpButton.isDisposed()) {
         m_workingSetUpButton.setEnabled(set != null && sets.length > 0 && sets[0] != set);
+      }
+      if (m_availableBundlesTree != null && !m_availableBundlesTree.isDisposed()) {
+        m_availableBundlesTree.setVisible(!ScoutExplorerSettingsSupport.OTHER_PROJECTS_WORKING_SET_NAME.equals(set));
       }
     }
     finally {
@@ -179,8 +182,8 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
     m_selection = new HashMap<String, IAdaptable[]>();
     m_initialSets = new HashSet<String>(workingSetNames.length);
     for (int i = 0; i < workingSetNames.length; i++) {
-      workingSetNames[i] = scoutWorkingSets[i].getName();
-      m_selection.put(scoutWorkingSets[i].getName(), scoutWorkingSets[i].getElements());
+      workingSetNames[i] = scoutWorkingSets[i].getLabel();
+      m_selection.put(scoutWorkingSets[i].getLabel(), scoutWorkingSets[i].getElements());
       m_initialSets.add(workingSetNames[i]);
     }
 
@@ -188,7 +191,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
     IWorkingSet[] checkedSets = ScoutExplorerSettingsSupport.get().getScoutWorkingSets(false);
     String[] checkedWorkingSetNames = new String[checkedSets.length];
     for (int i = 0; i < checkedWorkingSetNames.length; i++) {
-      checkedWorkingSetNames[i] = checkedSets[i].getName();
+      checkedWorkingSetNames[i] = checkedSets[i].getLabel();
     }
 
     Label label = new Label(composite, SWT.NONE);
@@ -416,7 +419,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
 
       // try to find an existing set
       for (IWorkingSet s : existings) {
-        if (workingSet.equals(s.getName())) {
+        if (workingSet.equals(s.getLabel())) {
           currentSet = s;
           break;
         }
@@ -437,7 +440,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
       m_initialSets.remove(workingSet);
 
       // collect all hidden sets
-      if (!visibleSets.contains(currentSet.getName())) {
+      if (!visibleSets.contains(currentSet.getLabel())) {
         hiddenSets.add(currentSet);
       }
 
