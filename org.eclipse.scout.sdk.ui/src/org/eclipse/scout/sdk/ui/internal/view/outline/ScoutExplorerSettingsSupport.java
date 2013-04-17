@@ -18,15 +18,20 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkingSet;
 
 /**
  * <h3>{@link ScoutExplorerSettingsSupport}</h3>
@@ -34,6 +39,7 @@ import org.eclipse.ui.PlatformUI;
  * @author mvi
  * @since 3.9.0 20.03.2013
  */
+@SuppressWarnings("restriction")
 public final class ScoutExplorerSettingsSupport {
 
   private final static ScoutExplorerSettingsSupport INSTANCE = new ScoutExplorerSettingsSupport();
@@ -65,7 +71,8 @@ public final class ScoutExplorerSettingsSupport {
   private final static String SHOW_BINARY_BUNDLES_ENABLED = "true"; // default
   private final static String SHOW_BINARY_BUNDLES_DISABLED = "false";
 
-  private final static char DELIMITER = ',';
+  public final static char DELIMITER = ',';
+  public final static String OTHER_PROJECTS_WORKING_SET_NAME = "Other Projects";
 
   private BundlePresentation m_bundlePresentation;
   private boolean m_showFragments;
@@ -305,14 +312,32 @@ public final class ScoutExplorerSettingsSupport {
   public synchronized IWorkingSet[] getScoutWorkingSets(boolean includeHidden) {
     IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
     IWorkingSet[] allWorkingSets = workingSetManager.getAllWorkingSets();
-    HashSet<IWorkingSet> result = new HashSet<IWorkingSet>(allWorkingSets.length);
+    HashSet<IWorkingSet> result = new HashSet<IWorkingSet>(allWorkingSets.length + 1);
+    HashSet<IScoutBundle> bundlesThatBelongToASet = new HashSet<IScoutBundle>();
     for (IWorkingSet ws : allWorkingSets) {
-      if (ws.isVisible() && SCOUT_WOKRING_SET_ID.equals(ws.getId())) {
-        if (includeHidden || !m_hiddenWorkingSets.contains(ws.getName())) {
-          result.add(ws);
+      IWorkingSet fws = filterWorkingSet(ws, includeHidden);
+      if (fws != null) {
+        result.add(fws);
+      }
+
+      // remember the bundles used
+      for (IAdaptable a : ws.getElements()) {
+        IScoutBundle b = (IScoutBundle) a.getAdapter(IScoutBundle.class);
+        if (b != null) {
+          bundlesThatBelongToASet.add(b);
         }
       }
     }
+
+    // others working set
+    IScoutBundle[] unAssignedBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getNotInListFilter(bundlesThatBelongToASet));
+    IWorkingSet others = new WorkingSet(OTHER_PROJECTS_WORKING_SET_NAME, OTHER_PROJECTS_WORKING_SET_NAME, unAssignedBundles);
+    others.setId(SCOUT_WOKRING_SET_ID);
+    others = filterWorkingSet(others, includeHidden);
+    if (others != null) {
+      result.add(others);
+    }
+
     IWorkingSet[] array = result.toArray(new IWorkingSet[result.size()]);
     Arrays.sort(array, new Comparator<IWorkingSet>() {
       @Override
@@ -323,5 +348,14 @@ public final class ScoutExplorerSettingsSupport {
       }
     });
     return array;
+  }
+
+  private IWorkingSet filterWorkingSet(IWorkingSet ws, boolean includeHidden) {
+    if (ws.isVisible() && SCOUT_WOKRING_SET_ID.equals(ws.getId())) {
+      if (includeHidden || !m_hiddenWorkingSets.contains(ws.getName())) {
+        return ws;
+      }
+    }
+    return null;
   }
 }

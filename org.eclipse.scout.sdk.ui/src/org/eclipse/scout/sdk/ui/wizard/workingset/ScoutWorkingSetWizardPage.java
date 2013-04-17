@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.TextField;
@@ -13,6 +12,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
+import org.eclipse.scout.sdk.ui.internal.dialog.workingset.NewScoutWorkingSetDialog;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -126,12 +126,8 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
   private void validatePage() {
     String errorMessage = null;
 
-    if (!StringUtility.hasText(m_nameField.getText())) {
-      errorMessage = Texts.get("PleaseSpecifyAName");
-    }
-
-    if (PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(m_nameField.getText().trim()) != null) {
-      errorMessage = Texts.get("NameAlreadyInUse");
+    if (!NewScoutWorkingSetDialog.isValid(m_nameField.getText())) {
+      errorMessage = Texts.get("NameNotValid");
     }
 
     setErrorMessage(errorMessage);
