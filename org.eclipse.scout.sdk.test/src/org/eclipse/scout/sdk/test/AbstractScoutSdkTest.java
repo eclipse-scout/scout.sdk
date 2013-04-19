@@ -59,7 +59,6 @@ public abstract class AbstractScoutSdkTest {
   protected static void showEgitMessageBoxes(boolean show) {
     try {
       // preference store as defined in org.eclipse.ui.plugin.AbstractUIPlugin.getPreferenceStore()
-      @SuppressWarnings("deprecation")
       IPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), "org.eclipse.egit.ui");
 
       // following constants are coming from class org.eclipse.egit.ui.UIPreferences:
