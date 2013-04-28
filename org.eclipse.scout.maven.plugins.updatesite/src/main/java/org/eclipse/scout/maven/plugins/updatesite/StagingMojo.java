@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package org.eclipse.scout.maven.plugins.updatesite;
 
 import java.io.File;
@@ -59,7 +69,6 @@ public class StagingMojo extends AbstractMojo {
   private String updatesiteDir;
 
   /**
-   *
    * @parameter default-value="nightly"
    */
   private String compositeDir;
@@ -68,7 +77,6 @@ public class StagingMojo extends AbstractMojo {
    * @parameter default-value="http://download.eclipse.org/scout/nightly/3.9"
    */
   private String compositeUrl;
-
 
   /**
    * @parameter default-value="/home/data/httpd/download.eclipse.org/scout/stagingArea"
@@ -79,7 +87,6 @@ public class StagingMojo extends AbstractMojo {
    * @parameter default-value=100
    */
   private String maxSize;
-
 
   public String getP2InputDirectory() {
     return p2InputDirectory;
@@ -97,7 +104,6 @@ public class StagingMojo extends AbstractMojo {
     this.outputDirectory = outputDirectory;
   }
 
-
   public String getCompositeDirName() {
     return compositeDir;
   }
@@ -106,16 +112,13 @@ public class StagingMojo extends AbstractMojo {
     this.compositeDir = compositeDirName;
   }
 
-
   public String getUpdatesiteDir() {
     return updatesiteDir;
   }
 
-
   public int getMaxSize() {
     return Integer.parseInt(maxSize);
   }
-
 
   public void setUpdatesiteDir(String updatesiteDir) {
     this.updatesiteDir = updatesiteDir;
@@ -129,8 +132,8 @@ public class StagingMojo extends AbstractMojo {
     this.compositeUrl = compositeUrl;
   }
 
-  private File getStageDir(){
-	  return new File(getOutputDirectory() + File.separator + "stage");
+  private File getStageDir() {
+    return new File(getOutputDirectory() + File.separator + "stage");
   }
 
   public void execute() throws MojoExecutionException {
@@ -142,7 +145,7 @@ public class StagingMojo extends AbstractMojo {
     publish(doStageFile);
   }
 
-  public void publish(File file) throws MojoExecutionException{
+  public void publish(File file) throws MojoExecutionException {
     try {
       FileUtility.copyToDir(file, new File(getStagingArea()));
     }
@@ -181,8 +184,8 @@ public class StagingMojo extends AbstractMojo {
       String jarName = contentJar.getName();
       File contentXML = extractCompositeArchive(outputDir, contentJar);
       appendChild(contentXML, getUpdatesiteDir());
-      truncateChildren(contentXML,getMaxSize());
-      File contentFolder = new File(outputDir,folderName);
+      truncateChildren(contentXML, getMaxSize());
+      File contentFolder = new File(outputDir, folderName);
       contentFolder.mkdir();
       FileUtility.copyToDir(contentXML, contentFolder);
       File newContentJar = new File(outputDir, jarName);
@@ -191,7 +194,7 @@ public class StagingMojo extends AbstractMojo {
       FileUtility.deleteFile(contentFolder);
     }
     catch (IOException e) {
-      throw new MojoExecutionException("Could not update archive",e);
+      throw new MojoExecutionException("Could not update archive", e);
     }
   }
 
@@ -245,7 +248,7 @@ public class StagingMojo extends AbstractMojo {
       Node children = childrenNodes.item(0);
 
       NodeList childNodes = doc.getElementsByTagName("child");
-      int removeCount = childNodes.getLength()- truncateSize;
+      int removeCount = childNodes.getLength() - truncateSize;
       for (int i = 0; i < removeCount; i++) {
         children.removeChild(children.getFirstChild());
       }
@@ -263,15 +266,15 @@ public class StagingMojo extends AbstractMojo {
     }
   }
 
-  private String getChildElementCount(Node node){
-    int count=0;
+  private String getChildElementCount(Node node) {
+    int count = 0;
     NodeList childNodes = node.getChildNodes();
-    for(int i=0;i<childNodes.getLength();i++){
-      if(childNodes.item(i) instanceof Element){
+    for (int i = 0; i < childNodes.getLength(); i++) {
+      if (childNodes.item(i) instanceof Element) {
         count++;
       }
     }
-    return ""+count;
+    return "" + count;
   }
 
   private File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
@@ -356,7 +359,8 @@ public class StagingMojo extends AbstractMojo {
   }
 
   /**
-   * @param stagingArea the stagingArea to set
+   * @param stagingArea
+   *          the stagingArea to set
    */
   public void setStagingArea(String stagingArea) {
     this.stagingArea = stagingArea;
