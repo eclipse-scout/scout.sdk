@@ -53,5 +53,4 @@ public class PublishMojo extends AbstractStagingMojo {
   public void setStagingArea(String stagingArea) {
     this.stagingArea = stagingArea;
   }
-
 }

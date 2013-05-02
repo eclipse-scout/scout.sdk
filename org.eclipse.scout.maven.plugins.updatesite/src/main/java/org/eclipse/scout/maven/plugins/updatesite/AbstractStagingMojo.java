@@ -5,9 +5,10 @@ import java.io.File;
 import org.apache.maven.plugin.AbstractMojo;
 
 public abstract class AbstractStagingMojo extends AbstractMojo {
+
   /**
    * The directory where the generated archive file will be put.
-   *
+   * 
    * @parameter default-value="${project.build.directory}"
    */
   private String outputDirectory;
@@ -20,9 +21,7 @@ public abstract class AbstractStagingMojo extends AbstractMojo {
     this.outputDirectory = outputDirectory;
   }
 
-  public File getStageTargetDir(){
-    return new File(getOutputDirectory(),"stageTarget");
+  public File getStageTargetDir() {
+    return new File(getOutputDirectory(), "stageTarget");
   }
-
-
 }

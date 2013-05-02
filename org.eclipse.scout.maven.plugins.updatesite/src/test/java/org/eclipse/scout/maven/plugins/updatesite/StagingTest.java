@@ -24,8 +24,7 @@ import org.junit.Test;
 /**
  *
  */
-public class StagingTest
-{
+public class StagingTest {
 
   private File tempDir;
 
@@ -47,7 +46,7 @@ public class StagingTest
 
   @After
   public void tearDown() throws IOException {
-      FileUtility.deleteFile(tempDir);
+    FileUtility.deleteFile(tempDir);
   }
 
   /**
@@ -68,7 +67,7 @@ public class StagingTest
   public void testCreateStageZip() throws MojoExecutionException {
     StagingMojo stagingMojo = new StagingMojo();
     stagingMojo.setOutputDirectory(targetDirectory.getPath());
-    File zipFile = stagingMojo.createStageZip(sourceDirectory,"");
+    File zipFile = stagingMojo.createStageZip(sourceDirectory, "");
     assertTrue(zipFile.exists());
   }
 
@@ -87,6 +86,4 @@ public class StagingTest
     String pathname = getClass().getResource("/compositeContent.jar").getFile();
     return new File(pathname);
   }
-
-
 }

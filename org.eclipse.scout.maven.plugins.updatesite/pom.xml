@@ -35,7 +35,7 @@
       <artifactId>maven-core</artifactId>
       <version>3.0</version>
     </dependency>
-        <dependency>
+    <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
       <version>3.2</version>
@@ -47,8 +47,6 @@
       <version>3.0.8</version>
     </dependency>
   </dependencies>
-
-
 
   <build>
     <plugins>
@@ -102,15 +100,6 @@
             </configuration>
           </plugin>
         </plugins>
-        <pluginManagement>
-          <plugins>
-            <!-- <plugin> -->
-            <!-- <groupId>org.eclipse.tycho</groupId> -->
-            <!-- <artifactId>tycho-compiler-plugin</artifactId> -->
-            <!-- <version>0.16.0</version> -->
-            <!-- </plugin> -->
-          </plugins>
-        </pluginManagement>
       </build>
     </profile>
     <profile>
@@ -122,7 +111,5 @@
         </pluginManagement>
       </build>
     </profile>
-
   </profiles>
-
 </project>

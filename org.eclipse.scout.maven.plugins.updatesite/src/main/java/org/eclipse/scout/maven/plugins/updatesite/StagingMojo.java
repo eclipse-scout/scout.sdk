@@ -33,7 +33,7 @@ import org.xml.sax.SAXException;
 
 /**
  * Stage the updatesite to staging area of the build server.
- *
+ * 
  * @goal stage
  */
 public class StagingMojo extends AbstractStagingMojo {
@@ -48,14 +48,14 @@ public class StagingMojo extends AbstractStagingMojo {
 
   /**
    * The directory where the generated archive file will be put.
-   *
+   * 
    * @parameter default-value="${project.build.directory}/repository"
    */
   private String p2InputDirectory;
 
   /**
    * The directory where the generated archive file will be put.
-   *
+   * 
    * @parameter
    */
   private String updatesiteDir;
@@ -69,7 +69,6 @@ public class StagingMojo extends AbstractStagingMojo {
    * @parameter default-value="http://download.eclipse.org/scout"
    */
   private String repositoryUrl;
-
 
   /**
    * @parameter default-value=100
@@ -105,7 +104,7 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   public String getCompositeUrl() {
-    return getRepositoryUrl()+ "/" + getCompositeDirName();
+    return getRepositoryUrl() + "/" + getCompositeDirName();
   }
 
   private File getStageDir() {
@@ -119,8 +118,8 @@ public class StagingMojo extends AbstractStagingMojo {
     File stageTargetDir = getStageTargetDir();
     stageTargetDir.mkdirs();
     String timestamp = createTimestamp();
-    File zipFile = createStageZip(getStageDir(),timestamp);
-    createDoStageFile(zipFile,timestamp);
+    File zipFile = createStageZip(getStageDir(), timestamp);
+    createDoStageFile(zipFile, timestamp);
   }
 
   public File createCompositeRepo() throws MojoExecutionException {
@@ -331,11 +330,10 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   /**
-   * @param repositoryUrl the repositoryUrl to set
+   * @param repositoryUrl
+   *          the repositoryUrl to set
    */
   public void setRepositoryUrl(String repositoryUrl) {
     this.repositoryUrl = repositoryUrl;
   }
-
-
 }

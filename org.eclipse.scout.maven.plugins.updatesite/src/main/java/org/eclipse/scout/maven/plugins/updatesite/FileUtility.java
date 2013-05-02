@@ -45,7 +45,7 @@ import org.xml.sax.SAXException;
 
 /**
  * <h4>FileUtility</h4>
- *
+ * 
  * @author aho
  * @since 1.1.0 (22.01.2011)
  */
@@ -90,13 +90,10 @@ public class FileUtility {
           catch (IOException e) {
             // void
           }
-
         }
-
       }
     }
   }
-
 
   public static void copyToDir(File input, File toDir) throws IOException {
     copyToDir(input, toDir, input.getParentFile().getAbsoluteFile().toURI());
