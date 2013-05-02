@@ -27,7 +27,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.0</version>
+      <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -35,18 +35,94 @@
       <artifactId>maven-core</artifactId>
       <version>3.0</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-jar-plugin</artifactId>
-      <version>2.3.1</version>
-      <type>maven-plugin</type>
+        <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>3.2</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-plugin-plugin</artifactId>
-      <version>2.9</version>
-      <type>maven-plugin</type>
+      <groupId>org.codehaus.plexus</groupId>
+      <artifactId>plexus-utils</artifactId>
+      <version>3.0.8</version>
     </dependency>
   </dependencies>
+
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.5.1</version>
+        <configuration>
+          <compiler-version>1.6</compiler-version>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>3.2</version>
+        <configuration>
+          <goalPrefix>org.eclipse.scout.maven.plugins.updatesite</goalPrefix>
+          <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
+        </configuration>
+        <executions>
+          <execution>
+            <id>mojo-descriptor</id>
+            <goals>
+              <goal>descriptor</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>help-goal</id>
+            <goals>
+              <goal>helpmojo</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+
+  <profiles>
+    <profile>
+      <id>bree-libs</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.3.2</version>
+            <configuration>
+              <source>1.6</source>
+              <target>1.6</target>
+            </configuration>
+          </plugin>
+        </plugins>
+        <pluginManagement>
+          <plugins>
+            <!-- <plugin> -->
+            <!-- <groupId>org.eclipse.tycho</groupId> -->
+            <!-- <artifactId>tycho-compiler-plugin</artifactId> -->
+            <!-- <version>0.16.0</version> -->
+            <!-- </plugin> -->
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+    <profile>
+      <id>singleRepoBuild</id>
+      <build>
+        <pluginManagement>
+          <plugins>
+          </plugins>
+        </pluginManagement>
+      </build>
+    </profile>
+
+  </profiles>
 
 </project>

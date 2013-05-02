@@ -38,7 +38,6 @@ public class StagingTest
     URL testRepo = getClass().getResource("/repository");
     sourceDirectory = new File(testRepo.getFile());
 
-    //TODO use temp file instead
     targetDirectory = new File("target");
     targetDirectory.mkdirs();
 
@@ -48,7 +47,7 @@ public class StagingTest
 
   @After
   public void tearDown() throws IOException {
-//    	FileUtility.deleteFile(tempDir);
+      FileUtility.deleteFile(tempDir);
   }
 
   /**
@@ -69,7 +68,7 @@ public class StagingTest
   public void testCreateStageZip() throws MojoExecutionException {
     StagingMojo stagingMojo = new StagingMojo();
     stagingMojo.setOutputDirectory(targetDirectory.getPath());
-    File zipFile = stagingMojo.createStageZip(sourceDirectory);
+    File zipFile = stagingMojo.createStageZip(sourceDirectory,"");
     assertTrue(zipFile.exists());
   }
 
@@ -89,10 +88,5 @@ public class StagingTest
     return new File(pathname);
   }
 
-  @Test
-  public void testUpdateComposite() throws MojoExecutionException {
-    StagingMojo stagingMojo = new StagingMojo();
-    stagingMojo.updateComposite(targetDirectory, getTestJARFile(), "compositeContent");
-  }
 
 }

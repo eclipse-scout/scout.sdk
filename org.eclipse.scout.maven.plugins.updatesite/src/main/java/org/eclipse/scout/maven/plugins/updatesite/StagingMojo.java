@@ -24,7 +24,6 @@ import java.util.Locale;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,7 +36,7 @@ import org.xml.sax.SAXException;
  *
  * @goal stage
  */
-public class StagingMojo extends AbstractMojo {
+public class StagingMojo extends AbstractStagingMojo {
 
   private static final String COMPOSITE_CONTENT = "compositeContent";
 
@@ -46,13 +45,6 @@ public class StagingMojo extends AbstractMojo {
   private static final String COMPOSITE_ARTIFACTS_JAR = COMPOSITE_ARTIFACTS + ".jar";
 
   private static final String COMPOSITE_CONTENT_JAR = COMPOSITE_CONTENT + ".jar";
-
-  /**
-   * The directory where the generated archive file will be put.
-   *
-   * @parameter default-value="${project.build.directory}"
-   */
-  private String outputDirectory;
 
   /**
    * The directory where the generated archive file will be put.
@@ -74,14 +66,10 @@ public class StagingMojo extends AbstractMojo {
   private String compositeDir;
 
   /**
-   * @parameter default-value="http://download.eclipse.org/scout/nightly/3.9"
+   * @parameter default-value="http://download.eclipse.org/scout"
    */
-  private String compositeUrl;
+  private String repositoryUrl;
 
-  /**
-   * @parameter default-value="/home/data/httpd/download.eclipse.org/scout/stagingArea"
-   */
-  private String stagingArea;
 
   /**
    * @parameter default-value=100
@@ -94,14 +82,6 @@ public class StagingMojo extends AbstractMojo {
 
   public void setP2InputDirectory(String p2InputDirectory) {
     this.p2InputDirectory = p2InputDirectory;
-  }
-
-  public String getOutputDirectory() {
-    return outputDirectory;
-  }
-
-  public void setOutputDirectory(String outputDirectory) {
-    this.outputDirectory = outputDirectory;
   }
 
   public String getCompositeDirName() {
@@ -125,33 +105,22 @@ public class StagingMojo extends AbstractMojo {
   }
 
   public String getCompositeUrl() {
-    return compositeUrl;
-  }
-
-  public void setCompositeUrl(String compositeUrl) {
-    this.compositeUrl = compositeUrl;
+    return getRepositoryUrl()+ "/" + getCompositeDirName();
   }
 
   private File getStageDir() {
     return new File(getOutputDirectory() + File.separator + "stage");
   }
 
+  @Override
   public void execute() throws MojoExecutionException {
     File compositeRepo = createCompositeRepo();
     updateCompositeJars(compositeRepo);
-    File zipFile = createStageZip(getStageDir());
-    File doStageFile = createDoStageFile(zipFile);
-    publish(zipFile);
-    publish(doStageFile);
-  }
-
-  public void publish(File file) throws MojoExecutionException {
-    try {
-      FileUtility.copyToDir(file, new File(getStagingArea()));
-    }
-    catch (IOException e) {
-      throw new MojoExecutionException("Publishing failed ", e);
-    }
+    File stageTargetDir = getStageTargetDir();
+    stageTargetDir.mkdirs();
+    String timestamp = createTimestamp();
+    File zipFile = createStageZip(getStageDir(),timestamp);
+    createDoStageFile(zipFile,timestamp);
   }
 
   public File createCompositeRepo() throws MojoExecutionException {
@@ -181,6 +150,7 @@ public class StagingMojo extends AbstractMojo {
 
   public void updateComposite(File outputDir, File contentJar, String folderName) throws MojoExecutionException {
     try {
+      getLog().info("Downloading " + contentJar);
       String jarName = contentJar.getName();
       File contentXML = extractCompositeArchive(outputDir, contentJar);
       appendChild(contentXML, getUpdatesiteDir());
@@ -296,8 +266,11 @@ public class StagingMojo extends AbstractMojo {
     }
   }
 
-  public File createStageZip(File directory) throws MojoExecutionException {
-    File outZipFile = new File(getOutputDirectory(), getStageFileName());
+  public File createStageZip(File directory, String timestamp) throws MojoExecutionException {
+    File stageTargetDir = getStageTargetDir();
+    stageTargetDir.mkdirs();
+
+    File outZipFile = new File(stageTargetDir, "stage" + timestamp + ".zip");
     try {
       getLog().info("Zipping " + directory + " to " + outZipFile.getPath());
       FileUtility.compressArchive(directory, outZipFile);
@@ -308,9 +281,9 @@ public class StagingMojo extends AbstractMojo {
     }
   }
 
-  private File createDoStageFile(File zipInputFile) throws MojoExecutionException {
+  private File createDoStageFile(File zipInputFile, String timestamp) throws MojoExecutionException {
     try {
-      File out = new File(getOutputDirectory(), "doStage");
+      File out = new File(getStageTargetDir(), "doStage_" + timestamp);
       String md5 = createMD5(zipInputFile) + "  " + zipInputFile.getName();
       FileWriter writer = new FileWriter(out);
       writer.write(md5);
@@ -345,24 +318,24 @@ public class StagingMojo extends AbstractMojo {
     }
   }
 
-  private String getStageFileName() {
-    SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd-hhmm", Locale.ENGLISH);
-    String timestamp = f.format(new Date());
-    return "stage_" + timestamp + ".zip";
+  private String createTimestamp() {
+    SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd-hhmmss-SSS", Locale.ENGLISH);
+    return f.format(new Date());
   }
 
   /**
-   * @return the stagingArea
+   * @return the repositoryUrl
    */
-  public String getStagingArea() {
-    return stagingArea;
+  public String getRepositoryUrl() {
+    return repositoryUrl;
   }
 
   /**
-   * @param stagingArea
-   *          the stagingArea to set
+   * @param repositoryUrl the repositoryUrl to set
    */
-  public void setStagingArea(String stagingArea) {
-    this.stagingArea = stagingArea;
+  public void setRepositoryUrl(String repositoryUrl) {
+    this.repositoryUrl = repositoryUrl;
   }
+
+
 }

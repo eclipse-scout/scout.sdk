@@ -97,9 +97,6 @@ public class FileUtility {
     }
   }
 
-  public static void moveToDir(File input, File inputDir, File outputDir) {
-
-  }
 
   public static void copyToDir(File input, File toDir) throws IOException {
     copyToDir(input, toDir, input.getParentFile().getAbsoluteFile().toURI());

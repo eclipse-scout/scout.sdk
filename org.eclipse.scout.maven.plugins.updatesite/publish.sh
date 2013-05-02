@@ -87,16 +87,22 @@ truncateComposite(){
 	cd ${cur}
 }
 
-if [ -f $stagingArea/$stageTriggerFileName ]; then
-  backupDir=$(pwd)
-  cd $stagingArea
-  mv $stagingArea/$stageTriggerFileName $stagingArea/processing
-  processZipFile $(md5sum -c $stagingArea/processing)
-  rm -rf $stagingArea/*
-  chgrp -R technology.scout $workingDir
-  chmod g+w -R $workingDir
-  cd $backupDir
-fi
+
+backupDir=$(pwd)
+cd $stagingArea
+ for f in doStage*
+ do
+  if [ -f "$f" ]; then
+     echo "Processing $f ";
+     mv $f processing;
+     processZipFile $(md5sum -c $stagingArea/processing);
+  fi
+ done
+rm -rf $stagingArea/*;
+chgrp -R technology.scout $workingDir
+chmod g+w -R $workingDir
+cd $backupDir
+
 
 #echo $stagingArea/stage.zip
 #username=$(ls -l $stagingArea/stage.zip | awk '{print $3}')
