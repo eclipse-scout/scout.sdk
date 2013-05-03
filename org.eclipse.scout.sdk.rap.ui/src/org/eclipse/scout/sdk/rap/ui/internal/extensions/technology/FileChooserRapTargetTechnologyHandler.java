@@ -65,8 +65,8 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
     }
     try {
       final BooleanHolder licAccepted = new BooleanHolder(false);
-      final Map<String, License[]> lic = P2Utility.getLicense(RAP_INCUBATOR_FEATURE_NAME, new URI(RAP_INCUBATOR_UPDATE_SITE_URL), monitor);
-      Map<String, License[]> licScout = P2Utility.getLicense(SCOUT_INCUBATOR_FEATURE_NAME, new URI(SCOUT_INCUBATOR_UPDATE_SITE_URL), monitor);
+      final Map<String, License[]> lic = P2Utility.getLicenses(new String[]{RAP_INCUBATOR_FEATURE_NAME}, new URI[]{new URI(RAP_INCUBATOR_UPDATE_SITE_URL)}, monitor);
+      Map<String, License[]> licScout = P2Utility.getLicenses(new String[]{SCOUT_INCUBATOR_FEATURE_NAME}, new URI[]{new URI(SCOUT_INCUBATOR_UPDATE_SITE_URL)}, monitor);
       lic.putAll(licScout);
 
       ScoutSdkUi.getDisplay().syncExec(new Runnable() {

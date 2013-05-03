@@ -43,11 +43,13 @@ public class NlsFindReferencesJob extends Job {
 
   private final INlsProject m_project;
   private IType m_nlsType;
-  // private HashMap<String, List<Match>> m_matches;
   private DefaultNlsKeySearchRequestor m_searchRequstor;
 
   /**
-   * @param name
+   * @param project
+   *          the scope
+   * @param text
+   *          the name of the job
    */
   public NlsFindReferencesJob(INlsProject project, String text) {
     super(text);

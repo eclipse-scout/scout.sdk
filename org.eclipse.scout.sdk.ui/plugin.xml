@@ -927,6 +927,23 @@
             class="org.eclipse.scout.sdk.ui.internal.extensions.technology.laf.RayoUiSwingEnvTechnologyHandler"
             technology="scout.technology.laf.rayo">
       </handler>
+      <technology
+            category="General Features"
+            id="scout.technology.common.docx4j"
+            name="Docx4j Support">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j.Docx4jManifestTechnologyHandler"
+            technology="scout.technology.common.docx4j">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j.Docx4jProdTechnologyHandler"
+            technology="scout.technology.common.docx4j">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j.Docx4jDesktopTechnologyHandler"
+            technology="scout.technology.common.docx4j">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.workingSets">

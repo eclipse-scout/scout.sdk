@@ -78,7 +78,7 @@ public class FileChooserField extends Composite {
     FormData data = new FormData();
     data.top = new FormAttachment(0, 0);
     data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(40, 0);
+    data.right = new FormAttachment(10, 0);
     data.bottom = new FormAttachment(100, 0);
     m_label.setLayoutData(data);
 
@@ -153,8 +153,8 @@ public class FileChooserField extends Composite {
     m_text.setEditable(editable);
   }
 
-  public void setInput(Object input) {
-
+  public void setValue(String s) {
+    m_text.setText(s);
   }
 
   public String[] getExtendsionFilter() {

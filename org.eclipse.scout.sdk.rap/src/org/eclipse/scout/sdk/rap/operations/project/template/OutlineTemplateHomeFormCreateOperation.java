@@ -178,9 +178,9 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
       protected String createMethodBody(IImportValidator validator) throws JavaModelException {
         StringBuilder body = new StringBuilder();
         body.append("// Table already is scrollable, it's not necessary to make the form scrollable too\n");
-        body.append("IDeviceTransformationService service = SERVICES.getService(IDeviceTransformationService.class);\n");
-        body.append("if (service != null && service.getDeviceTransformer() != null) {\n");
-        body.append("  service.getDeviceTransformer().getDeviceTransformationExcluder().excludeFieldTransformation(this, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);\n");
+        body.append("DeviceTransformationConfig config = DeviceTransformationUtility.getDeviceTransformationConfig();\n");
+        body.append("if (config != null) {\n");
+        body.append("  config.excludeFieldTransformation(this, MobileDeviceTransformation.MAKE_MAINBOX_SCROLLABLE);\n");
         body.append("}");
         return body.toString();
       }

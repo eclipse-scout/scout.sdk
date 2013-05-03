@@ -92,7 +92,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   protected void contributeManifestFile(IScoutBundle bundle, List<IScoutTechnologyResource> list) {
-    if (bundle != null) {
+    if (bundle != null && !bundle.isBinary()) {
       IScoutTechnologyResource res = getManifestResource(bundle);
       if (res.getResource() != null) {
         list.add(res);
@@ -209,11 +209,11 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   protected void selectionChangedProductFiles(IScoutTechnologyResource[] resources, boolean selected, String[]... pluginIds) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
-      selectionChangedProductFiles(r, selected, pluginIds);
+      selectionChangedProductFile(r, selected, pluginIds);
     }
   }
 
-  protected void selectionChangedProductFiles(IScoutTechnologyResource r, boolean selected, String[]... pluginIds) throws CoreException {
+  protected void selectionChangedProductFile(IScoutTechnologyResource r, boolean selected, String[]... pluginIds) throws CoreException {
     ProductFileModelHelper h = new ProductFileModelHelper(r.getResource());
     for (String[] list : pluginIds) {
       for (String pluginId : list) {
@@ -230,17 +230,21 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   protected void selectionChangedManifest(IScoutTechnologyResource[] resources, boolean selected, String... pluginsToHandle) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
-      PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getProject());
-      for (String pluginId : pluginsToHandle) {
-        if (selected) {
-          pluginModel.Manifest.addDependency(pluginId);
-        }
-        else {
-          pluginModel.Manifest.removeDependency(pluginId);
-        }
-      }
-      pluginModel.save();
+      selectionChangedManifest(r, selected, pluginsToHandle);
     }
+  }
+
+  protected void selectionChangedManifest(IScoutTechnologyResource r, boolean selected, String... pluginsToHandle) throws CoreException {
+    PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getProject());
+    for (String pluginId : pluginsToHandle) {
+      if (selected) {
+        pluginModel.Manifest.addDependency(pluginId);
+      }
+      else {
+        pluginModel.Manifest.removeDependency(pluginId);
+      }
+    }
+    pluginModel.save();
   }
 
   protected void selectionChangedManifestImportPackage(IScoutTechnologyResource[] resources, boolean selected, String[] packages, String[] versions) throws CoreException {
@@ -334,34 +338,72 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
    * @throws CoreException
    */
   protected FeatureInstallResult ensureFeatureInstalled(final String featureId, final String featureUrl, final IProgressMonitor monitor, String... definingPlugins) throws CoreException {
-    if (JdtUtility.areAllPluginsInstalled(definingPlugins)) {
-      return FeatureInstallResult.InstallationNotNecessary;
-    }
+    return ensureFeaturesInstalled(new String[]{featureId}, new String[]{featureUrl}, monitor, new String[][]{definingPlugins});
+  }
+
+  /**
+   * checks whether a given features are already present and installs them if not.<br>
+   * this is done by validating if the plugins specified by 'definingPlugins' can be found in the platform.
+   * if yes, this method does nothing. if at least one of the given plugins are missing, the complete feature is
+   * installed from the given p2 repository URL. Before the installation a license agreement dialog is presented and the
+   * feature is only installed if all licenses are accepted.
+   * 
+   * @param featureIds
+   *          the features that will be installed if the corresponding definingPlugins are not found on the platform.
+   * @param featureUrls
+   *          The P2 repository URLs where the features should be installed from.
+   * @param monitor
+   *          the monitor
+   * @param definingPlugins
+   *          The plugins that define the corresponding feature. If all of them are present, nothing is installed even
+   *          if the feature itself is not present.
+   * @return the result of the feature installation.
+   * @throws CoreException
+   */
+  protected FeatureInstallResult ensureFeaturesInstalled(final String[] featureIds, final String[] featureUrls, final IProgressMonitor monitor, String[]... definingPlugins) throws CoreException {
+    ArrayList<URI> repos = new ArrayList<URI>();
+    ArrayList<String> featureIdsToInstall = new ArrayList<String>();
 
     try {
-      final BooleanHolder licAccepted = new BooleanHolder(false);
-      final URI uri = new URI(featureUrl);
-      final Map<String, License[]> lic = P2Utility.getLicense(featureId, uri, monitor);
-      ScoutSdkUi.getDisplay().syncExec(new Runnable() {
-        @Override
-        public void run() {
-          LicenseDialog licDialog = new LicenseDialog(ScoutSdkUi.getShell(), lic);
-          if (licDialog.open() == Dialog.OK) {
-            licAccepted.setValue(true);
-          }
+      int maxNum = Math.min(Math.min(featureIds.length, featureUrls.length), definingPlugins.length);
+      for (int i = 0; i < maxNum; i++) {
+        if (!JdtUtility.areAllPluginsInstalled(definingPlugins[i])) {
+          // remember which of the given features require installation
+          repos.add(new URI(featureUrls[i]));
+          featureIdsToInstall.add(featureIds[i]);
         }
-      });
-
-      if (licAccepted.getValue()) {
-        P2Utility.installUnit(featureId, uri, monitor);
-        return FeatureInstallResult.InstallationSuccessful;
-      }
-      else {
-        return FeatureInstallResult.LicenseNotAccepted;
       }
     }
     catch (URISyntaxException e) {
       throw new CoreException(new ScoutStatus(e));
+    }
+
+    if (featureIdsToInstall.size() == 0) {
+      return FeatureInstallResult.InstallationNotNecessary;
+    }
+
+    final URI[] repoURIs = repos.toArray(new URI[repos.size()]);
+    final String[] ius = featureIdsToInstall.toArray(new String[featureIdsToInstall.size()]);
+    final BooleanHolder licAccepted = new BooleanHolder(false);
+    final Map<String, License[]> licenses = P2Utility.getLicenses(ius, repoURIs, monitor);
+
+    // show license dialog
+    ScoutSdkUi.getDisplay().syncExec(new Runnable() {
+      @Override
+      public void run() {
+        LicenseDialog licDialog = new LicenseDialog(ScoutSdkUi.getShell(), licenses);
+        if (licDialog.open() == Dialog.OK) {
+          licAccepted.setValue(true);
+        }
+      }
+    });
+
+    if (licAccepted.getValue()) {
+      P2Utility.installUnits(ius, repoURIs, monitor);
+      return FeatureInstallResult.InstallationSuccessful;
+    }
+    else {
+      return FeatureInstallResult.LicenseNotAccepted;
     }
   }
 

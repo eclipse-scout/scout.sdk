@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -14,11 +14,11 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.scout.nls.sdk.extension.NlsExportImportExtensionPoints;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 
-/** <h4> NlsImportWizard </h4>
- *
+/**
+ * <h4>NlsImportWizard</h4>
+ * 
  * @author Andreas Hoegger
  * @since 1.1.0 (12.11.2010)
- *
  */
 public class NlsImportWizard extends Wizard {
 
@@ -32,7 +32,7 @@ public class NlsImportWizard extends Wizard {
 
   @Override
   public void addPages() {
-    addPage(new ImportExportWizardPage("Import NLS Entries", "Choose a exporter to import NLS entries.", m_project, NlsExportImportExtensionPoints.EXTENSION_POINT_ID_NLS_IMPORTER));
+    addPage(new ImportExportWizardPage("Import NLS Entries", "Please choose an importer.", m_project, NlsExportImportExtensionPoints.EXTENSION_POINT_ID_NLS_IMPORTER));
   }
 
   @Override

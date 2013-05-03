@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -124,11 +125,18 @@ public class LicenseDialog extends TitleAreaDialog {
     Label label = new Label(composite, SWT.NONE);
     label.setText(Texts.get("LicDialogListLabel"));
     m_iuViewer = new TreeViewer(composite, SWT.FULL_SELECTION | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+    m_iuViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
     m_iuViewer.setContentProvider(new P_ContentProvider());
     m_iuViewer.setLabelProvider(new P_LabelProvider());
     m_iuViewer.setComparator(new ViewerComparator());
     m_iuViewer.setInput(m_iuToLicenses);
-    m_iuViewer.setSelection(new StructuredSelection(m_iuToLicenses.entrySet().iterator().next().getValue()[0]), false);
+    if (m_iuToLicenses != null && m_iuToLicenses.size() > 0) {
+      for (License[] licenses : m_iuToLicenses.values())
+        if (licenses != null && licenses.length > 0) {
+          m_iuViewer.setSelection(new StructuredSelection(licenses[0]), false);
+          break;
+        }
+    }
     m_iuViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {

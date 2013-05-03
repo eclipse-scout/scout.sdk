@@ -1,0 +1,85 @@
+package org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j;
+
+import java.util.List;
+
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.sdk.compatibility.P2Utility;
+import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
+import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
+import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
+import org.eclipse.scout.sdk.ui.internal.extensions.technology.IOrbitConstants;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+
+/**
+ * <h3>{@link Docx4jManifestTechnologyHandler}</h3>
+ * 
+ * @author mvi
+ * @since 3.9.0 23.04.2013
+ */
+public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants, IOrbitConstants {
+
+  private boolean m_newPluginsInstalled;
+
+  public Docx4jManifestTechnologyHandler() {
+  }
+
+  @Override
+  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+    m_newPluginsInstalled = false;
+    if (selected) {
+      FeatureInstallResult result = ensureFeaturesInstalled(new String[]{LOGGING_BRIDGE_FEATURE, XML_GRAPHICS_FEATURE_NAME, DOCX4J_FEATURE, DOCX4J_SDK_FEATURE},
+          new String[]{SCOUT_LOGGING_BRIDGE_FEATURE_URL, ORBIT_UPDATESITE_URL, SCOUT_DOCX4J_FEATURE_URL, SCOUT_DOCX4J_FEATURE_URL}, monitor,
+          new String[]{LOGGING_BRIDGE_LOG4J_FRAGMENT},
+          new String[]{XML_GRAPHICS_PLUGIN_NAME, APACHE_COMMONS_PLUGIN_NAME, APACHE_COMMONS_LOGGING_PLUGIN_NAME},
+          new String[]{DOCX4J_PLUGIN, DOCX4J_SCOUT_CLIENT_PLUGIN, DOCX4J_SCOUT_PLUGIN},
+          new String[]{DOCX4J_SDK_PLUGIN});
+      if (FeatureInstallResult.LicenseNotAccepted.equals(result)) {
+        return false; // abort processing if the installation would be necessary but the license was not accepted.
+      }
+      else if (FeatureInstallResult.InstallationSuccessful.equals(result)) {
+        m_newPluginsInstalled = true; // remember if we have installed new plug-in so that we can ask for a restart later on.
+      }
+    }
+    return true;
+  }
+
+  @Override
+  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    for (IScoutTechnologyResource r : resources) {
+      if (IScoutBundle.TYPE_CLIENT.equals(r.getBundle().getType())) {
+        selectionChangedManifest(r, selected, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN, DOCX4J_SCOUT_CLIENT_PLUGIN);
+      }
+      else {
+        selectionChangedManifest(r, selected, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN);
+      }
+    }
+  }
+
+  @Override
+  public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+    if (m_newPluginsInstalled) {
+      P2Utility.promptForRestart();
+    }
+  }
+
+  @Override
+  public TriState getSelection(IScoutBundle project) throws CoreException {
+    return getSelectionManifests(project.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true),
+        DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN);
+  }
+
+  @Override
+  public boolean isActive(IScoutBundle project) {
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_CLIENT), true) != null;
+  }
+
+  @Override
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
+    IScoutBundle[] childBundles = project.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_CLIENT), true);
+    contributeManifestFiles(childBundles, list);
+  }
+}

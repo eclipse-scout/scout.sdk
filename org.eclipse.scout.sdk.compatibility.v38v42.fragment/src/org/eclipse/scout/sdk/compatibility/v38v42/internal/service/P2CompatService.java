@@ -4,7 +4,7 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -57,24 +57,27 @@ public class P2CompatService implements IP2CompatService {
   }
 
   @Override
-  public void installUnit(String rootIU, URI p2RepositoryURI, IProgressMonitor monitor) throws CoreException {
-    IInstallableUnit[] units = getInstallableUnits(new String[]{rootIU}, getMetadataRepository(p2RepositoryURI, monitor), monitor);
-    ArrayList<IInstallableUnit> toInstall = new ArrayList<IInstallableUnit>(units.length);
-    for (IInstallableUnit iu : units) {
-      toInstall.add(iu);
+  public void installUnits(String[] rootIUs, URI[] p2RepositoryURIs, IProgressMonitor monitor) throws CoreException {
+    ArrayList<IInstallableUnit> toInstall = new ArrayList<IInstallableUnit>(rootIUs.length);
+    for (int i = 0; i < Math.min(rootIUs.length, p2RepositoryURIs.length); i++) {
+      IInstallableUnit[] units = getInstallableUnits(new String[]{rootIUs[i]}, getMetadataRepository(p2RepositoryURIs[i], monitor), monitor);
+      for (IInstallableUnit iu : units) {
+        toInstall.add(iu);
+      }
     }
 
     ProvisioningUI ui = ProvisioningUI.getDefaultUI();
-    InstallOperation op = ui.getInstallOperation(toInstall, new URI[]{p2RepositoryURI});
+    InstallOperation op = ui.getInstallOperation(toInstall, p2RepositoryURIs);
 
     ProvisioningJob resJob = op.getResolveJob(monitor);
     IStatus resResult = resJob.runModal(monitor);
     if (resResult.isOK()) {
       ProvisioningJob provJob = op.getProvisioningJob(monitor);
+      if(provJob != null) {
       resResult = provJob.runModal(monitor);
       if (!resResult.isOK()) {
         throw new CoreException(resResult);
-      }
+      }}
     }
     else {
       throw new CoreException(resResult);
@@ -82,9 +85,18 @@ public class P2CompatService implements IP2CompatService {
   }
 
   @Override
-  public Map<String /* IU id */, License[] /*license bodies */> getLicense(String rootIU, URI p2RepositoryURI, IProgressMonitor monitor) throws CoreException {
-    IInstallableUnit[] units = getInstallableUnits(new String[]{rootIU}, getMetadataRepository(p2RepositoryURI, monitor), monitor);
-    HashMap<String, License[]> ret = new HashMap<String, License[]>(units.length);
+  public Map<String /* IU id */, License[] /*license bodies */> getLicenses(String[] rootIUs, URI[] p2RepositoryURIs, IProgressMonitor monitor) throws CoreException {
+    ArrayList<IInstallableUnit> units = new ArrayList<IInstallableUnit>(rootIUs.length);
+    for (int i = 0; i < Math.min(rootIUs.length, p2RepositoryURIs.length); i++) {
+      IInstallableUnit[] ius = getInstallableUnits(new String[]{rootIUs[i]}, getMetadataRepository(p2RepositoryURIs[i], monitor), monitor);
+      if (ius != null && ius.length > 0) {
+        for (IInstallableUnit iu : ius) {
+          units.add(iu);
+        }
+      }
+    }
+
+    LinkedHashMap<String, License[]> ret = new LinkedHashMap<String, License[]>(units.size());
     for (IInstallableUnit iu : units) {
       Collection<ILicense> licenses = iu.getLicenses(null);
       ArrayList<License> licList = new ArrayList<License>(licenses.size());

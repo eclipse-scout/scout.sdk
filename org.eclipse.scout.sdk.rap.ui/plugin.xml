@@ -53,6 +53,10 @@
             class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.FileChooserRapProductTechnologyHandler"
             technology="scout.technology.rap.filechooser">
       </handler>
+      <handler
+            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.Docx4jRapProductTechnologyHandler"
+            technology="scout.technology.common.docx4j">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
