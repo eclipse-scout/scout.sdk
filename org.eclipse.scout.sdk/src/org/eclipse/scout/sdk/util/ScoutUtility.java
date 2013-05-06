@@ -111,15 +111,15 @@ public final class ScoutUtility {
   }
 
   public static String getIndent(IType type) {
-    String indent = "";
+    StringBuilder indent = new StringBuilder("");
     if (type.getDeclaringType() != null) {
       IType decType = type.getDeclaringType();
       while (decType != null) {
         decType = decType.getDeclaringType();
-        indent += SdkProperties.TAB;
+        indent.append(SdkProperties.TAB);
       }
     }
-    return indent;
+    return indent.toString();
   }
 
   public static void registerServiceClass(IProject project, String extensionPoint, String elemType, String className, String requiredSessionClass, String serviceFactoryClass, IProgressMonitor monitor) throws CoreException {
