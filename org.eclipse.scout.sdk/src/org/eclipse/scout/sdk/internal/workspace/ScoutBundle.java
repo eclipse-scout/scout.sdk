@@ -101,10 +101,10 @@ public class ScoutBundle implements IScoutBundle {
 
   private ITypeHierarchyChangedListener m_textProvidersChangedListener;
   private IEclipsePreferences m_projectPreferences;
-  private Holder<INlsProject> m_nlsProjectHolder;
-  private Holder<INlsProject> m_docsNlsProjectHolder;
-  private IIconProvider m_iconProvider;
-  private IPackageFragmentRoot m_rootPackage;
+  private volatile Holder<INlsProject> m_nlsProjectHolder;
+  private volatile Holder<INlsProject> m_docsNlsProjectHolder;
+  private volatile IIconProvider m_iconProvider;
+  private volatile IPackageFragmentRoot m_rootPackage;
 
   public ScoutBundle(IPluginModelBase bundle, IProgressMonitor monitor) {
     m_pluginModelBase = bundle;
@@ -263,14 +263,17 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public INlsProject getNlsProject() {
-    if (m_nlsProjectHolder == null) {
+    Holder<INlsProject> result = m_nlsProjectHolder;
+    if (result == null) {
       synchronized (this) {
-        if (m_nlsProjectHolder == null) {
+        result = m_nlsProjectHolder;
+        if (result == null) {
           try {
             registerNlsServiceListener();
-            m_nlsProjectHolder = new Holder<INlsProject>(INlsProject.class, null);
+            result = new Holder<INlsProject>(INlsProject.class, null);
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.TEXTS), this});
-            m_nlsProjectHolder.setValue(nlsProject);
+            result.setValue(nlsProject);
+            m_nlsProjectHolder = result;
           }
           catch (CoreException e) {
             ScoutSdk.logError("error loading NLS project for: '" + getSymbolicName() + "'.", e);
@@ -278,19 +281,22 @@ public class ScoutBundle implements IScoutBundle {
         }
       }
     }
-    return m_nlsProjectHolder.getValue();
+    return result.getValue();
   }
 
   @Override
   public INlsProject getDocsNlsProject() {
-    if (m_docsNlsProjectHolder == null) {
+    Holder<INlsProject> result = m_docsNlsProjectHolder;
+    if (result == null) {
       synchronized (this) {
-        if (m_docsNlsProjectHolder == null) {
+        result = m_docsNlsProjectHolder;
+        if (result == null) {
           try {
             registerNlsServiceListener();
-            m_docsNlsProjectHolder = new Holder<INlsProject>(INlsProject.class, null);
+            result = new Holder<INlsProject>(INlsProject.class, null);
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.IDocumentationTextProviderService), this});
-            m_docsNlsProjectHolder.setValue(nlsProject);
+            result.setValue(nlsProject);
+            m_docsNlsProjectHolder = result;
           }
           catch (CoreException e) {
             ScoutSdk.logError("error loading NLS project for: '" + getSymbolicName() + "'.", e);
@@ -298,7 +304,7 @@ public class ScoutBundle implements IScoutBundle {
         }
       }
     }
-    return m_docsNlsProjectHolder.getValue();
+    return result.getValue();
   }
 
   @Override
@@ -316,15 +322,18 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public IPackageFragment getPackageFragment(String packageFqn) throws JavaModelException {
-    if (m_rootPackage == null) {
+    IPackageFragmentRoot result = m_rootPackage;
+    if (result == null) {
       synchronized (this) {
-        if (m_rootPackage == null) {
+        result = m_rootPackage;
+        if (result == null) {
           Path src = new Path(IPath.SEPARATOR + getSymbolicName() + IPath.SEPARATOR + SdkProperties.DEFAULT_SOURCE_FOLDER_NAME);
-          m_rootPackage = getJavaProject().findPackageFragmentRoot(src);
+          result = getJavaProject().findPackageFragmentRoot(src);
+          m_rootPackage = result;
         }
       }
     }
-    return m_rootPackage.getPackageFragment(packageFqn);
+    return result.getPackageFragment(packageFqn);
   }
 
   @Override
@@ -338,14 +347,16 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public IIconProvider getIconProvider() {
-    if (m_iconProvider == null) {
+    IIconProvider result = m_iconProvider;
+    if (result == null) {
       synchronized (this) {
-        if (m_iconProvider == null) {
-          m_iconProvider = new ScoutProjectIcons(this);
+        result = m_iconProvider;
+        if (result == null) {
+          m_iconProvider = result = new ScoutProjectIcons(this);
         }
       }
     }
-    return m_iconProvider;
+    return result;
   }
 
   @Override
