@@ -23,14 +23,14 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
   }
 
   public static final String UPDATE_SITE_URL = "http://download.eclipse.org/releases/kepler";
-  public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.feature.group";
-  public static final String SCOUT_RT_FEATURE = "org.eclipse.scout.rt.feature.group";
+  public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.source.feature.group";
+  public static final String SCOUT_RT_FEATURE = "org.eclipse.scout.rt.source.feature.group";
   public static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.feature.feature.group";
   public static final String ECLIPSE_RT_RAP_REQUIREMENTS_FEATURE = "org.eclipse.rap.equinox.target.feature.feature.group";
-  public static final String ECLIPSE_PLATFORM_FEATURE = "org.eclipse.platform.feature.group";
-  public static final String ECLIPSE_RPC_FEATURE = "org.eclipse.rcp.feature.group";
-  public static final String ECLIPSE_RPC_E4_FEATURE = "org.eclipse.e4.rcp.feature.group";
-  public static final String ECLIPSE_HELP_FEATURE = "org.eclipse.help.feature.group";
+  public static final String ECLIPSE_PLATFORM_FEATURE = "org.eclipse.platform.source.feature.group";
+  public static final String ECLIPSE_RPC_FEATURE = "org.eclipse.rcp.source.feature.group";
+  public static final String ECLIPSE_RPC_E4_FEATURE = "org.eclipse.e4.rcp.source.feature.group";
+  public static final String ECLIPSE_HELP_FEATURE = "org.eclipse.help.source.feature.group";
   public static final String ECLIPSE_EMF_ECORE_FEATURE = "org.eclipse.emf.ecore.feature.group";
   public static final String ECLIPSE_EMF_COMMON_FEATURE = "org.eclipse.emf.common.feature.group";
 
