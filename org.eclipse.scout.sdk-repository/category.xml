@@ -12,6 +12,12 @@
    <feature url="features/org.eclipse.scout.sdk.rap_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk.rap" version="0.0.0">
       <category name="Eclipse Scout SDK"/>
    </feature>
+   <feature url="features/org.eclipse.scout.sdk.testing_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk.testing" version="0.0.0">
+      <category name="Eclipse Scout SDK"/>
+   </feature>
+   <feature url="features/org.eclipse.scout.sdk.testing.source_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk.testing.source" version="0.0.0">
+      <category name="Eclipse Scout SDK"/>
+   </feature>
    <category-def name="Eclipse Scout SDK" label="Scout Application Development SDK">
       <description>
          Scout Application Development SDK

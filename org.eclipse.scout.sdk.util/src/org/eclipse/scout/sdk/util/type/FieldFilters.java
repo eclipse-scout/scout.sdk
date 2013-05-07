@@ -15,12 +15,22 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 
 /**
- *
+ * Contains predefined field filters
  */
 public class FieldFilters {
+
+  public static IFieldFilter getNameFilter(final String name) {
+    return new IFieldFilter() {
+      @Override
+      public boolean accept(IField field) {
+        return CompareUtility.equals(field.getElementName(), name);
+      }
+    };
+  }
 
   public static IFieldFilter getFlagsFilter(final int flags) {
     return new IFieldFilter() {
@@ -64,7 +74,6 @@ public class FieldFilters {
 
   public static IFieldFilter getCompositeFilter(final IFieldFilter... filters) {
     return new IFieldFilter() {
-
       @Override
       public boolean accept(IField field) {
         for (IFieldFilter f : filters) {

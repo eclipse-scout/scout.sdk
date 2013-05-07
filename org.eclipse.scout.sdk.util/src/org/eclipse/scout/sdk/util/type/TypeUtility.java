@@ -310,6 +310,17 @@ public class TypeUtility {
     return null;
   }
 
+  /**
+   * Searches and returns the first method with the given name in the given type.<br>
+   * If multiple methods with the same name exist (overloads), the first is returned as they appear in the source or
+   * class file.
+   * 
+   * @param type
+   *          The type in which the method should be searched.
+   * @param methodName
+   *          The name of the method.
+   * @return The first method found or null.
+   */
   public static IMethod getMethod(IType type, final String methodName) {
     IMethod[] methods = getMethods(type, new IMethodFilter() {
       @Override
@@ -323,33 +334,70 @@ public class TypeUtility {
     return null;
   }
 
+  /**
+   * Gets all methods in the given type.<br>
+   * The methods are in the order in which they appear in the source or class file.
+   * 
+   * @param type
+   *          The type to get all methods of.
+   * @return an array of all methods of the given type. never returns null.
+   */
   public static IMethod[] getMethods(IType type) {
     return getMethods(type, null);
   }
 
+  /**
+   * Gets all methods in the given type that match the given filter.<br>
+   * The methods are in the order in which they appear in the source or class file.
+   * 
+   * @param type
+   *          The type to get all methods of.
+   * @param filter
+   *          The filter.
+   * @return an array of all methods of the given type matching the given filter. never returns null.
+   */
   public static IMethod[] getMethods(IType type, IMethodFilter filter) {
     return getMethods(type, filter, null);
   }
 
+  /**
+   * Gets all methods in the given type that match the given filter ordered by the given comparator.<br>
+   * If the given comparator is null, the methods are in the order in which they appear in the source or class file.
+   * 
+   * @param type
+   *          The type to get all methods of.
+   * @param filter
+   *          The filter to use or null for no filtering.
+   * @param comparator
+   *          The comparator to use or null to get the methods in the order in which they appear in the source or class
+   *          file.
+   * @return an array of all methods of the given type matching the given filter. never returns null.
+   */
   public static IMethod[] getMethods(IType type, IMethodFilter filter, Comparator<IMethod> comparator) {
-    Collection<IMethod> unsortedMethods = new ArrayList<IMethod>();
     try {
-      for (IMethod method : type.getMethods()) {
+      IMethod[] methods = type.getMethods();
+      if (filter == null && comparator == null) {
+        return methods;
+      }
+
+      Collection<IMethod> collector = null;
+      if (comparator == null) {
+        collector = new ArrayList<IMethod>(methods.length);
+      }
+      else {
+        collector = new TreeSet<IMethod>(comparator);
+      }
+
+      for (IMethod method : methods) {
         if (filter == null || filter.accept(method)) {
-          unsortedMethods.add(method);
+          collector.add(method);
         }
       }
+      return collector.toArray(new IMethod[collector.size()]);
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not get methods of '" + type.getFullyQualifiedName() + "'.", e);
-    }
-    if (comparator == null) {
-      return unsortedMethods.toArray(new IMethod[unsortedMethods.size()]);
-    }
-    else {
-      TreeSet<IMethod> sortedMethods = new TreeSet<IMethod>(comparator);
-      sortedMethods.addAll(unsortedMethods);
-      return sortedMethods.toArray(new IMethod[sortedMethods.size()]);
+      return new IMethod[]{};
     }
   }
 
@@ -782,6 +830,47 @@ public class TypeUtility {
     else {
       return false;
     }
+  }
+
+  /**
+   * Tries to find a method in the given type and all super types and super interfaces.<br>
+   * If multiple methods with the same name exist in a type (overloads), the first is returned as they appear in the
+   * source or class file.
+   * 
+   * @param methodName
+   *          the name of the method
+   * @param type
+   *          The start type in which (together with its super types and super interfaces) the given method should be
+   *          searched.
+   * @param superTypeHierarchy
+   *          The super type hierarchy of the given type.
+   * @return The first method found in the type itself, its super types or super interfaces (searched in this order). If
+   *         multiple methods with the same name exist in a type (overloads), the first is returned as they appear in
+   *         the source or class file.
+   */
+  public static IMethod findMethodInSuperHierarchy(String methodName, IType type, ITypeHierarchy superTypeHierarchy) {
+    IMethod method = getMethod(type, methodName);
+    if (TypeUtility.exists(method)) {
+      return method;
+    }
+    // super types
+    IType superType = superTypeHierarchy.getSuperclass(type);
+    if (TypeUtility.exists(superType) && !superType.getElementName().equals(Object.class.getName())) {
+      method = findMethodInSuperHierarchy(methodName, superType, superTypeHierarchy);
+    }
+    if (TypeUtility.exists(method)) {
+      return method;
+    }
+    // interfaces
+    for (IType intType : superTypeHierarchy.getSuperInterfaces(type)) {
+      if (TypeUtility.exists(intType) && !intType.getElementName().equals(Object.class.getName())) {
+        method = findMethodInSuperHierarchy(methodName, intType, superTypeHierarchy);
+      }
+      if (TypeUtility.exists(method)) {
+        return method;
+      }
+    }
+    return null;
   }
 
   /**
