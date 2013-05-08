@@ -60,7 +60,9 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
             AbstractNlsFile nlsFile = AbstractNlsFile.loadNlsFile(f);
             if (PluginRegistry.findModel(nlsFile.getProject()) != null && nlsFile.getNlsTypeName() != null) {
               IType type = NlsTypeUtility.getType(nlsFile.getNlsTypeName());
-              return NlsCore.getNlsWorkspace().getNlsProject(new Object[]{type});
+              if (TypeUtility.exists(type)) {
+                return getNlsProject(type);
+              }
             }
           }
           catch (CoreException e) {
