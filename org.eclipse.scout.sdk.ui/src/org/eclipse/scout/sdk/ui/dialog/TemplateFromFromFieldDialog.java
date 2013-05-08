@@ -96,15 +96,18 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
       }
     });
 
-    m_entityField = getFieldToolkit().createEntityTextField(container, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
-    m_entityField.setText(getTargetPackage());
-    m_entityField.addModifyListener(new ModifyListener() {
-      @Override
-      public void modifyText(ModifyEvent e) {
-        setTargetPackageInternal((String) m_entityField.getText());
-        pingStateChanging();
-      }
-    });
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      m_entityField = getFieldToolkit().createEntityTextField(container, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
+      m_entityField.setText(getTargetPackage());
+      m_entityField.addModifyListener(new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent e) {
+          setTargetPackageInternal((String) m_entityField.getText());
+          pingStateChanging();
+        }
+      });
+      m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    }
 
     m_replaceExistingFormField = new Button(container, SWT.CHECK);
     m_replaceExistingFormField.setText(Texts.get("UseTemplateFor", getFormField().getElementName()));
@@ -131,7 +134,6 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     // layout
     container.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
     container.setLayout(new GridLayout(1, true));
-    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_templateNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_replaceExistingFormField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_createExternalFormDataField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
@@ -195,7 +197,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
     try {
       setStateChanging(true);
       setTargetPackageInternal(targetPackage);
-      if (isControlCreated()) {
+      if (isControlCreated() && m_entityField != null) {
         m_entityField.setText(targetPackage);
       }
     }

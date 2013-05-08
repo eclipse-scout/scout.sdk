@@ -67,6 +67,7 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
     for (TargetPackageModel entry : m_entries) {
       EntityTextField txt = new EntityTextField(c, entry.m_label, 40, entry.m_context);
       txt.setText(entry.m_curVal);
+      txt.setEnabled(DefaultTargetPackage.isPackageConfigurationEnabled());
       txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
       m_allEntityTextFields.add(txt);
     }

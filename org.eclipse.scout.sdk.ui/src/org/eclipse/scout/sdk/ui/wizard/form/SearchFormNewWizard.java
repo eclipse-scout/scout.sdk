@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.form.SearchFormNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
@@ -119,11 +120,11 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
     IScoutBundle searchFormBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM, true, true);
     m_operation.setSearchFormLocationBundle(searchFormBundle);
-    m_operation.setSearchFormPackageName(searchFormBundle.getPackageName(m_page1.getTargetPackage()));
+    m_operation.setSearchFormPackageName(searchFormBundle.getPackageName(m_page1.getTargetPackage(IDefaultTargetPackage.CLIENT_SEARCHFORMS)));
 
     IScoutBundle searchFormDataBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM_DATA, true, true);
     m_operation.setSearchFormDataLocationBundle(searchFormDataBundle);
-    m_operation.setSearchFormDataPackageName(searchFormDataBundle.getPackageName(m_page1.getTargetPackage()));
+    m_operation.setSearchFormDataPackageName(searchFormDataBundle.getPackageName(m_page1.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)));
     return true;
   }
 
@@ -244,7 +245,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
         ITreeNode searchFormNode = m_page2.getTreeNode(TYPE_SEARCH_FORM, true, true);
         if (searchFormNode != null) {
           try {
-            String fqn = searchFormBundle.getPackageName(m_page1.getTargetPackage()) + "." + searchFormNode.getText();
+            String fqn = searchFormBundle.getPackageName(m_page1.getTargetPackage(IDefaultTargetPackage.CLIENT_SEARCHFORMS)) + "." + searchFormNode.getText();
             if (searchFormBundle.getJavaProject().findType(fqn) != null) {
               return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.ERROR) : (IStatus.WARNING),
                   ScoutSdkUi.PLUGIN_ID, "'" + searchFormNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
@@ -262,7 +263,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
         ITreeNode formDataNode = m_page2.getTreeNode(TYPE_SEARCH_FORM_DATA, true, true);
         if (formDataNode != null) {
           try {
-            String fqn = formDataBundle.getPackageName(m_page1.getTargetPackage()) + "." + formDataNode.getText();
+            String fqn = formDataBundle.getPackageName(m_page1.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)) + "." + formDataNode.getText();
             if (formDataBundle.getJavaProject().findType(fqn) != null) {
               return new Status((source instanceof SearchFormNewWizardPage) ? (IStatus.WARNING) : (IStatus.ERROR),
                   ScoutSdkUi.PLUGIN_ID, "'" + formDataNode.getText() + "' " + Texts.get("AlreadyExists") + ".");

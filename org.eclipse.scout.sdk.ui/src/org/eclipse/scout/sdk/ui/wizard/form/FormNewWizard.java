@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
@@ -153,12 +154,12 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     IScoutBundle formBundle = m_locationPage.getLocationBundle(TYPE_FORM, true, true);
     if (formBundle != null) {
       m_operation.setFormBundle(formBundle);
-      m_operation.setFormPackage(formBundle.getPackageName(m_formPage.getTargetPackage()));
+      m_operation.setFormPackage(formBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS)));
     }
     IScoutBundle formDataBundle = m_locationPage.getLocationBundle(TYPE_FORM_DATA, true, true);
     if (formDataBundle != null) {
       m_operation.setFormDataBundle(formDataBundle);
-      m_operation.setFormDataPackage(formDataBundle.getPackageName(m_formPage.getTargetPackage()));
+      m_operation.setFormDataPackage(formDataBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)));
     }
 
     m_operation.setClientServiceRegistryBundles(m_locationPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true));
@@ -167,21 +168,21 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     if (permCreateBundle != null) {
       m_operation.setPermissionCreateBundle(permCreateBundle);
       m_operation.setPermissionCreateName(m_locationPage.getTextOfNode(TYPE_PERMISSION_CREATE, true, true));
-      m_operation.setPermissionCreatePackage(permCreateBundle.getPackageName(m_formPage.getTargetPackage()));
+      m_operation.setPermissionCreatePackage(permCreateBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)));
     }
 
     IScoutBundle permReadBundle = m_locationPage.getLocationBundle(TYPE_PERMISSION_READ, true, true);
     if (permReadBundle != null) {
       m_operation.setPermissionReadBundle(permReadBundle);
       m_operation.setPermissionReadName(m_locationPage.getTextOfNode(TYPE_PERMISSION_READ, true, true));
-      m_operation.setPermissionReadPackage(permReadBundle.getPackageName(m_formPage.getTargetPackage()));
+      m_operation.setPermissionReadPackage(permReadBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)));
     }
 
     IScoutBundle permUpdateBundle = m_locationPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true);
     if (permUpdateBundle != null) {
       m_operation.setPermissionUpdateBundle(permUpdateBundle);
       m_operation.setPermissionUpdateName(m_locationPage.getTextOfNode(TYPE_PERMISSION_UPDATE, true, true));
-      m_operation.setPermissionUpdatePackage(permUpdateBundle.getPackageName(m_formPage.getTargetPackage()));
+      m_operation.setPermissionUpdatePackage(permUpdateBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)));
     }
 
     m_operation.setServerServiceRegistryBundles(m_locationPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true));
@@ -190,14 +191,14 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     if (serviceImplBundle != null) {
       m_operation.setServiceImplementationBundle(serviceImplBundle);
       m_operation.setServiceImplementationName(m_locationPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
-      m_operation.setServiceImplementationPackage(serviceImplBundle.getPackageName(m_formPage.getTargetPackage()));
+      m_operation.setServiceImplementationPackage(serviceImplBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES)));
     }
 
     IScoutBundle serviceInterfaceBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (serviceInterfaceBundle != null) {
       m_operation.setServiceInterfaceBundle(serviceInterfaceBundle);
       m_operation.setServiceInterfaceName(m_locationPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
-      m_operation.setServiceInterfacePackage(serviceInterfaceBundle.getPackageName(m_formPage.getTargetPackage()));
+      m_operation.setServiceInterfacePackage(serviceInterfaceBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)));
     }
     return true;
   }
@@ -366,7 +367,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
         ITreeNode serviceImplNode = m_locationPage.getTreeNode(TYPE_SERVICE_IMPLEMENTATION, true, true);
         if (serviceImplNode != null) {
           try {
-            String fqn = serviceImplementationBundle.getPackageName(m_formPage.getTargetPackage()) + "." + serviceImplNode.getText();
+            String fqn = serviceImplementationBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES)) + "." + serviceImplNode.getText();
             IType findType = serviceImplementationBundle.getJavaProject().findType(fqn);
             if (TypeUtility.exists(findType)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceImplNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
@@ -384,7 +385,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
         ITreeNode serviceInterfaceNode = m_locationPage.getTreeNode(TYPE_SERVICE_INTERFACE, true, true);
         if (serviceInterfaceNode != null) {
           try {
-            String fqn = serviceInterfaceBundle.getPackageName(m_formPage.getTargetPackage()) + "." + serviceInterfaceNode.getText();
+            String fqn = serviceInterfaceBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)) + "." + serviceInterfaceNode.getText();
             IType interfaceType = serviceInterfaceBundle.getJavaProject().findType(fqn);
             if (TypeUtility.exists(interfaceType)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + serviceInterfaceNode.getText() + "' " + Texts.get("AlreadyExists") + ".");
@@ -418,7 +419,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
         ITreeNode permissionNode = m_locationPage.getTreeNode(permissionType, true, true);
         if (permissionNode != null) {
           try {
-            String fqn = permissionBundle.getPackageName(m_formPage.getTargetPackage()) + "." + permissionNode.getText();
+            String fqn = permissionBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)) + "." + permissionNode.getText();
             IType permission = permissionBundle.getJavaProject().findType(fqn);
             if (permission != null && permission.exists()) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "'" + permissionNode.getText() + "' " + Texts.get("AlreadyExists") + ".");

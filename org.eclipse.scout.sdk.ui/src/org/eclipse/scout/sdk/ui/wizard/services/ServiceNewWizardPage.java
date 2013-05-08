@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -92,22 +93,24 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_bundle, labelColWidthPercent);
-    m_entityField.setText(getTargetPackage());
-    m_entityField.addModifyListener(new ModifyListener() {
-      @Override
-      public void modifyText(ModifyEvent e) {
-        setTargetPackageInternal((String) m_entityField.getText());
-        pingStateChanging();
-      }
-    });
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_bundle, labelColWidthPercent);
+      m_entityField.setText(getTargetPackage());
+      m_entityField.addModifyListener(new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent e) {
+          setTargetPackageInternal((String) m_entityField.getText());
+          pingStateChanging();
+        }
+      });
+      m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    }
 
     // layout
     parent.setLayout(new GridLayout(1, true));
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   @Override
@@ -209,7 +212,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       setStateChanging(true);
       setTargetPackageInternal(targetPackage);
-      if (isControlCreated()) {
+      if (isControlCreated() && m_entityField != null) {
         m_entityField.setText(targetPackage);
       }
     }

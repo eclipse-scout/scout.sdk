@@ -142,7 +142,9 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_translationFolderField.setText("resources/texts");
     m_languagesToCreate.add(null); // default language
     m_superTypeField.acceptProposal(m_defaultProposal);
-    m_entityField.setText(getTargetPackage());
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      m_entityField.setText(getTargetPackage());
+    }
   }
 
   private void createServiceGroup(Composite parent) {
@@ -169,20 +171,22 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       }
     });
 
-    m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_bundle);
-    m_entityField.addModifyListener(new ModifyListener() {
-      @Override
-      public void modifyText(ModifyEvent e) {
-        setTargetPackageInternal((String) m_entityField.getText());
-        pingStateChanging();
-      }
-    });
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_bundle);
+      m_entityField.addModifyListener(new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent e) {
+          setTargetPackageInternal((String) m_entityField.getText());
+          pingStateChanging();
+        }
+      });
+      attachGridData(m_entityField);
+    }
 
     group.setLayout(new GridLayout(1, true));
     attachGridData(group);
     attachGridData(m_superTypeField);
     attachGridData(m_className);
-    attachGridData(m_entityField);
   }
 
   private Control createTranslationGroup(Composite parent) {
@@ -445,7 +449,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     try {
       setStateChanging(true);
       setTargetPackageInternal(targetPackage);
-      if (isControlCreated()) {
+      if (isControlCreated() && m_entityField != null) {
         m_entityField.setText(targetPackage);
       }
     }

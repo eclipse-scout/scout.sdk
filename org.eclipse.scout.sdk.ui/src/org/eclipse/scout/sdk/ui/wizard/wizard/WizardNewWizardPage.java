@@ -123,24 +123,27 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
-    m_entityField.setText(getTargetPackage());
-    m_entityField.addModifyListener(new ModifyListener() {
-      @Override
-      public void modifyText(ModifyEvent e) {
-        setTargetPackageInternal((String) m_entityField.getText());
-        pingStateChanging();
-      }
-    });
+    GridData tablePageData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
+      m_entityField.setText(getTargetPackage());
+      m_entityField.addModifyListener(new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent e) {
+          setTargetPackageInternal((String) m_entityField.getText());
+          pingStateChanging();
+        }
+      });
+      m_entityField.setLayoutData(tablePageData);
+    }
 
     // layout
     parent.setLayout(new GridLayout(1, true));
 
-    GridData tablePageData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
     m_nlsNameField.setLayoutData(tablePageData);
     m_typeNameField.setLayoutData(tablePageData);
     m_superTypeField.setLayoutData(tablePageData);
-    m_entityField.setLayoutData(tablePageData);
   }
 
   @Override
@@ -267,7 +270,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       setStateChanging(true);
       setTargetPackageInternal(targetPackage);
-      if (isControlCreated()) {
+      if (isControlCreated() && m_entityField != null) {
         m_entityField.setText(targetPackage);
       }
     }

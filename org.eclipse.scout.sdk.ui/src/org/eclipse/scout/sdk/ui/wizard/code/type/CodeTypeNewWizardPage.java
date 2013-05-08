@@ -136,15 +136,18 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_sharedBundle, labelColWidthPercent);
-    m_entityField.setText(getTargetPackage());
-    m_entityField.addModifyListener(new ModifyListener() {
-      @Override
-      public void modifyText(ModifyEvent e) {
-        setTargetPackageInternal((String) m_entityField.getText());
-        pingStateChanging();
-      }
-    });
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_sharedBundle, labelColWidthPercent);
+      m_entityField.setText(getTargetPackage());
+      m_entityField.addModifyListener(new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent e) {
+          setTargetPackageInternal((String) m_entityField.getText());
+          pingStateChanging();
+        }
+      });
+      m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    }
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
         new JavaElementAbstractTypeContentProvider(iCodeType, getSharedBundle().getJavaProject(), m_defaultCodeType), labelColWidthPercent);
@@ -198,7 +201,6 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_genericTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
   @Override
@@ -394,7 +396,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     try {
       setStateChanging(true);
       setTargetPackageInternal(targetPackage);
-      if (isControlCreated()) {
+      if (isControlCreated() && m_entityField != null) {
         m_entityField.setText(targetPackage);
       }
     }

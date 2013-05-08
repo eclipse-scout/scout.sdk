@@ -24,6 +24,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
@@ -89,6 +90,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     super.start(context);
     plugin = this;
     logManager = new SdkLogManager(this);
+
     CreateFormDataRequest requestService = new CreateFormDataRequest();
     if (m_formDataServiceRegistration == null) {
       m_formDataServiceRegistration = context.registerService(ICreateFormDataRequest.class.getName(), requestService, null);
@@ -96,9 +98,13 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (m_preferencesPropertyListener == null) {
       m_preferencesPropertyListener = new P_PreferenceStorePropertyListener();
     }
+    getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
+
     getPreferenceStore().setDefault(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE, true);
     ScoutSdk.getDefault().setFormDataAutoUpdate(getPreferenceStore().getBoolean(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE));
-    getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
+
+    getPreferenceStore().setDefault(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, false);
+    DefaultTargetPackage.setIsPackageConfigurationEnabled(!getPreferenceStore().getBoolean(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE));
   }
 
   @Override
@@ -498,6 +504,12 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
       if (FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE.equals(event.getProperty())) {
         Boolean autoUpdate = (Boolean) event.getNewValue();
         ScoutSdk.getDefault().setFormDataAutoUpdate(autoUpdate);
+      }
+      else if (DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE.equals(event.getProperty())) {
+        Boolean useLegacy = (Boolean) event.getNewValue();
+        if (useLegacy != null) {
+          DefaultTargetPackage.setIsPackageConfigurationEnabled(!useLegacy.booleanValue());
+        }
       }
     }
   }

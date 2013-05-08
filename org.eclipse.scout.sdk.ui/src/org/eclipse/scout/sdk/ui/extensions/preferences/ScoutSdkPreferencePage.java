@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.extensions.preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.ui.IWorkbench;
@@ -25,10 +26,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * This page is used to modify preferences only. They are stored in the preference store that belongs to the main
  * plug-in class. That way, preferences can be accessed directly via the preference store.
  */
-
 public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
 
   private BooleanFieldEditor m_updateFormDataAutomaticallyField;
+  private BooleanFieldEditor m_targetPackageConfigEnabledField;
 
   public ScoutSdkPreferencePage() {
     super(GRID);
@@ -46,6 +47,8 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
   public void createFieldEditors() {
     m_updateFormDataAutomaticallyField = new BooleanFieldEditor(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE, Texts.get("UpdateFormDataAutomatically"), getFieldEditorParent());
     addField(m_updateFormDataAutomaticallyField);
+    m_targetPackageConfigEnabledField = new BooleanFieldEditor(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, Texts.get("UseLegacyTargetPackage"), getFieldEditorParent());
+    addField(m_targetPackageConfigEnabledField);
   }
 
   @Override

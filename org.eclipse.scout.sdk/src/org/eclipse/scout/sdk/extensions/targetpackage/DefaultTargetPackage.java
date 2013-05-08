@@ -31,12 +31,15 @@ import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 
 /**
- * <h3>{@link DefaultTargetPackage}</h3> ...
+ * <h3>{@link DefaultTargetPackage}</h3>
  * 
  * @author mvi
  * @since 3.9.0 17.12.2012
  */
 public final class DefaultTargetPackage implements IDefaultTargetPackage {
+
+  public final static String PROP_USE_LEGACY_TARGET_PACKAGE = ScoutSdk.PLUGIN_ID + ".propDefaultTargetPackageConfigEnabled";
+
   private final static String PREFERENCES_PREFIX = "default.target.package.";
   private final static String PACKAGE_PREFIX = ".";
 
@@ -46,8 +49,9 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
   private final static String ATTRIB_ID = "id";
   private final static String ATTRIB_TYPE = "bundleType";
 
-  private final static Object lock = new Object();
   private static Map<String /* packageId */, TargetPackageEntry> defaultValues = null;
+  private static boolean isPackageConfigurationEnabled;
+  private final static Object lock = new Object();
   private final static Map<IScoutBundle, Map<String /* packageId */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutBundle, Map<String, StringHolder>>();
   private final static Map<IScoutBundle, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutBundle, IPreferenceChangeListener>();
 
@@ -106,12 +110,58 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
     return ret;
   }
 
+  public static boolean isPackageConfigurationEnabled() {
+    synchronized (lock) {
+      return isPackageConfigurationEnabled;
+    }
+  }
+
+  public static void setIsPackageConfigurationEnabled(boolean enabled) {
+    synchronized (lock) {
+      isPackageConfigurationEnabled = enabled;
+    }
+  }
+
   public static String get(IScoutBundle context, String packageId) {
-    String config = getConfiguredDefaultPackageCached(context, packageId);
-    if (config != null) {
-      return config;
+    if (isPackageConfigurationEnabled()) {
+      // users can specify the target package: use the configured defaults
+      String config = getConfiguredDefaultPackageCached(context, packageId);
+      if (config != null) {
+        return config;
+      }
+    }
+    else {
+      String legacyPackage = getLegacyPackages(packageId);
+      if (legacyPackage != null) {
+        return legacyPackage;
+      }
     }
     return getDefaults().get(packageId).getDefaultSuffix();
+  }
+
+  /**
+   * exceptions for target packages: the new location differs from the packages used in older scout sdk versions.<br>
+   * To keep backwards compatibility with old scout projects a legacy support can be enabled. in this case these old
+   * packages are used.
+   * 
+   * @param packageId
+   * @return
+   */
+  private static String getLegacyPackages(String packageId) {
+    // legacy support: users cannot specify the target package: use pre-defined packages
+    if (IDefaultTargetPackage.CLIENT_FORMS.equals(packageId)) {
+      return "ui.forms";
+    }
+    else if (IDefaultTargetPackage.CLIENT_SEARCHFORMS.equals(packageId)) {
+      return "ui.searchforms";
+    }
+    else if (IDefaultTargetPackage.SHARED_SERVICES.equals(packageId)) {
+      return "services.process";
+    }
+    else if (IDefaultTargetPackage.SERVER_SERVICES.equals(packageId)) {
+      return "services.process";
+    }
+    return null;
   }
 
   public static String getPreferenceKey(String packageId) {

@@ -146,15 +146,18 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
-    m_entityField.setText(getTargetPackage());
-    m_entityField.addModifyListener(new ModifyListener() {
-      @Override
-      public void modifyText(ModifyEvent e) {
-        setTargetPackageInternal((String) m_entityField.getText());
-        pingStateChanging();
-      }
-    });
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_clientBundle, labelColWidthPercent);
+      m_entityField.setText(getTargetPackage(null));
+      m_entityField.addModifyListener(new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent e) {
+          setTargetPackageInternal((String) m_entityField.getText());
+          pingStateChanging();
+        }
+      });
+      m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    }
 
     Control formIdGroup = createIdGroup(p);
 
@@ -165,7 +168,6 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     formIdGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
@@ -236,7 +238,12 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      return JavaElementValidator.validatePackageName(getTargetPackage(null));
+    }
+    else {
+      return Status.OK_STATUS;
+    }
   }
 
   protected IStatus getStatusPropertyId() {
@@ -252,7 +259,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_FORM)) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
-    if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
+    if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS)) + "." + getTypeName())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 
@@ -384,15 +391,20 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     setPropertyString(PROP_FORM_ID_NAME, formId);
   }
 
-  public String getTargetPackage() {
-    return (String) getProperty(PROP_TARGET_PACKAGE);
+  public String getTargetPackage(String packageId) {
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      return (String) getProperty(PROP_TARGET_PACKAGE);
+    }
+    else {
+      return DefaultTargetPackage.get(null, packageId);
+    }
   }
 
   public void setTargetPackage(String targetPackage) {
     try {
       setStateChanging(true);
       setTargetPackageInternal(targetPackage);
-      if (isControlCreated()) {
+      if (isControlCreated() && m_entityField != null) {
         m_entityField.setText(targetPackage);
       }
     }

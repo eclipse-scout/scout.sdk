@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>CodeField</h3> ...
+ * <h3>EntityTextField</h3> ...
  */
 public class EntityTextField extends Composite {
 
@@ -125,6 +125,12 @@ public class EntityTextField extends Composite {
       s = "";
     }
     m_text.setText(s);
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    super.setEnabled(enabled);
+    m_text.setEnabled(enabled);
   }
 
   public IStatus getStatus() {
