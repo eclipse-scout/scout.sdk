@@ -17,14 +17,14 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.handlers.HandlerUtil;
 
 public abstract class AbstractScoutHandler extends AbstractHandler implements IScoutHandler {
   private String m_label;
@@ -137,21 +137,23 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
   @SuppressWarnings("unchecked")
   @Override
   public final Object execute(ExecutionEvent event) throws ExecutionException {
-    ISelection selection = HandlerUtil.getActiveWorkbenchWindow(event).getActivePage().getSelection();
-    if (selection instanceof IStructuredSelection) {
-      Shell shell = HandlerUtil.getActiveShell(event);
-      IStructuredSelection strucSelection = (IStructuredSelection) selection;
+    IScoutExplorerPart explorer = ScoutSdkUi.getExplorer(false);
+    if (explorer != null) {
+      IStructuredSelection selection = explorer.getSelection();
+      if (selection != null && explorer.getSite() != null) {
+        Shell shell = explorer.getSite().getShell();
 
-      IPage[] selectedPages = new IPage[strucSelection.size()];
+        IPage[] selectedPages = new IPage[selection.size()];
 
-      // iterator can only contain IPage's. this is ensured by the MenuVisibilityTester class
-      Iterator<IPage> it = strucSelection.iterator();
-      int index = 0;
-      while (it.hasNext()) {
-        selectedPages[index++] = it.next();
+        // iterator can only contain IPage's. this is ensured by the MenuVisibilityTester class
+        Iterator<IPage> it = selection.iterator();
+        int index = 0;
+        while (it.hasNext()) {
+          selectedPages[index++] = it.next();
+        }
+
+        return execute(shell, selectedPages, event);
       }
-
-      return execute(shell, selectedPages, event);
     }
     return null;
   }

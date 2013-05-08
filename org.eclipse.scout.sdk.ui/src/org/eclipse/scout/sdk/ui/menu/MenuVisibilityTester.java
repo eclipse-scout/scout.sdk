@@ -91,6 +91,8 @@ public class MenuVisibilityTester extends PropertyTester {
             IScoutHandler currentMenu = ScoutMenuContributionItemFactory.getMenuInstance(currentMenuClass);
             if (currentMenu == null) return false; // no instance could be created -> do not show the menu
 
+            cmd.setHandler(currentMenu);
+
             // check for multi select
             if (!currentMenu.isMultiSelectSupported() && selectedNodes.length > 1) return false;
 
