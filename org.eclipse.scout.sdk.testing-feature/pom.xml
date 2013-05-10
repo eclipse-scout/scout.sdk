@@ -24,7 +24,7 @@
   <artifactId>org.eclipse.scout.sdk.testing</artifactId>
   <packaging>eclipse-feature</packaging>
 
-  <name>Eclipse Scout SDK Testing API</name>
+  <name>Eclipse Scout SDK Testing</name>
 
   <build>
     <pluginManagement>
