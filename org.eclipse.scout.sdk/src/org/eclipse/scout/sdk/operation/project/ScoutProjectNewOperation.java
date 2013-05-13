@@ -169,14 +169,15 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   protected String computeExecutionEnvironment() {
-
     String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
     IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
-    for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
-      String executionEnvId = env.getId();
-      if (executionEnvId.startsWith(EXEC_ENV_PREFIX) && env.isStrictlyCompatible(defaultVm)) {
-        if (executionEnvId.compareTo(execEnv) > 0) {
-          execEnv = executionEnvId; // take the newest
+    if (defaultVm != null) {
+      for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
+        String executionEnvId = env.getId();
+        if (executionEnvId.startsWith(EXEC_ENV_PREFIX) && env.isStrictlyCompatible(defaultVm)) {
+          if (executionEnvId.compareTo(execEnv) > 0) {
+            execEnv = executionEnvId; // take the newest
+          }
         }
       }
     }
