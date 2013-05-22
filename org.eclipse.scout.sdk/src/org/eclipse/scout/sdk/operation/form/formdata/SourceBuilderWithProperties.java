@@ -179,16 +179,18 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
             continue;
           }
 
+          // skip validation rules having return value null or false
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
-          if (generatedSourceCode != null) {
-            if (generatedSourceCode.equals("null")) {
-              it.remove();
-              continue;
+          if ("null".equals(generatedSourceCode) || "false".equals(generatedSourceCode)) {
+            if (replaceAnnotationPresent && !superTypeHasNoFormFieldData) {
+              // replace annotation is present and super type has already a form field data. Hence rule must be overridden in the generated method.
+              vm.setSkipRule(true);
             }
-            if (generatedSourceCode.equals("false")) {
+            else {
+              // no replace annotation is present. Hence just ignore the rule.
               it.remove();
-              continue;
             }
+            continue;
           }
         }
         if (list.size() > 0) {

@@ -578,6 +578,11 @@ public class ExtendedExtendedForm extends ExtendedForm {
     }
 
     @Override
+    protected boolean getConfiguredMandatory() {
+      return true;
+    }
+
+    @Override
     protected int getConfiguredMaxLength() {
       return 15;
     }

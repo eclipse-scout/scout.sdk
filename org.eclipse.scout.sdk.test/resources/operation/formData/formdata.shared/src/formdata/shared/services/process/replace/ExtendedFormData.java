@@ -149,6 +149,7 @@ public class ExtendedFormData extends BaseFormData {
     @Override
     protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
+      ruleMap.remove(ValidationRule.MANDATORY);
       ruleMap.put(ValidationRule.MAX_LENGTH, 100);
     }
   }

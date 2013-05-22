@@ -213,7 +213,7 @@ public class ReplaceFormFiledTest extends AbstractScoutSdkTest {
     assertTrue(TypeUtility.exists(type));
     assertEquals("BaseFormData.Name", type.getSuperclassName());
     assertValidationRules(type,
-        "ruleMap.put(ValidationRule.MANDATORY, false);",
+        "ruleMap.remove(ValidationRule.MANDATORY);",
         "ruleMap.put(ValidationRule.MAX_LENGTH, 100);");
   }
 
@@ -420,6 +420,7 @@ public class ReplaceFormFiledTest extends AbstractScoutSdkTest {
     assertTrue(TypeUtility.exists(type));
     assertEquals("ExtendedFormData.NameEx", type.getSuperclassName());
     assertValidationRules(type,
+        "ruleMap.put(ValidationRule.MANDATORY, true);",
         "ruleMap.put(ValidationRule.MAX_LENGTH, 15);");
   }
 
