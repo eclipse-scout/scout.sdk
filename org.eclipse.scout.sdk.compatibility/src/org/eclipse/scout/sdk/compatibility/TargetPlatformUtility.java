@@ -3,6 +3,7 @@ package org.eclipse.scout.sdk.compatibility;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.compatibility.internal.ScoutCompatibilityActivator;
 import org.eclipse.scout.sdk.compatibility.internal.service.ITargetPlatformCompatService;
 
@@ -10,13 +11,13 @@ public final class TargetPlatformUtility {
   private TargetPlatformUtility() {
   }
 
-  public static void resolveTargetPlatform(IFile targetFile, IProgressMonitor monitor) throws CoreException {
-    resolveTargetPlatform(targetFile, false, monitor);
+  public static IStatus resolveTargetPlatform(IFile targetFile, IProgressMonitor monitor) throws CoreException {
+    return resolveTargetPlatform(targetFile, false, monitor);
   }
 
-  public static void resolveTargetPlatform(IFile targetFile, boolean loadPlatform, IProgressMonitor monitor) throws CoreException {
+  public static IStatus resolveTargetPlatform(IFile targetFile, boolean loadPlatform, IProgressMonitor monitor) throws CoreException {
     ITargetPlatformCompatService svc = getService();
-    svc.resolveTargetPlatform(targetFile, loadPlatform, monitor);
+    return svc.resolveTargetPlatform(targetFile, loadPlatform, monitor);
   }
 
   private static ITargetPlatformCompatService getService() {

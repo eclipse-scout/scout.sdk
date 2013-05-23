@@ -24,15 +24,16 @@ import org.eclipse.scout.sdk.compatibility.v36.internal.provisional.LoadTargetDe
 @SuppressWarnings("restriction")
 public class TargetPlatformCompatService implements ITargetPlatformCompatService {
   @Override
-  public void resolveTargetPlatform(IFile targetFile, boolean loadPlatform, IProgressMonitor monitor) throws CoreException {
+  public IStatus resolveTargetPlatform(IFile targetFile, boolean loadPlatform, IProgressMonitor monitor) throws CoreException {
     ITargetPlatformService targetService = (ITargetPlatformService) PDECore.getDefault().acquireService(ITargetPlatformService.class.getName());
     ITargetHandle handle = targetService.getTarget(targetFile);
     ITargetDefinition def = handle.getTargetDefinition();
-    def.resolve(monitor);
-    if (loadPlatform) {
-    	LoadTargetDefinitionJobSync loadJob = new LoadTargetDefinitionJobSync(def);
-      loadJob.run(monitor);
+    IStatus result = def.resolve(monitor);
+    if (loadPlatform && result.isOK()) {
+      LoadTargetDefinitionJobSync loadJob = new LoadTargetDefinitionJobSync(def);
+      result = loadJob.run(monitor);
     }
+    return result;
   }
 
   @Override
