@@ -124,6 +124,18 @@ public interface INlsProject {
   void updateRow(INlsEntry row, IProgressMonitor monitor);
 
   /**
+   * Updates (or creates if not existing) the given row.
+   * If the key is inherited, this method does nothing.
+   * 
+   * @param row
+   *          The row to update or create.
+   * @param flush
+   *          Specifis if the changes should directly be persisted to the underlying resource.
+   * @param monitor
+   */
+  void updateRow(INlsEntry row, boolean flush, IProgressMonitor monitor);
+
+  /**
    * Changes the key of the entry with the same key as the given row
    * 
    * @param row
@@ -199,4 +211,11 @@ public interface INlsProject {
    * @return true if this project contains at least one read-only resource.
    */
   boolean isReadOnly();
+
+  /**
+   * Flushes all changes done to this NLS project to the underlying resources.
+   * 
+   * @param monitor
+   */
+  void flush(IProgressMonitor monitor);
 }

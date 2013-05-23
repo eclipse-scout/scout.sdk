@@ -36,6 +36,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.translationResource.AbstractTra
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.TranslationResourceEvent;
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
+import org.eclipse.scout.sdk.util.resources.WeakResourceChangeListener;
 
 /**
  * <h4>WorkspaceTranslationFile</h4>
@@ -43,13 +44,15 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 public class WorkspaceTranslationFile extends AbstractTranslationResource {
 
   private final IFile m_file;
+  private final IResourceChangeListener m_translationFileChangedListener;
 
   public WorkspaceTranslationFile(IFile file) {
     super(NlsSdkSimple.getLanguage(file.getName()));
     Assert.isTrue(file != null);
     Assert.isTrue(file.exists());
     m_file = file;
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(new P_TranslationFileChangedListener(), IResourceChangeEvent.POST_CHANGE);
+    m_translationFileChangedListener = new P_TranslationFileChangedListener();
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(new WeakResourceChangeListener(m_translationFileChangedListener), IResourceChangeEvent.POST_CHANGE);
     reload(new NullProgressMonitor());
   }
 
@@ -81,13 +84,9 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
     }
   }
 
-  public void updateTextNoFire(String key, String newText, IProgressMonitor monitor) {
-    setTranslation(key, newText, false, monitor);
-  }
-
   @Override
-  public void updateText(String key, String newText, IProgressMonitor monitor) {
-    setTranslation(key, newText, monitor);
+  public void updateText(String key, String newText, boolean fireEvent, IProgressMonitor monitor) {
+    setTranslation(key, newText, fireEvent, monitor);
   }
 
   @Override

@@ -31,6 +31,7 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.sdk.util.resources.WeakResourceChangeListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
@@ -46,15 +47,17 @@ public class NlsType implements INlsType {
 
   private static final Pattern REGEX_RESOURCE_BUNDLE_FIELD = Pattern.compile(RESOURCE_BUNDLE_FIELD_NAME + "\\s*=\\s*\\\"([^\\\"]*)\\\"\\s*\\;", Pattern.DOTALL);
 
-  protected final IType m_type;
   protected IType[] m_superTypes;
+  protected IResourceChangeListener m_nlsResourceChangeListener;
+  protected final IType m_type;
   protected final BasicPropertySupport m_propertySupport;
 
   public NlsType(IType type) {
     m_propertySupport = new BasicPropertySupport(this);
     m_type = type;
     if (!m_type.isReadOnly()) {
-      ResourcesPlugin.getWorkspace().addResourceChangeListener(new P_NlsResourceChangeListener(), IResourceChangeEvent.POST_CHANGE);
+      m_nlsResourceChangeListener = new P_NlsResourceChangeListener();
+      ResourcesPlugin.getWorkspace().addResourceChangeListener(new WeakResourceChangeListener(m_nlsResourceChangeListener), IResourceChangeEvent.POST_CHANGE);
     }
     reload();
   }

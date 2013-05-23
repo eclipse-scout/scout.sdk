@@ -188,7 +188,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
   }
 
   @Override
-  public void updateText(String key, String text, IProgressMonitor monitor) {
+  public void updateText(String key, String text, boolean fireEvent, IProgressMonitor monitor) {
     throw new UnsupportedOperationException("this method is not supported on : " + this.getClass().getSimpleName() + " readOnly=" + isReadOnly());
   }
 

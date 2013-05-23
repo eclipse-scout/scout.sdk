@@ -19,10 +19,12 @@ import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.sdk.util.resources.WeakResourceChangeListener;
 
 public class WorkspaceNlsFile extends AbstractNlsFile {
 
-  private IFile m_file;
+  private final IFile m_file;
+  private final IResourceChangeListener m_translationFileChangedListener;
 
   /**
    * @param stream
@@ -31,7 +33,8 @@ public class WorkspaceNlsFile extends AbstractNlsFile {
   public WorkspaceNlsFile(IFile file) throws CoreException {
     super(file);
     m_file = file;
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(new P_NlsFileChangeListener(), IResourceChangeEvent.POST_CHANGE);
+    m_translationFileChangedListener = new P_NlsFileChangeListener();
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(new WeakResourceChangeListener(m_translationFileChangedListener), IResourceChangeEvent.POST_CHANGE);
   }
 
   @Override

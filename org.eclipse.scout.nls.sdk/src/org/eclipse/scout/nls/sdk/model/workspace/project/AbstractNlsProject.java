@@ -326,6 +326,18 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   @Override
   public void updateRow(INlsEntry row, IProgressMonitor monitor) {
+    updateRow(row, true, monitor);
+  }
+
+  @Override
+  public void flush(IProgressMonitor monitor) {
+    for (ITranslationResource r : m_resourceProvider.getResources()) {
+      r.commitChanges(monitor);
+    }
+  }
+
+  @Override
+  public void updateRow(INlsEntry row, boolean flush, IProgressMonitor monitor) {
     if (!StringUtility.hasText(row.getKey())) {
       throw new IllegalArgumentException("a text key cannot be null.");
     }
@@ -335,14 +347,14 @@ public abstract class AbstractNlsProject implements INlsProject {
       NlsEntry existingEntry = m_entries.get(row.getKey());
       if (existingEntry != null) {
         if (existingEntry.getType() == INlsEntry.TYPE_INHERITED) {
-          createNewRowInternal(row, monitor); // override
+          createNewRowInternal(row, flush, monitor); // override
         }
         else {
-          updateExistingRowInternal(existingEntry, row, monitor);
+          updateExistingRowInternal(existingEntry, row, flush, monitor);
         }
       }
       else {
-        createNewRowInternal(row, monitor);
+        createNewRowInternal(row, flush, monitor);
       }
     }
     finally {
@@ -350,19 +362,19 @@ public abstract class AbstractNlsProject implements INlsProject {
     }
   }
 
-  private void createNewRowInternal(INlsEntry row, IProgressMonitor monitor) {
+  private void createNewRowInternal(INlsEntry row, boolean flush, IProgressMonitor monitor) {
     NlsEntry newRow = new NlsEntry(row);
     m_entries.put(newRow.getKey(), newRow);
     for (Entry<Language, String> entry : newRow.getAllTranslations().entrySet()) {
       ITranslationResource r = getTranslationResource(entry.getKey());
       if (r != null) {
-        r.updateText(newRow.getKey(), entry.getValue(), monitor);
+        r.updateText(newRow.getKey(), entry.getValue(), flush, monitor);
       }
     }
     fireNlsProjectEvent(new NlsProjectEvent(this, newRow, NlsProjectEvent.TYPE_ENTRY_ADDED));
   }
 
-  private void updateExistingRowInternal(NlsEntry existingRow, INlsEntry row, IProgressMonitor monitor) {
+  private void updateExistingRowInternal(NlsEntry existingRow, INlsEntry row, boolean flush, IProgressMonitor monitor) {
     boolean updated = false;
     for (Entry<Language, String> entry : row.getAllTranslations().entrySet()) {
       String existingTranslation = existingRow.getTranslation(entry.getKey());
@@ -370,7 +382,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         ITranslationResource r = getTranslationResource(entry.getKey());
         if (r != null) {
           updated = true;
-          r.updateText(row.getKey(), entry.getValue(), monitor);
+          r.updateText(row.getKey(), entry.getValue(), flush, monitor);
           existingRow.addTranslation(entry.getKey(), entry.getValue());
         }
       }

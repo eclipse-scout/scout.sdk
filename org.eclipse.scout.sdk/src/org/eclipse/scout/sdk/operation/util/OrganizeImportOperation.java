@@ -13,11 +13,12 @@ package org.eclipse.scout.sdk.operation.util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
-import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -49,7 +50,17 @@ public class OrganizeImportOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     boolean isWorkingCopy = getCompilationUnit().isWorkingCopy();
-    CompilationUnit astRoot = SharedASTProvider.getAST(getCompilationUnit(), SharedASTProvider.WAIT_YES, monitor);
+
+//    CompilationUnit astRoot = SharedASTProvider.getAST(getCompilationUnit(), SharedASTProvider.WAIT_YES, monitor);
+
+    @SuppressWarnings("deprecation")
+    final ASTParser parser = ASTParser.newParser(AST.JLS3);
+    parser.setResolveBindings(false);//???
+    parser.setStatementsRecovery(false);
+    parser.setBindingsRecovery(false);
+    parser.setSource(getCompilationUnit());
+    CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
+
     CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(getCompilationUnit().getJavaProject());
     OrganizeImportsOperation organizeImps = new OrganizeImportsOperation(getCompilationUnit(), astRoot, settings.importIgnoreLowercase, !isWorkingCopy, true, null);
     organizeImps.run(monitor);

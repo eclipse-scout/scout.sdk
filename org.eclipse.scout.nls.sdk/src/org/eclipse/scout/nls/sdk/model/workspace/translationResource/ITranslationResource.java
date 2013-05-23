@@ -49,7 +49,7 @@ public interface ITranslationResource {
    * @param newText
    * @param nullProgressMonitor
    */
-  void updateText(String key, String newText, IProgressMonitor monitor);
+  void updateText(String key, String newText, boolean fireEvent, IProgressMonitor monitor);
 
   /**
    * @param key

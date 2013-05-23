@@ -30,6 +30,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
 import org.eclipse.scout.nls.sdk.model.util.Language;
@@ -191,17 +192,12 @@ public class SimpleNlsProject extends AbstractNlsProject {
     return m_nlsClass;
   }
 
-  private class P_NlsClassPropertyChangeListener implements PropertyChangeListener {
+  private class P_NlsClassPropertyChangeListener implements PropertyChangeListener, WeakEventListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (NlsType.PROP_TRANSLATION_FILE_PREFIX.equals(evt.getPropertyName()) ||
           NlsType.PROP_TRANSLATION_FOLDER_NAME.equals(evt.getPropertyName())) {
-        // reset cache
-        resetCache();
-        // find files
-        updateTranslationResourceLocation();
-        // fire full reload
-        fireNlsProjectEvent(new NlsProjectEvent(SimpleNlsProject.this, NlsProjectEvent.TYPE_FULL_REFRESH));
+        refresh();
       }
       else if (NlsType.PROP_SUPER_TYPE.equals(evt.getPropertyName())) {
         resetCache();

@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 public final class ScoutSeverityManager {
 
-  private static ScoutSeverityManager instance = new ScoutSeverityManager();
+  private final static ScoutSeverityManager instance = new ScoutSeverityManager();
 
   public static ScoutSeverityManager getInstance() {
     return instance;
