@@ -28,7 +28,9 @@ import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
+import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
+import org.eclipse.scout.sdk.ui.services.OrganizeImportService;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.swt.SWT;
@@ -105,6 +107,8 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
     getPreferenceStore().setDefault(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, false);
     DefaultTargetPackage.setIsPackageConfigurationEnabled(!getPreferenceStore().getBoolean(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE));
+
+    context.registerService(IOrganizeImportService.class, new OrganizeImportService(), null);
   }
 
   @Override

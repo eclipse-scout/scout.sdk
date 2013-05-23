@@ -13,19 +13,15 @@ package org.eclipse.scout.sdk.operation.util;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
-import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation;
-import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 
 /**
- *
+ * Organizes the imports of the given compilation unit if a corresponding service is registered.
  */
-@SuppressWarnings("restriction")
 public class OrganizeImportOperation implements IOperation {
 
   private final ICompilationUnit m_icu;
@@ -49,21 +45,26 @@ public class OrganizeImportOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    boolean isWorkingCopy = getCompilationUnit().isWorkingCopy();
-
-//    CompilationUnit astRoot = SharedASTProvider.getAST(getCompilationUnit(), SharedASTProvider.WAIT_YES, monitor);
-
-    @SuppressWarnings("deprecation")
-    final ASTParser parser = ASTParser.newParser(AST.JLS3);
-    parser.setResolveBindings(false);//???
-    parser.setStatementsRecovery(false);
-    parser.setBindingsRecovery(false);
-    parser.setSource(getCompilationUnit());
-    CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-
-    CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(getCompilationUnit().getJavaProject());
-    OrganizeImportsOperation organizeImps = new OrganizeImportsOperation(getCompilationUnit(), astRoot, settings.importIgnoreLowercase, !isWorkingCopy, true, null);
-    organizeImps.run(monitor);
+    BundleContext context = ScoutSdk.getDefault().getBundle().getBundleContext();
+    ServiceReference reference = context.getServiceReference(IOrganizeImportService.class.getName());
+    try {
+      if (reference != null) {
+        @SuppressWarnings("unchecked")
+        Object service = context.getService(reference);
+        if (service instanceof IOrganizeImportService) {
+          ((IOrganizeImportService) service).organize(getCompilationUnit(), monitor);
+        }
+        else {
+          ScoutSdk.logWarning("No valid Organize Imports Service has been registered.");
+        }
+      }
+      else {
+        ScoutSdk.logWarning("No Organize Imports Service has been registered.");
+      }
+    }
+    finally {
+      context.ungetService(reference);
+    }
   }
 
   public ICompilationUnit getCompilationUnit() {
