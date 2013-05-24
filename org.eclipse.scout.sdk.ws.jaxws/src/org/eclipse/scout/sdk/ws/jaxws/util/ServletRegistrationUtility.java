@@ -39,7 +39,7 @@ public final class ServletRegistrationUtility {
     if (bundle == null) {
       return null;
     }
-    if (IScoutBundle.TYPE_SERVER.equals(bundle.getType())) {
+    if (!IScoutBundle.TYPE_SERVER.equals(bundle.getType())) {
       return null;
     }
 
