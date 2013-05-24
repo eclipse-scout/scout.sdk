@@ -13,7 +13,8 @@
       <vmArgs>-Xms64m
 -Xmx512m
 -XX:MaxPermSize=256m</vmArgs>
-      <programArgsMac>--launcher.secondThread</programArgsMac>
+      <programArgsMac>--launcher.secondThread
+-nosplash</programArgsMac>
    </launcherArgs>
 
    <windowImages/>

@@ -87,7 +87,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
 
   private final static Pattern PATTERN = Pattern.compile("name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"", Pattern.MULTILINE);
   private final static String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
-  private final static String MAC_OS_X_SWT_WARNING_MESSAGE_KEY = "scoutSwtMacOsXWarningKey";
 
   /**
    * @param toolkit
@@ -301,35 +300,12 @@ public class ProductLaunchPresenter extends AbstractPresenter {
         IPreferenceStore store = ScoutSdkUi.getDefault().getPreferenceStore();
         ProductFileModelHelper pfmh = new ProductFileModelHelper(m_productFile);
         if (pfmh.ProductFile.existsDependency(RuntimeClasses.ScoutUiSwingBundleId)) {
-          // it is a swing product to be launched on Mac OS X: show warning
+          // it is a swing product to be launched on Mac OS X: show help box
           String doNotShowAgainString = store.getString(MAC_OS_X_SWING_WARNING_MESSAGE_KEY);
           boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
           if (!doNotShowAgain) {
-            // Swing only runs when the java process is running in 32bit mode.
-            // therefore: if we detect a 64bit process, we add a parameter to switch to 32bit mode for the swing client.
-            String x64AddMessage = "";
-            if (Platform.ARCH_X86_64.equals(Platform.getOSArch())) {
-              x64AddMessage = "\n    - add '-d32'";
-            }
-            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwingWarningTitle"), Texts.get("MacOsXSwingWarningMessage", x64AddMessage),
+            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwingWarningTitle"), Texts.get("MacOsXSwingWarningMessage"),
                 Texts.get("DoNotShowAgain"), false, store, MAC_OS_X_SWING_WARNING_MESSAGE_KEY);
-          }
-        }
-        else if (pfmh.ProductFile.existsDependency(RuntimeClasses.ScoutUiSwtBundleId)) {
-          // it is a SWT product to be launched on Mac OS X: show warning
-          String doNotShowAgainString = store.getString(MAC_OS_X_SWT_WARNING_MESSAGE_KEY);
-          boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);
-          if (!doNotShowAgain) {
-            // that the SWT binaries can be loaded, the arch of the process must match the arch of the binaries.
-            // Even a 32bit process is running it might be that the JRE is a 64bit JRE. In that case a 64bit process would be created by default.
-            // To correct that, we add the 32bit switch for that case so that the JRE works in the same mode as the running eclipse.
-            String x86AddMessage = "";
-            if (Platform.ARCH_X86.equals(Platform.getOSArch())) {
-              x86AddMessage = "\n- Add '-d32' to the 'VM arguments' box (only when using an Apple JRE).";
-            }
-
-            MessageDialogWithToggle.openWarning(ScoutSdkUi.getShell(), Texts.get("MacOsXSwtWarningTitle"), Texts.get("MacOsXSwtWarningMessage", x86AddMessage),
-                Texts.get("DoNotShowAgain"), false, store, MAC_OS_X_SWT_WARNING_MESSAGE_KEY);
           }
         }
       }
