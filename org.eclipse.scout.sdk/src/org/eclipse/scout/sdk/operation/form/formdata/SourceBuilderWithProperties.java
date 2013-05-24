@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2011,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -37,12 +37,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
-/**
- * <h3>{@link SourceBuilderWithProperties}</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 1.0.8 21.02.2011
- */
 public class SourceBuilderWithProperties extends TypeSourceBuilder {
 
   private static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
@@ -182,16 +176,18 @@ public class SourceBuilderWithProperties extends TypeSourceBuilder {
             continue;
           }
 
+          // skip validation rules having return value null or false
           String generatedSourceCode = vm.getRuleGeneratedSourceCode();
-          if (generatedSourceCode != null) {
-            if (generatedSourceCode.equals("null")) {
-              it.remove();
-              continue;
+          if ("null".equals(generatedSourceCode) || "false".equals(generatedSourceCode)) {
+            if (replaceAnnotationPresent && !superTypeHasNoFormFieldData) {
+              // replace annotation is present and super type has already a form field data. Hence rule must be overridden in the generated method.
+              vm.setSkipRule(true);
             }
-            if (generatedSourceCode.equals("false")) {
+            else {
+              // no replace annotation is present. Hence just ignore the rule.
               it.remove();
-              continue;
             }
+            continue;
           }
         }
         if (list.size() > 0) {
