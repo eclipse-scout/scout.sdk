@@ -2,11 +2,11 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK Rap
 Bundle-SymbolicName: org.eclipse.scout.sdk.rap;singleton:=true
-Bundle-Version: 3.9.0.qualifier
+Bundle-Version: 3.10.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.rap.ScoutSdkRap
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.scout.sdk;bundle-version="3.9.0";visibility:=reexport,
+ org.eclipse.scout.sdk;bundle-version="3.10.0";visibility:=reexport,
  org.eclipse.core.variables
 Export-Package: org.eclipse.scout.sdk.rap,
  org.eclipse.scout.sdk.rap.operations.project,

@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK Util
 Bundle-SymbolicName: org.eclipse.scout.sdk.util;singleton:=true
-Bundle-Version: 3.9.0.qualifier
+Bundle-Version: 3.10.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.util.internal.SdkUtilActivator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime,
@@ -15,7 +15,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="3.5.0";visibility:=reexport,
  org.eclipse.text;bundle-version="3.5.0";visibility:=reexport,
  org.eclipse.scout.commons;bundle-version="3.7.0";visibility:=reexport,
- org.eclipse.scout.sdk.compatibility;bundle-version="3.9.0";visibility:=reexport
+ org.eclipse.scout.sdk.compatibility;bundle-version="3.10.0";visibility:=reexport
 Export-Package: org.eclipse.scout.sdk.util,
  org.eclipse.scout.sdk.util.ast,
  org.eclipse.scout.sdk.util.ast.visitor,

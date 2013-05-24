@@ -79,6 +79,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   private ColorRegistry m_colorRegistry;
   private FontRegistry m_fontRegistry;
   private ServiceRegistration m_formDataServiceRegistration;
+  private ServiceRegistration m_organizeImportServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
 
   /**
@@ -93,10 +94,13 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     plugin = this;
     logManager = new SdkLogManager(this);
 
-    CreateFormDataRequest requestService = new CreateFormDataRequest();
     if (m_formDataServiceRegistration == null) {
-      m_formDataServiceRegistration = context.registerService(ICreateFormDataRequest.class.getName(), requestService, null);
+      m_formDataServiceRegistration = context.registerService(ICreateFormDataRequest.class.getName(), new CreateFormDataRequest(), null);
     }
+    if (m_organizeImportServiceRegistration == null) {
+      m_organizeImportServiceRegistration = context.registerService(IOrganizeImportService.class.getName(), new OrganizeImportService(), null);
+    }
+
     if (m_preferencesPropertyListener == null) {
       m_preferencesPropertyListener = new P_PreferenceStorePropertyListener();
     }
@@ -107,8 +111,6 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
     getPreferenceStore().setDefault(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, false);
     DefaultTargetPackage.setIsPackageConfigurationEnabled(!getPreferenceStore().getBoolean(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE));
-
-    context.registerService(IOrganizeImportService.class, new OrganizeImportService(), null);
   }
 
   @Override
@@ -123,6 +125,10 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (m_formDataServiceRegistration != null) {
       m_formDataServiceRegistration.unregister();
       m_formDataServiceRegistration = null;
+    }
+    if (m_organizeImportServiceRegistration != null) {
+      m_organizeImportServiceRegistration.unregister();
+      m_organizeImportServiceRegistration = null;
     }
   }
 
