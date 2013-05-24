@@ -905,7 +905,7 @@
             symbolicName="com.bsiag.scout.rt.server.jdbc.oracle11g2">
       </bundle>
       <bundle
-            symbolicName="com.bsiag.scout.rt.server.jdbc.postgres9">
+            symbolicName="com.bsiag.scout.rt.server.jdbc.postgresql9">
       </bundle>
       <bundle
             symbolicName="com.bsiag.scout.rt.ui.swing.rayo">

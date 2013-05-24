@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2011,2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -15,9 +15,6 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ITypeHierarchy;
 
-/**
- *
- */
 public class ValidationRuleMethod {
   private final IAnnotation m_annotation;
   private final IField m_ruleField;
@@ -26,7 +23,7 @@ public class ValidationRuleMethod {
   private final IMethod m_annotatedMethod;
   private final IMethod m_implementedMethod;
   private final ITypeHierarchy m_superTypeHierarchy;
-  private final boolean m_skipRule;
+  private boolean m_skipRule;
 
   public ValidationRuleMethod(IAnnotation annotation, IField ruleField, String ruleName, String ruleGeneratedSourceCode, IMethod annotatedMethod, IMethod implementedMethod, ITypeHierarchy superTypeHierarchy, boolean skipRule) {
     m_annotation = annotation;
@@ -93,5 +90,9 @@ public class ValidationRuleMethod {
    */
   public boolean isSkipRule() {
     return m_skipRule;
+  }
+
+  public void setSkipRule(boolean skipRule) {
+    m_skipRule = skipRule;
   }
 }

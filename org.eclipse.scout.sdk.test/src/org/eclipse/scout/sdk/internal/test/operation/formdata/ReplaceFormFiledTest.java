@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -214,7 +213,7 @@ public class ReplaceFormFiledTest extends AbstractScoutSdkTest {
     assertTrue(TypeUtility.exists(type));
     assertEquals("BaseFormData.Name", type.getSuperclassName());
     assertValidationRules(type,
-        "ruleMap.put(ValidationRule.MANDATORY, false);",
+        "ruleMap.remove(ValidationRule.MANDATORY);",
         "ruleMap.put(ValidationRule.MAX_LENGTH, 100);");
   }
 
@@ -421,6 +420,7 @@ public class ReplaceFormFiledTest extends AbstractScoutSdkTest {
     assertTrue(TypeUtility.exists(type));
     assertEquals("ExtendedFormData.NameEx", type.getSuperclassName());
     assertValidationRules(type,
+        "ruleMap.put(ValidationRule.MANDATORY, true);",
         "ruleMap.put(ValidationRule.MAX_LENGTH, 15);");
   }
 
@@ -996,8 +996,4 @@ public class ReplaceFormFiledTest extends AbstractScoutSdkTest {
     assertFalse(TypeUtility.exists(type));
   }
 
-  @AfterClass
-  public static void cleanUp() throws Exception {
-    clearWorkspace();
-  }
 }

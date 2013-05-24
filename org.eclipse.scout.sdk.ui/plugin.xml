@@ -887,7 +887,7 @@
       <technology
             category="Database Drivers"
             id="scout.technology.jdbc.postgres9"
-            name="Postgres 9 JDBC Driver for Eclipse Scout">
+            name="PostgreSQL 9 JDBC Driver for Eclipse Scout">
       </technology>
       <handler
             class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Postgres9JdbcManifestTechnologyHandler"
