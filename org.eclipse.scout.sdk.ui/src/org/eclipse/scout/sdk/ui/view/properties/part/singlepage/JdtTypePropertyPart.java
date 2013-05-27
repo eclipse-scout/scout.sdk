@@ -445,7 +445,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
 
   AbstractMethodPresenter createOperationPresenter(Composite parent, ConfigurationMethod method) {
     AbstractMethodPresenter presenter = null;
-    if (method.getMethodName().equals("execResetSearchFilter")) {
+    if ("execResetSearchFilter".equals(method.getMethodName())) {
       presenter = new ExecResetSearchFilterMethodPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
