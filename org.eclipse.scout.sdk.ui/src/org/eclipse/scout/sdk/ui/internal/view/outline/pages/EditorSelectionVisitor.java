@@ -563,7 +563,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
-        return CONTINUE_BRANCH;
+        return CONTINUE;
       }
     }
     return CANCEL_SUBTREE;
@@ -588,7 +588,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       IType currentElement = (IType) getCurrentElement();
       ITypeHierarchy hierarchy = getCachedTypeHierarchy(currentElement);
       if (hierarchy != null && hierarchy.contains(TypeUtility.getType(RuntimeClasses.IService))) {
-        return CONTINUE_BRANCH;
+        return CONTINUE;
       }
     }
     return CANCEL_SUBTREE;

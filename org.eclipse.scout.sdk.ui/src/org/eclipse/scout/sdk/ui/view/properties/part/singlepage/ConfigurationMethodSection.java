@@ -19,8 +19,6 @@ import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.PropertyViewConf
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ControlEvent;
-import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -151,37 +149,39 @@ public class ConfigurationMethodSection {
     category.setLayout(catLayout);
     category.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
 
-    category.addControlListener(new ControlListener() {
-      private final int m_columnWidth = 300;
-      private int m_numCols = 1;
-
-      private void layoutColumns() {
-        try {
-          category.setRedraw(false);
-          parent.setRedraw(false);
-          int numCols = Math.max(1, category.getBounds().width / m_columnWidth);
-          if (numCols != m_numCols) {
-            catLayout.numColumns = numCols;
-            m_numCols = numCols;
-            section.reflow();
-          }
-        }
-        finally {
-          category.setRedraw(true);
-          parent.setRedraw(true);
-        }
-      }
-
-      @Override
-      public void controlResized(ControlEvent e) {
-        layoutColumns();
-      }
-
-      @Override
-      public void controlMoved(ControlEvent e) {
-        layoutColumns();
-      }
-    });
+// dynamic column feature removed because of bug 408173 (https://bugs.eclipse.org/bugs/show_bug.cgi?id=408173)
+// can be re-enabled as soon as a suitable solution is found.
+//    category.addControlListener(new ControlListener() {
+//      private final int m_columnWidth = 300;
+//      private int m_numCols = 1;
+//
+//      private void layoutColumns() {
+//        try {
+//          category.setRedraw(false);
+//          parent.setRedraw(false);
+//          int numCols = Math.max(1, category.getBounds().width / m_columnWidth);
+//          if (numCols != m_numCols) {
+//            catLayout.numColumns = numCols;
+//            m_numCols = numCols;
+//            section.reflow();
+//          }
+//        }
+//        finally {
+//          category.setRedraw(true);
+//          parent.setRedraw(true);
+//        }
+//      }
+//
+//      @Override
+//      public void controlResized(ControlEvent e) {
+//        layoutColumns();
+//      }
+//
+//      @Override
+//      public void controlMoved(ControlEvent e) {
+//        layoutColumns();
+//      }
+//    });
     return category;
   }
 
