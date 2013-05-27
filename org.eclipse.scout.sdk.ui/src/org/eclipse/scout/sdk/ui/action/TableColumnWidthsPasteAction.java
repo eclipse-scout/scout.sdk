@@ -25,6 +25,8 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
@@ -41,13 +43,18 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) {
-    changeColumnWidths(m_type, m_widthsMap);
+    if (m_widthsMap != null && m_widthsMap.size() > 0) {
+      changeColumnWidths(m_type, m_widthsMap, shell);
+    }
+    else {
+      showInfoMessageBox(shell, Texts.get("Action_PasteColumnWidths_InvalidClipboard"));
+    }
     return null;
   }
 
   @Override
   public boolean isVisible() {
-    return isEditable(m_type) && m_widthsMap != null;
+    return isEditable(m_type);
   }
 
   public void init(IPage origin) {
@@ -66,6 +73,12 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
       ScoutSdkUi.logError("Unable to get the identification constant from the scout class", e);
       return true; // try to parse it anyway
     }
+  }
+
+  private void showInfoMessageBox(Shell s, String message) {
+    MessageBox msgBox = new MessageBox(s, SWT.OK | SWT.ICON_INFORMATION);
+    msgBox.setMessage(message);
+    msgBox.open();
   }
 
   private String getStringFromClipboard() {
@@ -117,15 +130,18 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
     }
   }
 
-  private void changeColumnWidths(IType tableType, HashMap<String, Integer> map) {
+  private void changeColumnWidths(IType tableType, HashMap<String, Integer> map, Shell shell) {
     // for all columns within the table
     for (IType innerType : ScoutTypeUtility.getColumns(tableType)) {
       String className = innerType.getFullyQualifiedName();
       Integer columnWidth = map.get(className);
       // there is a corresponding entry in the clipboard for the current column?
-      if (columnWidth != null) {
+      if (columnWidth != null && columnWidth >= 0) {
         IOperation op = new ConfigPropertyMethodUpdateOperation(innerType, COLUMN_WIDTH_METHOD_NAME, "  return " + columnWidth.toString() + ";", true);
         new OperationJob(op).schedule();
+      }
+      else if (columnWidth != null) {
+        showInfoMessageBox(shell, Texts.get("ColumnWidthPasteInvalidWidth", columnWidth.toString()));
       }
     }
   }
