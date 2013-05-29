@@ -119,7 +119,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
           }
         }
         else if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_BEFORE) {
-          if (selectedIndex < children.size() && children.get(selectedIndex + 1).equals(targetPage)) {
+          if (selectedIndex < (children.size() - 1) && children.get(selectedIndex + 1).equals(targetPage)) {
             return false;
           }
         }
