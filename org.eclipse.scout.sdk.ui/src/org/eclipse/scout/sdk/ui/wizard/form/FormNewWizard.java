@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
@@ -248,13 +249,21 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
           if (permissionUpdateNode != null) {
             permissionUpdateNode.setText("Update" + prefix + SdkProperties.SUFFIX_PERMISSION);
           }
+
+          String legacyServiceAddName = null;
+          if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+            legacyServiceAddName = "";
+          }
+          else {
+            legacyServiceAddName = "Process";
+          }
           ITreeNode serviceImplNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_IMPLEMENTATION));
           if (serviceImplNode != null) {
-            serviceImplNode.setText(prefix + SdkProperties.SUFFIX_SERVICE);
+            serviceImplNode.setText(prefix + legacyServiceAddName + SdkProperties.SUFFIX_SERVICE);
           }
           ITreeNode serviceInterfaceNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SERVICE_INTERFACE));
           if (serviceInterfaceNode != null) {
-            serviceInterfaceNode.setText("I" + prefix + SdkProperties.SUFFIX_SERVICE);
+            serviceInterfaceNode.setText("I" + prefix + legacyServiceAddName + SdkProperties.SUFFIX_SERVICE);
           }
           m_locationPage.refreshTree();
         }

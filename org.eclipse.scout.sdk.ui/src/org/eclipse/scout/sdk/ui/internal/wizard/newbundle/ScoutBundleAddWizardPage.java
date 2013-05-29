@@ -10,11 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newbundle;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNodeGroup;
 import org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Composite;
@@ -27,8 +25,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ScoutBundleAddWizardPage extends ScoutProjectNewWizardPage {
 
-  private static final Pattern PROJECT_NAME_REGEX = Pattern.compile("(.*)\\s*\\((.*)\\).*");
-
   private final IScoutBundle m_project;
   private final String m_name;
   private final String m_postfix;
@@ -38,7 +34,7 @@ public class ScoutBundleAddWizardPage extends ScoutProjectNewWizardPage {
     m_project = project;
     setTitle(Texts.get("CreateNewScoutBundles"));
     setDescription(Texts.get("NewScoutBundlesDesc"));
-    String[] parts = getProjectNameParts(project.getSymbolicName());
+    String[] parts = ScoutBundleNodeGroup.getBundleBaseNameAndPostfix(project);
     m_name = parts[0];
     m_postfix = parts[1];
   }
@@ -58,26 +54,5 @@ public class ScoutBundleAddWizardPage extends ScoutProjectNewWizardPage {
 
   public IScoutBundle getProject() {
     return m_project;
-  }
-
-  private static String[] getProjectNameParts(String name) {
-    String newName = name;
-    String postfix = "";
-    if (name.contains("(")) {
-      Matcher m = PROJECT_NAME_REGEX.matcher(name);
-      if (m.find()) {
-        newName = m.group(1).trim();
-        postfix = m.group(2).trim();
-      }
-      else {
-        newName = "";
-      }
-    }
-
-    int p = newName.lastIndexOf('.');
-    if (p > 0) {
-      newName = newName.substring(0, p);
-    }
-    return new String[]{newName, postfix};
   }
 }

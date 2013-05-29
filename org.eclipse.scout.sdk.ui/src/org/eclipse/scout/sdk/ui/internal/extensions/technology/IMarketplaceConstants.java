@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.technology;
 
+import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
+
 /**
  * <h3>{@link IMarketplaceConstants}</h3> ...
  * 
@@ -29,7 +31,7 @@ public interface IMarketplaceConstants {
   String SCOUT_POSTGRES_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.postgresql9.source.feature.group";
   String POSTGRES_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.postgresql9";
   String POSTGRES_JDBC_FRAGMENT = "org.postgres.postgresql9.jdbc.fragment";
-  String DERBY_JDBC_PLUGIN = "org.eclipse.scout.rt.jdbc.derby";
+  String DERBY_JDBC_PLUGIN = ScoutProjectAddOperation.DERBY_JDBC_PLUGIN;
   String DERBY_JDBC_FRAGMENT = "org.apache.derby.jdbc_1091.fragment";
 
   // rayo swing look and feel

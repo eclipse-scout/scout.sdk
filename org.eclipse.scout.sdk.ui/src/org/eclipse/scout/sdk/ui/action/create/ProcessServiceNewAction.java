@@ -25,7 +25,7 @@ public class ProcessServiceNewAction extends AbstractWizardAction {
   private IScoutBundle m_bundle;
 
   public ProcessServiceNewAction() {
-    super(Texts.get("Action_newTypeX", "Process Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), null, false, Category.NEW);
+    super(Texts.get("Action_newTypeX", Texts.get("Service")), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), null, false, Category.NEW);
   }
 
   public void setScoutBundle(IScoutBundle bundle) {
