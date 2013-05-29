@@ -331,6 +331,7 @@ public interface SdkIcons {
   String UnknownFieldRemove = ToolRemove; // TODO
 
   String BundlePresentationGrouped = "presentation_grouped.gif";
+  String BundlePresentationFlatGrouped = "presentation_flatgroup.gif";
   String BundlePresentationHierarchical = "presentation_hierarchical.gif";
   String BundlePresentationFlat = "presentation_flat.gif";
   String ScoutWorkingSet = "scoutWorkingSet.png";

@@ -48,7 +48,8 @@ public final class ScoutExplorerSettingsSupport {
     Grouped,
     Hierarchical,
     Flat,
-    WorkingSet
+    WorkingSet,
+    FlatGroups,
   }
 
   public final static String SCOUT_WOKRING_SET_ID = "org.eclipse.scout.sdk.ui.workingSet";
@@ -64,6 +65,7 @@ public final class ScoutExplorerSettingsSupport {
   private final static String DISPLAY_STYLE_HIERARCHICAL = "hierarchical";
   private final static String DISPLAY_STYLE_FLAT = "flat";
   private final static String DISPLAY_STYLE_WORKING_SET = "workingSet";
+  private final static String DISPLAY_STYLE_FLAT_GROUPS = "flatGroups";
 
   private final static String SHOW_FRAGMENTS_ENABLED = "true";
   private final static String SHOW_FRAGMENTS_DISABLED = "false"; // default
@@ -178,6 +180,9 @@ public final class ScoutExplorerSettingsSupport {
     else if (DISPLAY_STYLE_WORKING_SET.equals(input)) {
       return BundlePresentation.WorkingSet;
     }
+    else if (DISPLAY_STYLE_FLAT_GROUPS.equals(input)) {
+      return BundlePresentation.FlatGroups;
+    }
     return BundlePresentation.Grouped;
   }
 
@@ -190,6 +195,9 @@ public final class ScoutExplorerSettingsSupport {
     }
     else if (BundlePresentation.WorkingSet.equals(input)) {
       return DISPLAY_STYLE_WORKING_SET;
+    }
+    else if (BundlePresentation.FlatGroups.equals(input)) {
+      return DISPLAY_STYLE_FLAT_GROUPS;
     }
     return DISPLAY_STYLE_GROUPED;
   }

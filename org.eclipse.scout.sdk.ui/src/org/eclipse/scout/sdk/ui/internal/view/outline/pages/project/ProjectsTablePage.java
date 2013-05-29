@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -133,12 +136,29 @@ public class ProjectsTablePage extends AbstractPage {
       }
     }
     else {
-      // grouped display
       ScoutBundleTreeModel uiModel = new ScoutBundleTreeModel();
       uiModel.build();
-      for (ScoutBundleNodeGroup g : uiModel.getRoots()) {
-        new BundleNodeGroupTablePage(this, g);
+      if (ScoutExplorerSettingsSupport.BundlePresentation.FlatGroups.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+        // flat grouped
+        HashSet<ScoutBundleNodeGroup> collector = new HashSet<ScoutBundleNodeGroup>();
+        collectAllBundleGroupsRec(collector, uiModel.getRoots());
+        for (ScoutBundleNodeGroup g : collector) {
+          new BundleNodeGroupTablePage(this, g);
+        }
       }
+      else {
+        // grouped display
+        for (ScoutBundleNodeGroup g : uiModel.getRoots()) {
+          new BundleNodeGroupTablePage(this, g);
+        }
+      }
+    }
+  }
+
+  private void collectAllBundleGroupsRec(Set<ScoutBundleNodeGroup> collector, ScoutBundleNodeGroup[] groups) {
+    for (ScoutBundleNodeGroup g : groups) {
+      collector.add(g);
+      collectAllBundleGroupsRec(collector, g.getChildGroups().toArray(new ScoutBundleNodeGroup[g.getChildGroups().size()]));
     }
   }
 

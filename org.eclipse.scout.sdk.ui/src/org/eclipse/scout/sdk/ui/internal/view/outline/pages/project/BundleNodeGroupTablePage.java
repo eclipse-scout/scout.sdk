@@ -26,6 +26,8 @@ import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateActi
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
+import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport;
+import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport.BundlePresentation;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -127,10 +129,12 @@ public class BundleNodeGroupTablePage extends AbstractPage {
       b.createBundlePage(this);
     }
 
-    ScoutBundleNodeGroup[] childGroups = m_group.getChildGroups().toArray(new ScoutBundleNodeGroup[m_group.getChildGroups().size()]);
-    Arrays.sort(childGroups);
-    for (ScoutBundleNodeGroup childGroup : childGroups) {
-      new BundleNodeGroupTablePage(this, childGroup);
+    if (BundlePresentation.Grouped.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+      ScoutBundleNodeGroup[] childGroups = m_group.getChildGroups().toArray(new ScoutBundleNodeGroup[m_group.getChildGroups().size()]);
+      Arrays.sort(childGroups);
+      for (ScoutBundleNodeGroup childGroup : childGroups) {
+        new BundleNodeGroupTablePage(this, childGroup);
+      }
     }
   }
 }
