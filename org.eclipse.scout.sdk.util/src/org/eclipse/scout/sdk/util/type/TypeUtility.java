@@ -635,6 +635,17 @@ public class TypeUtility {
         return foundType;
       }
     }
+
+    // some types may not be part of the compilation unit (e.g. declaringType is binary, then there is no compilation unit) and cannot be resolved in the class file.
+    // this can happen when e.g. only a reference to a final static field is in the class file and there is no other reference to the class.
+    // then the compiler removes this reference and directly puts the value of the field in the class file even though the reference remains in the source of the class.
+    // the originating class can then not be found anymore. This happens e.g. with the AbstractIcons reference in AbstractSmartField.
+    // to solve this, try to find a unique type in the workspace with the simple name. If there is only one match, we are happy.
+    IType[] candidates = TypeUtility.getTypes(typeName);
+    if (candidates != null && candidates.length == 1) {
+      return candidates[0];
+    }
+
     SdkUtilActivator.logWarning("could not find referenced type '" + typeName + "' in '" + declaringType.getFullyQualifiedName() + "'.");
     return null;
   }
