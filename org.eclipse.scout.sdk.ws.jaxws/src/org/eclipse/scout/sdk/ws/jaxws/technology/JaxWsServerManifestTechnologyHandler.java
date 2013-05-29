@@ -15,6 +15,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.ServerNodePage;
@@ -24,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class JaxWsServerManifestTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public final static String JAXWS_RUNTIME_PLUGIN = "org.eclipse.scout.jaxws216";
+  public final static String JAXWS_RUNTIME_PLUGIN = ScoutProjectAddOperation.JAXWS_RUNTIME_PLUGIN;
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {

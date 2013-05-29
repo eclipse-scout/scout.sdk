@@ -16,6 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link ScoutBundleNodeGroup}</h3> ...
@@ -35,28 +36,32 @@ public class ScoutBundleNodeGroup implements Comparable<ScoutBundleNodeGroup> {
     m_parentGroups = new HashSet<ScoutBundleNodeGroup>();
     m_childGroups = new HashSet<ScoutBundleNodeGroup>();
     m_childBundles = new HashSet<ScoutBundleNode>();
-    m_groupName = getGroupName(definingBundle.getSymbolicName(), definingBundle.getType());
+    m_groupName = getGroupName(definingBundle.getScoutBundle());
     m_childBundles.add(definingBundle);
   }
 
-  private String getGroupName(String symbolicName, String type) {
-    Matcher m = Pattern.compile("^(.*)\\.(" + type.toLowerCase() + ")(\\.(.*))?$").matcher(symbolicName.toLowerCase());
+  public static String[] getBundleBaseNameAndPostfix(IScoutBundle b) {
+    String type = b.getType().toLowerCase();
+    String symbolicName = b.getSymbolicName().toLowerCase();
+    Matcher m = Pattern.compile("^(.*)\\.(" + type.toLowerCase() + ")(\\.(.*))?$").matcher(symbolicName);
     if (m.find()) {
-      String prefix = StringUtility.trim(m.group(1));
+      String baseName = StringUtility.trim(m.group(1));
       String postfix = StringUtility.trim(m.group(4));
-
-      StringBuilder builder = new StringBuilder();
-      if (!StringUtility.isNullOrEmpty(prefix)) {
-        builder.append(prefix);
-      }
-      if (!StringUtility.isNullOrEmpty(postfix)) {
-        builder.append(" (").append(postfix).append(")");
-      }
-      return builder.toString();
+      return new String[]{baseName, postfix};
     }
     else {
-      return symbolicName;
+      return new String[]{symbolicName, ""};
     }
+  }
+
+  private String getGroupName(IScoutBundle b) {
+    String[] baseNameAndPostfix = getBundleBaseNameAndPostfix(b);
+    StringBuilder builder = new StringBuilder();
+    builder.append(baseNameAndPostfix[0]);
+    if (!StringUtility.isNullOrEmpty(baseNameAndPostfix[1])) {
+      builder.append(" (").append(baseNameAndPostfix[1]).append(")");
+    }
+    return builder.toString();
   }
 
   public void addChildBundle(ScoutBundleNode child) {

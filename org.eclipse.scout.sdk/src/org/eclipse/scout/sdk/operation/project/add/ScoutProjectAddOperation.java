@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.operation.project.add;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -22,6 +23,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
@@ -31,6 +33,7 @@ import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -45,7 +48,13 @@ import org.osgi.framework.Constants;
  */
 public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
 
+  public final static String CLIENT_SVG_BUNDLE_NAME = "org.eclipse.scout.svg.client";
+  public final static String W3C_DOM_SVG_PACKAGE = "org.w3c.dom.svg";
+  public final static String DERBY_JDBC_PLUGIN = "org.eclipse.scout.rt.jdbc.derby";
+  public final static String JAXWS_RUNTIME_PLUGIN = "org.eclipse.scout.jaxws216";
+
   public final static String PROP_EXISTING_BUNDLE = "parentScoutBundle";
+  public final static String PROP_PRODUCT_FILES_TO_EXTEND = "productFilesToExtend";
 
   private final IScoutBundle m_project;
 
@@ -103,6 +112,37 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
     postProcess(monitor, workingCopyManager);
   }
 
+  /**
+   * Adds the additionalSymbolicName to all product files that already have the existingSymbolicName dependency.
+   * 
+   * @param existingSymbolicName
+   * @param additionalSymbolicName
+   * @throws CoreException
+   */
+  private void addDependencyToProducts(String existingSymbolicName, String additionalSymbolicName) throws CoreException {
+    IFile[] productFiles = getProperties().getProperty(PROP_PRODUCT_FILES_TO_EXTEND, IFile[].class);
+    if (productFiles == null || productFiles.length < 1) {
+      return;
+    }
+
+    for (IFile prodFile : productFiles) {
+      ProductFileModelHelper pfmh = new ProductFileModelHelper(prodFile);
+      if (pfmh.ProductFile.existsDependency(existingSymbolicName)) {
+        // the product has already a dependency to the existing bundle. Then we also add the new dependency.
+        pfmh.ProductFile.addDependency(additionalSymbolicName);
+        pfmh.save();
+      }
+    }
+  }
+
+  private boolean isDependencyPresent(IScoutBundle bundle, String dependency) {
+    PluginModelHelper h = new PluginModelHelper(bundle.getSymbolicName());
+    if (h.Manifest.existsDependency(dependency)) {
+      return true;
+    }
+    return false;
+  }
+
   private void postProcess(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (isNodeChecked(CreateServerPluginOperation.BUNDLE_ID)) {
       // clear server plugin.xml
@@ -114,6 +154,17 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
       pmh.PluginXml.removeExtensionPoint(IRuntimeClasses.EXTENSION_POINT_SERVLET_FILTERS);
       pmh.PluginXml.removeExtensionPoint("org.eclipse.core.runtime.applications");
       pmh.PluginXml.removeExtensionPoint(IRuntimeClasses.EXTENSION_POINT_PRODUCTS);
+
+      IScoutBundle parentServer = m_project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
+      if (!isDependencyPresent(parentServer, DERBY_JDBC_PLUGIN)) {
+        // derby is disabled in parent. also remove for us.
+        pmh.Manifest.removeDependency(DERBY_JDBC_PLUGIN);
+      }
+      if (!isDependencyPresent(parentServer, JAXWS_RUNTIME_PLUGIN)) {
+        // derby is disabled in parent. also remove for us.
+        pmh.Manifest.removeDependency(JAXWS_RUNTIME_PLUGIN);
+      }
+
       pmh.save();
     }
     if (isNodeChecked(CreateSharedPluginOperation.BUNDLE_ID)) {
@@ -135,22 +186,36 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
     if (isNodeChecked(CreateClientPluginOperation.BUNDLE_ID)) {
       // register the desktop extension
       String clientPluginName = getProperties().getProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, String.class);
-      IJavaProject server = getCreatedBundle(clientPluginName);
-      PluginModelHelper pmh = new PluginModelHelper(server.getProject());
+      IJavaProject client = getCreatedBundle(clientPluginName);
+      PluginModelHelper pmh = new PluginModelHelper(client.getProject());
       Map<String, String> props = new HashMap<String, String>(2);
       props.put("active", "true");
       props.put("class", clientPluginName + ".ui.desktop.DesktopExtension");
       pmh.PluginXml.addSimpleExtension(IRuntimeClasses.EXTENSION_POINT_DESKTOP_EXTENSIONS, IRuntimeClasses.EXTENSION_ELEMENT_DESKTOP_EXTENSION, props);
+
+      IScoutBundle parentClient = m_project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
+      if (!isDependencyPresent(parentClient, CLIENT_SVG_BUNDLE_NAME)) {
+        // svg is disabled in parent. also remove for us.
+        pmh.Manifest.removeDependency(CLIENT_SVG_BUNDLE_NAME);
+        pmh.Manifest.removeImportPackage(W3C_DOM_SVG_PACKAGE);
+      }
       pmh.save();
+
+      // workaround for bug 391373. Can be removed as soon as the bug is fixed.
+      TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IDesktopExtension)).invalidate();
     }
 
     for (IJavaProject p : getCreatedBundlesList()) {
       String type = RuntimeBundles.getBundleType(p.getProject());
       IScoutBundle parent = m_project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(type), true);
       if (parent != null && !parent.getSymbolicName().equals(p.getElementName())) {
+        // add dependency to parent module
         PluginModelHelper pmh = new PluginModelHelper(p.getProject());
         pmh.Manifest.addDependency(parent.getSymbolicName(), true);
         pmh.save();
+
+        // add to product files if needed
+        addDependencyToProducts(parent.getSymbolicName(), p.getElementName());
       }
     }
   }

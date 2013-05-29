@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -25,8 +26,8 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  private final static String CLIENT_SVG_BUNDLE_NAME = "org.eclipse.scout.svg.client";
-  private final static String W3C_DOM_SVG_PACKAGE = "org.w3c.dom.svg";
+  private final static String CLIENT_SVG_BUNDLE_NAME = ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME;
+  private final static String W3C_DOM_SVG_PACKAGE = ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE;
 
   public final static String[] COMMON_SVG_PLUGINS = new String[]{
       "org.apache.batik.bridge",
