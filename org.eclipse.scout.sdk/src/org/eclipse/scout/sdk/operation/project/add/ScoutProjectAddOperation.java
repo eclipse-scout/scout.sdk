@@ -201,8 +201,17 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
       }
       pmh.save();
 
-      // workaround for bug 391373. Can be removed as soon as the bug is fixed.
-      TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IDesktopExtension)).invalidate();
+      // TODO workaround for bug 387958. Can be removed as soon as the bug is fixed.
+      try
+      {
+        IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+        if (TypeUtility.exists(iDesktopExtension)) {
+          TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension).invalidate();
+        }
+      }
+      catch (Exception e) {
+        //nop
+      }
     }
 
     for (IJavaProject p : getCreatedBundlesList()) {
