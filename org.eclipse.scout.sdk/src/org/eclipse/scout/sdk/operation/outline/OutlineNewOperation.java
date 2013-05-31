@@ -215,6 +215,7 @@ public class OutlineNewOperation implements IOperation {
       }
     }
 
+    workingCopyManager.reconcile(getDesktopType().getCompilationUnit(), monitor);
     ITypeHierarchy desktopSuperHierarchy = TypeUtility.getSuperTypeHierarchy(getDesktopType());
     final boolean isExtension = desktopSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension));
     OrderedInnerTypeNewOperation outlineButtonOp = new OrderedInnerTypeNewOperation(className, getDesktopType(), false) {
