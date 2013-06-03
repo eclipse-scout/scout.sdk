@@ -1,9 +1,7 @@
+a#scout-overviewLink img { background-image: url(../graphics/scout.png); }
+a#scout-newprojectLink img { background-image: url(../graphics/scout.png); }
 
-a#scout-overviewLink img { background-image : url(../graphics/scout.png); }
-a#scout-newprojectLink img { background-image : url(../graphics/scout.png); }
+a#scout-tutIntroLink img { background-image: url(../graphics/scout.png); }
+a#scout-howtoIntroLink img { background-image: url(../graphics/scout.png); }
 
-a#scout-tutIntroLink img { background-image : url(../graphics/scout.png); }
-a#scout-howtoIntroLink img { background-image : url(../graphics/scout.png); }
-a#scout-webinarIntroLink img { background-image : url(../graphics/scout.png); }
-
-a#scout-newIntroLink img { background-image : url(../graphics/scout.png); }
+a#scout-newIntroLink img { background-image: url(../graphics/scout.png); }

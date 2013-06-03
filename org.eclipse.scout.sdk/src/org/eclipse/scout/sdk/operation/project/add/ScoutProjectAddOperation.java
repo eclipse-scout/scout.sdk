@@ -156,13 +156,15 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
       pmh.PluginXml.removeExtensionPoint(IRuntimeClasses.EXTENSION_POINT_PRODUCTS);
 
       IScoutBundle parentServer = m_project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
-      if (!isDependencyPresent(parentServer, DERBY_JDBC_PLUGIN)) {
-        // derby is disabled in parent. also remove for us.
-        pmh.Manifest.removeDependency(DERBY_JDBC_PLUGIN);
-      }
-      if (!isDependencyPresent(parentServer, JAXWS_RUNTIME_PLUGIN)) {
-        // derby is disabled in parent. also remove for us.
-        pmh.Manifest.removeDependency(JAXWS_RUNTIME_PLUGIN);
+      if (parentServer != null) {
+        if (!isDependencyPresent(parentServer, DERBY_JDBC_PLUGIN)) {
+          // derby is disabled in parent. also remove for us.
+          pmh.Manifest.removeDependency(DERBY_JDBC_PLUGIN);
+        }
+        if (!isDependencyPresent(parentServer, JAXWS_RUNTIME_PLUGIN)) {
+          // derby is disabled in parent. also remove for us.
+          pmh.Manifest.removeDependency(JAXWS_RUNTIME_PLUGIN);
+        }
       }
 
       pmh.save();
@@ -194,15 +196,24 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
       pmh.PluginXml.addSimpleExtension(IRuntimeClasses.EXTENSION_POINT_DESKTOP_EXTENSIONS, IRuntimeClasses.EXTENSION_ELEMENT_DESKTOP_EXTENSION, props);
 
       IScoutBundle parentClient = m_project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
-      if (!isDependencyPresent(parentClient, CLIENT_SVG_BUNDLE_NAME)) {
+      if (parentClient != null && !isDependencyPresent(parentClient, CLIENT_SVG_BUNDLE_NAME)) {
         // svg is disabled in parent. also remove for us.
         pmh.Manifest.removeDependency(CLIENT_SVG_BUNDLE_NAME);
         pmh.Manifest.removeImportPackage(W3C_DOM_SVG_PACKAGE);
       }
       pmh.save();
 
-      // workaround for bug 391373. Can be removed as soon as the bug is fixed.
-      TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IDesktopExtension)).invalidate();
+      // TODO workaround for bug 387958. Can be removed as soon as the bug is fixed.
+      try
+      {
+        IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+        if (TypeUtility.exists(iDesktopExtension)) {
+          TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension).invalidate();
+        }
+      }
+      catch (Exception e) {
+        //nop
+      }
     }
 
     for (IJavaProject p : getCreatedBundlesList()) {
