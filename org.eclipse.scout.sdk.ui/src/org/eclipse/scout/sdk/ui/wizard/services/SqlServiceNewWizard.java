@@ -230,7 +230,7 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
+          if (serviceImplementationBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
             }

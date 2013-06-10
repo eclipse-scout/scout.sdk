@@ -140,7 +140,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
     Job j = new Job("load scout sdk default super type settings...") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        if (parent != null && !parent.isDisposed()) {
+        if (!parent.isDisposed()) {
           try {
             loadAllModels(new IModelLoadProgressObserver<U>() {
               @Override
@@ -157,7 +157,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
             });
           }
           finally {
-            if (parent != null && !parent.isDisposed()) {
+            if (!parent.isDisposed()) {
               parent.getDisplay().asyncExec(new Runnable() {
                 @Override
                 public void run() {

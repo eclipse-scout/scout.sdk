@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.commands.Category;
 import org.eclipse.core.commands.Command;
@@ -41,8 +42,8 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
 
     Map<IScoutHandler.Category, ArrayList<IScoutHandler>> sorted = ContextMenuContributorExtensionPoint.getAllRegisteredContextMenusByCategory();
 
-    for (IScoutHandler.Category c : sorted.keySet()) {
-      for (IScoutHandler a : sorted.get(c)) {
+    for (Entry<IScoutHandler.Category, ArrayList<IScoutHandler>> entry : sorted.entrySet()) {
+      for (IScoutHandler a : entry.getValue()) {
         Command cmd = getCommand(serviceLocator, a);
 
         CommandContributionItemParameter p = new CommandContributionItemParameter(serviceLocator, cmd.getId(), cmd.getId(), SWT.PUSH);
@@ -56,7 +57,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
         TestExpression e = new TestExpression("org.eclipse.scout.sdk.ui.menu", "menuVisibilityTester", args, Boolean.TRUE);
         additions.addContributionItem(item, e);
       }
-      additions.addContributionItem(new Separator(c.getId()), null);
+      additions.addContributionItem(new Separator(entry.getKey().getId()), null);
     }
   }
 

@@ -89,11 +89,9 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode createTree(IScoutBundle clientBundle) {
     IScoutBundle serverBundle = null;
     IScoutBundle sharedBundle = null;
-    if (clientBundle != null) {
-      sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
-      if (sharedBundle != null) {
-        serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), clientBundle, false);
-      }
+    sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    if (sharedBundle != null) {
+      serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), clientBundle, false);
     }
 
     ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
@@ -518,10 +516,10 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceInterfaceBundle == null && serviceRegistrationBundle != null) {
+          if (serviceInterfaceBundle == null) {
             return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "The client service registration can not be done without a service interface.");
           }
-          if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
+          if (serviceInterfaceBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getSymbolicName()));
             }
@@ -538,7 +536,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
+          if (serviceImplementationBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
             }

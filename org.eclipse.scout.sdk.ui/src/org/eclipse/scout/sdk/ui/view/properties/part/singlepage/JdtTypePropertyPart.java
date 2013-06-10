@@ -283,9 +283,9 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new DoublePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
-      // TODO: presenter for DRAG_AND_DROP_TYPE
-    }
+    //else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
+    // presenter for DRAG_AND_DROP_TYPE
+    //}
     else if (propertyType.equals("INTEGER")) {
       presenter = new IntegerPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -306,9 +306,9 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new ColorPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("OBJECT")) {
-      // TODO: presenter for OBJECT
-    }
+    // else if (propertyType.equals("OBJECT")) {
+    // presenter for OBJECT
+    //}
     else if (propertyType.equals("LABEL_POSITION")) {
       presenter = new LabelPositionPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -329,12 +329,12 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new CodeTypeProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
-      // TODO: presenter for COMPOSER_ATTRIBUTE_TYPE
-    }
-    else if (propertyType.equals("FILE_EXTENSIONS")) {
-      // TODO: presenter for FILE_EXTENSIONS
-    }
+    //else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
+    // presenter for COMPOSER_ATTRIBUTE_TYPE
+    //}
+    //else if (propertyType.equals("FILE_EXTENSIONS")) {
+    // presenter for FILE_EXTENSIONS
+    //}
     else if (propertyType.equals("FORM_DISPLAY_HINT")) {
       presenter = new FormDisplayHintPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -351,9 +351,9 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new IconPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("KEY_STROKE")) {
-      // TODO: presenter for KEY_STROKE
-    }
+    //else if (propertyType.equals("KEY_STROKE")) {
+    // presenter for KEY_STROKE
+    //}
     else if (propertyType.equals("LOOKUP_CALL")) {
       presenter = new LookupCallProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -370,26 +370,26 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new OutlineRootPagePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("OUTLINE")) {
-      // TODO: presenter for OUTLINE
-    }
+    //else if (propertyType.equals("OUTLINE")) {
+    // presenter for OUTLINE
+    //}
     else if (propertyType.equals("OUTLINES")) {
       presenter = new OutlinesPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("FORM")) {
-      // TODO: presenter for FORM
-    }
+    //else if (propertyType.equals("FORM")) {
+    // presenter for FORM
+    //}
     else if (propertyType.equals("SEARCH_FORM")) {
       presenter = new SearchFormPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("NLS_PROVIDER")) {
-      // TODO: presenter for NLS_PROVIDER (on sql services: ? extends ScoutTexts)
-    }
-    else if (propertyType.equals("SQL_STYLE")) {
-      // TODO: presenter for SQL_STYLE
-    }
+    //else if (propertyType.equals("NLS_PROVIDER")) {
+    // presenter for NLS_PROVIDER (on sql services: ? extends ScoutTexts)
+    //}
+    //else if (propertyType.equals("SQL_STYLE")) {
+    // presenter for SQL_STYLE
+    //}
     else if (propertyType.equals("SQL")) {
       presenter = new MultiLineStringPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -406,15 +406,15 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new VerticalAglinmentPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("CHART_QNAME")) {
-      // TODO: presenter for CHART_QNAME
-    }
-    else if (propertyType.equals("HOUR_OF_DAY")) {
-      // TODO: presenter for HOUR_OF_DAY
-    }
-    else if (propertyType.equals("DURATION_MINUTES")) {
-      // TODO: presenter for DURATION_MINUTES
-    }
+    //else if (propertyType.equals("CHART_QNAME")) {
+    // presenter for CHART_QNAME
+    //}
+    //else if (propertyType.equals("HOUR_OF_DAY")) {
+    // presenter for HOUR_OF_DAY
+    //}
+    //else if (propertyType.equals("DURATION_MINUTES")) {
+    // presenter for DURATION_MINUTES
+    //}
     else if (propertyType.equals("MENU_CLASS")) {
       presenter = new MenuProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);

@@ -116,14 +116,11 @@ public class ScoutStructuredType implements IStructuredType {
   @Override
   public <T extends IJavaElement> T[] getElements(CATEGORIES category, Class<T> clazz) {
     IJavaElement[] elements = getElements(category);
-    if (elements != null) {
-      T[] result = (T[]) Array.newInstance(clazz, elements.length);
-      for (int i = 0; i < elements.length; i++) {
-        result[i] = (T) elements[i];
-      }
-      return result;
+    T[] result = (T[]) Array.newInstance(clazz, elements.length);
+    for (int i = 0; i < elements.length; i++) {
+      result[i] = (T) elements[i];
     }
-    return null;
+    return result;
   }
 
   @Override

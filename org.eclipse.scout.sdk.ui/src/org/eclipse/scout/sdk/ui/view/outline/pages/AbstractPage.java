@@ -95,7 +95,9 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public boolean isChildrenLoaded() {
-    return m_childrenLoaded;
+    synchronized (m_children) {
+      return m_childrenLoaded;
+    }
   }
 
   @Override
@@ -202,28 +204,30 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public final synchronized void loadChildren() {
-    if (!isChildrenLoaded()) {
-      try {
-        loadChildrenImpl();
-        // extension point
-        ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
-        if (extensions != null) {
-          for (ExplorerPageExtension ext : extensions) {
-            if (ext.getFactoryClass() != null) {
-              IPageFactory factory = ext.createFactoryClass();
-              factory.createChildren(this);
-            }
-            else if (ext.getPageClass() != null) {
-              IPage childPage = ext.createPageInstance();
-              childPage.setParent(this);
+  public final void loadChildren() {
+    synchronized (m_children) {
+      if (!isChildrenLoaded()) {
+        try {
+          loadChildrenImpl();
+          // extension point
+          ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
+          if (extensions != null) {
+            for (ExplorerPageExtension ext : extensions) {
+              if (ext.getFactoryClass() != null) {
+                IPageFactory factory = ext.createFactoryClass();
+                factory.createChildren(this);
+              }
+              else if (ext.getPageClass() != null) {
+                IPage childPage = ext.createPageInstance();
+                childPage.setParent(this);
+              }
             }
           }
         }
-      }
-      finally {
-        // crucial to mark children as loaded to prevent an infinite loop
-        m_childrenLoaded = true;
+        finally {
+          // crucial to mark children as loaded to prevent an infinite loop
+          m_childrenLoaded = true;
+        }
       }
     }
   }

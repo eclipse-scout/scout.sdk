@@ -91,7 +91,7 @@ public final class ScoutBundleExtensionPoint {
                 }
                 String attOrderNr = element.getAttribute(attributeOrderNumber);
                 try {
-                  extensionPoint.setOrderNumber(new Integer(attOrderNr).intValue());
+                  extensionPoint.setOrderNumber(Integer.valueOf(attOrderNr).intValue());
                 }
                 catch (NumberFormatException e) {
                   ScoutSdkUi.logError("could not parse order number '" + attOrderNr + "' of extension '" + element.getNamespaceIdentifier() + "'.", e);

@@ -14,6 +14,7 @@ import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.TextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalPopup.SearchPatternInput;
@@ -49,14 +50,15 @@ public class ProposalTextField extends TextField {
   private Button m_popupButton;
   private ProposalPopup m_popup;
   private P_ProposalFieldListener m_proposalFieldListener;
+  private IProposalPopupListener m_popupListener;
   private Object m_selectedProposal = null;
   private Object m_lastFiredProposal = null;
-  private EventListenerList m_eventListeners = new EventListenerList();
-  private Lock m_updateLock = new Lock();
-  private Lock m_focusLock = new Lock();
-  private IProposalPopupListener m_popupListener = new P_PopupListener();
-  private int m_style;
   private Object m_input;
+
+  private final EventListenerList m_eventListeners = new EventListenerList();
+  private final OptimisticLock m_updateLock = new OptimisticLock();
+  private final OptimisticLock m_focusLock = new OptimisticLock();
+  private final int m_style;
 
   public ProposalTextField(Composite parent) {
     this(parent, STYLE_DEFAULT);
@@ -152,7 +154,7 @@ public class ProposalTextField extends TextField {
       @Override
       public void widgetSelected(SelectionEvent e) {
         try {
-          if (m_updateLock.aquire()) {
+          if (m_updateLock.acquire()) {
             if (m_popup.isVisible()) {
               closePopup();
             }
@@ -224,7 +226,7 @@ public class ProposalTextField extends TextField {
   public synchronized void acceptProposal(Object proposal) {
     // update ui
     try {
-      if (m_updateLock.aquire()) {
+      if (m_updateLock.acquire()) {
         String text;
         if (proposal != null) {
           text = m_popup.getText(proposal);
@@ -257,10 +259,7 @@ public class ProposalTextField extends TextField {
     if (getSelectionHandler() != null) {
       getSelectionHandler().handleProposalAccepted(proposal, m_popup.getInput().getPattern(), this);
     }
-    else if (proposal instanceof ISeparatorProposal) {
-      // void
-    }
-    else {
+    else if (!(proposal instanceof ISeparatorProposal)) {
       acceptProposal(proposal);
     }
   }
@@ -275,7 +274,7 @@ public class ProposalTextField extends TextField {
 
   @Override
   public void setText(String text) {
-    if (m_updateLock.aquire()) {
+    if (m_updateLock.acquire()) {
       try {
         if (text == null) {
           text = "";
@@ -393,7 +392,7 @@ public class ProposalTextField extends TextField {
     return false;
   }
 
-  public Object getSelectedProposal() {
+  public synchronized Object getSelectedProposal() {
     return m_selectedProposal;
   }
 
@@ -402,7 +401,7 @@ public class ProposalTextField extends TextField {
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Modify: {
-          if (m_updateLock.aquire()) {
+          if (m_updateLock.acquire()) {
             try {
               // acceptProposal(null);
               textModified();
@@ -507,7 +506,6 @@ public class ProposalTextField extends TextField {
         default:
           break;
       }
-
     }
   } // end class P_ProposalFieldListener
 
@@ -517,7 +515,7 @@ public class ProposalTextField extends TextField {
       switch (event.getType()) {
         case ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED:
           try {
-            m_focusLock.aquire();
+            m_focusLock.acquire();
             acceptProposalInternal((Object) event.getData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL));
             // only move to the next field, if the current field is not the last (ticket 84'140).
             Control[] siblings = getParent().getChildren();
@@ -536,26 +534,9 @@ public class ProposalTextField extends TextField {
         case ProposalPopupEvent.TYPE_PROPOSAL_SELECTED:
           updateProposals();
           break;
-        case ProposalPopupEvent.TYPE_POPUP_CLOSED:
-          if (m_focusLock.aquire()) {
-            try {
-              if (!CompareUtility.equals(m_lastFiredProposal, m_selectedProposal)) {
-                // if(m_selectedProposal != null){
-                // notifyAcceptProposal(m_selectedProposal);
-                // }
-              }
-//              m_popup.close();
-
-            }
-            finally {
-              m_focusLock.release();
-            }
-          }
-          break;
         default:
           break;
       }
     }
   } // end class P_PopupListener
-
 }

@@ -139,6 +139,14 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof DefaultSuperClassModel)) {
+      return false;
+    }
+    return label.equals(((DefaultSuperClassModel) obj).label);
+  }
+
+  @Override
   public int compareTo(DefaultSuperClassModel o) {
     return label.compareTo(o.label);
   }

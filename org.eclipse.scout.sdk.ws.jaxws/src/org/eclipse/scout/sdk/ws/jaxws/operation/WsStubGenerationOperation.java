@@ -261,7 +261,7 @@ public class WsStubGenerationOperation implements IOperation {
       // validate exit code of processes
       for (IProcess process : launch.getProcesses()) {
         if (process.getExitValue() != 0) {
-          new CoreException(new ScoutStatus("Stub generation failed"));
+          throw new CoreException(new ScoutStatus("Stub generation failed."));
         }
       }
     }

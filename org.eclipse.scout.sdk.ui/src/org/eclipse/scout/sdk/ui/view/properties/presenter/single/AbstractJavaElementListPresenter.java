@@ -93,7 +93,7 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
     m_tableModel = new JavaElementTableContentProvider();
     m_table = new AutoResizeColumnTable(container, SWT.FULL_SELECTION | SWT.BORDER);
     TableColumn simpleNameCol = new TableColumn(m_table, SWT.LEFT);
-    simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(3));
+    simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, Integer.valueOf(3));
     simpleNameCol.setWidth(170);
     simpleNameCol.setText(Texts.get("Member"));
     m_table.setHeaderVisible(false);

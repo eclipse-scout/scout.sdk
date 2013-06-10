@@ -563,7 +563,7 @@ public final class MarkerRebuildUtility {
     if (portTypeQName != null) {
       IType portTypeInterfaceType = JaxWsSdkUtility.resolvePortTypeInterfaceType(portTypeQName, stubJarFile);
       if (portTypeInterfaceType == null) {
-        String markerSourceId = MarkerUtility.createMarker(wsdlResource.getFile(), MarkerType.StubJar, markerGroupUUID, Texts.get("PortTypeXNotFoundInStubJarY", portTypeQName == null ? "<?>" : portTypeQName.toString(), stubJarFile.getName()));
+        String markerSourceId = MarkerUtility.createMarker(wsdlResource.getFile(), MarkerType.StubJar, markerGroupUUID, Texts.get("PortTypeXNotFoundInStubJarY", portTypeQName.toString(), stubJarFile.getName()));
         registerStubRebuildCommand(markerSourceId, buildJaxWsBean, wsdlResource, bundle);
       }
     }
@@ -572,7 +572,7 @@ public final class MarkerRebuildUtility {
     if (serviceQName != null) {
       IType serviceType = JaxWsSdkUtility.resolveServiceType(serviceQName, stubJarFile);
       if (serviceType == null) {
-        String markerSourceId = MarkerUtility.createMarker(wsdlResource.getFile(), MarkerType.StubJar, markerGroupUUID, Texts.get("ServiceTypeXNotFoundInStubJarY", serviceQName == null ? "<?>" : serviceQName.toString(), stubJarFile.getName()));
+        String markerSourceId = MarkerUtility.createMarker(wsdlResource.getFile(), MarkerType.StubJar, markerGroupUUID, Texts.get("ServiceTypeXNotFoundInStubJarY", serviceQName.toString(), stubJarFile.getName()));
         registerStubRebuildCommand(markerSourceId, buildJaxWsBean, wsdlResource, bundle);
         return false;
       }

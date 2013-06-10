@@ -364,7 +364,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
+          if (serviceInterfaceBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_page2.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getSymbolicName()));
             }
@@ -381,7 +381,7 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
+          if (serviceImplementationBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_page2.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
             }

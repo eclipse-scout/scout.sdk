@@ -10,7 +10,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.IOUtility;
-import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -113,7 +112,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
         String line = lines[i];
         if (StringUtility.hasText(line)) {
           String[] parts = line.split("\t");
-          Integer columnWidth = NumberUtility.nvl(new Integer(parts[1]), 0);
+          Integer columnWidth = Integer.valueOf(parts[1]);
           if (columnWidth < 0) {
             columnWidth = 0;
           }

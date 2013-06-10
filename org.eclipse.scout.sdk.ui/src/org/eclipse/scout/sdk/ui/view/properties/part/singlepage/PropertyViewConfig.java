@@ -210,11 +210,7 @@ public class PropertyViewConfig {
 
   private ConfigTypes parseConfigType(String type) {
     try {
-      ConfigTypes ret = ConfigTypes.valueOf(type);
-      if (ret == null) {
-        ret = DEFAULT_CONFIG_TYPE;
-      }
-      return ret;
+      return ConfigTypes.valueOf(type);
     }
     catch (Exception e) {
       return DEFAULT_CONFIG_TYPE;
@@ -223,11 +219,7 @@ public class PropertyViewConfig {
 
   private ConfigCategory parseConfigCategory(String cat) {
     try {
-      ConfigCategory ret = ConfigCategory.valueOf(cat);
-      if (ret == null) {
-        ret = DEFAULT_CONFIG_CATEGORY;
-      }
-      return ret;
+      return ConfigCategory.valueOf(cat);
     }
     catch (Exception e) {
       return DEFAULT_CONFIG_CATEGORY;

@@ -269,9 +269,19 @@ public class ConfigurationMethodSection {
     }
 
     @Override
+    public boolean equals(Object obj) {
+      if (!(obj instanceof ConfigurationMethodEx)) {
+        return false;
+      }
+      ConfigurationMethodEx other = (ConfigurationMethodEx) obj;
+      return m_category.getOrder() == other.m_category.getOrder() && m_order.equals(other.m_order) &&
+          m_configMethod.getMethodName().equals(other.m_configMethod.getMethodName());
+    }
+
+    @Override
     public int compareTo(ConfigurationMethodEx o) {
       // sort first by category
-      int catComp = new Integer(m_category.getOrder()).compareTo(o.m_category.getOrder());
+      int catComp = Integer.valueOf(m_category.getOrder()).compareTo(o.m_category.getOrder());
       if (catComp != 0) {
         return catComp;
       }

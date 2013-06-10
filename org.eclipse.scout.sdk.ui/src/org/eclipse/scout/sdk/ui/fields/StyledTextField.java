@@ -30,7 +30,7 @@ public class StyledTextField extends TextField {
   private P_SuffixListener m_suffixListener = null;
   private String m_readOnlyPrefix;
   private String m_readOnlySuffix;
-  private OptimisticLock m_revalLock = new OptimisticLock();
+  private final OptimisticLock m_revalLock = new OptimisticLock();
 
   /**
    * @param parent
@@ -53,7 +53,7 @@ public class StyledTextField extends TextField {
     return m_readOnlySuffix;
   }
 
-  public String getModifiableText() {
+  public synchronized String getModifiableText() {
     String text = getText();
     if (m_suffixListener != null && text.length() >= m_suffixListener.getSuffix().length()) {
       text = text.substring(0, text.length() - m_suffixListener.getSuffix().length());
@@ -80,7 +80,6 @@ public class StyledTextField extends TextField {
     if (StringUtility.isNullOrEmpty(getReadOnlyPrefix()) && StringUtility.isNullOrEmpty(getReadOnlySuffix())) {
       // uninstall
       if (m_suffixListener != null) {
-        m_suffixListener.setSuffix("");
         textComp.removeListener(SWT.Selection, m_suffixListener);
         textComp.removeListener(SWT.MouseDown, m_suffixListener);
         textComp.removeListener(SWT.Modify, m_suffixListener);
@@ -129,7 +128,7 @@ public class StyledTextField extends TextField {
   }
 
   @Override
-  public void setText(String text) {
+  public synchronized void setText(String text) {
     if (text == null) {
       text = "";
     }

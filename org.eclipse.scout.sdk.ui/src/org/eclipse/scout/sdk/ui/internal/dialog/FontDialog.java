@@ -387,7 +387,7 @@ public class FontDialog extends TitleAreaDialog {
 
     @Override
     public Object[] getElements(Object inputElement) {
-      return new Integer[]{new Integer(SWT.BOLD), new Integer(SWT.ITALIC), new Integer(SWT.BOLD | SWT.ITALIC), new Integer(SWT.NORMAL)};
+      return new Integer[]{Integer.valueOf(SWT.BOLD), Integer.valueOf(SWT.ITALIC), Integer.valueOf(SWT.BOLD | SWT.ITALIC), Integer.valueOf(SWT.NORMAL)};
     }
 
     @Override

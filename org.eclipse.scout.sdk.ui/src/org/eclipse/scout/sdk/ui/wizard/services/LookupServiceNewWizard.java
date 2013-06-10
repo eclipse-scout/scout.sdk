@@ -80,11 +80,9 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode createTree(IScoutBundle serverBundle) {
     IScoutBundle sharedBundle = null;
     IScoutBundle clientBundle = null;
-    if (serverBundle != null) {
-      sharedBundle = serverBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
-      if (sharedBundle != null) {
-        clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), serverBundle, false);
-      }
+    sharedBundle = serverBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    if (sharedBundle != null) {
+      clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), serverBundle, false);
     }
 
     ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
@@ -100,13 +98,13 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
       // service interface
       TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface));
     }
-    if (serverBundle != null) {
-      ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
-      // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
-      // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
-    }
+
+    ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
+    // service implementation
+    TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
+    // service implementation
+    TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+
     return rootNode;
   }
 
@@ -306,7 +304,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
+          if (serviceInterfaceBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getSymbolicName()));
             }
@@ -323,7 +321,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceImplementationBundle != null && serviceRegistrationBundle != null) {
+          if (serviceImplementationBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
             }

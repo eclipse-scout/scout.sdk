@@ -173,7 +173,7 @@ public class FormFieldExtensionPoint {
             break;
           }
           if (modClassName == null) {
-            ScoutSdkUi.logWarning("Could not find model '" + modClassName + "'. Skiping this extension.");
+            ScoutSdkUi.logWarning("Could not find model in '" + extension.getUniqueIdentifier() + "'. Skiping this extension.");
             continue;
           }
           ITypeHierarchy superTypeHierarchy = null;

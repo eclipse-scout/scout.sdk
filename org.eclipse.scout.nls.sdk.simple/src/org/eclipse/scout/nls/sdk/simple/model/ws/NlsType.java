@@ -73,14 +73,10 @@ public class NlsType implements INlsType {
   protected String getBundleValue() throws JavaModelException {
     IField field = m_type.getField(RESOURCE_BUNDLE_FIELD_NAME);
     if (TypeUtility.exists(field)) {
-      //int flags = field.getFlags();
-      //int refFlags = Flags.AccPublic | Flags.AccStatic;
-      //if ((refFlags & flags) == refFlags) {
       Matcher matcher = REGEX_RESOURCE_BUNDLE_FIELD.matcher(field.getSource());
       if (matcher.find()) {
         return matcher.group(1);
       }
-      //}
     }
     return null;
   }
@@ -101,11 +97,11 @@ public class NlsType implements INlsType {
       if (bundleValue != null) {
         String[] splitedValue = bundleValue.split("\\.");
         String filePrefix = splitedValue[splitedValue.length - 1];
-        String folderName = "";
+        StringBuilder folderName = new StringBuilder();
         for (int i = 0; i < splitedValue.length - 1; i++) {
-          folderName = folderName + FOLDER_SEGMENT_SEPARATOR + splitedValue[i];
+          folderName.append(FOLDER_SEGMENT_SEPARATOR).append(splitedValue[i]);
         }
-        setTranslationFolderName(folderName);
+        setTranslationFolderName(folderName.toString());
         setTranslationFilePrefix(filePrefix);
       }
 

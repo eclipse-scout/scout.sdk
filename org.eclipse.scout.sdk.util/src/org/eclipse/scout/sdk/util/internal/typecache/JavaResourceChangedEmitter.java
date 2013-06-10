@@ -137,8 +137,8 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(type);
       if (listenerList != null) {
         for (Iterator<WeakReference<IJavaResourceChangedListener>> it = listenerList.iterator(); it.hasNext();) {
-          WeakReference<IJavaResourceChangedListener> ref = it.next();
-          if (ref.get() == null || ref.get().equals(listener)) {
+          IJavaResourceChangedListener curListener = it.next().get();
+          if (curListener == null || curListener.equals(listener)) {
             it.remove();
           }
         }
@@ -167,8 +167,8 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(type);
       if (listenerList != null) {
         for (Iterator<WeakReference<IJavaResourceChangedListener>> it = listenerList.iterator(); it.hasNext();) {
-          WeakReference<IJavaResourceChangedListener> ref = it.next();
-          if (ref.get() == null || ref.get().equals(listener)) {
+          IJavaResourceChangedListener curListener = it.next().get();
+          if (curListener == null || curListener.equals(listener)) {
             it.remove();
           }
         }
@@ -245,7 +245,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
               }
             }
             else if (collector.isEmpty()) {
-              addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, (collector != null) ? kind : CHANGED_EXTERNAL, e));
+              addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, e));
             }
           }
         }
@@ -309,7 +309,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       boolean fireChanges = false;
       JdtEvent[] jdtEvents = new JdtEvent[0];
       synchronized (m_resourceLock) {
-        if (collector != null && collector.hasEvents()) {
+        if (collector.hasEvents()) {
           long resourceModification = icu.getResource().getModificationStamp();
           fireChanges = (icu == null) || resourceModification != collector.getLastModification();
           jdtEvents = collector.removeAllEvents(resourceModification);

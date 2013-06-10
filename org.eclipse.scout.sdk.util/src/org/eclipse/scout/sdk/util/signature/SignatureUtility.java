@@ -466,7 +466,7 @@ public final class SignatureUtility {
       String paramName = PARAM_SIG_REPLACEMENT_REGEX.matcher(paramSig).replaceAll("$1");
       paramSig = PARAM_SIG_REPLACEMENT_REGEX.matcher(paramSig).replaceAll("$2");
       if (contextType == null) {
-        String signature = getResolvedSignature(paramSig, signatureOwner, contextType);
+        String signature = getResolvedSignature(paramSig, signatureOwner, null);
         return signature;
       }
       else if (paramTypeName.equals(paramName)) {

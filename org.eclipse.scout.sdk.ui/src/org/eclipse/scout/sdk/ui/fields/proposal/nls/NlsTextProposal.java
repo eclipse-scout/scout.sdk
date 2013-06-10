@@ -179,6 +179,14 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof NlsTextProposal)) {
+      return false;
+    }
+    return CompareUtility.equals(getMatchString(), ((NlsTextProposal) obj).getMatchString());
+  }
+
+  @Override
   public int compareTo(NlsTextProposal o) {
     return CompareUtility.compareTo(getMatchString(), o.getMatchString());
   }

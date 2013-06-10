@@ -12,43 +12,22 @@ package org.eclipse.scout.nls.sdk.internal.model;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeSet;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.nls.sdk.model.util.AbstractChangeLogModel;
 
 public class PropertyBasedModel extends AbstractChangeLogModel implements Comparable<PropertyBasedModel> {
 
-  private PropertySupport propertySupport = new PropertySupport(this);
+  private final PropertySupport propertySupport = new PropertySupport(this);
   private PropertyBasedModel m_original;
-
-  private List<String> m_properties = new LinkedList<String>();
 
   private P_ChangeLogPropertyListener m_changeLogPropertyListener = new P_ChangeLogPropertyListener();
   private boolean m_hasChanges;
   private boolean m_pauseChangeLog;
 
   public PropertyBasedModel() {
-  }
-
-  /**
-   * copy contstuctor
-   * 
-   * @param model
-   */
-  public PropertyBasedModel(PropertyBasedModel model) {
-    Set<Entry<String, Object>> props = model.getPropertiesMap().entrySet();
-    for (Entry<String, Object> entry : props) {
-      propertySupport.setProperty(entry.getKey(), entry.getValue());
-    }
   }
 
   /**
@@ -61,29 +40,17 @@ public class PropertyBasedModel extends AbstractChangeLogModel implements Compar
     return 1;
   }
 
-  public void setPauseChangeLog(boolean pause) {
-    m_pauseChangeLog = pause;
-  }
-
-  public void startChangeLog() {
-    m_original = new PropertyBasedModel(this);
-    addPropertyChangeListener(m_changeLogPropertyListener);
-  }
-
-  public void stopChangeLog() {
-    m_original = null;
-    removePropertyChangeListener(m_changeLogPropertyListener);
-    m_hasChanges = false;
+  @Override
+  public int hashCode() {
+    int hash = 0;
+    for (Entry<String, Object> entry : getPropertiesMap().entrySet()) {
+      hash ^= entry.hashCode();
+    }
+    return hash;
   }
 
   public boolean hasChanges() {
     return m_hasChanges;
-  }
-
-  public IStatus commitChanges(IProgressMonitor monitor) {
-    m_original = new PropertyBasedModel(this);
-    revalidateChangeLog();
-    return Status.OK_STATUS;
   }
 
   protected boolean calculateChanges() {
@@ -115,11 +82,10 @@ public class PropertyBasedModel extends AbstractChangeLogModel implements Compar
   }
 
   protected void setPropertyBool(String key, boolean value) {
-    setProperty(key, new Boolean(value));
+    setProperty(key, Boolean.valueOf(value));
   }
 
   protected void setProperty(String key, Object value) {
-
     if (m_pauseChangeLog && m_original != null) {
       m_original.setProperty(key, value);
     }
@@ -136,14 +102,6 @@ public class PropertyBasedModel extends AbstractChangeLogModel implements Compar
 
   public void removePropertyChangeListener(PropertyChangeListener listener) {
     propertySupport.removePropertyChangeListener(listener);
-  }
-
-  public void fireAllProperties() {
-    List<String> props = new ArrayList<String>(m_properties);
-    for (String prop : props) {
-      propertySupport.firePropertyChange(prop, null, propertySupport
-          .getProperty(prop));
-    }
   }
 
   public void clearProperties() {

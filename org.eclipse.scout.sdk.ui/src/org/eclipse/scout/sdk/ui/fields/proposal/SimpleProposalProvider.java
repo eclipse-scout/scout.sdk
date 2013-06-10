@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 
 public class SimpleProposalProvider extends ContentProposalProvider {
 
-  private SimpleProposal[] m_proposals;
+  private final SimpleProposal[] m_proposals;
 
   public SimpleProposalProvider(SimpleProposal[] proposals) {
     m_proposals = proposals;
@@ -50,6 +50,17 @@ public class SimpleProposalProvider extends ContentProposalProvider {
 
   public SimpleProposal[] getProposals() {
     return m_proposals;
+  }
+
+  @Override
+  public int hashCode() {
+    int hashCode = 0;
+    if (m_proposals != null) {
+      for (SimpleProposal p : m_proposals) {
+        hashCode ^= p.hashCode();
+      }
+    }
+    return hashCode;
   }
 
   @Override

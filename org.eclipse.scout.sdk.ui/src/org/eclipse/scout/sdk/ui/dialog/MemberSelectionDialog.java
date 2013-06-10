@@ -99,11 +99,11 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     Composite rootPane = new Composite(parent, SWT.NONE);
     AutoResizeColumnTable table = new AutoResizeColumnTable(rootPane, SWT.CHECK | SWT.BORDER | SWT.FULL_SELECTION);
     TableColumn simpleNameCol = new TableColumn(table, SWT.LEFT);
-    simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(3));
+    simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, Integer.valueOf(3));
     simpleNameCol.setWidth(170);
     simpleNameCol.setText("Member");
     TableColumn packageCol = new TableColumn(table, SWT.LEFT);
-    packageCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(5));
+    packageCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, Integer.valueOf(5));
     packageCol.setText("Package");
     packageCol.setWidth(270);
     m_viewer = new CheckboxTableViewer(table);

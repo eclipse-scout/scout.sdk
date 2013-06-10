@@ -102,13 +102,13 @@ public final class RuntimeClasses implements IRuntimeClasses {
   private static Double parseDouble(String order) {
     if (StringUtility.hasText(order)) {
       try {
-        return new Double(Double.parseDouble(order));
+        return Double.valueOf(order);
       }
       catch (NumberFormatException e) {
         ScoutSdk.logWarning("Invalid numeric extension order: '" + order + "'.", e);
       }
     }
-    return new Double(0);
+    return Double.valueOf(0);
   }
 
   private static String getConfiguredSuperTypeNameCached(IScoutBundle context, String interfaceFqn) {

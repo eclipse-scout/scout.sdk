@@ -48,6 +48,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
@@ -61,7 +62,6 @@ import org.eclipse.scout.nls.sdk.internal.ui.fields.TextProposalField;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.operations.NewNlsFileOperationDesc;
-import org.eclipse.scout.nls.sdk.util.concurrent.Lock;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -78,20 +78,16 @@ import org.eclipse.ui.dialogs.ElementTreeSelectionDialog;
 public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
 
   private Composite m_rootPane;
-
   private TextButtonField m_containerField;
   private TextProposalField m_package;
   private TextField<String> m_className;
-
   private TextProposalField m_translationFolderField;
   private TextField<String> m_translationFileName;
 
   private final FieldValidator m_fieldValidator;
   private final P_RootContainerModifyListener m_containerFieldModifyListener;
-
   private final NewNlsFileOperationDesc m_desc;
-
-  private final Lock m_lock = new Lock();
+  private final OptimisticLock m_lock = new OptimisticLock();
   private final PackageProposalModel m_packageProposalModel;
 
   public NewNlsFileWizardPage2(String pageName, NewNlsFileOperationDesc desc) {
@@ -465,10 +461,6 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
       finally {
         m_lock.release();
       }
-    }
-    else if (name.equals(NewNlsFileOperationDesc.PROP_PACKAGE)) {
-      // TODO uncomment
-      // m_packageField.setInput((IPackageFragment) newValue);
     }
     revalidate();
   }

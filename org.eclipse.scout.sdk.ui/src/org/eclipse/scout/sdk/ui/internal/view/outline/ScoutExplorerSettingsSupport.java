@@ -295,9 +295,9 @@ public final class ScoutExplorerSettingsSupport {
     return result;
   }
 
-  private int getOrder(String workingSetName) {
-    for (int i = 0; i < m_workingSetsOrder.length; i++) {
-      if (CompareUtility.equals(m_workingSetsOrder[i], workingSetName)) {
+  private static int getOrder(String workingSetName, String[] setsOrder) {
+    for (int i = 0; i < setsOrder.length; i++) {
+      if (CompareUtility.equals(setsOrder[i], workingSetName)) {
         return i;
       }
     }
@@ -350,8 +350,8 @@ public final class ScoutExplorerSettingsSupport {
     Arrays.sort(array, new Comparator<IWorkingSet>() {
       @Override
       public int compare(IWorkingSet o1, IWorkingSet o2) {
-        int order1 = getOrder(o1.getName());
-        int order2 = getOrder(o2.getName());
+        int order1 = getOrder(o1.getName(), m_workingSetsOrder);
+        int order2 = getOrder(o2.getName(), m_workingSetsOrder);
         return order1 - order2;
       }
     });

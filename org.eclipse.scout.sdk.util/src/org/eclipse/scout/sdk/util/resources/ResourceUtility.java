@@ -136,10 +136,9 @@ public final class ResourceUtility {
    * @return a string containing the content of the given file
    */
   public static String getContent(IFile f) throws CoreException {
-    InputStream is = null;
+    BufferedReader reader = null;
     try {
-      is = f.getContents();
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+      reader = new BufferedReader(new InputStreamReader(f.getContents()));
       StringBuilder sb = new StringBuilder();
       String line = null;
       String nl = getLineSeparator(f);
@@ -153,9 +152,9 @@ public final class ResourceUtility {
       throw new CoreException(new ScoutStatus(e));
     }
     finally {
-      if (is != null) {
+      if (reader != null) {
         try {
-          is.close();
+          reader.close();
         }
         catch (IOException e) {
           //nop

@@ -50,20 +50,21 @@ public class NlsWorkingSet implements IWorkingSet {
 
   @Override
   public String getLabel() {
-    String name = "";
+    return getName(" -");
+  }
+
+  private String getName(String delim) {
+    StringBuilder name = new StringBuilder();
     for (IProject project : m_projects) {
-      name = name + " -" + project.getName();
+      name.append(delim);
+      name.append(project.getName());
     }
-    return name;
+    return name.toString();
   }
 
   @Override
   public String getName() {
-    String name = "";
-    for (IProject project : m_projects) {
-      name = name + " " + project.getName();
-    }
-    return name;
+    return getName(" ");
   }
 
   @Override

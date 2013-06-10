@@ -90,10 +90,11 @@ public class PropertyBeansRenameAction extends AbstractRenameAction {
       if (TypeUtility.getFirstMethod(bean.getDeclaringType(), MethodFilters.getNameRegexFilter(Pattern.compile("(get|set|is)" + newName))) != null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
       }
-      String fieldName = "m_" + Character.toLowerCase(newName.charAt(0));
+      StringBuilder fieldName = new StringBuilder();
+      fieldName.append("m_").append(Character.toLowerCase(newName.charAt(0)));
       if (bean.getBeanName().length() > 1) {
-        fieldName = fieldName + newName.substring(1);
-        if (TypeUtility.getFirstField(bean.getDeclaringType(), FieldFilters.getNameRegexFilter(Pattern.compile(fieldName))) != null) {
+        fieldName.append(newName.substring(1));
+        if (TypeUtility.getFirstField(bean.getDeclaringType(), FieldFilters.getNameRegexFilter(Pattern.compile(fieldName.toString()))) != null) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
         }
       }

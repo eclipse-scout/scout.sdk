@@ -26,7 +26,8 @@ public final class TechnologyExtensionPoint {
   public final static String ATTR_CLASS = "class";
   public final static String ATTR_CATEGORY = "category";
 
-  private static Technology[] technologies;
+  private static volatile Technology[] technologies;
+  private final static Object lock = new Object();
 
   private TechnologyExtensionPoint() {
   }
@@ -61,30 +62,34 @@ public final class TechnologyExtensionPoint {
 
   public static Technology[] getTechnologyExtensions() {
     if (technologies == null) {
-      Map<String, ArrayList<IScoutTechnologyHandler>> handlers = getHandlers();
-      HashSet<Technology> techs = new HashSet<Technology>();
-      IExtensionRegistry reg = Platform.getExtensionRegistry();
-      IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_ID);
-      IExtension[] extensions = xp.getExtensions();
-      for (IExtension extension : extensions) {
-        IConfigurationElement[] elements = extension.getConfigurationElements();
-        for (IConfigurationElement element : elements) {
-          if (TAG_TECH.equals(element.getName())) {
-            String id = element.getAttribute(ATTR_ID);
-            String name = element.getAttribute(ATTR_NAME);
-            String category = element.getAttribute(ATTR_CATEGORY);
-            if (category != null && category.trim().length() < 1) {
-              category = null;
-            }
-            if (name != null && id != null && name.trim().length() > 0 && id.trim().length() > 0) {
-              Technology t = new Technology(id, name, category);
-              t.addAllHandlers(handlers.get(id));
-              techs.add(t);
+      synchronized (lock) {
+        if (technologies == null) {
+          Map<String, ArrayList<IScoutTechnologyHandler>> handlers = getHandlers();
+          HashSet<Technology> techs = new HashSet<Technology>();
+          IExtensionRegistry reg = Platform.getExtensionRegistry();
+          IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_ID);
+          IExtension[] extensions = xp.getExtensions();
+          for (IExtension extension : extensions) {
+            IConfigurationElement[] elements = extension.getConfigurationElements();
+            for (IConfigurationElement element : elements) {
+              if (TAG_TECH.equals(element.getName())) {
+                String id = element.getAttribute(ATTR_ID);
+                String name = element.getAttribute(ATTR_NAME);
+                String category = element.getAttribute(ATTR_CATEGORY);
+                if (category != null && category.trim().length() < 1) {
+                  category = null;
+                }
+                if (name != null && id != null && name.trim().length() > 0 && id.trim().length() > 0) {
+                  Technology t = new Technology(id, name, category);
+                  t.addAllHandlers(handlers.get(id));
+                  techs.add(t);
+                }
+              }
             }
           }
+          technologies = techs.toArray(new Technology[techs.size()]);
         }
       }
-      technologies = techs.toArray(new Technology[techs.size()]);
     }
     return technologies;
   }

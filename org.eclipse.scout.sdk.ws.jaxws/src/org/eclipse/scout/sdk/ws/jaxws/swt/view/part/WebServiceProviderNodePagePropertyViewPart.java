@@ -793,7 +793,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       }
       if (!accept) {
         for (XmlResource bindingFileResource : getPage().getBindingFileResources()) {
-          if (resource == bindingFileResource) {
+          if (resource == bindingFileResource.getFile()) {
             accept = true;
             break;
           }

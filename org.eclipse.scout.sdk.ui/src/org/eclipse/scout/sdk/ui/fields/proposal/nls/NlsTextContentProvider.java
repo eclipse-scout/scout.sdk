@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
  */
 public class NlsTextContentProvider extends ContentProposalProvider implements IDialogSettingsProvider {
 
-  private NlsTextLabelProvider m_labelProvider;
+  private final NlsTextLabelProvider m_labelProvider;
 
   public NlsTextContentProvider(NlsTextLabelProvider labelProvider) {
     m_labelProvider = labelProvider;
@@ -103,6 +103,15 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
   @Override
   public IDialogSettings getDialogSettings() {
     return ScoutSdkUi.getDefault().getDialogSettingsSection(NlsTextLabelProvider.class.getName(), true);
+  }
+
+  @Override
+  public int hashCode() {
+    NlsTextLabelProvider labelProvider = getLabelProvider();
+    if (labelProvider != null) {
+      return labelProvider.hashCode();
+    }
+    return 0;
   }
 
   @Override

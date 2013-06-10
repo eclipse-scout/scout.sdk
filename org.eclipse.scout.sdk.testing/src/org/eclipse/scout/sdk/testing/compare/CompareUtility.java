@@ -103,7 +103,7 @@ public final class CompareUtility {
         lineNr++;
       }
       if (lineB != null) {
-        compareResult.addDifference(new LineCompareResult.LineDifference(lineNr, lineA, lineB));
+        compareResult.addDifference(new LineCompareResult.LineDifference(lineNr, null, lineB));
       }
 
       return compareResult;

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -17,7 +17,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -27,19 +26,22 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 public class PropertySupport {
 
   public static final int DEFAULT_INT_VALUE = 0;
-  public static final int DEFAULT_DOUBLE_VALUE = 0;
-  public static final Integer DEFAULT_INT = new Integer(DEFAULT_INT_VALUE);
-  public static final Double DEFAULT_DOUBLE = new Double(DEFAULT_DOUBLE_VALUE);
+  public static final double DEFAULT_DOUBLE_VALUE = 0;
+  public static final Integer DEFAULT_INT = Integer.valueOf(DEFAULT_INT_VALUE);
+  public static final Double DEFAULT_DOUBLE = Double.valueOf(DEFAULT_DOUBLE_VALUE);
   public static final long DEFAULT_LONG_VALUE = DEFAULT_INT_VALUE;
-  public static final Long DEFAULT_LONG = new Long(DEFAULT_LONG_VALUE);
-  private static final Boolean DEFAULT_BOOL = new Boolean(false);
-  private HashMap<String, Object> m_props = new HashMap<String, Object>();
-  private Object m_source;
+  public static final Long DEFAULT_LONG = Long.valueOf(DEFAULT_LONG_VALUE);
+  private static final Boolean DEFAULT_BOOL = Boolean.valueOf(false);
+
+  private final Map<String, Object> m_props;
+  private final Object m_source;
+
   private transient Vector<PropertyChangeListener> m_listeners;
-  private Hashtable<String, Object> m_children;
+  private Map<String, Object> m_children;
 
   public PropertySupport(Object sourceBean) {
     m_source = sourceBean;
+    m_props = new HashMap<String, Object>();
   }
 
   public void clearProperties() {
@@ -82,7 +84,7 @@ public class PropertySupport {
   }
 
   public void setPropertyInt(String name, int i) {
-    setProperty(name, new Integer(i), DEFAULT_INT);
+    setProperty(name, Integer.valueOf(i), DEFAULT_INT);
   }
 
   public int getPropertyInt(String name) {
@@ -91,7 +93,7 @@ public class PropertySupport {
   }
 
   public void setPropertyDouble(String name, double d) {
-    setProperty(name, new Double(d), DEFAULT_DOUBLE);
+    setProperty(name, Double.valueOf(d), DEFAULT_DOUBLE);
   }
 
   public double getPropertyDouble(String name) {
@@ -109,7 +111,7 @@ public class PropertySupport {
   }
 
   public void setPropertyLong(String name, long i) {
-    setProperty(name, new Long(i), DEFAULT_LONG);
+    setProperty(name, Long.valueOf(i), DEFAULT_LONG);
   }
 
   public long getPropertyLong(String name) {
@@ -118,7 +120,7 @@ public class PropertySupport {
   }
 
   public boolean setPropertyBool(String name, boolean b) {
-    return setProperty(name, new Boolean(b), DEFAULT_BOOL);
+    return setProperty(name, Boolean.valueOf(b), DEFAULT_BOOL);
   }
 
   public boolean getPropertyBool(String name) {
@@ -218,7 +220,7 @@ public class PropertySupport {
 
   public synchronized void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     if (m_children == null) {
-      m_children = new java.util.Hashtable<String, Object>();
+      m_children = new HashMap<String, Object>();
     }
     PropertySupport child = (PropertySupport) m_children.get(propertyName);
     if (child == null) {
@@ -243,7 +245,7 @@ public class PropertySupport {
     if (oldValue == newValue) {
       return;
     }
-    firePropertyChangeImpl(propertyName, new Integer(oldValue), new Integer(newValue));
+    firePropertyChangeImpl(propertyName, Integer.valueOf(oldValue), Integer.valueOf(newValue));
   }
 
   public void firePropertyChange(String propertyName, boolean oldValue, boolean newValue) {

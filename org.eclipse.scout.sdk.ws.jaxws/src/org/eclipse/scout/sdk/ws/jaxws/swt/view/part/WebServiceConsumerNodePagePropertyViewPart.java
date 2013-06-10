@@ -622,7 +622,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       }
       if (!accept) {
         for (XmlResource bindingFileResource : getPage().getBindingFileResources()) {
-          if (resource == bindingFileResource) {
+          if (resource == bindingFileResource.getFile()) {
             accept = true;
             break;
           }

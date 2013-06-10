@@ -59,7 +59,7 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
     }
 
     @Override
-    public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
+    public synchronized Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
       ensureCache();
       if (!StringUtility.hasText(searchPattern)) {
         searchPattern = "*";
@@ -78,7 +78,7 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
     }
 
     @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+    public synchronized void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
       m_proposals = null; // clear cache
     }
 
@@ -89,7 +89,7 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
       }
     }
 
-    private synchronized void ensureCache() {
+    private void ensureCache() {
       if (m_proposals == null) {
         if (getMethod() != null) {
           ArrayList<IType> collector = new ArrayList<IType>();

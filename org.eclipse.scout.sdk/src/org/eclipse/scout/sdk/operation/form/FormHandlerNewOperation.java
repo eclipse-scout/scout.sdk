@@ -94,8 +94,6 @@ public class FormHandlerNewOperation implements IOperation {
     m_createdHandler = formHandlerOp.getCreatedType();
 
     // start method
-    String nameKey = getTypeName();
-    nameKey = nameKey.replaceFirst(SdkProperties.SUFFIX_FORM_HANDLER + "\\b", "");
     if (!StringUtility.isNullOrEmpty(getStartMethodName())) {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(m_createdHandler.getCompilationUnit());
       IType form = TypeUtility.getAncestor(m_createdHandler, TypeFilters.getSubtypeFilter(iForm, hierarchy));

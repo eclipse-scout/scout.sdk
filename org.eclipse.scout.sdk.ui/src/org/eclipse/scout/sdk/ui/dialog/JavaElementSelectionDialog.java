@@ -87,11 +87,11 @@ public class JavaElementSelectionDialog extends Dialog {
     });
 
     TableColumn simpleNameCol = new TableColumn(m_filteredTable.getTable(), SWT.LEFT);
-    simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(3));
+    simpleNameCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, Integer.valueOf(3));
     simpleNameCol.setWidth(170);
     simpleNameCol.setText(Texts.get("Member"));
     TableColumn packageCol = new TableColumn(m_filteredTable.getTable(), SWT.LEFT);
-    packageCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, new Integer(5));
+    packageCol.setData(AutoResizeColumnTable.COLUMN_WEIGHT, Integer.valueOf(5));
     packageCol.setText(Texts.get("Package"));
     packageCol.setWidth(270);
 

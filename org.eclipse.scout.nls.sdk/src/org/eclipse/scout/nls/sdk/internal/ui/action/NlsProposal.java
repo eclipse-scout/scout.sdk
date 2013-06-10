@@ -52,7 +52,7 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
 
   @Override
   public void apply(IDocument document) {
-    apply(null, '\0', 0, m_offset);
+    apply(document, '\0', m_offset);
   }
 
   @Override

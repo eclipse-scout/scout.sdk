@@ -130,7 +130,7 @@ public class ContextMenuContributorExtensionPoint {
               new TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>>(new Comparator<IScoutHandler.Category>() {
                 @Override
                 public int compare(IScoutHandler.Category o1, IScoutHandler.Category o2) {
-                  return new Integer(o1.getOrder()).compareTo(o2.getOrder());
+                  return Integer.valueOf(o1.getOrder()).compareTo(o2.getOrder());
                 }
               });
 

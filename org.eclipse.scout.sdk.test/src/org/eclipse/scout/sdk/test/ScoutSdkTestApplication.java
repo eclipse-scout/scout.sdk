@@ -38,7 +38,7 @@ public class ScoutSdkTestApplication implements ITestHarness, IApplication {
     if (!EXIT_OK.equals(result)) {
       System.err.println("ScoutSdkTestApplication: Unexpected result from running application " + application + ": " + result);
     }
-    return new Integer(m_scoutJUnitPluginTesetExecutorResult);
+    return Integer.valueOf(m_scoutJUnitPluginTesetExecutorResult);
   }
 
   @Override

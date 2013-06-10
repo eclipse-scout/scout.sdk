@@ -16,8 +16,14 @@ public class ExportScoutProjectEntry implements Comparable<ExportScoutProjectEnt
   }
 
   @Override
+  public int hashCode() {
+    Integer o = Integer.valueOf(getOrder());
+    return o.hashCode() ^ getName().hashCode();
+  }
+
+  @Override
   public int compareTo(ExportScoutProjectEntry o) {
-    int ret = new Integer(getOrder()).compareTo(o.getOrder());
+    int ret = Integer.valueOf(getOrder()).compareTo(o.getOrder());
     if (ret == 0) {
       return getName().compareTo(o.getName());
     }
@@ -33,7 +39,7 @@ public class ExportScoutProjectEntry implements Comparable<ExportScoutProjectEnt
     ExportScoutProjectEntry o = (ExportScoutProjectEntry) obj;
     return getId().equals(o.getId()) &&
         getName().equals(o.getName()) &&
-        new Integer(getOrder()).equals(o.getOrder()) &&
+        Integer.valueOf(getOrder()).equals(o.getOrder()) &&
         getIcon().equals(o.getIcon());
   }
 

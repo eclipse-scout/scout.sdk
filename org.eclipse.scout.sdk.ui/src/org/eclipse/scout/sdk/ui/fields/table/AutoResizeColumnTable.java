@@ -67,9 +67,6 @@ public class AutoResizeColumnTable extends Table {
   protected void handleAutoSizeColumns() {
     if (!isDisposed()) {
       int totalWidth = getClientArea().width;
-      if (getVerticalBar() != null && getVerticalBar().getVisible()) {
-        // totalWidth -= getSwtField().getVerticalBar().getSize().x;
-      }
       int totalWeight = 0;
       HashMap<TableColumn, Integer> columnWeights = new HashMap<TableColumn, Integer>();
       for (TableColumn col : getColumns()) {

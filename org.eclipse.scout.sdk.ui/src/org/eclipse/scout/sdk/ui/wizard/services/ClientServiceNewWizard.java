@@ -258,7 +258,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
           IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceInterfaceBundle != null && serviceRegistrationBundle != null) {
+          if (serviceInterfaceBundle != null) {
             if (!ScoutTypeUtility.isOnClasspath(serviceInterfaceBundle, serviceRegistrationBundle)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE), serviceRegistrationBundle.getSymbolicName()));
             }

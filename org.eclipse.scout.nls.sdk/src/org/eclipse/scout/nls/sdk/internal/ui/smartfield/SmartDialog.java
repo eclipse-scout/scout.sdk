@@ -60,7 +60,7 @@ public class SmartDialog {
   private P_SmartFieldTableModel m_smartTableModel;
   private List<ISmartDialogListener> m_smartDialogListeners = new LinkedList<ISmartDialogListener>();
   private Point m_defaultSize = new Point(200, 250);
-  private static Collator s_collator = Collator.getInstance(Locale.getDefault());
+  private final static Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
   public SmartDialog(Shell parentShell) {
     m_smartTableModel = new P_SmartFieldTableModel();
@@ -334,9 +334,18 @@ public class SmartDialog {
     }
 
     @Override
-    public int compareTo(P_CompareableSmartItem o) {
+    public boolean equals(Object obj) {
+      if (!(obj instanceof P_CompareableSmartItem)) {
+        return false;
+      }
+      String me = m_smartModel.getText(m_item);
+      String other = m_smartModel.getText(((P_CompareableSmartItem) obj).getItem());
+      return COLLATOR.equals(me, other);
+    }
 
-      return s_collator.compare(m_smartModel.getText(m_item), m_smartModel.getText(o.getItem()));
+    @Override
+    public int compareTo(P_CompareableSmartItem o) {
+      return COLLATOR.compare(m_smartModel.getText(m_item), m_smartModel.getText(o.getItem()));
     }
 
     public Object getItem() {

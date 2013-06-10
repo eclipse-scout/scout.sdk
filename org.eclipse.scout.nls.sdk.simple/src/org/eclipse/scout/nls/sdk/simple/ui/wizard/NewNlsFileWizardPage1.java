@@ -36,6 +36,7 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.ui.PDEPlugin;
 import org.eclipse.pde.internal.ui.dialogs.PluginSelectionDialog;
+import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.ui.FieldValidator;
 import org.eclipse.scout.nls.sdk.internal.ui.TextButtonField;
@@ -46,7 +47,6 @@ import org.eclipse.scout.nls.sdk.internal.ui.smartfield.ISmartFieldListener;
 import org.eclipse.scout.nls.sdk.internal.ui.smartfield.ISmartFieldModel;
 import org.eclipse.scout.nls.sdk.internal.ui.smartfield.SmartField;
 import org.eclipse.scout.nls.sdk.simple.operations.NewNlsFileOperationDesc;
-import org.eclipse.scout.nls.sdk.util.concurrent.Lock;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -62,18 +62,17 @@ import org.eclipse.swt.widgets.Group;
 @SuppressWarnings("restriction")
 public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
 
-  private NewNlsFileOperationDesc m_desc;
   private Composite m_rootPane;
   private FieldValidator m_fieldValidator = new FieldValidator();
 
   private TextField<String> m_fileName;
   private SmartField m_nlsParentFile;
   private TextButtonField m_nlsParentPluginField;
-  private P_ParentPluginModifyListener m_parentModifyListener;
   private TextButtonField m_pluginField;
-  private Lock m_lock = new Lock();
 
-  // private TextProposalField m_plugin;
+  private final P_ParentPluginModifyListener m_parentModifyListener;
+  private final OptimisticLock m_lock = new OptimisticLock();
+  private final NewNlsFileOperationDesc m_desc;
 
   public NewNlsFileWizardPage1(String pageName, NewNlsFileOperationDesc desc) {
     super(true, "new NLS File");
@@ -310,17 +309,6 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
         }
       }
     }
-    // if (name.equals(NewNlsFileOperationDesc.PROP_BINDING_DYNAMIC)) {
-    // if (((Boolean) newValue).booleanValue()) {
-    // m_dynamicBinding.setSelection(true);
-    // m_nlsParentPluginField.setVisible(true);
-    // m_nlsParentFile.setVisible(true);
-    // } else {
-    // m_staticBinding.setSelection(true);
-    // m_nlsParentPluginField.setVisible(false);
-    // m_nlsParentFile.setVisible(false);
-    // }
-    // }
     revalidate();
   }
 

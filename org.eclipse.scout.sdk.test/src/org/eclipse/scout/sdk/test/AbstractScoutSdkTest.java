@@ -96,7 +96,7 @@ public abstract class AbstractScoutSdkTest {
 
   /**
    * deletes all workspace projects and waits for a silent workspace
-   * 
+   *
    * @throws Exception
    */
   public static void clearWorkspace() throws Exception {
@@ -255,7 +255,7 @@ public abstract class AbstractScoutSdkTest {
       return b == null;
     }
     if (b == null) {
-      return a == null;
+      return false;
     }
     int lineNr = 1;
     BufferedReader readerA = null;

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions.preferences;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -33,6 +34,14 @@ public class TargetPackageModel implements Comparable<TargetPackageModel> {
     m_id = id;
     m_defaultVal = defaultVal;
     m_context = context;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof TargetPackageModel)) {
+      return false;
+    }
+    return CompareUtility.equals(m_id, ((TargetPackageModel) obj).m_id);
   }
 
   @Override

@@ -283,7 +283,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitBeanPropertyTablePage((BeanPropertyTablePage) page);
     }
     else if (page instanceof BeanPropertyNodePage) {
-
+      return visitBeanPropertyNodePage((BeanPropertyNodePage) page);
     }
     else if (page instanceof AbstractBoxNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);

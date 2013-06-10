@@ -27,9 +27,6 @@ public class NlsEntryModifyAction extends AbstractWorkspaceAction {
   public NlsEntryModifyAction(INlsEntry entry, INlsProject project) {
     super("Modify Entry...", true);
     m_entry = new NlsEntry(entry);
-    if (m_entry == null) {
-      m_entry = new NlsEntry("", project);
-    }
     m_project = project;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.Text));
   }

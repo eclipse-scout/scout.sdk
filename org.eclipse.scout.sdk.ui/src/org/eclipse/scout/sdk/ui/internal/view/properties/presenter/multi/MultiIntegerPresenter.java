@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -128,18 +129,11 @@ public class MultiIntegerPresenter extends AbstractMultiValuePresenter<Integer> 
     if (ar.length > 0) {
       Integer ref = ar[0];
       for (Integer b : ar) {
-        if (b == null && ref != null) {
-          return false;
-        }
-        if (b != null && ref == null) {
-          return false;
-        }
-        if (b != ref) {
+        if (CompareUtility.notEquals(b, ref)) {
           return false;
         }
       }
     }
     return true;
   }
-
 }

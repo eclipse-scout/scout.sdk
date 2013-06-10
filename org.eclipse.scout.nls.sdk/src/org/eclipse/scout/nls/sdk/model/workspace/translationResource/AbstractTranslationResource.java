@@ -82,7 +82,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
         if (oldEntry == null) {
           multiEvent.addEvent(new TranslationResourceEvent(this, key, translation, TranslationResourceEvent.TYPE_ENTRY_ADD));
         }
-        else if (oldEntry != null && StringUtility.isNullOrEmpty(translation)) {
+        else if (StringUtility.isNullOrEmpty(translation)) {
           multiEvent.addEvent(new TranslationResourceEvent(this, key, translation, TranslationResourceEvent.TYPE_ENTRY_REMOVE));
         }
         else if (!oldEntry.equals(translation)) {

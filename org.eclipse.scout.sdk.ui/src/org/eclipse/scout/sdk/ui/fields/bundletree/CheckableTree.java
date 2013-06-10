@@ -281,7 +281,7 @@ public class CheckableTree extends Composite {
   protected ITreeNode[] sortChildren(ITreeNode[] children) {
     TreeMap<CompositeObject, ITreeNode> nodes = new TreeMap<CompositeObject, ITreeNode>();
     for (ITreeNode n : children) {
-      nodes.put(new CompositeObject(new Long(n.getOrderNr()), n.getText(), n), n);
+      nodes.put(new CompositeObject(Long.valueOf(n.getOrderNr()), n.getText(), n), n);
     }
     return nodes.values().toArray(new ITreeNode[nodes.values().size()]);
   }

@@ -238,6 +238,15 @@ public class Technology implements Comparable<Technology> {
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof Technology)) {
+      return false;
+    }
+    Technology other = (Technology) obj;
+    return m_id.equals(other.m_id) && m_category.equals(other.m_category) && m_name.equals(other.m_name);
+  }
+
+  @Override
   public int compareTo(Technology o) {
     int ret = m_category.compareTo(o.m_category);
     if (ret == 0) {

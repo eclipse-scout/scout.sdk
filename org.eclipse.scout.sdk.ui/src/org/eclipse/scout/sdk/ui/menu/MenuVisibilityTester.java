@@ -3,6 +3,7 @@ package org.eclipse.scout.sdk.ui.menu;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.expressions.PropertyTester;
@@ -42,8 +43,8 @@ public class MenuVisibilityTester extends PropertyTester {
   }
 
   private static void prepareMenu(IScoutHandler menu, HashMap<IPage, IContextMenuContributor> contributors) {
-    for (IPage p : contributors.keySet()) {
-      contributors.get(p).prepareMenuAction(p, menu);
+    for (Entry<IPage, IContextMenuContributor> entry : contributors.entrySet()) {
+      entry.getValue().prepareMenuAction(entry.getKey(), menu);
     }
   }
 

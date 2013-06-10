@@ -871,6 +871,25 @@ public class ProposalPopup extends Window {
     }
 
     @Override
+    public int hashCode() {
+      int hash = 0;
+      if (m_input != null) {
+        hash ^= m_input.hashCode();
+      }
+      if (m_pattern != null) {
+        hash ^= m_pattern.hashCode();
+      }
+      if (m_proposals != null) {
+        for (Object proposal : m_proposals) {
+          if (proposal != null) {
+            hash ^= proposal.hashCode();
+          }
+        }
+      }
+      return hash;
+    }
+
+    @Override
     public boolean equals(Object obj) {
       if (!(obj instanceof SearchPatternInput)) {
         return false;

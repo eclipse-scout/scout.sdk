@@ -16,6 +16,7 @@ package org.eclipse.scout.sdk.ws.jaxws.operation;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
@@ -101,10 +102,9 @@ public class AnnotationUpdateOperation implements IOperation {
 
     // prepare creation of properties
     // type properties
-    for (String propertyName : resolvedTypePropertyMap.keySet()) {
-      if (!m_propertyRemoveMap.contains(propertyName)) {
-        String resolvedTypeName = resolvedTypePropertyMap.get(propertyName);
-        op.addParameter(propertyName + " = " + resolvedTypeName + ".class");
+    for (Entry<String, String> property : resolvedTypePropertyMap.entrySet()) {
+      if (!m_propertyRemoveMap.contains(property.getKey())) {
+        op.addParameter(property.getKey() + " = " + property.getValue() + ".class");
       }
     }
     // string properties
