@@ -27,8 +27,6 @@
       <import feature="org.eclipse.pde" version="3.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="3.5.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.jdt" version="3.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.scout.rt" version="3.9.0.qualifier"/>
-      <import feature="org.eclipse.scout.rt.source" version="3.9.0.qualifier"/>
    </requires>
 
    <plugin
@@ -121,6 +119,13 @@
 
    <plugin
          id="org.eclipse.scout.sdk.help"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.commons"
          download-size="0"
          install-size="0"
          version="0.0.0"
