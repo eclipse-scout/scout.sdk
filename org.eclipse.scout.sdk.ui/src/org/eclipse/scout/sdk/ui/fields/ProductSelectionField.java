@@ -77,8 +77,8 @@ public class ProductSelectionField extends TextField {
         if (dialog.open() == Dialog.OK) {
           IFile newFile = dialog.getSelectedProductFile();
           if (!CompareUtility.equals(newFile, getProductFile())) {
-            if (m_inputLock.acquire()) {
-              try {
+            try {
+              if (m_inputLock.acquire()) {
                 String representationStr = "";
                 if (newFile != null)
                 {
@@ -86,9 +86,9 @@ public class ProductSelectionField extends TextField {
                 }
                 getTextComponent().setText(representationStr);
               }
-              finally {
-                m_inputLock.release();
-              }
+            }
+            finally {
+              m_inputLock.release();
             }
             setProductFileInternal(newFile);
           }

@@ -274,16 +274,16 @@ public class ProposalTextField extends TextField {
 
   @Override
   public void setText(String text) {
-    if (m_updateLock.acquire()) {
-      try {
+    try {
+      if (m_updateLock.acquire()) {
         if (text == null) {
           text = "";
         }
         super.setText(text);
       }
-      finally {
-        m_updateLock.release();
-      }
+    }
+    finally {
+      m_updateLock.release();
     }
   }
 
@@ -401,15 +401,13 @@ public class ProposalTextField extends TextField {
     public void handleEvent(Event event) {
       switch (event.type) {
         case SWT.Modify: {
-          if (m_updateLock.acquire()) {
-            try {
-              // acceptProposal(null);
+          try {
+            if (m_updateLock.acquire()) {
               textModified();
-              // notifyTextModified();
             }
-            finally {
-              m_updateLock.release();
-            }
+          }
+          finally {
+            m_updateLock.release();
           }
           break;
         }

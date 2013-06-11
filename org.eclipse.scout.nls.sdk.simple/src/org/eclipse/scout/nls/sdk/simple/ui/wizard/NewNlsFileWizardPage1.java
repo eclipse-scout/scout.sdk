@@ -277,14 +277,16 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
   }
 
   private void handlePropertyChanged(String name, Object oldValue, Object newValue) {
-    if (name.equals(NewNlsFileOperationDesc.PROP_PARENT_PLUGIN) && m_lock.acquire()) {
+    if (name.equals(NewNlsFileOperationDesc.PROP_PARENT_PLUGIN)) {
       try {
-        IPluginModelBase p = (IPluginModelBase) newValue;
-        if (p == null) {
-          m_nlsParentPluginField.setText("");
-        }
-        else {
-          m_nlsParentPluginField.setText(p.getBundleDescription().getName());
+        if (m_lock.acquire()) {
+          IPluginModelBase p = (IPluginModelBase) newValue;
+          if (p == null) {
+            m_nlsParentPluginField.setText("");
+          }
+          else {
+            m_nlsParentPluginField.setText(p.getBundleDescription().getName());
+          }
         }
       }
       finally {
@@ -294,9 +296,8 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
     else if (name.equals(NewNlsFileOperationDesc.PROP_PLUGIN)) {
       IProject p = (IProject) newValue;
       m_parentModifyListener.setPlugin(p);
-      if (m_lock.acquire()) {
-        try {
-
+      try {
+        if (m_lock.acquire()) {
           if (p == null) {
             m_pluginField.setText("");
           }
@@ -304,9 +305,9 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
             m_pluginField.setText(p.getName());
           }
         }
-        finally {
-          m_lock.release();
-        }
+      }
+      finally {
+        m_lock.release();
       }
     }
     revalidate();

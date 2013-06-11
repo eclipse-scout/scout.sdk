@@ -446,16 +446,18 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
       m_containerFieldModifyListener.setPlugin((IProject) newValue);
       m_packageProposalModel.setProject((IProject) newValue);
     }
-    if (name.equals(NewNlsFileOperationDesc.PROP_SRC_CONTAINER) && m_lock.acquire()) {
+    if (name.equals(NewNlsFileOperationDesc.PROP_SRC_CONTAINER)) {
       try {
-        IPath path = (IPath) newValue;
-        if (path == null) {
-          m_containerField.setText("");
-          m_desc.setSourceContainer(null);
-        }
-        else {
-          m_containerField.setText(path.lastSegment());
-          m_desc.setSourceContainer(path);
+        if (m_lock.acquire()) {
+          IPath path = (IPath) newValue;
+          if (path == null) {
+            m_containerField.setText("");
+            m_desc.setSourceContainer(null);
+          }
+          else {
+            m_containerField.setText(path.lastSegment());
+            m_desc.setSourceContainer(path);
+          }
         }
       }
       finally {
