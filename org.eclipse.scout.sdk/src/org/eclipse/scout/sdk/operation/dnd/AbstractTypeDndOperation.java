@@ -90,15 +90,21 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getTargetDeclaringType());
     TypePosition position = updateOrderNumbers(structuredType, monitor, workingCopyManager);
     String typeSimpleName = getNewTypeName();
+
     List<String> imports = new ArrayList<String>();
+    String normalizedTypeElementName = null;
+    String normalizedTargetTypeElementName = null;
     if (!getTargetDeclaringType().equals(getType().getDeclaringType())) {
-      String normalizedTypeElementName = getType().getFullyQualifiedName().replace('$', '.');
-      String normalizedTargetTypeElementName = getTargetDeclaringType().getFullyQualifiedName().replace('$', '.');
-      for (IImportDeclaration imp : getType().getCompilationUnit().getImports()) {
-        String normalizedImport = imp.getElementName().replace('$', '.');
-        if (normalizedImport.startsWith(normalizedTypeElementName)) {
-          imports.add(normalizedTargetTypeElementName + "." + typeSimpleName + normalizedImport.replaceAll("^" + normalizedTypeElementName, ""));
-        }
+      normalizedTypeElementName = getType().getFullyQualifiedName().replace('$', '.');
+      normalizedTargetTypeElementName = getTargetDeclaringType().getFullyQualifiedName().replace('$', '.');
+    }
+    for (IImportDeclaration imp : getType().getCompilationUnit().getImports()) {
+      String normalizedImport = imp.getElementName().replace('$', '.');
+      if (normalizedTypeElementName != null && normalizedImport.startsWith(normalizedTypeElementName)) {
+        imports.add(normalizedTargetTypeElementName + "." + typeSimpleName + normalizedImport.replaceAll("^" + normalizedTypeElementName, ""));
+      }
+      else {
+        imports.add(normalizedImport);
       }
     }
 
