@@ -213,7 +213,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       BindingFileNewAction d = new BindingFileNewAction();
       d.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource());
       presenter = new ActionPresenter(getSection(SECTION_ID_STUB_PROPERTIES).getSectionClient(), d, getFormToolkit());
-      presenter.setEnabled(getPage().getBuildJaxWsBean() != null && !getPage().getPortType().isReadOnly());
+      presenter.setEnabled(getPage().getBuildJaxWsBean() != null && TypeUtility.exists(getPage().getPortType()) && !getPage().getPortType().isReadOnly());
       gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       gd.horizontalAlignment = SWT.RIGHT;
       presenter.getContainer().setLayoutData(gd);
