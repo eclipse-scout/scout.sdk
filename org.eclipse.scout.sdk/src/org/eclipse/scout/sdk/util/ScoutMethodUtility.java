@@ -31,16 +31,22 @@ public final class ScoutMethodUtility {
 
   public static String getMethodReturnValue(IMethod method) {
     try {
-      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(method.getSource());
-      if (m.find()) {
-        return m.group(1).trim();
+      String src = method.getSource();
+      if (src != null) {
+        Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(src);
+        if (m.find()) {
+          return m.group(1).trim();
+        }
+        else {
+          ScoutSdk.logInfo("Could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+        }
       }
       else {
-        ScoutSdk.logInfo("could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+        ScoutSdk.logWarning("Could not find source for method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
       }
     }
     catch (JavaModelException e) {
-      ScoutSdk.logError("could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+      ScoutSdk.logError("Could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
     }
     return null;
   }
