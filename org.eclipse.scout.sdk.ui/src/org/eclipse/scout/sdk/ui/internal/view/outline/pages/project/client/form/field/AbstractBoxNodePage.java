@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction;
-import org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction;
+import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
@@ -102,8 +102,8 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
     else if (menu instanceof FormFieldNewAction) {
       ((FormFieldNewAction) menu).setType(getType());
     }
-    else if (menu instanceof BoxDeleteAction) {
-      ((BoxDeleteAction) menu).setBoxType(getType());
+    else if (menu instanceof FormFieldDeleteAction) {
+      ((FormFieldDeleteAction) menu).addFormFieldType(getType());
     }
     else if (menu instanceof CreateTemplateAction) {
       CreateTemplateAction action = (CreateTemplateAction) menu;
@@ -119,6 +119,6 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, FormFieldNewAction.class,
-        BoxDeleteAction.class, CreateTemplateAction.class, FormDataUpdateAction.class};
+        FormFieldDeleteAction.class, CreateTemplateAction.class, FormDataUpdateAction.class};
   }
 }

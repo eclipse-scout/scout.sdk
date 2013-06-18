@@ -77,6 +77,7 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
             for (int i = 0; i < m_backupTree.length; i++) {
               m_backupTree[i] = new P_BackupNode(null, dirtyStructureRoots[i]);
             }
+            m_treeViewer.setSelection(null, false); // remove the selection. we will restore it later. prevents 'widget disposed' errors during refresh later on.
           }
         });
         // model thread

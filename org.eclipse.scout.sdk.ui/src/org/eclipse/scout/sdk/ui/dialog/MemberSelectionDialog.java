@@ -47,18 +47,31 @@ public class MemberSelectionDialog extends TitleAreaDialog {
   private CheckboxTableViewer m_viewer;
   private EventListenerList m_listeners;
   private final String m_title;
-
-  public MemberSelectionDialog(Shell parentShell, String title, String message) {
-    this(parentShell, title);
-    setMessage(message);
-  }
+  private final String m_message;
 
   public MemberSelectionDialog(Shell parentShell, String title) {
+    this(parentShell, title, null);
+  }
+
+  public MemberSelectionDialog(Shell parentShell, String title, String message) {
     super(parentShell);
     m_title = title;
+    m_message = message;
     m_listeners = new EventListenerList();
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setHelpAvailable(false);
+  }
+
+  @Override
+  protected Control createContents(Composite parent) {
+    Control ret = super.createContents(parent);
+    if (m_message != null) {
+      setMessage(m_message);
+    }
+    if (m_title != null) {
+      setTitle(m_title);
+    }
+    return ret;
   }
 
   @Override

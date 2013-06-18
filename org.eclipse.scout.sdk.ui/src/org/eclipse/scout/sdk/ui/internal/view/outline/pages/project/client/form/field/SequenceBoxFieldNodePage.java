@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction;
+import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -42,7 +42,7 @@ public class SequenceBoxFieldNodePage extends AbstractBoxNodePage {
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
-    if (menu instanceof BoxDeleteAction) {
+    if (menu instanceof FormFieldDeleteAction) {
       menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SequenceboxRemove));
     }
   }

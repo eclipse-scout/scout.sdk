@@ -159,7 +159,6 @@ public class FormDeleteAction extends AbstractScoutHandler {
         members.add(candidate);
       }
     }
-
   }
 
   public IType getFormType() {
@@ -187,7 +186,6 @@ public class FormDeleteAction extends AbstractScoutHandler {
         m_confirmDialog.setMessage(Texts.get("FormDataDeleteWithForm", m_formData.getElementName()), IMessageProvider.WARNING);
       }
       m_confirmDialog.getOkButton().setEnabled(canOk);
-
     }
   }
 }

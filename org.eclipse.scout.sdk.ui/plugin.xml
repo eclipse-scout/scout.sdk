@@ -530,10 +530,9 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ToolbuttonNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.WizardNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.BoxDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.DeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.LookupCallDeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.PropertyBeanDeleteAction"></contextMenu>

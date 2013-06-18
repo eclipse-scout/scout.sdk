@@ -10,28 +10,51 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.delete;
 
-import java.util.LinkedList;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldDeleteOperation;
+import org.eclipse.scout.sdk.operation.form.field.BoxDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 public class FormFieldDeleteAction extends AbstractScoutHandler {
 
-  private LinkedList<IType> m_formFieldTypes;
+  private final Set<IType> m_formFieldTypes;
 
   public FormFieldDeleteAction() {
     super(Texts.get("DeleteWithPopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldRemove), "Delete", true, Category.DELETE);
-    m_formFieldTypes = new LinkedList<IType>();
+    m_formFieldTypes = new LinkedHashSet<IType>();
+  }
+
+  @Override
+  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
+    IType[] members = m_formFieldTypes.toArray(new IType[m_formFieldTypes.size()]);
+
+    MemberSelectionDialog m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteFormField"), Texts.get("SelectFieldsToRemove"));
+    m_confirmDialog.setMembers(members);
+    m_confirmDialog.setSelectedMembers(members);
+
+    if (m_confirmDialog.open() == Dialog.OK) {
+      IMember[] selectedMembers = m_confirmDialog.getSelectedMembers();
+      BoxDeleteOperation[] deleteOperations = new BoxDeleteOperation[selectedMembers.length];
+      for (int i = 0; i < selectedMembers.length; i++) {
+        deleteOperations[i] = new BoxDeleteOperation((IType) selectedMembers[i]);
+      }
+
+      OperationJob job = new OperationJob(deleteOperations);
+      job.schedule();
+    }
+    return null;
   }
 
   @Override
@@ -42,25 +65,6 @@ public class FormFieldDeleteAction extends AbstractScoutHandler {
       }
     }
     return true;
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    if (m_formFieldTypes.size() == 1) {
-      box.setMessage(Texts.get("FieldDeleteConfirmation"));
-    }
-    else {
-      box.setMessage(Texts.get("FieldDeleteConfirmationPlural"));
-    }
-    if (box.open() == SWT.OK) {
-      for (IType t : m_formFieldTypes) {
-        FormFieldDeleteOperation op = new FormFieldDeleteOperation(t, true);
-        OperationJob job = new OperationJob(op);
-        job.schedule();
-      }
-    }
-    return null;
   }
 
   public void addFormFieldType(IType formFieldType) {
