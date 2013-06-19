@@ -12,7 +12,6 @@ package org.eclipse.scout.nls.sdk.internal.ui.action;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,16 +50,16 @@ public class NlsTextCompletionProposalComputer implements IJavaCompletionProposa
   private static final Pattern PATTERN = Pattern.compile("([A-Za-z0-9\\_\\-]*)\\.get\\(\\\"([a-zA-Z0-9\\_\\-]*)");
 
   @Override
-  public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+  public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)) {
-      return Collections.EMPTY_LIST;
+      return new ArrayList<ICompletionProposal>(0);
     }
     JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
     return Arrays.asList(computeProposals(javaContext));
   }
 
   @Override
-  public List computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+  public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     return new ArrayList<IContextInformation>();
   }
 

@@ -59,7 +59,7 @@ public abstract class AbstractScoutSdkTest {
   protected static void showEgitMessageBoxes(boolean show) {
     try {
       // preference store as defined in org.eclipse.ui.plugin.AbstractUIPlugin.getPreferenceStore()
-      IPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), "org.eclipse.egit.ui");
+      IPreferenceStore store = new ScopedPreferenceStore(InstanceScope.INSTANCE, "org.eclipse.egit.ui");
 
       // following constants are coming from class org.eclipse.egit.ui.UIPreferences:
       store.setValue("show_detached_head_warning", show);

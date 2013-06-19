@@ -33,7 +33,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>{@link ScoutRapTargetCreationOperation}</h3> ...
- * 
+ *
  * @author mvi
  * @since 3.8.0 20.03.2012
  */
@@ -67,13 +67,11 @@ public class ScoutRapTargetCreationOperation implements IOperation {
     try {
       final String suffix = ".jar";
       IOUtility.deleteDirectory(getDestinationDirectory());
-      Enumeration urls = getSourcePlugin().findEntries(SCOUT_RAP_TARGET_PLUGIN_SUB_DIR, "*", true);
+      Enumeration<URL> urls = getSourcePlugin().findEntries(SCOUT_RAP_TARGET_PLUGIN_SUB_DIR, "*", true);
       if (urls != null) {
         while (urls.hasMoreElements()) {
-          Object url = urls.nextElement();
-          if (url instanceof URL) {
-            extract((URL) url);
-          }
+          URL url = urls.nextElement();
+          extract((URL) url);
         }
       }
 

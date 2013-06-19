@@ -31,6 +31,8 @@
 
   <properties>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</tycho.scmUrl>
+    <target-platform>eclipse-3.7</target-platform>
+    <platform-version>[3.7,3.8)</platform-version>
   </properties>
 
   <repositories>

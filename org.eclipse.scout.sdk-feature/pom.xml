@@ -55,9 +55,7 @@
             </goals>
             <configuration>
               <excludes>
-                <plugin id="org.eclipse.scout.sdk.compatibility.v35.fragment" />
-                <plugin id="org.eclipse.scout.sdk.compatibility.v36.fragment" />
-                <plugin id="org.eclipse.scout.sdk.compatibility.v37v41.fragment" />
+                <!-- <plugin id="org.eclipse.scout.sdk.compatibility.v37v41.fragment" /> -->
               </excludes>
             </configuration>
           </execution>

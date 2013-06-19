@@ -85,7 +85,7 @@ public class ScoutCompatibilityActivator extends Plugin {
   }
 
   public Object acquireService(String type) {
-    ServiceReference reference = m_context.getServiceReference(type);
+    ServiceReference<?> reference = m_context.getServiceReference(type);
     try {
       if (reference == null) {
         return null;
@@ -120,6 +120,6 @@ public class ScoutCompatibilityActivator extends Plugin {
   }
 
   public <T extends Object> void registerService(Class<T> type, T service) {
-    m_context.registerService(type.getName(), service, new Hashtable(0));
+    m_context.registerService(type.getName(), service, new Hashtable<String, Object>(0));
   }
 }

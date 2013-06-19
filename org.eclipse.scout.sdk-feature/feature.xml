@@ -86,14 +86,6 @@
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.sdk.compatibility.v36.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.scout.sdk.compatibility.v37v41.fragment"
          download-size="0"
          install-size="0"

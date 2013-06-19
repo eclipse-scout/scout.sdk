@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.sql;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -19,6 +19,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.osgi.framework.Bundle;
 
@@ -33,10 +35,10 @@ public class SqlBindFromFormDataCompletionComputer implements IJavaCompletionPro
   private SqlBindCompletionProposalProcessor m_processor = null;
 
   @Override
-  public List computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+  public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)
         || Platform.getBundle(ScoutSdkUi.PLUGIN_ID).getState() != Bundle.ACTIVE) {
-      return Collections.EMPTY_LIST;
+      return new ArrayList<ICompletionProposal>(0);
     }
     if (m_processor == null) {
       m_processor = new SqlBindCompletionProposalProcessor();
@@ -47,7 +49,7 @@ public class SqlBindFromFormDataCompletionComputer implements IJavaCompletionPro
   }
 
   @Override
-  public List computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
+  public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (m_processor == null) {
       m_processor = new SqlBindCompletionProposalProcessor();
     }
