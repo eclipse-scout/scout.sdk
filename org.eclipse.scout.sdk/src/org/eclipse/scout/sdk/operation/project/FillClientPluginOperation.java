@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillClientPluginOperation extends AbstractScoutProjectNewOperation {
@@ -62,7 +63,7 @@ public class FillClientPluginOperation extends AbstractScoutProjectNewOperation 
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    String destPathPref = "src/" + (m_clientProject.getName().replace('.', '/')) + "/";
+    String destPathPref = SdkProperties.DEFAULT_SOURCE_FOLDER_NAME + "/" + m_clientProject.getName().replace('.', '/') + "/";
     Map<String, String> props = getStringProperties();
     new InstallJavaFileOperation("templates/client/src/Activator.java", destPathPref + "Activator.java", m_clientProject, props).run(monitor, workingCopyManager);
     if (isInstallClientSession()) {

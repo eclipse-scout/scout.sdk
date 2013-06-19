@@ -82,7 +82,7 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
     }
   }
 
-  public static IPackageFragment getOrCreatePackageFragment(IJavaProject p, String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  private IPackageFragment getOrCreatePackageFragment(IJavaProject p, String packageName, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IPackageFragment pck = null;
     IPackageFragmentRoot root = p.findPackageFragmentRoot(new Path(IPath.SEPARATOR + p.getProject().getName() + IPath.SEPARATOR + SdkProperties.DEFAULT_SOURCE_FOLDER_NAME));
     pck = root.getPackageFragment(packageName);

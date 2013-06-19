@@ -17,9 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.operation.project.AbstractCreateScoutBundleOperation;
-import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
@@ -71,7 +69,7 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
       new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/startup-body.html", project, "web-resources/startup-body.html").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/logout.html", project, "web-resources/logout.html").run(monitor, workingCopyManager);
 
-      String destPathPref = "src/" + (getCreatedProject().getName().replace('.', '/')) + "/";
+      String destPathPref = SdkProperties.DEFAULT_SOURCE_FOLDER_NAME + "/" + getCreatedProject().getName().replace('.', '/') + "/";
       new InstallJavaFileOperation("templates/ui.rap/src/Activator.java", destPathPref + "Activator.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
       new InstallJavaFileOperation("templates/ui.rap/src/StandaloneRwtEnvironment.java", destPathPref + "StandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
       new InstallJavaFileOperation("templates/ui.rap/src/MobileStandaloneRwtEnvironment.java", destPathPref + "MobileStandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
@@ -79,23 +77,17 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
 
       // dev product
       new InstallTextFileOperation("templates/ui.rap/products/development/config.ini", "products/development/config.ini", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
-      InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/ui.rap/products/development/app-rap-dev.product",
-          "products/development/" + getProjectAlias() + "-rap-dev.product", uiRapBundle, project, getStringProperties());
+      InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/ui.rap/products/development/app-rap-dev.product", "products/development/" + getProjectAlias() + "-rap-dev.product", uiRapBundle, project, getStringProperties());
       devProdInstallOp.run(monitor, workingCopyManager);
       getProperties().setProperty(PROP_PRODUCT_FILE_DEV, devProdInstallOp.getCreatedFile());
-
-      IJavaProject shared = getCreatedBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
-      if (shared != null) {
-        // register development product as project launcher in project-property-part
-        SdkProperties.addProjectProductLauncher(shared.getElementName(), devProdInstallOp.getCreatedFile());
-      }
+      addCreatedProductFile(devProdInstallOp.getCreatedFile());
 
       // prod product
       new InstallTextFileOperation("templates/ui.rap/products/production/config.ini", "products/production/config.ini", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
-      InstallTextFileOperation prodProdInstallOp = new InstallTextFileOperation("templates/ui.rap/products/production/app-rap.product",
-          "products/production/" + getProjectAlias() + "-rap.product", uiRapBundle, project, getStringProperties());
+      InstallTextFileOperation prodProdInstallOp = new InstallTextFileOperation("templates/ui.rap/products/production/app-rap.product", "products/production/" + getProjectAlias() + "-rap.product", uiRapBundle, project, getStringProperties());
       prodProdInstallOp.run(monitor, workingCopyManager);
       getProperties().setProperty(PROP_PRODUCT_FILE_PROD, prodProdInstallOp.getCreatedFile());
+      addCreatedProductFile(prodProdInstallOp.getCreatedFile());
     }
     catch (MalformedURLException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdkRap.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));

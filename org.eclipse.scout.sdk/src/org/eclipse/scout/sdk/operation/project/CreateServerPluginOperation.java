@@ -19,11 +19,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class CreateServerPluginOperation extends AbstractCreateScoutBundleOperation {
@@ -79,23 +77,17 @@ public class CreateServerPluginOperation extends AbstractCreateScoutBundleOperat
     if (isInstallServerProducts()) {
       // dev-product
       new InstallTextFileOperation("templates/server/products/development/config.ini", "products/development/config.ini", project, props).run(monitor, workingCopyManager);
-      InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/server/products/development/app-server-dev.product",
-          "products/development/" + getProjectAlias() + "-server-dev.product", project, props);
+      InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/server/products/development/app-server-dev.product", "products/development/" + getProjectAlias() + "-server-dev.product", project, props);
       devProdInstallOp.run(monitor, workingCopyManager);
       getProperties().setProperty(PROP_PRODUCT_FILE_DEV, devProdInstallOp.getCreatedFile());
-
-      IJavaProject shared = getCreatedBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
-      if (shared != null) {
-        // register development product as project launcher in project-property-part
-        SdkProperties.addProjectProductLauncher(shared.getElementName(), devProdInstallOp.getCreatedFile());
-      }
+      addCreatedProductFile(devProdInstallOp.getCreatedFile());
 
       // prod-product
       new InstallTextFileOperation("templates/server/products/production/config.ini", "products/production/config.ini", project, props).run(monitor, workingCopyManager);
-      InstallTextFileOperation prodProdInstallOp = new InstallTextFileOperation("templates/server/products/production/app-server.product",
-          "products/production/" + getProjectAlias() + "-server.product", project, props);
+      InstallTextFileOperation prodProdInstallOp = new InstallTextFileOperation("templates/server/products/production/app-server.product", "products/production/" + getProjectAlias() + "-server.product", project, props);
       prodProdInstallOp.run(monitor, workingCopyManager);
       getProperties().setProperty(PROP_PRODUCT_FILE_PROD, prodProdInstallOp.getCreatedFile());
+      addCreatedProductFile(prodProdInstallOp.getCreatedFile());
     }
 
     if (isInstallHtmlResources()) {

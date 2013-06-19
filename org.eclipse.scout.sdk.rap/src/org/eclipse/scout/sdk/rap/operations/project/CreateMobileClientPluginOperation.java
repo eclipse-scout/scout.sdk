@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.osgi.framework.Bundle;
@@ -57,7 +58,7 @@ public class CreateMobileClientPluginOperation extends AbstractCreateScoutBundle
     new InstallTextFileOperation("templates/client.mobile/plugin.xml", "plugin.xml", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/client.mobile/build.properties", "build.properties", uiRapBundle, project, getStringProperties()).run(monitor, workingCopyManager);
 
-    String destPathPref = "src/" + (getCreatedProject().getName().replace('.', '/')) + "/";
+    String destPathPref = SdkProperties.DEFAULT_SOURCE_FOLDER_NAME + "/" + getCreatedProject().getName().replace('.', '/') + "/";
     new InstallJavaFileOperation("templates/client.mobile/src/Activator.java", destPathPref + "Activator.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
 
     // Add logoff texts

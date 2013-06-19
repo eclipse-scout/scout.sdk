@@ -8,6 +8,9 @@ public interface IScoutProjectNewOperation extends IOperation {
   // list of java projects that have been created so far
   String PROP_CREATED_BUNDLES = "CREATED_BUNDLES";
 
+  // list of product files that have been created so far
+  String PROP_CREATED_PRODUCT_FILES = "CREATED_PRODUCT_FILES";
+
   // project properties that are always present
   String PROP_PROJECT_NAME = "GROUP";
   String PROP_PROJECT_ALIAS = "ALIAS";

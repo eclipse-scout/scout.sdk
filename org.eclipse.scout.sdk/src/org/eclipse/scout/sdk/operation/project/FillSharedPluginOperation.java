@@ -17,6 +17,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillSharedPluginOperation extends AbstractScoutProjectNewOperation {
@@ -55,7 +56,7 @@ public class FillSharedPluginOperation extends AbstractScoutProjectNewOperation 
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String txtSvcName = getTextProviderServiceName();
 
-    String destPathPref = "src/" + (m_project.getName().replace('.', '/')) + "/";
+    String destPathPref = SdkProperties.DEFAULT_SOURCE_FOLDER_NAME + "/" + m_project.getName().replace('.', '/') + "/";
     Map<String, String> props = getStringProperties();
     new InstallJavaFileOperation("templates/shared/src/Activator.java", destPathPref + "Activator.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/Icons.java", destPathPref + "Icons.java", m_project, props).run(monitor, workingCopyManager);

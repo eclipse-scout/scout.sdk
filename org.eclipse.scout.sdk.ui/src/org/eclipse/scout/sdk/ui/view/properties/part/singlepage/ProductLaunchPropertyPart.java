@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
@@ -37,6 +36,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedViewPart {
   private static final String SECTION_ID_LINKS = "section.links";
+  private static final String PRODUCT_FOLDER = "products";
 
   final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
   final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
@@ -55,7 +55,7 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
   protected void fillLinkSection(Composite parent) {
     IScoutBundle bundle = getPage().getScoutBundle();
     if (bundle != null && !bundle.isBinary()) {
-      IResource resource = bundle.getProject().findMember(SdkProperties.PRODUCT_FOLDER);
+      IResource resource = bundle.getProject().findMember(PRODUCT_FOLDER);
       if (resource != null && resource.exists() && resource.getType() == IResource.FOLDER) {
         // spider products
         IFolder productFolder = (IFolder) resource;

@@ -11,7 +11,9 @@
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
 import java.util.ArrayList;
+import java.util.List;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -25,18 +27,22 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ScoutProjectPropertyPart;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.INewWizard;
@@ -115,6 +121,20 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
         job.join();
       }
       catch (InterruptedException e) {
+      }
+
+      // save the default product launchers
+      String sharedName = properties.getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class);
+      if (StringUtility.hasText(sharedName)) {
+        @SuppressWarnings("unchecked")
+        List<IFile> productFiles = properties.getProperty(IScoutProjectNewOperation.PROP_CREATED_PRODUCT_FILES, List.class);
+        if (productFiles != null && productFiles.size() > 0) {
+          for (IFile productFile : productFiles) {
+            if (ResourceUtility.exists(productFile) && productFile.getName().contains("dev")) {
+              ScoutProjectPropertyPart.addProjectProductLauncher(sharedName, productFile);
+            }
+          }
+        }
       }
 
       // wait until all jobs have finished

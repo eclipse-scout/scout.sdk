@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.osgi.framework.Bundle;
@@ -32,7 +33,7 @@ import org.osgi.framework.Bundle;
  */
 public class InstallJavaFileOperation extends InstallTextFileOperation {
   public InstallJavaFileOperation(String srcPath, String rootPackageRelativeDestPath, IScoutBundle scoutBundle, Map<String, String> properties) {
-    this(srcPath, "src/" + (scoutBundle.getSymbolicName().replace('.', '/')) + "/" + rootPackageRelativeDestPath, scoutBundle.getProject(), properties);
+    this(srcPath, SdkProperties.DEFAULT_SOURCE_FOLDER_NAME + "/" + scoutBundle.getSymbolicName().replace('.', '/') + "/" + rootPackageRelativeDestPath, scoutBundle.getProject(), properties);
   }
 
   public InstallJavaFileOperation(String srcPath, String destPath, IProject project, Map<String, String> properties) {

@@ -159,7 +159,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   private Collection<P_OperationElement> getRootOperations(Collection<P_OperationElement> nodes) {
-    ArrayList<P_OperationElement> roots = new ArrayList<ScoutProjectNewOperation.P_OperationElement>();
+    ArrayList<P_OperationElement> roots = new ArrayList<P_OperationElement>();
     for (P_OperationElement el : nodes) {
       if (el.parent == null) {
         roots.add(el);
@@ -200,13 +200,13 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   protected void putInitialProperties() {
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_EXEC_ENV, computeExecutionEnvironment());
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_OS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_OS));
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_WS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_WS));
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_ARCH, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_ARCH));
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_LOCALHOST, getHostName());
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_CURRENT_DATE, SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT).format(new Date()));
-    getProperties().setProperty(IScoutProjectNewOperation.PROP_USER_NAME, System.getProperty("user.name"));
+    getProperties().setProperty(PROP_EXEC_ENV, computeExecutionEnvironment());
+    getProperties().setProperty(PROP_OS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_OS));
+    getProperties().setProperty(PROP_WS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_WS));
+    getProperties().setProperty(PROP_ARCH, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_ARCH));
+    getProperties().setProperty(PROP_LOCALHOST, getHostName());
+    getProperties().setProperty(PROP_CURRENT_DATE, SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT).format(new Date()));
+    getProperties().setProperty(PROP_USER_NAME, System.getProperty("user.name"));
     getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, "Default");
   }
 

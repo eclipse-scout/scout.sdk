@@ -18,11 +18,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -79,16 +77,12 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
     InstallTextFileOperation devProdInstallOp = new InstallTextFileOperation("templates/ui.swt/products/development/app-client-dev.product", "products/development/" + getProjectAlias() + "-swt-client-dev.product", project, props);
     devProdInstallOp.run(monitor, workingCopyManager);
     getProperties().setProperty(PROP_PRODUCT_FILE_DEV, devProdInstallOp.getCreatedFile());
+    addCreatedProductFile(devProdInstallOp.getCreatedFile());
 
     new InstallTextFileOperation("templates/ui.swt/products/production/config.ini", "products/production/config.ini", project, props).run(monitor, workingCopyManager);
     InstallTextFileOperation prodProdInstallOp = new InstallTextFileOperation("templates/ui.swt/products/production/app-client.product", "products/production/" + getProjectAlias() + "-swt-client.product", project, props);
     prodProdInstallOp.run(monitor, workingCopyManager);
     getProperties().setProperty(PROP_PRODUCT_FILE_PROD, prodProdInstallOp.getCreatedFile());
-
-    IJavaProject shared = getCreatedBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
-    if (shared != null) {
-      // register development product as project launcher in project-property-part
-      SdkProperties.addProjectProductLauncher(shared.getElementName(), devProdInstallOp.getCreatedFile());
-    }
+    addCreatedProductFile(prodProdInstallOp.getCreatedFile());
   }
 }

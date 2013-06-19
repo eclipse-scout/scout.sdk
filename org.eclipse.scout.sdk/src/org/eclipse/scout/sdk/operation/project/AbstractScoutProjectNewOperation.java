@@ -1,11 +1,13 @@
 package org.eclipse.scout.sdk.operation.project;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
@@ -31,6 +33,10 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     }
   }
 
+  protected final void addCreatedProductFile(IFile file) {
+    getCreatedProductFiles().add(file);
+  }
+
   protected final void addCreatedBundle(IJavaProject javaProject) {
     getCreatedBundlesList().add(javaProject);
   }
@@ -49,8 +55,18 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
   }
 
   @SuppressWarnings("unchecked")
-  protected List<IJavaProject> getCreatedBundlesList() {
+  protected final List<IJavaProject> getCreatedBundlesList() {
     return getProperties().getProperty(PROP_CREATED_BUNDLES, List.class);
+  }
+
+  @SuppressWarnings("unchecked")
+  public final synchronized List<IFile> getCreatedProductFiles() {
+    List<IFile> list = getProperties().getProperty(PROP_CREATED_PRODUCT_FILES, List.class);
+    if (list == null) {
+      list = new ArrayList<IFile>();
+      getProperties().setProperty(PROP_CREATED_PRODUCT_FILES, list);
+    }
+    return list;
   }
 
   @SuppressWarnings("unchecked")

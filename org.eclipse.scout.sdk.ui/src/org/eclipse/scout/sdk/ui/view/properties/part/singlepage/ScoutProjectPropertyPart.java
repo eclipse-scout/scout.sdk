@@ -15,15 +15,21 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.dialog.ProductSelectionDialog;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
@@ -35,7 +41,6 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Techno
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.Section;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
@@ -45,6 +50,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
+import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * <h3>{@link ScoutProjectPropertyPart}</h3> ...
@@ -58,6 +64,8 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
   private static final String SECTION_ID_PRODUCT_LAUNCHER = "section.productLauncher";
   private static final String SECTION_ID_VERSION = "section.version";
   private static final String SECTION_ID_TECHNOLOGY = "section.technology";
+
+  private static final String PROJECT_PROD_LAUNCHERS = "pref_scout_project_prod_launcher";
 
   private ArrayList<ProductLaunchPresenter> m_launchPresenters = new ArrayList<ProductLaunchPresenter>();
 
@@ -196,7 +204,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   @Override
   public void init(IMemento memento) {
-    refreshProductLaunchPresenters(SdkProperties.getProjectProductLaunchers(getScoutProject().getSymbolicName()));
+    refreshProductLaunchPresenters(getProjectProductLaunchers(getScoutProject().getSymbolicName()));
   }
 
   @Override
@@ -205,7 +213,60 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     for (int i = 0; i < files.length; i++) {
       files[i] = m_launchPresenters.get(i).getProductFile();
     }
-    SdkProperties.saveProjectProductLaunchers(getScoutProject().getSymbolicName(), files);
+    saveProjectProductLaunchers(getScoutProject().getSymbolicName(), files);
+  }
+
+  public static void saveProjectProductLaunchers(String projectName, IFile[] productFiles) {
+    StringBuilder mementoString = new StringBuilder();
+    for (int i = 0; i < productFiles.length; i++) {
+      mementoString.append(productFiles[i].getFullPath());
+      if (i < productFiles.length - 1) {
+        mementoString.append(",");
+      }
+    }
+    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
+    node.put(PROJECT_PROD_LAUNCHERS + "_" + projectName, mementoString.toString());
+    try {
+      node.flush();
+    }
+    catch (BackingStoreException e) {
+      ScoutSdkUi.logError("unable to persist project product launcher settings.", e);
+    }
+  }
+
+  public static void addProjectProductLauncher(String projectName, IFile productFile) {
+    IFile[] existingLaunchers = getProjectProductLaunchers(projectName);
+    IPath path = productFile.getFullPath();
+    for (IFile existing : existingLaunchers) {
+      if (existing.getFullPath().equals(path)) {
+        return; /* this entry already exists */
+      }
+    }
+
+    IFile[] newProdFiles = new IFile[existingLaunchers.length + 1];
+    System.arraycopy(existingLaunchers, 0, newProdFiles, 0, existingLaunchers.length);
+    newProdFiles[existingLaunchers.length] = productFile;
+    saveProjectProductLaunchers(projectName, newProdFiles);
+  }
+
+  public static IFile[] getProjectProductLaunchers(String projectName) {
+    ArrayList<IFile> products = new ArrayList<IFile>();
+    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
+    String mementoProducts = node.get(PROJECT_PROD_LAUNCHERS + "_" + projectName, "");
+    if (!StringUtility.isNullOrEmpty(mementoProducts)) {
+      String[] productLocations = mementoProducts.split(",\\s*");
+      if (productLocations != null && productLocations.length > 0) {
+        for (String productPath : productLocations) {
+          if (!StringUtility.isNullOrEmpty(productPath)) {
+            IFile productFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(productPath));
+            if (productFile != null && productFile.exists()) {
+              products.add(productFile);
+            }
+          }
+        }
+      }
+    }
+    return products.toArray(new IFile[products.size()]);
   }
 
   private class P_ProductFile {
