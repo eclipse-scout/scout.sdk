@@ -224,7 +224,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
         mementoString.append(",");
       }
     }
-    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
+    IEclipsePreferences node = InstanceScope.INSTANCE.getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
     node.put(PROJECT_PROD_LAUNCHERS + "_" + projectName, mementoString.toString());
     try {
       node.flush();
@@ -251,7 +251,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   public static IFile[] getProjectProductLaunchers(String projectName) {
     ArrayList<IFile> products = new ArrayList<IFile>();
-    IEclipsePreferences node = new InstanceScope().getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
+    IEclipsePreferences node = InstanceScope.INSTANCE.getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
     String mementoProducts = node.get(PROJECT_PROD_LAUNCHERS + "_" + projectName, "");
     if (!StringUtility.isNullOrEmpty(mementoProducts)) {
       String[] productLocations = mementoProducts.split(",\\s*");
