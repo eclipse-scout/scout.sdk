@@ -21,9 +21,9 @@ import org.eclipse.pde.internal.core.target.provisional.IBundleContainer;
 import org.eclipse.pde.internal.core.target.provisional.ITargetDefinition;
 import org.eclipse.pde.internal.core.target.provisional.ITargetHandle;
 import org.eclipse.pde.internal.core.target.provisional.ITargetPlatformService;
-import org.eclipse.pde.internal.core.target.provisional.LoadTargetDefinitionJob;
 import org.eclipse.scout.sdk.compatibility.internal.ScoutCompatibilityActivator;
 import org.eclipse.scout.sdk.compatibility.internal.service.ITargetPlatformCompatService;
+import org.eclipse.scout.sdk.compatibility.v36.internal.provisional.LoadTargetDefinitionJobSync;
 
 @SuppressWarnings("restriction")
 public class TargetPlatformCompatService implements ITargetPlatformCompatService {
@@ -58,7 +58,7 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
   private IStatus resolveTarget(ITargetDefinition def, boolean loadPlatform, IProgressMonitor monitor) {
     IStatus result = def.resolve(monitor);
     if (loadPlatform && result.isOK()) {
-      LoadTargetDefinitionJob loadJob = new LoadTargetDefinitionJob(def);
+      LoadTargetDefinitionJobSync loadJob = new LoadTargetDefinitionJobSync(def);
       result = loadJob.run(monitor);
     }
     return result;
