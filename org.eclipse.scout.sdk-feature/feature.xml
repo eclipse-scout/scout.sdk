@@ -24,9 +24,9 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.pde" version="3.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.platform" version="3.5.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.5.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.pde" version="3.7.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="3.7.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.jdt" version="3.7.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -103,6 +103,14 @@
 
    <plugin
          id="org.eclipse.scout.sdk.compatibility.v43.fragment"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         fragment="true"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.compatibility.v44.fragment"
          download-size="0"
          install-size="0"
          version="0.0.0"

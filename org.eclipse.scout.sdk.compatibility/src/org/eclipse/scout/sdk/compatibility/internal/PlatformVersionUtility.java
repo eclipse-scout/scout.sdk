@@ -13,7 +13,15 @@ public final class PlatformVersionUtility {
    * @return
    */
   public static boolean isLatest() {
-    return isKepler();
+    return isLuna();
+  }
+
+  public static boolean isLuna() {
+    return isLuna(getPlatformVersion());
+  }
+
+  public static boolean isLuna(Version v) {
+    return v.getMajor() == 4 && v.getMinor() == 4;
   }
 
   public static boolean isKepler() {

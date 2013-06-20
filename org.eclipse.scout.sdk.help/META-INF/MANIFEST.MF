@@ -5,10 +5,12 @@ Bundle-SymbolicName: org.eclipse.scout.sdk.help;singleton:=true
 Bundle-Version: 3.10.0.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.help.internal.ScoutSdkHelpActivator
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.ui.intro,
- org.eclipse.ui.workbench,
- org.eclipse.scout.sdk.ui,
- org.eclipse.scout.sdk.util
+Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)",
+ org.eclipse.ui.intro;bundle-version="[3.4.0,4.0.0)",
+ org.eclipse.ui.workbench;bundle-version="[3.7.0,4.0.0)",
+ org.eclipse.scout.sdk.ui;bundle-version="[3.10.0,3.11.0)",
+ org.eclipse.scout.sdk.util;bundle-version="[3.10.0,3.11.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
+Export-Package: org.eclipse.scout.sdk.help.internal,
+ org.eclipse.scout.sdk.help.internal.action
