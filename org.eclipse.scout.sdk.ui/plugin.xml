@@ -42,6 +42,48 @@
          <perspectiveShortcut
                id="org.eclipse.pde.ui.PDEPerspective">
          </perspectiveShortcut>
+         <newWizardShortcut
+               id="org.eclipse.pde.ui.NewProjectWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.pde.ui.NewFragmentWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.pde.ui.NewFeatureProjectWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.jdt.ui.wizards.NewPackageCreationWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.jdt.ui.wizards.NewClassCreationWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.jdt.ui.wizards.NewInterfaceCreationWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.jdt.ui.wizards.NewSourceFolderCreationWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.jdt.ui.wizards.NewEnumCreationWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.jdt.ui.wizards.NewAnnotationCreationWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.scout.newWorkingSetWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.jdt.ui.wizards.NewJavaWorkingSetWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.pde.ui.NewProductConfigurationWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.ui.wizards.new.folder">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.ui.wizards.new.file">
+         </newWizardShortcut>
       </perspectiveExtension>
    </extension>
       <extension
@@ -91,12 +133,20 @@
       <wizard
             category="org.eclipse.scout.sdk"
             class="org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizard"
-            finalPerspective="org.eclipse.pde.ui.PDEPerspective"
+            finalPerspective="org.eclipse.scout.sdk.ui.internal.ScoutPerspective"
             hasPages="true"
             icon="resources/icons/projectGroup_add.png"
             id="org.eclipse.scout.newProjectWizard"
             name="Scout Project"
             project="true"/>
+      <wizard
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.wizard.workingset.NewScoutWorkingSetWizard"
+            icon="resources/icons/scoutWorkingSet.png"
+            id="org.eclipse.scout.newWorkingSetWizard"
+            name="Scout Working Set"
+            preferredPerspectives="org.eclipse.scout.sdk.ui.internal.ScoutPerspective">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

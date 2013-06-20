@@ -63,7 +63,7 @@ public class NewScoutWorkingSetDialog extends Dialog {
   }
 
   private static boolean isValid(String txt, String[] usedNames) {
-    if (!isValid(txt)) {
+    if (!isValid(txt, (String) null)) {
       return false;
     }
 
@@ -79,14 +79,16 @@ public class NewScoutWorkingSetDialog extends Dialog {
     return true;
   }
 
-  public static boolean isValid(String txt) {
+  public static boolean isValid(String txt, String oldName) {
     if (!StringUtility.hasText(txt)) {
       return false;
     }
 
     // working set must not exist yet
-    if (PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(txt) != null) {
-      return false;
+    if (!CompareUtility.equals(txt, oldName)) {
+      if (PlatformUI.getWorkbench().getWorkingSetManager().getWorkingSet(txt) != null) {
+        return false;
+      }
     }
 
     // name cannot contain the delimiter used to persist the sets

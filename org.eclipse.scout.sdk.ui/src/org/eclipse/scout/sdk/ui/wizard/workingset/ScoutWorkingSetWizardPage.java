@@ -33,14 +33,26 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
   private CheckableTree m_availableBundlesTree;
   private TextField m_nameField;
   private IWorkingSet m_currentWorkingSet;
+  private boolean m_createNewSet;
+  private String m_title;
+  private String m_oldWorkingSetName;
 
   public ScoutWorkingSetWizardPage() {
-    super(Texts.get("ConfigureScoutWorkingSets"), Texts.get("ConfigureScoutWorkingSets"), null);
+    super(ScoutWorkingSetWizardPage.class.getName(), null, null);
     setMessage(Texts.get("WorkingSetsMsg"));
   }
 
   @Override
   public void createControl(Composite parent) {
+    m_createNewSet = getSelection() == null;
+    if (m_createNewSet) {
+      setTitle(Texts.get("NewScoutWorkingSet"));
+    }
+    else {
+      setTitle(Texts.get("ConfigureScoutWorkingSets"));
+      m_oldWorkingSetName = getSelection().getName();
+    }
+
     Composite p = new Composite(parent, SWT.NONE);
 
     m_nameField = new TextField(p, Texts.get("Name") + ":", 7);
@@ -57,7 +69,7 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
     m_availableBundlesTree.setDragDetect(false);
 
     // init values
-    if (getSelection() != null) {
+    if (!m_createNewSet) {
       m_nameField.setText(getSelection().getName());
 
       ArrayList<ITreeNode> checked = new ArrayList<ITreeNode>();
@@ -111,7 +123,7 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
       elements[i] = (IAdaptable) checkedNodes[i].getData();
     }
 
-    if (getSelection() == null) {
+    if (m_createNewSet) {
       // new
       IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
       setSelection(workingSetManager.createWorkingSet(workingSetName, elements));
@@ -126,7 +138,7 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
   private void validatePage() {
     String errorMessage = null;
 
-    if (!NewScoutWorkingSetDialog.isValid(m_nameField.getText())) {
+    if (!NewScoutWorkingSetDialog.isValid(m_nameField.getText(), m_oldWorkingSetName)) {
       errorMessage = Texts.get("NameNotValid");
     }
 
