@@ -79,6 +79,10 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     return m_bundleGraph;
   }
 
+  synchronized int getNumBundleGraphRebuildJobs() {
+    return Job.getJobManager().find(BUNDLE_GRAPH_REBUILD_JOB_FAMILY).length;
+  }
+
   /**
    * Schedules a job that rebuilds the scout bundle graph (asynchronously).
    * After finishing, changes are reported using the {@link IScoutWorkspaceListener}
@@ -86,7 +90,6 @@ public final class ScoutWorkspace implements IScoutWorkspace {
    * @see IScoutWorkspace#addWorkspaceListener(IScoutWorkspaceListener)
    */
   public void rebuildGraph() {
-    Job.getJobManager().cancel(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
     final P_BundleGraphRebuildJob j = createBundleGraphRebuildJob();
     j.addJobChangeListener(new JobChangeAdapter() {
       @Override
@@ -96,7 +99,11 @@ public final class ScoutWorkspace implements IScoutWorkspace {
         }
       }
     });
-    j.schedule();
+
+    synchronized (this) {
+      Job.getJobManager().cancel(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+      j.schedule();
+    }
   }
 
   private P_BundleGraphRebuildJob createBundleGraphRebuildJob() {

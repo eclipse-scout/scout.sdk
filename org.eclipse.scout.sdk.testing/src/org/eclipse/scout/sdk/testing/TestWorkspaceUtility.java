@@ -49,11 +49,28 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Assert;
 import org.osgi.framework.Bundle;
 
+/**
+ * <h3>{@link TestWorkspaceUtility}</h3>Contains helper methods that affect the running workspace.
+ * 
+ * @author aho
+ * @since 3.9.0 15.03.2013
+ */
 public final class TestWorkspaceUtility {
 
   private TestWorkspaceUtility() {
   }
 
+  /**
+   * Copies and creates the given Eclipse projects in the current workspace.
+   * 
+   * @param resourceBundle
+   *          The bundle that contains the project resources.
+   * @param baseFolder
+   *          The folder (inside the bundle) that contains the project folders
+   * @param projects
+   *          Array of project names (folder names inside the base folder that contain a .project file).
+   * @throws Exception
+   */
   public static void setupWorkspace(Bundle resourceBundle, String baseFolder, String... projects) throws Exception {
     Assert.assertNotNull("baseFolder must not be null", baseFolder);
     if (projects == null || projects.length == 0) {
@@ -96,6 +113,14 @@ public final class TestWorkspaceUtility {
     JdtUtility.waitForSilentWorkspace();
   }
 
+  /**
+   * Executes the given operations and builds the workspace afterwards. This method blocks until the workspace build has
+   * completed.
+   * 
+   * @param ops
+   *          The operations to execute.
+   * @throws Exception
+   */
   public static void executeAndBuildWorkspace(IOperation... ops) throws Exception {
     OperationJob job = new OperationJob(ops);
     job.schedule();
@@ -133,6 +158,11 @@ public final class TestWorkspaceUtility {
     builder.append(status.getMessage());
   }
 
+  /**
+   * Recompiles the entire workspace. This method blocks until the build has been completed.
+   * 
+   * @throws CoreException
+   */
   public static void buildWorkspace() throws CoreException {
     ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
     JdtUtility.waitForRefresh();
@@ -161,6 +191,14 @@ public final class TestWorkspaceUtility {
     }
   }
 
+  /**
+   * Imports and opens the given project in the workspace.
+   * 
+   * @param projectName
+   *          The name of the project
+   * @return The created project.
+   * @throws CoreException
+   */
   public static IProject createProject(String projectName) throws CoreException {
     IProgressMonitor monitor = new NullProgressMonitor();
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
@@ -246,7 +284,6 @@ public final class TestWorkspaceUtility {
   }
 
   public void printWorkspace(String title, PrintStream out) {
-
     out.println("---print WS [" + title + "] ----");
     out.println("Bundles:");
     for (IScoutBundle b : ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter())) {
@@ -266,6 +303,19 @@ public final class TestWorkspaceUtility {
     out.println("--- END [" + title + "] ----");
   }
 
+  /**
+   * Appends the content of a file in the workspace to a {@link StringBuilder}.
+   * 
+   * @param project
+   *          The project that contains the file.
+   * @param ressourcePath
+   *          The project relative path to the file. Must exist.
+   * @param source
+   *          The builder to which the content of the given file should be appended. Must not be null.
+   * @param lineDelimiter
+   *          The line delimiter that should be used when appending lines to the builder.
+   * @throws CoreException
+   */
   public static void copyTemplateToBuffer(IProject project, String ressourcePath, StringBuilder source, String lineDelimiter) throws CoreException {
     BufferedReader reader = null;
     try {
@@ -288,5 +338,4 @@ public final class TestWorkspaceUtility {
       }
     }
   }
-
 }

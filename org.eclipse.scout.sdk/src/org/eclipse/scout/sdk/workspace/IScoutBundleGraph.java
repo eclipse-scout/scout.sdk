@@ -90,4 +90,26 @@ public interface IScoutBundleGraph {
    */
   IScoutBundle getBundle(String symbolicName);
 
+  /**
+   * Waits until the bundle graph has been built.<br>
+   * <p>
+   * More formally: If there are no bundle-graph-rebuild-jobs running or waiting, this method returns immediately.<br>
+   * Otherwise this method blocks until:
+   * <ol>
+   * <li>all rebuild-jobs have finished (completed or cancelled)</li>
+   * <li>and there is not a follow-up rebuild-job re-scheduled.</li>
+   * </ol>
+   * Note: If two rebuild-jobs are executed consecutively (the first can complete before the second starts), this method
+   * returns after the first build job has completed.
+   * </p>
+   * <p>
+   * <strong>Use case example:<br>
+   * </strong> If multiple modifications are applied to a manifest.mf file this may result in several plug-in model
+   * changes. This causes the bundle graph to start a re-build for each modification. But all except the last
+   * rebuild-job are cancelled because they would operate on obsolete plug-in models. This method blocks until all of
+   * these jobs have finished and the plug-in model changes have been processed by the bundle graph.<br>
+   * </p>
+   */
+  void waitFor();
+
 }

@@ -46,7 +46,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   private final Set<String> m_dependencyIssues;
   private final ReentrantReadWriteLock m_lock;
 
-  private Map<String /*symbolic name*/, ScoutBundle> m_bundleGraph;
+  private volatile Map<String /*symbolic name*/, ScoutBundle> m_bundleGraph;
   private Map<IPath, IPluginModelBase> m_targetPlatformBundles;
 
   ScoutBundleGraph() {
@@ -229,8 +229,12 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
     }
   }
 
-  private IScoutBundle getBundleNoLock(String symbolicName) {
-    return m_bundleGraph.get(symbolicName);
+  @Override
+  public void waitFor() {
+    do {
+      JdtUtility.waitForJobFamily(ScoutWorkspace.BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+    }
+    while (ScoutWorkspace.getInstance().getNumBundleGraphRebuildJobs() > 0);
   }
 
   private void ensureGraphCreated() {
@@ -238,8 +242,13 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
       // When first accessing the bundle graph (using the scout workspace) it is initialized asynchronously.
       // The build of the graph is executed in an own job which may lead to a not initialized graph when first using it (when the job has not completed yet).
       // This method blocks until the job has finished and the graph is initialized to ensure clients get a result when accessing the graph.
+      // Because the first calculation of the bundle graph cannot be cancelled there is no need to wait for subsequent builds (no need to call waitFor()).
       JdtUtility.waitForJobFamily(ScoutWorkspace.BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
     }
+  }
+
+  private IScoutBundle getBundleNoLock(String symbolicName) {
+    return m_bundleGraph.get(symbolicName);
   }
 
   private static Map<IPath, IPluginModelBase> getTargetPlatformBundles() {

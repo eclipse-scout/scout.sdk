@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>BcUtilities</h3> ...
+ * <h3>ScoutUtility</h3>Contains scout specific utility methods.
  */
 public final class ScoutUtility {
 
@@ -70,8 +70,7 @@ public final class ScoutUtility {
   /**
    * strips a (IMethod) method body from its comments
    * this is needed in order to avoid wrong method property
-   * assignments (e.g. if a commented "@BsiCaseBeanProperty"
-   * annotation exists, then this method is NO BsiCaseBeanProperty
+   * assignments.
    * 
    * @param methodBody
    * @return
