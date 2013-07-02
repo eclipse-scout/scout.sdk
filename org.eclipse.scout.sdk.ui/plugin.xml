@@ -993,6 +993,19 @@
             class="org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j.Docx4jDesktopTechnologyHandler"
             technology="scout.technology.common.docx4j">
       </handler>
+      <technology
+            category="General Features"
+            id="scout.technology.common.f2"
+            name="F2 Support">
+      </technology>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.f2.F2ManifestTechnologyHandler"
+            technology="scout.technology.common.f2">
+      </handler>
+      <handler
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.f2.F2ProdTechnologyHandler"
+            technology="scout.technology.common.f2">
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.workingSets">

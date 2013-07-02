@@ -53,4 +53,9 @@ public interface IMarketplaceConstants {
   String SCOUT_LOGGING_BRIDGE_FEATURE_URL = "http://tools.bsiag.com/marketplace/logging_bridge/3.9";
   String LOGGING_BRIDGE_FEATURE = "org.eclipse.scout.logging.bridges.source.feature.group";
   String LOGGING_BRIDGE_LOG4J_FRAGMENT = "org.eclipse.scout.commons.log4j.bridge.fragment";
+
+  // f2
+  String F2_FEATURE_URL = "http://tools.bsiag.com/marketplace/f2/1.0";
+  String F2_FEATURE = "org.eclipse.update-f2.source.feature.group";
+  String F2_PLUGIN = "org.eclipse.update.f2";
 }
