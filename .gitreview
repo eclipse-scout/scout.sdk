@@ -1,0 +1,7 @@
+[gerrit]
+host=git.eclipse.org
+port=29418
+project=scout/org.eclipse.scout.sdk.git
+defaultbranch=release/3.9.1
+defaultremote=origin
+defaultrebase=0
