@@ -32,7 +32,7 @@ public class MultipleFormDataUpdateOperation implements IOperation {
 
   @Override
   public String getOperationName() {
-    return "update formdatas...";
+    return "Update Form Datas...";
   }
 
   @Override
@@ -45,8 +45,14 @@ public class MultipleFormDataUpdateOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     validate();
-    for (IType t : getTypes()) {
+    IType[] types = getTypes();
+    monitor.beginTask("Updating Form Datas", types.length);
+    int i = 0;
+    for (IType t : types) {
+      i++;
+      monitor.setTaskName("Updating Form Data " + i + " of " + types.length + " (" + t.getElementName() + ")");
       new FormDataUpdateOperation(t).run(monitor, workingCopyManager);
+      monitor.worked(1);
     }
   }
 

@@ -57,6 +57,7 @@ import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility;
+import org.eclipse.scout.sdk.operation.page.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -491,6 +492,78 @@ public class ScoutTypeUtility extends TypeUtility {
         formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
       }
     }
+  }
+
+  /**
+   * Parses the possible available {@link IRuntimeClasses#PageData} annotation on the given type. If the type is not
+   * annotated, <code>null</code> is returned.
+   * 
+   * @since 3.10.0-M1
+   */
+  public static PageDataAnnotation findPageDataAnnotation(IType type) throws JavaModelException {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
+
+    try {
+      String typeSignature = getPageDataAnnotationValue(type);
+      if (StringUtility.isNullOrEmpty(typeSignature)) {
+        return null;
+      }
+
+      IType tmpType = type;
+      String superTypeSignature = null;
+      IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+
+      do {
+        org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy = tmpType.newSupertypeHierarchy(null);
+        if (!superTypeHierarchy.contains(iPageWithTable)) {
+          break;
+        }
+
+        tmpType = superTypeHierarchy.getSuperclass(tmpType);
+        superTypeSignature = getPageDataAnnotationValue(tmpType);
+      }
+      while (superTypeSignature == null && tmpType != null);
+
+      if (superTypeSignature == null) {
+        superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractTablePageData, true);
+      }
+
+      return new PageDataAnnotation(typeSignature, superTypeSignature);
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not parse @PageData annotation of type '" + type.getFullyQualifiedName() + "'.", e);
+    }
+
+    return null;
+  }
+
+  /**
+   * Checks whether the given type is annotated with a {@link IRuntimeClasses#PageData} annotation and if so, this
+   * method returns its <code>value()</code>. Otherwise <code>null</code>.
+   * 
+   * @since 3.10.0-M1
+   */
+  private static String getPageDataAnnotationValue(IType type) throws JavaModelException {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
+
+    IAnnotation annotation = JdtUtility.getAnnotation(type, RuntimeClasses.PageData);
+    if (!TypeUtility.exists(annotation)) {
+      return null;
+    }
+
+    for (IMemberValuePair p : annotation.getMemberValuePairs()) {
+      if ("value".equals(p.getMemberName())) {
+        Object value = p.getValue();
+        String simpleName = ((String) value).replaceAll("\\.class$", "");
+        return ScoutUtility.getReferencedTypeSignature(type, simpleName);
+      }
+    }
+
+    return null;
   }
 
   public static IType[] getPotentialMasterFields(IType field) {

@@ -1,8 +1,9 @@
 package formdata.shared.services.process;
 
 import java.util.Map;
-import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import java.util.Set;
+
+import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
 public class TableFieldFormData extends AbstractFormData {
@@ -74,6 +75,7 @@ public class TableFieldFormData extends AbstractFormData {
       setValueInternal(row, CUSTOM_COLUMN_ID, custom);
     }
 
+    @SuppressWarnings("unchecked")
     public Set<Map<String, Integer>> getCustom(int row) {
       return (Set<Map<String, Integer>>) getValueInternal(row, CUSTOM_COLUMN_ID);
     }
@@ -102,6 +104,7 @@ public class TableFieldFormData extends AbstractFormData {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void setValueAt(int row, int column, Object value) {
       switch (column) {
         case PERSON_NR_COLUMN_ID:

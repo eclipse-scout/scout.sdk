@@ -105,11 +105,11 @@ public final class TestUtility {
   /**
    * Specifies if Scout should update the form datas automatically or not.
    * 
-   * @param autoBuild
+   * @param enabled
    *          true for auto update, false to disable.
    */
   @SuppressWarnings("restriction")
-  public static void setAutoUpdateFormData(boolean autoBuild) {
-    org.eclipse.scout.sdk.internal.ScoutSdk.getDefault().setFormDataAutoUpdate(autoBuild);
+  public static void setAutoUpdateEnabled(boolean enabled) {
+    org.eclipse.scout.sdk.internal.ScoutSdk.getDefault().setAutoUpdateEnabled(enabled);
   }
 }

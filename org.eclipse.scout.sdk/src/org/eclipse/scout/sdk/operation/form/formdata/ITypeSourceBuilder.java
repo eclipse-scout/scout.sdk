@@ -17,6 +17,15 @@ import org.eclipse.scout.commons.CompositeObject;
  */
 public interface ITypeSourceBuilder extends ISourceBuilder {
 
+  public static final int CATEGORY_METHOD_PROPERTY = 0;
+  public static final int CATEGORY_METHOD_FIELD_GETTER = 2;
+  public static final int CATEGORY_MEHTOD = 3;
+  public static final int CATEGORY_TYPE_PROPERTY = 4;
+  public static final int CATEGORY_TYPE_FIELD = 5;
+  public static final int CATEGORY_TYPE_TABLE_COLUMN = 6;
+  public static final int CATEGORY_TYPE_COMPOSER_ATTRIBUTE = 7;
+  public static final int CATEGORY_TYPE_COMPOSER_ENTITY = 8;
+
   /**
    * @param builder
    * @param category

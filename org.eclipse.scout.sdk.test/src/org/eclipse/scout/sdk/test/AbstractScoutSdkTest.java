@@ -80,7 +80,7 @@ public abstract class AbstractScoutSdkTest {
   protected static void setupWorkspace(Bundle resourceBundle, String baseFolder, String... projects) throws Exception {
     showEgitMessageBoxes(false);
     JdtUtility.setWorkspaceAutoBuilding(false);
-    setAutoUpdateFormData(false);
+    setAutoUpdateEnabled(false);
     Assert.assertNotNull("baseFolder must not be null", baseFolder);
     if (projects == null || projects.length == 0) {
       projects = new String[]{null};
@@ -122,8 +122,8 @@ public abstract class AbstractScoutSdkTest {
     JdtUtility.waitForSilentWorkspace();
   }
 
-  protected static void setAutoUpdateFormData(boolean autoBuild) {
-    ScoutSdk.getDefault().setFormDataAutoUpdate(autoBuild);
+  protected static void setAutoUpdateEnabled(boolean enabled) {
+    ScoutSdk.getDefault().setAutoUpdateEnabled(enabled);
   }
 
   protected static void executeAndBuildWorkspace(IOperation... ops) throws Exception {

@@ -8,19 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.operation.form.formdata;
+package formdata.client.ui.desktop.outline.pages;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.annotations.PageData;
 
-/**
- * <h3>{@link ICreateFormDataRequest}</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 1.0.8 17.02.2011
- */
-public interface ICreateFormDataRequest {
+import formdata.shared.services.pages.ExtendedTablePageWithoutExtendedTableData;
 
-  public boolean createFormData(IType type, String packageName, String simpleName);
+@PageData(ExtendedTablePageWithoutExtendedTableData.class)
+public class ExtendedTablePageWithoutExtendedTable extends BaseTablePage {
 
-  public int showQuestion(String title, String message, int buttons);
 }

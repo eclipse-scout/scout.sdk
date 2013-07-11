@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -61,6 +62,11 @@ public class ReplaceFormFiledTest extends AbstractScoutSdkTest {
     s_validationRules.put("ValidationRule.MASTER_VALUE_FIELD", "\"masterValueField\"");
     s_validationRules.put("ValidationRule.MASTER_VALUE_REQUIRED", "\"masterValueRequired\"");
     s_validationRules.put("ValidationRule.ZERO_NULL_EQUALITY", "\"zeroNullEquality\"");
+  }
+
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    clearWorkspace();
   }
 
   private static IType updateFormData(IProject sharedProject, String formFqcn, String formDataFqcn, String formDataSuperClassName) throws Exception {

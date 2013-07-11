@@ -14,7 +14,7 @@ import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
+import org.eclipse.scout.sdk.operation.data.AutoUpdateManager;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -45,7 +45,7 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
    */
   @Override
   public void createFieldEditors() {
-    m_updateFormDataAutomaticallyField = new BooleanFieldEditor(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE, Texts.get("UpdateFormDataAutomatically"), getFieldEditorParent());
+    m_updateFormDataAutomaticallyField = new BooleanFieldEditor(AutoUpdateManager.PROP_AUTO_UPDATE, Texts.get("UpdateModelDataAutomatically"), getFieldEditorParent());
     addField(m_updateFormDataAutomaticallyField);
     m_targetPackageConfigEnabledField = new BooleanFieldEditor(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, Texts.get("UseLegacyTargetPackage"), getFieldEditorParent());
     addField(m_targetPackageConfigEnabledField);

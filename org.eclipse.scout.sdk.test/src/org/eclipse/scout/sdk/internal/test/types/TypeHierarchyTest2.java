@@ -38,7 +38,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setup() {
-    setAutoUpdateFormData(false);
+    setAutoUpdateEnabled(false);
     ScoutSdkCore.getScoutWorkspace();
   }
 

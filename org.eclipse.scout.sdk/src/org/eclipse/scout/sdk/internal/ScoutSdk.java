@@ -12,7 +12,9 @@ package org.eclipse.scout.sdk.internal;
 
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.TuningUtility;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
+import org.eclipse.scout.sdk.operation.data.AutoUpdateManager;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdateHandler;
+import org.eclipse.scout.sdk.operation.page.pagedata.PageDataAutoUpdateHandler;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.osgi.framework.BundleContext;
@@ -28,7 +30,7 @@ public class ScoutSdk extends Plugin {
   private static ScoutSdk plugin;
   private static SdkLogManager logManager;
 
-  private FormDataAutoUpdater m_formDataUpdateSupport;
+  private AutoUpdateManager m_autoUpdateManager;
 
   /*
    * (non-Javadoc)
@@ -47,7 +49,9 @@ public class ScoutSdk extends Plugin {
 
     logInfo("Starting SCOUT SDK Plugin.");
 
-    m_formDataUpdateSupport = new FormDataAutoUpdater();
+    m_autoUpdateManager = new AutoUpdateManager();
+    m_autoUpdateManager.addModelDataUpdateHandler(new FormDataAutoUpdateHandler());
+    m_autoUpdateManager.addModelDataUpdateHandler(new PageDataAutoUpdateHandler());
   }
 
   /*
@@ -57,7 +61,7 @@ public class ScoutSdk extends Plugin {
   @Override
   public void stop(BundleContext context) throws Exception {
     TuningUtility.finishAll();
-    m_formDataUpdateSupport.dispose();
+    m_autoUpdateManager.dispose();
     TypeCacheAccessor.getHierarchyCache().dispose();
     TypeCacheAccessor.getTypeCache().dispose();
     TypeCacheAccessor.getJavaResourceChangedEmitter().dispose();
@@ -128,11 +132,11 @@ public class ScoutSdk extends Plugin {
     logManager.log(level, message, t);
   }
 
-  public void setFormDataAutoUpdate(boolean autoUpdate) {
-    m_formDataUpdateSupport.setEnabled(autoUpdate);
+  public void setAutoUpdateEnabled(boolean enabled) {
+    m_autoUpdateManager.setEnabled(enabled);
   }
 
-  public boolean isFormDataAutoUpdate() {
-    return m_formDataUpdateSupport.isEnabled();
+  public boolean isAutoUpdateEnabled() {
+    return m_autoUpdateManager.isEnabled();
   }
 }
