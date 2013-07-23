@@ -8,8 +8,7 @@ stagingArea=$workingDir/stagingArea
 repositoriesDir=$workingDir
 stageTriggerFileName=doStage
 
-processZipFile()
-{
+processZipFile() {
   backupDir=$(pwd)
   zipFile=$backupDir"/"${1%?}
   sigOk=$2
@@ -21,7 +20,7 @@ processZipFile()
     chmod -R g+w $stagingArea/working
 
     cd $stagingArea/working
-      for d in {[0-9\.]*,nightly,releases}
+    for d in {[0-9\.]*,nightly,releases}
      do
         if [ -d "$d" ]; then
            if  [ -d  $repositoriesDir/$d""_new ]; then
@@ -41,33 +40,50 @@ processZipFile()
         fi
      done
 
-	truncateNightly $workingDir/nightly
+    truncateNightly $workingDir/nightly
 
-     #cleanup stagingArea
-     cp  $stagingArea/working/*.xml $repositoriesDir/
-     rm -rf $stagingArea/working
+    #cleanup stagingArea
+    cp  $stagingArea/working/*.xml $repositoriesDir/
+    rm -rf $stagingArea/working
     cd $backupDir
   else
     echo "md5 not valid for $zipFile!"
   fi
 }
 
-## remove old nightly repositories that are not contained in the composite updateiste
-truncateNightly(){
+## remove old nightly repositories that are not contained in the composite update site
+truncateNightly() {
 	cur=$(pwd)
 	dir=$1
+	echo "Current dir: ${cur}."
+	echo "Recursively truncate dir: ${dir}."
 	cd ${dir}
 	for d in *
 	do
 		if [ -d "$d" ]; then
-			truncateComposite "$d"
+			echo -e "\nTruncating Scout ${d} composite dir"
+			truncateScoutVersion "$d"
 		fi
-    done
+  done
 	cd ${cur}
 }
 
-# removes all folders starting with N that are not contained in the compositeContent.jar
-truncateComposite(){
+## removes sub folders starting with scout of a specific Scout version, e.g. scout.main, scout.rap
+truncateScoutVersion() {
+  curdir=$1
+  pushd ${curdir} > /dev/null
+  for dir in scout*
+  do
+    if [ -d "$dir" ]; then
+      echo -e "\t\tTruncating composite dir ${dir}"
+      truncateComposite "$dir"
+    fi
+  done
+  popd > /dev/null
+}
+
+## removes all folders starting with N that are not contained in the compositeContent.jar
+truncateComposite() {
 	cur=$(pwd)
 	compositeDir=$1
 
@@ -75,10 +91,11 @@ truncateComposite(){
 	unzip -q compositeContent.jar
 		for sub in N*
 			do
+				echo -e "\t\t\tChecking nightly dir ${sub}"
 				if [ -d "$sub" ]; then
 					if ! (grep -q "$sub" compositeContent.xml);
 						then
-							echo "$sub is not contained in composite. Removing..";
+							echo -e "\t\t\t\t$sub is not contained in composite. Removing...";
 							rm -rf $sub
 					fi
 				fi
