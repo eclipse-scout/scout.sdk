@@ -80,6 +80,11 @@ truncateScoutVersion() {
     fi
   done
   popd > /dev/null
+  # special handling for Scout 3.8 since folder structure is different.
+	if echo ${curdir} | grep -w -q "3.8"; then
+		echo -e "\t\tTruncating Scout ${curdir} composite dir"
+		truncateComposite "$curdir"
+	fi  
 }
 
 ## removes all folders starting with N that are not contained in the compositeContent.jar
@@ -88,7 +93,7 @@ truncateComposite() {
 	compositeDir=$1
 
 	cd ${compositeDir}
-	unzip -q compositeContent.jar
+	unzip -q -o compositeContent.jar
 		for sub in N*
 			do
 				echo -e "\t\t\tChecking nightly dir ${sub}"
