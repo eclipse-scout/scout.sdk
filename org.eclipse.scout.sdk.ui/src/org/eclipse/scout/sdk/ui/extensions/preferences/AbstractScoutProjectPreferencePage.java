@@ -137,7 +137,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
     indicatorData.heightHint = 15;
     indicator.setLayoutData(indicatorData);
 
-    Job j = new Job("load scout sdk default super type settings...") {
+    Job j = new Job("load scout sdk settings...") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         if (parent != null && !parent.isDisposed()) {
@@ -145,14 +145,16 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
             loadAllModels(new IModelLoadProgressObserver<U>() {
               @Override
               public void loaded(U justLoadedModel) {
-                parent.getDisplay().asyncExec(new Runnable() {
-                  @Override
-                  public void run() {
-                    if (!indicator.isDisposed()) {
-                      indicator.worked(1);
+                if (parent != null && !parent.isDisposed()) {
+                  parent.getDisplay().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                      if (!indicator.isDisposed()) {
+                        indicator.worked(1);
+                      }
                     }
-                  }
-                });
+                  });
+                }
               }
             });
           }
