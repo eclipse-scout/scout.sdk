@@ -71,8 +71,14 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
         }
       }
     }
-    for (String dir : folders) {
-      addLocalDirectory(dir);
+    if (folders.size() > 0) {
+      for (String dir : folders) {
+        addLocalDirectory(dir);
+      }
+    }
+    else {
+      // ensure that at least the eclipse home is set, even if there are no bundle locations found.
+      addEclipseHomeEntry();
     }
   }
 
