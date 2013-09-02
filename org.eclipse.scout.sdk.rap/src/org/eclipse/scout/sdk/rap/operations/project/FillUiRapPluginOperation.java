@@ -22,7 +22,7 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
     STRATEGY_LATER
   }
 
-  public static final String UPDATE_SITE_URL = "http://download.eclipse.org/releases/kepler";
+  public static final String UPDATE_SITE_URL = "http://download.eclipse.org/releases/luna";
   public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.source.feature.group";
   public static final String SCOUT_RT_FEATURE = "org.eclipse.scout.rt.source.feature.group";
   public static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.feature.feature.group";
