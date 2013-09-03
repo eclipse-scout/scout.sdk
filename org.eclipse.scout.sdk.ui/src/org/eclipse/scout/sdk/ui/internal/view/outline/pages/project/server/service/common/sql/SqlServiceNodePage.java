@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
-import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
@@ -38,8 +37,7 @@ public class SqlServiceNodePage extends AbstractServiceNodePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class,
-        ServiceOperationNewAction.class, ServiceDeleteAction.class};
+    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class, ServiceDeleteAction.class};
   }
 
   @Override

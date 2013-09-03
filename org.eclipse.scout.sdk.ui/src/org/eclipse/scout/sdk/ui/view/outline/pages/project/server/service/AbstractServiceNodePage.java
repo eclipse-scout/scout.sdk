@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
+import org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -90,7 +91,8 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class, ServiceOperationNewAction.class};
+    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class,
+        ServiceOperationNewAction.class, ServiceDeleteAction.class};
   }
 
   @Override
@@ -108,6 +110,11 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     }
     else if (menu instanceof ServiceOperationNewAction) {
       ((ServiceOperationNewAction) menu).init(getInterfaceType(), getType());
+    }
+    else if (menu instanceof ServiceDeleteAction) {
+      ServiceDeleteAction action = (ServiceDeleteAction) menu;
+      action.setServiceImplementation(getType());
+      action.setServiceInterface(getInterfaceType());
     }
   }
 

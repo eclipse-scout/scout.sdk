@@ -11,6 +11,11 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.bookmark;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction;
+import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
+import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
@@ -25,5 +30,11 @@ public class BookmarkStorageServiceNodePage extends AbstractServiceNodePage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.BOOKMARK_STORAGE_SERVICE_NODE_PAGE;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class, ServiceDeleteAction.class};
   }
 }
