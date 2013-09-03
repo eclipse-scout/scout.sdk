@@ -97,7 +97,7 @@
       ranking="10">
     </filter>
     <filter
-      aliases="/web"
+      aliases="/"
       class="org.eclipse.scout.http.servletfilter.security.BasicSecurityFilter"
       ranking="20">
     </filter>
