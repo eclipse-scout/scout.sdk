@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -433,7 +434,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       presenter.getContainer().setLayoutData(layoutData);
-      presenter.setEnabled(!isDirty() && !getPage().getType().isReadOnly());
+      presenter.setEnabled(isPresenterEnabled(method));
       m_methodPresenters.put(method.getMethodName(), presenter);
     }
     else {
@@ -441,6 +442,28 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
 
     return presenter;
+  }
+
+  private static boolean isFinal(IMethod m) {
+    if (m == null) {
+      return false;
+    }
+
+    try {
+      return (m.getFlags() & Flags.AccFinal) != 0;
+    }
+    catch (JavaModelException e) {
+      ScoutSdkUi.logError("Unable to retrieve flags for method '" + m.getElementName() + "'.", e);
+      return false;
+    }
+  }
+
+  private boolean isPresenterEnabled(ConfigurationMethod m) {
+    return isPresenterEnabled(m, isDirty());
+  }
+
+  private boolean isPresenterEnabled(ConfigurationMethod m, boolean compilationUnitDirty) {
+    return !isFinal(m.getDefaultMethod()) && !compilationUnitDirty && !getPage().getType().isReadOnly();
   }
 
   AbstractMethodPresenter createOperationPresenter(Composite parent, ConfigurationMethod method) {
@@ -458,7 +481,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       layoutData.widthHint = 200;
       presenter.getContainer().setLayoutData(layoutData);
-      presenter.setEnabled(!isDirty() && !getPage().getType().isReadOnly());
+      presenter.setEnabled(isPresenterEnabled(method));
       m_methodPresenters.put(method.getMethodName(), presenter);
     }
     return presenter;
@@ -487,7 +510,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
             if (getForm() != null && !getForm().isDisposed()) {
               m_saveButton.setEnabled(dirty);
               for (AbstractMethodPresenter p : m_methodPresenters.values()) {
-                p.setEnabled(!dirty && !getPage().getType().isReadOnly());
+                p.setEnabled(isPresenterEnabled(p.getMethod(), dirty));
               }
               if (dirty) {
                 addStatus(m_icuNotSyncStatus);
