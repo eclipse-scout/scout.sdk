@@ -20,7 +20,7 @@ import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
  * Base class for PDE model access of workspace plugins.<br>
  * This implementation uses lazy initialization of the PDE models.<br>
  * This class is thread safe.
- * 
+ *
  * @author mvi
  * @since 3.8.0
  */
@@ -54,7 +54,7 @@ public final class LazyPluginModel {
     return getProject() != null && getProject().isOpen() && getProject().exists() &&
         getManifestFile() != null && getManifestFile().exists() &&
         getPluginXmlFile() != null && /* plugin.xml must not exist yet */
-        getBuildPropertiesFile() != null && getBuildPropertiesFile().exists();
+        getBuildPropertiesFile() != null /* build properties must not exist (e.g. in an imported binary project, see bug 415083) */;
   }
 
   public synchronized BundlePluginModelBase getBundlePluginModel() {
