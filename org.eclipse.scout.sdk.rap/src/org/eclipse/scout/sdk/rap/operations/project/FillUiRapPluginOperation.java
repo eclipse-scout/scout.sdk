@@ -26,7 +26,7 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
   public static final String SCOUT_RT_RAP_FEATURE = "org.eclipse.scout.rt.rap.source.feature.group";
   public static final String SCOUT_RT_FEATURE = "org.eclipse.scout.rt.source.feature.group";
   public static final String ECLIPSE_RT_RAP_FEATURE = "org.eclipse.rap.feature.feature.group";
-  public static final String ECLIPSE_RT_RAP_REQUIREMENTS_FEATURE = "org.eclipse.rap.equinox.target.feature.feature.group";
+  public static final String ECLIPSE_RT_RAP_REQUIREMENTS_FEATURE = "org.eclipse.rap.equinox.luna.target.feature.feature.group";
   public static final String ECLIPSE_PLATFORM_FEATURE = "org.eclipse.platform.source.feature.group";
   public static final String ECLIPSE_RPC_FEATURE = "org.eclipse.rcp.source.feature.group";
   public static final String ECLIPSE_RPC_E4_FEATURE = "org.eclipse.e4.rcp.source.feature.group";
