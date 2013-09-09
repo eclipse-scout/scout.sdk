@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSuppo
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -28,7 +29,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <h3>{@link NewScoutWorkingSetDialog}</h3> ...
+ * <h3>{@link NewScoutWorkingSetDialog}</h3>
  * 
  * @author mvi
  * @since 3.9.0 04.04.2013
@@ -53,6 +54,10 @@ public class NewScoutWorkingSetDialog extends Dialog {
 
   public String getWorkingSetName() {
     return (String) m_propertySupport.getPropertyString(PROP_WORKING_SET_NAME);
+  }
+
+  public void setWorkingSetName(String name) {
+    m_propertySupport.setProperty(PROP_WORKING_SET_NAME, name.trim());
   }
 
   @Override
@@ -107,13 +112,18 @@ public class NewScoutWorkingSetDialog extends Dialog {
   protected Control createDialogArea(Composite parent) {
     Composite rootArea = new Composite(parent, SWT.NONE);
     final TextField f = new TextField(rootArea, Texts.get("Name"));
+    String initText = getWorkingSetName();
+    if (StringUtility.hasText(initText)) {
+      f.setText(initText);
+      f.setSelection(new Point(0, initText.length()));
+    }
     f.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
         String newText = f.getText();
         boolean valid = isValid(newText, m_existingSets);
         if (valid) {
-          m_propertySupport.setProperty(PROP_WORKING_SET_NAME, newText.trim());
+          setWorkingSetName(newText);
         }
         getButton(OK).setEnabled(valid);
       }
