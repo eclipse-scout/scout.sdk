@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.extensions.bundle.INewScoutBundleHandler;
+import org.eclipse.scout.sdk.ui.extensions.bundle.IProductLauncherContributor;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -40,6 +41,7 @@ public final class ScoutBundleExtensionPoint {
   private final static String attributeBundleType = "bundleType";
   private final static String attributeOrderNumber = "orderNumber";
   private final static String attributeClass = "bundleNewHandler";
+  private final static String attributeProductLauncherContributor = "productLauncherContributor";
   private final static String attributeBundlePage = "bundlePage";
   private final static String attributeIcon = "icon";
   private final static String attributeLauncherIcon = "launcherIcon";
@@ -67,6 +69,11 @@ public final class ScoutBundleExtensionPoint {
               try {
                 String contribPlugin = element.getContributor().getName();
                 extensionPoint.setNewScoutBundleHandler((INewScoutBundleHandler) element.createExecutableExtension(attributeClass));
+
+                String productLauncherContributor = element.getAttribute(attributeProductLauncherContributor);
+                if (StringUtility.hasText(productLauncherContributor)) {
+                  extensionPoint.setProductLauncherContributor((IProductLauncherContributor) element.createExecutableExtension(attributeProductLauncherContributor));
+                }
 
                 String bundlePage = StringUtility.trim(element.getAttribute(attributeBundlePage));
                 if (!StringUtility.isNullOrEmpty(bundlePage)) {

@@ -862,7 +862,8 @@
             icon="resources/icons/serverBundle.png"
             id="org.eclipse.scout.sdk.ui.ServerBundle"
             launcherIcon="resources/icons/serverLauncher.gif"
-            orderNumber="-200">
+            orderNumber="-200"
+            productLauncherContributor="org.eclipse.scout.sdk.ui.internal.extensions.bundle.ServerProductLauncherContributor">
       </bundleNode>
    </extension>
    <extension

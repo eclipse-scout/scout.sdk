@@ -23,9 +23,9 @@ public class ScoutBundleUiExtension {
   private String m_bundleID;
   private String m_bundleName;
   private INewScoutBundleHandler m_bundleExtention;
+  private IProductLauncherContributor m_productLauncherContributor;
   private Class<? extends IPage> m_bundlePageClass;
   private ImageDescriptor m_icon;
-  private ImageDescriptor m_binaryIcon;
   private ImageDescriptor m_launcherIcon;
   private String m_bundleType;
 
@@ -109,4 +109,11 @@ public class ScoutBundleUiExtension {
     m_launcherIcon = launcherIcon;
   }
 
+  public IProductLauncherContributor getProductLauncherContributor() {
+    return m_productLauncherContributor;
+  }
+
+  public void setProductLauncherContributor(IProductLauncherContributor productLauncherContributor) {
+    m_productLauncherContributor = productLauncherContributor;
+  }
 }

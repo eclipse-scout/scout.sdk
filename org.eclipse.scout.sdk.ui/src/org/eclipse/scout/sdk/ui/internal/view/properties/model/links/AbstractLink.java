@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -36,9 +36,9 @@ public abstract class AbstractLink implements ILink {
     this(name, null, order);
   }
 
-  public AbstractLink(String name, Image imgage, int orderNumber) {
+  public AbstractLink(String name, Image image, int orderNumber) {
     m_name = name;
-    m_image = imgage;
+    m_image = image;
     m_orderNumber = orderNumber;
   }
 

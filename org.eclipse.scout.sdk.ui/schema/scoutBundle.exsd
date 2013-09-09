@@ -105,6 +105,16 @@
                </appinfo>
             </annotation>
          </attribute>
+         <attribute name="productLauncherContributor" type="string">
+            <annotation>
+               <documentation>
+                  Optional contributor to enhance the product launch presenter with custom links.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.ui.extensions.bundle.IProductLauncherContributor"/>
+               </appinfo>
+            </annotation>
+         </attribute>
          <attribute name="icon" type="string">
             <annotation>
                <documentation>

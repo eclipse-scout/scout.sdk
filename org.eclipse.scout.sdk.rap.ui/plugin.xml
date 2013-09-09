@@ -11,7 +11,8 @@
             icon="resources/icons/uiBundle.png"
             id="org.eclipse.scout.sdk.ui.UiRapBundle"
             launcherIcon="resources/icons/rapLauncher.gif"
-            orderNumber="-520">
+            orderNumber="-520"
+            productLauncherContributor="org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle.RapProductLauncherContributor">
       </bundleNode>
    </extension>
    <extension

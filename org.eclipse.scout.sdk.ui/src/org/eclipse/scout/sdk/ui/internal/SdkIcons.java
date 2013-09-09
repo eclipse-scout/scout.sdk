@@ -207,6 +207,7 @@ public interface SdkIcons {
   String Variables = "variables.png";
   String VariableAdd = "variable_add.png";
   String VariableRemove = "variable_remove.png";
+  String Web = "web.gif";
   String webBundle = "webBundle.png";
   String WebBundleAdd = "webBundle_add.png";
   String WebBundleRemove = "webBundle_remove.png";

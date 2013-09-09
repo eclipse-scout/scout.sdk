@@ -69,6 +69,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   private String m_productName;
   private final IFile m_productFile;
   private final IScoutBundle m_bundle;
+  private final static Object m_lock = new Object();
 
   // internal
   private ImageHyperlink m_runLink;
@@ -81,6 +82,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
 
   private final static Pattern PATTERN = Pattern.compile("name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"", Pattern.MULTILINE);
   private final static String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
+  public final static String TERMINATED_MODE = "terminated";
 
   /**
    * @param toolkit
@@ -178,6 +180,16 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     }
     catch (CoreException e) {
       ScoutSdkUi.logWarning("Unable to find config.ini file for product '" + getProductFile().getLocation().toOSString() + "'.", e);
+    }
+
+    try {
+      ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+      if (uiExt != null && uiExt.getProductLauncherContributor() != null) {
+        uiExt.getProductLauncherContributor().contributeLinks(getProductFile(), model);
+      }
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("Error while loading product launcher link contributor for product '" + getProductFile().getLocation().toOSString() + "'.", e);
     }
 
     LinksPresenter presenter = new LinksPresenter(getToolkit(), parent, model);
@@ -345,36 +357,56 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     }
   }
 
+  private void refreshUiLaunchState(String mode) {
+    if (!m_stopLink.isDisposed() && !m_mainGroup.isDisposed()) {
+      m_stopLink.setEnabled(!TERMINATED_MODE.equals(mode));
+      if (TERMINATED_MODE.equals(mode)) {
+        m_mainGroup.setText(getProductFile().getParent().getName());
+      }
+      else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+        m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
+      }
+      else if (ILaunchManager.RUN_MODE.equals(mode)) {
+        m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+      }
+    }
+    try {
+      ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+      if (uiExt != null && uiExt.getProductLauncherContributor() != null) {
+        uiExt.getProductLauncherContributor().refreshLaunchState(mode);
+      }
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("Error while refreshing launch state for product '" + getProductFile().getLocation().toOSString() + "'.", e);
+    }
+  }
+
   private void recomputeLaunchState() {
-    if (getContainer() != null && !getContainer().isDisposed()) {
-      getContainer().getDisplay().asyncExec(new Runnable() {
-        @Override
-        public void run() {
-          ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
-          for (ILaunch l : launches) {
-            if (l.getLaunchConfiguration() != null && l.getLaunchConfiguration().getName().equals(getProductFile().getName())) {
-              if (!m_stopLink.isDisposed() && !m_mainGroup.isDisposed()) {
+    synchronized (m_lock) {
+      if (getContainer() != null && !getContainer().isDisposed()) {
+        getContainer().getDisplay().asyncExec(new Runnable() {
+          @Override
+          public void run() {
+            ILaunch[] launches = DebugPlugin.getDefault().getLaunchManager().getLaunches();
+            boolean launchRunning = false;
+            for (ILaunch l : launches) {
+              if (l.getLaunchConfiguration() != null && l.getLaunchConfiguration().getName().equals(getProductFile().getName())) {
+                launchRunning = true;
                 if (l.isTerminated()) {
-                  m_stopLink.setEnabled(false);
-                  m_mainGroup.setText(getProductFile().getParent().getName());
+                  refreshUiLaunchState(TERMINATED_MODE);
                 }
                 else {
-                  m_stopLink.setEnabled(true);
-                  if (l.getLaunchMode().equals(ILaunchManager.DEBUG_MODE)) {
-                    m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
-                  }
-                  else if (l.getLaunchMode().equals(ILaunchManager.RUN_MODE)) {
-                    m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
-                  }
-                  else {
-                    m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("UndefinedState") + "...");
-                  }
+                  refreshUiLaunchState(l.getLaunchMode());
                 }
               }
             }
+
+            if (!launchRunning) {
+              refreshUiLaunchState(TERMINATED_MODE);
+            }
           }
-        }
-      });
+        });
+      }
     }
   }
 
