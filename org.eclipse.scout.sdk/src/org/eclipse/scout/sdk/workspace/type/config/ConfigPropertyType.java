@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.workspace.type.config;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -144,8 +145,9 @@ public class ConfigPropertyType {
   }
 
   public ConfigurationMethod[] getConfigurationMethods(int methodType) {
-    ArrayList<ConfigurationMethod> result = new ArrayList<ConfigurationMethod>();
-    for (ConfigurationMethod m : m_configurationMethods.values()) {
+    Collection<ConfigurationMethod> values = m_configurationMethods.values();
+    ArrayList<ConfigurationMethod> result = new ArrayList<ConfigurationMethod>(values.size());
+    for (ConfigurationMethod m : values) {
       if (m.getMethodType() == methodType) {
         result.add(m);
       }

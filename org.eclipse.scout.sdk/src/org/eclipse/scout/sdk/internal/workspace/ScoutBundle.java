@@ -130,6 +130,14 @@ public class ScoutBundle implements IScoutBundle {
     m_rootPackage = null;
   }
 
+  /**
+   * returns a valid java project that can be edited or null if no editable java project can be found.<br>
+   * An editable java project is a java project that exists, is not read-only and has at least one writable package
+   * fragment root.
+   * 
+   * @param bundle
+   * @return
+   */
   private IJavaProject getJavaProject(IPluginModelBase bundle) {
     if (bundle.getUnderlyingResource() != null) {
       IProject project = bundle.getUnderlyingResource().getProject();
@@ -137,7 +145,25 @@ public class ScoutBundle implements IScoutBundle {
         IJavaProject jp = JavaCore.create(project);
         if (jp != null) {
           if (jp.exists() && !jp.isReadOnly()) {
-            return jp;
+            try {
+              IPackageFragmentRoot[] packageFragmentRoots = jp.getPackageFragmentRoots();
+              if (packageFragmentRoots != null) {
+                for (IPackageFragmentRoot root : packageFragmentRoots) {
+                  if (root != null && !root.isArchive() && !root.isReadOnly()) {
+                    return jp;
+                  }
+                }
+              }
+            }
+            catch (JavaModelException e) {
+              BundleDescription bundleDescription = bundle.getBundleDescription();
+              if (bundleDescription != null) {
+                ScoutSdk.logError("Unable to evaluate package fragment roots of bundle '" + bundleDescription.getSymbolicName() + "'. The bundle will be handled as binary.", e);
+              }
+              else {
+                ScoutSdk.logError("Unable to evaluate package fragment roots. The bundle will be handled as binary.", e);
+              }
+            }
           }
         }
       }

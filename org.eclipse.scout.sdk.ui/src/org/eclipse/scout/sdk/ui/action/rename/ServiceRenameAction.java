@@ -58,13 +58,13 @@ public class ServiceRenameAction extends AbstractRenameAction {
 
   @Override
   public boolean isVisible() {
-    return isEditable(m_serviceImplementation) && isEditable(m_serviceInterface);
+    return isEditable(m_serviceImplementation);
   }
 
   @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
     transaction.add(m_serviceImplementation, newName);
-    if (TypeUtility.exists(m_serviceInterface) && !m_serviceInterface.isBinary()) {
+    if (isEditable(m_serviceInterface)) {
       final String newInterfaceName = "I" + newName;
       final IScoutBundle interfaceBundle = ScoutTypeUtility.getScoutBundle(m_serviceInterface);
       final String oldFqn = m_serviceInterface.getFullyQualifiedName();

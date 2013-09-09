@@ -65,9 +65,13 @@ public class CreateMobileClientPluginOperation extends AbstractCreateScoutBundle
     String sharedBundleName = getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class);
     IScoutBundle shared = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(sharedBundleName);
 
-    INlsProject nlsProject = shared.getNlsProject();
-    NlsEntry entry = new NlsEntry("Logoff", nlsProject);
-    entry.addTranslation(Language.LANGUAGE_DEFAULT, "Log off");
-    nlsProject.updateRow(entry, monitor);
+    if(shared != null) {
+      INlsProject nlsProject = shared.getNlsProject();
+      if(nlsProject != null) {
+        NlsEntry entry = new NlsEntry("Logoff", nlsProject);
+        entry.addTranslation(Language.LANGUAGE_DEFAULT, "Log off");
+        nlsProject.updateRow(entry, monitor);
+      }
+    }
   }
 }

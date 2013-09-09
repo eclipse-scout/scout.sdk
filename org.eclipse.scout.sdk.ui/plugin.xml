@@ -25,13 +25,67 @@
                id="org.eclipse.debug.ui.launchActionSet">
          </actionSet>
          <actionSet
+               id="org.eclipse.jdt.ui.JavaElementCreationActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.jdt.ui.SearchActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.ui.edit.text.actionSet.annotationNavigation">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.ui.edit.text.actionSet.navigation">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.ui.NavigateActionSet">
+         </actionSet>
+         <actionSet
                id="org.eclipse.jdt.debug.ui.JDTDebugActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.jdt.ui.A_OpenActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.jdt.ui.CodingActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.pde.ui.SearchActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.search.searchActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.jdt.junit.JUnitActionSet">
+         </actionSet>
+         <actionSet
+               id="org.eclipse.jdt.ui.text.java.actionSet.presentation">
          </actionSet>
          <viewShortcut
                id="org.eclipse.scout.sdk.ui.internal.view.properties.ScoutPropertyView">
          </viewShortcut>
          <viewShortcut
                id="org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.views.ProblemView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.jdt.ui.JavadocView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.views.ProgressView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.views.TaskList">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.ui.console.ConsoleView">
+         </viewShortcut>
+         <viewShortcut
+               id="org.eclipse.pde.runtime.LogView">
          </viewShortcut>
          <perspectiveShortcut
                id="org.eclipse.debug.ui.DebugPerspective">

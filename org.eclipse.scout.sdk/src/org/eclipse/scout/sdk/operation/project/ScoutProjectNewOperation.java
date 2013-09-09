@@ -22,16 +22,15 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.pde.internal.core.ICoreConstants;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 @SuppressWarnings("restriction")
 public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
@@ -122,11 +121,9 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     collector.addAll(invalidNodes);
 
     // TODO workaround for bug 387958. Can be removed as soon as the bug is fixed.
-    try
-    {
-      IType txtProvSvcType = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
-      if (TypeUtility.exists(txtProvSvcType)) {
-        TypeUtility.getPrimaryTypeHierarchy(txtProvSvcType).invalidate();
+    try {
+      for (IPrimaryTypeTypeHierarchy h : TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies()) {
+        h.invalidate();
       }
     }
     catch (Exception e) {

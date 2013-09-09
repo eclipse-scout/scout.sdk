@@ -15,7 +15,6 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServerServicesNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
@@ -72,7 +71,7 @@ public class AccessControlServiceTablePage extends AbstractPage {
       if (interfaces.length > 0) {
         serviceInterface = interfaces[0];
       }
-      new ServerServicesNodePage(this, service, serviceInterface);
+      new AccessControlServiceNodePage(this, service, serviceInterface);
     }
   }
 

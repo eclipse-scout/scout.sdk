@@ -23,7 +23,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
@@ -35,14 +34,16 @@ import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.osgi.framework.Constants;
 
 /**
  * <h3>{@link ScoutProjectAddOperation}</h3> ...
- * 
+ *
  * @author mvi
  * @since 3.8.0 02.03.2012
  */
@@ -114,7 +115,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
 
   /**
    * Adds the additionalSymbolicName to all product files that already have the existingSymbolicName dependency.
-   * 
+   *
    * @param existingSymbolicName
    * @param additionalSymbolicName
    * @throws CoreException
@@ -203,17 +204,16 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
       }
       pmh.save();
 
-      // TODO workaround for bug 387958. Can be removed as soon as the bug is fixed.
-      try
-      {
-        IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
-        if (TypeUtility.exists(iDesktopExtension)) {
-          TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension).invalidate();
-        }
+    }
+
+    // TODO workaround for bug 387958. Can be removed as soon as the bug is fixed.
+    try {
+      for (IPrimaryTypeTypeHierarchy h : TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies()) {
+        h.invalidate();
       }
-      catch (Exception e) {
-        //nop
-      }
+    }
+    catch (Exception e) {
+      //nop
     }
 
     for (IJavaProject p : getCreatedBundlesList()) {

@@ -40,14 +40,14 @@ public class ServiceDeleteAction extends AbstractScoutHandler {
 
   @Override
   public boolean isVisible() {
-    return isEditable(m_serviceImplementation) && isEditable(m_serviceInterface);
+    return isEditable(m_serviceImplementation);
   }
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     m_confirmDialog = new MemberSelectionDialog(shell, getLabel());
     ArrayList<IMember> members = new ArrayList<IMember>();
-    if (TypeUtility.exists(m_serviceInterface)) {
+    if (isEditable(m_serviceInterface)) {
       members.add(m_serviceInterface);
     }
     if (TypeUtility.exists(m_serviceImplementation)) {
@@ -59,11 +59,11 @@ public class ServiceDeleteAction extends AbstractScoutHandler {
     if (m_confirmDialog.open() == Dialog.OK) {
       ServiceDeleteOperation deleteOp = new ServiceDeleteOperation();
       for (IMember m : m_confirmDialog.getSelectedMembers()) {
-        String qallifiedName = ((IType) m).getFullyQualifiedName();
-        if (m_serviceInterface != null && m_serviceInterface.getFullyQualifiedName().equals(qallifiedName)) {
+        String qalifiedName = ((IType) m).getFullyQualifiedName();
+        if (m_serviceInterface != null && m_serviceInterface.getFullyQualifiedName().equals(qalifiedName)) {
           deleteOp.setServiceInterface(m_serviceInterface);
         }
-        else if (m_serviceImplementation.getFullyQualifiedName().equals(qallifiedName)) {
+        else if (m_serviceImplementation.getFullyQualifiedName().equals(qalifiedName)) {
           deleteOp.setServiceImplementation(m_serviceImplementation);
         }
       }

@@ -11,6 +11,9 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.accesscontrol;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
+import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
@@ -25,5 +28,11 @@ public class AccessControlServiceNodePage extends AbstractServiceNodePage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.ACCESS_CONTROL_SERVICE_NODE_PAGE;
+  }
+
+  @SuppressWarnings("unchecked")
+  @Override
+  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class};
   }
 }

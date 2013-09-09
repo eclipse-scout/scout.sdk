@@ -72,6 +72,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
   private CheckableTree m_availableBundlesTree;
   private Button m_addWorkingSetButton;
   private Button m_removeWorkingSetButton;
+  private Button m_renameWorkingSetButton;
   private Button m_workingSetUpButton;
   private Button m_workingSetDownButton;
 
@@ -153,8 +154,12 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
         }
       }
       m_availableBundlesTree.getTreeViewer().refresh();
+      boolean isCustomWorkingSetSelected = set != null && !ScoutExplorerSettingsSupport.OTHER_PROJECTS_WORKING_SET_NAME.equals(set);
       if (m_removeWorkingSetButton != null && !m_removeWorkingSetButton.isDisposed()) {
-        m_removeWorkingSetButton.setEnabled(set != null && !ScoutExplorerSettingsSupport.OTHER_PROJECTS_WORKING_SET_NAME.equals(set));
+        m_removeWorkingSetButton.setEnabled(isCustomWorkingSetSelected);
+      }
+      if (m_renameWorkingSetButton != null && !m_renameWorkingSetButton.isDisposed()) {
+        m_renameWorkingSetButton.setEnabled(isCustomWorkingSetSelected);
       }
 
       String[] sets = getAllWorkingSets();
@@ -262,6 +267,37 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
         }
       }
     });
+    m_renameWorkingSetButton = new Button(buttonContainerLeft, SWT.PUSH | SWT.FLAT);
+    m_renameWorkingSetButton.setText(Texts.get("RenameWithPopup"));
+    m_renameWorkingSetButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        NewScoutWorkingSetDialog d = new NewScoutWorkingSetDialog(getShell(), getAllWorkingSets()) {
+          @Override
+          protected void configureShell(Shell newShell) {
+            super.configureShell(newShell);
+            newShell.setText(Texts.get("RenameScoutWorkingSet"));
+          }
+        };
+        d.setWorkingSetName(m_currentWorkingSet);
+        if (d.open() == OK) {
+          String[] sets = getAllWorkingSets();
+          boolean isChecked = m_workingSetsViewer.getChecked(m_currentWorkingSet);
+          for (int i = 0; i < sets.length; i++) {
+            if (sets[i] == m_currentWorkingSet) {
+              sets[i] = d.getWorkingSetName();
+              break;
+            }
+          }
+          m_selection.put(d.getWorkingSetName(), m_selection.remove(m_currentWorkingSet));
+          m_workingSetsViewer.setInput(sets);
+          m_workingSetsViewer.setSelection(new StructuredSelection(d.getWorkingSetName()), true);
+          m_workingSetsViewer.setChecked(d.getWorkingSetName(), isChecked);
+          handleWorkingSetSelectionChanged(d.getWorkingSetName());
+        }
+      }
+    });
+
     m_workingSetUpButton = new Button(buttonContainerRight, SWT.PUSH | SWT.FLAT);
     m_workingSetUpButton.setText(Texts.get("Up"));
     m_workingSetUpButton.addSelectionListener(new SelectionAdapter() {
@@ -324,7 +360,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
     l.marginHeight = 0;
     l.marginWidth = 0;
     buttonContainer.setLayout(l);
-    l = new GridLayout(2, false);
+    l = new GridLayout(3, false);
     l.verticalSpacing = 0;
     l.marginHeight = 0;
     l.marginWidth = 0;

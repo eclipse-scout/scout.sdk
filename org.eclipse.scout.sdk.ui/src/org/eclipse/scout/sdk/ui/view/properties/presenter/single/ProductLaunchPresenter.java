@@ -14,11 +14,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
@@ -30,11 +28,8 @@ import org.eclipse.debug.core.ILaunchManager;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.pde.internal.core.iproduct.IConfigurationFileInfo;
-import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
 import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
@@ -83,7 +78,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
 
   private P_LaunchListener m_launchListener;
   private P_RecomputeLaunchStateJob m_stateUpdateJob;
-  private WorkspaceProductModel m_productModel;
 
   private final static Pattern PATTERN = Pattern.compile("name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"", Pattern.MULTILINE);
   private final static String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
@@ -152,15 +146,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       l.setImage(ScoutSdkUi.getDefault().getImageRegistry().get(uiExt.getLauncherIconPath()));
     }
 
-    m_productModel = null;
-    try {
-      m_productModel = new WorkspaceProductModel(getProductFile(), false);
-      m_productModel.load();
-    }
-    catch (CoreException e) {
-      ScoutSdkUi.logWarning("could not load product model of '" + getProductFile() + "'.", e);
-      return;
-    }
     Control linkPart = createLinkPart(m_mainGroup);
     Control actionPart = createActionPart(m_mainGroup);
 
@@ -183,17 +168,16 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   protected Control createLinkPart(Composite parent) {
     LinksPresenterModel model = new LinksPresenterModel();
     model.addGlobalLink(new FileOpenLink(getProductFile(), 10, IPDEUIConstants.PRODUCT_EDITOR_ID));
-    // find config.ini
-    IConfigurationFileInfo info = m_productModel.getProduct().getConfigurationFileInfo();
-    if (info != null) {
-      String path = info.getPath(Platform.getOS());
-      if (path == null) {
-        path = info.getPath(null);
+
+    try {
+      ProductFileModelHelper pfmh = new ProductFileModelHelper(getProductFile());
+      IFile configIni = pfmh.ConfigurationFile.getFile();
+      if (configIni != null) {
+        model.addGlobalLink(new FileOpenLink(configIni, 20, EditorsUI.DEFAULT_TEXT_EDITOR_ID));
       }
-      if (!StringUtility.isNullOrEmpty(path)) {
-        IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(path));
-        model.addGlobalLink(new FileOpenLink(configIniFile, 20, EditorsUI.DEFAULT_TEXT_EDITOR_ID));
-      }
+    }
+    catch (CoreException e) {
+      ScoutSdkUi.logWarning("Unable to find config.ini file for product '" + getProductFile().getLocation().toOSString() + "'.", e);
     }
 
     LinksPresenter presenter = new LinksPresenter(getToolkit(), parent, model);
