@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link RapTargetNewWizard}</h3> ...
- * 
+ *
  * @author mvi
  * @since 3.9.0 16.01.2013
  */
@@ -55,18 +55,20 @@ public class RapTargetNewWizard extends AbstractWorkspaceWizard {
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(strategy)) {
       // existing local target
-      RapTargetVariable.get().setValue(localFolder);
+      File f = new File(localFolder);
+      RapTargetVariable.get().setValue(f.getAbsolutePath());
     }
     else {
       // locally extracted, new target from rap.target plug-in
+      File f = new File(extractFolder);
+
       ScoutRapTargetCreationOperation scoutRapTargetExtractOp = new ScoutRapTargetCreationOperation();
-      scoutRapTargetExtractOp.setDestinationDirectory(new File(extractFolder));
+      scoutRapTargetExtractOp.setDestinationDirectory(f);
       scoutRapTargetExtractOp.validate();
       scoutRapTargetExtractOp.run(monitor, workingCopyManager);
 
       // set the environment variable
-      File f = new File(extractFolder);
-      RapTargetVariable.get().setValue(f.toURI().toString());
+      RapTargetVariable.get().setValue(f.getAbsolutePath());
     }
     return true;
   }
