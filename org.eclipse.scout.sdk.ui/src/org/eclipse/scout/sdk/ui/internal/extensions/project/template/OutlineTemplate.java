@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.project.template;
 
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -20,6 +19,7 @@ import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation
 import org.eclipse.scout.sdk.ui.extensions.project.template.IProjectTemplate;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class OutlineTemplate implements IProjectTemplate {
 
@@ -47,9 +47,7 @@ public class OutlineTemplate implements IProjectTemplate {
 
   @Override
   public IStatus getStatus() {
-    if (Platform.getBundle(RuntimeClasses.ScoutClientBundleId) != null &&
-        Platform.getBundle(RuntimeClasses.ScoutServerBundleId) != null &&
-        Platform.getBundle(RuntimeClasses.ScoutSharedBundleId) != null) {
+    if (TypeUtility.existsType(RuntimeClasses.AbstractOkButton) /* check if a client type is present (don't care which type) */) {
       return Status.OK_STATUS;
     }
     else {
