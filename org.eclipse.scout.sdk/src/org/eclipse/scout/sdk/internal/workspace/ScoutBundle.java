@@ -149,7 +149,7 @@ public class ScoutBundle implements IScoutBundle {
               IPackageFragmentRoot[] packageFragmentRoots = jp.getPackageFragmentRoots();
               if (packageFragmentRoots != null) {
                 for (IPackageFragmentRoot root : packageFragmentRoots) {
-                  if (root != null && !root.isArchive() && !root.isReadOnly()) {
+                  if (root != null && !root.isArchive() && !root.isReadOnly() && !root.isExternal()) {
                     return jp;
                   }
                 }
