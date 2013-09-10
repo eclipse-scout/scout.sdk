@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.project.template;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.project.template.IProjectTemplate;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
@@ -33,5 +35,10 @@ public class EmptyApplicationTemplate implements IProjectTemplate {
   @Override
   public String getId() {
     return null;
+  }
+
+  @Override
+  public IStatus getStatus() {
+    return Status.OK_STATUS;
   }
 }

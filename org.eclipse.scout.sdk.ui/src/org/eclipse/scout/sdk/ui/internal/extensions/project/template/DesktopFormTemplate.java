@@ -10,10 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.project.template;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
 import org.eclipse.scout.sdk.ui.extensions.project.template.IProjectTemplate;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 
 public class DesktopFormTemplate implements IProjectTemplate {
@@ -35,5 +40,17 @@ public class DesktopFormTemplate implements IProjectTemplate {
   @Override
   public String getId() {
     return SingleFormTemplateOperation.TEMPLATE_ID;
+  }
+
+  @Override
+  public IStatus getStatus() {
+    if (Platform.getBundle(RuntimeClasses.ScoutClientBundleId) != null &&
+        Platform.getBundle(RuntimeClasses.ScoutServerBundleId) != null &&
+        Platform.getBundle(RuntimeClasses.ScoutSharedBundleId) != null) {
+      return Status.OK_STATUS;
+    }
+    else {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TemplateNotPossibleTargetPlatform"));
+    }
   }
 }

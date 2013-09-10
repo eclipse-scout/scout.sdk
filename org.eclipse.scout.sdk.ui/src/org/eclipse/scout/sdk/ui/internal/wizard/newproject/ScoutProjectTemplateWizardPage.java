@@ -14,6 +14,9 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -48,7 +51,6 @@ import org.eclipse.swt.widgets.Label;
 public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage {
 
   private FilteredTable m_table;
-//  private IScoutElementTemplateOperation m_selectedTemplate;
   private Label m_descriptionLabel;
   private P_ContentProvider m_provider;
   private ProjectTemplateExtension m_selectedTemplate;
@@ -75,6 +77,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
           selectedItem = (ProjectTemplateExtension) selection.getFirstElement();
         }
         handleSelection(selectedItem);
+        pingStateChanging();
       }
     });
 
@@ -92,6 +95,21 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
 
     m_table.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
     m_descriptionLabel.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+  }
+
+  @Override
+  protected void validatePage(MultiStatus multiStatus) {
+    super.validatePage(multiStatus);
+    multiStatus.add(getTemplateStatus());
+  }
+
+  protected IStatus getTemplateStatus() {
+    if (m_selectedTemplate != null) {
+      return m_selectedTemplate.getTemplate().getStatus();
+    }
+    else {
+      return Status.OK_STATUS;
+    }
   }
 
   @Override
