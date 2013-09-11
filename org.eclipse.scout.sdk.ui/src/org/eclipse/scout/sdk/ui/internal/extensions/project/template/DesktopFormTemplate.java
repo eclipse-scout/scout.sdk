@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.project.template;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
@@ -46,6 +48,10 @@ public class DesktopFormTemplate implements IProjectTemplate {
   public IStatus getStatus() {
     if (TypeUtility.existsType(RuntimeClasses.AbstractFormData) /* check if a shared type is present (don't care which type) */&&
         TypeUtility.existsType(RuntimeClasses.AbstractOkButton) /* check if a client type is present (don't care which type) */) {
+      return Status.OK_STATUS;
+    }
+    else if (Platform.getBundle(IRuntimeClasses.ScoutClientBundleId) != null &&
+        Platform.getBundle(IRuntimeClasses.ScoutSharedBundleId) != null) {
       return Status.OK_STATUS;
     }
     else {
