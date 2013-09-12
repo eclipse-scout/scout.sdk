@@ -30,6 +30,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
@@ -65,13 +66,12 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
  */
 @SuppressWarnings("restriction")
 public class ProductLaunchPresenter extends AbstractPresenter {
-
+  private String m_curLaunchState;
   private String m_productName;
   private final IFile m_productFile;
   private final IScoutBundle m_bundle;
   private final static Object m_lock = new Object();
 
-  // internal
   private ImageHyperlink m_runLink;
   private ImageHyperlink m_debugLink;
   private ImageHyperlink m_stopLink;
@@ -358,26 +358,29 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   }
 
   private void refreshUiLaunchState(String mode) {
-    if (!m_stopLink.isDisposed() && !m_mainGroup.isDisposed()) {
-      m_stopLink.setEnabled(!TERMINATED_MODE.equals(mode));
-      if (TERMINATED_MODE.equals(mode)) {
-        m_mainGroup.setText(getProductFile().getParent().getName());
+    if (!CompareUtility.equals(mode, m_curLaunchState)) {
+      m_curLaunchState = mode;
+      if (!m_stopLink.isDisposed() && !m_mainGroup.isDisposed()) {
+        m_stopLink.setEnabled(!TERMINATED_MODE.equals(mode));
+        if (TERMINATED_MODE.equals(mode)) {
+          m_mainGroup.setText(getProductFile().getParent().getName());
+        }
+        else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
+          m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
+        }
+        else if (ILaunchManager.RUN_MODE.equals(mode)) {
+          m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+        }
       }
-      else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-        m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
+      try {
+        ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+        if (uiExt != null && uiExt.getProductLauncherContributor() != null) {
+          uiExt.getProductLauncherContributor().refreshLaunchState(mode);
+        }
       }
-      else if (ILaunchManager.RUN_MODE.equals(mode)) {
-        m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+      catch (Exception e) {
+        ScoutSdkUi.logWarning("Error while refreshing launch state for product '" + getProductFile().getLocation().toOSString() + "'.", e);
       }
-    }
-    try {
-      ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
-      if (uiExt != null && uiExt.getProductLauncherContributor() != null) {
-        uiExt.getProductLauncherContributor().refreshLaunchState(mode);
-      }
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("Error while refreshing launch state for product '" + getProductFile().getLocation().toOSString() + "'.", e);
     }
   }
 

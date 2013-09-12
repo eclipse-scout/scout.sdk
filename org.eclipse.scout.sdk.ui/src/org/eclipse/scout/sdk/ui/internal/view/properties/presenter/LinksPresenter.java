@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.ILink;
@@ -18,6 +21,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresen
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -81,7 +85,23 @@ public class LinksPresenter extends AbstractPresenter {
   }
 
   private Control createHyperlink(Composite parent, ILink link) {
-    ImageHyperlink field = getToolkit().createImageHyperlink(parent, SWT.NONE);
+    final ImageHyperlink field = getToolkit().createImageHyperlink(parent, SWT.NONE);
+    link.addPropertyChangeListener(new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        if (ILink.PROP_NAME.equals(evt.getPropertyName())) {
+          String newTxt = (String) evt.getNewValue();
+          if (newTxt == null) {
+            newTxt = "";
+          }
+          field.setText(newTxt);
+        }
+        else if (ILink.PROP_IMAGE.equals(evt.getPropertyName())) {
+          field.setImage((Image) evt.getNewValue());
+          field.redraw();
+        }
+      }
+    });
     field.setUnderlined(true);
     field.setText(link.getName());
     field.setImage(link.getImage());

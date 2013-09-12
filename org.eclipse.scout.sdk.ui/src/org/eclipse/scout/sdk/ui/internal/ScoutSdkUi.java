@@ -317,10 +317,9 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   @Override
   protected void initializeImageRegistry(org.eclipse.jface.resource.ImageRegistry reg) {
-
     reg.put(CheckboxYesDisabled, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + CheckboxYes), SWT.IMAGE_DISABLE));
     reg.put(CheckboxNoDisabled, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + CheckboxNo), SWT.IMAGE_DISABLE));
-
+    reg.put(WebDisabled, ImageDescriptor.createWithFlags(ScoutSdkUi.imageDescriptorFromPlugin(ScoutSdkUi.PLUGIN_ID, "resources/icons/" + Web), SWT.IMAGE_DISABLE));
   }
 
   @Override

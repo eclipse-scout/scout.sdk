@@ -70,6 +70,7 @@ public interface SdkIcons {
   String ButtonStyle = Default; // TODO
   String ContentAssist = "content_assist_cue.gif";
   String Separator = "type_separator.gif";
+  String WebDisabled = "web_disabled";
 
   String Button = "button.png";
   String ButtonAdd = "button_add.gif";

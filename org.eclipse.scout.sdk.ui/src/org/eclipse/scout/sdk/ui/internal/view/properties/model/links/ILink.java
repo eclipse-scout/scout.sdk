@@ -4,11 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.model.links;
+
+import java.beans.PropertyChangeListener;
 
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Resource;
@@ -20,6 +22,9 @@ import org.eclipse.swt.graphics.Resource;
  * @since 1.0.8 09.02.2010
  */
 public interface ILink {
+
+  String PROP_NAME = "name";
+  String PROP_IMAGE = "image";
 
   /**
    * @return
@@ -36,5 +41,15 @@ public interface ILink {
    * is called once the link is disposed. can be used to free {@link Resource}
    */
   void dispose();
+
+  /**
+   * @param listener
+   */
+  void addPropertyChangeListener(PropertyChangeListener listener);
+
+  /**
+   * @param listener
+   */
+  void removePropertyChangeListener(PropertyChangeListener listener);
 
 }
