@@ -51,9 +51,9 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
     super(typeName, declaringType);
     setFormatSource(formatSource);
     // defaults
+    setFlags(Flags.AccPublic);
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getDeclaringType().getJavaProject()));
-    setFlags(Flags.AccPublic);
   }
 
   @Override
