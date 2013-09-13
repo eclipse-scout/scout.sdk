@@ -69,7 +69,7 @@ public class DateFieldNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
-    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSibling(getSibling());
     // getConfiguredLabel method

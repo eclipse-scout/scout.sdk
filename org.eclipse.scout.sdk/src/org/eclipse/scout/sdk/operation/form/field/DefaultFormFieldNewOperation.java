@@ -63,7 +63,7 @@ public class DefaultFormFieldNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSibling(getSibling());
     // getConfiguredLabel method

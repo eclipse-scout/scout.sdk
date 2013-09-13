@@ -69,7 +69,7 @@ public class StringFieldNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
-    FormFieldNewOperationNew formFieldOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    FormFieldNewOperation formFieldOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     formFieldOp.setFlags(Flags.AccPublic);
     formFieldOp.setSuperTypeSignature(getSuperTypeSignature());
     formFieldOp.setSibling(getSibling());

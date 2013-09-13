@@ -71,7 +71,7 @@ public class PlannerFieldNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSibling(getSibling());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());

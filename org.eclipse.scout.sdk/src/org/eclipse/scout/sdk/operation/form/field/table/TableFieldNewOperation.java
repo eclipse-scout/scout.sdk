@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperationNew;
+import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -79,7 +79,7 @@ public class TableFieldNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSibling(getSibling());
 

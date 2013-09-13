@@ -73,7 +73,7 @@ public class BigdecimalFieldNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
-    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setFlags(Flags.AccPublic);
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSibling(getSibling());
