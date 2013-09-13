@@ -14,13 +14,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -31,44 +33,36 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
-public class CodeTypeNewOperation implements IOperation {
+public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
 
   private String m_nextCodeId;
-  private String m_typeName;
-  private String m_packageName;
-  private String m_superTypeSignature;
-  private String m_genericTypeSignature;
   private INlsEntry m_nlsEntry;
-  private IScoutBundle m_sharedBundle;
 
-  private IType m_createdType;
-  private boolean m_formatSource;
-
-  @Override
-  public String getOperationName() {
-    return "New Code Type...";
+  /**
+   * @param typeName
+   * @param packageName
+   * @param project
+   * @throws JavaModelException
+   */
+  public CodeTypeNewOperation(String typeName, String packageName, IJavaProject project) throws JavaModelException {
+    super(typeName, packageName, project);
+    // defaults
+    setFlags(Flags.AccPublic);
+    setPackageExportPolicy(ExportPolicy.AddPackage);
+    setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    setFormatSource(true);
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
-    if (getSharedBundle() == null) {
-      throw new IllegalArgumentException("shared bundle can not be null.");
-    }
-    if (StringUtility.isNullOrEmpty(getTypeName())) {
-      throw new IllegalArgumentException("type name can not be null or empty.");
-    }
+  public String getOperationName() {
+    return "New Code Type '" + getElementName() + "'...";
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageName(), ScoutUtility.getJavaProject(getSharedBundle()));
-    newOp.setSuperTypeSignature(getSuperTypeSignature());
-    newOp.setFlags(Flags.AccPublic);
-    newOp.setPackageExportPolicy(ExportPolicy.AddPackage);
     // serial version UID
-    newOp.addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
+    addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
     // field ID
     FieldSourceBuilder idFieldBuilder = new FieldSourceBuilder("ID") {
       @Override
@@ -88,55 +82,32 @@ public class CodeTypeNewOperation implements IOperation {
       idFieldBuilder.setValue(getNextCodeId());
     }
     idFieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
-    idFieldBuilder.setSignature(getGenericTypeSignature());
-    newOp.addFieldSourceBuilder(idFieldBuilder);
+    String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
+    if (typeArguments.length > 0) {
+      idFieldBuilder.setSignature(typeArguments[0]);
+    }
+    else {
+      idFieldBuilder.setSignature(SignatureCache.createTypeSignature(Object.class.getName()));
+    }
+    addFieldSourceBuilder(idFieldBuilder);
     // constructor
-    IMethodSourceBuilder constructorSourceBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getTypeName());
+    IMethodSourceBuilder constructorSourceBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
     constructorSourceBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     constructorSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
-    newOp.addMethodSourceBuilder(constructorSourceBuilder);
+    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorSourceBuilder), constructorSourceBuilder);
 
     // nls
     if (getNlsEntry() != null) {
-      IMethodSourceBuilder nlsSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
+      IMethodSourceBuilder nlsSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
       nlsSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
-      newOp.addMethodSourceBuilder(nlsSourceBuilder);
+      addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsSourceBuilder), nlsSourceBuilder);
     }
     // get id method
-    IMethodSourceBuilder getIdSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), "getId");
+    IMethodSourceBuilder getIdSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), "getId");
     getIdSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return ID;"));
-    newOp.addMethodSourceBuilder(getIdSourceBuilder);
+    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getIdSourceBuilder), getIdSourceBuilder);
 
-    newOp.validate();
-    newOp.run(monitor, workingCopyManager);
-    m_createdType = newOp.getCreatedType();
-    workingCopyManager.register(m_createdType.getCompilationUnit(), monitor);
-
-    if (isFormatSource()) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedType(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
-  }
-
-  public IType getCreatedType() {
-    return m_createdType;
-  }
-
-  public void setFormatSource(boolean formatSource) {
-    m_formatSource = formatSource;
-  }
-
-  public boolean isFormatSource() {
-    return m_formatSource;
-  }
-
-  public void setSharedBundle(IScoutBundle sharedBundle) {
-    m_sharedBundle = sharedBundle;
-  }
-
-  public IScoutBundle getSharedBundle() {
-    return m_sharedBundle;
+    super.run(monitor, workingCopyManager);
   }
 
   public void setNextCodeId(String nextCodeId) {
@@ -147,14 +118,6 @@ public class CodeTypeNewOperation implements IOperation {
     return m_nextCodeId;
   }
 
-  public String getTypeName() {
-    return m_typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
-  }
-
   public void setNlsEntry(INlsEntry nlsKey) {
     m_nlsEntry = nlsKey;
   }
@@ -163,27 +126,4 @@ public class CodeTypeNewOperation implements IOperation {
     return m_nlsEntry;
   }
 
-  public String getSuperTypeSignature() {
-    return m_superTypeSignature;
-  }
-
-  public void setSuperTypeSignature(String superTypeSignature) {
-    m_superTypeSignature = superTypeSignature;
-  }
-
-  public void setGenericTypeSignature(String genericTypeSignature) {
-    m_genericTypeSignature = genericTypeSignature;
-  }
-
-  public String getGenericTypeSignature() {
-    return m_genericTypeSignature;
-  }
-
-  public String getPackageName() {
-    return m_packageName;
-  }
-
-  public void setPackageName(String packageName) {
-    m_packageName = packageName;
-  }
 }

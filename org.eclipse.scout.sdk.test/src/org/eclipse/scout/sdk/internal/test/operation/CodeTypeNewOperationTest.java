@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.internal.test.operation;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -40,27 +39,47 @@ public class CodeTypeNewOperationTest extends AbstractSdkTestWithSampleProject {
   @Test
   public void testNewCodeType() throws Exception {
     Assert.assertTrue(TypeUtility.exists(getSharedJavaProject()));
-    CodeTypeNewOperation codeTypeOp = new CodeTypeNewOperation();
     IScoutBundle sharedBundle = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(getSharedJavaProject());
-    codeTypeOp.setSharedBundle(sharedBundle);
-    codeTypeOp.setTypeName("CodeType01");
-    codeTypeOp.setPackageName(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_CODE));
+    CodeTypeNewOperation codeTypeOp = new CodeTypeNewOperation("CodeType01", DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_CODE), sharedBundle.getJavaProject());
     codeTypeOp.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType<" + Long.class.getName() + ">"));
-    codeTypeOp.setGenericTypeSignature(Signature.createTypeSignature(Long.class.getName(), true));
     // nls
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(getSharedJavaProject());
     INlsEntry entry = nlsProject.getEntry("Text02");
     codeTypeOp.setNlsEntry(entry);
     codeTypeOp.setFormatSource(true);
     executeBuildAssertNoCompileErrors(codeTypeOp);
-    IType codeType = codeTypeOp.getCreatedType();
-    SdkAssert.assertExist(codeType);
-    SdkAssert.assertPublic(codeType).assertNoMoreFlags();
-    IMethod getIdMethod = SdkAssert.assertMethodExist(codeType, "getId");
-    SdkAssert.assertPublic(getIdMethod).assertNoMoreFlags();
-    IField idField = SdkAssert.assertFieldExist(codeType, "ID");
-    SdkAssert.assertPublic(idField).assertFinal().assertStatic().assertNoMoreFlags();
-    SdkAssert.assertSerialVersionUidExists(codeType);
 
+    SdkAssert.assertExist(codeTypeOp.getCreatedType());
+    testApiOfCodeType01();
+
+  }
+
+  private void testApiOfCodeType01() throws Exception {
+    // type CodeType01
+    IType codeType01 = SdkAssert.assertTypeExists("services.code.CodeType01");
+    SdkAssert.assertHasFlags(codeType01, 1);
+    SdkAssert.assertHasSuperTypeSignature(codeType01, "QAbstractCodeType<QLong;>;");
+
+    // fields of CodeType01
+    SdkAssert.assertEquals("field count of 'CodeType01'", 2, codeType01.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(codeType01, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+    IField iD = SdkAssert.assertFieldExist(codeType01, "ID");
+    SdkAssert.assertHasFlags(iD, 25);
+    SdkAssert.assertFieldSignature(iD, "QLong;");
+
+    SdkAssert.assertEquals("method count of 'CodeType01'", 3, codeType01.getMethods().length);
+    IMethod codeType011 = SdkAssert.assertMethodExist(codeType01, "CodeType01", new String[]{});
+    SdkAssert.assertTrue(codeType011.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(codeType011, "V");
+    IMethod getConfiguredText = SdkAssert.assertMethodExist(codeType01, "getConfiguredText", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getConfiguredText, "QString;");
+    SdkAssert.assertAnnotation(getConfiguredText, "java.lang.Override");
+    IMethod getId = SdkAssert.assertMethodExist(codeType01, "getId", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getId, "QLong;");
+    SdkAssert.assertAnnotation(getId, "java.lang.Override");
+
+    SdkAssert.assertEquals("inner types count of 'CodeType01'", 0, codeType01.getTypes().length);
   }
 }

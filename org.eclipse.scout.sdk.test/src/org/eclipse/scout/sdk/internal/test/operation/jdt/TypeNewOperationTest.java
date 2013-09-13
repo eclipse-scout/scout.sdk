@@ -55,7 +55,7 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     String packageName = "jdt.test.client.type.output";
     PrimaryTypeNewOperation typeOp = new PrimaryTypeNewOperation(typeName, packageName, clientProject);
     typeOp.setFlags(Flags.AccPublic);
-    typeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createCompilationUnitCommentBuilder());
+    typeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     typeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeOp);
 

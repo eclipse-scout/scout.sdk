@@ -59,7 +59,7 @@ public final class CommentSourceBuilderFactory {
     }
   }
 
-  public static final ICommentSourceBuilder createCompilationUnitCommentBuilder() {
+  public static final ICommentSourceBuilder createPreferencesCompilationUnitCommentBuilder() {
     if (javaElementCommentBuilderService != null) {
       return javaElementCommentBuilderService.createCompilationUnitCommentBuilder();
     }

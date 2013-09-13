@@ -205,11 +205,8 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    CodeTypeNewOperation op = new CodeTypeNewOperation();
+    CodeTypeNewOperation op = new CodeTypeNewOperation(getTypeName(), getSharedBundle().getPackageName(getTargetPackage()), ScoutUtility.getJavaProject(getSharedBundle()));
     // write back members
-    op.setSharedBundle(getSharedBundle());
-    op.setTypeName(getTypeName());
-    op.setPackageName(getSharedBundle().getPackageName(getTargetPackage()));
     op.setNlsEntry(getNlsName());
 
     IType superTypeProp = getSuperType();
@@ -223,11 +220,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
       op.setSuperTypeSignature(sig);
     }
-    if (getGenericSignature() != null) {
-      op.setGenericTypeSignature(getGenericSignature());
-    }
     op.setNextCodeId(getNextCodeIdSource());
-    op.setFormatSource(true);
     op.validate();
     op.run(monitor, workingCopyManager);
     return true;

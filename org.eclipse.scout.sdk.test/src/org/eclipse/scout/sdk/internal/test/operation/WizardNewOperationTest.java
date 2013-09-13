@@ -40,7 +40,7 @@ public class WizardNewOperationTest extends AbstractSdkTestWithSampleProject {
     WizardNewOperation newOp = new WizardNewOperation("Test01Wizard", getClientJavaProject().getElementName() + ".wizard.output", getClientJavaProject());
     newOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IWizard, getClientJavaProject()));
     executeBuildAssertNoCompileErrors(newOp);
-    IType wizard = newOp.getCreatedWizard();
+    IType wizard = newOp.getCreatedType();
     SdkAssert.assertExist(wizard);
     SdkAssert.assertPublic(wizard).assertNoMoreFlags();
     SdkAssert.assertHasSuperType(wizard, RuntimeClasses.IWizard);
@@ -56,7 +56,7 @@ public class WizardNewOperationTest extends AbstractSdkTestWithSampleProject {
     INlsEntry entry = nlsProject.getEntry("Text02");
     newOp.setNlsEntry(entry);
     executeBuildAssertNoCompileErrors(newOp);
-    IType wizard = newOp.getCreatedWizard();
+    IType wizard = newOp.getCreatedType();
     SdkAssert.assertExist(wizard);
     SdkAssert.assertPublic(wizard).assertNoMoreFlags();
     SdkAssert.assertHasSuperType(wizard, RuntimeClasses.IWizard);

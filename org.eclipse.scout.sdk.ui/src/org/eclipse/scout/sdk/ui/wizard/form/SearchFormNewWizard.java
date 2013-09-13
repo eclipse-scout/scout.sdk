@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -52,7 +53,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   private final IScoutBundle m_clientBundle;
   private SearchFormNewWizardPage m_page1;
   private BundleTreeWizardPage m_page2;
-  private SearchFormNewOperation m_operation = new SearchFormNewOperation();
+  private SearchFormNewOperation m_operation;
   private ITreeNode m_locationPageRoot;
 
   public SearchFormNewWizard(IScoutBundle clientBundle) {
@@ -109,7 +110,8 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
   @Override
   protected boolean beforeFinish() throws CoreException {
     // fill operation before gui is disposed
-    m_operation.setTypeName(m_page1.getTypeName());
+    IScoutBundle searchFormBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM, true, true);
+    m_operation = new SearchFormNewOperation(m_page1.getTypeName(), searchFormBundle.getPackageName(m_page1.getTargetPackage(IDefaultTargetPackage.CLIENT_SEARCHFORMS)), ScoutUtility.getJavaProject(searchFormBundle));
     m_operation.setNlsEntry(m_page1.getNlsName());
     IType superTypeProp = m_page1.getSuperType();
     if (superTypeProp != null) {
@@ -117,10 +119,6 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
     }
     m_operation.setTablePage(m_page1.getTablePageType());
     m_operation.setCreateSearchHandler(m_page2.getTreeNode(TYPE_HANDLER_SEARCH, true, true) != null);
-
-    IScoutBundle searchFormBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM, true, true);
-    m_operation.setSearchFormLocationBundle(searchFormBundle);
-    m_operation.setSearchFormPackageName(searchFormBundle.getPackageName(m_page1.getTargetPackage(IDefaultTargetPackage.CLIENT_SEARCHFORMS)));
 
     IScoutBundle searchFormDataBundle = m_page2.getLocationBundle(TYPE_SEARCH_FORM_DATA, true, true);
     m_operation.setSearchFormDataLocationBundle(searchFormDataBundle);

@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -47,11 +48,6 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * @since 1.0.0 2008
  */
 public class FormNewOperation extends PrimaryTypeNewOperation {
-  public static final int METHOD_INDEX_CONSTUCTOR = 10;
-  public static final int METHOD_INDEX_CONFIG_PROPERTY = 20;
-  public static final int METHOD_INDEX_FORM_PROPERTY = 30;
-  public static final int METHOD_INDEX_FIELD_GETTER = 40;
-  public static final int METHOD_INDEX_OTHER = 99;
 
   private INlsEntry m_nlsEntry;
   private String m_formDataSignature;
@@ -66,7 +62,13 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
   public FormNewOperation(String typeName, String packageName, IJavaProject clientProject) throws JavaModelException {
     super(typeName, packageName, clientProject);
+
+    // defaults
+    setPackageExportPolicy(ExportPolicy.AddPackage);
     setFlags(Flags.AccPublic);
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, getJavaProject()));
+    getSourceBuilder().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setFormatSource(true);
   }
 
@@ -86,15 +88,10 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-//    final PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageName(), getClientProject());
 
-    if (getSuperTypeSignature() == null) {
-      setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, getJavaProject()));
-    }
     if (!StringUtility.isNullOrEmpty(getFormDataSignature())) {
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation(getFormDataSignature(), SdkCommand.CREATE, null));
     }
-    setPackageExportPolicy(ExportPolicy.AddPackage);
 
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
@@ -108,6 +105,25 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
 
+    if (StringUtility.hasText(getFormIdName())) {
+      createFormIdProperty(getSourceBuilder());
+    }
+
+    createMainBox(getSourceBuilder(), monitor, workingCopyManager);
+
+    super.run(monitor, workingCopyManager);
+
+    m_createdMainBox = TypeUtility.findInnerType(getCreatedType(), SdkProperties.TYPE_NAME_MAIN_BOX);
+
+    workingCopyManager.register(getCreatedType().getCompilationUnit(), monitor);
+  }
+
+  /**
+   * @param formBuilder
+   * @return mainbox builder
+   * @throws CoreException
+   */
+  protected void createMainBox(ITypeSourceBuilder formBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // main box
     ITypeSourceBuilder mainBoxBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MAIN_BOX);
     mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
@@ -120,27 +136,26 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     IMethodSourceBuilder mainBoxGetterBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(mainBoxSignature);
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(mainBoxGetterBuilder), mainBoxGetterBuilder);
 
-    double order = 10;
-    // ok button
+    fillMainBox(formBuilder, mainBoxBuilder);
+  }
+
+  /**
+   * @param formBuilder
+   * @param mainBoxBuilder
+   * @param nextOrderNr
+   */
+  protected void fillMainBox(ITypeSourceBuilder formBuilder, ITypeSourceBuilder mainBoxBuilder) {
+    double nextOrderNr = 10;
     if (isCreateButtonOk()) {
-      createOkButton(getSourceBuilder(), mainBoxBuilder, order);
-      order += 10;
+      createOkButton(getSourceBuilder(), mainBoxBuilder, nextOrderNr);
+      nextOrderNr += 10;
     }
 
     // cancel button
     if (isCreateButtonCancel()) {
-      createCancelButton(getSourceBuilder(), mainBoxBuilder, order);
-      order += 10;
+      createCancelButton(getSourceBuilder(), mainBoxBuilder, nextOrderNr);
+      nextOrderNr += 10;
     }
-    if (StringUtility.hasText(getFormIdName())) {
-      createFormIdProperty(getSourceBuilder());
-    }
-
-    super.run(monitor, workingCopyManager);
-
-    m_createdMainBox = TypeUtility.findInnerType(getCreatedType(), SdkProperties.TYPE_NAME_MAIN_BOX);
-
-    workingCopyManager.register(getCreatedType().getCompilationUnit(), monitor);
   }
 
   protected void createOkButton(ITypeSourceBuilder formBuilder, ITypeSourceBuilder mainboxBuilder, double order) {

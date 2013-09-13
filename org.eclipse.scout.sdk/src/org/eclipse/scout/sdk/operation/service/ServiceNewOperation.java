@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
@@ -76,9 +77,13 @@ public class ServiceNewOperation implements IOperation {
   public ServiceNewOperation(String serviceInterfaceName, String serviceName) {
     m_formatSource = true;
     m_implementationBuilder = new TypeSourceBuilder(serviceName);
-    m_implementationBuilder.setFlags(Flags.AccPublic);
     m_interfaceBuilder = new TypeSourceBuilder(serviceInterfaceName);
+    // defaults
+    m_implementationBuilder.setFlags(Flags.AccPublic);
+    m_implementationBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+
     m_interfaceBuilder.setFlags(Flags.AccPublic | Flags.AccInterface);
+    m_interfaceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
 
     m_proxyRegistrationProjects = new ArrayList<IJavaProject>();
     m_serviceRegistrationProjects = new ArrayList<IJavaProject>();

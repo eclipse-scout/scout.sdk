@@ -17,6 +17,8 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
@@ -28,13 +30,16 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>PermissionNewOperation</h3> ...
  */
-public class PermissionNewOperation extends org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation {
+public class PermissionNewOperation extends PrimaryTypeNewOperation {
 
   public PermissionNewOperation(String permissinName, String packageName, IJavaProject project) throws JavaModelException {
     super(permissinName, packageName, project);
+
+    // defaults
     setFlags(Flags.AccPublic);
     setFormatSource(true);
     setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.BasicPermission));
+    setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
   }
 
   @Override
