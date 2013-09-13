@@ -17,6 +17,7 @@ import javax.xml.ws.handler.soap.SOAPMessageContext;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
@@ -25,6 +26,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -65,7 +67,9 @@ public class HandlerNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     PrimaryTypeNewOperation opType = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
-
+    opType.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+    opType.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    opType.setFlags(Flags.AccPublic);
     String superTypeSignature;
     if (m_superType.getFullyQualifiedName().equals(LogicalHandler.class.getName())) {
       superTypeSignature = Signature.createTypeSignature(LogicalHandler.class.getName() + "<" + LogicalMessageContext.class.getName() + ">", false);
@@ -127,6 +131,9 @@ public class HandlerNewOperation implements IOperation {
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
       PrimaryTypeNewOperation newTypeOp = new PrimaryTypeNewOperation(typeName, packageName, m_bundle.getJavaProject());
+      newTypeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+      newTypeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+      newTypeOp.setFlags(Flags.AccPublic);
       newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();

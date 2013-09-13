@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.rap.operations.project.CreateMobileClientPluginOper
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
@@ -75,6 +76,8 @@ public class SingleFormTemplateHomeFormCreateOperation extends AbstractScoutProj
   private void createHomeForm(IScoutBundle mobileClient, IType desktopForm, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     String packageName = mobileClient.getPackageName(".ui.forms");
     PrimaryTypeNewOperation homeFormOp = new PrimaryTypeNewOperation("MobileHomeForm", packageName, mobileClient.getJavaProject());
+    homeFormOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+    homeFormOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     homeFormOp.setFlags(Flags.AccPublic);
     homeFormOp.setSuperTypeSignature(SignatureCache.createTypeSignature(SignatureCache.createTypeSignature(desktopForm.getFullyQualifiedName())));
 

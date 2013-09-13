@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.rap.operations.project.CreateMobileClientPluginOper
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
@@ -77,6 +78,8 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
 
     String packageName = mobileClient.getPackageName(".ui.forms");
     PrimaryTypeNewOperation homeFormOp = new PrimaryTypeNewOperation("MobileHomeForm", packageName, mobileClient.getJavaProject());
+    homeFormOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+    homeFormOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     homeFormOp.setFlags(Flags.AccPublic);
     homeFormOp.addInterfaceSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.mobile.ui.form.outline.IOutlineChooserForm"));
     homeFormOp.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.mobile.ui.form.AbstractMobileForm"));

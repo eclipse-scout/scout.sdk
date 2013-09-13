@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperat
 import org.eclipse.scout.sdk.rap.operations.project.CreateMobileClientPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -74,6 +75,8 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
     String pck = mobileClient.getDefaultPackage(IDefaultTargetPackage.CLIENT_DESKTOP);
     final String desktopExtensionName = "DesktopExtension";
     PrimaryTypeNewOperation desktopExtensionOp = new PrimaryTypeNewOperation(desktopExtensionName, pck, mobileClient.getJavaProject());
+    desktopExtensionOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+    desktopExtensionOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     desktopExtensionOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDesktopExtension, mobileClient));
     desktopExtensionOp.setFlags(Flags.AccPublic);
     // fields

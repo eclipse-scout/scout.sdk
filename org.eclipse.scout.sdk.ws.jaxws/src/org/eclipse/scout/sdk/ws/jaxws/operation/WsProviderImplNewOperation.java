@@ -14,6 +14,7 @@ import javax.jws.WebService;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -23,6 +24,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -62,6 +64,9 @@ public class WsProviderImplNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     PrimaryTypeNewOperation implNewTypeOp = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
+    implNewTypeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+    implNewTypeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    implNewTypeOp.setFlags(Flags.AccPublic);
     if (TypeUtility.exists(m_portTypeInterfaceType)) {
       implNewTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(m_portTypeInterfaceType.getFullyQualifiedName()));
     }
@@ -143,6 +148,9 @@ public class WsProviderImplNewOperation implements IOperation {
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
       PrimaryTypeNewOperation newTypeOp = new PrimaryTypeNewOperation(typeName, packageName, m_bundle.getJavaProject());
+      newTypeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+      newTypeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+      newTypeOp.setFlags(Flags.AccPublic);
       newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();
