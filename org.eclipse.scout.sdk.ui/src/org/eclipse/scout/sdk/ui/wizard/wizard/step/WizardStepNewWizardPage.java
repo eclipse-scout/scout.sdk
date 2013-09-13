@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -173,7 +174,8 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       protected Object[][] computeProposals() {
         ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IForm));
-        IType[] forms = formHierarchy.getAllSuperclasses(TypeUtility.getType(RuntimeClasses.IForm), TypeFilters.getTypesOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getTypeNameComparator());
+        ITypeFilter formsFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(m_declaringType.getJavaProject()));
+        IType[] forms = formHierarchy.getAllSubtypes(TypeUtility.getType(RuntimeClasses.IForm), formsFilter, TypeComparators.getTypeNameComparator());
         return new Object[][]{forms};
       }
     };
