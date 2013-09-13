@@ -21,6 +21,8 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -37,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>FormHandlerNewOperation</h3> ...
  */
-public class FormHandlerNewOperation extends org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation {
+public class FormHandlerNewOperation extends InnerTypeNewOperation {
 
   private IMethod m_createdStartMethod;
 
@@ -48,6 +50,8 @@ public class FormHandlerNewOperation extends org.eclipse.scout.sdk.operation.jdt
   public FormHandlerNewOperation(String typeName, IType declaringType, boolean formatSource) {
     super(typeName, declaringType);
     setFormatSource(formatSource);
+    // defaults
+    setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getDeclaringType().getJavaProject()));
     setFlags(Flags.AccPublic);
   }
@@ -74,7 +78,7 @@ public class FormHandlerNewOperation extends org.eclipse.scout.sdk.operation.jdt
         TypeFilters.getTopLevelTypeFilter()));
 
     String handlerName = getElementName();
-    
+
     if (TypeUtility.exists(form) && handlerName != null && handlerName.length() > 1) {
       String startMethodName = handlerName.replaceFirst(SdkProperties.SUFFIX_FORM_HANDLER + "\\b", "");
       if (startMethodName.length() > 1) {
