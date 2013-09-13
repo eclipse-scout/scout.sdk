@@ -77,7 +77,13 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
             for (int i = 0; i < m_backupTree.length; i++) {
               m_backupTree[i] = new P_BackupNode(null, dirtyStructureRoots[i]);
             }
-            m_treeViewer.setSelection(null, false); // remove the selection. we will restore it later. prevents 'widget disposed' errors during refresh later on.
+            try {
+              m_treeViewer.setData(SELECTION_PREVENTER, this);
+              m_treeViewer.setSelection(null, false); // remove the selection. we will restore it later. prevents 'widget disposed' errors during refresh later on.
+            }
+            finally {
+              m_treeViewer.setData(SELECTION_PREVENTER, null);
+            }
           }
         });
         // model thread
@@ -125,7 +131,6 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
   }
 
   private void restoreSelectionInUiThread() {
-    boolean isNewSelection = false;
     TreePath[] paths = m_backupedSelection.getPaths();
     ArrayList<TreePath> newPaths = new ArrayList<TreePath>();
     for (TreePath p : paths) {
@@ -137,7 +142,6 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
             newSegments.add(segment);
           }
           else {
-            isNewSelection = true;
             break;
           }
         }
@@ -147,9 +151,7 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
       }
       newPaths.add(new TreePath(newSegments.toArray()));
     }
-    if (isNewSelection) {
-      m_view.getTreeViewer().setSelection(new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()])));
-    }
+    m_view.getTreeViewer().setSelection(new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()])));
   }
 
   private class P_BackupNode {

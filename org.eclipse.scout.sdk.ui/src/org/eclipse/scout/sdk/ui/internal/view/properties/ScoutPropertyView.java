@@ -23,6 +23,8 @@ import org.eclipse.scout.sdk.ui.extensions.view.property.IPropertyViewPart;
 import org.eclipse.scout.sdk.ui.extensions.view.property.ISinglePropertyViewPart;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.view.property.PropertyViewExtensionPoint;
+import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ExceptionSinglePagePropertyViewPart;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.UnknownSinglePagePropertyViewPart;
@@ -41,13 +43,11 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class ScoutPropertyView extends ViewPart {
 
-  private HashCodeComparator hasCodeComparator = new HashCodeComparator();
+  private final static P_HashCodeComparator HASH_CODE_COMPARATOR = new P_HashCodeComparator();
 
   private Composite m_content;
-  private IPropertyViewPart m_currentPart = null;
-
+  private IPropertyViewPart m_currentPart;
   private P_SelectionListener m_selectionListener;
-
   private IMemento m_memento;
 
   @Override
@@ -79,7 +79,7 @@ public class ScoutPropertyView extends ViewPart {
     m_content = new Composite(parent, SWT.NONE);
     m_content.setLayout(new FillLayout());
     ISelection selection = getSite().getWorkbenchWindow().getSelectionService().getSelection(IScoutConstants.SCOUT_EXPLORER_VIEW);
-    handleSelectionChanged(selection);
+    handleSelectionChanged((ScoutExplorerPart) ScoutSdkUi.getExplorer(false), selection);
   }
 
   /**
@@ -96,7 +96,12 @@ public class ScoutPropertyView extends ViewPart {
     super.init(site, memento);
   }
 
-  protected void handleSelectionChanged(ISelection selection) {
+  protected void handleSelectionChanged(ScoutExplorerPart part, ISelection selection) {
+    if (part != null && part.getTreeViewer() != null && part.getTreeViewer().getData(RefreshOutlineSubTreeJob.SELECTION_PREVENTER) != null) {
+      // the event comes from the refresh outline job which clears the selection to re-apply it later on. we are not interested in the clear-event.
+      return;
+    }
+
     // clear old
     IPage[] pagesa = getPagesOfSelection(selection);
     if (m_currentPart != null) {
@@ -138,7 +143,6 @@ public class ScoutPropertyView extends ViewPart {
       }
     }
     catch (Throwable e) {
-      //
       if (m_currentPart != null) {
         m_currentPart.dispose();
         m_currentPart = null;
@@ -163,8 +167,6 @@ public class ScoutPropertyView extends ViewPart {
       m_currentPart.init(m_memento);
     }
     m_content.layout(false);
-
-//    m_content.layout(true);
   }
 
   private IPage[] getPagesOfSelection(ISelection selection) {
@@ -187,19 +189,19 @@ public class ScoutPropertyView extends ViewPart {
     if (pagesA == null || pagesB == null) {
       return false;
     }
-    Arrays.sort(pagesA, hasCodeComparator);
-    Arrays.sort(pagesB, hasCodeComparator);
+    Arrays.sort(pagesA, HASH_CODE_COMPARATOR);
+    Arrays.sort(pagesB, HASH_CODE_COMPARATOR);
     return Arrays.equals(pagesA, pagesB);
   }
 
   private class P_SelectionListener implements ISelectionListener {
     @Override
     public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-      handleSelectionChanged(selection);
+      handleSelectionChanged((ScoutExplorerPart) part, selection);
     }
   } // end class P_SelectionListener
 
-  private class HashCodeComparator implements Comparator<Object> {
+  private final static class P_HashCodeComparator implements Comparator<Object> {
     @Override
     public int compare(Object o1, Object o2) {
       if (o1 == null && o2 == null) {
