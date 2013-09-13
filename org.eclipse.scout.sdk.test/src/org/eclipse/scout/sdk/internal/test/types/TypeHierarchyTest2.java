@@ -48,7 +48,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       SdkAssert.assertNotNull(bundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(bundle, IDefaultTargetPackage.CLIENT_OUTLINES), bundle.getJavaProject());
       executeBuildAssertNoCompileErrors(createOutlineOp);
-      IType outline = createOutlineOp.getCreatedOutline();
+      IType outline = createOutlineOp.getCreatedType();
       subtypes = outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter());
       assertEquals(1, subtypes.length);
       outline.delete(true, new NullProgressMonitor());
@@ -74,7 +74,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       SdkAssert.assertNotNull(clientBundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
       executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
-      IType outline = createOutlineOp.getCreatedOutline();
+      IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
       subtypes = outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter());
       assertEquals(1, subtypes.length);
@@ -102,7 +102,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
       executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
 
-      IType outline = createOutlineOp.getCreatedOutline();
+      IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
       subtypes = outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter());
       assertEquals(1, subtypes.length);
@@ -130,7 +130,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
       executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
 
-      IType outline = createOutlineOp.getCreatedOutline();
+      IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
       subtypes = outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter());
       assertEquals(1, subtypes.length);
@@ -158,7 +158,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
       executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
 
-      IType outline = createOutlineOp.getCreatedOutline();
+      IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
       subtypes = outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter());
       assertEquals(1, subtypes.length);
@@ -186,7 +186,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       SdkAssert.assertNotNull(clientBundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
       executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
-      createOutlineOp.getCreatedOutline();
+      createOutlineOp.getCreatedType();
       assertEquals(1, outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter()).length);
       clearWorkspace();
       assertFalse(TypeUtility.exists(iOutline));

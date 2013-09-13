@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.ui.wizard.lookupcall.LookupCallNewWizardPage.LOOKUP_SERVICE_STRATEGY;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -120,23 +121,18 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
   @Override
   protected boolean beforeFinish() throws CoreException {
     // fill operation before gui is disposed
-    m_operation = new LookupCallNewOperation();
+    IScoutBundle lookupCallBundle = m_page2.getLocationBundle(TYPE_LOOKUPCALL, true, true);
+    m_operation = new LookupCallNewOperation(m_page1.getTypeName(), lookupCallBundle.getPackageName(m_page1.getTargetPackage()), ScoutUtility.getJavaProject(lookupCallBundle));
     IScoutBundle serviceProxyRegBundle = m_page2.getLocationBundle(TYPE_SERVICE_REG_CLIENT, true, true);
     if (serviceProxyRegBundle != null) {
       m_operation.setServiceProxyRegistrationProject(serviceProxyRegBundle.getJavaProject());
     }
 
-    IScoutBundle lookupCallBundle = m_page2.getLocationBundle(TYPE_LOOKUPCALL, true, true);
-    if (lookupCallBundle != null) {
-      m_operation.setLookupCallProject(lookupCallBundle.getJavaProject());
-      m_operation.setLookupCallPackageName(lookupCallBundle.getPackageName(m_page1.getTargetPackage()));
-    }
     m_operation.setFormatSource(false);
     IScoutBundle serviceRegistrationBundle = m_page2.getLocationBundle(TYPE_SERVICE_REG_SERVER, true, true);
     if (serviceRegistrationBundle != null) {
       m_operation.setServiceRegistrationProject(serviceRegistrationBundle.getJavaProject());
     }
-    m_operation.setLookupCallName(m_page1.getTypeName());
 
     IScoutBundle serviceBundle = m_page2.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (serviceBundle != null) {

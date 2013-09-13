@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.Regex;
@@ -141,6 +142,8 @@ public class CreateTemplateOperation implements IOperation {
       }
     };
     PrimaryTypeNewOperation op = new PrimaryTypeNewOperation(typeSourceBuilder, getPackageName(), ScoutUtility.getJavaProject(getTemplateBundle()));
+    op.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
+    op.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
 
     String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
 
@@ -159,10 +162,10 @@ public class CreateTemplateOperation implements IOperation {
       formDataType = op.getCreatedType();
     }
     op.setPackageExportPolicy(ExportPolicy.AddPackage);
+    op.setFormatSource(true);
     op.validate();
     op.run(monitor, workingCopyManager);
     IType templateType = op.getCreatedType();
-
     workingCopyManager.reconcile(templateType.getCompilationUnit(), monitor);
 
     // form data

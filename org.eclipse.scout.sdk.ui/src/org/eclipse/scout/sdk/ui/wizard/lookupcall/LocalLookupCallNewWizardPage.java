@@ -151,12 +151,10 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     LocalLookupCallNewOperation op = new LocalLookupCallNewOperation(getTypeName(), getClientBundle().getPackageName(getTargetPackage()), ScoutUtility.getJavaProject(getClientBundle()));
-    op.setLookupCallName(getTypeName());
-    op.setPackageName(getClientBundle().getPackageName(getTargetPackage()));
     op.setFormatSource(true);
     IType superTypeProp = getLookupCallSuperType();
     if (superTypeProp != null) {
-      op.setLookupCallSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
     op.validate();
     op.run(monitor, manager);

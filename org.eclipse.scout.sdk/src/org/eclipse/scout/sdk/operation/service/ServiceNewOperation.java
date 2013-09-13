@@ -120,6 +120,7 @@ public class ServiceNewOperation implements IOperation {
         interfaceSignatures.add(service2Signature);
       }
       PrimaryTypeNewOperation interfaceOp = new PrimaryTypeNewOperation(getInterfaceSourceBuilder(), getInterfacePackageName(), getInterfaceProject());
+      interfaceOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
       interfaceOp.setPackageExportPolicy(ExportPolicy.AddPackage);
 
       interfaceOp.setFormatSource(isFormatSource());
@@ -140,6 +141,7 @@ public class ServiceNewOperation implements IOperation {
         getImplementationSourceBuilder().setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getImplementationProject()));
       }
       PrimaryTypeNewOperation implementationOp = new PrimaryTypeNewOperation(getImplementationSourceBuilder(), getImplementationPackageName(), getImplementationProject());
+      implementationOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
       implementationOp.setFormatSource(isFormatSource());
       implementationOp.validate();
       implementationOp.run(monitor, workingCopyManager);
