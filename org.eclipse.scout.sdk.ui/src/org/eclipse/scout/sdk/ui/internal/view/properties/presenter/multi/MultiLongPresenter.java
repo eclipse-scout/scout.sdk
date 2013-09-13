@@ -15,18 +15,17 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiValuePresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.parser.LongPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -99,21 +98,9 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
   protected synchronized void storeMethods(MethodBean<Long>[] beans, Long value) {
     ArrayList<IOperation> list = new ArrayList<IOperation>();
     for (MethodBean<Long> bean : beans) {
-      try {
-        String sourceValue = formatSourceValue(value);
-        ConfigurationMethod method = bean.getMethod();
-        if (UiUtility.equals(bean.getDefaultValue(), sourceValue)) {
-          if (method.isImplemented()) {
-            list.add(new ScoutMethodDeleteOperation(method.peekMethod()));
-          }
-        }
-        else {
-          list.add(new ConfigPropertyMethodUpdateOperation(method.getType(), method.getMethodName(), "return " + sourceValue + ";", true));
-        }
-      }
-      catch (CoreException e) {
-        ScoutSdkUi.logError("could not format source value", e);
-      }
+      ConfigurationMethod method = bean.getMethod();
+      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<Long>(ScoutTypeUtility.getConfigurationMethod(method.getType(), method.getMethodName()), new LongPropertySourceParser());
+      updateOp.setValue(value);
     }
     new OperationJob(list).schedule();
   }

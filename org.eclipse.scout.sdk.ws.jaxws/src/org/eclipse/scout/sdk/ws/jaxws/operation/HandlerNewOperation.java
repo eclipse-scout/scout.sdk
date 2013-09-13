@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -64,7 +64,7 @@ public class HandlerNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutTypeNewOperation opType = new ScoutTypeNewOperation(m_typeName, m_packageName, m_bundle);
+    PrimaryTypeNewOperation opType = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
 
     String superTypeSignature;
     if (m_superType.getFullyQualifiedName().equals(LogicalHandler.class.getName())) {
@@ -126,7 +126,7 @@ public class HandlerNewOperation implements IOperation {
       String typeName = Signature.getSimpleName(qualifiedTypeName);
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
-      ScoutTypeNewOperation newTypeOp = new ScoutTypeNewOperation(typeName, packageName, m_bundle);
+      PrimaryTypeNewOperation newTypeOp = new PrimaryTypeNewOperation(typeName, packageName, m_bundle.getJavaProject());
       newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();

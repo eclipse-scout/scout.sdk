@@ -29,7 +29,8 @@ import org.junit.runners.Suite.SuiteClasses;
     TypeCacheTest.class,
     TypeHierarchyTest1.class,
     TypeHierarchyTest2.class,
-    TypeUtilityTest.class})
+    TypeUtilityTest.class
+})
 public class _SuiteTypes {
 
 }

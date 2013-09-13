@@ -25,7 +25,7 @@ public interface ISourceBuilder {
 
   String getElementName();
 
-  String createSource(IImportValidator validator) throws JavaModelException;
+  String createSource(IImportValidator validator, String lineDelimiter) throws JavaModelException;
 
   int getType();
 

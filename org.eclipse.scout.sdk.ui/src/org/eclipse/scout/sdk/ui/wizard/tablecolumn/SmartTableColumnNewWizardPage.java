@@ -24,7 +24,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.SmartTableColumnNewOperation;
+import org.eclipse.scout.sdk.operation.form.field.table.SmartTableColumnNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.IButtonGroupListener;
@@ -258,7 +258,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       });
     }
 
-    SmartTableColumnNewOperation operation = new SmartTableColumnNewOperation(m_declaringType, true);
+    SmartTableColumnNewOperation operation = new SmartTableColumnNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     IType superType = getSuperType();
     if (superType != null) {
@@ -272,7 +272,6 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setSuperTypeSignature(sig);
     }
     operation.setNlsEntry(getNlsName());
-    operation.setTypeName(getTypeName());
     operation.setCodeType(getCodeType());
     if (getLookupCall() != null) {
       operation.setLookupCall(getLookupCall());

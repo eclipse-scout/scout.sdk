@@ -1,36 +1,53 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelPositionPresenter.LabelPosition;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerSourcePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.SourcePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
-public class LabelPositionPresenter extends AbstractProposalPresenter<LabelPosition> {
+public class LabelPositionPresenter extends AbstractProposalPresenter<SourceProperty<Integer>> {
 
-  protected static enum LabelPosition {
-    Left, // 1
-    OnField, // 2
-    Right, // 3
-    Top, // 4
-    Default
-    /* 0 */
+  protected static final SourceProperty<Integer> LABEL_POSITION_DEFAULT;
+  protected static final SourceProperty<Integer> LABEL_POSITION_LEFT;
+  protected static final SourceProperty<Integer> LABEL_POSITION_ON_FIELD;
+  protected static final SourceProperty<Integer> LABEL_POSITION_RIGHT;
+  protected static final SourceProperty<Integer> LABEL_POSITION_TOP;
+
+  protected static final List<SourceProperty<Integer>> PROPOSALS;
+  static {
+    LABEL_POSITION_DEFAULT = new UiSourceProperty<Integer>(Integer.valueOf(0), "default");
+    LABEL_POSITION_LEFT = new UiSourceProperty<Integer>(Integer.valueOf(1), "left");
+    LABEL_POSITION_ON_FIELD = new UiSourceProperty<Integer>(Integer.valueOf(2), "on field");
+    LABEL_POSITION_RIGHT = new UiSourceProperty<Integer>(Integer.valueOf(3), "right");
+    LABEL_POSITION_TOP = new UiSourceProperty<Integer>(Integer.valueOf(3), "top");
+    PROPOSALS = new ArrayList<SourceProperty<Integer>>();
+    PROPOSALS.add(LABEL_POSITION_DEFAULT);
+    PROPOSALS.add(LABEL_POSITION_LEFT);
+    PROPOSALS.add(LABEL_POSITION_ON_FIELD);
+    PROPOSALS.add(LABEL_POSITION_RIGHT);
+    PROPOSALS.add(LABEL_POSITION_TOP);
   }
+
+  private final SourcePropertyParser<Integer> m_parser;
 
   public LabelPositionPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new IntegerSourcePropertyParser(PROPOSALS);
   }
 
   @Override
@@ -38,93 +55,56 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<LabelPosit
     ILabelProvider labelProvider = new LabelProvider() {
       @Override
       public String getText(Object element) {
-        LabelPosition value = (LabelPosition) element;
-        switch (value) {
-          case OnField:
-            return "On Field";
-        }
         return element.toString();
       }
 
       @Override
       public Image getImage(Object element) {
-        LabelPosition value = (LabelPosition) element;
-        switch (value) {
-          case Left:
-            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft);
-          case OnField:
-            return ScoutSdkUi.getImage(ScoutSdkUi.Default);
-          case Right:
-            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight);
-          case Top:
-            return ScoutSdkUi.getImage(ScoutSdkUi.VerticalTop);
+        if (CompareUtility.equals(LABEL_POSITION_LEFT, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft);
         }
-        return ScoutSdkUi.getImage(ScoutSdkUi.Default);
+        else if (CompareUtility.equals(LABEL_POSITION_RIGHT, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight);
+        }
+        else if (CompareUtility.equals(LABEL_POSITION_TOP, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.VerticalTop);
+        }
+        else {
+          return ScoutSdkUi.getImage(ScoutSdkUi.Default);
+        }
       }
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(LabelPosition.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new UiSourceProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  @Override
-  protected LabelPosition parseInput(String input) throws CoreException {
-    int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    switch (parsedInt) {
-      case 1:
-        return LabelPosition.Left;
-      case 2:
-        return LabelPosition.OnField;
-      case 3:
-        return LabelPosition.Right;
-      case 4:
-        return LabelPosition.Top;
-      case 0:
-        return LabelPosition.Default;
-    }
-    return null;
+  public SourcePropertyParser<Integer> getParser() {
+    return m_parser;
   }
 
   @Override
-  protected void storeValue(LabelPosition value) throws CoreException {
+  protected SourceProperty<Integer> parseInput(String input) throws CoreException {
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+  }
+
+  @Override
+  protected synchronized void storeValue(SourceProperty<Integer> value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<SourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<SourceProperty<Integer>>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      StringBuilder source = new StringBuilder("return ");
-      switch (value) {
-        case Left:
-          source.append("LABEL_POSITION_LEFT");
-          break;
-        case OnField:
-          source.append("LABEL_POSITION_ON_FIELD");
-          break;
-        case Right:
-          source.append("LABEL_POSITION_RIGHT");
-          break;
-        case Top:
-          source.append("LABEL_POSITION_TOP");
-          break;
-        case Default:
-          source.append("LABEL_POSITION_DEFAULT");
-          break;
-        default:
-          ScoutSdkUi.logWarning("could not store value '" + value + "'.");
-          return;
-      }
-      source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
-    }
+
   }
 }

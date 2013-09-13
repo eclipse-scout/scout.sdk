@@ -15,33 +15,25 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
-import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.icon.IconContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.icon.IconLabelProvider;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IconSourcePropertyParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -64,8 +56,11 @@ public class IconPresenter extends AbstractMethodPresenter {
   private OptimisticLock storeValueLock = new OptimisticLock();
   private ScoutIconDesc m_currentSourceIcon;
 
+  private IconSourcePropertyParser m_parser;
+
   public IconPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new IconSourcePropertyParser();
   }
 
   @Override
@@ -105,6 +100,7 @@ public class IconPresenter extends AbstractMethodPresenter {
     IIconProvider newIconProvider = ScoutTypeUtility.findIconProvider(method.getType());
     if (!CompareUtility.equals(newIconProvider, m_iconProvider)) {
       m_iconProvider = newIconProvider;
+      m_parser.setIconProvider(m_iconProvider);
       m_proposalField.setContentProvider(new IconContentProvider(m_iconProvider, (ILabelProvider) m_proposalField.getLabelProvider()));
       m_proposalField.setEnabled(m_iconProvider != null);
     }
@@ -125,6 +121,10 @@ public class IconPresenter extends AbstractMethodPresenter {
     finally {
       storeValueLock.release();
     }
+  }
+
+  public IconSourcePropertyParser getParser() {
+    return m_parser;
   }
 
   protected void handleProposalAccepted(ContentProposalEvent event) {
@@ -159,45 +159,24 @@ public class IconPresenter extends AbstractMethodPresenter {
   }
 
   protected ScoutIconDesc parseInput(String input) throws CoreException {
-    String parsedString = PropertyMethodSourceUtility.parseReturnParameterIcon(input, getMethod().peekMethod());
-    if (getIconProvider() != null && !StringUtility.isNullOrEmpty(parsedString)) {
-      String simpleIconName = REGEX.matcher(parsedString).replaceAll("$1");
-      return getIconProvider().getIcon(simpleIconName);
-    }
-    return null;
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
   }
 
   public ScoutIconDesc getDefaultValue() {
     return m_defaultIcon;
   }
 
-  protected synchronized void storeValue(final ScoutIconDesc value) {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+  protected synchronized void storeValue(ScoutIconDesc value) {
+    if (value == null) {
+      m_proposalField.acceptProposal(getDefaultValue());
+      value = getDefaultValue();
     }
-    else {
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), null, true) {
-        @Override
-        protected String createMethodBody(IMethod methodToOverride, IImportValidator validator) throws JavaModelException {
-          StringBuilder source = new StringBuilder();
-          source.append("return ");
-          if (value != null) {
-            String iconTypeSig = SignatureCache.createTypeSignature(value.getConstantField().getDeclaringType().getFullyQualifiedName());
-            source.append("  " + SignatureUtility.getTypeReference(iconTypeSig, validator) + "." + value.getConstantField().getElementName());
-            source.append(";");
-          }
-          else {
-            source.append("null;");
-          }
-          return source.toString();
-        }
-      };
-    }
-    if (op != null) {
-      final OperationJob job = new OperationJob(op);
+    try {
+      ConfigPropertyUpdateOperation<ScoutIconDesc> updateOp = new ConfigPropertyUpdateOperation<ScoutIconDesc>(getMethod(), getParser());
+      updateOp.setValue(value);
+      final OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      final ScoutIconDesc finalValue = value;
       job.addJobChangeListener(new JobChangeAdapter() {
         @Override
         public void done(IJobChangeEvent event) {
@@ -206,8 +185,8 @@ public class IconPresenter extends AbstractMethodPresenter {
             @Override
             public void run() {
               Image icon = null;
-              if (value != null) {
-                icon = ((ILabelProvider) m_proposalField.getLabelProvider()).getImage(value);
+              if (finalValue != null) {
+                icon = ((ILabelProvider) m_proposalField.getLabelProvider()).getImage(finalValue);
               }
               if (icon != null) {
                 ((GridData) m_currentIconPresenter.getLayoutData()).exclude = false;
@@ -225,6 +204,10 @@ public class IconPresenter extends AbstractMethodPresenter {
       });
       job.schedule();
     }
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
+    }
+
   }
 
 }

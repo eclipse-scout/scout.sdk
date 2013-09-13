@@ -18,7 +18,9 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Test;
@@ -35,11 +37,11 @@ public class JavaProjectTests extends AbstractScoutSdkTest {
   @Test
   public void testResourceProjectEquality() throws Exception {
     String projectName = "aProject";
-    IProject project1 = createProject(projectName);
+    IProject project1 = TestWorkspaceUtility.createProject(projectName);
     assertTrue(project1.exists());
     clearWorkspace();
     assertFalse(project1.exists());
-    IProject project2 = createProject(projectName);
+    IProject project2 = TestWorkspaceUtility.createProject(projectName);
     assertTrue(project2.exists());
     assertTrue(project1.exists());
     assertTrue(project1.equals(project2));
@@ -55,13 +57,13 @@ public class JavaProjectTests extends AbstractScoutSdkTest {
   public void testJavaProjectEquality() throws Exception {
     try {
       IScoutBundle module = ScoutProjectHelper.setupNewProject("a", false, true, false);
-      IJavaProject shared1 = module.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true).getJavaProject();
+      IJavaProject shared1 = ScoutUtility.getJavaProject(module.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true));
       assertTrue(shared1.exists());
       clearWorkspace();
       assertFalse(shared1.exists());
 
       IScoutBundle module2 = ScoutProjectHelper.setupNewProject("a", false, true, false);
-      IJavaProject shared2 = module2.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true).getJavaProject();
+      IJavaProject shared2 = ScoutUtility.getJavaProject(module2.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true));
       assertTrue(shared2.exists());
       assertTrue(shared1.exists());
       assertNotSame(shared1, shared2);

@@ -27,6 +27,7 @@ import org.eclipse.scout.nls.sdk.internal.model.workspace.InheritedNlsEntry;
 import org.eclipse.scout.nls.sdk.internal.ui.action.CopyPasteAction;
 import org.eclipse.scout.nls.sdk.internal.ui.action.FindReferencesAction;
 import org.eclipse.scout.nls.sdk.internal.ui.action.RemoveAction;
+import org.eclipse.scout.nls.sdk.internal.ui.action.UpdateKeyUsageCountAction;
 import org.eclipse.scout.nls.sdk.internal.ui.action.UpdateReferenceCountAction;
 import org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport.NlsExportAction;
 import org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport.NlsImportAction;
@@ -255,6 +256,7 @@ public class NlsTablePage extends Composite {
       }
       manager.add(new FindReferencesAction(m_nlsProjects, entry.getKey()));
       manager.add(new UpdateReferenceCountAction(m_nlsProjects, m_table, m_tableModel));
+      manager.add(new UpdateKeyUsageCountAction(m_nlsProjects, m_table, m_tableModel));
       if (cursorText != null && cursorText.length() > 0) {
         manager.add(new Separator());
         manager.add(new CopyPasteAction("Copy", cursorText, m_table.getDisplay()));

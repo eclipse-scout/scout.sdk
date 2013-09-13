@@ -82,10 +82,8 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    FormHandlerNewOperation operation = new FormHandlerNewOperation(getDeclaringType());
-    operation.setFormatSource(true);
+    FormHandlerNewOperation operation = new FormHandlerNewOperation(getTypeName(), m_declaringType, true);
     // write back members
-    operation.setTypeName(getTypeName());
     FormHandlerNewWizardPage1 previousPage = (FormHandlerNewWizardPage1) getWizard().getPreviousPage(this);
     if (previousPage.getSelectedSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(previousPage.getSelectedSuperType().getFullyQualifiedName()));
@@ -93,9 +91,8 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
 
     IStructuredType structuredType = ScoutTypeUtility.createStructuredForm(m_declaringType);
     operation.setSibling(structuredType.getSiblingTypeFormHandler(getTypeName()));
-    operation.setStartMethodSibling(structuredType.getSiblingMethodStartHandler(operation.getStartMethodName()));
     operation.run(monitor, workingCopyManager);
-    m_createdFormHandler = operation.getCreatedHandler();
+    m_createdFormHandler = operation.getCreatedType();
     return true;
   }
 

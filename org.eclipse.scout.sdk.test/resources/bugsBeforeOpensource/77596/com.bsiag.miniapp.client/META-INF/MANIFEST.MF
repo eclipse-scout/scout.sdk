@@ -18,4 +18,4 @@ Import-Package: javax.activation;resolution:=optional,
  javax.mail.internet;resolution:=optional,
  javax.mail.search;resolution:=optional,
  javax.mail.util;resolution:=optional
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

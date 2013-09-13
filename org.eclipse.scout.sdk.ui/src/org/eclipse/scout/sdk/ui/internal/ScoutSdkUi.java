@@ -24,15 +24,18 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
-import org.eclipse.scout.sdk.IMessageBoxService;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.operation.data.AutoUpdateManager;
 import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
+import org.eclipse.scout.sdk.service.IMessageBoxService;
+import org.eclipse.scout.sdk.sourcebuilder.comment.IJavaElementCommentBuilderService;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
+import org.eclipse.scout.sdk.ui.internal.service.SwtMessageBoxService;
+import org.eclipse.scout.sdk.ui.services.JavaElementCommentBuilderService;
 import org.eclipse.scout.sdk.ui.services.OrganizeImportService;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
+import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Color;
@@ -78,9 +81,11 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   private ColorRegistry m_colorRegistry;
   private FontRegistry m_fontRegistry;
+  private ServiceRegistration m_formDataServiceRegistration;
   private ServiceRegistration m_organizeImportServiceRegistration;
   private ServiceRegistration m_messageBoxServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
+  private ServiceRegistration<?> m_javaElementCommentBuilderService;
 
   /**
    * The constructor
@@ -100,14 +105,17 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (m_messageBoxServiceRegistration == null) {
       m_messageBoxServiceRegistration = context.registerService(IMessageBoxService.class.getName(), new SwtMessageBoxService(), null);
     }
+    if (m_javaElementCommentBuilderService == null) {
+      m_javaElementCommentBuilderService = context.registerService(IJavaElementCommentBuilderService.class.getName(), new JavaElementCommentBuilderService(), null);
+    }
 
     if (m_preferencesPropertyListener == null) {
       m_preferencesPropertyListener = new P_PreferenceStorePropertyListener();
     }
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
 
-    getPreferenceStore().setDefault(AutoUpdateManager.PROP_AUTO_UPDATE, true);
-    ScoutSdk.getDefault().setAutoUpdateEnabled(getPreferenceStore().getBoolean(AutoUpdateManager.PROP_AUTO_UPDATE));
+    getPreferenceStore().setDefault(IDtoAutoUpdateManager.PROP_AUTO_UPDATE, true);
+    ScoutSdk.getDefault().setFormDataAutoUpdate(getPreferenceStore().getBoolean(IDtoAutoUpdateManager.PROP_AUTO_UPDATE));
 
     getPreferenceStore().setDefault(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, false);
     DefaultTargetPackage.setIsPackageConfigurationEnabled(!getPreferenceStore().getBoolean(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE));
@@ -122,9 +130,17 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
       m_preferencesPropertyListener = null;
     }
     super.stop(context);
+    if (m_formDataServiceRegistration != null) {
+      m_formDataServiceRegistration.unregister();
+      m_formDataServiceRegistration = null;
+    }
     if (m_organizeImportServiceRegistration != null) {
       m_organizeImportServiceRegistration.unregister();
       m_organizeImportServiceRegistration = null;
+    }
+    if (m_javaElementCommentBuilderService != null) {
+      m_javaElementCommentBuilderService.unregister();
+      m_javaElementCommentBuilderService = null;
     }
     if (m_messageBoxServiceRegistration != null) {
       m_messageBoxServiceRegistration.unregister();
@@ -510,9 +526,9 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   private class P_PreferenceStorePropertyListener implements IPropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-      if (AutoUpdateManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
+      if (IDtoAutoUpdateManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
         Boolean autoUpdate = (Boolean) event.getNewValue();
-        ScoutSdk.getDefault().setAutoUpdateEnabled(autoUpdate);
+        ScoutSdk.getDefault().setFormDataAutoUpdate(autoUpdate);
       }
       else if (DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE.equals(event.getProperty())) {
         Boolean useLegacy = (Boolean) event.getNewValue();

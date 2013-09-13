@@ -168,11 +168,10 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     m_stubGenerationOperation.setWsdlFileName(wsdlFile.getName());
     m_stubGenerationOperation.addOperationFinishedListener(new P_StubGenerationFinishedListener());
 
-    m_wsConsumerImplNewOperation = new WsConsumerImplNewOperation();
-    m_wsConsumerImplNewOperation.setImplementationBundle(m_bundle);
-    m_wsConsumerImplNewOperation.addServiceRegistrationBundle(m_bundle);
-    m_wsConsumerImplNewOperation.setServicePackageName(m_wsConsumerImplClassWizardPage.getPackageName());
-    m_wsConsumerImplNewOperation.setServiceName(m_wsConsumerImplClassWizardPage.getTypeName());
+    m_wsConsumerImplNewOperation = new WsConsumerImplNewOperation("I" + m_wsConsumerImplClassWizardPage.getTypeName(), m_wsConsumerImplClassWizardPage.getTypeName());
+    m_wsConsumerImplNewOperation.setImplementationProject(m_bundle.getJavaProject());
+    m_wsConsumerImplNewOperation.addServiceRegistrationProject(m_bundle.getJavaProject());
+    m_wsConsumerImplNewOperation.setImplementationPackageName(m_wsConsumerImplClassWizardPage.getPackageName());
     m_wsConsumerImplNewOperation.setCreateScoutWebServiceAnnotation(m_wsConsumerImplClassWizardPage.isAnnotateImplClass());
     m_wsConsumerImplNewOperation.setAuthenticationHandlerQName(m_wsConsumerImplClassWizardPage.getAuthenticationHandler());
 

@@ -10,37 +10,36 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.field;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.text.Document;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.eclipse.text.edits.InsertEdit;
 
 public class CalendarFieldNewOperation implements IOperation {
 
   // in members
+  private final String m_typeName;
   private final IType m_declaringType;
   private boolean m_formatSource;
-  private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
   private IJavaElement m_sibling;
@@ -48,11 +47,12 @@ public class CalendarFieldNewOperation implements IOperation {
   private IType m_createdCalendarField;
   private IType m_createdCalendar;
 
-  public CalendarFieldNewOperation(IType declaringType) {
-    this(declaringType, false);
+  public CalendarFieldNewOperation(String typeName, IType declaringType) {
+    this(typeName, declaringType, true);
   }
 
-  public CalendarFieldNewOperation(IType declaringType, boolean fomatSource) {
+  public CalendarFieldNewOperation(String typeName, IType declaringType, boolean fomatSource) {
+    m_typeName = typeName;
     m_declaringType = declaringType;
     m_formatSource = fomatSource;
     // default
@@ -77,48 +77,34 @@ public class CalendarFieldNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
-    FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
-    newOp.setTypeName(getTypeName());
+    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    newOp.setSiblingField(getSibling());
-    newOp.validate();
-    newOp.run(monitor, workingCopyManager);
-    m_createdCalendarField = newOp.getCreatedFormField();
+    newOp.setSibling(getSibling());
+    // getConfiguredLabel method
     if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation labelOp = new NlsTextMethodUpdateOperation(getCreatedCalendarField(), NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL);
-      labelOp.setNlsEntry(getNlsEntry());
-      labelOp.validate();
-      labelOp.run(monitor, workingCopyManager);
+      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
+      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    // calendar
-    InnerTypeNewOperation calendarOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR, getCreatedCalendarField());
-    calendarOp.setTypeModifiers(Flags.AccPublic);
-    calendarOp.setSibling(null);
-    calendarOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendar, getDeclaringType().getJavaProject()));
-    calendarOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
-    calendarOp.validate();
-    calendarOp.run(monitor, workingCopyManager);
-    // generic on calendar field
-    Pattern p = Pattern.compile("extends\\s*" + SignatureUtility.getTypeReference(getSuperTypeSignature(), new SimpleImportValidator()), Pattern.MULTILINE);
-    Matcher matcher = p.matcher(getCreatedCalendarField().getSource());
-    if (matcher.find()) {
-      Document doc = new Document(getCreatedCalendarField().getSource());
-      InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedCalendarField().getElementName() + "." + SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR + ">");
-      try {
-        genericEdit.apply(doc);
-        ScoutTypeUtility.setSource(getCreatedCalendarField(), doc.get(), workingCopyManager, monitor);
-      }
-      catch (Exception e) {
-        ScoutSdk.logWarning("could not set the generic type of the calendar field.", e);
-      }
-    }
-    if (isFormatSource()) {
-      // format
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedCalendarField(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
+    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractCalendarField)) {
+      // create inner type calendar
+      ITypeSourceBuilder calendarBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR);
+      calendarBuilder.setFlags(Flags.AccPublic);
+      calendarBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendar, getDeclaringType().getJavaProject()));
+      calendarBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
+      newOp.addTypeSourceBuilder(calendarBuilder);
+      // update generic in supertype signature
+      StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
+      superTypeSigBuilder.append("<").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR).append(">");
+      setSuperTypeSignature(Signature.createTypeSignature(superTypeSigBuilder.toString(), true));
     }
 
+    newOp.setFormatSource(isFormatSource());
+    newOp.validate();
+    newOp.run(monitor, workingCopyManager);
+    m_createdCalendarField = newOp.getCreatedType();
+    m_createdCalendar = TypeUtility.findInnerType(m_createdCalendarField, SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR);
   }
 
   public IType getCreatedCalendarField() {
@@ -143,10 +129,6 @@ public class CalendarFieldNewOperation implements IOperation {
 
   public String getTypeName() {
     return m_typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
   }
 
   public INlsEntry getNlsEntry() {

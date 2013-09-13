@@ -13,23 +13,23 @@ package org.eclipse.scout.sdk.operation.lookupcall;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.service.LookupServiceNewOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  *
@@ -37,15 +37,15 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class LookupCallNewOperation implements IOperation {
   // in members
   private String m_lookupCallName;
-  private String m_serviceSuperTypeSignature;
-  private IScoutBundle m_bundle;
   private String m_lookupCallPackageName;
-  private IScoutBundle m_interfaceRegistrationBundle;
+  private IJavaProject m_lookupCallProject;
+  private String m_serviceSuperTypeSignature;
+  private IJavaProject m_serviceProxyRegistrationProject;
   private String m_serviceInterfacePackageName;
-  private IScoutBundle m_serviceInterfaceBundle;
-  private IScoutBundle m_implementationRegistrationBundle;
+  private IJavaProject m_serviceInterfaceProject;
+  private IJavaProject m_serviceRegistrationProject;
   private String m_serviceImplementationPackage;
-  private IScoutBundle m_serviceImplementationBundle;
+  private IJavaProject m_serviceImplementationProject;
   private IType m_lookupService;
   private boolean m_formatSource;
 
@@ -54,9 +54,19 @@ public class LookupCallNewOperation implements IOperation {
   private IType m_outLookupService;
   private IType m_outLookupServiceInterface;
 
+  public LookupCallNewOperation() {
+    this(null, null, null);
+  }
+
+  public LookupCallNewOperation(String lookupCallName, String packageName, IJavaProject project) {
+    m_lookupCallName = lookupCallName;
+    m_lookupCallPackageName = packageName;
+    m_lookupCallProject = project;
+  }
+
   @Override
   public String getOperationName() {
-    return null;
+    return "New Lookupcall '" + getLookupCallName() + "'...";
   }
 
   @Override
@@ -67,17 +77,15 @@ public class LookupCallNewOperation implements IOperation {
     IType lookupServiceInterface = getLookupService();
     if (lookupServiceInterface == null) {
       if (!StringUtility.isNullOrEmpty(getServiceSuperTypeSignature())) {
-        LookupServiceNewOperation serviceOp = new LookupServiceNewOperation();
-        serviceOp.addProxyRegistrationBundle(getInterfaceRegistrationBundle());
-        serviceOp.setImplementationBundle(getServiceImplementationBundle());
-        serviceOp.setServiceName(namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
-        serviceOp.setServicePackageName(getServiceImplementationPackage());
-        serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
-        serviceOp.setServiceInterfaceName("I" + namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
-        serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
-        serviceOp.setServiceInterfacePackageName(getServiceInterfacePackageName());
-        serviceOp.setServiceSuperTypeSignature(getServiceSuperTypeSignature());
-        serviceOp.addServiceRegistrationBundle(getImplementationRegistrationBundle());
+        LookupServiceNewOperation serviceOp = new LookupServiceNewOperation(namePrefix + SdkProperties.SUFFIX_LOOKUP_SERVICE);
+        serviceOp.addProxyRegistrationProject(getServiceProxyRegistrationProject());
+        serviceOp.setImplementationProject(getServiceImplementationProject());
+        serviceOp.setImplementationPackageName(getServiceImplementationPackage());
+        serviceOp.setInterfaceProject(getServiceInterfaceProject());
+        serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
+        serviceOp.setInterfacePackageName(getServiceInterfacePackageName());
+        serviceOp.setImplementationSuperTypeSignature(getServiceSuperTypeSignature());
+        serviceOp.addServiceRegistrationProject(getServiceRegistrationProject());
         serviceOp.validate();
         serviceOp.run(monitor, workingCopyManager);
         lookupServiceInterface = serviceOp.getCreatedServiceInterface();
@@ -86,34 +94,25 @@ public class LookupCallNewOperation implements IOperation {
     }
     m_outLookupServiceInterface = lookupServiceInterface;
     // lookup call
-    ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getLookupCallPackageName(), getBundle());
+    PrimaryTypeNewOperation lookupCallOp = new PrimaryTypeNewOperation(getLookupCallName(), getLookupCallPackageName(), getLookupCallProject());
+    lookupCallOp.setFlags(Flags.AccPublic);
     lookupCallOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.LookupCall));
+    lookupCallOp.addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
+    if (getOutLookupServiceInterface() != null) {
+      // getConfiguredService method
+      IMethodSourceBuilder getConfiguredServiceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(lookupCallOp.getSourceBuilder(), "getConfiguredService");
+      getConfiguredServiceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append("  return ").append(validator.getTypeName(SignatureCache.createTypeSignature(getOutLookupServiceInterface().getFullyQualifiedName()))).append(".class;");
+        }
+      });
+      lookupCallOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredServiceBuilder), getConfiguredServiceBuilder);
+    }
+    lookupCallOp.setPackageExportPolicy(ExportPolicy.AddPackage);
     lookupCallOp.validate();
     lookupCallOp.run(monitor, workingCopyManager);
     m_outLookupCall = lookupCallOp.getCreatedType();
-
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD, new IPackageFragment[]{m_outLookupCall.getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
-
-    FieldCreateOperation serialVersionUidOp = new FieldCreateOperation(getOutLookupCall(), "serialVersionUID", false);
-    serialVersionUidOp.setFlags(Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    serialVersionUidOp.setSignature(Signature.SIG_LONG);
-    serialVersionUidOp.setSimpleInitValue("1L");
-    serialVersionUidOp.validate();
-    serialVersionUidOp.run(monitor, workingCopyManager);
-    if (lookupServiceInterface != null) {
-      final IType finalService = lookupServiceInterface;
-      MethodOverrideOperation lookupServiceMethodOp = new MethodOverrideOperation(m_outLookupCall, "getConfiguredService", false) {
-        @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String serviceTypeRef = validator.getTypeName(SignatureCache.createTypeSignature(finalService.getFullyQualifiedName()));
-          return "  return " + serviceTypeRef + ".class;";
-        }
-      };
-      lookupServiceMethodOp.validate();
-      lookupServiceMethodOp.run(monitor, workingCopyManager);
-    }
   }
 
   @Override
@@ -128,28 +127,36 @@ public class LookupCallNewOperation implements IOperation {
     m_lookupCallName = lookupCallName;
   }
 
-  public IScoutBundle getBundle() {
-    return m_bundle;
+  public String getLookupCallPackageName() {
+    return m_lookupCallPackageName;
   }
 
-  public void setBundle(IScoutBundle bundle) {
-    m_bundle = bundle;
+  public void setLookupCallPackageName(String lookupCallPackageName) {
+    m_lookupCallPackageName = lookupCallPackageName;
   }
 
-  public IScoutBundle getInterfaceRegistrationBundle() {
-    return m_interfaceRegistrationBundle;
+  public void setLookupCallProject(IJavaProject lookupCallProject) {
+    m_lookupCallProject = lookupCallProject;
   }
 
-  public void setInterfaceRegistrationBundle(IScoutBundle interfaceRegistrationBundle) {
-    m_interfaceRegistrationBundle = interfaceRegistrationBundle;
+  public IJavaProject getLookupCallProject() {
+    return m_lookupCallProject;
   }
 
-  public IScoutBundle getServiceInterfaceBundle() {
-    return m_serviceInterfaceBundle;
+  public void setServiceProxyRegistrationProject(IJavaProject serviceProxyRegistrationProject) {
+    m_serviceProxyRegistrationProject = serviceProxyRegistrationProject;
   }
 
-  public void setServiceInterfaceBundle(IScoutBundle serviceInterfaceBundle) {
-    m_serviceInterfaceBundle = serviceInterfaceBundle;
+  public IJavaProject getServiceProxyRegistrationProject() {
+    return m_serviceProxyRegistrationProject;
+  }
+
+  public void setServiceInterfaceProject(IJavaProject serviceInterfaceProject) {
+    m_serviceInterfaceProject = serviceInterfaceProject;
+  }
+
+  public IJavaProject getServiceInterfaceProject() {
+    return m_serviceInterfaceProject;
   }
 
   public void setServiceSuperTypeSignature(String serviceSuperTypeSignature) {
@@ -160,20 +167,20 @@ public class LookupCallNewOperation implements IOperation {
     return m_serviceSuperTypeSignature;
   }
 
-  public IScoutBundle getImplementationRegistrationBundle() {
-    return m_implementationRegistrationBundle;
+  public IJavaProject getServiceRegistrationProject() {
+    return m_serviceRegistrationProject;
   }
 
-  public void setImplementationRegistrationBundle(IScoutBundle implementationRegistrationBundle) {
-    m_implementationRegistrationBundle = implementationRegistrationBundle;
+  public void setServiceRegistrationProject(IJavaProject serviceRegistrationProject) {
+    m_serviceRegistrationProject = serviceRegistrationProject;
   }
 
-  public IScoutBundle getServiceImplementationBundle() {
-    return m_serviceImplementationBundle;
+  public void setServiceImplementationProject(IJavaProject serviceImplementationProject) {
+    m_serviceImplementationProject = serviceImplementationProject;
   }
 
-  public void setServiceImplementationBundle(IScoutBundle serviceImplementationBundle) {
-    m_serviceImplementationBundle = serviceImplementationBundle;
+  public IJavaProject getServiceImplementationProject() {
+    return m_serviceImplementationProject;
   }
 
   public void setLookupService(IType lookupService) {
@@ -220,11 +227,4 @@ public class LookupCallNewOperation implements IOperation {
     m_serviceInterfacePackageName = serviceInterfacePackageName;
   }
 
-  public String getLookupCallPackageName() {
-    return m_lookupCallPackageName;
-  }
-
-  public void setLookupCallPackageName(String lookupCallPackageName) {
-    m_lookupCallPackageName = lookupCallPackageName;
-  }
 }

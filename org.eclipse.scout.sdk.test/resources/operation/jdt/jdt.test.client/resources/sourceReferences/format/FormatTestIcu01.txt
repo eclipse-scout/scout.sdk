@@ -1,0 +1,6 @@
+package jdt.test.client.format.output;
+
+public class FormatTestIcu01 {
+  public FormatTestIcu01() {
+  }
+}

@@ -116,4 +116,8 @@ public class CompilationUnitImportValidator implements IImportValidator {
     m_icu.reconcile(ICompilationUnit.NO_AST, false, null, monitor);
     setup();
   }
+
+  public ICompilationUnit getCompilationUnit() {
+    return m_icu;
+  }
 }

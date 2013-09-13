@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.util.ast.visitor;
 
 import java.util.HashSet;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -124,8 +124,8 @@ public class VariableResolveVisitor extends DefaultAstVisitor {
               String resolvedSignature = SignatureUtility.getResolvedSignature(Signature.createTypeSignature(node.getName().getFullyQualifiedName(), false), JdtUtility.findDeclaringType(m_containerElement));
               m_currentVariable.variableTypeName = resolvedSignature;
             }
-            catch (JavaModelException e) {
-              e.printStackTrace();
+            catch (CoreException e) {
+              SdkUtilActivator.logError(e);
             }
             return false;
           }

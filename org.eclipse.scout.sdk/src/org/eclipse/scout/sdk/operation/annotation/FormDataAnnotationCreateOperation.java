@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.operation.annotation;
 
 import java.util.ArrayList;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -34,9 +34,8 @@ public class FormDataAnnotationCreateOperation extends AnnotationCreateOperation
   }
 
   @Override
-  public String createSource(IImportValidator validator, String NL) throws JavaModelException {
-    StringBuilder source = new StringBuilder();
-    source.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
+  public void createSource(StringBuilder sourceBuilder, IImportValidator validator, String lineDelimiter) throws CoreException {
+    sourceBuilder.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
     if (hasArguments()) {
       ArrayList<String> args = new ArrayList<String>();
       if (getFormDataSignature() != null) {
@@ -55,18 +54,17 @@ public class FormDataAnnotationCreateOperation extends AnnotationCreateOperation
         args.add(b.toString());
       }
       if (args.size() > 0) {
-        source.append("(");
+        sourceBuilder.append("(");
         for (int i = 0; i < args.size(); i++) {
-          source.append(args.get(i));
+          sourceBuilder.append(args.get(i));
           if (i < args.size() - 1) {
-            source.append(", ");
+            sourceBuilder.append(", ");
           }
         }
-        source.append(")");
+        sourceBuilder.append(")");
       }
 
     }
-    return source.toString();
   }
 
   public boolean hasArguments() {

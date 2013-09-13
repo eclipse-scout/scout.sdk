@@ -14,20 +14,22 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -41,8 +43,8 @@ public class MenuNewOperation implements IOperation {
   static final String FORM_NAME = "form";
 
   // in members
+  private final String m_typeName;
   private final IType m_declaringType;
-  private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
   private IJavaElement m_sibling;
@@ -52,11 +54,12 @@ public class MenuNewOperation implements IOperation {
   // out members
   private IType m_createdMenu;
 
-  public MenuNewOperation(IType declaringType) {
-    this(declaringType, false);
+  public MenuNewOperation(String menuName, IType declaringType) {
+    this(menuName, declaringType, true);
   }
 
-  public MenuNewOperation(IType declaringType, boolean formatSource) {
+  public MenuNewOperation(String menuName, IType declaringType, boolean formatSource) {
+    m_typeName = menuName;
     m_declaringType = declaringType;
     m_formatSource = formatSource;
   }
@@ -73,107 +76,83 @@ public class MenuNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    OrderedInnerTypeNewOperation menuNewOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
+    OrderedInnerTypeNewOperation menuNewOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType());
     menuNewOp.setSuperTypeSignature(getSuperTypeSignature());
-    menuNewOp.setTypeModifiers(Flags.AccPublic);
+    menuNewOp.setFlags(Flags.AccPublic);
     menuNewOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IMenu));
     menuNewOp.setSibling(getSibling());
+    // getConfiguredLabel method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
+      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
+    }
+    final boolean isNewFormHandler = getFormHandler() != null && getFormHandler().getElementName().matches("^New.*");
+    if (isNewFormHandler) {
+      // getConfiguredEmptySpaceAction method
+      IMethodSourceBuilder getConfiguredEmptySpaceActionBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), "getConfiguredEmptySpaceAction");
+      getConfiguredEmptySpaceActionBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return true;"));
+      menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredEmptySpaceActionBuilder), getConfiguredEmptySpaceActionBuilder);
+
+      // getConfiguredSingleSelectionAction method
+      IMethodSourceBuilder getConfiguredSingleSelectionActionBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), "getConfiguredSingleSelectionAction");
+      getConfiguredSingleSelectionActionBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return false;"));
+      menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredSingleSelectionActionBuilder), getConfiguredSingleSelectionActionBuilder);
+
+    }
+    if (getFormToOpen() != null) {
+      //     execAction method
+      IMethodSourceBuilder execActionBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), "execAction");
+      execActionBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
+          String formTypeName = validator.getTypeName(SignatureCache.createTypeSignature(getFormToOpen().getFullyQualifiedName()));
+          source.append(formTypeName + " ").append(FORM_NAME).append(" = new ").append(formTypeName).append("();").append(lineDelimiter);
+          if (getFormHandler() != null) {
+            IType table = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy));
+            if (!isNewFormHandler && TypeUtility.exists(table)) {
+              IType[] columns = ScoutTypeUtility.getPrimaryKeyColumns(table);
+              for (IType col : columns) {
+                // find method on form
+                String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
+                IMethod writeMethodOnForm = TypeUtility.getMethod(getFormToOpen(), "set" + colPropName);
+                if (TypeUtility.exists(writeMethodOnForm)) {
+                  source.append(FORM_NAME + "." + writeMethodOnForm.getElementName() + "(get" + col.getElementName() + "().getSelectedValue());").append(lineDelimiter);
+                }
+              }
+            }
+            String startMethodName = getFormHandler().getElementName().replaceAll("^(.*)Handler$", "start$1");
+            IMethod startMethod = TypeUtility.getMethod(getFormToOpen(), startMethodName);
+            if (TypeUtility.exists(startMethod)) {
+              source.append(FORM_NAME + "." + startMethod.getElementName() + "();");
+            }
+          }
+          else {
+            source.append(ScoutUtility.getCommentBlock("start form here.")).append(lineDelimiter);
+          }
+          IType pageWithTable = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IPageWithTable), hierarchy));
+          if (TypeUtility.exists(pageWithTable)) {
+            source.append("\n" + FORM_NAME + ".waitFor();").append(lineDelimiter);
+            source.append("if (" + FORM_NAME + ".isFormStored()) {").append(lineDelimiter);
+            source.append("reloadPage();").append(lineDelimiter);
+            source.append("}");
+          }
+        }
+      });
+      menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execActionBuilder), execActionBuilder);
+    }
+
+    menuNewOp.setFormatSource(isFormatSource());
     menuNewOp.validate();
     menuNewOp.run(monitor, workingCopyManager);
     m_createdMenu = menuNewOp.getCreatedType();
-    if (getNlsEntry() != null) {
-      // text
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(getCreatedMenu(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TEXT, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
 
-    boolean isNewFormHandler = getFormHandler() != null && getFormHandler().getElementName().matches("^New.*");
-    if (isNewFormHandler) {
-      MethodOverrideOperation getConfiguredEmptySpaceActionOp = new MethodOverrideOperation(getCreatedMenu(), "getConfiguredEmptySpaceAction");
-      getConfiguredEmptySpaceActionOp.setSimpleBody("return true;");
-      getConfiguredEmptySpaceActionOp.validate();
-      getConfiguredEmptySpaceActionOp.run(monitor, workingCopyManager);
-
-      MethodOverrideOperation getConfiguredSingleSelectionActionOp = new MethodOverrideOperation(getCreatedMenu(), "getConfiguredSingleSelectionAction");
-      getConfiguredSingleSelectionActionOp.setSimpleBody("return false;");
-      getConfiguredSingleSelectionActionOp.validate();
-      getConfiguredSingleSelectionActionOp.run(monitor, workingCopyManager);
-    }
-    createExecActionMethod(m_createdMenu, isNewFormHandler, monitor, workingCopyManager);
-
-    if (isFormatSource()) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedMenu(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
-  }
-
-  private IMethod createExecActionMethod(IType menu, final boolean isNewFormHandler, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
-    IMethod execActionMethod = null;
-    if (getFormToOpen() != null) {
-      MethodOverrideOperation execActionOp = new MethodOverrideOperation(menu, "execAction", false) {
-        @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getCreatedMenu().getCompilationUnit());
-
-          StringBuilder sourceBuilder = new StringBuilder();
-          String formTypeName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getFormToOpen().getFullyQualifiedName()), getDeclaringType(), validator);
-          sourceBuilder.append(formTypeName + " " + FORM_NAME + " = new " + formTypeName + "();\n");
-          if (getFormHandler() != null) {
-            IType table = TypeUtility.getAncestor(getCreatedMenu(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy));
-            if (!isNewFormHandler && TypeUtility.exists(table)) {
-              createFormParameterSource(getFormToOpen(), getFormHandler(), table, sourceBuilder, validator);
-            }
-            createStartFormSource(getFormToOpen(), getFormHandler(), sourceBuilder, validator);
-          }
-          else {
-            sourceBuilder.append(ScoutUtility.getCommentBlock("start form here.") + "\n");
-          }
-          createReloadPage(getFormToOpen(), getFormHandler(), hierarchy, sourceBuilder, validator);
-          return sourceBuilder.toString();
-        }
-      };
-      execActionOp.validate();
-      execActionOp.run(monitor, manager);
-      execActionMethod = execActionOp.getCreatedMethod();
-    }
-    return execActionMethod;
   }
 
   public IType getCreatedMenu() {
     return m_createdMenu;
-  }
-
-  private void createFormParameterSource(IType form, IType formHandler, IType table, StringBuilder builder, IImportValidator validator) {
-    IType[] columns = ScoutTypeUtility.getPrimaryKeyColumns(table);
-    for (IType col : columns) {
-      // find method on form
-      String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
-      IMethod writeMethodOnForm = TypeUtility.getMethod(form, "set" + colPropName);
-      if (TypeUtility.exists(writeMethodOnForm)) {
-        builder.append(FORM_NAME + "." + writeMethodOnForm.getElementName() + "(get" + col.getElementName() + "().getSelectedValue());\n");
-      }
-    }
-  }
-
-  private void createStartFormSource(IType form, IType formHandler, StringBuilder builder, IImportValidator validator) {
-    String startMethodName = formHandler.getElementName().replaceAll("^(.*)Handler$", "start$1");
-    IMethod startMethod = TypeUtility.getMethod(form, startMethodName);
-    if (TypeUtility.exists(startMethod)) {
-      builder.append(FORM_NAME + "." + startMethod.getElementName() + "();");
-    }
-  }
-
-  private void createReloadPage(IType form, IType formHandler, ITypeHierarchy hierarchy, StringBuilder builder, IImportValidator validator) {
-    IType pageWithTable = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IPageWithTable), hierarchy));
-    if (TypeUtility.exists(pageWithTable)) {
-      builder.append("\n" + FORM_NAME + ".waitFor();\n");
-      builder.append("if (" + FORM_NAME + ".isFormStored()) {\n");
-      builder.append("reloadPage();\n");
-      builder.append("}");
-    }
   }
 
   @Override
@@ -187,10 +166,6 @@ public class MenuNewOperation implements IOperation {
 
   public String getTypeName() {
     return m_typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
   }
 
   public INlsEntry getNlsEntry() {

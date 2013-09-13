@@ -13,32 +13,35 @@ package org.eclipse.scout.sdk.operation.form;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class SearchFormNewOperation implements IOperation {
 
@@ -76,105 +79,112 @@ public class SearchFormNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // create empty form data
-    String formDataSignature = null;
+//    String formDataSignature = null;
+    IType formDataType = null;
     if (getSearchFormDataLocationBundle() != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTypeName() + "Data", getSearchFormDataPackageName(), getSearchFormDataLocationBundle());
+      // form data
+      PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(getTypeName() + "Data", getSearchFormDataPackageName(), ScoutUtility.getJavaProject(getSearchFormDataLocationBundle()));
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+      formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
       formDataOp.run(monitor, workingCopyManager);
-      formDataSignature = SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName());
-      // exported form type
-      ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{formDataOp.getCreatedType().getPackageFragment()}, true);
-      manifestOp.run(monitor, workingCopyManager);
+      formDataType = formDataOp.getCreatedType();
+//      formDataSignature = SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName());
     }
     // form
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getSearchFormPackageName(), getSearchFormLocationBundle());
+    PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getSearchFormPackageName(), ScoutUtility.getJavaProject(getSearchFormLocationBundle()));
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    if (!StringUtility.isNullOrEmpty(formDataSignature)) {
-      FormDataAnnotationCreateOperation annotOp = new FormDataAnnotationCreateOperation(null);
-      annotOp.setSdkCommand(SdkCommand.CREATE);
-      annotOp.setFormDataSignature(formDataSignature);
-      newOp.addAnnotation(annotOp);
+    if (formDataType != null) {
+      newOp.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation(SignatureCache.createTypeSignature(formDataType.getFullyQualifiedName()), SdkCommand.CREATE, null));
     }
-    newOp.run(monitor, workingCopyManager);
-    m_createdFormType = newOp.getCreatedType();
-    workingCopyManager.register(m_createdFormType.getCompilationUnit(), monitor);
+    // constructor
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(newOp.getElementName());
+    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
+    newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    // getConfiguredLabel method
     if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(m_createdFormType, NlsTextMethodUpdateOperation.GET_CONFIGURED_TITLE);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
-
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY,
-        new IPackageFragment[]{m_createdFormType.getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
-
-    // create constructor
-    ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(m_createdFormType);
-    constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-    constructorOp.setSimpleBody("  super();");
-    constructorOp.validate();
-    constructorOp.run(monitor, workingCopyManager);
-    // form data
-    FormDataUpdateOperation formDataOp = null;
-    if (getSearchFormDataLocationBundle() != null) {
-      formDataOp = new FormDataUpdateOperation(getCreatedFormType());
-      formDataOp.run(monitor, workingCopyManager);
-      m_createdFormDataType = formDataOp.getFormDataType();
+      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TITLE);
+      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
     if (getTablePage() != null) {
-      SearchFormFromTablePageFillOperation fillOp = new SearchFormFromTablePageFillOperation();
-      fillOp.setSearchFormType(m_createdFormType);
-      fillOp.setFormDataType(m_createdFormDataType);
-      fillOp.setTablePageType(getTablePage());
-      fillOp.run(monitor, workingCopyManager);
-      IMethod confSearchFormMethod = TypeUtility.getMethod(getTablePage(), "getConfiguredSearchForm");
-      if (TypeUtility.exists(confSearchFormMethod)) {
-        confSearchFormMethod.delete(true, monitor);
-      }
-      IMethod getConfiguredSearchFormMethod = TypeUtility.getMethod(getTablePage(), "getConfiguredSearchForm");
-      if (TypeUtility.exists(getConfiguredSearchFormMethod)) {
-        ScoutMethodDeleteOperation delOp = new ScoutMethodDeleteOperation(getConfiguredSearchFormMethod);
-        delOp.validate();
-        delOp.run(monitor, workingCopyManager);
-      }
-
-      MethodOverrideOperation overrideOp = new MethodOverrideOperation(getTablePage(), "getConfiguredSearchForm") {
-        @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String simpleRef = validator.getTypeName(SignatureCache.createTypeSignature(getCreatedFormType().getFullyQualifiedName()));
-          return "return " + simpleRef + ".class;";
-        }
-      };
-      overrideOp.validate();
-      overrideOp.run(monitor, workingCopyManager);
+      // fill search form from table page
+      fillFromTablePage(newOp.getSourceBuilder(), newOp.getPackageName() + "." + newOp.getElementName(), getTablePage(), formDataType, newOp.getJavaProject(), monitor, workingCopyManager);
     }
     else {
       // main box
-      FormFieldNewOperation mainBoxOp = new FormFieldNewOperation(getCreatedFormType());
-      mainBoxOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, getCreatedFormType().getJavaProject()));
-      mainBoxOp.setTypeName(SdkProperties.TYPE_NAME_MAIN_BOX);
-      mainBoxOp.validate();
-      mainBoxOp.run(monitor, workingCopyManager);
+      ITypeSourceBuilder mainBoxBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MAIN_BOX);
+      mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
+      mainBoxBuilder.setFlags(Flags.AccPublic);
+      mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, newOp.getJavaProject()));
+      newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, 10.0), mainBoxBuilder);
+
       if (isCreateSearchHandler()) {
-        FormHandlerNewOperation searchHandlerOp = new FormHandlerNewOperation(getCreatedFormType());
-        searchHandlerOp.setTypeName(SdkProperties.TYPE_NAME_SEARCH_HANDLER);
-        searchHandlerOp.setStartMethodSibling(ScoutTypeUtility.createStructuredForm(getCreatedFormType()).getSiblingMethodStartHandler(searchHandlerOp.getStartMethodName()));
-        searchHandlerOp.run(monitor, workingCopyManager);
-        m_createdSearchHandler = searchHandlerOp.getCreatedHandler();
+        ITypeSourceBuilder newHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_SEARCH_HANDLER);
+        newHandlerBuilder.setFlags(Flags.AccPublic);
+        newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, newOp.getJavaProject()));
+        newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(newHandlerBuilder), newHandlerBuilder);
+
+        // start method
+        final String handlerFqn = newOp.getPackageName() + "." + newOp.getElementName() + "." + newHandlerBuilder.getElementName();
+        IMethodSourceBuilder startHandlerMethodBuilder = new MethodSourceBuilder(SdkProperties.TYPE_NAME_SEARCH_HANDLER_PREFIX);
+        startHandlerMethodBuilder.setFlags(Flags.AccPublic);
+        startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+        startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+        startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+          @Override
+          public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+            source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqn, true))).append("());");
+          }
+        });
+        newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);
+
       }
     }
+    newOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    newOp.setFormatSource(true);
+    newOp.validate();
+    newOp.run(monitor, workingCopyManager);
+    m_createdFormType = newOp.getCreatedType();
+    workingCopyManager.register(m_createdFormType.getCompilationUnit(), monitor);
+    // TODO evaluate update form data!!!
+//    FormDataUpdateOperation formDataOp = null;
+//    if (getSearchFormDataLocationBundle() != null) {
+//      formDataOp = new FormDataUpdateOperation(getCreatedFormType());
+//      formDataOp.run(monitor, workingCopyManager);
+//      m_createdFormDataType = formDataOp.getFormDataType();
+//    }
+  }
 
-    if (formDataOp != null) {
-      formDataOp.run(monitor, workingCopyManager);
+  /**
+   * @param sourceBuilder
+   * @param tablePage
+   * @param monitor
+   * @param workingCopyManager
+   * @throws CoreException
+   */
+  private void fillFromTablePage(ITypeSourceBuilder searchFormBuilder, String searchFormFqn, IType tablePage, IType formDataType, IJavaProject searchFormProject, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    SearchFormFromTablePageHelper.fillSearchForm(searchFormBuilder, searchFormFqn, formDataType, getTablePage(), searchFormProject, monitor);
+
+    IMethod getConfiguredSearchFormMethod = TypeUtility.getMethod(getTablePage(), "getConfiguredSearchForm");
+    if (TypeUtility.exists(getConfiguredSearchFormMethod)) {
+      JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
+      delOp.addMember(getConfiguredSearchFormMethod);
+      delOp.validate();
+      delOp.run(monitor, workingCopyManager);
     }
-    // format source
-    workingCopyManager.reconcile(getCreatedFormType().getCompilationUnit(), monitor);
-    JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedFormType(), true);
-    formatOp.validate();
-    formatOp.run(monitor, workingCopyManager);
+
+    MethodNewOperation getConfiguredSearchFormOp = new MethodNewOperation(MethodSourceBuilderFactory.createOverrideMethodSourceBuilder("", getTablePage()), getTablePage());
+    getConfiguredSearchFormOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        String simpleRef = validator.getTypeName(SignatureCache.createTypeSignature(getCreatedFormType().getFullyQualifiedName()));
+        source.append("return ").append(simpleRef).append(".class;");
+      }
+    });
+    getConfiguredSearchFormOp.validate();
+    getConfiguredSearchFormOp.run(monitor, workingCopyManager);
   }
 
   @Override

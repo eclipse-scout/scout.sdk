@@ -29,7 +29,7 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.dialog.IMemberSelectionChangedListener;
 import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;

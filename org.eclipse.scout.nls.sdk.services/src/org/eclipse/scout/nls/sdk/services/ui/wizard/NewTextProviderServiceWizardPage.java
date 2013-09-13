@@ -52,9 +52,9 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -101,7 +101,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_bundle = bundle;
     m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
-    m_defaultProposal = RuntimeClasses.getSuperType(RuntimeClasses.ITextProviderService, bundle.getJavaProject());
+    m_defaultProposal = RuntimeClasses.getSuperType(RuntimeClasses.ITextProviderService, ScoutUtility.getJavaProject(bundle));
   }
 
   private NlsServiceType[] getTextProviderServicesInSamePlugin() {
@@ -152,7 +152,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     group.setText("Text Provider Service Class");
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, "Super Class",
-        new JavaElementAbstractTypeContentProvider(iTextProviderService, m_bundle.getJavaProject(), m_defaultProposal));
+        new JavaElementAbstractTypeContentProvider(iTextProviderService, ScoutUtility.getJavaProject(m_bundle), m_defaultProposal));
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -332,7 +332,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       }
     }
 
-    multiStatus.add(JavaElementValidator.validatePackageName(getTargetPackage()));
+    multiStatus.add(ScoutUtility.validatePackageName(getTargetPackage()));
     multiStatus.add(Status.OK_STATUS);
   }
 

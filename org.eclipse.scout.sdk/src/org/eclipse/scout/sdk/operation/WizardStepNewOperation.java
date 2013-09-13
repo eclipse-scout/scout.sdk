@@ -14,19 +14,30 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.IStructuredType;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>WizardStepNewOperation</h3> ...
@@ -37,19 +48,22 @@ public class WizardStepNewOperation implements IOperation {
 
   // in member
   private final IType m_declaringType;
-  private String m_typeName;
+  private final String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
+  private IType m_form;
+  private IType m_formHandler;
   private IJavaElement m_sibling;
   private boolean m_formatSource;
   // out member
   private IType m_createdWizardStep;
 
-  public WizardStepNewOperation(IType declaringType) {
-    this(declaringType, false);
+  public WizardStepNewOperation(String typeName, IType declaringType) {
+    this(typeName, declaringType, false);
   }
 
-  public WizardStepNewOperation(IType declaringType, boolean formatSource) {
+  public WizardStepNewOperation(String typeName, IType declaringType, boolean formatSource) {
+    m_typeName = typeName;
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default values
@@ -74,42 +88,95 @@ public class WizardStepNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation wizardStepOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
+    wizardStepOp.setFlags(Flags.AccPublic);
+    wizardStepOp.setSuperTypeSignature(getSuperTypeSignature());
     wizardStepOp.setOrderDefinitionType(iWizardStep);
     wizardStepOp.setSibling(getSibling());
-    wizardStepOp.setSuperTypeSignature(getSuperTypeSignature());
-    wizardStepOp.setTypeModifiers(Flags.AccPublic);
+    // nls method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsTextMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(wizardStepOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TITLE);
+      nlsTextMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      wizardStepOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsTextMethodBuilder), nlsTextMethodBuilder);
+    }
+    // form
+    if (getForm() != null) {
+      String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+      if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractWizardStep)) {
+        // update generic in supertype signature
+        StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
+        superTypeSigBuilder.append("<").append(getForm().getFullyQualifiedName()).append(">");
+        wizardStepOp.setSuperTypeSignature(Signature.createTypeSignature(superTypeSigBuilder.toString(), true));
+        // execActivate method
+        IMethodSourceBuilder execActivateBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(wizardStepOp.getSourceBuilder(), "execActivate");
+        execActivateBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+          @Override
+          public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+            String formRefName = validator.getTypeName(SignatureCache.createTypeSignature(getForm().getFullyQualifiedName()));
+            source.append(formRefName).append(" form = getForm();").append(lineDelimiter);
+            source.append("if(form == null){").append(lineDelimiter);
+            source.append("form = new ").append(formRefName).append("();").append(lineDelimiter);
+            source.append("// start the form by executing the form handler").append(lineDelimiter);
+            if (getFormHandler() != null) {
+              source.append("form.startWizardStep(this,").append(validator.getTypeName(SignatureCache.createTypeSignature(getFormHandler().getFullyQualifiedName()))).append(".class);").append(lineDelimiter);
+            }
+            else {
+              source.append(ScoutUtility.getCommentBlock("start the form (e.g. form.startWizardStep(this, MyForm.ModifyHandler.class);")).append(lineDelimiter);
+            }
+            source.append("// Register the form on the step").append(lineDelimiter);
+            source.append("setForm(form);").append(lineDelimiter);
+            source.append("}").append(lineDelimiter);
+            source.append("// Set the form on the wizard").append(lineDelimiter);
+            source.append("// This will automatically display it as inner form of the wizard container form").append(lineDelimiter);
+            source.append("getWizard().setWizardForm(form);");
+          }
+        });
+        wizardStepOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execActivateBuilder), execActivateBuilder);
+        // execDeactivate method
+        IMethodSourceBuilder execDeactivateBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(wizardStepOp.getSourceBuilder(), "execDeactivate");
+        execDeactivateBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+          @Override
+          public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+            String formRefName = validator.getTypeName(SignatureCache.createTypeSignature(getForm().getFullyQualifiedName()));
+            source.append("// Save the form if the user clicks next").append(lineDelimiter);
+            source.append("if (stepKind == STEP_NEXT){").append(lineDelimiter);
+            source.append(formRefName).append(" form = getForm();").append(lineDelimiter);
+            source.append("if (form != null) {").append(lineDelimiter);
+            source.append("form.doSave();").append(lineDelimiter);
+            source.append("}").append(lineDelimiter);
+            source.append("}");
+          }
+        });
+        wizardStepOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execDeactivateBuilder), execDeactivateBuilder);
+
+      }
+    }
+
     wizardStepOp.validate();
     wizardStepOp.run(monitor, workingCopyManager);
-    m_createdWizardStep = wizardStepOp.getCreatedType();
+    setCreatedWizardStep(wizardStepOp.getCreatedType());
     // getter on declaring type
-    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedWizardStep(), getDeclaringType(), true) {
+    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedWizardStep(), getDeclaringType(), false);
+    IStructuredType structuredType = ScoutTypeUtility.createStructuredWizard(getDeclaringType());
+    getterOp.setSibling(structuredType.getSiblingMethodFieldGetter(getterOp.getElementName()));
+    getterOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
       @Override
-      protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        String wizardStepRef = validator.getTypeName(SignatureCache.createTypeSignature(getField().getFullyQualifiedName()));
-        StringBuilder source = new StringBuilder();
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        String wizardStepRef = validator.getTypeName(SignatureCache.createTypeSignature(getCreatedWizardStep().getFullyQualifiedName()));
         source.append("return getStep(" + wizardStepRef + ".class);");
-        return source.toString();
       }
-    };
+    });
     getterOp.validate();
     getterOp.run(monitor, workingCopyManager);
 
-    // nls entry
-    if (getNlsEntry() != null) {
-      // text
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(getCreatedWizardStep(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TITLE, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
     if (m_formatSource) {
-      JavaElementFormatOperation foramtOp = new JavaElementFormatOperation(getCreatedWizardStep(), true);
+      JavaElementFormatOperation foramtOp = new JavaElementFormatOperation(getDeclaringType().getCompilationUnit(), true);
       foramtOp.validate();
       foramtOp.run(monitor, workingCopyManager);
     }
   }
 
-  public void setCreatedWizardStep(IType createdWizardStep) {
+  protected void setCreatedWizardStep(IType createdWizardStep) {
     m_createdWizardStep = createdWizardStep;
   }
 
@@ -123,10 +190,6 @@ public class WizardStepNewOperation implements IOperation {
 
   public String getTypeName() {
     return m_typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
   }
 
   public INlsEntry getNlsEntry() {
@@ -161,4 +224,19 @@ public class WizardStepNewOperation implements IOperation {
     return m_formatSource;
   }
 
+  public void setForm(IType form) {
+    m_form = form;
+  }
+
+  public IType getForm() {
+    return m_form;
+  }
+
+  public void setFormHandler(IType formHandler) {
+    m_formHandler = formHandler;
+  }
+
+  public IType getFormHandler() {
+    return m_formHandler;
+  }
 }

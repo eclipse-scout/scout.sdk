@@ -14,14 +14,13 @@ import java.text.DecimalFormat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.DoublePropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -29,24 +28,15 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>DoublePresenter</h3> ...
  */
 public class DoublePresenter extends AbstractValuePresenter<Double> {
+  private final IPropertySourceParser<Double> m_parser;
 
   public DoublePresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, "[-+0-9\\.\\,\\'eEinfd]*");
+    m_parser = new DoublePropertySourceParser();
   }
 
-  @Override
-  protected String formatSourceValue(Double value) throws CoreException {
-    if (value == null) {
-      return "null";
-    }
-    else if (value.doubleValue() == Double.MAX_VALUE) {
-      return "Double.MAX_VALUE";
-    }
-    else if (value.doubleValue() == -Double.MAX_VALUE) {
-      return "-Double.MAX_VALUE";
-    }
-    String sourceVal = value.toString();
-    return sourceVal;
+  public IPropertySourceParser<Double> getParser() {
+    return m_parser;
   }
 
   @Override
@@ -73,24 +63,22 @@ public class DoublePresenter extends AbstractValuePresenter<Double> {
     if (input.equals("")) {
       return getDefaultValue();
     }
-    Double d = PropertyMethodSourceUtility.parseReturnParameterDouble(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    return d;
+    else {
+      return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+    }
   }
 
   @Override
   protected synchronized void storeValue(Double value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<Double> updateOp = new ConfigPropertyUpdateOperation<Double>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      String sourceValue = formatSourceValue(value);
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
-    }
-    if (op != null) {
-      new OperationJob(op).schedule();
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
   }
 

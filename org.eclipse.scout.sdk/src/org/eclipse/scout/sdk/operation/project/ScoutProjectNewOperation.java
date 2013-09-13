@@ -27,7 +27,7 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
@@ -181,6 +181,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   protected String computeExecutionEnvironment() {
+
     String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
     IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
     if (defaultVm != null) {

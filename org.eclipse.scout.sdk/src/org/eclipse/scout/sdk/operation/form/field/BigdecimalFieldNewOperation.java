@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.operation.form.field;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
@@ -19,8 +20,11 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -39,11 +43,12 @@ public class BigdecimalFieldNewOperation implements IOperation {
   // out members
   private IType m_createdField;
 
-  public BigdecimalFieldNewOperation(IType declaringType) {
-    this(declaringType, false);
+  public BigdecimalFieldNewOperation(String typeName, IType declaringType) {
+    this(typeName, declaringType, true);
   }
 
-  public BigdecimalFieldNewOperation(IType declaringType, boolean formatSource) {
+  public BigdecimalFieldNewOperation(String typeName, IType declaringType, boolean formatSource) {
+    m_typeName = typeName;
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
@@ -68,25 +73,22 @@ public class BigdecimalFieldNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
-    FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
-    newOp.setTypeName(getTypeName());
+    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    newOp.setFlags(Flags.AccPublic);
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    newOp.setSiblingField(getSibling());
+    newOp.setSibling(getSibling());
+    // getConfiguredLabel method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
+      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
+    }
+
+    newOp.setFormatSource(isFormatSource());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
-    m_createdField = newOp.getCreatedFormField();
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation labelOp = new NlsTextMethodUpdateOperation(getCreatedField(), NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL);
-      labelOp.setNlsEntry(getNlsEntry());
-      labelOp.validate();
-      labelOp.run(monitor, workingCopyManager);
-    }
-    if (isFormatSource()) {
-      // format
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(m_createdField, true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
+    m_createdField = newOp.getCreatedType();
+
   }
 
   public IType getCreatedField() {

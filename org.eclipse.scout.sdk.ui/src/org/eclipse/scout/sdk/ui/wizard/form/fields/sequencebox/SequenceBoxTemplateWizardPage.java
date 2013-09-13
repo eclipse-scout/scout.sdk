@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields.sequencebox;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -31,7 +29,6 @@ import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.form.fields.EmptyTemplate;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -70,19 +67,6 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
     // layout
     parent.setLayout(new GridLayout(1, true));
     m_filteredTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH | GridData.GRAB_VERTICAL));
-  }
-
-  @Override
-  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    if (m_selectedTemplate != null) {
-      SequenceBoxNewWizardPage previousPage = (SequenceBoxNewWizardPage) getPreviousPage();
-      IType sequenceBox = previousPage.getCreatedType();
-      if (sequenceBox != null) {
-        m_selectedTemplate.apply(sequenceBox, manager, monitor);
-      }
-    }
-
-    return true;
   }
 
   /**

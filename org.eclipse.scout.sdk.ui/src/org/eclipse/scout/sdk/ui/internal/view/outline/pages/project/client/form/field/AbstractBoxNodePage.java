@@ -111,7 +111,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
       action.setType(getType());
     }
     else if (menu instanceof FormDataUpdateAction) {
-      ((FormDataUpdateAction) menu).setType(getType());
+      ((FormDataUpdateAction) menu).setEnabled(getType());
     }
   }
 

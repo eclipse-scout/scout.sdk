@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.operation.template.InstallBinaryFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
-import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
 
@@ -69,7 +69,7 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
       new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/startup-body.html", project, "web-resources/startup-body.html").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation(ScoutSdkRap.PLUGIN_ID, "templates/ui.rap/web-resources/logout.html", project, "web-resources/logout.html").run(monitor, workingCopyManager);
 
-      String destPathPref = SdkProperties.DEFAULT_SOURCE_FOLDER_NAME + "/" + getCreatedProject().getName().replace('.', '/') + "/";
+      String destPathPref = TypeUtility.DEFAULT_SOURCE_FOLDER_NAME + "/" + getCreatedProject().getName().replace('.', '/') + "/";
       new InstallJavaFileOperation("templates/ui.rap/src/Activator.java", destPathPref + "Activator.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
       new InstallJavaFileOperation("templates/ui.rap/src/StandaloneRwtEnvironment.java", destPathPref + "StandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);
       new InstallJavaFileOperation("templates/ui.rap/src/MobileStandaloneRwtEnvironment.java", destPathPref + "MobileStandaloneRwtEnvironment.java", uiRapBundle, getCreatedProject(), getStringProperties()).run(monitor, workingCopyManager);

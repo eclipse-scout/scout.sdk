@@ -14,18 +14,26 @@ import java.util.HashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateMobileClientPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -39,8 +47,6 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
  * @since 3.9.0 08.03.2013
  */
 public class MobileDesktopExtensionInstallOperation extends AbstractScoutProjectNewOperation {
-
-  public final static String MOBILE_HOME_FORM_NAME = "MobileHomeForm";
 
   @Override
   public boolean isRelevant() {
@@ -62,65 +68,73 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
     IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     IScoutBundle mobileClient = bundleGraph.getBundle(getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class));
 
+    String homeFormFqn = bundleGraph.getBundle(getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class)).getPackageName("ui.forms") + ".MobileHomeForm";
+    final String homeFormSignature = Signature.createTypeSignature(homeFormFqn, true);
+
     String pck = mobileClient.getDefaultPackage(IDefaultTargetPackage.CLIENT_DESKTOP);
     final String desktopExtensionName = "DesktopExtension";
-    ScoutTypeNewOperation desktopExtensionOp = new ScoutTypeNewOperation(desktopExtensionName, pck, mobileClient) {
-      @Override
-      protected void createContent(StringBuilder source, IImportValidator validator) {
-        source.append("private " + MOBILE_HOME_FORM_NAME + " m_homeForm;\n");
-        source.append("private boolean m_active;\n\n");
-        source.append("public " + desktopExtensionName + "() {\n");
-        source.append("  setActive(!UserAgentUtility.isDesktopDevice());\n");
-        source.append("}\n\n");
-        source.append("public boolean isActive() {\n");
-        source.append("  return m_active;\n");
-        source.append("}\n\n");
-        source.append("public void setActive(boolean active) {\n");
-        source.append("  m_active = active;\n");
-        source.append("}");
-      }
-    };
+    PrimaryTypeNewOperation desktopExtensionOp = new PrimaryTypeNewOperation(desktopExtensionName, pck, mobileClient.getJavaProject());
     desktopExtensionOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDesktopExtension, mobileClient));
+    desktopExtensionOp.setFlags(Flags.AccPublic);
+    // fields
+    final String homeFormFieldName = "m_homeForm";
+    desktopExtensionOp.addFieldSourceBuilder(FieldSourceBuilderFactory.createFieldSourceBuilder(homeFormFieldName, homeFormSignature, Flags.AccPrivate, null));
+    IFieldSourceBuilder activeFieldBuilder = FieldSourceBuilderFactory.createFieldSourceBuilder("m_active", Signature.SIG_BOOLEAN, Flags.AccPrivate, null);
+    desktopExtensionOp.addFieldSourceBuilder(activeFieldBuilder);
+    // constructor
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(desktopExtensionName);
+    constructorBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("setActive(!").append(validator.getTypeName(SignatureCache.createTypeSignature("org.eclipse.scout.rt.shared.ui.UserAgentUtility")));
+        source.append(".isDesktopDevice());").append(lineDelimiter);
+      }
+    });
+    desktopExtensionOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    // isActive
+    IMethodSourceBuilder isActiveBuilder = MethodSourceBuilderFactory.createGetter(activeFieldBuilder);
+    desktopExtensionOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(isActiveBuilder), isActiveBuilder);
+    // setActive
+    IMethodSourceBuilder setActiveBuilder = MethodSourceBuilderFactory.createSetter(activeFieldBuilder);
+    desktopExtensionOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(setActiveBuilder), setActiveBuilder);
+
+    // execGuiAttached
+    IMethodSourceBuilder execGuiAttachedBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(desktopExtensionOp.getSourceBuilder(), "execGuiAttached");
+    execGuiAttachedBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("if (!isActive()) {").append(lineDelimiter);
+        source.append("  return super.execGuiAttached();").append(lineDelimiter);
+        source.append("}").append(lineDelimiter).append(lineDelimiter);
+        source.append("if (").append(homeFormFieldName).append(" == null) {").append(lineDelimiter);
+        source.append("  ").append(homeFormFieldName).append(" = new ").append(validator.getTypeName(homeFormSignature)).append("();").append(lineDelimiter);
+        source.append("  ").append(homeFormFieldName).append(".startView();").append(lineDelimiter);
+        source.append("}").append(lineDelimiter);
+        source.append("return ").append(validator.getTypeName(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ui.desktop.ContributionCommand"))).append(".Continue;").append(lineDelimiter);
+
+      }
+    });
+    desktopExtensionOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execGuiAttachedBuilder), execGuiAttachedBuilder);
+    // execGuiDetached method
+    IMethodSourceBuilder execGuiDetachedBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(desktopExtensionOp.getSourceBuilder(), "execGuiDetached");
+    execGuiDetachedBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("if (!isActive()) {").append(lineDelimiter);
+        source.append("  return super.execGuiDetached();").append(lineDelimiter);
+        source.append("}").append(lineDelimiter).append(lineDelimiter);
+        source.append("if (").append(homeFormFieldName).append(" != null) {").append(lineDelimiter);
+        source.append("  ").append(homeFormFieldName).append(".doClose();").append(lineDelimiter);
+        source.append("}").append(lineDelimiter);
+        source.append("return ").append(validator.getTypeName(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ui.desktop.ContributionCommand"))).append(".Continue;").append(lineDelimiter);
+      }
+    });
+    desktopExtensionOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execGuiDetachedBuilder), execGuiDetachedBuilder);
+
+    desktopExtensionOp.setFormatSource(true);
     desktopExtensionOp.validate();
     desktopExtensionOp.run(monitor, workingCopyManager);
     IType desktopExtension = desktopExtensionOp.getCreatedType();
-
-    // execGuiAttached
-    MethodOverrideOperation execGuiAttached = new MethodOverrideOperation(desktopExtension, "execGuiAttached", false) {
-      @Override
-      protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        StringBuilder body = new StringBuilder();
-        body.append("if (!isActive()) {\n");
-        body.append("  return super.execGuiAttached();\n");
-        body.append("}\n\n");
-        body.append("if (m_homeForm == null) {\n");
-        body.append("  m_homeForm = new " + MOBILE_HOME_FORM_NAME + "();\n");
-        body.append("  m_homeForm.startView();\n");
-        body.append("}\n");
-        body.append("return ContributionCommand.Continue;");
-        return body.toString();
-      }
-    };
-    execGuiAttached.validate();
-    execGuiAttached.run(monitor, workingCopyManager);
-
-    // execGuiDetached
-    MethodOverrideOperation execGuiDetached = new MethodOverrideOperation(desktopExtension, "execGuiDetached", false) {
-      @Override
-      protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        StringBuilder body = new StringBuilder();
-        body.append("if (!isActive()) {\n");
-        body.append("  return super.execGuiDetached();\n");
-        body.append("}\n\n");
-        body.append("if (m_homeForm != null) {\n");
-        body.append("  m_homeForm.doClose();\n");
-        body.append("}\n");
-        body.append("return ContributionCommand.Continue;");
-        return body.toString();
-      }
-    };
-    execGuiDetached.validate();
-    execGuiDetached.run(monitor, workingCopyManager);
 
     registerDesktopExtension(desktopExtension, mobileClient, monitor, workingCopyManager);
   }

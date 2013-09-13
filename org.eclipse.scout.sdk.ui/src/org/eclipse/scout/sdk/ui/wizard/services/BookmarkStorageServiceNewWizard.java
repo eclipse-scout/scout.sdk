@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
@@ -39,14 +38,10 @@ import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
@@ -59,7 +54,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
-  private ServiceNewOperation m_operation = new ServiceNewOperation();
+  private ServiceNewOperation m_operation;
 
   public BookmarkStorageServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewBookmarkService"));
@@ -114,33 +109,32 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
+    m_operation = new ServiceNewOperation(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
-      m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
+      m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
-      m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
-      m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
+      m_operation.setImplementationProject(implementationBundle.getJavaProject());
+      m_operation.setImplementationPackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
 
-    m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IBookmarkStorageService));
+    m_operation.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IBookmarkStorageService));
 
     IScoutBundle[] regProxyLocations = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
     for (IScoutBundle cb : regProxyLocations) {
-      m_operation.addProxyRegistrationBundle(cb);
+      m_operation.addProxyRegistrationProject(cb.getJavaProject());
     }
     IScoutBundle[] serverRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
     for (IScoutBundle sb : serverRegBundles) {
-      m_operation.addServiceRegistrationBundle(sb);
+      m_operation.addServiceRegistrationProject(sb.getJavaProject());
     }
     IScoutBundle interfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
-      m_operation.setInterfaceBundle(interfaceBundle);
-      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setInterfaceProject(interfaceBundle.getJavaProject());
+      m_operation.setInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
-    m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
 
     return true;
   }
@@ -151,23 +145,24 @@ public class BookmarkStorageServiceNewWizard extends AbstractWorkspaceWizard {
       m_operation.validate();
       m_operation.run(monitor, workingCopyManager);
 
-      IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
-      ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
-      IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, ScoutTypeFilters.getTypesInScoutBundles(m_operation.getImplementationBundle()), TypeComparators.getTypeNameComparator());
-
-      if (serverSessions != null && serverSessions.length == 1) {
-        final IType serverSessionType = serverSessions[0];
-        MethodOverrideOperation methodOp = new MethodOverrideOperation(m_operation.getCreatedServiceImplementation(), "getCurrentUserId", true) {
-          @Override
-          protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-            validator.addImport(serverSessionType.getFullyQualifiedName());
-            String serverSess = validator.getTypeName(SignatureCache.createTypeSignature(serverSessionType.getFullyQualifiedName()));
-            return "return " + serverSess + ".get().getUserId();";
-          }
-        };
-        methodOp.validate();
-        methodOp.run(monitor, workingCopyManager);
-      }
+      // TODO
+//      IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
+//      ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
+//      IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, ScoutTypeFilters.getTypesInScoutBundles(m_operation.getImplementationProject()), TypeComparators.getTypeNameComparator());
+//
+//      if (serverSessions != null && serverSessions.length == 1) {
+//        final IType serverSessionType = serverSessions[0];
+//        MethodOverrideOperation methodOp = new MethodOverrideOperation(m_operation.getCreatedServiceImplementation(), "getCurrentUserId", true) {
+//          @Override
+//          protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+//            validator.addImport(serverSessionType.getFullyQualifiedName());
+//            String serverSess = validator.getTypeName(SignatureCache.createTypeSignature(serverSessionType.getFullyQualifiedName()));
+//            return "return " + serverSess + ".get().getUserId();";
+//          }
+//        };
+//        methodOp.validate();
+//        methodOp.run(monitor, workingCopyManager);
+//      }
 
       return true;
     }

@@ -51,12 +51,11 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
 
   private final BundleTreeWizardPage m_locationWizardPage;
   private final ProcessServiceNewWizardPage m_serviceNewWizardPage;
-  private final ProcessServiceNewOperation m_operation;
+  private ProcessServiceNewOperation m_operation;
   private final ITreeNode m_locationWizardPageRoot;
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewProcessService"));
-    m_operation = new ProcessServiceNewOperation();
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 
     m_serviceNewWizardPage = new ProcessServiceNewWizardPage(serverBundle);
@@ -111,33 +110,38 @@ public class ProcessServiceNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
+    m_operation = new ProcessServiceNewOperation(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     m_serviceNewWizardPage.fillProcessServiceNewOperation(m_operation);
-    m_operation.setClientServiceRegistryBundles(m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true));
+    IScoutBundle[] proxyRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
+    for (IScoutBundle b : proxyRegBundles) {
+      m_operation.addProxyRegistrationProject(b.getJavaProject());
+    }
 
     IScoutBundle permissionBundle = m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_CREATE, true, true);
     if (permissionBundle != null) {
-      m_operation.setPermissionPackageName(permissionBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
-      m_operation.setPermissionCreateBundle(permissionBundle);
+      m_operation.setPermissionsPackageName(permissionBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setPermissionCreateProject(permissionBundle.getJavaProject());
       m_operation.setPermissionCreateName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_CREATE, true, true));
-      m_operation.setPermissionReadBundle(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_READ, true, true));
+      m_operation.setPermissionReadProject(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_READ, true, true).getJavaProject());
       m_operation.setPermissionReadName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_READ, true, true));
-      m_operation.setPermissionUpdateBundle(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true));
+      m_operation.setPermissionUpdateProject(m_locationWizardPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true).getJavaProject());
       m_operation.setPermissionUpdateName(m_locationWizardPage.getTextOfNode(TYPE_PERMISSION_UPDATE, true, true));
     }
-    m_operation.setServerServiceRegistryBundles(m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true));
+    IScoutBundle[] registrationBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
+    for (IScoutBundle b : registrationBundles) {
+      m_operation.addServiceRegistrationProject(b.getJavaProject());
+    }
 
     IScoutBundle serviceImplBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (serviceImplBundle != null) {
-      m_operation.setServiceImplementationBundle(serviceImplBundle);
-      m_operation.setServicePackageName(serviceImplBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
-      m_operation.setServiceImplementationName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
+      m_operation.setImplementationProject(serviceImplBundle.getJavaProject());
+      m_operation.setImplementationPackageName(serviceImplBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
 
     IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (serviceInterfaceBundle != null) {
-      m_operation.setServiceInterfaceBundle(serviceInterfaceBundle);
-      m_operation.setServiceInterfacePackageName(serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
-      m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
+      m_operation.setInterfaceProject(serviceInterfaceBundle.getJavaProject());
+      m_operation.setInterfacePackageName(serviceInterfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     return true;
   }

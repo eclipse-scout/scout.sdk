@@ -10,37 +10,50 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.VerticalAglinmentPresenter.VerticalAlignment;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerSourcePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.SourcePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>VerticalAglinmentPresenter</h3> ...
  */
-public class VerticalAglinmentPresenter extends AbstractProposalPresenter<VerticalAlignment> {
+public class VerticalAglinmentPresenter extends AbstractProposalPresenter<SourceProperty<Integer>> {
+  protected static final SourceProperty<Integer> TOP;
+  protected static final SourceProperty<Integer> CENTER;
+  protected static final SourceProperty<Integer> BOTTOM;
 
-  protected static enum VerticalAlignment {
-    Top,
-    Center,
-    Bottom
+  protected static final List<SourceProperty<Integer>> PROPOSALS;
+  static {
+    TOP = new UiSourceProperty<Integer>(Integer.valueOf(-1), "top");
+    CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
+    BOTTOM = new UiSourceProperty<Integer>(Integer.valueOf(1), "bottom");
+    PROPOSALS = new ArrayList<SourceProperty<Integer>>();
+    PROPOSALS.add(TOP);
+    PROPOSALS.add(CENTER);
+    PROPOSALS.add(BOTTOM);
   }
+
+  private final SourcePropertyParser<Integer> m_parser;
 
   public VerticalAglinmentPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new IntegerSourcePropertyParser(PROPOSALS);
   }
 
   @Override
@@ -53,70 +66,51 @@ public class VerticalAglinmentPresenter extends AbstractProposalPresenter<Vertic
 
       @Override
       public Image getImage(Object element) {
-        VerticalAlignment value = (VerticalAlignment) element;
-        switch (value) {
-          case Top:
-            return ScoutSdkUi.getImage(ScoutSdkUi.VerticalTop);
-          case Center:
-            return ScoutSdkUi.getImage(ScoutSdkUi.VerticalCenter);
-          case Bottom:
-            return ScoutSdkUi.getImage(ScoutSdkUi.VerticalBottom);
+        if (CompareUtility.equals(TOP, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.VerticalTop);
         }
-        return null;
+        else if (CompareUtility.equals(CENTER, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.VerticalCenter);
+        }
+        else if (CompareUtility.equals(BOTTOM, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.VerticalBottom);
+        }
+        else {
+          return ScoutSdkUi.getImage(ScoutSdkUi.Default);
+        }
       }
-
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(VerticalAlignment.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new UiSourceProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  @Override
-  protected VerticalAlignment parseInput(String input) throws CoreException {
-    int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    if (parsedInt < 0) {
-      return VerticalAlignment.Top;
-    }
-    else if (parsedInt == 0) {
-      return VerticalAlignment.Center;
-    }
-    else {
-      return VerticalAlignment.Bottom;
-    }
+  public SourcePropertyParser<Integer> getParser() {
+    return m_parser;
   }
 
   @Override
-  protected synchronized void storeValue(VerticalAlignment value) throws CoreException {
+  protected SourceProperty<Integer> parseInput(String input) throws CoreException {
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+  }
+
+  @Override
+  protected synchronized void storeValue(SourceProperty<Integer> value) throws CoreException {
     if (value == null) {
-      // set to default
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<SourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<SourceProperty<Integer>>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      StringBuilder source = new StringBuilder("return ");
-      switch (value) {
-        case Top:
-          source.append("-1");
-          break;
-        case Center:
-          source.append("0");
-          break;
-        case Bottom:
-          source.append("1");
-          break;
-      }
-      source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
-    }
+
   }
 
 }

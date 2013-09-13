@@ -124,13 +124,11 @@ public class TabBoxNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    TabBoxNewOperation operation = new TabBoxNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    TabBoxNewOperation operation = new TabBoxNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

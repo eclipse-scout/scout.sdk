@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+  <extension id="app" name="Application" point="org.eclipse.core.runtime.applications">
+    <application>
+      <run class="empty.project.ui.swing.SwingApplication"/>
+    </application>
+  </extension>
+  <extension id="product" point="org.eclipse.core.runtime.products">
+    <product
+          application="empty.project.ui.swing.app"
+          name="project">
+       <property
+             name="appName"
+             value="project">
+       </property>
+    </product>
+  </extension>
+</plugin>

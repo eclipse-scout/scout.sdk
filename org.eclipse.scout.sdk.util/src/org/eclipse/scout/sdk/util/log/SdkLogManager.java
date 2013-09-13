@@ -25,6 +25,15 @@ public class SdkLogManager {
     m_logLevel = logLevel;
   }
 
+  protected IStatus createStatus(IStatus log) {
+    if (log instanceof LogStatus) {
+      return (LogStatus) log;
+    }
+    else {
+      return createStatus(log.getSeverity(), log.getMessage(), log.getException());
+    }
+  }
+
   protected IStatus createStatus(int severity, String message, Throwable t) {
     String msg = message;
     if (msg == null) {
@@ -37,6 +46,11 @@ public class SdkLogManager {
     if ((log.getSeverity() & getLogLevel()) != 0) {
       getPlugin().getLog().log(log);
     }
+
+  }
+
+  public void log(IStatus log) {
+    logImpl(createStatus(log));
   }
 
   public void logInfo(Throwable t) {

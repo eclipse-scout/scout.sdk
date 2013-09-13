@@ -42,7 +42,7 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.viewer.ScoutBundleLableProvider;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.SWT;
@@ -458,7 +458,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusBundleName() {
-    return JavaElementValidator.validateNewBundleName(getBundleName());
+    return ScoutUtility.validateNewBundleName(getBundleName());
   }
 
   protected void validateStatusFragmentGroup(MultiStatus multiStatus) {

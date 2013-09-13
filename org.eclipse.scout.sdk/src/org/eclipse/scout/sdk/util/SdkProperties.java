@@ -24,7 +24,6 @@ import org.eclipse.jdt.core.IMethod;
 public final class SdkProperties {
 
   public static final int TOOL_BUTTON_SIZE = 22;
-  public static final String DEFAULT_SOURCE_FOLDER_NAME = "src";
   public static final String TAB = "  ";
 
   public static final String SUFFIX_BOX = "Box";
@@ -75,13 +74,24 @@ public final class SdkProperties {
   public static final String TYPE_NAME_MODIFY_HANDLER = TYPE_NAME_MODIFY_HANDLER_PREFIX + SUFFIX_FORM_HANDLER;
   public static final String TYPE_NAME_NEW_HANDLER_PREFIX = "New";
   public static final String TYPE_NAME_NEW_HANDLER = TYPE_NAME_NEW_HANDLER_PREFIX + SUFFIX_FORM_HANDLER;
-  public static final String TYPE_NAME_SEARCH_HANDLER = "Search" + SUFFIX_FORM_HANDLER;
+  public static final String TYPE_NAME_SEARCH_HANDLER_PREFIX = "Search";
+  public static final String TYPE_NAME_SEARCH_HANDLER = TYPE_NAME_SEARCH_HANDLER_PREFIX + SUFFIX_FORM_HANDLER;
+  public static final String TYPE_NAME_VIEW_HANDLER_PREFIX = "View";
+  public static final String TYPE_NAME_VIEW_HANDLER = TYPE_NAME_VIEW_HANDLER_PREFIX + SUFFIX_FORM_HANDLER;
+  public static final String TYPE_NAME_OK_BUTTON = "OkButton";
+  public static final String TYPE_NAME_CANCEL_BUTTON = "CancelButton";
+
   public static final String TYPE_NAME_CALENDARFIELD_CALENDAR = "Calendar";
   public static final String TYPE_NAME_TABLEFIELD_TABLE = "Table";
   public static final String TYPE_NAME_TREEBOX_TREE = "Tree";
   public static final String TYPE_NAME_PLANNERFIELD_TABLE = "ResourceTable";
   public static final String TYPE_NAME_PLANNERFIELD_ACTIVITYMAP = "ActivityMap";
   public static final String TYPE_NAME_OUTLINE_WITH_TABLE_TABLE = "Table";
+
+  public static final String METHOD_NAME_GET_CONFIGURED_LABEL = "getConfiguredLabel";
+  public static final String METHOD_NAME_GET_CONFIGURED_TEXT = "getConfiguredText";
+  public static final String METHOD_NAME_GET_CONFIGURED_TITLE = "getConfiguredTitle";
+  public static final String METHOD_NAME_GET_CONFIGURED_HEADER_TEXT = "getConfiguredHeaderText";
 
   public static final String NUMBER_MAX = "inf";
   public static final String NUMBER_MIN = "-inf";

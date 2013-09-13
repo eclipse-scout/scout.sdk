@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.exception.JavaElementNotExistException;
 import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -42,7 +43,7 @@ public class ScoutMethodDeleteOperation implements IOperation {
       throw new IllegalArgumentException("method is null");
     }
     if (!TypeUtility.exists(getMethod())) {
-      throw new IllegalArgumentException("type to implement the method does not exist.");
+      throw new JavaElementNotExistException("type to implement the method does not exist.");
     }
     if (getMethod().isReadOnly()) {
       throw new IllegalArgumentException("read only method can not be deleted.");

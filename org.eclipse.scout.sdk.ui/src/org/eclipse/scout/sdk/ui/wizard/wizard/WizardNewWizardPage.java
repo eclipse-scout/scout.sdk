@@ -33,11 +33,11 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -148,20 +148,15 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    WizardNewOperation m_operation = new WizardNewOperation();
-    m_operation.setClientBundle(getClientBundle());
+    WizardNewOperation op = new WizardNewOperation(getTypeName(), getClientBundle().getPackageName(getTargetPackage()), getClientBundle().getJavaProject());
     // write back members
-    if (getNlsName() != null) {
-      m_operation.setNlsEntry(getNlsName());
-    }
-    m_operation.setPackageName(getClientBundle().getPackageName(getTargetPackage()));
-    m_operation.setTypeName(getTypeName());
+    op.setNlsEntry(getNlsName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
-    m_operation.setFormatSource(true);
-    m_operation.run(monitor, workingCopyManager);
+    op.setFormatSource(true);
+    op.run(monitor, workingCopyManager);
     return true;
   }
 
@@ -182,7 +177,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {

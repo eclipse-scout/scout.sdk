@@ -21,7 +21,7 @@ import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -45,6 +45,9 @@ public class WellformServerBundleOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
+    if (getBundle() == null) {
+      throw new IllegalArgumentException("Bundle can not be null.");
+    }
   }
 
   @Override

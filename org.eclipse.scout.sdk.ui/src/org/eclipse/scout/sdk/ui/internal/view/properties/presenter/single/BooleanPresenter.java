@@ -13,15 +13,14 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.parser.BooleanPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -37,9 +36,11 @@ import org.eclipse.swt.widgets.Control;
 public class BooleanPresenter extends AbstractMethodPresenter {
 
   private Button m_checkbox;
+  private final IPropertySourceParser<Boolean> m_parser;
 
   public BooleanPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new BooleanPropertySourceParser();
   }
 
   @Override
@@ -96,29 +97,19 @@ public class BooleanPresenter extends AbstractMethodPresenter {
 
   protected void parseMethodBody() throws CoreException {
     String value = PropertyMethodSourceUtility.getMethodReturnValue(getMethod().peekMethod());
-    boolean checked = PropertyMethodSourceUtility.parseReturnParameterBoolean(value, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+    boolean checked = m_parser.parseSourceValue(value, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
     m_checkbox.setSelection(checked);
   }
 
   private synchronized void handleCheckboxSelectionChanged() {
-    IOperation op = null;
     try {
-      String sourceValue = Boolean.toString(m_checkbox.getSelection());
-      if (UiUtility.equals(getMethod().computeDefaultValue(), sourceValue)) {
-        if (getMethod().isImplemented()) {
-          op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-        }
-      }
-      else {
-        op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
-      }
-      if (op != null) {
-        OperationJob job = new OperationJob(op);
-        job.setDebug(true);
-        job.schedule();
-      }
+      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<Boolean>(getMethod(), m_parser);
+      updateOp.setValue(Boolean.valueOf(m_checkbox.getSelection()));
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    catch (CoreException e) {
+    catch (Exception e) {
       ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
   }

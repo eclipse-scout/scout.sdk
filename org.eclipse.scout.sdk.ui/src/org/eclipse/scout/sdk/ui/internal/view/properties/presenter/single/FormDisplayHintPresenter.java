@@ -10,38 +10,56 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormDisplayHintPresenter.DisplayHint;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.FieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerFieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>FormDisplayHintPresenter</h3> ...
  */
-public class FormDisplayHintPresenter extends AbstractProposalPresenter<DisplayHint> {
+public class FormDisplayHintPresenter extends AbstractProposalPresenter<FieldProperty<Integer>> {
+  protected static final UiFieldProperty<Integer> DISPLAY_HINT_DIALOG;
+  protected static final UiFieldProperty<Integer> DISPLAY_HINT_POPUP_WINDOW;
+  protected static final UiFieldProperty<Integer> DISPLAY_HINT_POPUP_DIALOG;
+  protected static final UiFieldProperty<Integer> DISPLAY_HINT_VIEW;
 
-  protected static enum DisplayHint {
-    Dialog,
-    PopupWindow,
-    PopupDialog,
-    View
+  protected static final List<FieldProperty<Integer>> PROPOSALS;
+  static {
+    IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
+    DISPLAY_HINT_DIALOG = new UiFieldProperty<Integer>(iForm.getField("DISPLAY_HINT_DIALOG"), "dialog");
+    DISPLAY_HINT_POPUP_WINDOW = new UiFieldProperty<Integer>(iForm.getField("DISPLAY_HINT_POPUP_WINDOW"), "popup window");
+    DISPLAY_HINT_POPUP_DIALOG = new UiFieldProperty<Integer>(iForm.getField("DISPLAY_HINT_POPUP_DIALOG"), "popup dialog");
+    DISPLAY_HINT_VIEW = new UiFieldProperty<Integer>(iForm.getField("DISPLAY_HINT_VIEW"), "view");
+    PROPOSALS = new ArrayList<FieldProperty<Integer>>();
+    PROPOSALS.add(DISPLAY_HINT_DIALOG);
+    PROPOSALS.add(DISPLAY_HINT_POPUP_WINDOW);
+    PROPOSALS.add(DISPLAY_HINT_POPUP_DIALOG);
+    PROPOSALS.add(DISPLAY_HINT_VIEW);
   }
+
+  private final FieldReferencePropertyParser<Integer> m_parser;
 
   public FormDisplayHintPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new IntegerFieldReferencePropertyParser(PROPOSALS);
   }
 
   @Override
@@ -59,59 +77,37 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<DisplayH
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(DisplayHint.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new FieldProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  @Override
-  protected DisplayHint parseInput(String input) throws CoreException {
-    int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    switch (parsedInt) {
-      case 0:
-        return DisplayHint.Dialog;
-      case 10:
-        return DisplayHint.PopupWindow;
-      case 12:
-        return DisplayHint.PopupDialog;
-      case 20:
-        return DisplayHint.View;
-    }
-    return null;
+  public FieldReferencePropertyParser<Integer> getParser() {
+    return m_parser;
   }
 
   @Override
-  protected synchronized void storeValue(DisplayHint value) throws CoreException {
+  protected FieldProperty<Integer> parseInput(String input) throws CoreException {
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+  }
+
+  @Override
+  protected synchronized void storeValue(FieldProperty<Integer> value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+
+    try {
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      StringBuilder source = new StringBuilder("return ");
-      switch (value) {
-        case Dialog:
-          source.append("DISPLAY_HINT_DIALOG");
-          break;
-        case PopupWindow:
-          source.append("DISPLAY_HINT_POPUP_WINDOW");
-          break;
-        case PopupDialog:
-          source.append("DISPLAY_HINT_POPUP_DIALOG");
-          break;
-        case View:
-          source.append("DISPLAY_HINT_VIEW");
-          break;
-      }
-      source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
-    }
+
   }
+
 }

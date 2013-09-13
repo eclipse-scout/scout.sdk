@@ -2,6 +2,7 @@ package formdata.shared.services.process.replace;
 
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
+
 import formdata.shared.services.process.AbstractPersonTableFieldData;
 
 public class TableFieldExFormData extends TableFieldBaseFormData {

@@ -121,7 +121,11 @@ public class ConfigurationMethod {
 
   public IMethod peekMethod() {
     if (!m_methodStack.isEmpty()) {
+      while (!m_methodStack.peek().exists()) {
+        m_methodStack.pop();
+      }
       return m_methodStack.peek();
+
     }
     return null;
   }

@@ -14,8 +14,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TableFieldNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
@@ -24,6 +22,8 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -136,8 +136,9 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
       Integer columnWidth = map.get(className);
       // there is a corresponding entry in the clipboard for the current column?
       if (columnWidth != null && columnWidth >= 0) {
-        IOperation op = new ConfigPropertyMethodUpdateOperation(innerType, COLUMN_WIDTH_METHOD_NAME, "  return " + columnWidth.toString() + ";", true);
-        new OperationJob(op).schedule();
+        ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME), new IntegerPropertySourceParser());
+        updateOp.setValue(columnWidth);
+        new OperationJob(updateOp).schedule();
       }
       else if (columnWidth != null) {
         showInfoMessageBox(shell, Texts.get("ColumnWidthPasteInvalidWidth", columnWidth.toString()));

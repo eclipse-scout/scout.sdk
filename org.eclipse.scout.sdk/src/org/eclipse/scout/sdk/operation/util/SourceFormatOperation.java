@@ -43,18 +43,22 @@ public class SourceFormatOperation implements IOperation {
     m_project = project;
   }
 
-  public SourceFormatOperation(IJavaProject project, Document document, ISourceRange range) {
-    m_project = project;
-    m_document = document;
-    m_range = range;
-  }
-
   public SourceFormatOperation(IType type) throws JavaModelException {
     this(type.getJavaProject(), new Document(type.getCompilationUnit().getSource()), type.getSourceRange());
   }
 
   public SourceFormatOperation(IMethod method) throws JavaModelException {
     this(method.getJavaProject(), new Document(method.getCompilationUnit().getSource()), method.getSourceRange());
+  }
+
+  public SourceFormatOperation(IJavaProject project, Document document) {
+    this(project, document, new SourceRange(0, document.getLength()));
+  }
+
+  public SourceFormatOperation(IJavaProject project, Document document, ISourceRange range) {
+    m_project = project;
+    m_document = document;
+    m_range = range;
   }
 
   @Override

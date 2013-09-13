@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -24,39 +25,37 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * This Operation is used to add/remove exported packages from the manifest.
  */
 public class ManifestExportPackageOperation implements IOperation {
-  public static final int TYPE_REMOVE = 1 << 1;
-  public static final int TYPE_REMOVE_WHEN_EMTPY = 1 << 2;
-  public static final int TYPE_ADD = 1 << 5;
-  public static final int TYPE_ADD_WHEN_NOT_EMTPY = 1 << 6;
 
   private IPackageFragment[] m_packages;
-  private final int m_type;
+  private final ExportPolicy m_exportPolicy;
   private final boolean m_avoidInternalMarkedExports;
 
+  public ManifestExportPackageOperation(ExportPolicy exportPolicy, IPackageFragment packageFragment, boolean avoidInternalMarkedExports) {
+    this(exportPolicy, new IPackageFragment[]{packageFragment}, avoidInternalMarkedExports);
+  }
+
   /**
-   * @param type
-   *          on of: {@link ManifestExportPackageOperation}{@value #TYPE_REMOVE}, {@link ManifestExportPackageOperation}
-   *          {@value #TYPE_REMOVE_WHEN_EMTPY}, {@link ManifestExportPackageOperation}{@value #TYPE_ADD},
-   *          {@link ManifestExportPackageOperation}{@value #TYPE_ADD_WHEN_NOT_EMTPY}
+   * @param exportPolicy
    * @param packageFragment
    *          the packages to operate on
    * @param avoidInternalMarkedExports
    *          to ensure packages with internal in its names will not be exported.
    */
-  public ManifestExportPackageOperation(int type, IPackageFragment[] packageFragment, boolean avoidInternalMarkedExports) {
-    m_type = type;
+  public ManifestExportPackageOperation(ExportPolicy exportPolicy, IPackageFragment[] packageFragment, boolean avoidInternalMarkedExports) {
+    m_exportPolicy = exportPolicy;
     m_packages = packageFragment;
     m_avoidInternalMarkedExports = avoidInternalMarkedExports;
   }
 
   @Override
   public String getOperationName() {
-    switch (m_type) {
-      case TYPE_REMOVE:
-      case TYPE_REMOVE_WHEN_EMTPY:
+
+    switch (getExportPolicy()) {
+      case RemovePackage:
+      case RemovePackageWhenEmpty:
         return Texts.get("Operation_removeExportedPackage");
-      case TYPE_ADD:
-      case TYPE_ADD_WHEN_NOT_EMTPY:
+      case AddPackage:
+      case AddPackageWhenNotEmpty:
         return Texts.get("Operation_addExportedPackage");
       default:
         return "";
@@ -70,17 +69,17 @@ public class ManifestExportPackageOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    switch (m_type) {
-      case TYPE_REMOVE_WHEN_EMTPY:
+    switch (getExportPolicy()) {
+      case RemovePackageWhenEmpty:
         runRemoveWhenEmpty(monitor);
         break;
-      case TYPE_REMOVE:
+      case RemovePackage:
         runRemove(monitor);
         break;
-      case TYPE_ADD_WHEN_NOT_EMTPY:
+      case AddPackageWhenNotEmpty:
         runAddWhenNotEmpty(monitor);
         break;
-      case TYPE_ADD:
+      case AddPackage:
         runAdd(monitor);
         break;
     }
@@ -131,5 +130,9 @@ public class ManifestExportPackageOperation implements IOperation {
     PluginModelHelper h = new PluginModelHelper(pck.getJavaProject().getProject());
     h.Manifest.removeExportPackage(pck);
     h.save();
+  }
+
+  public ExportPolicy getExportPolicy() {
+    return m_exportPolicy;
   }
 }

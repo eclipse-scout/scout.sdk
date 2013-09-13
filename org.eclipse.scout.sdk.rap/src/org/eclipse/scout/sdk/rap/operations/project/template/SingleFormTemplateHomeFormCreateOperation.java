@@ -13,21 +13,28 @@ package org.eclipse.scout.sdk.rap.operations.project.template;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.annotations.InjectFieldTo;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.form.field.ButtonFieldNewOperation;
-import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateMobileClientPluginOperation;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -66,39 +73,48 @@ public class SingleFormTemplateHomeFormCreateOperation extends AbstractScoutProj
   }
 
   private void createHomeForm(IScoutBundle mobileClient, IType desktopForm, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutTypeNewOperation homeFormOp = new ScoutTypeNewOperation(MobileDesktopExtensionInstallOperation.MOBILE_HOME_FORM_NAME,
-        mobileClient.getPackageName(".ui.forms"), mobileClient);
-    homeFormOp.setSuperTypeSignature(SignatureCache.createTypeSignature(desktopForm.getFullyQualifiedName()));
-    homeFormOp.validate();
-    homeFormOp.run(monitor, workingCopyManager);
-    IType homeForm = homeFormOp.getCreatedType();
+    String packageName = mobileClient.getPackageName(".ui.forms");
+    PrimaryTypeNewOperation homeFormOp = new PrimaryTypeNewOperation("MobileHomeForm", packageName, mobileClient.getJavaProject());
+    homeFormOp.setFlags(Flags.AccPublic);
+    homeFormOp.setSuperTypeSignature(SignatureCache.createTypeSignature(SignatureCache.createTypeSignature(desktopForm.getFullyQualifiedName())));
 
     // constructor
-    ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(homeForm, false);
-    constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-    constructorOp.setSimpleBody("  super();");
-    constructorOp.validate();
-    constructorOp.run(monitor, workingCopyManager);
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(homeFormOp.getElementName());
+    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
+    homeFormOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
 
-    // logoff button
-    ButtonFieldNewOperation logoutButtonOp = new ButtonFieldNewOperation(homeForm, false);
-    logoutButtonOp.setNlsEntry(mobileClient.getNlsProject().getEntry("Logoff"));
-    logoutButtonOp.setTypeName("LogoutButton");
-    logoutButtonOp.validate();
-    logoutButtonOp.run(monitor, workingCopyManager);
-    IType logoutButton = logoutButtonOp.getCreatedButton();
+    // LogoutButton type
+    ITypeSourceBuilder logoutButtonBuilder = new TypeSourceBuilder("LogoutButton");
+    logoutButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IButton, mobileClient.getJavaProject()));
+    logoutButtonBuilder.setFlags(Flags.AccPublic);
+    logoutButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+    homeFormOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(logoutButtonBuilder, 10), logoutButtonBuilder);
 
-    // execclickaction
-    MethodOverrideOperation execClickAction = new MethodOverrideOperation(logoutButton, "execClickAction", false);
-    execClickAction.setSimpleBody("ClientJob.getCurrentSession().stopSession();");
-    execClickAction.validate();
-    execClickAction.run(monitor, workingCopyManager);
+    // getConfiguredLabel method
+    IMethodSourceBuilder getConfiguredLabelBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(logoutButtonBuilder, SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
+    getConfiguredLabelBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(mobileClient.getNlsProject().getEntry("Logoff")));
+    logoutButtonBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredLabelBuilder), getConfiguredLabelBuilder);
+    // execClickAction method
+    IMethodSourceBuilder execClickActionBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(logoutButtonBuilder, "execClickAction");
+    execClickActionBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
-    // InjectFieldTo annotation
-    AnnotationCreateOperation injectFieldTo = new AnnotationCreateOperation(logoutButton, SignatureCache.createTypeSignature(InjectFieldTo.class.getName()));
-    injectFieldTo.addParameter(desktopForm.getElementName() + ".MainBox.class");
-    injectFieldTo.validate();
-    injectFieldTo.run(monitor, workingCopyManager);
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append(validator.getTypeName(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ClientJob")));
+        source.append(".getCurrentSession().stopSession();");
+      }
+    });
+    logoutButtonBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execClickActionBuilder), execClickActionBuilder);
+    logoutButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createInjectFieldTo(desktopForm.getElementName() + ".MainBox.class"));
+    // end LogoutButton type
+
+    // LogOutButton getter
+    IMethodSourceBuilder getLogoutButtonBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(Signature.createTypeSignature(homeFormOp.getPackageName() + "." + homeFormOp.getElementName() + "." + logoutButtonBuilder.getElementName(), true));
+    homeFormOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(getLogoutButtonBuilder), getLogoutButtonBuilder);
+
+    homeFormOp.setFormatSource(true);
+    homeFormOp.validate();
+    homeFormOp.run(monitor, workingCopyManager);
   }
 }

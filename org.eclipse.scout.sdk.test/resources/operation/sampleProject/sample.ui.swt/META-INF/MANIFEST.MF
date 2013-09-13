@@ -1,0 +1,24 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: My Application
+Bundle-SymbolicName: sample.ui.swt;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-ClassPath: .
+Bundle-Activator: sample.ui.swt.Activator
+Export-Package: sample.ui.swt;uses:="org.eclipse.scout.rt.ui.swt,org.eclipse.scout.rt.client.session,org.osgi.framework",
+ sample.ui.swt.application,
+ sample.ui.swt.application.button,
+ sample.ui.swt.application.menu,
+ sample.ui.swt.editor,
+ sample.ui.swt.perspective,
+ sample.ui.swt.views
+Require-Bundle: sample.client;visibility:=reexport,
+ sample.shared,
+ org.eclipse.scout.rt.ui.swt,
+ org.eclipse.scout.net,
+ org.eclipse.equinox.app,
+ org.eclipse.core.runtime,
+ org.eclipse.ui,
+ org.eclipse.ui.views
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

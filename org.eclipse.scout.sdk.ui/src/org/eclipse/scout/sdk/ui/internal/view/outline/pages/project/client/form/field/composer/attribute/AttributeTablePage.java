@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class AttributeTablePage extends AbstractPage {
 
-  protected IType iComposerAttribute = TypeUtility.getType(RuntimeClasses.IComposerAttribute);
+  protected IType iDataModelAttribute = TypeUtility.getType(RuntimeClasses.IDataModelAttribute);
   private final IType m_declaringType;
 
   private InnerTypePageDirtyListener m_attributeChangedListener;
@@ -67,10 +67,10 @@ public class AttributeTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     if (m_attributeChangedListener == null) {
-      m_attributeChangedListener = new InnerTypePageDirtyListener(this, iComposerAttribute);
+      m_attributeChangedListener = new InnerTypePageDirtyListener(this, iDataModelAttribute);
       TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
     }
-    for (IType attribute : ScoutTypeUtility.getComposerAttributes(getDeclaringType())) {
+    for (IType attribute : ScoutTypeUtility.getDataModelAttributes(getDeclaringType())) {
       new AttributeNodePage(this, attribute);
     }
   }

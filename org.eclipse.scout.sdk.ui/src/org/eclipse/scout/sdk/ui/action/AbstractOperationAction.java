@@ -31,23 +31,23 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class AbstractOperationAction extends AbstractScoutHandler {
 
-  private Collection<IOperation> m_operations;
+  private OperationJob m_job;
 
   public AbstractOperationAction(String label, ImageDescriptor image, String keyStroke, boolean multiSelectSupported, Category cat) {
     super(label, image, keyStroke, multiSelectSupported, cat);
+    m_job = new OperationJob();
   }
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    if (m_operations != null && m_operations.size() > 0) {
-      OperationJob job = new OperationJob(m_operations);
-      job.schedule();
+    if (m_job.getOperationCount() > 0) {
+      m_job.schedule();
     }
     return null;
   }
 
-  public Collection<IOperation> getOperations() {
-    return m_operations;
+  public OperationJob getJob() {
+    return m_job;
   }
 
   public void setOperation(IOperation operation) {
@@ -55,6 +55,10 @@ public abstract class AbstractOperationAction extends AbstractScoutHandler {
   }
 
   public void setOperations(Collection<IOperation> operations) {
-    m_operations = operations;
+    m_job.setOperations(operations);
+  }
+
+  public int getOperationCount() {
+    return m_job.getOperationCount();
   }
 }

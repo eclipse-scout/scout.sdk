@@ -27,22 +27,30 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.SimpleJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 
 /**
  * <h3>{@link WizardStepNewWizardPage}</h3> ...
@@ -58,11 +66,15 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
   private static final String PROP_TYPE_NAME = "typeName";
   private static final String PROP_SUPER_TYPE = "superType";
   private static final String PROP_SIBLING = "sibling";
+  private static final String PROP_FORM_TYPE = "formType";
+  private static final String PROP_FORM_HANDLER_TYPE = "formHandlerType";
 
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private ProposalTextField m_siblingField;
+  private ProposalTextField m_stepFormField;
+  private ProposalTextField m_formHandlerField;
 
   // process members
   private final IType m_abstractWizardStep;
@@ -137,6 +149,8 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    Control formGroup = createFormGroup(parent);
+
     // layout
     parent.setLayout(new GridLayout(1, true));
 
@@ -144,17 +158,85 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_siblingField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    formGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+  }
+
+  /**
+   * @param parent
+   * @return
+   */
+  protected Control createFormGroup(Composite parent) {
+    Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
+    group.setText("Steps form");
+    m_stepFormField = getFieldToolkit().createProposalField(group, Texts.get("Form"));
+    AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IForm));
+        IType[] forms = formHierarchy.getAllSuperclasses(TypeUtility.getType(RuntimeClasses.IForm), TypeFilters.getTypesOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getTypeNameComparator());
+        return new Object[][]{forms};
+      }
+    };
+    m_stepFormField.setContentProvider(contentProvider);
+    m_stepFormField.setLabelProvider(contentProvider.getLabelProvider());
+    m_stepFormField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        try {
+          setStateChanging(true);
+          setFormType((IType) event.proposal);
+
+          AbstractJavaElementContentProvider formHandlerProvider = null;
+          IType formHandlerSelection = (IType) m_formHandlerField.getSelectedProposal();
+          if (getFormType() != null) {
+            IType[] formHandlers = ScoutTypeUtility.getFormHandlers(getFormType());
+            if (formHandlers != null) {
+              formHandlerProvider = new SimpleJavaElementContentProvider(formHandlers);
+            }
+            // assign null selection if the current selected form is not the declaring type of the form hanlder selection.
+            if (formHandlerSelection != null && !getFormType().equals(formHandlerSelection.getDeclaringType())) {
+              formHandlerSelection = null;
+            }
+            m_formHandlerField.setEnabled(true);
+          }
+          else {
+            m_formHandlerField.setEnabled(false);
+          }
+          // backup
+          m_formHandlerField.setContentProvider(formHandlerProvider);
+          m_formHandlerField.setLabelProvider(formHandlerProvider == null ? null : formHandlerProvider.getLabelProvider());
+          m_formHandlerField.acceptProposal(formHandlerSelection);
+        }
+        finally {
+          setStateChanging(false);
+        }
+
+      }
+    });
+
+    m_formHandlerField = getFieldToolkit().createProposalField(group, Texts.get("FormHandler"));
+    m_formHandlerField.setEnabled(false);
+    m_formHandlerField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        setFormHandlerTypeInternal((IType) event.proposal);
+        pingStateChanging();
+      }
+    });
+
+    // layout
+    group.setLayout(new GridLayout(1, true));
+    m_stepFormField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_formHandlerField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    return group;
   }
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    WizardStepNewOperation operation = new WizardStepNewOperation(m_declaringType, true);
+    WizardStepNewOperation operation = new WizardStepNewOperation(getTypeName(), m_declaringType, true);
 
     // write back members
-    if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName());
-    }
-    operation.setTypeName(getTypeName());
+    operation.setNlsEntry(getNlsName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
@@ -166,6 +248,9 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     else {
       operation.setSibling(getSibling().getElement());
     }
+    operation.setForm(getFormType());
+    operation.setFormHandler(getFormHandlerType());
+    operation.validate();
     operation.run(monitor, workingCopyManager);
     m_createdWizardStep = operation.getCreatedWizardStep();
     return true;
@@ -297,5 +382,47 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
 
   private void setSiblingInternal(SiblingProposal sibling) {
     setProperty(PROP_SIBLING, sibling);
+  }
+
+  public IType getFormType() {
+    return (IType) getProperty(PROP_FORM_TYPE);
+  }
+
+  public void setFormType(IType superType) {
+    try {
+      setStateChanging(true);
+      setFormTypeInternal(superType);
+      if (isControlCreated()) {
+        m_stepFormField.acceptProposal(superType);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  private void setFormTypeInternal(IType superType) {
+    setProperty(PROP_FORM_TYPE, superType);
+  }
+
+  public IType getFormHandlerType() {
+    return (IType) getProperty(PROP_FORM_HANDLER_TYPE);
+  }
+
+  public void setFormHandlerType(IType superType) {
+    try {
+      setStateChanging(true);
+      setFormHandlerTypeInternal(superType);
+      if (isControlCreated()) {
+        m_formHandlerField.acceptProposal(superType);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  private void setFormHandlerTypeInternal(IType superType) {
+    setProperty(PROP_FORM_HANDLER_TYPE, superType);
   }
 }

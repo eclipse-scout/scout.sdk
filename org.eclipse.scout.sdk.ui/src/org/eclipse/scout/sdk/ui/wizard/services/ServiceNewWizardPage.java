@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -126,7 +126,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {

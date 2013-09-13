@@ -125,13 +125,11 @@ public class HtmlFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    HtmlFieldNewOperation operation = new HtmlFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    HtmlFieldNewOperation operation = new HtmlFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

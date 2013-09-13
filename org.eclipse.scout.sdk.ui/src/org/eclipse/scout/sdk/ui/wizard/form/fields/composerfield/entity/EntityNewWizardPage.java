@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
+  final IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IDataModelEntity);
 
   public static final String PROP_NLS_NAME = "nlsName";
   public static final String PROP_TYPE_NAME = "typeName";
@@ -72,7 +72,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    m_abstractComposerEntity = RuntimeClasses.getSuperType(RuntimeClasses.IComposerEntity, m_declaringType.getJavaProject());
+    m_abstractComposerEntity = RuntimeClasses.getSuperType(RuntimeClasses.IDataModelEntity, m_declaringType.getJavaProject());
     setSuperTypeInternal(m_abstractComposerEntity);
   }
 
@@ -133,11 +133,10 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ComposerEntityNewOperation operation = new ComposerEntityNewOperation(m_declaringType);
+    ComposerEntityNewOperation operation = new ComposerEntityNewOperation(getTypeName(), m_declaringType);
 
     // write back members
     operation.setNlsEntry(getNlsName());
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

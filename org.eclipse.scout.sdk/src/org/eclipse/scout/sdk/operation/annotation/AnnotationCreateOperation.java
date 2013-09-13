@@ -29,7 +29,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.form.formdata.AnnotationSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
@@ -133,14 +133,15 @@ public class AnnotationCreateOperation implements IOperation {
     return 0;
   }
 
-  public TextEdit createEdit(IImportValidator validator, String NL) throws CoreException {
+  public TextEdit createEdit(IImportValidator validator, String lineDelimiter) throws CoreException {
     try {
       ISourceRange replaceRange = getAnnotationReplaceRange();
       // check empty line
       char[] characters = getAnnotationOwner().getCompilationUnit().getBuffer().getCharacters();
       if (replaceRange.getOffset() >= 0 && replaceRange.getOffset() <= characters.length
           && replaceRange.getOffset() + replaceRange.getLength() >= 0 && replaceRange.getOffset() + replaceRange.getLength() <= characters.length) {
-        StringBuilder builder = new StringBuilder(createSource(validator, NL));
+        StringBuilder builder = new StringBuilder();
+        createSource(builder, validator, lineDelimiter);
         Document sourceDocument = new Document(getAnnotationOwner().getCompilationUnit().getSource());
         IRegion lineInfo = sourceDocument.getLineInformationOfOffset(replaceRange.getOffset());
         String line = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
@@ -151,10 +152,10 @@ public class AnnotationCreateOperation implements IOperation {
           // void
         }
         else if (PATTERN.matcher(prefix).matches()) {
-          builder.append(NL + formatter.createIndentationString(1));
+          builder.append(lineDelimiter + formatter.createIndentationString(1));
         }
         else if (PATTERN.matcher(postfix).matches()) {
-          builder.insert(0, NL + formatter.createIndentationString(1));
+          builder.insert(0, lineDelimiter + formatter.createIndentationString(1));
         }
         return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());
       }
@@ -169,12 +170,12 @@ public class AnnotationCreateOperation implements IOperation {
   public void validate() throws IllegalArgumentException {
   }
 
-  public String createSource(IImportValidator validator, String NL) throws JavaModelException {
-    return m_builder.createSource(validator);
+  public void createSource(StringBuilder sourceBuilder, IImportValidator validator, String lineDelimiter) throws CoreException {
+    m_builder.createSource(sourceBuilder, lineDelimiter, getAnnotationOwner().getJavaProject(), validator);
   }
 
   public String getSignature() {
-    return m_builder.getAnnotationSignature();
+    return m_builder.getSignature();
   }
 
   public IMember getAnnotationOwner() {

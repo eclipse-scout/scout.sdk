@@ -42,13 +42,14 @@ public final class TestUtility {
    *          true for automatic build, false to disable.
    * @throws CoreException
    */
-  public static void setAutoBuildWorkspace(boolean autoBuild) throws CoreException {
+  public static void setAutoBuildWorkspace(boolean autoBuild)
+      throws CoreException {
     JdtUtility.setWorkspaceAutoBuilding(autoBuild);
   }
 
   /**
-   * If there are egit plugins available in the environment where tests are executed, the test might be blocked by the
-   * pop boxes created by egit.
+   * If there are egit plugins available in the environment where tests are
+   * executed, the test might be blocked by the pop boxes created by egit.
    * This can be disabled (and enabled) by this method.
    * 
    * @param show
@@ -56,11 +57,13 @@ public final class TestUtility {
    */
   public static void showEgitMessageBoxes(boolean show) {
     try {
-      // preference store as defined in org.eclipse.ui.plugin.AbstractUIPlugin.getPreferenceStore()
-      @SuppressWarnings("deprecation")
-      IPreferenceStore store = new ScopedPreferenceStore(new InstanceScope(), "org.eclipse.egit.ui");
+      // preference store as defined in
+      // org.eclipse.ui.plugin.AbstractUIPlugin.getPreferenceStore()
+      IPreferenceStore store = new ScopedPreferenceStore(
+          InstanceScope.INSTANCE, "org.eclipse.egit.ui");
 
-      // following constants are coming from class org.eclipse.egit.ui.UIPreferences:
+      // following constants are coming from class
+      // org.eclipse.egit.ui.UIPreferences:
       store.setValue("show_detached_head_warning", show);
       store.setValue("show_git_prefix_warning", show);
       store.setValue("show_home_drive_warning", show);
@@ -68,13 +71,14 @@ public final class TestUtility {
       store.setValue("show_rebase_confirm", show);
     }
     catch (Throwable e) {
-      //NOP
+      // NOP
     }
   }
 
   /**
-   * Defines a new PDE target with given name and all directories of all bundles in the running osgi runtime.
-   * This target is then resolved and set as the current target platform.
+   * Defines a new PDE target with given name and all directories of all
+   * bundles in the running osgi runtime. This target is then resolved and set
+   * as the current target platform.
    * 
    * @param targetName
    *          the name of the target
@@ -83,14 +87,16 @@ public final class TestUtility {
    * @throws CoreException
    */
   @SuppressWarnings("restriction")
-  public static void loadRunningOsgiAsTarget(String targetName, IProgressMonitor monitor) throws CoreException {
+  public static void loadRunningOsgiAsTarget(String targetName,
+      IProgressMonitor monitor) throws CoreException {
     Bundle[] bundles = SdkTestingApi.getContext().getBundles();
     Set<File> dirs = new HashSet<File>();
     for (Bundle bundle : bundles) {
       if (bundle instanceof org.eclipse.osgi.framework.internal.core.AbstractBundle) {
         org.eclipse.osgi.framework.internal.core.AbstractBundle aBundle = (org.eclipse.osgi.framework.internal.core.AbstractBundle) bundle;
         if (aBundle.getBundleData() instanceof org.eclipse.osgi.baseadaptor.BaseData) {
-          org.eclipse.osgi.baseadaptor.BaseData bundleData = (org.eclipse.osgi.baseadaptor.BaseData) aBundle.getBundleData();
+          org.eclipse.osgi.baseadaptor.BaseData bundleData = (org.eclipse.osgi.baseadaptor.BaseData) aBundle
+              .getBundleData();
 
           File file = bundleData.getBundleFile().getBaseFile();
           if (file != null && file.exists()) {
@@ -99,17 +105,18 @@ public final class TestUtility {
         }
       }
     }
-    TargetPlatformUtility.resolveTargetPlatform(dirs, targetName, true, monitor);
+    TargetPlatformUtility.resolveTargetPlatform(dirs, targetName, true,
+        monitor);
   }
 
   /**
    * Specifies if Scout should update the form datas automatically or not.
    * 
-   * @param enabled
+   * @param autoBuild
    *          true for auto update, false to disable.
    */
-  @SuppressWarnings("restriction")
-  public static void setAutoUpdateEnabled(boolean enabled) {
-    org.eclipse.scout.sdk.internal.ScoutSdk.getDefault().setAutoUpdateEnabled(enabled);
+  public static void setAutoUpdateFormData(boolean autoBuild) {
+    org.eclipse.scout.sdk.internal.ScoutSdk.getDefault()
+        .setFormDataAutoUpdate(autoBuild);
   }
 }

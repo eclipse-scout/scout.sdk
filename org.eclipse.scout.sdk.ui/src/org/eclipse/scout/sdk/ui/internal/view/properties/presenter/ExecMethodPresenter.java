@@ -12,10 +12,9 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
@@ -90,7 +89,8 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
   protected void overrideMethod() {
     if (!getMethod().isImplemented()) {
       try {
-        MethodOverrideOperation overrideOp = new MethodOverrideOperation(getMethod().getType(), getMethod().getMethodName(), true);
+        MethodOverrideOperation overrideOp = new MethodOverrideOperation(getMethod().getMethodName(), getMethod().getType());
+        overrideOp.setFormatSource(true);
         IJavaElement sibling = null;
         IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getMethod().getType());
         sibling = structuredType.getSiblingMethodConfigExec(getMethod().getMethodName());
@@ -106,7 +106,7 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
           showJavaElementInEditor(overrideOp.getCreatedMethod());
         }
       }
-      catch (JavaModelException e) {
+      catch (CoreException e) {
         ScoutSdkUi.logWarning("could not override the method '" + getMethod().getMethodName() + "' on '" + getMethod().getType().getFullyQualifiedName() + "'", e);
       }
     }

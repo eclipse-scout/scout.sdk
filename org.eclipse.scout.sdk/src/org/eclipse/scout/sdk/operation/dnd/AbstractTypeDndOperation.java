@@ -19,16 +19,17 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationsUpdateOperation;
 import org.eclipse.scout.sdk.operation.form.field.IFieldPosition;
-import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.annotation.OrderAnnotationsUpdateOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -156,15 +157,17 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
   }
 
   protected IType createNewType(IType declaringType, String simpleName, final String source, final String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation fieldCopyOp = new InnerTypeNewOperation(simpleName, getTargetDeclaringType()) {
+    TypeSourceBuilder fieldSourceBuilder = new TypeSourceBuilder(simpleName) {
       @Override
-      public String createSource(IImportValidator validator) throws JavaModelException {
+      public void createSource(StringBuilder sourcebuilder, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         for (String imp : fqImports) {
           validator.addImport(imp);
         }
-        return source;
+        sourcebuilder.append(source);
       }
     };
+
+    InnerTypeNewOperation fieldCopyOp = new InnerTypeNewOperation(fieldSourceBuilder, getTargetDeclaringType());
     fieldCopyOp.setSibling(sibling);
     fieldCopyOp.setFormatSource(false);
     fieldCopyOp.run(monitor, manager);

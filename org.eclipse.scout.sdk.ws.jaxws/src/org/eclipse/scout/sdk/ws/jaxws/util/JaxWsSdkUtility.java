@@ -1055,7 +1055,7 @@ public final class JaxWsSdkUtility {
     return false;
   }
 
-  public static String resolveTypeName(IType declaringType, IType typeToBeResolved) throws JavaModelException {
+  public static String resolveTypeName(IType declaringType, IType typeToBeResolved) throws CoreException {
     String typeSignature = SignatureCache.createTypeSignature(typeToBeResolved.getFullyQualifiedName());
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(declaringType.getCompilationUnit());
     return SignatureUtility.getTypeReference(typeSignature, declaringType, validator);

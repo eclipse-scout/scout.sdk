@@ -80,7 +80,15 @@ public class PropertyViewExtensionPoint {
       // order extensions
       TreeMap<CompositeObject, PropertyViewExtension> orderedExtensions = new TreeMap<CompositeObject, PropertyViewExtension>();
       for (PropertyViewExtension ext : extendsions.values()) {
-        orderedExtensions.put(new CompositeObject(-distanceToIPage(ext.getPageClass(), 0), ext), ext);
+        try {
+          int distanceToIPage = distanceToIPage(ext.getPageClass(), 0);
+
+          orderedExtensions.put(new CompositeObject(-distanceToIPage, ext), ext);
+        }
+        catch (Throwable t) {
+          ScoutSdkUi.logError("Could not determ load extension '" + ext.toString() + "'!");
+          // TODO: handle exception
+        }
       }
       m_extensions = new ArrayList<PropertyViewExtension>(orderedExtensions.values());
     }

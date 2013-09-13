@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementC
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -40,7 +41,6 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -97,7 +97,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         new AbstractJavaElementContentProvider() {
           @Override
           protected Object[][] computeProposals() {
-            ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeFilters.getNotInTypes(localLookupCall));
+            ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(ScoutUtility.getJavaProject(getClientBundle())), TypeFilters.getNotInTypes(localLookupCall));
             ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
             return new Object[][]{TypeUtility.toArray(localLookupCall), lookupServiceHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator())};
           }
@@ -150,8 +150,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    LocalLookupCallNewOperation op = new LocalLookupCallNewOperation();
-    op.setBundle(getClientBundle());
+    LocalLookupCallNewOperation op = new LocalLookupCallNewOperation(getTypeName(), getClientBundle().getPackageName(getTargetPackage()), ScoutUtility.getJavaProject(getClientBundle()));
     op.setLookupCallName(getTypeName());
     op.setPackageName(getClientBundle().getPackageName(getTargetPackage()));
     op.setFormatSource(true);
@@ -165,7 +164,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {

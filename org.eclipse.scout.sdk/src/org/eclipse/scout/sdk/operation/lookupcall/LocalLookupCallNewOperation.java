@@ -15,23 +15,22 @@ import java.util.ArrayList;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  *
@@ -39,13 +38,20 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class LocalLookupCallNewOperation implements IOperation {
   // in members
   private String m_lookupCallName;
-  private String m_lookupCallSuperTypeSignature;
-  private IScoutBundle m_clientBundle;
-  private boolean m_formatSource;
   private String m_packageName;
+  private IJavaProject m_javaProject;
+  private String m_lookupCallSuperTypeSignature;
+  private boolean m_formatSource;
 
   //out members
-  private IType m_outLookupCall;
+  private IType m_createdLookupCall;
+
+  public LocalLookupCallNewOperation(String lookupCallName, String packageName, IJavaProject javaProject) {
+    m_lookupCallName = lookupCallName;
+    m_packageName = packageName;
+    m_javaProject = javaProject;
+
+  }
 
   @Override
   public String getOperationName() {
@@ -53,54 +59,56 @@ public class LocalLookupCallNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-
-    // lookup call
-    ScoutTypeNewOperation lookupCallOp = new ScoutTypeNewOperation(getLookupCallName(), getPackageName(), getBundle());
-    lookupCallOp.setSuperTypeSignature(getLookupCallSuperTypeSignature());
-    lookupCallOp.validate();
-    lookupCallOp.run(monitor, workingCopyManager);
-    m_outLookupCall = lookupCallOp.getCreatedType();
-
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD, new IPackageFragment[]{m_outLookupCall.getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
-
-    FieldCreateOperation serialVersionUidOp = new FieldCreateOperation(getOutLookupCall(), "serialVersionUID", false);
-    serialVersionUidOp.setFlags(Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    serialVersionUidOp.setSignature(Signature.SIG_LONG);
-    serialVersionUidOp.setSimpleInitValue("1L");
-    serialVersionUidOp.validate();
-    serialVersionUidOp.run(monitor, workingCopyManager);
-
-    MethodOverrideOperation execCreateLookupRowsMethodOp = new MethodOverrideOperation(m_outLookupCall, "execCreateLookupRows", false) {
-      @Override
-      protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        String refLookupRow = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.LookupRow));
-        String refArrayList = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
-        StringBuilder body = new StringBuilder();
-        body.append(refArrayList + "<" + refLookupRow + "> rows = new " + refArrayList + "<" + refLookupRow + ">();\n");
-        body.append("  " + ScoutUtility.getCommentBlock("create lookup rows here.") + "\n");
-        body.append("  return rows;");
-        return body.toString();
-      }
-    };
-    execCreateLookupRowsMethodOp.validate();
-    execCreateLookupRowsMethodOp.run(monitor, workingCopyManager);
-
-    if (isFormatSource()) {
-      // format
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getOutLookupCall(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
-  }
-
-  @Override
   public void validate() throws IllegalArgumentException {
     if (StringUtility.isNullOrEmpty(getPackageName())) {
       throw new IllegalArgumentException("package can not be null or empty.");
     }
+  }
+
+  @Override
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+
+    // lookup call
+    PrimaryTypeNewOperation lookupCallOp = new PrimaryTypeNewOperation(getLookupCallName(), getPackageName(), getJavaProject());
+    lookupCallOp.setFlags(Flags.AccPublic);
+    lookupCallOp.setSuperTypeSignature(getLookupCallSuperTypeSignature());
+    lookupCallOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    // serial version uid
+    lookupCallOp.addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
+    // execCreateLookupRows method
+    IMethodSourceBuilder execCreateLookupRowsBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(lookupCallOp.getSourceBuilder(), "execCreateLookupRows");
+    execCreateLookupRowsBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        String refLookupRow = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.LookupRow));
+        String refArrayList = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
+        source.append(refArrayList).append("<").append(refLookupRow).append("> rows = new ").append(refArrayList).append("<").append(refLookupRow).append(">();").append(lineDelimiter);
+        source.append("  ").append(ScoutUtility.getCommentBlock("create lookup rows here.")).append(lineDelimiter);
+        source.append("  return rows;");
+      }
+    });
+    lookupCallOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execCreateLookupRowsBuilder), execCreateLookupRowsBuilder);
+    lookupCallOp.setFormatSource(isFormatSource());
+    lookupCallOp.validate();
+    lookupCallOp.run(monitor, workingCopyManager);
+    m_createdLookupCall = lookupCallOp.getCreatedType();
+
+  }
+
+  public void setJavaProject(IJavaProject javaProject) {
+    m_javaProject = javaProject;
+  }
+
+  public IJavaProject getJavaProject() {
+    return m_javaProject;
+  }
+
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public void setPackageName(String packageName) {
+    m_packageName = packageName;
   }
 
   public String getLookupCallName() {
@@ -119,14 +127,6 @@ public class LocalLookupCallNewOperation implements IOperation {
     return m_lookupCallSuperTypeSignature;
   }
 
-  public IScoutBundle getBundle() {
-    return m_clientBundle;
-  }
-
-  public void setBundle(IScoutBundle bundle) {
-    m_clientBundle = bundle;
-  }
-
   public boolean isFormatSource() {
     return m_formatSource;
   }
@@ -135,15 +135,7 @@ public class LocalLookupCallNewOperation implements IOperation {
     m_formatSource = formatSource;
   }
 
-  public IType getOutLookupCall() {
-    return m_outLookupCall;
-  }
-
-  public String getPackageName() {
-    return m_packageName;
-  }
-
-  public void setPackageName(String packageName) {
-    m_packageName = packageName;
+  public IType getCreatedLookupCall() {
+    return m_createdLookupCall;
   }
 }

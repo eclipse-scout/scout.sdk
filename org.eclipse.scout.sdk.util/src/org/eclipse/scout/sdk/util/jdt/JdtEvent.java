@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.util.jdt;
 
 import java.util.EventObject;
 
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IType;
@@ -105,14 +106,32 @@ public class JdtEvent extends EventObject {
     return hash;
   }
 
+  @SuppressWarnings("null")
   public ITypeHierarchy getSuperTypeHierarchy() {
     if (m_superTypeHierarchy == null) {
-      if (TypeUtility.exists(getElement()) && getElement().getElementType() == IJavaElement.TYPE) {
-        try {
-          m_superTypeHierarchy = ((IType) getElement()).newSupertypeHierarchy(null);
+      if (TypeUtility.exists(getElement())) {
+        IType type = null;
+        if (getElement().getElementType() == IJavaElement.TYPE) {
+          type = (IType) getElement();
         }
-        catch (JavaModelException e) {
-          SdkUtilActivator.logError("could not create super type hierarchy for '" + getElement().getElementName() + "'.");
+        else if (getElement().getElementType() == IJavaElement.COMPILATION_UNIT) {
+          try {
+            IType[] types = ((ICompilationUnit) getElement()).getTypes();
+            if (types.length > 0) {
+              type = types[0];
+            }
+          }
+          catch (JavaModelException ex) {
+            SdkUtilActivator.logError(ex);
+          }
+        }
+        if (TypeUtility.exists(type)) {
+          try {
+            m_superTypeHierarchy = type.newSupertypeHierarchy(null);
+          }
+          catch (JavaModelException e) {
+            SdkUtilActivator.logError("could not create super type hierarchy for '" + getElement().getElementName() + "'.");
+          }
         }
       }
     }

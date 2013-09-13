@@ -34,7 +34,7 @@ public class InstallClientSessionAction extends AbstractOperationAction {
 
   @Override
   public boolean isVisible() {
-    return getOperations() != null;
+    return getOperationCount() > 0;
   }
 
   public void init(ICachedTypeHierarchy clientSessionHierarchy, IScoutBundle scoutResource) {

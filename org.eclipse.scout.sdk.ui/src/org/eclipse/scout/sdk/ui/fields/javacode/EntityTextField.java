@@ -27,7 +27,6 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
@@ -134,7 +133,7 @@ public class EntityTextField extends Composite {
   }
 
   public IStatus getStatus() {
-    return JavaElementValidator.validatePackageName(m_text.getText());
+    return ScoutUtility.validatePackageName(m_text.getText());
   }
 
   public void addModifyListener(ModifyListener listener) {

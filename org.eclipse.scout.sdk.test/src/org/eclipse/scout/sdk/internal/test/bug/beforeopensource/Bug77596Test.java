@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.internal.test.bug.beforeopensource;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -30,12 +30,11 @@ public class Bug77596Test extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("bugsBeforeOpensource/77596", "com.bsiag.miniapp.client", "com.bsiag.miniapp.shared");
+    setupWorkspace("resources/bugsBeforeOpensource/77596", "com.bsiag.miniapp.client", "com.bsiag.miniapp.shared");
   }
 
   private IStructuredType getCompanyFormHelper() {
-    IType form = TypeUtility.getType("com.bsiag.miniapp.client.ui.forms.CompanyForm");
-    Assert.assertTrue(TypeUtility.exists(form));
+    IType form = SdkAssert.assertTypeExists("com.bsiag.miniapp.client.ui.forms.CompanyForm");
     IStructuredType helper = null;
     /*try {
       TuningUtility.startTimer();*/

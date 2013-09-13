@@ -56,8 +56,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility;
-import org.eclipse.scout.sdk.operation.page.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -73,6 +71,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -83,6 +82,8 @@ public class ScoutTypeUtility extends TypeUtility {
   private static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
   private static final Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
   private static final Pattern RETURN_TRUE_PATTERN = Pattern.compile("return\\s*true", Pattern.MULTILINE);
+  private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
+  private final static Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
 
   private ScoutTypeUtility() {
   }
@@ -119,10 +120,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @return true if element was found in the classpath of bundle
    */
   public static boolean isOnClasspath(IScoutBundle element, IScoutBundle bundle) {
-    if (element == null || bundle == null) {
-      return false;
-    }
-    return isOnClasspath(element.getJavaProject(), bundle.getJavaProject());
+    return isOnClasspath(ScoutUtility.getJavaProject(element), ScoutUtility.getJavaProject(bundle));
   }
 
   /**
@@ -135,10 +133,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @return true if element was found in the classpath of bundle
    */
   public static boolean isOnClasspath(IJavaElement element, IScoutBundle bundle) {
-    if (bundle == null) {
-      return false;
-    }
-    return isOnClasspath(element, bundle.getJavaProject());
+    return isOnClasspath(element, ScoutUtility.getJavaProject(bundle));
   }
 
   /**
@@ -159,20 +154,30 @@ public class ScoutTypeUtility extends TypeUtility {
     ArrayList<IType> types = new ArrayList<IType>();
     if (TypeUtility.exists(method)) {
       try {
-        Matcher matcher = Regex.REGEX_METHOD_NEW_TYPE_OCCURRENCES.matcher(method.getSource());
-        while (matcher.find()) {
-          try {
-            String resolvedSignature = SignatureUtility.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), method.getDeclaringType());
-            if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
-              String pck = org.eclipse.jdt.core.Signature.getSignatureQualifier(resolvedSignature);
-              String simpleName = org.eclipse.jdt.core.Signature.getSignatureSimpleName(resolvedSignature);
-              if (!StringUtility.isNullOrEmpty(pck) && !StringUtility.isNullOrEmpty(simpleName)) {
-                types.add(TypeUtility.getType(pck + "." + simpleName));
+        String src = method.getSource();
+        if (src != null) {
+          src = ScoutUtility.removeComments(src);
+          Matcher matcher = Regex.REGEX_METHOD_NEW_TYPE_OCCURRENCES.matcher(src);
+          while (matcher.find()) {
+            try {
+              String resolvedSignature = SignatureUtility.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), method.getDeclaringType());
+              if (!StringUtility.isNullOrEmpty(resolvedSignature)) {
+                String pck = org.eclipse.jdt.core.Signature.getSignatureQualifier(resolvedSignature);
+                String simpleName = org.eclipse.jdt.core.Signature.getSignatureSimpleName(resolvedSignature);
+                if (!StringUtility.isNullOrEmpty(pck) && !StringUtility.isNullOrEmpty(simpleName)) {
+                  IType candidate = TypeUtility.getType(pck + "." + simpleName);
+                  if (TypeUtility.exists(candidate)) {
+                    types.add(candidate);
+                  }
+                }
               }
             }
-          }
-          catch (IllegalArgumentException e) {
-            ScoutSdk.logWarning("could not parse signature '" + matcher.group(1) + "' in method '" + method.getElementName() + "' of type '" + method.getDeclaringType().getFullyQualifiedName() + "'. Trying to find page occurences.");
+            catch (IllegalArgumentException e) {
+              ScoutSdk.logWarning("could not parse signature '" + matcher.group(1) + "' in method '" + method.getElementName() + "' of type '" + method.getDeclaringType().getFullyQualifiedName() + "'. Trying to find page occurences.");
+            }
+            catch (CoreException ex) {
+              ScoutSdk.logWarning("could not resolve signature '" + matcher.group(1) + "' in method '" + method.getElementName() + "' of type '" + method.getDeclaringType().getFullyQualifiedName() + "'. Trying to find page occurences.");
+            }
           }
         }
       }
@@ -286,13 +291,34 @@ public class ScoutTypeUtility extends TypeUtility {
     }
     else if (primaryTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractFormData))) {
       // search field data within form data
-      IType formDataType = primaryType.getType(FormDataUtility.getBeanName(FormDataUtility.getFieldNameWithoutSuffix(formField.getElementName()), true));
+      IType formDataType = primaryType.getType(getFormDataName(formField.getElementName()));
       if (TypeUtility.exists(formDataType)) {
         return formDataType;
       }
     }
-
     return null;
+  }
+
+  public static String getFormDataName(String typeName) {
+    String formDataName = typeName;
+    if (typeName.endsWith("Field")) {
+      formDataName = typeName.replaceAll("Field$", "");
+    }
+    else if (typeName.endsWith("Button")) {
+      formDataName = typeName.replaceAll("Button$", "");
+    }
+    else if (typeName.endsWith("Column")) {
+      formDataName = typeName.replaceAll("Column$", "");
+    }
+    String resultName = formDataName;
+//    int i = 0;
+//    if (operation != null) {
+//      while (operation.getTypeNewOperation(resultName) != null) {
+//        resultName = formDataName + i;
+//        i++;
+//      }
+//    }
+    return resultName;
   }
 
   /**
@@ -500,7 +526,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * 
    * @since 3.10.0-M1
    */
-  public static PageDataAnnotation findPageDataAnnotation(IType type) throws JavaModelException {
+  public static PageDataAnnotation findPageDataAnnotation(IType type, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
       return null;
     }
@@ -516,7 +542,6 @@ public class ScoutTypeUtility extends TypeUtility {
       IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 
       do {
-        org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy = tmpType.newSupertypeHierarchy(null);
         if (!superTypeHierarchy.contains(iPageWithTable)) {
           break;
         }
@@ -550,7 +575,7 @@ public class ScoutTypeUtility extends TypeUtility {
       return null;
     }
 
-    IAnnotation annotation = JdtUtility.getAnnotation(type, RuntimeClasses.PageData);
+    IAnnotation annotation = JdtUtility.getAnnotation(type, IRuntimeClasses.PageData);
     if (!TypeUtility.exists(annotation)) {
       return null;
     }
@@ -728,12 +753,12 @@ public class ScoutTypeUtility extends TypeUtility {
     return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IButton), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
-  public static IType[] getComposerEntities(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IComposerEntity), TypeComparators.getTypeNameComparator());
+  public static IType[] getDataModelEntities(IType declaringType) {
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IDataModelEntity), TypeComparators.getTypeNameComparator());
   }
 
-  public static IType[] getComposerAttributes(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IComposerAttribute), TypeComparators.getTypeNameComparator());
+  public static IType[] getDataModelAttributes(IType declaringType) {
+    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IDataModelAttribute), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getFormFieldData(IType declaringType) {
@@ -819,7 +844,7 @@ public class ScoutTypeUtility extends TypeUtility {
               returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
               return SignatureUtility.isEqualSignature(formFieldSignature, returnTypeSignature);
             }
-            catch (JavaModelException e) {
+            catch (CoreException e) {
               ScoutSdk.logError("could not parse signature of method '" + candidate.getElementName() + "' in type '" + candidate.getDeclaringType().getFullyQualifiedName() + "'.", e);
               return false;
             }
@@ -846,7 +871,7 @@ public class ScoutTypeUtility extends TypeUtility {
             returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
             return formFieldSignature.equals(returnTypeSignature);
           }
-          catch (JavaModelException e) {
+          catch (CoreException e) {
             ScoutSdk.logError("could not parse signature of method '" + candidate.getElementName() + "' in type '" + candidate.getDeclaringType().getFullyQualifiedName() + "'.", e);
             return false;
           }
@@ -870,7 +895,7 @@ public class ScoutTypeUtility extends TypeUtility {
             returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
             return formFieldSignature.equals(returnTypeSignature);
           }
-          catch (JavaModelException e) {
+          catch (CoreException e) {
             ScoutSdk.logError("could not parse signature of method '" + candidate.getElementName() + "' in type '" + candidate.getDeclaringType().getFullyQualifiedName() + "'.", e);
             return false;
           }
@@ -1128,6 +1153,92 @@ public class ScoutTypeUtility extends TypeUtility {
     return null;
   }
 
+  public static String computeFormFieldGenericType(IType type, ITypeHierarchy formFieldHierarchy) throws CoreException {
+    if (type == null || type.getFullyQualifiedName().equals(Object.class.getName())) {
+      return null;
+    }
+    IType superType = formFieldHierarchy.getSuperclass(type);
+    if (TypeUtility.exists(superType)) {
+      if (TypeUtility.isGenericType(superType)) {
+        // compute generic parameter type by merging all super type generic parameter declarations
+        List<GenericSignatureMapping> signatureMapping = new ArrayList<GenericSignatureMapping>();
+        IType currentType = type;
+        IType currentSuperType = superType;
+        while (currentSuperType != null) {
+          if (TypeUtility.isGenericType(currentSuperType)) {
+            String superTypeGenericParameterName = currentSuperType.getTypeParameters()[0].getElementName();
+            String currentSuperTypeSig = currentType.getSuperclassTypeSignature();
+            String[] typeArgs = Signature.getTypeArguments(currentSuperTypeSig);
+            if (typeArgs.length < 1) {
+              // if the class has no generic type defined, use java.lang.Object as type for the formdata
+              typeArgs = new String[]{Signature.C_RESOLVED + Object.class.getName() + Signature.C_SEMICOLON};
+            }
+            String superTypeGenericParameterSignature = getResolvedGenericTypeSignature(typeArgs[0], currentType);
+            signatureMapping.add(0, new GenericSignatureMapping(superTypeGenericParameterName, superTypeGenericParameterSignature));
+            currentType = currentSuperType;
+            currentSuperType = formFieldHierarchy.getSuperclass(currentSuperType);
+          }
+          else {
+            break;
+          }
+        }
+        String signature = signatureMapping.get(0).getSuperTypeGenericParameterSignature();
+        for (int i = 1; i < signatureMapping.size(); i++) {
+          String replacement = signatureMapping.get(i).getSuperTypeGenericParameterSignature();
+          replacement = replacement.substring(0, replacement.length() - 1);
+          signature = signature.replaceAll("[T,L,Q]" + signatureMapping.get(i).getSuperTypeGenericParameterName(), replacement);
+        }
+        return SignatureUtility.getResolvedSignature(signature, type);
+      }
+      else {
+        return computeFormFieldGenericType(superType, formFieldHierarchy);
+      }
+    }
+    else {
+      return null;
+    }
+  }
+
+  private static String getResolvedGenericTypeSignature(String signature, IType type) throws JavaModelException {
+    String workingSig = signature.replace('/', '.');
+    workingSig = Signature.getTypeErasure(workingSig);
+    StringBuilder signatureBuilder = new StringBuilder();
+    Matcher prefMatcher = PREF_REGEX.matcher(workingSig);
+    if (prefMatcher.find()) {
+      signatureBuilder.append(prefMatcher.group(1));
+      workingSig = prefMatcher.group(2);
+    }
+    if (Signature.getTypeSignatureKind(workingSig) == Signature.BASE_TYPE_SIGNATURE) {
+      signatureBuilder.append(workingSig);
+      return signatureBuilder.toString();
+    }
+    else {
+      if (workingSig.length() > 0 && workingSig.charAt(0) == Signature.C_UNRESOLVED) {
+        String[][] resolvedTypeName = type.resolveType(Signature.getSignatureSimpleName(workingSig));
+        if (resolvedTypeName != null && resolvedTypeName.length == 1) {
+          String fqName = resolvedTypeName[0][0];
+          if (fqName != null && fqName.length() > 0) {
+            fqName = fqName + ".";
+          }
+          fqName = fqName + resolvedTypeName[0][1];
+          workingSig = SignatureCache.createTypeSignature(fqName);
+        }
+      }
+      workingSig = SUFF_REGEX.matcher(workingSig).replaceAll("$1");
+      signatureBuilder.append(workingSig);
+      String[] typeArguments = Signature.getTypeArguments(signature);
+      if (typeArguments.length > 0) {
+        signatureBuilder.append("<");
+        for (int i = 0; i < typeArguments.length; i++) {
+          signatureBuilder.append(getResolvedGenericTypeSignature(typeArguments[i], type));
+        }
+        signatureBuilder.append(">");
+      }
+      signatureBuilder.append(";");
+    }
+    return signatureBuilder.toString();
+  }
+
   public static IStructuredType createStructuredType(IType type) {
     try {
       org.eclipse.jdt.core.ITypeHierarchy supertypeHierarchy = type.newSupertypeHierarchy(null);
@@ -1146,10 +1257,10 @@ public class ScoutTypeUtility extends TypeUtility {
       else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IComposerField))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IComposerAttribute))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDataModelAttribute))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IComposerEntity))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDataModelEntity))) {
         return createStructuredComposer(type);
       }
       else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IFormField))) {
@@ -1719,5 +1830,23 @@ public class ScoutTypeUtility extends TypeUtility {
         CATEGORIES.TYPE_UNCATEGORIZED
         );
     return new ScoutStructuredType(type, enabled);
+  }
+
+  protected static class GenericSignatureMapping {
+    private final String m_superTypeGenericParameterName;
+    private final String m_superTypeGenericParameterSignature;
+
+    public GenericSignatureMapping(String superTypeGenericParameterName, String superTypeGenericParameterSignature) {
+      m_superTypeGenericParameterName = superTypeGenericParameterName;
+      m_superTypeGenericParameterSignature = superTypeGenericParameterSignature;
+    }
+
+    public String getSuperTypeGenericParameterName() {
+      return m_superTypeGenericParameterName;
+    }
+
+    public String getSuperTypeGenericParameterSignature() {
+      return m_superTypeGenericParameterSignature;
+    }
   }
 }

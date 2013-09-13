@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: sample.shared
+Bundle-SymbolicName: sample.shared;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: sample.shared.Activator
+Export-Package: sample.shared,
+ sample.shared.empty,
+ sample.shared.form.data,
+ sample.shared.person,
+ sample.shared.services.code,
+ sample.shared.services.common.text,
+ sample.shared.services.lookup
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.shared;visibility:=reexport
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

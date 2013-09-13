@@ -14,40 +14,30 @@ import java.text.DecimalFormat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.LongPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>DoublePresenter</h3> ...
+ * <h3>LongPresenter</h3> ...
  */
 public class LongPresenter extends AbstractValuePresenter<Long> {
 
+  private final IPropertySourceParser<Long> m_parser;
+
   public LongPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, "[-+0-9\\'Eeinfl]*");
+    m_parser = new LongPropertySourceParser();
   }
 
-  @Override
-  protected String formatSourceValue(Long value) throws CoreException {
-    if (value == null) {
-      return "null";
-    }
-    else if (value.longValue() == Long.MAX_VALUE) {
-      return "Long.MAX_VALUE";
-    }
-    else if (value.longValue() == Long.MIN_VALUE) {
-      return "Long.MIN_VALUE";
-    }
-    String sourceVal = value.toString();
-
-    return sourceVal + "L";
+  public IPropertySourceParser<Long> getParser() {
+    return m_parser;
   }
 
   @Override
@@ -71,29 +61,25 @@ public class LongPresenter extends AbstractValuePresenter<Long> {
 
   @Override
   protected Long parseDisplayInput(String input) throws CoreException {
-    if (input == null || input.equals("")) {
-      return null;
+    if (input.equals("")) {
+      return getDefaultValue();
     }
     else {
-      Long d = PropertyMethodSourceUtility.parseReturnParameterLong(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-      return d;
+      return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
     }
   }
 
   @Override
   protected synchronized void storeValue(Long value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<Long>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      String sourceValue = formatSourceValue(value);
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
-    }
-    if (op != null) {
-      new OperationJob(op).schedule();
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
   }
 
@@ -101,5 +87,4 @@ public class LongPresenter extends AbstractValuePresenter<Long> {
   protected int getTextAlignment() {
     return SWT.RIGHT;
   }
-
 }

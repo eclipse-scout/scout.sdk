@@ -35,8 +35,8 @@ import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionP
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -284,7 +284,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   protected IStatus getStatusProjectName() {
     for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
       if (node.isEnabled() && m_bundleTree.isChecked(node)) {
-        IStatus s = JavaElementValidator.validateNewBundleName(node.getText());
+        IStatus s = ScoutUtility.validateNewBundleName(node.getText());
         if (!s.isOK()) {
           return s;
         }

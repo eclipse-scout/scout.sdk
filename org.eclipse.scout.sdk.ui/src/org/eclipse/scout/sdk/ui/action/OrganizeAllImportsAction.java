@@ -19,6 +19,7 @@ import org.eclipse.jdt.ui.actions.OrganizeImportsAction;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.swt.widgets.Shell;
@@ -38,7 +39,7 @@ public class OrganizeAllImportsAction extends AbstractScoutHandler {
     OrganizeImportsAction a = new OrganizeImportsAction(site);
     ArrayList<IJavaProject> list = new ArrayList<IJavaProject>();
     for (IScoutBundle b : getScoutProject().getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
-      list.add(b.getJavaProject());
+      list.add(ScoutUtility.getJavaProject(b));
     }
     StructuredSelection sel = new StructuredSelection(list.toArray());
     a.run(sel);

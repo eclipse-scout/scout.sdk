@@ -31,12 +31,12 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -143,8 +143,6 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   void fillProcessServiceNewOperation(ProcessServiceNewOperation op) {
-    op.setServiceImplementationName(getTypeName());
-    op.setServiceInterfaceName("I" + getTypeName());
     op.setFormData(getFormDataType());
   }
 
@@ -186,7 +184,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
   public IScoutBundle getServerBundle() {

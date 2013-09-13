@@ -15,14 +15,22 @@ package org.eclipse.scout.sdk.operation.service;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
-import org.eclipse.scout.sdk.operation.annotation.InputValidationAnnotationCreateOperation;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.MethodParameter;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link ProcessServiceNewOperation}</h3> ...
@@ -30,27 +38,19 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @author Andreas Hoegger
  * @since 1.0.8 10.02.2010
  */
-public class ProcessServiceNewOperation implements IOperation {
-
-  private IScoutBundle[] m_clientServiceRegistryBundles;
-  private IScoutBundle m_serviceInterfaceBundle;
-  private String m_serviceInterfaceName;
-  private String m_serviceInterfacePackageName;
-
-  private String m_permissionPackageName;
-  private IScoutBundle m_permissionCreateBundle;
-  private String m_permissionCreateName;
-  private IScoutBundle m_permissionReadBundle;
-  private String m_permissionReadName;
-  private IScoutBundle m_permissionUpdateBundle;
-  private String m_permissionUpdateName;
-
-  private String m_servicePackageName;
-  private IScoutBundle m_serviceImplementationBundle;
-  private String m_serviceImplementationName;
-  private IScoutBundle[] m_serverServiceRegistryBundles;
+public class ProcessServiceNewOperation extends ServiceNewOperation {
+  private static final String TEXT_AUTHORIZATION_FAILED = "AuthorizationFailed";
 
   private IType m_formData;
+  private IJavaProject m_permissionCreateProject;
+  private String m_permissionCreatePackageName;
+  private String m_permissionCreateName;
+  private IJavaProject m_permissionReadProject;
+  private String m_permissionReadPackageName;
+  private String m_permissionReadName;
+  private IJavaProject m_permissionUpdateProject;
+  private String m_permissionUpdatePackageName;
+  private String m_permissionUpdateName;
 
   // created types
   private IType m_createdServiceInterface;
@@ -59,103 +59,205 @@ public class ProcessServiceNewOperation implements IOperation {
   private IType m_createdUpdatePermission;
   private IType m_createdCreatePermission;
 
+  public ProcessServiceNewOperation(String serviceName) {
+    this("I" + serviceName, serviceName);
+  }
+
+  public ProcessServiceNewOperation(String interfaceName, String implementationName) {
+    super(interfaceName, implementationName);
+    getInterfaceSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
+    getInterfaceSourceBuilder().addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createValidationStrategyProcess());
+  }
+
   @Override
   public String getOperationName() {
-    return "create process service '" + getServiceImplementationName() + "'...";
+    return "create process service '" + getImplementationName() + "'...";
   }
 
   @Override
   public void validate() throws IllegalArgumentException {
+
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // permissions
-    if (getPermissionCreateBundle() != null) {
-      PermissionNewOperation permissionOp = new PermissionNewOperation();
-      permissionOp.setSharedBundle(getPermissionCreateBundle());
-      permissionOp.setTypeName(getPermissionCreateName());
-      permissionOp.setPackageName(getPermissionPackageName());
+    if (getPermissionCreateProject() != null) {
+      PermissionNewOperation permissionOp = new PermissionNewOperation(getPermissionCreateName(), getPermissionCreatePackageName(), getPermissionCreateProject());
+      permissionOp.validate();
       permissionOp.run(monitor, workingCopyManager);
-      m_createdCreatePermission = permissionOp.getCreatedPermission();
+      m_createdCreatePermission = permissionOp.getCreatedType();
     }
-    if (getPermissionReadBundle() != null) {
-      PermissionNewOperation permissionOp = new PermissionNewOperation();
-      permissionOp.setSharedBundle(getPermissionReadBundle());
-      permissionOp.setTypeName(getPermissionReadName());
-      permissionOp.setPackageName(getPermissionPackageName());
+    if (getPermissionReadProject() != null) {
+      PermissionNewOperation permissionOp = new PermissionNewOperation(getPermissionReadName(), getPermissionReadPackageName(), getPermissionReadProject());
+      permissionOp.validate();
       permissionOp.run(monitor, workingCopyManager);
-      m_createdReadPermission = permissionOp.getCreatedPermission();
+      m_createdReadPermission = permissionOp.getCreatedType();
     }
-    if (getPermissionUpdateBundle() != null) {
-      PermissionNewOperation permissionOp = new PermissionNewOperation();
-      permissionOp.setSharedBundle(getPermissionUpdateBundle());
-      permissionOp.setTypeName(getPermissionUpdateName());
-      permissionOp.setPackageName(getPermissionPackageName());
+    if (getPermissionUpdateProject() != null) {
+      PermissionNewOperation permissionOp = new PermissionNewOperation(getPermissionUpdateName(), getPermissionUpdatePackageName(), getPermissionUpdateProject());
+      permissionOp.validate();
       permissionOp.run(monitor, workingCopyManager);
-      m_createdUpdatePermission = permissionOp.getCreatedPermission();
+      m_createdUpdatePermission = permissionOp.getCreatedType();
     }
 
-    if (getServiceImplementationBundle() != null) {
-      // service interface
-      ServiceNewOperation serviceOp = new ServiceNewOperation();
-      for (IScoutBundle cb : getClientServiceRegistryBundles()) {
-        serviceOp.addProxyRegistrationBundle(cb);
+    if (TypeUtility.exists(getFormData())) {
+      String interfaceFqn = getInterfacePackageName() + "." + getInterfaceName();
+      String formDataSignature = SignatureCache.createTypeSignature(getFormData().getFullyQualifiedName());
+      IJavaProject nlsLookupProject = getInterfaceProject();
+      if (nlsLookupProject == null) {
+        // fallback
+        nlsLookupProject = getImplementationProject();
       }
-      for (IScoutBundle sb : getServerServiceRegistryBundles()) {
-        serviceOp.addServiceRegistrationBundle(sb);
-      }
-      if (getServiceImplementationBundle() != null) {
-        serviceOp.setImplementationBundle(getServiceImplementationBundle());
-        serviceOp.setServiceName(getServiceImplementationName());
-        serviceOp.setServicePackageName(getServicePackageName());
-      }
-      if (getServiceInterfaceBundle() != null) {
-        serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
-        serviceOp.setServiceInterfaceName(getServiceInterfaceName());
-        serviceOp.setServiceInterfacePackageName(getServiceInterfacePackageName());
-        serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
-      }
-      serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServiceImplementationBundle().getJavaProject()));
-      serviceOp.run(monitor, workingCopyManager);
-      m_createdServiceInterface = serviceOp.getCreatedServiceInterface();
-      m_createdServiceImplementation = serviceOp.getCreatedServiceImplementation();
+      INlsProject nlsProject = ScoutTypeUtility.findNlsProject(nlsLookupProject);
+      // create methods
+      createCreateMethod(interfaceFqn, formDataSignature, nlsProject);
+      createLoadMethod(interfaceFqn, formDataSignature, nlsProject);
+      createPrepareCreateMethod(interfaceFqn, formDataSignature, nlsProject);
+      createStoreMethod(interfaceFqn, formDataSignature, nlsProject);
 
-      // input validation annotation for process services
-      InputValidationAnnotationCreateOperation valStratOp = new InputValidationAnnotationCreateOperation(m_createdServiceInterface);
-      valStratOp.validate();
-      valStratOp.run(monitor, workingCopyManager);
-
-      // fill service
-      if (getFormData() != null) {
-        ProcessServiceCreateMethodOperation processServiceFillOp = new ProcessServiceCreateMethodOperation();
-        processServiceFillOp.setFormData(getFormData());
-        processServiceFillOp.setCreateCreateMethod(true);
-        processServiceFillOp.setCreateLoadMethod(true);
-        processServiceFillOp.setCreatePrepareCreateMethod(true);
-        processServiceFillOp.setCreateStoreMethod(true);
-        processServiceFillOp.setCreatePermission(getCreatedCreatePermission());
-        processServiceFillOp.setReadPermission(getCreatedReadPermission());
-        processServiceFillOp.setUpdatePermission(getCreatedUpdatePermission());
-        processServiceFillOp.setServiceImplementations(new IType[]{getCreatedServiceImplementation()});
-        processServiceFillOp.setServiceInterface(getCreatedServiceInterface());
-        processServiceFillOp.run(monitor, workingCopyManager);
-      }
     }
+    super.run(monitor, workingCopyManager);
   }
 
   /**
-   * @return the createdServiceInterface
+   *
    */
-  public IType getCreatedServiceInterface() {
-    return m_createdServiceInterface;
+  private void createCreateMethod(String interfaceFqn, String formDataSignature, final INlsProject nlsProject) {
+    ServiceMethod createMethod = new ServiceMethod("create", interfaceFqn);
+    createMethod.addParameter(new MethodParameter("formData", formDataSignature));
+    createMethod.setReturnTypeSignature(formDataSignature);
+    createMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    createMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        IType createPermission = getCreatedCreatePermission();
+        if (createPermission != null) {
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(createPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          if (nlsProject != null) {
+            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
+          }
+          else {
+            source.append("\"Authorization Failed\"");
+          }
+          source.append(");").append(lineDelimiter);
+          source.append("}").append(lineDelimiter);
+        }
+        source.append(ScoutUtility.getCommentBlock("business logic here.")).append(lineDelimiter);
+        source.append("return formData;");
+      }
+    });
+    getInterfaceSourceBuilder().addMethodSourceBuilder(createMethod.getInterfaceSourceBuilder());
+    getImplementationSourceBuilder().addMethodSourceBuilder(createMethod.getImplementationSourceBuilder());
   }
 
   /**
-   * @return the createdServiceImplementation
-   */
-  public IType getCreatedServiceImplementation() {
-    return m_createdServiceImplementation;
+  *
+  */
+  private void createLoadMethod(String interfaceFqn, String formDataSignature, final INlsProject nlsProject) {
+    ServiceMethod loadMethod = new ServiceMethod("load", interfaceFqn);
+    loadMethod.addParameter(new MethodParameter("formData", formDataSignature));
+    loadMethod.setReturnTypeSignature(formDataSignature);
+    loadMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    loadMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        IType readPermission = getCreatedReadPermission();
+        if (readPermission != null) {
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(readPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          if (nlsProject != null) {
+            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
+          }
+          else {
+            source.append("\"Authorization Failed\"");
+          }
+          source.append(");").append(lineDelimiter);
+          source.append("}").append(lineDelimiter);
+        }
+        source.append(ScoutUtility.getCommentBlock("business logic here.")).append(lineDelimiter);
+        source.append("return formData;");
+      }
+    });
+    getInterfaceSourceBuilder().addMethodSourceBuilder(loadMethod.getInterfaceSourceBuilder());
+    getImplementationSourceBuilder().addMethodSourceBuilder(loadMethod.getImplementationSourceBuilder());
+  }
+
+  /**
+  *
+  */
+  private void createPrepareCreateMethod(String interfaceFqn, String formDataSignature, final INlsProject nlsProject) {
+    ServiceMethod serviceMethod = new ServiceMethod("prepareCreate", interfaceFqn);
+    serviceMethod.addParameter(new MethodParameter("formData", formDataSignature));
+    serviceMethod.setReturnTypeSignature(formDataSignature);
+    serviceMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    serviceMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        IType createPermission = getCreatedCreatePermission();
+        if (createPermission != null) {
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(createPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          if (nlsProject != null) {
+            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
+          }
+          else {
+            source.append("\"Authorization Failed\"");
+          }
+          source.append(");").append(lineDelimiter);
+          source.append("}").append(lineDelimiter);
+        }
+        source.append(ScoutUtility.getCommentBlock("business logic here.")).append(lineDelimiter);
+        source.append("return formData;");
+      }
+    });
+    getInterfaceSourceBuilder().addMethodSourceBuilder(serviceMethod.getInterfaceSourceBuilder());
+    getImplementationSourceBuilder().addMethodSourceBuilder(serviceMethod.getImplementationSourceBuilder());
+  }
+
+  /**
+  *
+  */
+  private void createStoreMethod(String interfaceFqn, String formDataSignature, final INlsProject nlsProject) {
+    ServiceMethod serviceMethod = new ServiceMethod("store", interfaceFqn);
+    serviceMethod.addParameter(new MethodParameter("formData", formDataSignature));
+    serviceMethod.setReturnTypeSignature(formDataSignature);
+    serviceMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    serviceMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        IType updatePermission = getCreatedUpdatePermission();
+        if (updatePermission != null) {
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(updatePermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          if (nlsProject != null) {
+            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
+          }
+          else {
+            source.append("\"Authorization Failed\"");
+          }
+          source.append(");").append(lineDelimiter);
+          source.append("}").append(lineDelimiter);
+        }
+        source.append(ScoutUtility.getCommentBlock("business logic here.")).append(lineDelimiter);
+        source.append("return formData;");
+      }
+    });
+    getInterfaceSourceBuilder().addMethodSourceBuilder(serviceMethod.getInterfaceSourceBuilder());
+    getImplementationSourceBuilder().addMethodSourceBuilder(serviceMethod.getImplementationSourceBuilder());
   }
 
   /**
@@ -179,64 +281,38 @@ public class ProcessServiceNewOperation implements IOperation {
     return m_createdCreatePermission;
   }
 
-  /**
-   * @return the clientServiceRegistryBundles
-   */
-  public IScoutBundle[] getClientServiceRegistryBundles() {
-    return m_clientServiceRegistryBundles;
+  public void setPermissionsEntityName(String entityName) {
+    setPermissionCreateName("Create" + entityName + "Permission");
+    setPermissionReadName("Read" + entityName + "Permission");
+    setPermissionUpdateName("Update" + entityName + "Permission");
   }
 
-  /**
-   * @param clientServiceRegistryBundles
-   *          the clientServiceRegistryBundles to set
-   */
-  public void setClientServiceRegistryBundles(IScoutBundle[] clientServiceRegistryBundles) {
-    m_clientServiceRegistryBundles = clientServiceRegistryBundles;
+  public void setPermissionsProject(IJavaProject project) {
+    setPermissionCreateProject(project);
+    setPermissionReadProject(project);
+    setPermissionUpdateProject(project);
   }
 
-  /**
-   * @return the serviceInterfaceBundle
-   */
-  public IScoutBundle getServiceInterfaceBundle() {
-    return m_serviceInterfaceBundle;
+  public void setPermissionsPackageName(String permissionsPackageName) {
+    setPermissionCreatePackageName(permissionsPackageName);
+    setPermissionReadPackageName(permissionsPackageName);
+    setPermissionUpdatePackageName(permissionsPackageName);
   }
 
-  /**
-   * @param serviceInterfaceBundle
-   *          the serviceInterfaceBundle to set
-   */
-  public void setServiceInterfaceBundle(IScoutBundle serviceInterfaceBundle) {
-    m_serviceInterfaceBundle = serviceInterfaceBundle;
+  public void setPermissionCreateProject(IJavaProject permissionCreateProject) {
+    m_permissionCreateProject = permissionCreateProject;
   }
 
-  /**
-   * @return the serviceInterfaceName
-   */
-  public String getServiceInterfaceName() {
-    return m_serviceInterfaceName;
+  public IJavaProject getPermissionCreateProject() {
+    return m_permissionCreateProject;
   }
 
-  /**
-   * @param serviceInterfaceName
-   *          the serviceInterfaceName to set
-   */
-  public void setServiceInterfaceName(String serviceInterfaceName) {
-    m_serviceInterfaceName = serviceInterfaceName;
+  public void setPermissionCreatePackageName(String permissionCreatePackageName) {
+    m_permissionCreatePackageName = permissionCreatePackageName;
   }
 
-  /**
-   * @return the permissionCreateBundle
-   */
-  public IScoutBundle getPermissionCreateBundle() {
-    return m_permissionCreateBundle;
-  }
-
-  /**
-   * @param permissionCreateBundle
-   *          the permissionCreateBundle to set
-   */
-  public void setPermissionCreateBundle(IScoutBundle permissionCreateBundle) {
-    m_permissionCreateBundle = permissionCreateBundle;
+  public String getPermissionCreatePackageName() {
+    return m_permissionCreatePackageName;
   }
 
   /**
@@ -254,19 +330,20 @@ public class ProcessServiceNewOperation implements IOperation {
     m_permissionCreateName = permissionCreateName;
   }
 
-  /**
-   * @return the permissionReadBundle
-   */
-  public IScoutBundle getPermissionReadBundle() {
-    return m_permissionReadBundle;
+  public void setPermissionReadProject(IJavaProject permissionReadProject) {
+    m_permissionReadProject = permissionReadProject;
   }
 
-  /**
-   * @param permissionReadBundle
-   *          the permissionReadBundle to set
-   */
-  public void setPermissionReadBundle(IScoutBundle permissionReadBundle) {
-    m_permissionReadBundle = permissionReadBundle;
+  public IJavaProject getPermissionReadProject() {
+    return m_permissionReadProject;
+  }
+
+  public void setPermissionReadPackageName(String permissionReadPackageName) {
+    m_permissionReadPackageName = permissionReadPackageName;
+  }
+
+  public String getPermissionReadPackageName() {
+    return m_permissionReadPackageName;
   }
 
   /**
@@ -284,49 +361,20 @@ public class ProcessServiceNewOperation implements IOperation {
     m_permissionReadName = permissionReadName;
   }
 
-  /**
-   * @return the permissionUpdateBundle
-   */
-  public IScoutBundle getPermissionUpdateBundle() {
-    return m_permissionUpdateBundle;
+  public void setPermissionUpdateProject(IJavaProject permissionUpdateProject) {
+    m_permissionUpdateProject = permissionUpdateProject;
   }
 
-  /**
-   * @param permissionUpdateBundle
-   *          the permissionUpdateBundle to set
-   */
-  public void setPermissionUpdateBundle(IScoutBundle permissionUpdateBundle) {
-    m_permissionUpdateBundle = permissionUpdateBundle;
+  public IJavaProject getPermissionUpdateProject() {
+    return m_permissionUpdateProject;
   }
 
-  /**
-   * @return the serviceImplementationBundle
-   */
-  public IScoutBundle getServiceImplementationBundle() {
-    return m_serviceImplementationBundle;
+  public void setPermissionUpdatePackageName(String permissionUpdatePackageName) {
+    m_permissionUpdatePackageName = permissionUpdatePackageName;
   }
 
-  /**
-   * @param serviceImplementationBundle
-   *          the serviceImplementationBundle to set
-   */
-  public void setServiceImplementationBundle(IScoutBundle serviceImplementationBundle) {
-    m_serviceImplementationBundle = serviceImplementationBundle;
-  }
-
-  /**
-   * @return the serviceImplementationName
-   */
-  public String getServiceImplementationName() {
-    return m_serviceImplementationName;
-  }
-
-  /**
-   * @param serviceImplementationName
-   *          the serviceImplementationName to set
-   */
-  public void setServiceImplementationName(String serviceImplementationName) {
-    m_serviceImplementationName = serviceImplementationName;
+  public String getPermissionUpdatePackageName() {
+    return m_permissionUpdatePackageName;
   }
 
   /**
@@ -345,21 +393,6 @@ public class ProcessServiceNewOperation implements IOperation {
   }
 
   /**
-   * @return the serverServiceRegistryBundles
-   */
-  public IScoutBundle[] getServerServiceRegistryBundles() {
-    return m_serverServiceRegistryBundles;
-  }
-
-  /**
-   * @param serverServiceRegistryBundles
-   *          the serverServiceRegistryBundles to set
-   */
-  public void setServerServiceRegistryBundles(IScoutBundle[] serverServiceRegistryBundles) {
-    m_serverServiceRegistryBundles = serverServiceRegistryBundles;
-  }
-
-  /**
    * @param formData
    *          the formData to set
    */
@@ -372,30 +405,6 @@ public class ProcessServiceNewOperation implements IOperation {
    */
   public IType getFormData() {
     return m_formData;
-  }
-
-  public String getServiceInterfacePackageName() {
-    return m_serviceInterfacePackageName;
-  }
-
-  public void setServiceInterfacePackageName(String serviceInterfacePackageName) {
-    m_serviceInterfacePackageName = serviceInterfacePackageName;
-  }
-
-  public String getPermissionPackageName() {
-    return m_permissionPackageName;
-  }
-
-  public void setPermissionPackageName(String permissionPackageName) {
-    m_permissionPackageName = permissionPackageName;
-  }
-
-  public String getServicePackageName() {
-    return m_servicePackageName;
-  }
-
-  public void setServicePackageName(String servicePackageName) {
-    m_servicePackageName = servicePackageName;
   }
 
 }

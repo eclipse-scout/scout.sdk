@@ -17,9 +17,11 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -28,10 +30,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class KeyStrokeNewOperation implements IOperation {
 
-  final IType iKeyStroke = TypeUtility.getType(RuntimeClasses.IKeyStroke);
   // in members
+  private final String m_typeName;
   private final IType m_declaringType;
-  private String m_typeName;
   private String m_superTypeSignature;
   private String m_keyStroke;
   private IJavaElement m_sibling;
@@ -39,11 +40,12 @@ public class KeyStrokeNewOperation implements IOperation {
   // out members
   private IType m_createdKeyStroke;
 
-  public KeyStrokeNewOperation(IType declaringType) {
-    this(declaringType, false);
+  public KeyStrokeNewOperation(String keyStrokeName, IType declaringType) {
+    this(keyStrokeName, declaringType, true);
   }
 
-  public KeyStrokeNewOperation(IType declaringType, boolean formatSource) {
+  public KeyStrokeNewOperation(String keyStrokeName, IType declaringType, boolean formatSource) {
+    m_typeName = keyStrokeName;
     m_declaringType = declaringType;
     m_formatSource = formatSource;
   }
@@ -60,26 +62,20 @@ public class KeyStrokeNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    OrderedInnerTypeNewOperation keyStrokeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
-    keyStrokeOp.setOrderDefinitionType(iKeyStroke);
+    OrderedInnerTypeNewOperation keyStrokeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), isFormatSource());
+    keyStrokeOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IKeyStroke));
     keyStrokeOp.setSibling(getSibling());
     keyStrokeOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IKeyStroke, getDeclaringType().getJavaProject()));
-    keyStrokeOp.setTypeModifiers(Flags.AccPublic);
+    keyStrokeOp.setFlags(Flags.AccPublic);
+    if (!StringUtility.isNullOrEmpty(getKeyStroke())) {
+      IMethodSourceBuilder getConfiguredKeyStrokeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(keyStrokeOp.getSourceBuilder(), "getConfiguredKeyStroke");
+      getConfiguredKeyStrokeBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return \"" + getKeyStroke() + "\";"));
+      keyStrokeOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredKeyStrokeBuilder), getConfiguredKeyStrokeBuilder);
+    }
+
     keyStrokeOp.validate();
     keyStrokeOp.run(monitor, workingCopyManager);
     m_createdKeyStroke = keyStrokeOp.getCreatedType();
-    if (!StringUtility.isNullOrEmpty(getKeyStroke())) {
-      MethodOverrideOperation confKeyStrokeOp = new MethodOverrideOperation(getCreatedKeyStroke(), "getConfiguredKeyStroke", false);
-      confKeyStrokeOp.setSimpleBody("return \"" + getKeyStroke() + "\";");
-      confKeyStrokeOp.validate();
-      confKeyStrokeOp.run(monitor, workingCopyManager);
-    }
-    if (m_formatSource) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedKeyStroke(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
-
   }
 
   @Override
@@ -99,8 +95,12 @@ public class KeyStrokeNewOperation implements IOperation {
     return m_typeName;
   }
 
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
+  public boolean isFormatSource() {
+    return m_formatSource;
+  }
+
+  public void setFormatSource(boolean formatSource) {
+    m_formatSource = formatSource;
   }
 
   public String getSuperTypeSignature() {
@@ -126,4 +126,5 @@ public class KeyStrokeNewOperation implements IOperation {
   public void setSibling(IJavaElement sibling) {
     m_sibling = sibling;
   }
+
 }

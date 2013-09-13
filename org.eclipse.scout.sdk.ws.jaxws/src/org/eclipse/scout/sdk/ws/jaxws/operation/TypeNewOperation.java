@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -48,7 +48,7 @@ public class TypeNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutTypeNewOperation opType = new ScoutTypeNewOperation(m_typeName, m_packageName, m_bundle);
+    PrimaryTypeNewOperation opType = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
 
     if (m_superType != null) {
       opType.setSuperTypeSignature(SignatureCache.createTypeSignature(m_superType.getFullyQualifiedName()));

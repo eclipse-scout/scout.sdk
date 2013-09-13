@@ -6,11 +6,13 @@ package org.eclipse.scout.sdk.internal.test.types;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.testing.SdkAssert;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -28,9 +30,14 @@ import org.junit.Test;
  */
 public class RecreateTypeTest extends AbstractScoutSdkTest {
 
+  private static final String CLIENT_BUNDLE_NAME = "test.client";
+  private static final String SHARED_BUNDLE_NAME = "test.shared";
+
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("util/typeCache", "test.client", "test.shared");
+    setupWorkspace("resources/util/typeCache", CLIENT_BUNDLE_NAME, SHARED_BUNDLE_NAME);
+    SdkAssert.assertExist(JavaCore.create(getProject(CLIENT_BUNDLE_NAME)));
+    SdkAssert.assertExist(JavaCore.create(getProject(SHARED_BUNDLE_NAME)));
   }
 
   @Test
@@ -40,6 +47,7 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
     Assert.assertFalse(primaryFormFieldHierarchy.isCreated());
     IProject clientProject = getProject("test.client");
     IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(clientProject);
+    // ensure created
     // create new MyAbstractFormField
     IType abstractMyStringField = createType(clientBundle, "AbstractMyStringField", "test.client.ui.custom.field");
     Assert.assertTrue(primaryFormFieldHierarchy.contains(abstractMyStringField));
@@ -60,21 +68,17 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
 
   private IType createType(IScoutBundle bundle, String typeName, String packageName) throws Exception {
     // create new MyAbstractFormField
-    ScoutTypeNewOperation op = new ScoutTypeNewOperation(typeName, packageName, bundle);
-    op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
-    op.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringField, bundle.getJavaProject()));
-    OperationJob job = new OperationJob(op);
-    job.schedule();
-    job.join();
+    PrimaryTypeNewOperation op = new PrimaryTypeNewOperation(typeName, packageName, ScoutUtility.getJavaProject(bundle));
+    op.setFlags(Flags.AccAbstract | Flags.AccPublic);
+    op.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringField, ScoutUtility.getJavaProject(bundle)));
+    executeBuildAssertNoCompileErrors(op);
     return op.getCreatedType();
   }
 
   private void deleteType(IType abstractMyStringField) throws Exception {
     JavaElementDeleteOperation deleteTypeOp = new JavaElementDeleteOperation();
     deleteTypeOp.addMember(abstractMyStringField);
-    OperationJob deleteJob = new OperationJob(deleteTypeOp);
-    deleteJob.schedule();
-    deleteJob.join();
+    executeBuildAssertNoCompileErrors(deleteTypeOp);
   }
 
   @AfterClass

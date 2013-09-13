@@ -4,17 +4,24 @@
 package org.eclipse.scout.sdk.internal.test.util.signature;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.FullyQuallifiedValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -23,9 +30,14 @@ import org.junit.Test;
  * @author Andreas Hoegger
  * @since 1.0.8 23.02.2011
  */
-public class SignatureUtilityTest {
+public class SignatureUtilityTest extends AbstractScoutSdkTest {
 
   private static final String LONG_SIGNATURE = SignatureCache.createTypeSignature("java.lang.Long");
+
+  @BeforeClass
+  public static void setUpWorkspace() throws Exception {
+    setupWorkspace("resources/util/signature", "signature.tests");
+  }
 
   @Test
   public void testSimpleSignature() throws Exception {
@@ -123,6 +135,61 @@ public class SignatureUtilityTest {
     HashSet<String> imports = new HashSet<String>(Arrays.asList(validator.getImportsToCreate()));
     Assert.assertTrue(imports.remove("com.bsiag.scout.client.ui.desktop.outline.IOutline"));
     Assert.assertTrue(imports.isEmpty());
+  }
+
+  @Test
+  public void testResolveSignature() throws Exception {
+    IType type = TypeUtility.getType("signature.tests.SignatureTest");
+
+    String resolvedSignature01 = SignatureUtility.getResolvedSignature("Qsignature.tests.SignatureRefType.InnerType01;", type);
+    Assert.assertEquals("Lsignature.tests.SignatureRefType.InnerType01;", resolvedSignature01);
+    Assert.assertTrue(TypeUtility.exists(TypeUtility.getTypeBySignature(resolvedSignature01)));
+
+    String resolvedSignature02 = SignatureUtility.getResolvedSignature("QSignatureRefType.InnerType01;", type);
+    Assert.assertEquals("Lsignature.tests.SignatureRefType.InnerType01;", resolvedSignature02);
+    Assert.assertTrue(TypeUtility.exists(TypeUtility.getTypeBySignature(resolvedSignature02)));
+
+    String resolvedSignature03 = SignatureUtility.getResolvedSignature("QInnerType01;", type);
+    Assert.assertEquals("Lsignature.tests.SignatureRefType.InnerType01;", resolvedSignature03);
+    Assert.assertTrue(TypeUtility.exists(TypeUtility.getTypeBySignature(resolvedSignature03)));
+
+    String resolvedSig04 = SignatureUtility.getResolvedSignature("Qsignature.tests.SignatureRefType.InnerType02.InnerType03;", type);
+    Assert.assertEquals("Lsignature.tests.SignatureRefType.InnerType02.InnerType03;", resolvedSig04);
+    Assert.assertTrue(TypeUtility.exists(TypeUtility.getTypeBySignature(resolvedSig04)));
+
+    String resolvedSig05 = SignatureUtility.getResolvedSignature("QSignatureRefType.InnerType02.InnerType03;", type);
+    Assert.assertEquals("Lsignature.tests.SignatureRefType.InnerType02.InnerType03;", resolvedSig05);
+    Assert.assertTrue(TypeUtility.exists(TypeUtility.getTypeBySignature(resolvedSig05)));
+
+    String resolvedSig06 = SignatureUtility.getResolvedSignature("QInnerType02.InnerType03;", type);
+    Assert.assertEquals("Lsignature.tests.SignatureRefType.InnerType02.InnerType03;", resolvedSig06);
+    Assert.assertTrue(TypeUtility.exists(TypeUtility.getTypeBySignature(resolvedSig06)));
+  }
+
+  @Test
+  public void testGenericResolver01() throws Exception {
+    Map<String, ITypeGenericMapping> collector = new HashMap<String, ITypeGenericMapping>();
+    String superTypeSignature = Signature.createTypeSignature("signature.tests.generic.AbstractClass01<" + String.class.getName() + "," + Integer.class.getName() + ">", true);
+    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), null, superTypeSignature, null, collector);
+    Assert.assertEquals(Signature.createTypeSignature(String.class.getName(), true), collector.get("signature.tests.generic.IInterface01").getParameterSignature("GENERIC"));
+    Assert.assertEquals(Signature.createTypeSignature(Integer.class.getName(), true), collector.get("signature.tests.generic.IInterface02").getParameterSignature("A"));
+  }
+
+  @Test
+  public void testGenericResolver02() throws Exception {
+    Map<String, ITypeGenericMapping> collector = new HashMap<String, ITypeGenericMapping>();
+    String superTypeSignature = Signature.createTypeSignature("signature.tests.generic.AbstractClass02<" + Integer.class.getName() + ">", true);
+    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), null, superTypeSignature, null, collector);
+    Assert.assertEquals(Signature.createTypeSignature(String.class.getName(), true), collector.get("signature.tests.generic.IInterface01").getParameterSignature("GENERIC"));
+    Assert.assertEquals(Signature.createTypeSignature(List.class.getName() + "<" + Integer.class.getName() + ">", true), collector.get("signature.tests.generic.IInterface02").getParameterSignature("A"));
+  }
+
+  @Test
+  public void testGenericResolver03() throws Exception {
+    Map<String, ITypeGenericMapping> collector = new HashMap<String, ITypeGenericMapping>();
+    String superTypeSignature = Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField<" + Integer.class.getName() + ">", true);
+    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), null, superTypeSignature, null, collector);
+    Assert.assertEquals(Signature.createTypeSignature(Integer.class.getName(), true), collector.get("org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField").getParameterSignature("T"));
   }
 
 }

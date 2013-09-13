@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.testing.ApiAssert;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelPositionPresenter;
 import org.eclipse.scout.sdk.util.type.FieldFilters;
 import org.eclipse.scout.sdk.util.type.IFieldFilter;
@@ -44,11 +45,12 @@ public class FormFieldApiTest extends AbstractApiTest {
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);
     }
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("LABEL_POSITION_DEFAULT"), 0));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("LABEL_POSITION_LEFT"), 1));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("LABEL_POSITION_ON_FIELD"), 2));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("LABEL_POSITION_RIGHT"), 3));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("LABEL_POSITION_TOP"), 4));
+
+    ApiAssert.assertConstantValue(fieldMap.remove("LABEL_POSITION_DEFAULT"), 0);
+    ApiAssert.assertConstantValue(fieldMap.remove("LABEL_POSITION_LEFT"), 1);
+    ApiAssert.assertConstantValue(fieldMap.remove("LABEL_POSITION_ON_FIELD"), 2);
+    ApiAssert.assertConstantValue(fieldMap.remove("LABEL_POSITION_RIGHT"), 3);
+    ApiAssert.assertConstantValue(fieldMap.remove("LABEL_POSITION_TOP"), 4);
     if (!fieldMap.isEmpty()) {
       StringBuilder message = new StringBuilder("Field are not considered of SDK '");
       Iterator<String> it = fieldMap.keySet().iterator();

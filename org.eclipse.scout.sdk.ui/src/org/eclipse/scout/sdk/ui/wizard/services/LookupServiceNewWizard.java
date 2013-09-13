@@ -54,7 +54,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
-  private LookupServiceNewOperation m_operation = new LookupServiceNewOperation();
+  private LookupServiceNewOperation m_operation;
 
   public LookupServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewLookupService"));
@@ -110,31 +110,30 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
+    m_operation = new LookupServiceNewOperation(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
-      m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
+      m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
-      m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
-      m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
+      m_operation.setImplementationProject(implementationBundle.getJavaProject());
+      m_operation.setImplementationPackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     IScoutBundle[] regProxyLocations = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
     for (IScoutBundle cb : regProxyLocations) {
-      m_operation.addProxyRegistrationBundle(cb);
+      m_operation.addProxyRegistrationProject(cb.getJavaProject());
     }
     IScoutBundle[] serverRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
     for (IScoutBundle sb : serverRegBundles) {
-      m_operation.addServiceRegistrationBundle(sb);
+      m_operation.addServiceRegistrationProject(sb.getJavaProject());
     }
     IScoutBundle interfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
-      m_operation.setInterfaceBundle(interfaceBundle);
-      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setInterfaceProject(interfaceBundle.getJavaProject());
+      m_operation.setInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
-    m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
-    m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
+    m_operation.addImplementationInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
     return true;
   }
 

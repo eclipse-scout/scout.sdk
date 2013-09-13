@@ -22,8 +22,8 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -57,7 +57,7 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
     IProject project = getCreatedProject();
 
     // src folder
-    IFolder folder = project.getFolder(SdkProperties.DEFAULT_SOURCE_FOLDER_NAME);
+    IFolder folder = project.getFolder(TypeUtility.DEFAULT_SOURCE_FOLDER_NAME);
     if (!folder.exists()) {
       ResourceUtility.mkdirs(folder, monitor);
     }
@@ -72,7 +72,7 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
     IPath path = project.getFullPath().append("bin");
     m_javaProject.setOutputLocation(path, null);
     IClasspathEntry[] entries = new IClasspathEntry[3];
-    IPath pathSrc = project.getFullPath().append(SdkProperties.DEFAULT_SOURCE_FOLDER_NAME);
+    IPath pathSrc = project.getFullPath().append(TypeUtility.DEFAULT_SOURCE_FOLDER_NAME);
     entries[0] = JavaCore.newSourceEntry(pathSrc);
     entries[1] = createJREEntry(getExecutionEnvironment());
     entries[2] = createContainerEntry();

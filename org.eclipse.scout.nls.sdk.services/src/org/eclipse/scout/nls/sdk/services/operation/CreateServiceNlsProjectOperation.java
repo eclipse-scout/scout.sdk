@@ -16,33 +16,38 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.nls.sdk.simple.operations.CreateSimpleNlsProjectOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class CreateServiceNlsProjectOperation implements IOperation {
 
+  private final String m_serviceName;
+  private final String m_packageName;
+  private final IJavaProject m_javaProject;
   private IType m_superType;
-  private IScoutBundle m_bundle;
   private String m_translationFolder;
   private String m_translationFilePrefix;
-  private String m_packageName;
-  private String m_serviceName;
   private String[] m_languages;
 
   private IType m_createdServiceType;
 
-  public CreateServiceNlsProjectOperation() {
+  public CreateServiceNlsProjectOperation(String serviceName, String packagename, IJavaProject javaProject) {
+    m_serviceName = serviceName;
+    m_packageName = packagename;
+    m_javaProject = javaProject;
   }
 
   @Override
@@ -55,7 +60,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     if (m_superType == null) {
       throw new IllegalArgumentException("super type not set.");
     }
-    if (m_bundle == null) {
+    if (m_javaProject == null) {
       throw new IllegalArgumentException("bundle not set.");
     }
     if (StringUtility.isNullOrEmpty(getTranslationFolder())) {
@@ -73,20 +78,20 @@ public class CreateServiceNlsProjectOperation implements IOperation {
   }
 
   private void createLanguageFiles(IProgressMonitor monitor) throws CoreException {
-    IFolder folder = getBundle().getProject().getFolder(getTranslationFolder());
+    IFolder folder = getJavaProject().getProject().getFolder(getTranslationFolder());
     for (String lang : getLanguages()) {
       CreateSimpleNlsProjectOperation.createLanguageFile(lang, folder, getTranslationFilePrefix(), monitor);
     }
   }
 
   private void addBuildEntry() throws CoreException {
-    IFolder folder = getBundle().getProject().getFolder(getTranslationFolder());
+    IFolder folder = getJavaProject().getProject().getFolder(getTranslationFolder());
 
-    PluginModelHelper pmh = new PluginModelHelper(getBundle().getProject());
+    PluginModelHelper pmh = new PluginModelHelper(getJavaProject().getProject());
 
     // check if the folder is already exported
     IContainer checkFolder = folder;
-    while (getBundle().getProject().getLocation().isPrefixOf(checkFolder.getLocation())) {
+    while (getJavaProject().getProject().getLocation().isPrefixOf(checkFolder.getLocation())) {
       if (pmh.BuildProperties.existsBinaryBuildEntry(checkFolder)) {
         return;
       }
@@ -104,7 +109,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // ensure sync
-    getBundle().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+    getJavaProject().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
     // create language translation properties files
     createLanguageFiles(monitor);
@@ -113,21 +118,18 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     addBuildEntry();
 
     // create and register text provider service
-    ServiceNewOperation serviceOp = new ServiceNewOperation();
-    serviceOp.addServiceRegistrationBundle(getBundle());
-    serviceOp.setImplementationBundle(getBundle());
-    serviceOp.setServiceName(getServiceName());
-    serviceOp.setServicePackageName(getPackageName());
-    serviceOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
+    ServiceNewOperation serviceOp = new ServiceNewOperation(null, getServiceName());
+    serviceOp.setImplementationProject(getJavaProject());
+    serviceOp.setImplementationPackageName(getPackageName());
+    serviceOp.addServiceRegistrationProject(getJavaProject());
+    serviceOp.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
+    // getDynamicNlsBaseName method
+    IMethodSourceBuilder getDynamicNlsBaseNameBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(serviceOp.getImplementationSourceBuilder(), "getDynamicNlsBaseName");
+    getDynamicNlsBaseNameBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return \"" + CreateSimpleNlsProjectOperation.getResourcePathString(getTranslationFolder(), getTranslationFilePrefix()) + "\";"));
+    serviceOp.getImplementationSourceBuilder().addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getDynamicNlsBaseNameBuilder), getDynamicNlsBaseNameBuilder);
     serviceOp.validate();
     serviceOp.run(monitor, workingCopyManager);
     m_createdServiceType = serviceOp.getCreatedServiceImplementation();
-
-    // override abstract method with path to resources
-    MethodOverrideOperation methodOp = new MethodOverrideOperation(serviceOp.getCreatedServiceImplementation(), NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER, true);
-    methodOp.setSimpleBody("return \"" + CreateSimpleNlsProjectOperation.getResourcePathString(getTranslationFolder(), getTranslationFilePrefix()) + "\";");
-    methodOp.validate();
-    methodOp.run(monitor, workingCopyManager);
 
     // we have changed the NLS service hierarchy: clear the cache so that it will be re-created next time including our just created service.
     TypeUtility.getPrimaryTypeHierarchy(getSuperType()).invalidate();
@@ -145,12 +147,8 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     m_superType = superType;
   }
 
-  public IScoutBundle getBundle() {
-    return m_bundle;
-  }
-
-  public void setBundle(IScoutBundle bundle) {
-    m_bundle = bundle;
+  public IJavaProject getJavaProject() {
+    return m_javaProject;
   }
 
   public String getTranslationFolder() {
@@ -173,10 +171,6 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     return m_serviceName;
   }
 
-  public void setServiceName(String serviceName) {
-    m_serviceName = serviceName;
-  }
-
   public void setLanguages(String[] languages) {
     m_languages = languages;
   }
@@ -193,7 +187,4 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     return m_packageName;
   }
 
-  public void setPackageName(String packageName) {
-    m_packageName = packageName;
-  }
 }

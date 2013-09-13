@@ -36,11 +36,11 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.code.CodeIdField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -81,7 +81,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     setTargetPackage(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_CODE));
     setTitle(Texts.get("NewCodeType"));
     setDescription(Texts.get("CreateANewCodeType"));
-    m_defaultCodeType = RuntimeClasses.getSuperType(RuntimeClasses.ICodeType, m_sharedBundle.getJavaProject());
+    m_defaultCodeType = RuntimeClasses.getSuperType(RuntimeClasses.ICodeType, ScoutUtility.getJavaProject(m_sharedBundle));
     m_superType = m_defaultCodeType;
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
   }
@@ -150,7 +150,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     }
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iCodeType, getSharedBundle().getJavaProject(), m_defaultCodeType), labelColWidthPercent);
+        new JavaElementAbstractTypeContentProvider(iCodeType, ScoutUtility.getJavaProject(getSharedBundle()), m_defaultCodeType), labelColWidthPercent);
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -252,7 +252,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusNextCodeIdField() throws JavaModelException {

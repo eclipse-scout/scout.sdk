@@ -11,79 +11,79 @@
 package org.eclipse.scout.sdk.internal.test.operation.formdata;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class IgnoredFieldsFormTest extends AbstractScoutSdkTest {
+public class IgnoredFieldsFormTest extends AbstractSdkTestWithFormDataProject {
 
-  private IType m_formData;
-
-  @BeforeClass
-  public static void setUpWorkspace() throws Exception {
-    setupWorkspace("operation/formData", "formdata.shared", "formdata.client");
-  }
-
-  @Before
+  @Test
   public void testCreateFormData() throws Exception {
-    if (m_formData == null) {
-      String formName = "IgnoredFieldsForm";
-      IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
-      Assert.assertTrue(TypeUtility.exists(form));
+    String formName = "IgnoredFieldsForm";
+    IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
+    Assert.assertTrue(TypeUtility.exists(form));
 
-      IProject sharedProject = getProject("formdata.shared");
-      Assert.assertNotNull(sharedProject);
+    IProject sharedProject = getProject("formdata.shared");
+    Assert.assertNotNull(sharedProject);
 
-      FormDataUpdateOperation op = new FormDataUpdateOperation(form);
-      OperationJob job = new OperationJob(op);
-      job.schedule();
-      job.join();
-      buildWorkspace();
-      m_formData = op.getFormDataType();
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertEquals(m_formData.getFullyQualifiedName(), "formdata.shared.services.process." + formName + "Data");
-      Assert.assertEquals(m_formData.getSuperclassTypeSignature(), "QAbstractFormData;");
-    }
+    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
+
+    FormDataUpdateOperation op = new FormDataUpdateOperation(form, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+
+    testApiOfIgnoredFieldsFormData();
   }
 
-  @Test
-  public void testNotIgnoredField() throws Exception {
-    // string field
-    IType notIgnoredField = m_formData.getType("NotIgnored");
-    Assert.assertTrue(TypeUtility.exists(notIgnoredField));
-    Assert.assertEquals("QAbstractValueFieldData<QString;>;", notIgnoredField.getSuperclassTypeSignature());
-    IMethod notIgnoredGetter = TypeUtility.getMethod(m_formData, "getNotIgnored");
-    Assert.assertTrue(TypeUtility.exists(notIgnoredGetter));
-    Assert.assertEquals(notIgnoredGetter.getReturnType(), "QNotIgnored;");
-  }
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfIgnoredFieldsFormData() throws Exception {
+    // type IgnoredFieldsFormData
+    IType ignoredFieldsFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.IgnoredFieldsFormData");
+    SdkAssert.assertHasFlags(ignoredFieldsFormData, 1);
+    SdkAssert.assertHasSuperTypeSignature(ignoredFieldsFormData, "QAbstractFormData;");
 
-  @Test
-  public void testIgnoredField() throws Exception {
-    IType ignoredField = m_formData.getType("IgnoredInteger");
-    Assert.assertFalse(TypeUtility.exists(ignoredField));
-    IMethod ignoredGetter = TypeUtility.getMethod(m_formData, "getIgnoredInteger");
-    Assert.assertFalse(TypeUtility.exists(ignoredGetter));
-  }
+    // fields of IgnoredFieldsFormData
+    SdkAssert.assertEquals("field count of 'IgnoredFieldsFormData'", 1, ignoredFieldsFormData.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(ignoredFieldsFormData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-  @Test
-  public void testIgnoredInheritedField() throws Exception {
-    IType ignoredField = m_formData.getType("InheritedIgnored");
-    Assert.assertFalse(TypeUtility.exists(ignoredField));
-    IMethod ignoredGetter = TypeUtility.getMethod(m_formData, "getInheritedIgnored");
-    Assert.assertFalse(TypeUtility.exists(ignoredGetter));
-  }
+    SdkAssert.assertEquals("method count of 'IgnoredFieldsFormData'", 2, ignoredFieldsFormData.getMethods().length);
+    IMethod ignoredFieldsFormData1 = SdkAssert.assertMethodExist(ignoredFieldsFormData, "IgnoredFieldsFormData", new String[]{});
+    SdkAssert.assertTrue(ignoredFieldsFormData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(ignoredFieldsFormData1, "V");
+    IMethod getNotIgnored = SdkAssert.assertMethodExist(ignoredFieldsFormData, "getNotIgnored", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getNotIgnored, "QNotIgnored;");
 
-  @AfterClass
-  public static void cleanUp() throws Exception {
-    clearWorkspace();
+    SdkAssert.assertEquals("inner types count of 'IgnoredFieldsFormData'", 1, ignoredFieldsFormData.getTypes().length);
+    // type NotIgnored
+    IType notIgnored = SdkAssert.assertTypeExists(ignoredFieldsFormData, "NotIgnored");
+    SdkAssert.assertHasFlags(notIgnored, 9);
+    SdkAssert.assertHasSuperTypeSignature(notIgnored, "QAbstractValueFieldData<QString;>;");
+
+    // fields of NotIgnored
+    SdkAssert.assertEquals("field count of 'NotIgnored'", 1, notIgnored.getFields().length);
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(notIgnored, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID1, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID1, "J");
+
+    SdkAssert.assertEquals("method count of 'NotIgnored'", 2, notIgnored.getMethods().length);
+    IMethod notIgnored1 = SdkAssert.assertMethodExist(notIgnored, "NotIgnored", new String[]{});
+    SdkAssert.assertTrue(notIgnored1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(notIgnored1, "V");
+    IMethod initValidationRules = SdkAssert.assertMethodExist(notIgnored, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(initValidationRules, "V");
+    SdkAssert.assertAnnotation(initValidationRules, "java.lang.Override");
+    SdkAssert.assertMethodValidationRules(initValidationRules, new String[]{"ruleMap.put(ValidationRule.MAX_LENGTH, 4000);"}, true);
+
+    SdkAssert.assertEquals("inner types count of 'NotIgnored'", 0, notIgnored.getTypes().length);
   }
 }

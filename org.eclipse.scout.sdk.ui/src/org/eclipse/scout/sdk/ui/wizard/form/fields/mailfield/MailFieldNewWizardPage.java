@@ -127,13 +127,11 @@ public class MailFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    MailFieldNewOperation operation = new MailFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    MailFieldNewOperation operation = new MailFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

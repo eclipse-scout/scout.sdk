@@ -123,13 +123,11 @@ public class StringFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    StringFieldNewOperation operation = new StringFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    StringFieldNewOperation operation = new StringFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

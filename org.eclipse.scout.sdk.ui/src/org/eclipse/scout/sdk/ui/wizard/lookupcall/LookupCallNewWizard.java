@@ -121,26 +121,32 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
   protected boolean beforeFinish() throws CoreException {
     // fill operation before gui is disposed
     m_operation = new LookupCallNewOperation();
-    m_operation.setInterfaceRegistrationBundle(m_page2.getLocationBundle(TYPE_SERVICE_REG_CLIENT, true, true));
+    IScoutBundle serviceProxyRegBundle = m_page2.getLocationBundle(TYPE_SERVICE_REG_CLIENT, true, true);
+    if (serviceProxyRegBundle != null) {
+      m_operation.setServiceProxyRegistrationProject(serviceProxyRegBundle.getJavaProject());
+    }
 
     IScoutBundle lookupCallBundle = m_page2.getLocationBundle(TYPE_LOOKUPCALL, true, true);
     if (lookupCallBundle != null) {
-      m_operation.setBundle(lookupCallBundle);
+      m_operation.setLookupCallProject(lookupCallBundle.getJavaProject());
       m_operation.setLookupCallPackageName(lookupCallBundle.getPackageName(m_page1.getTargetPackage()));
     }
     m_operation.setFormatSource(false);
-    m_operation.setImplementationRegistrationBundle(m_page2.getLocationBundle(TYPE_SERVICE_REG_SERVER, true, true));
+    IScoutBundle serviceRegistrationBundle = m_page2.getLocationBundle(TYPE_SERVICE_REG_SERVER, true, true);
+    if (serviceRegistrationBundle != null) {
+      m_operation.setServiceRegistrationProject(serviceRegistrationBundle.getJavaProject());
+    }
     m_operation.setLookupCallName(m_page1.getTypeName());
 
     IScoutBundle serviceBundle = m_page2.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (serviceBundle != null) {
-      m_operation.setServiceImplementationBundle(serviceBundle);
+      m_operation.setServiceImplementationProject(serviceBundle.getJavaProject());
       m_operation.setServiceImplementationPackage(serviceBundle.getPackageName(m_page1.getTargetPackage()));
     }
 
     IScoutBundle interfaceBundle = m_page2.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
-      m_operation.setServiceInterfaceBundle(interfaceBundle);
+      m_operation.setServiceInterfaceProject(interfaceBundle.getJavaProject());
       m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_page1.getTargetPackage()));
     }
     switch (m_page1.getLookupServiceStrategy()) {

@@ -49,6 +49,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>DefaultFormFieldNewWizardPage</h3> ...
+ * TODO [aho] in case of a code type selection ensure to prvide the correct generic type!
  */
 public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
@@ -165,13 +166,11 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ListBoxFieldNewOperation operation = new ListBoxFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    ListBoxFieldNewOperation operation = new ListBoxFieldNewOperation(getTypeName(), m_declaringType);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {

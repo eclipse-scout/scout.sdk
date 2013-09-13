@@ -31,11 +31,11 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -77,7 +77,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   public SearchFormNewWizardPage(IScoutBundle clientBundle) {
     super(SearchFormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    m_abstractSearchForm = RuntimeClasses.getSuperType(RuntimeClasses.ISearchForm, clientBundle.getJavaProject());
+    m_abstractSearchForm = RuntimeClasses.getSuperType(RuntimeClasses.ISearchForm, ScoutUtility.getJavaProject(clientBundle));
     m_labelColWidthPercent = 20;
     setTitle(Texts.get("SearchForm2"));
     setDescription(Texts.get("CreateANewSearchForm"));
@@ -126,7 +126,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iSearchForm, getClientBundle().getJavaProject(), m_abstractSearchForm), m_labelColWidthPercent);
+        new JavaElementAbstractTypeContentProvider(iSearchForm, ScoutUtility.getJavaProject(getClientBundle()), m_abstractSearchForm), m_labelColWidthPercent);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -170,7 +170,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_tablePageField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("TablePage"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        IType[] list = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+        IType[] list = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(ScoutUtility.getJavaProject(getClientBundle())), TypeComparators.getTypeNameComparator());
         return new Object[][]{list};
       }
     }, m_labelColWidthPercent);
@@ -220,7 +220,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusTargetPackge() {
     if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
-      return JavaElementValidator.validatePackageName(getTargetPackage(null));
+      return ScoutUtility.validatePackageName(getTargetPackage(null));
     }
     else {
       return Status.OK_STATUS;

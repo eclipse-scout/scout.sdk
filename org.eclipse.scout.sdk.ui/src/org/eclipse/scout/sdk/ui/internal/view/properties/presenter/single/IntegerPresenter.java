@@ -14,14 +14,13 @@ import java.text.DecimalFormat;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -30,22 +29,15 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class IntegerPresenter extends AbstractValuePresenter<Integer> {
 
+  private final IPropertySourceParser<Integer> m_parser;
+
   public IntegerPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, "[-+0-9\\'eEinf]*");
+    m_parser = new IntegerPropertySourceParser();
   }
 
-  @Override
-  protected String formatSourceValue(Integer value) throws CoreException {
-    if (value == null) {
-      return "null";
-    }
-    else if (value.intValue() == Integer.MAX_VALUE) {
-      return "Integer.MAX_VALUE";
-    }
-    else if (value.intValue() == -Integer.MAX_VALUE) {
-      return "-Integer.MAX_VALUE";
-    }
-    return value.toString();
+  public IPropertySourceParser<Integer> getParser() {
+    return m_parser;
   }
 
   @Override
@@ -73,27 +65,22 @@ public class IntegerPresenter extends AbstractValuePresenter<Integer> {
       return getDefaultValue();
     }
     else {
-      Integer d = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-      return d;
+      return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
     }
   }
 
   @Override
   protected synchronized void storeValue(Integer value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      String sourceValue = formatSourceValue(value);
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
-    }
-
   }
 
   @Override

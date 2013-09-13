@@ -91,7 +91,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
     if (TypeUtility.exists(type)) {
 //      if (hierarchy.isSubtype(iFormField, type)) {
       InnerTypeGetterCreateOperation op = new InnerTypeGetterCreateOperation(type, formType, true);
-      CompositeObject key = new CompositeObject(1, op.getMethodName());
+      CompositeObject key = new CompositeObject(1, op.getElementName());
       for (Entry<CompositeObject, IJavaElement> entry : siblings.entrySet()) {
         if (entry.getKey().compareTo(key) > 0) {
           op.setSibling(entry.getValue());

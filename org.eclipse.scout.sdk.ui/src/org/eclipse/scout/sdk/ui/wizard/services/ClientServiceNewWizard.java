@@ -51,7 +51,7 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
 
   private BundleTreeWizardPage m_locationWizardPage;
   private ServiceNewWizardPage m_serviceNewWizardPage;
-  private ServiceNewOperation m_operation = new ServiceNewOperation();
+  private ServiceNewOperation m_operation;
   private ITreeNode m_locationPageRoot;
 
   public ClientServiceNewWizard(IScoutBundle clientBundle) {
@@ -84,25 +84,24 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
+    m_operation = new ServiceNewOperation(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
-      m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setImplementationProject(implementationBundle.getJavaProject());
+      m_operation.setImplementationPackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     IScoutBundle interfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (interfaceBundle != null) {
-      m_operation.setInterfaceBundle(interfaceBundle);
-      m_operation.setServiceInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.setInterfaceProject(interfaceBundle.getJavaProject());
+      m_operation.setInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
-    m_operation.setServiceInterfaceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
-    m_operation.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
+    m_operation.addImplementationInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
-      m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
+      m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
-    m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     for (IScoutBundle sb : m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REGISTRATION, true, true)) {
-      m_operation.addServiceRegistrationBundle(sb);
+      m_operation.addServiceRegistrationProject(sb.getJavaProject());
     }
     return true;
   }

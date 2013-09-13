@@ -13,16 +13,17 @@
  */
 package org.eclipse.scout.sdk.internal.test.types;
 
+import java.io.File;
+
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -38,11 +39,11 @@ public class TypeUtilityTest extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("util/typeUtility", "a");
+    setupWorkspace("resources/util/typeUtility", "a");
   }
 
   @Before
-  public void setup() {
+  public void setup1() {
     m_type = TypeUtility.getType("a.BeanProperties");
     m_propertyBeans = TypeUtility.getPropertyBeans(m_type, ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
   }
@@ -173,8 +174,9 @@ public class TypeUtilityTest extends AbstractScoutSdkTest {
     return null;
   }
 
-  @AfterClass
-  public static void cleanUp() throws Exception {
-    clearWorkspace();
+  @Test
+  public void testMethodFinder() throws Exception {
+    IType methodTestType = TypeUtility.getType("a.MethodTestType");
+    TypeUtility.getMethod(methodTestType, "setFile", new String[]{Signature.createTypeSignature(File.class.getName(), true)});
   }
 }

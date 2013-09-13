@@ -15,17 +15,16 @@ import java.util.StringTokenizer;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.FontDialog;
-import org.eclipse.scout.sdk.ui.internal.dialog.FontSpec;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.parser.FontPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.FontSpec;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -47,8 +46,15 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
   private Font m_defaultFont;
   private Button m_chooserButton;
 
+  private IPropertySourceParser<FontSpec> m_parser;
+
   public FontPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, ".*");
+    m_parser = new FontPropertySourceParser();
+  }
+
+  public IPropertySourceParser<FontSpec> getParser() {
+    return m_parser;
   }
 
   @Override
@@ -184,52 +190,12 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
   }
 
   @Override
-  protected String formatSourceValue(FontSpec value) throws CoreException {
-    if (value == null || value.isDefault()) {
-      return "null";
-    }
-    StringBuilder sourceBuilder = new StringBuilder();
-    if (value.getStyle() != null) {
-      if ((value.getStyle() & SWT.BOLD) != 0) {
-        if (sourceBuilder.length() > 0) {
-          sourceBuilder.append("-");
-        }
-        sourceBuilder.append("BOLD");
-      }
-      if ((value.getStyle() & SWT.ITALIC) != 0) {
-        if (sourceBuilder.length() > 0) {
-          sourceBuilder.append("-");
-        }
-        sourceBuilder.append("ITALIC");
-      }
-      if (sourceBuilder.length() == 0) {
-        sourceBuilder.append("PLAIN");
-
-      }
-    }
-    if (value.getHeight() != null) {
-      if (sourceBuilder.length() > 0) {
-        sourceBuilder.append("-");
-      }
-
-      sourceBuilder.append(value.getHeight());
-    }
-    if (value.getName() != null) {
-      if (sourceBuilder.length() > 0) {
-        sourceBuilder.append("-");
-      }
-      sourceBuilder.append(value.getName());
-    }
-    return "\"" + sourceBuilder.toString() + "\"";
-  }
-
-  @Override
   protected String formatDisplayValue(FontSpec value) throws CoreException {
     if (value == null || value.isDefault()) {
       return "";
     }
     else {
-      String displayValue = formatSourceValue(value);
+      String displayValue = getParser().formatSourceValue(value, null, null);
       displayValue = displayValue.replaceAll("^\\\"(.*)\\\"$", "$1");
       return displayValue;
     }
@@ -237,17 +203,15 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
 
   @Override
   protected synchronized void storeValue(FontSpec value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<FontSpec> updateOp = new ConfigPropertyUpdateOperation<FontSpec>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + formatSourceValue(value) + ";", true);
-    }
-    if (op != null) {
-      new OperationJob(op).schedule();
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
   }
 

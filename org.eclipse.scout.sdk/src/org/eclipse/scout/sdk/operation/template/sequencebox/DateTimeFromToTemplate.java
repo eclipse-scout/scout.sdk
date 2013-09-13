@@ -4,17 +4,18 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.template.sequencebox;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 
 public class DateTimeFromToTemplate extends DateFromToTemplate {
 
@@ -24,17 +25,21 @@ public class DateTimeFromToTemplate extends DateFromToTemplate {
   }
 
   @Override
-  public void apply(IType type, IWorkingCopyManager manager, IProgressMonitor monitor) throws CoreException {
-    super.apply(type, manager, monitor);
-    MethodOverrideOperation fromHasTimeOp = new MethodOverrideOperation(getFromType(), "getConfiguredHasTime");
-    fromHasTimeOp.setSimpleBody("return true;");
-    fromHasTimeOp.validate();
-    fromHasTimeOp.run(monitor, manager);
+  protected void fillFromFieldBuilder(ITypeSourceBuilder fromFieldBuilder) throws CoreException {
+    super.fillFromFieldBuilder(fromFieldBuilder);
+    createGetConfiguredHasTimeMethod(fromFieldBuilder);
+  }
 
-    MethodOverrideOperation toHasTimeOp = new MethodOverrideOperation(getToType(), "getConfiguredHasTime");
-    toHasTimeOp.setSimpleBody("return true;");
-    toHasTimeOp.validate();
-    toHasTimeOp.run(monitor, manager);
+  @Override
+  protected void fillToFieldBuilder(ITypeSourceBuilder toFieldBuilder) throws CoreException {
+    super.fillToFieldBuilder(toFieldBuilder);
+    createGetConfiguredHasTimeMethod(toFieldBuilder);
+  }
+
+  protected void createGetConfiguredHasTimeMethod(ITypeSourceBuilder builder) throws CoreException {
+    IMethodSourceBuilder methodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(builder, "getConfiguredHasTime");
+    methodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return true;"));
+    builder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(methodBuilder), methodBuilder);
   }
 
 }

@@ -131,7 +131,7 @@ public class ToolbuttonNewWizardPage2 extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ToolbuttonNewOperation operation = new ToolbuttonNewOperation(m_declaringType);
+    ToolbuttonNewOperation operation = new ToolbuttonNewOperation(getTypeName(), m_declaringType, true);
 
     // write back members
     ToolbuttonNewWizardPage1 previousPage = (ToolbuttonNewWizardPage1) getWizard().getPage(ToolbuttonNewWizardPage1.class.getName());
@@ -139,7 +139,6 @@ public class ToolbuttonNewWizardPage2 extends AbstractWorkspaceWizardPage {
     if (superType != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
-    operation.setTypeName(getTypeName());
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }

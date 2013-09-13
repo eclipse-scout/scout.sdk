@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: My Application
+Bundle-SymbolicName: sample.ui.swing;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: sample.ui.swing.Activator
+Bundle-ActivationPolicy: lazy
+Scout-Project: sample
+Scout-Project-Alias: sample
+Require-Bundle: org.eclipse.scout.rt.ui.swing,
+ sample.client;visibility:=reexport,
+ sample.shared,
+ org.eclipse.scout.net
+Export-Package: sample.ui.swing;uses:="org.eclipse.scout.rt.ui.swing,org.eclipse.scout.rt.client.session,org.osgi.framework"
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

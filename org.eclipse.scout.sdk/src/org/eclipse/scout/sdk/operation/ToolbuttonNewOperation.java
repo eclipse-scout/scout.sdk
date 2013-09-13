@@ -13,87 +13,49 @@ package org.eclipse.scout.sdk.operation;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>FormHandlerNewOperation</h3> ...
+ * <h3>ToolbuttonNewOperation</h3> ...
  */
-public class ToolbuttonNewOperation implements IOperation {
+public class ToolbuttonNewOperation extends OrderedInnerTypeNewOperation {
 
-  final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
-
-  private final IType m_declaringType;
   private INlsEntry m_nlsEntry;
-  private String m_typeName;
-  private String m_superTypeSignature;
-  private IJavaElement m_sibling;
-  private IType m_createdToolButton;
-  private boolean m_formatSource;
 
-  public ToolbuttonNewOperation(IType declaringType) {
-    this(declaringType, false);
+  public ToolbuttonNewOperation(String toolbuttonElementName, IType declaringType) {
+    this(toolbuttonElementName, declaringType, false);
   }
 
-  public ToolbuttonNewOperation(IType declaringType, boolean formatSource) {
-    m_declaringType = declaringType;
-    m_formatSource = formatSource;
-    // default values
-    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IToolButton, getDeclaringType().getJavaProject());
+  public ToolbuttonNewOperation(String toolbuttonElementName, IType declaringType, boolean formatSource) {
+    super(toolbuttonElementName, declaringType, formatSource);
+    // defaults
+    setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IToolButton));
+    setFlags(Flags.AccPublic);
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IToolButton, declaringType.getJavaProject()));
   }
 
   @Override
   public String getOperationName() {
-    return "new tool button...";
-  }
-
-  @Override
-  public void validate() throws IllegalArgumentException {
-    if (getDeclaringType() == null) {
-      throw new IllegalArgumentException("declaring type can not be null.");
-    }
-    if (StringUtility.isNullOrEmpty(getTypeName())) {
-      throw new IllegalArgumentException("type name is null or empty.");
-    }
+    return "new tool button [" + getElementName() + "]...";
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    OrderedInnerTypeNewOperation toolButtonOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
-    toolButtonOp.setOrderDefinitionType(iToolbutton);
-    toolButtonOp.setSibling(getSibling());
-    toolButtonOp.setSuperTypeSignature(getSuperTypeSignature());
-    toolButtonOp.setTypeModifiers(Flags.AccPublic);
-    toolButtonOp.validate();
-    toolButtonOp.run(monitor, workingCopyManager);
-    m_createdToolButton = toolButtonOp.getCreatedType();
     if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(getCreatedToolButton(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TEXT, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
+      IMethodSourceBuilder nlsTextGetterBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
+      nlsTextGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      getSourceBuilder().addMethodSourceBuilder(nlsTextGetterBuilder);
     }
-    if (m_formatSource) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedToolButton(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
-  }
-
-  public IType getCreatedToolButton() {
-    return m_createdToolButton;
-  }
-
-  public IType getDeclaringType() {
-    return m_declaringType;
+    super.run(monitor, workingCopyManager);
   }
 
   public void setNlsEntry(INlsEntry nlsEntry) {
@@ -102,37 +64,5 @@ public class ToolbuttonNewOperation implements IOperation {
 
   public INlsEntry getNlsEntry() {
     return m_nlsEntry;
-  }
-
-  public String getTypeName() {
-    return m_typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
-  }
-
-  public String getSuperTypeSignature() {
-    return m_superTypeSignature;
-  }
-
-  public void setSuperTypeSignature(String superTypeSignature) {
-    m_superTypeSignature = superTypeSignature;
-  }
-
-  public IJavaElement getSibling() {
-    return m_sibling;
-  }
-
-  public void setSibling(IJavaElement sibling) {
-    m_sibling = sibling;
-  }
-
-  public boolean isFormatSource() {
-    return m_formatSource;
-  }
-
-  public void setFormatSource(boolean formatSource) {
-    m_formatSource = formatSource;
   }
 }

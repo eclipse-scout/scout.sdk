@@ -5,7 +5,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -22,7 +22,7 @@ public class CompatibilityTest extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("util/platformUtility", PROJECT_NAME);
+    setupWorkspace("resources/util/platformUtility", PROJECT_NAME);
   }
 
   @AfterClass

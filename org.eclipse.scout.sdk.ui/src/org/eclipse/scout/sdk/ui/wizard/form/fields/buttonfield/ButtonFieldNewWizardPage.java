@@ -59,7 +59,6 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
-  private ButtonFieldNewOperation m_operation;
   private final String m_readOnlySuffix;
   private IType m_createdField;
 
@@ -73,7 +72,6 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(title);
     setDescription(message);
     m_declaringType = declaringType;
-    setOperation(new ButtonFieldNewOperation(m_declaringType));
     setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IButton, m_declaringType.getJavaProject()));
     m_sibling = SiblingProposal.SIBLING_END;
   }
@@ -133,22 +131,21 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    getOperation().setFormatSource(true);
+    ButtonFieldNewOperation buttonFieldOp = new ButtonFieldNewOperation(getTypeName(), getDeclaringType(), true);
     // write back members
-    getOperation().setNlsEntry(getNlsName());
-    getOperation().setTypeName(getTypeName());
+    buttonFieldOp.setNlsEntry(getNlsName());
     if (getSuperType() != null) {
-      getOperation().setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
+      buttonFieldOp.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
-      getOperation().setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
+      buttonFieldOp.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
     else {
-      getOperation().setSibling(getSibling().getElement());
+      buttonFieldOp.setSibling(getSibling().getElement());
     }
-    getOperation().run(monitor, workingCopyManager);
-    m_createdField = getOperation().getCreatedButton();
+    buttonFieldOp.run(monitor, workingCopyManager);
+    m_createdField = buttonFieldOp.getCreatedButton();
     return true;
   }
 
@@ -189,12 +186,8 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     return Status.OK_STATUS;
   }
 
-  public void setOperation(ButtonFieldNewOperation operation) {
-    m_operation = operation;
-  }
-
-  public ButtonFieldNewOperation getOperation() {
-    return m_operation;
+  public IType getDeclaringType() {
+    return m_declaringType;
   }
 
   /**

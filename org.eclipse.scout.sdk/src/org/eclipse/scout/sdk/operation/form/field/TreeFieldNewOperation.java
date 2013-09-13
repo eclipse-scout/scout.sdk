@@ -15,15 +15,21 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -31,17 +37,22 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class TreeFieldNewOperation implements IOperation {
 
+  private final String m_typeName;
   private final IType m_declaringType;
   private boolean m_formatSource;
-  private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
   private IJavaElement m_sibling;
   private IType m_createdField;
-  private IType m_createdTree;
 
-  public TreeFieldNewOperation(IType declaringType) {
+  public TreeFieldNewOperation(String typeName, IType declaringType) {
+    this(typeName, declaringType, true);
+  }
+
+  public TreeFieldNewOperation(String typeName, IType declaringType, boolean formatSource) {
+    m_typeName = typeName;
     m_declaringType = declaringType;
+    m_formatSource = formatSource;
     // default
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITreeField, getDeclaringType().getJavaProject()));
   }
@@ -63,46 +74,34 @@ public class TreeFieldNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
-    newOp.setTypeName(getTypeName());
+    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    newOp.setSiblingField(getSibling());
+    newOp.setSibling(getSibling());
+
+    // getConfiguredLabel method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
+      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
+    }
+    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractTreeField)) {
+      // create inner type calendar
+      ITypeSourceBuilder treeBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TREEBOX_TREE);
+      treeBuilder.setFlags(Flags.AccPublic);
+      treeBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITree, getDeclaringType().getJavaProject()));
+      treeBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
+      newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTeeKey(treeBuilder), treeBuilder);
+    }
+
+    newOp.setFormatSource(isFormatSource());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
-    m_createdField = newOp.getCreatedFormField();
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation labelOp = new NlsTextMethodUpdateOperation(getCreatedField(), NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL);
-      labelOp.setNlsEntry(getNlsEntry());
-      labelOp.validate();
-      labelOp.run(monitor, workingCopyManager);
-    }
-
-    m_createdTree = createTree(monitor, workingCopyManager);
-
-    if (isFormatSource()) {
-      // format
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedField(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
-  }
-
-  private IType createTree(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation tableNewOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_TREEBOX_TREE, getCreatedField());
-    tableNewOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITree, getDeclaringType().getJavaProject()));
-    tableNewOp.addTypeModifier(Flags.AccPublic);
-    tableNewOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
-    tableNewOp.validate();
-    tableNewOp.run(monitor, manager);
-    return tableNewOp.getCreatedType();
+    m_createdField = newOp.getCreatedType();
   }
 
   public IType getCreatedField() {
     return m_createdField;
-  }
-
-  public IType getCreatedTree() {
-    return m_createdTree;
   }
 
   public IType getDeclaringType() {
@@ -119,10 +118,6 @@ public class TreeFieldNewOperation implements IOperation {
 
   public String getTypeName() {
     return m_typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
   }
 
   public INlsEntry getNlsEntry() {

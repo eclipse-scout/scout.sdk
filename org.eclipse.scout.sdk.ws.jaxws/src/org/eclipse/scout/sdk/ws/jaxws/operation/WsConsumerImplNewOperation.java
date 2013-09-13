@@ -19,8 +19,8 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -31,6 +31,14 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class WsConsumerImplNewOperation extends ServiceNewOperation {
+  /**
+   * @param serviceInterfaceName
+   * @param serviceName
+   */
+  public WsConsumerImplNewOperation(String serviceInterfaceName, String serviceName) {
+    super(serviceInterfaceName, serviceName);
+  }
+
   // used for generic super type
   private IType m_jaxWsServiceType;
   // used for generic super type
@@ -69,7 +77,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
     superTypeSignature += Signature.toString(SignatureCache.createTypeSignature(jaxWsPortType.getFullyQualifiedName()));
     superTypeSignature += ">";
     superTypeSignature = SignatureCache.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getFullyQualifiedName() + superTypeSignature);
-    setServiceSuperTypeSignature(superTypeSignature);
+    setImplementationSuperTypeSignature(superTypeSignature);
     super.run(monitor, workingCopyManager);
 
     IType createdType = getCreatedServiceImplementation();
@@ -118,7 +126,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
       String typeName = Signature.getSimpleName(qualifiedTypeName);
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
-      ScoutTypeNewOperation newTypeOp = new ScoutTypeNewOperation(typeName, packageName, getImplementationBundle());
+      PrimaryTypeNewOperation newTypeOp = new PrimaryTypeNewOperation(typeName, packageName, getImplementationProject());
       newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();

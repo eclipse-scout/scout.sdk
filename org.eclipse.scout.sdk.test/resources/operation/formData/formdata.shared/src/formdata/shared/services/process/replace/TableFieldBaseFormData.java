@@ -39,22 +39,28 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
+    public AddressTableRowData addRow() {
+        return (AddressTableRowData) super.addRow();
+      }
+
+      @Override
+      public AddressTableRowData addRow(int rowState) {
+        return (AddressTableRowData) super.addRow(rowState);
+      }
+    
+      @Override
+      public AddressTableRowData createRow() {
+        return new AddressTableRowData();
+      }
+
+      @Override
+      public Class<? extends AbstractTableRowData> getRowType() {
+        return AddressTableRowData.class;
+      }
+
+    @Override
     public AddressTableRowData[] getRows() {
       return (AddressTableRowData[]) super.getRows();
-    }
-
-    public void setRows(AddressTableRowData[] rows) {
-      super.setRows(rows);
-    }
-
-    @Override
-    public AddressTableRowData addRow() {
-      return (AddressTableRowData) super.addRow();
-    }
-
-    @Override
-    public AddressTableRowData addRow(int rowState) {
-      return (AddressTableRowData) super.addRow(rowState);
     }
 
     @Override
@@ -62,25 +68,22 @@ public class TableFieldBaseFormData extends AbstractFormData {
       return (AddressTableRowData) super.rowAt(idx);
     }
 
-    @Override
-    public AddressTableRowData createRow() {
-      return new AddressTableRowData();
+    
+    public void setRows(AddressTableRowData[] rows) {
+      super.setRows(rows);
     }
 
-    @Override
-    public Class<? extends AbstractTableRowData> getRowType() {
-      return AddressTableRowData.class;
-    }
 
     public static class AddressTableRowData extends AbstractAddressTableFieldData.AbstractAddressTableRowData {
+    	
       private static final long serialVersionUID = 1L;
+
+        public static final String city = "city";
+      private String m_city;
 
       public AddressTableRowData() {
       }
-
-      public static final String city = "city";
-      private String m_city;
-
+      
       public String getCity() {
         return m_city;
       }

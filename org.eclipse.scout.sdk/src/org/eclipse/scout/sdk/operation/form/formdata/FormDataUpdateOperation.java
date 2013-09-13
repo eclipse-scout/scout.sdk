@@ -10,82 +10,61 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.operation.data.AbstractSingleDerivedTypeAutoUpdateOperation;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
+import org.eclipse.scout.sdk.operation.jdt.icu.CompilationUnitUpdateOperation;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * Update operations that creates {@link IRuntimeClasses#AbstractFormData} and
- * {@link IRuntimeClasses#AbstractFormFieldData} for {@link IRuntimeClasses#IForm} and
- * {@link IRuntimeClasses#IFormField}, respectively.
+ * <h3>{@link FormDataUpdateOperation}</h3> ...
  * 
- * @since 3.10.0-M1
+ * @author aho
+ * @since 3.8.0 14.01.2013
  */
-public class FormDataUpdateOperation extends AbstractSingleDerivedTypeAutoUpdateOperation {
+public class FormDataUpdateOperation extends CompilationUnitUpdateOperation {
 
-  private FormDataAnnotation m_formDataAnnotation;
+  private final IType m_formDataDefinitionType;
+  private IType m_createdFormData;
 
-  public FormDataUpdateOperation(IType type) {
-    this(type, null);
-  }
-
-  public FormDataUpdateOperation(IType type, FormDataAnnotation annotation) {
-    super(type);
-    m_formDataAnnotation = annotation;
-  }
-
-  @Override
-  public String getOperationName() {
-    return "Update Form Data for '" + getModelType().getElementName() + "'.";
+  /**
+   * @param typeName
+   */
+  public FormDataUpdateOperation(IType formDataDefinitionType, ICompilationUnit formDataIcu) {
+    super(formDataIcu);
+    m_formDataDefinitionType = formDataDefinitionType;
+    setFormatSource(true);
   }
 
   @Override
-  protected boolean prepare() {
-    if (m_formDataAnnotation == null) {
-      try {
-        m_formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getModelType(), TypeUtility.getSuperTypeHierarchy(getModelType()));
-      }
-      catch (JavaModelException e) {
-        ScoutSdk.logWarning("could not find form data annotation for '" + getModelType().getElementName() + "'.", e);
-      }
+  public void validate() throws IllegalArgumentException {
+    if (!TypeUtility.exists(getFormDataDefinitionType())) {
+      throw new IllegalArgumentException("form data definition type '" + getFormDataDefinitionType() + "' does not exist.");
     }
-    // form data
-    if (m_formDataAnnotation == null ||
-        !FormDataAnnotation.isSdkCommandCreate(m_formDataAnnotation) ||
-        StringUtility.isNullOrEmpty(m_formDataAnnotation.getFormDataTypeSignature())) {
-      return false;
-    }
-    return true;
-  }
-
-  public IType getFormDataType() {
-    return getDerivedModelType();
+    super.validate();
   }
 
   @Override
-  protected String getDerivedTypeSignature() {
-    return m_formDataAnnotation.getFormDataTypeSignature();
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getFormDataDefinitionType(), TypeUtility.getSuperTypeHierarchy(getFormDataDefinitionType()));
+    ITypeSourceBuilder typeOp = FormDataUtility.createFormDataSourceBuilder(getFormDataDefinitionType(), formDataAnnotation);//FormDataFactory.createFormDataBuilder(getFormDataDefinitionType(), formDataAnnotation);
+    addTypeSourceBuilder(typeOp);
+    super.run(monitor, workingCopyManager);
+    m_createdFormData = getCompilationUnit().getType(typeOp.getElementName());
+
   }
 
-  @Override
-  protected boolean checkExistingDerivedTypeSuperTypeHierarchy(IType type, ITypeHierarchy hierarchy) {
-    return hierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractFormData))
-        || hierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractFormFieldData));
+  public IType getFormDataDefinitionType() {
+    return m_formDataDefinitionType;
   }
 
-  @Override
-  protected ITypeSourceBuilder createTypeSourceBuilder(IType formDataType) {
-    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getModelType());
-    ITypeSourceBuilder sourceBuilder = FormDataUtility.getPrimaryTypeFormDataSourceBuilder(m_formDataAnnotation.getSuperTypeSignature(), getModelType(), hierarchy, formDataType.getJavaProject());
-    sourceBuilder.setElementName(formDataType.getElementName());
-    sourceBuilder.setSuperTypeSignature(FormDataUtility.getFormDataSuperTypeSignature(m_formDataAnnotation, getModelType(), hierarchy));
-    return sourceBuilder;
+  public IType getCreatedFormData() {
+    return m_createdFormData;
   }
+
 }

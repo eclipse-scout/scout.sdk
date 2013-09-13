@@ -19,9 +19,13 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -30,7 +34,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class ComposerAttributeNewOperation implements IOperation {
 
-  final IType iComposerAttribute = TypeUtility.getType(RuntimeClasses.IComposerAttribute);
+  final IType iDataModelAttribute = TypeUtility.getType(RuntimeClasses.IDataModelAttribute);
 
   // in member
   private final IType m_declaringType;
@@ -42,15 +46,16 @@ public class ComposerAttributeNewOperation implements IOperation {
   // out member
   private IType m_createdComposerAttribute;
 
-  public ComposerAttributeNewOperation(IType declaringType) {
-    this(declaringType, false);
+  public ComposerAttributeNewOperation(String attributeName, IType declaringType) {
+    this(attributeName, declaringType, false);
   }
 
-  public ComposerAttributeNewOperation(IType declaringType, boolean formatSource) {
+  public ComposerAttributeNewOperation(String attributeName, IType declaringType, boolean formatSource) {
+    m_typeName = attributeName;
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default values
-    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IComposerAttribute, getDeclaringType().getJavaProject());
+    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDataModelAttribute, getDeclaringType().getJavaProject());
   }
 
   @Override
@@ -70,22 +75,23 @@ public class ComposerAttributeNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    InnerTypeNewOperation typeNewOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
+    InnerTypeNewOperation typeNewOp = new InnerTypeNewOperation(getTypeName(), getDeclaringType());
+    typeNewOp.setFormatSource(true);
     typeNewOp.setSibling(getSibling());
     typeNewOp.setSuperTypeSignature(getSuperTypeSignature());
-    typeNewOp.setTypeModifiers(Flags.AccPublic);
+    typeNewOp.setFlags(Flags.AccPublic);
+    // serial version uid
+    typeNewOp.addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
+    // nls method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsTextMethod = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(typeNewOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
+      nlsTextMethod.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      typeNewOp.addMethodSourceBuilder(nlsTextMethod);
+    }
     typeNewOp.validate();
     typeNewOp.run(monitor, workingCopyManager);
     m_createdComposerAttribute = typeNewOp.getCreatedType();
 
-    // nls entry
-    if (getNlsEntry() != null) {
-      // text
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(getCreatedAttribute(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TEXT, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
     if (m_formatSource) {
       JavaElementFormatOperation foramtOp = new JavaElementFormatOperation(getCreatedAttribute(), true);
       foramtOp.validate();

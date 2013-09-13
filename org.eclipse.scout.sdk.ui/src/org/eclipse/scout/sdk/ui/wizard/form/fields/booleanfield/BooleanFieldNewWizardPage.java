@@ -125,11 +125,9 @@ public class BooleanFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    BooleanFieldNewOperation operation = new BooleanFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    BooleanFieldNewOperation operation = new BooleanFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     operation.setNlsEntry(getNlsName());
-    operation.setTypeName(getTypeName());
 
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));

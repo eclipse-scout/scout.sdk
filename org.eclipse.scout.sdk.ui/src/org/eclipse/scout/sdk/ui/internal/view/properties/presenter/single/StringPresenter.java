@@ -11,15 +11,15 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.StringPropertySourceParser;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -28,13 +28,15 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class StringPresenter extends AbstractValuePresenter<String> {
 
+  private final IPropertySourceParser<String> m_parser;
+
   public StringPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, null);
+    m_parser = new StringPropertySourceParser();
   }
 
-  @Override
-  protected String formatSourceValue(String value) throws CoreException {
-    return JdtUtility.toStringLiteral(value);
+  public IPropertySourceParser<String> getParser() {
+    return m_parser;
   }
 
   @Override
@@ -44,33 +46,35 @@ public class StringPresenter extends AbstractValuePresenter<String> {
 
   @Override
   protected String parseSourceInput(String input) throws CoreException {
-    String value = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    if (value == null) {
-      value = "";
-    }
-    return value;
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
   }
 
   @Override
   protected String parseDisplayInput(String input) throws CoreException {
+    if (StringUtility.isNullOrEmpty(input)) {
+      return null;
+    }
     return input;
+
   }
 
   @Override
   protected synchronized void storeValue(String value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<String> updateOp = new ConfigPropertyUpdateOperation<String>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      String sourceValue = formatSourceValue(value);
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
-    }
+  }
+
+  @Override
+  protected int getTextAlignment() {
+    return SWT.RIGHT;
   }
 
 }

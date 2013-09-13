@@ -14,85 +14,87 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class CalendarServiceNewOperation extends ServiceNewOperation {
 
-  final IType iService = TypeUtility.getType(RuntimeClasses.IService);
+  /**
+   * @param serviceInterfaceName
+   * @param serviceName
+   */
+  public CalendarServiceNewOperation(String serviceInterfaceName, String serviceName) {
+    super(serviceInterfaceName, serviceName);
+  }
 
   @Override
   public String getOperationName() {
-    return "new Lookup service";
+    return "new Calendar service '" + getImplementationName() + "'...";
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    super.run(monitor, workingCopyManager);
-    IType serviceInterface = getCreatedServiceInterface();
-    if (TypeUtility.exists(serviceInterface)) {
-      CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(serviceInterface.getCompilationUnit());
-      // getItems
-      StringBuilder methodBuilder = new StringBuilder();
-      String calendarItemSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem));
-      methodBuilder.append(calendarItemSimpleName);
-      methodBuilder.append("[] getItems(");
-      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
-      methodBuilder.append(" minDate, ");
-      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
-      methodBuilder.append(" maxDate) throws ");
-      String processingExceptionSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-      methodBuilder.append(processingExceptionSimpleName);
-      methodBuilder.append(";");
-      serviceInterface.createMethod(methodBuilder.toString(), null, true, monitor);
-      // storeItems
-      methodBuilder = new StringBuilder();
-      methodBuilder.append("void storeItems(").append(calendarItemSimpleName).append("[] items, boolean delta) throws ").append(processingExceptionSimpleName).append(";");
-      serviceInterface.createMethod(methodBuilder.toString(), null, true, monitor);
-      // create imports
-      importValidator.createImports(monitor);
-      // format
-      new JavaElementFormatOperation(serviceInterface, true).run(monitor, workingCopyManager);
-    }
-    IType serviceImplementation = getCreatedServiceImplementation();
-    if (TypeUtility.exists(serviceImplementation)) {
-      CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(serviceImplementation.getCompilationUnit());
-      StringBuilder methodBuilder = new StringBuilder();
-      String overrideSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(Override.class.getName()));
-      methodBuilder.append("@").append(overrideSimpleName).append("\n");
-      methodBuilder.append("public ");
-      String calendarItemSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem));
-      methodBuilder.append(calendarItemSimpleName);
-      methodBuilder.append("[] getItems(");
-      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
-      methodBuilder.append(" minDate, ");
-      methodBuilder.append(importValidator.getTypeName(SignatureCache.createTypeSignature(Date.class.getName())));
-      methodBuilder.append(" maxDate) throws ");
-      String processingExceptionSimpleName = importValidator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-      methodBuilder.append(processingExceptionSimpleName);
-      methodBuilder.append(" {\n");
-      methodBuilder.append(ScoutUtility.getCommentBlock("business logic here.")).append("\n");
-      methodBuilder.append("return new ").append(calendarItemSimpleName).append("[0];\n}\n");
-      serviceImplementation.createMethod(methodBuilder.toString(), null, true, monitor);
-      // storeItems
-      methodBuilder = new StringBuilder();
-      methodBuilder.append("@").append(overrideSimpleName).append("\n");
-      methodBuilder.append("public void storeItems(").append(calendarItemSimpleName).append("[] items, boolean delta) throws ").append(processingExceptionSimpleName).append("{\n");
-      methodBuilder.append(ScoutUtility.getCommentBlock("business logic here.")).append("\n");
-      methodBuilder.append("}\n");
-      serviceImplementation.createMethod(methodBuilder.toString(), null, true, monitor);
-      // create imports
-      importValidator.createImports(monitor);
-      // format
-      new JavaElementFormatOperation(serviceImplementation, true).run(monitor, workingCopyManager);
-    }
+    // interface getItems method
+    TypeSourceBuilder interfaceSourceBuilder = getInterfaceSourceBuilder();
+    IMethodSourceBuilder interfaceGetItemsBuilder = new MethodSourceBuilder("getItems");
+    interfaceGetItemsBuilder.setFlags(Flags.AccInterface);
+    interfaceGetItemsBuilder.setReturnTypeSignature(Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true));
+    interfaceGetItemsBuilder.addParameter(new MethodParameter("minDate", SignatureCache.createTypeSignature(Date.class.getName())));
+    interfaceGetItemsBuilder.addParameter(new MethodParameter("maxDate", SignatureCache.createTypeSignature(Date.class.getName())));
+    interfaceGetItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    interfaceSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(interfaceGetItemsBuilder), interfaceGetItemsBuilder);
+    // interface storeItems method
+    IMethodSourceBuilder interfaceStoreItemsBuilder = new MethodSourceBuilder("storeItems");
+    interfaceStoreItemsBuilder.setFlags(Flags.AccInterface);
+    interfaceStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    interfaceStoreItemsBuilder.addParameter(new MethodParameter("items", Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true)));
+    interfaceStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));
+    interfaceStoreItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    interfaceSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(interfaceStoreItemsBuilder), interfaceStoreItemsBuilder);
 
+    // implementation getItems method
+    TypeSourceBuilder implementationSourceBuilder = getImplementationSourceBuilder();
+    IMethodSourceBuilder implementationGetItemsBuilder = new MethodSourceBuilder("getItems");
+    implementationGetItemsBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
+    implementationGetItemsBuilder.setFlags(Flags.AccPublic);
+    implementationGetItemsBuilder.setReturnTypeSignature(Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true));
+    implementationGetItemsBuilder.addParameter(new MethodParameter("minDate", SignatureCache.createTypeSignature(Date.class.getName())));
+    implementationGetItemsBuilder.addParameter(new MethodParameter("maxDate", SignatureCache.createTypeSignature(Date.class.getName())));
+    implementationGetItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    implementationGetItemsBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append(ScoutUtility.getCommentBlock("business logic here.")).append(lineDelimiter);
+        source.append("return new ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem))).append("[0];").append(lineDelimiter);
+      }
+    });
+    implementationSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(implementationGetItemsBuilder), implementationGetItemsBuilder);
+    // implementation storeItems method
+    IMethodSourceBuilder implementationStoreItemsBuilder = new MethodSourceBuilder("storeItems");
+    implementationStoreItemsBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
+    implementationStoreItemsBuilder.setFlags(Flags.AccPublic);
+    implementationStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    implementationStoreItemsBuilder.addParameter(new MethodParameter("items", Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true)));
+    implementationStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));
+    implementationStoreItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    implementationStoreItemsBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(ScoutUtility.getCommentBlock("business logic here.")));
+    implementationSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(implementationStoreItemsBuilder), implementationStoreItemsBuilder);
+
+    super.run(monitor, workingCopyManager);
   }
 
 }

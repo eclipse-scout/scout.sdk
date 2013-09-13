@@ -18,11 +18,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.operation.jdt.field.FieldNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -97,7 +97,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     // field
     String memberName;
     if (m_correctSpelling) {
-      memberName = getBeanName(false);
+      memberName = getBeanName(false); 
     }
     else {
       memberName = getBeanName();
@@ -109,8 +109,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     if (isUseHungarianNotation()) {
       memberName = "m_" + memberName;
     }
-
-    FieldCreateOperation fieldOp = new FieldCreateOperation(getDeclaringType(), memberName, false);
+    FieldNewOperation fieldOp = new FieldNewOperation(memberName, getDeclaringType(), false);
     fieldOp.setSibling(getSiblingField());
     fieldOp.setSignature(getBeanTypeSignature());
     fieldOp.setFlags(Flags.AccPrivate);
@@ -125,11 +124,13 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
         prefix = "is";
       }
       String getterName = prefix + getBeanName(true);
-      MethodCreateOperation getterOp = new MethodCreateOperation(getDeclaringType(), getterName, "return " + memberName + ";", false);
+
+      MethodNewOperation getterOp = new MethodNewOperation(getterName, getDeclaringType(), false);
+      getterOp.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + memberName + ";"));
       getterOp.setReturnTypeSignature(getBeanTypeSignature());
-      getterOp.setMethodFlags(Flags.AccPublic);
+      getterOp.setFlags(Flags.AccPublic);
       if (m_createFormDataAnnotation) {
-        getterOp.addAnnotation(new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.FormData)));
+        getterOp.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
       }
       getterOp.setSibling(getSiblingMethods());
       getterOp.setFormatSource(true);
@@ -156,13 +157,13 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
       else {
         content = "this." + memberName + " = " + parameterName + ";";
       }
-      MethodCreateOperation setterOp = new MethodCreateOperation(getDeclaringType(), setterName, content, false);
+      MethodNewOperation setterOp = new MethodNewOperation(setterName, getDeclaringType(), false);
       setterOp.setReturnTypeSignature(Signature.SIG_VOID);
-      setterOp.setMethodFlags(Flags.AccPublic);
-      setterOp.setParameterSignatures(new String[]{getBeanTypeSignature()});
-      setterOp.setParameterNames(new String[]{parameterName});
+      setterOp.setFlags(Flags.AccPublic);
+      setterOp.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(content));
+      setterOp.addParameter(new MethodParameter(parameterName, getBeanTypeSignature()));
       if (m_createFormDataAnnotation) {
-        setterOp.addAnnotation(new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(RuntimeClasses.FormData)));
+        setterOp.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
       }
       setterOp.setSibling(getSiblingMethods());
       setterOp.setFormatSource(true);

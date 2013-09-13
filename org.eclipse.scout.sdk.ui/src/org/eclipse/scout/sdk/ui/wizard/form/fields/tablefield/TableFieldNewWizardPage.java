@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.form.field.TableFieldNewOperation;
+import org.eclipse.scout.sdk.operation.form.field.table.TableFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -124,13 +124,11 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    TableFieldNewOperation operation = new TableFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    TableFieldNewOperation operation = new TableFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

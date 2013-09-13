@@ -10,41 +10,36 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.PermissionNewOperation;
-import org.eclipse.scout.sdk.operation.annotation.InputValidationAnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.operation.service.ProcessServiceCreateMethodOperation;
-import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
-public class FormStackNewOperation implements IOperation {
+public class FormStackNewOperation extends FormNewOperation {
 
-  private String m_formName;
-  private String m_formPackage;
-  private INlsEntry m_nlsEntry;
-  private String m_formSuperTypeSignature;
-  private String m_formIdName;
-  private IScoutBundle m_formBundle;
-  private boolean m_createButtonOk = false;
-  private boolean m_createButtonCancel = false;
-  private boolean m_createIdProperty = false;
   private boolean m_createNewHandler = false;
   private boolean m_createModifyHandler = false;
   private boolean m_createExecStore = true;
@@ -53,324 +48,327 @@ public class FormStackNewOperation implements IOperation {
   private boolean m_createCreateMethod = true;
   private boolean m_createLoadMethod = true;
   private boolean m_createStoreMethod = true;
-  private IScoutBundle[] m_clientServiceRegistryBundles;
-  private IScoutBundle m_formDataBundle;
+  private IJavaProject m_formDataProject;
   private String m_formDataPackage;
 
-  private IScoutBundle m_permissionCreateBundle;
+  private IJavaProject m_permissionCreateProject;
   private String m_permissionCreateName;
   private String m_permissionCreatePackage;
 
-  private IScoutBundle m_permissionReadBundle;
+  private IJavaProject m_permissionReadProejct;
   private String m_permissionReadName;
   private String m_permissionReadPackage;
 
-  private IScoutBundle m_permissionUpdateBundle;
+  private IJavaProject m_permissionUpdateProject;
   private String m_permissionUpdateName;
   private String m_permissionUpdatePackage;
 
-  private IScoutBundle m_serviceInterfaceBundle;
+  private IJavaProject m_serviceInterfaceProject;
   private String m_serviceInterfaceName;
   private String m_serviceInterfacePackage;
-  private IScoutBundle m_serviceImplementationBundle;
+  private IJavaProject m_serviceImplementationProject;
   private String m_serviceImplementationSuperTypeSignature;
   private String m_serviceImplementationName;
   private String m_serviceImplementationPackage;
-  private IScoutBundle[] m_serverServiceRegistryBundles;
-  private boolean m_formatSource;
+  private List<IJavaProject> m_serviceProxyRegistrationProjects;
+  private List<IJavaProject> m_serviceRegistrationProjects;
 
   // operation members
-  private IType m_outProcessService;
-  private IType m_outProcessServiceInterface;
-  private IType m_outFormData;
-  private IType m_outForm;
-  private IType m_outMainBox;
-  private IType m_outReadPermission;
-  private IType m_outCreatePermission;
-  private IType m_outUpdatePermission;
-  private IType m_outNewHandler;
-  private IType m_outModifyHandler;
-  private IMethod m_outMainBoxGetterMethod;
+  private IType m_createdService;
+  private IType m_createdServiceInterface;
+  private IType m_createdFormData;
+  private IType m_createdCreatePermission;
+  private IType m_createdReadPermission;
+  private IType m_createdUpdatePermission;
+  private IType m_createdNewHandler;
+  private IType m_createdModifyHandler;
 
-  public FormStackNewOperation() {
-    this(false);
-  }
-
-  public FormStackNewOperation(boolean formatSource) {
-    m_formatSource = formatSource;
+  public FormStackNewOperation(String formName, String formPackageName, IJavaProject formProject) throws JavaModelException {
+    super(formName, formPackageName, formProject);
+    m_serviceRegistrationProjects = new ArrayList<IJavaProject>();
+    m_serviceProxyRegistrationProjects = new ArrayList<IJavaProject>();
   }
 
   @Override
   public String getOperationName() {
-    return "Create Form and Service '" + getFormName() + "'.";
-  }
-
-  @Override
-  public void validate() throws IllegalArgumentException {
-    if (StringUtility.isNullOrEmpty(getFormName())) {
-      throw new IllegalArgumentException("Form name can not be null.");
-    }
-    if (isCreateIdProperty() && StringUtility.isNullOrEmpty(getFormIdName())) {
-      throw new IllegalArgumentException("FormId can not be null.");
-    }
-
+    return "Create Form and Service '" + getElementName() + "'.";
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // create empty form data
-    String formDataSignature = null;
-    if (getFormDataBundle() != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getFormName() + "Data", getFormDataPackage(), getFormDataBundle());
-      formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
-      formDataOp.run(monitor, workingCopyManager);
-      m_outFormData = formDataOp.getCreatedType();
-      formDataSignature = SignatureCache.createTypeSignature(m_outFormData.getFullyQualifiedName());
+    if (getFormDataProject() != null) {
+      String formDataTypeName = getElementName() + "Data";
+      PrimaryTypeNewOperation formDataTypeNewOp = new PrimaryTypeNewOperation(formDataTypeName, getFormDataPackage(), getFormDataProject().getJavaProject());
+      formDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(formDataTypeName));
+      formDataTypeNewOp.setFlags(Flags.AccPublic);
+      formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+      formDataTypeNewOp.validate();
+      formDataTypeNewOp.run(monitor, workingCopyManager);
+      m_createdFormData = formDataTypeNewOp.getCreatedType();
+      setFormDataSignature(Signature.createTypeSignature(getCreatedFormData().getFullyQualifiedName(), true));
     }
-    // form
-    FormNewOperation formOp = new FormNewOperation();
-    formOp.setClientBundle(getFormBundle());
-    formOp.setFormatSource(m_formatSource);
-    // write back members
-    formOp.setNlsEntry(getNlsEntry());
-    formOp.setTypeName(getFormName());
-    if (getFormSuperTypeSignature() != null) {
-      formOp.setSuperTypeSignature(getFormSuperTypeSignature());
-    }
-    formOp.setFormDataSignature(formDataSignature);
-    formOp.setPackage(getFormPackage());
-    formOp.setCreateButtonOk(isCreateButtonOk());
-    formOp.setCreateButtonCancel(isCreateButtonCancel());
-    formOp.validate();
-    formOp.run(monitor, workingCopyManager);
-    m_outForm = formOp.getCreatedFormType();
-    m_outMainBox = formOp.getCreatedMainBox();
-    m_outMainBoxGetterMethod = formOp.getCreatedMainBoxGetter();
-    m_outForm.getCompilationUnit().reconcile(ICompilationUnit.NO_AST, false, null, monitor);
-    if (isCreateIdProperty()) {
-      BeanPropertyNewOperation beanPropOp = new BeanPropertyNewOperation(getOutForm(), getFormIdName(), SignatureCache.createTypeSignature(Long.class.getName()), Flags.AccPublic);
-      beanPropOp.setCreateFormDataAnnotation(true);
-      beanPropOp.setSiblingMethods(formOp.getCreatedMainBoxGetter());
-      beanPropOp.setSiblingField(null);
-      beanPropOp.run(monitor, workingCopyManager);
-    }
+    // service
+    ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation(getServiceImplementationName());
+    serviceOp.setFormatSource(isFormatSource());
+    serviceOp.setFormData(m_createdFormData);
+    serviceOp.setImplementationPackageName(getServiceImplementationPackage());
+    serviceOp.setImplementationProject(getServiceImplementationProject());
+    serviceOp.setImplementationSuperTypeSignature(getServiceImplementationSuperTypeSignature());
+    serviceOp.setInterfacePackageName(getServiceInterfacePackage());
+    serviceOp.setInterfaceProject(getServiceInterfaceProject());
+    serviceOp.setPermissionCreateName(getPermissionCreateName());
+    serviceOp.setPermissionCreatePackageName(getPermissionCreatePackage());
+    serviceOp.setPermissionCreateProject(getPermissionCreateProject());
+    serviceOp.setPermissionReadName(getPermissionReadName());
+    serviceOp.setPermissionReadPackageName(getPermissionReadPackage());
+    serviceOp.setPermissionReadProject(getPermissionReadProject());
+    serviceOp.setPermissionUpdateName(getPermissionUpdateName());
+    serviceOp.setPermissionUpdatePackageName(getPermissionUpdatePackage());
+    serviceOp.setPermissionUpdateProject(getPermissionUpdateProject());
+    serviceOp.setProxyRegistrationProjects(getServiceProxyRegistrationProjects());
+    serviceOp.setServiceRegistrationProjects(getServiceRegistrationProjects());
+    serviceOp.validate();
+    serviceOp.run(monitor, workingCopyManager);
+    m_createdService = serviceOp.getCreatedServiceImplementation();
+    m_createdServiceInterface = serviceOp.getCreatedServiceInterface();
+    m_createdCreatePermission = serviceOp.getCreatedCreatePermission();
+    m_createdReadPermission = serviceOp.getCreatedReadPermission();
+    m_createdUpdatePermission = serviceOp.getCreatedUpdatePermission();
 
-    // permissions
-    if (getPermissionCreateBundle() != null) {
-      PermissionNewOperation permissionOp = new PermissionNewOperation(m_formatSource);
-      permissionOp.setSharedBundle(getPermissionCreateBundle());
-      permissionOp.setPackageName(getPermissionCreatePackage());
-      permissionOp.setTypeName(getPermissionCreateName());
-      permissionOp.run(monitor, workingCopyManager);
-      m_outCreatePermission = permissionOp.getCreatedPermission();
-
-    }
-    if (getPermissionReadBundle() != null) {
-      PermissionNewOperation permissionOp = new PermissionNewOperation(m_formatSource);
-      permissionOp.setSharedBundle(getPermissionReadBundle());
-      permissionOp.setPackageName(getPermissionReadPackage());
-      permissionOp.setTypeName(getPermissionReadName());
-      permissionOp.run(monitor, workingCopyManager);
-      m_outReadPermission = permissionOp.getCreatedPermission();
-
-    }
-    if (getPermissionUpdateBundle() != null) {
-      PermissionNewOperation permissionOp = new PermissionNewOperation(m_formatSource);
-      permissionOp.setSharedBundle(getPermissionUpdateBundle());
-      permissionOp.setPackageName(getPermissionUpdatePackage());
-      permissionOp.setTypeName(getPermissionUpdateName());
-      permissionOp.run(monitor, workingCopyManager);
-      m_outUpdatePermission = permissionOp.getCreatedPermission();
-    }
-
-    if (getServiceImplementationBundle() != null) {
-      // service interface
-      ServiceNewOperation serviceOp = new ServiceNewOperation();
-      for (IScoutBundle cb : getClientServiceRegistryBundles()) {
-        serviceOp.addProxyRegistrationBundle(cb);
-      }
-      for (IScoutBundle sb : getServerServiceRegistryBundles()) {
-        serviceOp.addServiceRegistrationBundle(sb);
-      }
-      serviceOp.setImplementationBundle(getServiceImplementationBundle());
-      serviceOp.setInterfaceBundle(getServiceInterfaceBundle());
-      serviceOp.setServiceInterfaceName(getServiceInterfaceName());
-      serviceOp.setServiceInterfacePackageName(getServiceInterfacePackage());
-      serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
-      serviceOp.setServiceName(getServiceImplementationName());
-      serviceOp.setServicePackageName(getServiceImplementationPackage());
-      String serviceSuperTypeSig = getServiceImplementationSuperTypeSignature();
-      if (serviceSuperTypeSig == null) {
-        serviceSuperTypeSig = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServiceImplementationBundle().getJavaProject());
-      }
-      serviceOp.setServiceSuperTypeSignature(serviceSuperTypeSig);
-      serviceOp.run(monitor, workingCopyManager);
-      m_outProcessService = serviceOp.getCreatedServiceImplementation();
-      m_outProcessServiceInterface = serviceOp.getCreatedServiceInterface();
-
-      // input validation annotation for process services
-      InputValidationAnnotationCreateOperation valStratOp = new InputValidationAnnotationCreateOperation(m_outProcessServiceInterface);
-      valStratOp.validate();
-      valStratOp.run(monitor, workingCopyManager);
-
-      // fill service
-      if (getOutFormData() != null) {
-        ProcessServiceCreateMethodOperation processServiceFillOp = new ProcessServiceCreateMethodOperation();
-        processServiceFillOp.setFormData(getOutFormData());
-        processServiceFillOp.setCreateCreateMethod(isCreateCreateMethod());
-        processServiceFillOp.setCreateLoadMethod(isCreateLoadMethod());
-        processServiceFillOp.setCreatePrepareCreateMethod(isCreatePrepareCreateMethod());
-        processServiceFillOp.setCreateStoreMethod(isCreateStoreMethod());
-        processServiceFillOp.setCreatePermission(getOutCreatePermission());
-        processServiceFillOp.setReadPermission(getOutReadPermission());
-        processServiceFillOp.setUpdatePermission(getOutUpdatePermission());
-        processServiceFillOp.setServiceImplementations(new IType[]{getOutProcessService()});
-        processServiceFillOp.setServiceInterface(getOutProcessServiceInterface());
-        processServiceFillOp.run(monitor, workingCopyManager);
-      }
-      if (getOutProcessService() != null && m_formatSource) {
-        // format
-        JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getOutProcessService(), true);
-        formatOp.validate();
-        formatOp.run(monitor, workingCopyManager);
-      }
-      if (getOutProcessServiceInterface() != null && m_formatSource) {
-        // format
-        JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getOutProcessServiceInterface(), true);
-        formatOp.validate();
-        formatOp.run(monitor, workingCopyManager);
-      }
-    }
-    // fill form
-    if (isCreateModifyHandler()) {
-      FormHandlerNewOperation modifyHandlerOp = new FormHandlerNewOperation(getOutForm());
-      modifyHandlerOp.setStartMethodSibling(formOp.getCreatedMainBoxGetter());
-      modifyHandlerOp.setTypeName(SdkProperties.TYPE_NAME_MODIFY_HANDLER);
-      modifyHandlerOp.run(monitor, workingCopyManager);
-      m_outNewHandler = modifyHandlerOp.getCreatedHandler();
-      if (getOutProcessServiceInterface() != null) {
-        ModifyHandlerCreateMethodsOperation fillOp = new ModifyHandlerCreateMethodsOperation();
-        fillOp.setCreateExecLoad(isCreateExecLoad());
-        fillOp.setCreateExecStore(isCreateExecStore());
-        fillOp.setUpdatePermission(getOutUpdatePermission());
-        fillOp.setFormData(getOutFormData());
-        fillOp.setFormHandler(getOutNewHandler());
-        fillOp.setServiceInterface(getOutProcessServiceInterface());
-        fillOp.validate();
-        fillOp.run(monitor, workingCopyManager);
-      }
-    }
-    // fill form
     if (isCreateNewHandler()) {
-      FormHandlerNewOperation newHandlerOp = new FormHandlerNewOperation(getOutForm());
-      newHandlerOp.setStartMethodSibling(formOp.getCreatedMainBoxGetter());
-      newHandlerOp.setTypeName(SdkProperties.TYPE_NAME_NEW_HANDLER);
-      newHandlerOp.run(monitor, workingCopyManager);
-      m_outNewHandler = newHandlerOp.getCreatedHandler();
-      NewHandlerCreateMethodsOperation fillOp = new NewHandlerCreateMethodsOperation();
-      fillOp.setCreateExecLoad(isCreateExecLoad());
-      fillOp.setCreateExecStore(isCreateExecStore());
-      fillOp.setFormData(getOutFormData());
-      fillOp.setFormHandler(getOutNewHandler());
-      fillOp.setServiceInterface(getOutProcessServiceInterface());
-      fillOp.run(monitor, workingCopyManager);
+      createNewHandler(getSourceBuilder());
     }
-    if (TypeUtility.exists(m_outFormData)) {
-      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(m_outForm);
-      formDataUpdateOp.run(monitor, workingCopyManager);
+    if (isCreateModifyHandler()) {
+      createModifyHandler(getSourceBuilder());
+    }
+    super.run(monitor, workingCopyManager);
+//    m_outForm.getCompilationUnit().reconcile(ICompilationUnit.NO_AST, false, null, monitor);
+
+//    if (getFormDataBundle() != null) {
+//      FormDataNewOperation formDataOp = new FormDataNewOperation(m_outForm, ScoutTypeUtility.findFormDataAnnotation(m_outForm, TypeUtility.getSuperTypeHierarchy(m_outForm)));
+//      formDataOp.setScoutBundle(getFormDataBundle());
+//      formOp.run(monitor, workingCopyManager);
+//
+//    }
+//    if (TypeUtility.exists(getCreatedFormData())) {
+//      FormDataUpdateOperationNew formDataUpdateOp = new FormDataUpdateOperationNew(getCreatedType(), getCreatedFormData().getCompilationUnit());
+//      formDataUpdateOp.run(monitor, workingCopyManager);
+//    }
+
+  }
+
+  /**
+   * @param sourceBuilder
+   * @throws CoreException
+   */
+  private void createNewHandler(ITypeSourceBuilder formSourceBuilder) throws CoreException {
+    ITypeSourceBuilder newHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_NEW_HANDLER);
+    newHandlerBuilder.setFlags(Flags.AccPublic);
+    newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getJavaProject()));
+    formSourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(newHandlerBuilder), newHandlerBuilder);
+
+    if (m_createdServiceInterface != null && m_createdFormData != null) {
+      // exec load method
+      IMethodSourceBuilder execLoadSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newHandlerBuilder, "execLoad");
+      execLoadSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
+          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          source.append(serviceInterfaceName).append(" service = ");
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(");
+          source.append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
+          source.append("exportFormData(formData);").append(lineDelimiter);
+          if (TypeUtility.exists(TypeUtility.getMethod(m_createdServiceInterface, "prepareCreate"))) {
+            source.append("formData = service.prepareCreate(formData);").append(lineDelimiter);
+          }
+          else {
+            source.append(ScoutUtility.getCommentBlock("service call here")).append(lineDelimiter);
+          }
+          source.append("importFormData(formData);").append(lineDelimiter);
+        }
+      });
+      newHandlerBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execLoadSourceBuilder), execLoadSourceBuilder);
+      // exec store method
+      IMethodSourceBuilder execStoreSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newHandlerBuilder, "execStore");
+      execStoreSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
+          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
+          source.append("exportFormData(formData);").append(lineDelimiter);
+          if (TypeUtility.exists(TypeUtility.getMethod(m_createdServiceInterface, "create"))) {
+            source.append("formData = service.create(formData);").append(lineDelimiter);
+          }
+          else {
+            source.append(ScoutUtility.getCommentBlock("service call here")).append("").append(lineDelimiter);
+          }
+        }
+      });
+      newHandlerBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execStoreSourceBuilder), execStoreSourceBuilder);
     }
 
-    if (m_formatSource) {
-      // format
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getOutForm(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
+    // start method
+    final String handlerFqn = getPackageName() + "." + getElementName() + "." + newHandlerBuilder.getElementName();
+    IMethodSourceBuilder startHandlerMethodBuilder = new MethodSourceBuilder("start" + SdkProperties.TYPE_NAME_NEW_HANDLER_PREFIX);
+    startHandlerMethodBuilder.setFlags(Flags.AccPublic);
+    startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqn, true))).append("());");
+      }
+    });
+    formSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);
+  }
+
+  /**
+   * @param typeSourceBuilder
+   * @throws CoreException
+   */
+  protected void createModifyHandler(ITypeSourceBuilder formSourceBuilder) throws CoreException {
+    ITypeSourceBuilder modifyHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MODIFY_HANDLER);
+    modifyHandlerBuilder.setFlags(Flags.AccPublic);
+    modifyHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getJavaProject()));
+    formSourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(modifyHandlerBuilder), modifyHandlerBuilder);
+
+    if (m_createdServiceInterface != null && m_createdFormData != null) {
+      // exec load method
+      IMethodSourceBuilder execLoadSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(modifyHandlerBuilder, "execLoad");
+      execLoadSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
+          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          source.append(serviceInterfaceName).append(" service = ");
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(");
+          source.append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
+          source.append("exportFormData(formData);").append(lineDelimiter);
+          if (TypeUtility.exists(TypeUtility.getMethod(m_createdServiceInterface, "load"))) {
+            source.append("formData = service.load(formData);").append(lineDelimiter);
+          }
+          else {
+            source.append(ScoutUtility.getCommentBlock("service call here")).append(lineDelimiter);
+          }
+          source.append("importFormData(formData);").append(lineDelimiter);
+          if (getCreatedUpdatePermission() != null) {
+            source.append("setEnabledPermission(new " + validator.getTypeName(Signature.createTypeSignature(getCreatedUpdatePermission().getFullyQualifiedName(), true))).append("());").append(lineDelimiter);
+          }
+        }
+      });
+      modifyHandlerBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execLoadSourceBuilder), execLoadSourceBuilder);
+      // exec store method
+      IMethodSourceBuilder execStoreSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(modifyHandlerBuilder, "execStore");
+      execStoreSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
+          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
+          source.append("exportFormData(formData);").append(lineDelimiter);
+          if (TypeUtility.exists(TypeUtility.getMethod(m_createdServiceInterface, "store"))) {
+            source.append("formData = service.store(formData);").append(lineDelimiter);
+          }
+          else {
+            source.append(ScoutUtility.getCommentBlock("service call here")).append("").append(lineDelimiter);
+          }
+        }
+      });
+      modifyHandlerBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execStoreSourceBuilder), execStoreSourceBuilder);
     }
 
+    // start method
+    final String handlerFqn = getPackageName() + "." + getElementName() + "." + modifyHandlerBuilder.getElementName();
+    IMethodSourceBuilder startHandlerMethodBuilder = new MethodSourceBuilder("start" + SdkProperties.TYPE_NAME_MODIFY_HANDLER_PREFIX);
+    startHandlerMethodBuilder.setFlags(Flags.AccPublic);
+    startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqn, true))).append("());");
+      }
+    });
+    formSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);
   }
 
-  public String getFormName() {
-    return m_formName;
-  }
-
-  public void setFormName(String formName) {
-    m_formName = formName;
-  }
-
-  public INlsEntry getNlsEntry() {
-    return m_nlsEntry;
-  }
-
-  public void setNlsEntry(INlsEntry nlsEntry) {
-    m_nlsEntry = nlsEntry;
-  }
-
-  public String getFormSuperTypeSignature() {
-    return m_formSuperTypeSignature;
-  }
-
-  public void setFormSuperTypeSignature(String formSuperTypeSignature) {
-    m_formSuperTypeSignature = formSuperTypeSignature;
+  public void addServiceProxyRegistrationProject(IJavaProject project) {
+    m_serviceProxyRegistrationProjects.add(project);
   }
 
   /**
-   * @return the formBundle
+   * @param clientServiceRegistryProjects
+   *          the clientServiceRegistryProjects to set
    */
-  public IScoutBundle getFormBundle() {
-    return m_formBundle;
+  public void setServiceProxyRegistrationProjects(List<IJavaProject> clientServiceRegistryProjects) {
+    m_serviceProxyRegistrationProjects.clear();
+    m_serviceProxyRegistrationProjects.addAll(clientServiceRegistryProjects);
   }
 
   /**
-   * @param formBundle
-   *          the formBundle to set
+   * @return the serviceProxyRegistrationProjects
    */
-  public void setFormBundle(IScoutBundle formBundle) {
-    m_formBundle = formBundle;
+  public List<IJavaProject> getServiceProxyRegistrationProjects() {
+    return Collections.unmodifiableList(m_serviceProxyRegistrationProjects);
   }
 
   /**
-   * @return the clientServiceRegistryBundle
+   * @return the serverServiceRegistryProjects
    */
-  public IScoutBundle[] getClientServiceRegistryBundles() {
-    return m_clientServiceRegistryBundles;
+  public List<IJavaProject> getServiceRegistrationProjects() {
+    return Collections.unmodifiableList(m_serviceRegistrationProjects);
+  }
+
+  public boolean addServiceRegistrationProject(IJavaProject project) {
+    return m_serviceRegistrationProjects.add(project);
   }
 
   /**
-   * @param clientServiceRegistryBundles
-   *          the clientServiceRegistryBundle to set
+   * @param serverServiceRegistryProjects
+   *          the serverServiceRegistryProjects to set
    */
-  public void setClientServiceRegistryBundles(IScoutBundle[] clientServiceRegistryBundles) {
-    m_clientServiceRegistryBundles = clientServiceRegistryBundles;
+  public void setServiceRegistrationProjects(List<IJavaProject> serverServiceRegistryProjects) {
+    m_serviceRegistrationProjects.clear();
+    m_serviceRegistrationProjects.addAll(serverServiceRegistryProjects);
   }
 
   /**
-   * @return the formDataBundle
+   * @return the formDataProject
    */
-  public IScoutBundle getFormDataBundle() {
-    return m_formDataBundle;
+  public IJavaProject getFormDataProject() {
+    return m_formDataProject;
   }
 
   /**
-   * @param formDataBundle
-   *          the formDataBundle to set
+   * @param formDataProject
+   *          the formDataProject to set
    */
-  public void setFormDataBundle(IScoutBundle formDataBundle) {
-    m_formDataBundle = formDataBundle;
+  public void setFormDataProject(IJavaProject formDataProject) {
+    m_formDataProject = formDataProject;
   }
 
   /**
-   * @return the serviceInterfaceBundle
+   * @return the serviceInterfaceProject
    */
-  public IScoutBundle getServiceInterfaceBundle() {
-    return m_serviceInterfaceBundle;
+  public IJavaProject getServiceInterfaceProject() {
+    return m_serviceInterfaceProject;
   }
 
   /**
-   * @param serviceInterfaceBundle
-   *          the serviceInterfaceBundle to set
+   * @param serviceInterfaceProject
+   *          the serviceInterfaceProject to set
    */
-  public void setServiceInterfaceBundle(IScoutBundle serviceInterfaceBundle) {
-    m_serviceInterfaceBundle = serviceInterfaceBundle;
+  public void setServiceInterfaceProject(IJavaProject serviceInterfaceProject) {
+    m_serviceInterfaceProject = serviceInterfaceProject;
   }
 
   /**
@@ -404,48 +402,48 @@ public class FormStackNewOperation implements IOperation {
   }
 
   /**
-   * @return the permissionCreateBundle
+   * @return the permissionCreateProject
    */
-  public IScoutBundle getPermissionCreateBundle() {
-    return m_permissionCreateBundle;
+  public IJavaProject getPermissionCreateProject() {
+    return m_permissionCreateProject;
   }
 
   /**
-   * @param permissionCreateBundle
-   *          the permissionCreateBundle to set
+   * @param permissionCreateProject
+   *          the permissionCreateProject to set
    */
-  public void setPermissionCreateBundle(IScoutBundle permissionCreateBundle) {
-    m_permissionCreateBundle = permissionCreateBundle;
+  public void setPermissionCreateProject(IJavaProject permissionCreateProject) {
+    m_permissionCreateProject = permissionCreateProject;
   }
 
   /**
-   * @return the permissionReadBundle
+   * @return the permissionReadProject
    */
-  public IScoutBundle getPermissionReadBundle() {
-    return m_permissionReadBundle;
+  public IJavaProject getPermissionReadProject() {
+    return m_permissionReadProejct;
   }
 
   /**
-   * @param permissionReadBundle
-   *          the permissionReadBundle to set
+   * @param permissionReadProject
+   *          the permissionReadProject to set
    */
-  public void setPermissionReadBundle(IScoutBundle permissionReadBundle) {
-    m_permissionReadBundle = permissionReadBundle;
+  public void setPermissionReadProject(IJavaProject permissionReadProject) {
+    m_permissionReadProejct = permissionReadProject;
   }
 
   /**
-   * @return the permissionUpdateBundle
+   * @return the permissionUpdateProject
    */
-  public IScoutBundle getPermissionUpdateBundle() {
-    return m_permissionUpdateBundle;
+  public IJavaProject getPermissionUpdateProject() {
+    return m_permissionUpdateProject;
   }
 
   /**
-   * @param permissionUpdateBundle
-   *          the permissionUpdateBundle to set
+   * @param permissionUpdateProject
+   *          the permissionUpdateProject to set
    */
-  public void setPermissionUpdateBundle(IScoutBundle permissionUpdateBundle) {
-    m_permissionUpdateBundle = permissionUpdateBundle;
+  public void setPermissionUpdateProject(IJavaProject permissionUpdateProject) {
+    m_permissionUpdateProject = permissionUpdateProject;
   }
 
   /**
@@ -494,33 +492,18 @@ public class FormStackNewOperation implements IOperation {
   }
 
   /**
-   * @return the serviceImplementationBundle
+   * @return the serviceImplementationProject
    */
-  public IScoutBundle getServiceImplementationBundle() {
-    return m_serviceImplementationBundle;
+  public IJavaProject getServiceImplementationProject() {
+    return m_serviceImplementationProject;
   }
 
   /**
-   * @param serviceImplementationBundle
-   *          the serviceImplementationBundle to set
+   * @param serviceImplementationProject
+   *          the serviceImplementationProject to set
    */
-  public void setServiceImplementationBundle(IScoutBundle serviceImplementationBundle) {
-    m_serviceImplementationBundle = serviceImplementationBundle;
-  }
-
-  /**
-   * @return the serverServiceRegistryBundles
-   */
-  public IScoutBundle[] getServerServiceRegistryBundles() {
-    return m_serverServiceRegistryBundles;
-  }
-
-  /**
-   * @param serverServiceRegistryBundles
-   *          the serverServiceRegistryBundle to set
-   */
-  public void setServerServiceRegistryBundles(IScoutBundle[] serverServiceRegistryBundles) {
-    m_serverServiceRegistryBundles = serverServiceRegistryBundles;
+  public void setServiceImplementationProject(IJavaProject serviceImplementationProject) {
+    m_serviceImplementationProject = serviceImplementationProject;
   }
 
   public boolean isCreateNewHandler() {
@@ -539,128 +522,60 @@ public class FormStackNewOperation implements IOperation {
     m_createModifyHandler = createModifyHandler;
   }
 
-  public void setCreateIdProperty(boolean createIdProperty) {
-    m_createIdProperty = createIdProperty;
-  }
-
-  public boolean isCreateIdProperty() {
-    return m_createIdProperty;
-  }
-
-  public void setCreateButtonOk(boolean createButtonOk) {
-    m_createButtonOk = createButtonOk;
-  }
-
-  public boolean isCreateButtonCancel() {
-    return m_createButtonCancel;
-  }
-
-  public void setCreateButtonCancel(boolean createButtonCancel) {
-    m_createButtonCancel = createButtonCancel;
-  }
-
-  public boolean isCreateButtonOk() {
-    return m_createButtonOk;
-  }
-
-  public void setFormIdName(String formIdName) {
-    m_formIdName = formIdName;
-  }
-
-  public String getFormIdName() {
-    return m_formIdName;
-  }
-
   /**
    * @return the outProcessService
    */
-  public IType getOutProcessService() {
-    return m_outProcessService;
+  public IType getCreatedService() {
+    return m_createdService;
   }
 
   /**
    * @return the outProcessServiceInterface
    */
-  public IType getOutProcessServiceInterface() {
-    return m_outProcessServiceInterface;
+  public IType getCreatedServiceInterface() {
+    return m_createdServiceInterface;
   }
 
   /**
    * @return the outFormData
    */
-  public IType getOutFormData() {
-    return m_outFormData;
-  }
-
-  /**
-   * @return the outForm
-   */
-  public IType getOutForm() {
-    return m_outForm;
-  }
-
-  /**
-   * gets the mainbox that was created.
-   * 
-   * @return
-   */
-  public IType getOutMainBox() {
-    return m_outMainBox;
+  public IType getCreatedFormData() {
+    return m_createdFormData;
   }
 
   /**
    * @return the outReadPermission
    */
-  public IType getOutReadPermission() {
-    return m_outReadPermission;
+  public IType getCreatedReadPermission() {
+    return m_createdReadPermission;
   }
 
   /**
    * @return the outCreatePermission
    */
-  public IType getOutCreatePermission() {
-    return m_outCreatePermission;
+  public IType getCreatedCreatePermission() {
+    return m_createdCreatePermission;
   }
 
   /**
    * @return the outUpdatePermission
    */
-  public IType getOutUpdatePermission() {
-    return m_outUpdatePermission;
+  public IType getCreatedUpdatePermission() {
+    return m_createdUpdatePermission;
   }
 
   /**
    * @return the outNewHandler
    */
   public IType getOutNewHandler() {
-    return m_outNewHandler;
-  }
-
-  public IMethod getOutMainBoxGetterMethod() {
-    return m_outMainBoxGetterMethod;
+    return m_createdNewHandler;
   }
 
   /**
    * @return the outModifyHandler
    */
   public IType getOutModifyHandler() {
-    return m_outModifyHandler;
-  }
-
-  public void setFormatSource(boolean formatSource) {
-    m_formatSource = formatSource;
-  }
-
-  public boolean isFormatSource() {
-    return m_formatSource;
-  }
-
-  public String getFormPackage() {
-    return m_formPackage;
-  }
-
-  public void setFormPackage(String formPackage) {
-    m_formPackage = formPackage;
+    return m_createdModifyHandler;
   }
 
   public String getFormDataPackage() {
@@ -709,54 +624,6 @@ public class FormStackNewOperation implements IOperation {
 
   public void setPermissionUpdatePackage(String permissionUpdatePackage) {
     m_permissionUpdatePackage = permissionUpdatePackage;
-  }
-
-  public boolean isCreateExecStore() {
-    return m_createExecStore;
-  }
-
-  public void setCreateExecStore(boolean createExecStore) {
-    m_createExecStore = createExecStore;
-  }
-
-  public boolean isCreateExecLoad() {
-    return m_createExecLoad;
-  }
-
-  public void setCreateExecLoad(boolean createExecLoad) {
-    m_createExecLoad = createExecLoad;
-  }
-
-  public boolean isCreatePrepareCreateMethod() {
-    return m_createPrepareCreateMethod;
-  }
-
-  public void setCreatePrepareCreateMethod(boolean createPrepareCreateMethod) {
-    m_createPrepareCreateMethod = createPrepareCreateMethod;
-  }
-
-  public boolean isCreateCreateMethod() {
-    return m_createCreateMethod;
-  }
-
-  public void setCreateCreateMethod(boolean createCreateMethod) {
-    m_createCreateMethod = createCreateMethod;
-  }
-
-  public boolean isCreateLoadMethod() {
-    return m_createLoadMethod;
-  }
-
-  public void setCreateLoadMethod(boolean createLoadMethod) {
-    m_createLoadMethod = createLoadMethod;
-  }
-
-  public boolean isCreateStoreMethod() {
-    return m_createStoreMethod;
-  }
-
-  public void setCreateStoreMethod(boolean createStoreMethod) {
-    m_createStoreMethod = createStoreMethod;
   }
 
   public String getServiceImplementationSuperTypeSignature() {

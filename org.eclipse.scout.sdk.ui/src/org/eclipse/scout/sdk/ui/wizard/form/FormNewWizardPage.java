@@ -31,10 +31,10 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -81,7 +81,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   public FormNewWizardPage(IScoutBundle clientBundle) {
     super(FormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    m_abstractForm = RuntimeClasses.getSuperType(RuntimeClasses.IForm, m_clientBundle.getJavaProject());
+    m_abstractForm = RuntimeClasses.getSuperType(RuntimeClasses.IForm, ScoutUtility.getJavaProject(m_clientBundle));
 
     setTitle(Texts.get("CreateANewForm"));
     setDescription(Texts.get("CreateANewForm"));
@@ -136,7 +136,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iForm, getClientBundle().getJavaProject(), m_abstractForm), labelColWidthPercent);
+        new JavaElementAbstractTypeContentProvider(iForm, ScoutUtility.getJavaProject(getClientBundle()), m_abstractForm), labelColWidthPercent);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -207,15 +207,17 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   void fillOperation(FormStackNewOperation operation) {
-    operation.setCreateIdProperty(isCreateFormId());
-    operation.setFormIdName(getFormId());
-    operation.setFormName(getTypeName());
+    if (StringUtility.hasText(getFormId())) {
+      operation.setFormIdSignature(SignatureCache.createTypeSignature(Long.class.getName()));
+      operation.setFormIdName(getFormId());
+    }
+
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      operation.setFormSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
   }
 
@@ -239,7 +241,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusTargetPackge() {
     if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
-      return JavaElementValidator.validatePackageName(getTargetPackage(null));
+      return ScoutUtility.validatePackageName(getTargetPackage(null));
     }
     else {
       return Status.OK_STATUS;

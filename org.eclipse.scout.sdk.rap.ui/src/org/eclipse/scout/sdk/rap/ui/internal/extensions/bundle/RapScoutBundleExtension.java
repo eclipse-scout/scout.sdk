@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.util.PropertyMap;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.osgi.framework.Version;
@@ -61,7 +61,7 @@ public class RapScoutBundleExtension implements INewScoutBundleHandler {
 
       String clientMobileBundleName = AbstractScoutProjectNewOperation.getPluginName(wizard.getProjectWizardPage().getProjectName(), wizard.getProjectWizardPage().getProjectNamePostfix(),
           CreateMobileClientPluginOperation.MOBILE_CLIENT_PROJECT_NAME_SUFFIX);
-      IStatus s = JavaElementValidator.validateNewBundleName(clientMobileBundleName);
+      IStatus s = ScoutUtility.validateNewBundleName(clientMobileBundleName);
       if (!s.isOK()) {
         return s;
       }

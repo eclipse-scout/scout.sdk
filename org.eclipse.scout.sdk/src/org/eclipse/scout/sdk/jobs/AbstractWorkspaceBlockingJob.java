@@ -24,10 +24,17 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 public abstract class AbstractWorkspaceBlockingJob extends Job {
 
   private boolean m_debug = false;
+  private Exception m_callerTrace;
 
   public AbstractWorkspaceBlockingJob(String name) {
     super(name);
     setRule(ResourcesPlugin.getWorkspace().getRoot());
+  }
+
+  @Override
+  public boolean shouldSchedule() {
+    m_callerTrace = new Exception("Job scheduled by:");
+    return super.shouldSchedule();
   }
 
   @Override
@@ -52,33 +59,24 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
   }
 
   private final IStatus doRun(IProgressMonitor monitor) {
-    Throwable exception = null;
     IWorkingCopyManager workingCopyManager = TypeCacheAccessor.createWorkingCopyManger();
     try {
       try {
         validate();
-        try {
-          run(monitor, workingCopyManager);
-        }
-        catch (Throwable e) {
-          ScoutSdk.logError("Error occured while running Operation job '" + getName() + "'.", e);
-          exception = e;
-        }
+        run(monitor, workingCopyManager);
       }
-      catch (IllegalArgumentException e) {
-        ScoutSdk.logError("validation of job '" + getName() + "' failed.", e);
+      catch (Exception e) {
+        e.initCause(m_callerTrace);
+        Status errorStatus = new Status(Status.ERROR, ScoutSdk.PLUGIN_ID, e.getMessage(), e);
+        ScoutSdk.log(errorStatus);
+        return errorStatus;
       }
     }
     finally {
       workingCopyManager.unregisterAll(monitor);
       monitor.done();
     }
-    if (exception != null) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Error occured while running operation job.", exception);
-    }
-    else {
-      return Status.OK_STATUS;
-    }
+    return Status.OK_STATUS;
   }
 
   protected void validate() throws IllegalArgumentException {

@@ -51,12 +51,11 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
-    m_operation = new SequenceBoxNewOperation(getDeclaringType(), true);
+    m_operation = new SequenceBoxNewOperation(m_page1.getTypeName(), getDeclaringType(), true);
     // write back members
     if (m_page1.getNlsName() != null) {
       m_operation.setNlsEntry(m_page1.getNlsName());
     }
-    m_operation.setTypeName(m_page1.getTypeName());
     if (m_page1.getSuperType() != null) {
       m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(m_page1.getSuperType().getFullyQualifiedName()));
     }

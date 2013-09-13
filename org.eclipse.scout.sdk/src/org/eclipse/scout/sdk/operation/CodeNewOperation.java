@@ -17,9 +17,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -30,12 +29,15 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -56,7 +58,6 @@ public class CodeNewOperation implements IOperation {
   private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
-  private String m_genericTypeSignature;
   private IJavaElement m_sibling;
   private boolean m_formatSource;
   // out members
@@ -89,7 +90,7 @@ public class CodeNewOperation implements IOperation {
   @SuppressWarnings("unchecked")
   private static void setStaticModifierRec(TypeDeclaration td) {
     @SuppressWarnings("rawtypes")
-	List l = td.modifiers();
+    List l = td.modifiers();
     Modifier modStatic = td.getAST().newModifier(Modifier.ModifierKeyword.STATIC_KEYWORD);
     boolean isStatic = false;
     for (Object o : l) { // check if a static modifier is already present (contains does not work)
@@ -150,61 +151,45 @@ public class CodeNewOperation implements IOperation {
     codeOp.setSibling(getSibling());
     codeOp.setOrderDefinitionType(iCode);
     codeOp.setSuperTypeSignature(getSuperTypeSignature());
-    codeOp.setTypeModifiers(Flags.AccPublic | Flags.AccStatic);
+    codeOp.setFlags(Flags.AccPublic | Flags.AccStatic);
+    // version id
+    codeOp.addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
+    // nls text
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(codeOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
+      nlsSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      codeOp.addMethodSourceBuilder(nlsSourceBuilder);
+    }
+    // id
+    IMethodSourceBuilder getIdMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(codeOp.getSourceBuilder(), "getId");
+    String idSignature = getIdMethodBuilder.getReturnTypeSignature();
+    // id field
+    FieldSourceBuilder idFieldBuilder = new FieldSourceBuilder("ID") {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        super.createSource(source, lineDelimiter, ownerProject, validator);
+        if ("null".equals(getValue())) {
+          source.append(ScoutUtility.getCommentBlock("Auto-generated value"));
+        }
+      }
+    };
+    idFieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+    idFieldBuilder.setSignature(idSignature);
+    String nextCodeId = getNextCodeId();
+    if (StringUtility.isNullOrEmpty(nextCodeId)) {
+      idFieldBuilder.setValue("null");
+    }
+    else {
+      idFieldBuilder.setValue(nextCodeId);
+    }
+    codeOp.addFieldSourceBuilder(idFieldBuilder);
+    // getId method
+    getIdMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return ID;"));
+    codeOp.addMethodSourceBuilder(getIdMethodBuilder);
+    // create type
     codeOp.validate();
     codeOp.run(monitor, workingCopyManager);
     m_createdCode = codeOp.getCreatedType();
-
-    FieldCreateOperation versionUidOp = new FieldCreateOperation(getCreatedCode(), "serialVersionUID", false);
-    versionUidOp.setFlags(Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    versionUidOp.setSignature(Signature.SIG_LONG);
-    versionUidOp.setSimpleInitValue("1L");
-    versionUidOp.validate();
-    versionUidOp.run(monitor, workingCopyManager);
-
-    IJavaElement nlsMethodSibling = null;
-    String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
-    if (typeArguments != null && typeArguments.length > 0) {
-      String typeSig = getGenericTypeSignature();
-      if (typeSig.equals(typeArguments[0])) {
-        final boolean isCodeIdUndef = StringUtility.isNullOrEmpty(getNextCodeId());
-        final String todo = isCodeIdUndef ? ScoutUtility.getCommentBlock("Auto-generated value") : "";
-        final String codeId = isCodeIdUndef ? "null" : getNextCodeId();
-        FieldCreateOperation idOp = new FieldCreateOperation(getCreatedCode(), "ID", false) {
-          @Override
-          public void buildSource(StringBuilder builder, IImportValidator validator) throws JavaModelException {
-            super.buildSource(builder, validator);
-            builder.append(todo);
-          }
-        };
-
-        idOp.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
-        idOp.setSignature(typeSig);
-        idOp.setSimpleInitValue(codeId);
-        idOp.validate();
-        idOp.run(monitor, workingCopyManager);
-
-        MethodOverrideOperation getIdOp = new MethodOverrideOperation(getCreatedCode(), "getId", false);
-        getIdOp.setSimpleBody("return ID;");
-        getIdOp.setReturnTypeSignature(getGenericTypeSignature());
-        getIdOp.validate();
-        getIdOp.run(monitor, workingCopyManager);
-        nlsMethodSibling = getIdOp.getCreatedMethod();
-      }
-
-    }
-    if (getNlsEntry() != null) {
-      final IJavaElement finalSibing = nlsMethodSibling;
-      NlsTextMethodUpdateOperation confTextOp = new NlsTextMethodUpdateOperation(getCreatedCode(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TEXT, false) {
-        @Override
-        protected IJavaElement computeSibling() {
-          return finalSibing;
-        }
-      };
-      confTextOp.setNlsEntry(getNlsEntry());
-      confTextOp.validate();
-      confTextOp.run(monitor, workingCopyManager);
-    }
 
     if (isFormatSource()) {
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedCode(), true);
@@ -269,11 +254,4 @@ public class CodeNewOperation implements IOperation {
     return m_superTypeSignature;
   }
 
-  public void setGenericTypeSignature(String genericTypeSignature) {
-    m_genericTypeSignature = genericTypeSignature;
-  }
-
-  public String getGenericTypeSignature() {
-    return m_genericTypeSignature;
-  }
 }

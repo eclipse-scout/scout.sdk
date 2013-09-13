@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementC
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -43,7 +44,6 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.SWT;
@@ -78,7 +78,6 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   private EntityTextField m_entityField;
 
   // process members
-  private PageNewOperation m_operation;
 
   private boolean m_hoderTypeEnabled = true;
 
@@ -92,7 +91,6 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_PAGES));
     m_nameSuffix = "";
     setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IPageWithNodes, m_clientBundle.getJavaProject()));
-    setOperation(new PageNewOperation(true));
   }
 
   @Override
@@ -195,17 +193,15 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // write back members
-    getOperation().setClientBundle(getClientBundle());
-    getOperation().setNlsEntry(getNlsName());
-    getOperation().setTypeName(getTypeName());
-    getOperation().setPackageName(getClientBundle().getPackageName(getTargetPackage()));
+    PageNewOperation op = new PageNewOperation(getTypeName(), getClientBundle().getPackageName(getTargetPackage()), getClientBundle().getJavaProject());
+    op.setNlsEntry(getNlsName());
     IType superType = getSuperType();
     if (superType != null) {
-      getOperation().setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
+      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
-    getOperation().setHolderType(getHolderType());
-
-    getOperation().run(monitor, workingCopyManager);
+    op.setHolderType(getHolderType());
+    op.validate();
+    op.run(monitor, workingCopyManager);
     return true;
   }
 
@@ -224,7 +220,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusClientBundle() throws JavaModelException {
@@ -251,14 +247,6 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     else {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
     }
-  }
-
-  public void setOperation(PageNewOperation operation) {
-    m_operation = operation;
-  }
-
-  public PageNewOperation getOperation() {
-    return m_operation;
   }
 
   public IScoutBundle getClientBundle() {

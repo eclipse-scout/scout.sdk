@@ -13,28 +13,38 @@ package org.eclipse.scout.sdk.operation;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class WizardNewOperation implements IOperation {
 
-  private IScoutBundle m_clientBundle;
-  private String m_typeName;
+  private final String m_typeName;
+  private final String m_packageName;
+  private final IJavaProject m_javaProject;
+
   private String m_superTypeSignature;
   private INlsEntry m_nlsEntry;
   private boolean m_formatSource;
-  private String m_packageName;
 
   // operation member
   private IType m_createdWizard;
+
+  public WizardNewOperation(String typeName, String packageName, IJavaProject javaProject) {
+    m_typeName = typeName;
+    m_packageName = packageName;
+    m_javaProject = javaProject;
+
+  }
 
   @Override
   public String getOperationName() {
@@ -43,67 +53,52 @@ public class WizardNewOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
-    if (getClientBundle() == null) {
+    if (getJavaProject() == null) {
       throw new IllegalArgumentException("client bundle can not be null.");
     }
     if (StringUtility.isNullOrEmpty(getTypeName())) {
       throw new IllegalArgumentException("type name can not be null or empty.");
     }
-    if (StringUtility.isNullOrEmpty(getPackageName())) {
-      throw new IllegalArgumentException("package can not be null or empty.");
-    }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getClientBundle());
+
+    PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageName(), getJavaProject());
+    newOp.setFlags(Flags.AccPublic);
     newOp.setSuperTypeSignature(getSuperTypeSignature());
+    newOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    // constructor
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(newOp.getElementName());
+    constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
+    newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    // nls method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsTextMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TITLE);
+      nlsTextMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsTextMethodBuilder), nlsTextMethodBuilder);
+    }
+    newOp.setFormatSource(isFormatSource());
     newOp.run(monitor, workingCopyManager);
     m_createdWizard = newOp.getCreatedType();
     workingCopyManager.register(m_createdWizard.getCompilationUnit(), monitor);
-    // create constructor
-    ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(getCreatedWizard(), false);
-    constructorOp.setSimpleBody("super();");
-    constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.validate();
-    constructorOp.run(monitor, workingCopyManager);
-    // nls text
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(getCreatedWizard(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TITLE, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
 
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{getCreatedWizard().getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
-
-    if (m_formatSource) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedWizard(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
   }
 
   public IType getCreatedWizard() {
     return m_createdWizard;
   }
 
-  public void setClientBundle(IScoutBundle clientBundle) {
-    m_clientBundle = clientBundle;
-  }
-
-  public IScoutBundle getClientBundle() {
-    return m_clientBundle;
-  }
-
   public String getTypeName() {
     return m_typeName;
   }
 
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public IJavaProject getJavaProject() {
+    return m_javaProject;
   }
 
   public String getSuperTypeSignature() {
@@ -130,11 +125,4 @@ public class WizardNewOperation implements IOperation {
     m_formatSource = formatSource;
   }
 
-  public String getPackageName() {
-    return m_packageName;
-  }
-
-  public void setPackageName(String packageName) {
-    m_packageName = packageName;
-  }
 }

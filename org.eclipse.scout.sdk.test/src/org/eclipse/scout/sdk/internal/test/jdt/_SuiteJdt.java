@@ -21,7 +21,9 @@ import org.junit.runners.Suite.SuiteClasses;
  *
  */
 @RunWith(Suite.class)
-@SuiteClasses({JavaProjectTests.class,})
+@SuiteClasses({
+    JavaProjectTests.class
+})
 public class _SuiteJdt {
 
 }

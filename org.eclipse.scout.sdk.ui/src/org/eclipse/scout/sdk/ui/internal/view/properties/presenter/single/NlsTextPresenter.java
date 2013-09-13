@@ -15,13 +15,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.ILazyProposalContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -32,13 +28,15 @@ import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextSelectionHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodPresenter;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility.CustomImplementationException;
+import org.eclipse.scout.sdk.workspace.type.config.parser.NlsPropertySourceParser;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -51,6 +49,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   private INlsEntry m_currentSourceTuple;
   private INlsProject m_nlsProject;
   private OptimisticLock storeValueLock = new OptimisticLock();
+  private NlsPropertySourceParser m_parser;
 
   public NlsTextPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -94,33 +93,44 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
     INlsProject newNlsProject = resolveNlsProject(method);
     if (!CompareUtility.equals(newNlsProject, m_nlsProject)) {
       m_nlsProject = newNlsProject;
+      m_parser = new NlsPropertySourceParser(m_nlsProject);
       m_proposalField.setLabelProvider(createLabelProvider(getNlsProject()));
       m_proposalField.setContentProvider(createContentProvider(getNlsProject()));
       m_proposalField.setSelectionHandler(createSelectionHandler(getNlsProject()));
       m_proposalField.setEnabled(getNlsProject() != null);
     }
 
-    BooleanHolder isNlsText = new BooleanHolder();
-    String currentSourceValueKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeValue(), isNlsText);
     try {
       storeValueLock.acquire();
-      if (currentSourceValueKey != null) {
-        if (isNlsText.getValue()) {
-          m_currentSourceTuple = getNlsProject().getEntry(currentSourceValueKey);
-          if (m_currentSourceTuple == null) {
-            throw new CoreException(new ScoutStatus(Status.WARNING, "Key '" + currentSourceValueKey + "' not found!", null));
-          }
-          else {
-            m_proposalField.acceptProposal(m_currentSourceTuple);
-          }
-        }
-        else {
-          throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + currentSourceValueKey + "'.", null));
+      // check text only
+      try {
+        String simpleText = PropertyMethodSourceUtility.parseReturnParameterString(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+        if (simpleText != null) {
+          throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + simpleText + "'.", null));
         }
       }
-      else {
-        m_proposalField.acceptProposal(null);
+      catch (CustomImplementationException e) {
+        // void try to resolve nls entry
+        m_currentSourceTuple = getParser().parseSourceValue(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+        m_proposalField.acceptProposal(m_currentSourceTuple);
       }
+//      if (currentSourceValueKey != null) {
+//        if (isNlsText.getValue()) {
+//          m_currentSourceTuple = getNlsProject().getEntry(currentSourceValueKey);
+//          if (m_currentSourceTuple == null) {
+//            throw new CoreException(new ScoutStatus(Status.WARNING, "Key '" + currentSourceValueKey + "' not found!", null));
+//          }
+//          else {
+//            m_proposalField.acceptProposal(m_currentSourceTuple);
+//          }
+//        }
+//        else {
+//          throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + currentSourceValueKey + "'.", null));
+//        }
+//      }
+//      else {
+//        m_proposalField.acceptProposal(null);
+//      }
       m_proposalField.setEnabled(true);
     }
     finally {
@@ -137,6 +147,10 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
    */
   protected INlsProject resolveNlsProject(ConfigurationMethod method) {
     return ScoutTypeUtility.findNlsProject(method.getType());
+  }
+
+  public NlsPropertySourceParser getParser() {
+    return m_parser;
   }
 
   /**
@@ -207,31 +221,47 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   protected synchronized void storeNlsText(final INlsEntry proposal) throws CoreException {
     try {
       if (storeValueLock.acquire()) {
-        IOperation op = null;
-        INlsEntry defaultTuple = null;
-        String defaultKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
-        if (defaultKey != null) {
-          defaultTuple = getNlsProject().getEntry(defaultKey);
-        }
-        if (UiUtility.equals(defaultTuple, proposal)) {
-          if (getMethod().isImplemented()) {
-            op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-          }
-        }
-        else {
-          if (proposal != null) {
-            op = new NlsTextMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), false);
-            ((NlsTextMethodUpdateOperation) op).setNlsEntry(proposal);
-          }
-        }
-        if (op != null) {
-          new OperationJob(op).schedule();
-        }
+        ConfigPropertyUpdateOperation<INlsEntry> updateOp = new ConfigPropertyUpdateOperation<INlsEntry>(getMethod(), getParser());
+        updateOp.setValue(proposal);
+        OperationJob job = new OperationJob(updateOp);
+        job.setDebug(true);
+        job.schedule();
       }
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
     finally {
       storeValueLock.release();
     }
+
+//    try {
+//      if (storeValueLock.acquire()) {
+//        IOperation op = null;
+//        INlsEntry defaultTuple = null;
+//        String defaultKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
+//        if (defaultKey != null) {
+//          defaultTuple = getNlsProject().getEntry(defaultKey);
+//        }
+//        if (UiUtility.equals(defaultTuple, proposal)) {
+//          if (getMethod().isImplemented()) {
+//            op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
+//          }
+//        }
+//        else {
+//          if (proposal != null) {
+//            op = new NlsTextMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), false);
+//            ((NlsTextMethodUpdateOperation) op).setNlsEntry(proposal);
+//          }
+//        }
+//        if (op != null) {
+//          new OperationJob(op).schedule();
+//        }
+//      }
+//    }
+//    finally {
+//      storeValueLock.release();
+//    }
   }
 
   public INlsProject getNlsProject() {

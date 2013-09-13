@@ -118,10 +118,8 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    CalendarItemProviderNewOperation operation = new CalendarItemProviderNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    CalendarItemProviderNewOperation operation = new CalendarItemProviderNewOperation(getTypeName(), m_declaringType, true);
     // write back members
-    operation.setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
@@ -136,7 +134,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     }
     operation.validate();
     operation.run(monitor, workingCopyManager);
-    m_createdField = operation.getCreatedField();
+    m_createdField = operation.getCreatedType();
     return true;
   }
 

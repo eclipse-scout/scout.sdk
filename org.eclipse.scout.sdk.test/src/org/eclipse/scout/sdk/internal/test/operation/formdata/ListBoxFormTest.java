@@ -11,62 +11,76 @@
 package org.eclipse.scout.sdk.internal.test.operation.formdata;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ListBoxFormTest extends AbstractScoutSdkTest {
-
-  private IType m_formData;
-
-  @BeforeClass
-  public static void setUpWorkspace() throws Exception {
-    setupWorkspace("operation/formData", "formdata.shared", "formdata.client");
-  }
-
-  @Before
-  public void testCreateFormData() throws Exception {
-    if (m_formData == null) {
-      String formName = "ListBoxForm";
-      IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
-      Assert.assertTrue(TypeUtility.exists(form));
-
-      IProject sharedProject = getProject("formdata.shared");
-      Assert.assertNotNull(sharedProject);
-
-      FormDataUpdateOperation op = new FormDataUpdateOperation(form);
-      OperationJob job = new OperationJob(op);
-      job.schedule();
-      job.join();
-      buildWorkspace();
-      m_formData = op.getFormDataType();
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertEquals(m_formData.getFullyQualifiedName(), "formdata.shared.services.process." + formName + "Data");
-      Assert.assertEquals(m_formData.getSuperclassTypeSignature(), "QAbstractFormData;");
-    }
-  }
+public class ListBoxFormTest extends AbstractSdkTestWithFormDataProject {
 
   @Test
-  public void testListBox() throws Exception {
-    IType listBox = m_formData.getType("ListBox");
-    Assert.assertTrue(TypeUtility.exists(listBox));
-    Assert.assertEquals("QAbstractValueFieldData<[QLong;>;", listBox.getSuperclassTypeSignature());
-    IMethod tableFieldGetter = TypeUtility.getMethod(m_formData, "getListBox");
-    Assert.assertTrue(TypeUtility.exists(tableFieldGetter));
-    Assert.assertEquals(tableFieldGetter.getReturnType(), "QListBox;");
+  public void testCreateFormData() throws Exception {
+    String formName = "ListBoxForm";
+    IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
+    Assert.assertTrue(TypeUtility.exists(form));
+
+    IProject sharedProject = getProject("formdata.shared");
+    Assert.assertNotNull(sharedProject);
+
+    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
+
+    FormDataUpdateOperation op = new FormDataUpdateOperation(form, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+
+    testApiOfListBoxFormData();
   }
 
-  @AfterClass
-  public static void cleanUp() throws Exception {
-    clearWorkspace();
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfListBoxFormData() throws Exception {
+    // type ListBoxFormData
+    IType listBoxFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.ListBoxFormData");
+    SdkAssert.assertHasFlags(listBoxFormData, 1);
+    SdkAssert.assertHasSuperTypeSignature(listBoxFormData, "QAbstractFormData;");
+
+    // fields of ListBoxFormData
+    SdkAssert.assertEquals("field count of 'ListBoxFormData'", 1, listBoxFormData.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(listBoxFormData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    SdkAssert.assertEquals("method count of 'ListBoxFormData'", 2, listBoxFormData.getMethods().length);
+    IMethod listBoxFormData1 = SdkAssert.assertMethodExist(listBoxFormData, "ListBoxFormData", new String[]{});
+    SdkAssert.assertTrue(listBoxFormData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(listBoxFormData1, "V");
+    IMethod getListBox = SdkAssert.assertMethodExist(listBoxFormData, "getListBox", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getListBox, "QListBox;");
+
+    SdkAssert.assertEquals("inner types count of 'ListBoxFormData'", 1, listBoxFormData.getTypes().length);
+    // type ListBox
+    IType listBox = SdkAssert.assertTypeExists(listBoxFormData, "ListBox");
+    SdkAssert.assertHasFlags(listBox, 9);
+    SdkAssert.assertHasSuperTypeSignature(listBox, "QAbstractValueFieldData<[QLong;>;");
+
+    // fields of ListBox
+    SdkAssert.assertEquals("field count of 'ListBox'", 1, listBox.getFields().length);
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(listBox, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID1, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID1, "J");
+
+    SdkAssert.assertEquals("method count of 'ListBox'", 1, listBox.getMethods().length);
+    IMethod listBox1 = SdkAssert.assertMethodExist(listBox, "ListBox", new String[]{});
+    SdkAssert.assertTrue(listBox1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(listBox1, "V");
+
+    SdkAssert.assertEquals("inner types count of 'ListBox'", 0, listBox.getTypes().length);
   }
+
 }

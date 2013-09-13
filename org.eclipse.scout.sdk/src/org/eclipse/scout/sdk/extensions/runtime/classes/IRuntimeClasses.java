@@ -78,6 +78,7 @@ public interface IRuntimeClasses {
   String InputValidation = "org.eclipse.scout.rt.shared.validate.InputValidation"; // NO_UCD
   String VetoException = "org.eclipse.scout.commons.exception.VetoException"; // NO_UCD
   String ResourceServlet = "org.eclipse.scout.rt.server.ResourceServlet"; // NO_UCD
+  String UserAgentUtility = "org.eclipse.scout.rt.shared.ui.UserAgentUtility"; // NO_UCD
 
   String AbstractFormData = "org.eclipse.scout.rt.shared.data.form.AbstractFormData"; // NO_UCD
   String AbstractFormFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData"; // NO_UCD
@@ -99,6 +100,17 @@ public interface IRuntimeClasses {
   String AbstractOkButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton"; // NO_UCD
   String AbstractResetButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton"; // NO_UCD
   String AbstractSearchButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton"; // NO_UCD
+  String AbstractCalendarField = "org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField"; // NO_UCD
+  String AbstractPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable"; // NO_UCD
+  String AbstractExtensiblePageWithTable = "org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithTable";// NO_UCD
+  String AbstractWizardStep = "org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep";// NO_UCD
+  String AbstractPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField";// NO_UCD
+  String AbstractExtensibleActivityMap = "org.eclipse.scout.rt.extension.client.ui.basic.activitymap.AbstractExtensibleActivityMap";// NO_UCD
+  String AbstractActivityMap = "org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap";// NO_UCD
+  String AbstractTableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField";// NO_UCD
+  String AbstractTabBox = "org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox";// NO_UCD
+  String AbstractTreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField"; // NO_UCD
+  String AbstractTreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox"; // NO_UCD
 
   String IAccessControlService = "org.eclipse.scout.rt.shared.services.common.security.IAccessControlService";
   String IValidationStrategy = "org.eclipse.scout.rt.shared.validate.IValidationStrategy"; // NO_UCD
@@ -119,11 +131,21 @@ public interface IRuntimeClasses {
   String ICode = "org.eclipse.scout.rt.shared.services.common.code.ICode"; // NO_UCD
   String ICodeType = "org.eclipse.scout.rt.shared.services.common.code.ICodeType"; // NO_UCD
   String IColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn"; // NO_UCD
+  /**
+   * @deprecated use {@link IRuntimeClasses#IDataModelAttribute}
+   */
+  @Deprecated
   String IComposerAttribute = "org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute"; // NO_UCD
+  /**
+   * @deprecated use {@link IRuntimeClasses#IDataModelAttribute}
+   */
+  @Deprecated
   String IComposerEntity = "org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity"; // NO_UCD
   String IComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField"; // NO_UCD
   String ICompositeField = "org.eclipse.scout.rt.client.ui.form.fields.ICompositeField"; // NO_UCD
   String ICustomField = "org.eclipse.scout.rt.client.ui.form.fields.customfield.ICustomField"; // NO_UCD
+  String IDataModelAttribute = "org.eclipse.scout.rt.shared.data.model.IDataModelAttribute";// NO_UCD
+  String IDataModelEntity = "org.eclipse.scout.rt.shared.data.model.IDataModelEntity";// NO_UCD
   String IDateField = "org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"; // NO_UCD
   String IDesktop = "org.eclipse.scout.rt.client.ui.desktop.IDesktop"; // NO_UCD
   String IDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension"; // NO_UCD

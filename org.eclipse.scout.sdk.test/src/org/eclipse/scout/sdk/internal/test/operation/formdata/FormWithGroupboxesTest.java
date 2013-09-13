@@ -11,87 +11,100 @@
 package org.eclipse.scout.sdk.internal.test.operation.formdata;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class FormWithGroupboxesTest extends AbstractScoutSdkTest {
+public class FormWithGroupboxesTest extends AbstractSdkTestWithFormDataProject {
 
-  private IType m_formData;
-
-  @BeforeClass
-  public static void setUpWorkspace() throws Exception {
-    setupWorkspace("operation/formData", "formdata.shared", "formdata.client");
-  }
-
-  @Before
+  @Test
   public void testCreateFormData() throws Exception {
-    if (m_formData == null) {
-      String formName = "FormWithGroupBoxesForm";
-      IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
-      Assert.assertTrue(TypeUtility.exists(form));
+    String formName = "FormWithGroupBoxesForm";
+    IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
+    Assert.assertTrue(TypeUtility.exists(form));
 
-      IProject sharedProject = getProject("formdata.shared");
-      Assert.assertNotNull(sharedProject);
+    IProject sharedProject = getProject("formdata.shared");
+    Assert.assertNotNull(sharedProject);
 
-      FormDataUpdateOperation op = new FormDataUpdateOperation(form);
-      OperationJob job = new OperationJob(op);
-      job.schedule();
-      job.join();
-      buildWorkspace();
-      m_formData = op.getFormDataType();
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertEquals(m_formData.getFullyQualifiedName(), "formdata.shared.services.process." + formName + "Data");
-      Assert.assertEquals(m_formData.getSuperclassTypeSignature(), "QAbstractFormData;");
-    }
+    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
+
+    FormDataUpdateOperation op = new FormDataUpdateOperation(form, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+
+    testApiOfFormWithGroupBoxesFormData();
+
   }
 
-  public void testIgnoreGroupBox() throws Exception {
-    IType stringField = m_formData.getType("InnerBox");
-    Assert.assertFalse(TypeUtility.exists(stringField));
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfFormWithGroupBoxesFormData() throws Exception {
+    // type FormWithGroupBoxesFormData
+    IType formWithGroupBoxesFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.FormWithGroupBoxesFormData");
+    SdkAssert.assertHasFlags(formWithGroupBoxesFormData, 1);
+    SdkAssert.assertHasSuperTypeSignature(formWithGroupBoxesFormData, "QAbstractFormData;");
+
+    // fields of FormWithGroupBoxesFormData
+    SdkAssert.assertEquals("field count of 'FormWithGroupBoxesFormData'", 1, formWithGroupBoxesFormData.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(formWithGroupBoxesFormData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    SdkAssert.assertEquals("method count of 'FormWithGroupBoxesFormData'", 3, formWithGroupBoxesFormData.getMethods().length);
+    IMethod formWithGroupBoxesFormData1 = SdkAssert.assertMethodExist(formWithGroupBoxesFormData, "FormWithGroupBoxesFormData", new String[]{});
+    SdkAssert.assertTrue(formWithGroupBoxesFormData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(formWithGroupBoxesFormData1, "V");
+    IMethod getFlatString = SdkAssert.assertMethodExist(formWithGroupBoxesFormData, "getFlatString", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getFlatString, "QFlatString;");
+    IMethod getInnerInteger = SdkAssert.assertMethodExist(formWithGroupBoxesFormData, "getInnerInteger", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getInnerInteger, "QInnerInteger;");
+
+    SdkAssert.assertEquals("inner types count of 'FormWithGroupBoxesFormData'", 2, formWithGroupBoxesFormData.getTypes().length);
+    // type FlatString
+    IType flatString = SdkAssert.assertTypeExists(formWithGroupBoxesFormData, "FlatString");
+    SdkAssert.assertHasFlags(flatString, 9);
+    SdkAssert.assertHasSuperTypeSignature(flatString, "QAbstractValueFieldData<QString;>;");
+
+    // fields of FlatString
+    SdkAssert.assertEquals("field count of 'FlatString'", 1, flatString.getFields().length);
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(flatString, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID1, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID1, "J");
+
+    SdkAssert.assertEquals("method count of 'FlatString'", 2, flatString.getMethods().length);
+    IMethod flatString1 = SdkAssert.assertMethodExist(flatString, "FlatString", new String[]{});
+    SdkAssert.assertTrue(flatString1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(flatString1, "V");
+    IMethod initValidationRules = SdkAssert.assertMethodExist(flatString, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(initValidationRules, "V");
+    SdkAssert.assertAnnotation(initValidationRules, "java.lang.Override");
+    SdkAssert.assertMethodValidationRules(initValidationRules, new String[]{"ruleMap.put(ValidationRule.MAX_LENGTH, 4000);"}, true);
+
+    SdkAssert.assertEquals("inner types count of 'FlatString'", 0, flatString.getTypes().length);
+    // type InnerInteger
+    IType innerInteger = SdkAssert.assertTypeExists(formWithGroupBoxesFormData, "InnerInteger");
+    SdkAssert.assertHasFlags(innerInteger, 9);
+    SdkAssert.assertHasSuperTypeSignature(innerInteger, "QAbstractValueFieldData<QInteger;>;");
+
+    // fields of InnerInteger
+    SdkAssert.assertEquals("field count of 'InnerInteger'", 1, innerInteger.getFields().length);
+    IField serialVersionUID2 = SdkAssert.assertFieldExist(innerInteger, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID2, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID2, "J");
+
+    SdkAssert.assertEquals("method count of 'InnerInteger'", 1, innerInteger.getMethods().length);
+    IMethod innerInteger1 = SdkAssert.assertMethodExist(innerInteger, "InnerInteger", new String[]{});
+    SdkAssert.assertTrue(innerInteger1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(innerInteger1, "V");
+
+    SdkAssert.assertEquals("inner types count of 'InnerInteger'", 0, innerInteger.getTypes().length);
   }
 
-  @Test
-  public void testFlatField() throws Exception {
-    // string field
-    IType stringField = m_formData.getType("FlatString");
-    Assert.assertTrue(TypeUtility.exists(stringField));
-    Assert.assertEquals("QAbstractValueFieldData<QString;>;", stringField.getSuperclassTypeSignature());
-    IMethod stringGetter = TypeUtility.getMethod(m_formData, "getFlatString");
-    Assert.assertTrue(TypeUtility.exists(stringGetter));
-    Assert.assertEquals(stringGetter.getReturnType(), "QFlatString;");
-  }
-
-  @Test
-  public void testInnerFieldField() throws Exception {
-    // string field
-    IType stringField = m_formData.getType("InnerInteger");
-    Assert.assertTrue(TypeUtility.exists(stringField));
-    Assert.assertEquals("QAbstractValueFieldData<QInteger;>;", stringField.getSuperclassTypeSignature());
-    IMethod stringGetter = TypeUtility.getMethod(m_formData, "getInnerInteger");
-    Assert.assertTrue(TypeUtility.exists(stringGetter));
-    Assert.assertEquals(stringGetter.getReturnType(), "QInnerInteger;");
-  }
-
-  @Test
-  public void testIgnoredIntegerFieldField() throws Exception {
-    IType ignoredField = m_formData.getType("IgnoredInteger");
-    Assert.assertFalse(TypeUtility.exists(ignoredField));
-    IMethod ignoredGetter = TypeUtility.getMethod(m_formData, "getIgnoredInteger");
-    Assert.assertFalse(TypeUtility.exists(ignoredGetter));
-  }
-
-  @AfterClass
-  public static void cleanUp() throws Exception {
-    clearWorkspace();
-  }
 }

@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.util.type;
 
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -38,6 +40,16 @@ public final class MethodFilters {
         annotation = method.getAnnotation(annotationType.getFullyQualifiedName());
         return TypeUtility.exists(annotation);
       }
+
+      @Override
+      public String toString() {
+        StringBuilder text = new StringBuilder();
+        text.append("filter for method with annotation ");
+        if (annotationType != null) {
+          text.append(annotationType.getFullyQualifiedName());
+        }
+        return text.toString();
+      }
     };
   }
 
@@ -51,6 +63,16 @@ public final class MethodFilters {
       public boolean accept(IMethod method) {
         return method.getElementName().equals(methodName);
       }
+
+      @Override
+      public String toString() {
+        StringBuilder text = new StringBuilder();
+        text.append("filter for method with method name ");
+        if (methodName != null) {
+          text.append(methodName);
+        }
+        return text.toString();
+      }
     };
   }
 
@@ -59,6 +81,16 @@ public final class MethodFilters {
       @Override
       public boolean accept(IMethod method) {
         return regex.matcher(method.getElementName()).matches();
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder text = new StringBuilder();
+        text.append("filter for method where method name matches regex ");
+        if (regex != null) {
+          text.append(regex.toString());
+        }
+        return text.toString();
       }
     };
   }
@@ -74,6 +106,15 @@ public final class MethodFilters {
           SdkUtilActivator.logError("could not get flags of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.", e);
           return false;
         }
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder text = new StringBuilder();
+        text.append("filter for method with method flags [ ");
+        text.append(Flags.toString(flags));
+        text.append("]");
+        return text.toString();
       }
     };
   }
@@ -120,7 +161,7 @@ public final class MethodFilters {
   public static IMethodFilter getMultiMethodFilter(final IMethodFilter... filters) {
     return new IMethodFilter() {
       @Override
-      public boolean accept(IMethod method) {
+      public boolean accept(IMethod method) throws CoreException {
         if (filters == null) {
           return true;
         }
@@ -129,9 +170,25 @@ public final class MethodFilters {
             if (!f.accept(method)) {
               return false;
             }
+
           }
           return true;
         }
+      }
+
+      @Override
+      public String toString() {
+        StringBuilder text = new StringBuilder();
+        text.append("filters{");
+        if (filters != null) {
+          for (int i = 0; i < filters.length; i++) {
+            text.append(filters[i]);
+            if (i < filters.length - 1) {
+              text.append(", ");
+            }
+          }
+        }
+        return text.toString();
       }
     };
   }

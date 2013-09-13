@@ -10,17 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 
@@ -34,7 +44,7 @@ public class ExecResetSearchFilterMethodPresenter extends ExecMethodPresenter {
   protected void overrideMethod() {
     if (!getMethod().isImplemented()) {
       try {
-        P_OverrideExecResetSearchFilterMethod methodOverrideOperation = new P_OverrideExecResetSearchFilterMethod(getMethod().getType(), getMethod().getMethodName());
+        P_OverrideExecResetSearchFilterMethod methodOverrideOperation = new P_OverrideExecResetSearchFilterMethod(getMethod().getMethodName(), getMethod().getType());
         OperationJob job = new OperationJob(methodOverrideOperation);
         job.schedule();
         try {
@@ -46,7 +56,7 @@ public class ExecResetSearchFilterMethodPresenter extends ExecMethodPresenter {
           showJavaElementInEditor(methodOverrideOperation.getCreatedMethod());
         }
       }
-      catch (JavaModelException e) {
+      catch (CoreException e) {
         ScoutSdkUi.logWarning("could not override the method '" + getMethod().getMethodName() + "' on '" + getMethod().getType() + "'", e);
       }
     }
@@ -61,32 +71,45 @@ public class ExecResetSearchFilterMethodPresenter extends ExecMethodPresenter {
     /**
      * @param method
      * @param content
-     * @throws JavaModelException
+     * @throws CoreException
      */
-    public P_OverrideExecResetSearchFilterMethod(IType declaringType, String methodName) throws JavaModelException {
-      super(declaringType, methodName, true);
+    public P_OverrideExecResetSearchFilterMethod(String methodName, IType declaringType) throws CoreException {
+      super(methodName, declaringType);
+      setFormatSource(true);
       m_formDataType = null;
       m_formType = declaringType;
       ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       if (TypeUtility.exists(m_formType) && formHierarchy.isSubtype(iSearchForm, m_formType)) {
-        m_formDataType = ScoutTypeUtility.findFormDataForForm(m_formType);
+        String formDataSimpleName = m_formType.getElementName().replaceAll(SdkProperties.SUFFIX_FORM + "$", SdkProperties.SUFFIX_FORM_DATA);
+        IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getDeclaringType());
+        for (IScoutBundle shared : clientBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false)) {
+
+          String formDataFqn = DefaultTargetPackage.get(shared, IDefaultTargetPackage.SERVER_SERVICES) + "." + formDataSimpleName;
+          if (TypeUtility.existsType(formDataFqn)) {
+            m_formDataType = TypeUtility.getType(formDataFqn);
+            break;
+          }
+        }
       }
+
     }
 
     @Override
-    protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
       if (m_formDataType != null && m_formType != null) {
-        StringBuilder content = new StringBuilder();
-        content.append("super.execResetSearchFilter(searchFilter);\n");
-        String simpleFormDataName = validator.getTypeName(SignatureCache.createTypeSignature(m_formDataType.getFullyQualifiedName()));
-        content.append(simpleFormDataName + " formData = new " + simpleFormDataName + "();\n");
-        content.append("exportFormData(formData);\n");
-        content.append("searchFilter.setFormData(formData);");
-        return content.toString();
+        setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+          @Override
+          public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+            source.append("super.execResetSearchFilter(searchFilter);").append(lineDelimiter);
+            String simpleFormDataName = validator.getTypeName(SignatureCache.createTypeSignature(m_formDataType.getFullyQualifiedName()));
+            source.append(simpleFormDataName).append(" formData = new ").append(simpleFormDataName).append("();").append(lineDelimiter);
+            source.append("exportFormData(formData);").append(lineDelimiter);
+            source.append("searchFilter.setFormData(formData);");
+          }
+        });
       }
-      else {
-        return super.createMethodBody(validator);
-      }
+      super.run(monitor, workingCopyManager);
     }
+
   }
 }

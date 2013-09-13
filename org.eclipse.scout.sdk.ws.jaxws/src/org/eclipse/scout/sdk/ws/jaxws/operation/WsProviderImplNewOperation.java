@@ -21,14 +21,12 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -63,34 +61,25 @@ public class WsProviderImplNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutTypeNewOperation implNewTypeOp = new ScoutTypeNewOperation(m_typeName, m_packageName, m_bundle);
+    PrimaryTypeNewOperation implNewTypeOp = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
     if (TypeUtility.exists(m_portTypeInterfaceType)) {
       implNewTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(m_portTypeInterfaceType.getFullyQualifiedName()));
     }
     else {
       JaxWsSdk.logError("Could not link webservice provider to port type as port type could not be found");
     }
-    implNewTypeOp.run(monitor, workingCopyManager);
-    m_createdType = implNewTypeOp.getCreatedType();
-    workingCopyManager.register(m_createdType.getCompilationUnit(), monitor);
     if (TypeUtility.exists(m_portTypeInterfaceType)) {
       // override methods
       for (IMethod method : m_portTypeInterfaceType.getMethods()) {
-        MethodCreateOperation op = new MethodCreateOperation(m_createdType, method.getElementName());
-        op.setReturnTypeSignature(SignatureUtility.getReturnTypeSignatureResolved(method, m_portTypeInterfaceType));
-        op.setMethodFlags(method.getFlags());
-        op.setExceptionSignatures(method.getExceptionTypes());
-        String[] paramNames = method.getParameterNames();
-        op.setParameterNames(paramNames);
-        op.setParameterSignatures(SignatureUtility.getMethodParameterSignatureResolved(method, m_portTypeInterfaceType));
-        op.addAnnotation(new AnnotationCreateOperation(null, SignatureCache.createTypeSignature(Override.class.getName())));
-        op.run(monitor, workingCopyManager);
-
-        JavaElementFormatOperation wellFormOp = new JavaElementFormatOperation(op.getCreatedMethod(), true);
-        wellFormOp.validate();
-        wellFormOp.run(monitor, workingCopyManager);
+        IMethodSourceBuilder methodSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(implNewTypeOp.getSourceBuilder(), method.getElementName());
+        implNewTypeOp.addMethodSourceBuilder(methodSourceBuilder);
       }
     }
+
+    implNewTypeOp.setFormatSource(true);
+    implNewTypeOp.validate();
+    implNewTypeOp.run(monitor, workingCopyManager);
+    m_createdType = implNewTypeOp.getCreatedType();
 
     // create JAX-WS webservice annotation
     AnnotationUpdateOperation annotationOp = new AnnotationUpdateOperation();
@@ -153,7 +142,7 @@ public class WsProviderImplNewOperation implements IOperation {
       String typeName = Signature.getSimpleName(qualifiedTypeName);
       String packageName = Signature.getQualifier(qualifiedTypeName);
 
-      ScoutTypeNewOperation newTypeOp = new ScoutTypeNewOperation(typeName, packageName, m_bundle);
+      PrimaryTypeNewOperation newTypeOp = new PrimaryTypeNewOperation(typeName, packageName, m_bundle.getJavaProject());
       newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
       newTypeOp.run(monitor, workingCopyManager);
       type = newTypeOp.getCreatedType();

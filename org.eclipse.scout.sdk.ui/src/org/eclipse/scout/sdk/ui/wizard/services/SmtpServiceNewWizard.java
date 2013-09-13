@@ -51,7 +51,7 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
   private ServiceNewWizardPage m_serviceNewWizardPage;
   private BundleTreeWizardPage m_locationWizardPage;
   private ITreeNode m_locationWizardPageRoot;
-  private ServiceNewOperation m_operation = new ServiceNewOperation();
+  private ServiceNewOperation m_operation;
 
   public SmtpServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewSmtpService"));
@@ -91,19 +91,19 @@ public class SmtpServiceNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
+    m_operation = new ServiceNewOperation(null, m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
-      m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
+      m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
-      m_operation.setImplementationBundle(implementationBundle);
-      m_operation.setServicePackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
-      m_operation.setServiceName(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
+      m_operation.setImplementationProject(implementationBundle.getJavaProject());
+      m_operation.setImplementationPackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
     IScoutBundle[] serverRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
     for (IScoutBundle sb : serverRegBundles) {
-      m_operation.addServiceRegistrationBundle(sb);
+      m_operation.addServiceRegistrationProject(sb.getJavaProject());
     }
     return true;
   }

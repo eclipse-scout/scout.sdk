@@ -10,23 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.operation.formdata;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class ExternalCheckboxFieldTest extends AbstractScoutSdkTest {
-
-  @BeforeClass
-  public static void setUpWorkspace() throws Exception {
-    setupWorkspace("operation/formData", "formdata.shared", "formdata.client");
-  }
+public class ExternalCheckboxFieldTest extends AbstractSdkTestWithFormDataProject {
 
   @Test
   public void testCreateFormData() throws Exception {
@@ -34,24 +29,35 @@ public class ExternalCheckboxFieldTest extends AbstractScoutSdkTest {
     IType template = TypeUtility.getType("formdata.client.ui.template.formfield." + templateName);
     Assert.assertTrue(TypeUtility.exists(template));
 
-    IProject sharedProject = getProject("formdata.shared");
-    Assert.assertNotNull(sharedProject);
+    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(template, TypeUtility.getSuperTypeHierarchy(template));
 
-    FormDataUpdateOperation op = new FormDataUpdateOperation(template);
-    OperationJob job = new OperationJob(op);
-    job.schedule();
-    job.join();
-    buildWorkspace();
-    IType formData = op.getFormDataType();
-    Assert.assertTrue(TypeUtility.exists(formData));
-    Assert.assertTrue(TypeUtility.exists(formData));
-    Assert.assertEquals(formData.getFullyQualifiedName(), "formdata.shared.services.process." + templateName + "Data");
-    Assert.assertEquals(formData.getSuperclassTypeSignature(), "QAbstractValueFieldData<QBoolean;>;");
+    FormDataUpdateOperation op = new FormDataUpdateOperation(template, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    testApiOfAbstractTestCheckboxFieldData();
 
   }
 
-  @AfterClass
-  public static void cleanUp() throws Exception {
-    clearWorkspace();
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfAbstractTestCheckboxFieldData() throws Exception {
+    // type AbstractTestCheckboxFieldData
+    IType abstractTestCheckboxFieldData = SdkAssert.assertTypeExists("formdata.shared.services.process.AbstractTestCheckboxFieldData");
+    SdkAssert.assertHasFlags(abstractTestCheckboxFieldData, 1025);
+    SdkAssert.assertHasSuperTypeSignature(abstractTestCheckboxFieldData, "QAbstractValueFieldData<QBoolean;>;");
+
+    // fields of AbstractTestCheckboxFieldData
+    SdkAssert.assertEquals("field count of 'AbstractTestCheckboxFieldData'", 1, abstractTestCheckboxFieldData.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(abstractTestCheckboxFieldData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    SdkAssert.assertEquals("method count of 'AbstractTestCheckboxFieldData'", 1, abstractTestCheckboxFieldData.getMethods().length);
+    IMethod abstractTestCheckboxFieldData1 = SdkAssert.assertMethodExist(abstractTestCheckboxFieldData, "AbstractTestCheckboxFieldData", new String[]{});
+    SdkAssert.assertTrue(abstractTestCheckboxFieldData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(abstractTestCheckboxFieldData1, "V");
+
+    SdkAssert.assertEquals("inner types count of 'AbstractTestCheckboxFieldData'", 0, abstractTestCheckboxFieldData.getTypes().length);
   }
+
 }

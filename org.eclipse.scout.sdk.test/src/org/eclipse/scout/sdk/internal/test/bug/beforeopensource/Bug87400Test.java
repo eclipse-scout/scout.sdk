@@ -14,7 +14,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -43,7 +44,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("bugsBeforeOpensource/87400", "a", "a.client");
+    setupWorkspace("resources/bugsBeforeOpensource/87400", "a", "a.client");
   }
 
   @Test
@@ -83,8 +84,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
 
   @Test
   public void testGetScoutBundle_ScoutConfigPropertyMethod() throws Exception {
-    IType form = TypeUtility.getType("a.client.form.AForm");
-    Assert.assertTrue(TypeUtility.exists(form));
+    IType form = SdkAssert.assertTypeExists("a.client.form.AForm");
 
     IType mainBox = form.getType("MainBox");
     Assert.assertNotNull(mainBox);

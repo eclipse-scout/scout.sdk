@@ -19,12 +19,11 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.PropertyMap;
-import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.util.internal.typecache.JavaResourceChangedEmitter;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -43,7 +42,6 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setup() {
-    setAutoUpdateEnabled(false);
     ScoutSdkCore.getScoutWorkspace();
   }
 
@@ -103,15 +101,16 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
       SingleFormTemplateOperation op = new SingleFormTemplateOperation();
       op.setProperties(properties);
       op.init();
-      executeAndBuildWorkspace(op);
-      int severity = ScoutSeverityManager.getInstance().getSeverityOf(ResourcesPlugin.getWorkspace().getRoot(), IMarker.SEVERITY_WARNING);
-      if (severity >= IMarker.SEVERITY_ERROR) {
-        System.out.println();
-      }
-      Assert.assertTrue(severity < IMarker.SEVERITY_ERROR);
+      executeBuildAssertNoCompileErrors(op);
+
       JdtUtility.waitForIndexesReady();
       System.out.println("iForm exists " + iForm.exists() + "  " + iForm.getJavaProject().exists());
       subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getInWorkspaceFilter());
+//      if (subtypes.length == 0) {
+//        formHierarchy.invalidate();
+//        subtypes = formHierarchy.getAllSubtypes(iForm, TypeFilters.getInWorkspaceFilter());
+//        System.out.println(subtypes.length);
+//      }
       if (subtypes.length != 1) {
         System.out.println("NOT FIRED RESOURCES -------");
         for (ICompilationUnit icu : JavaResourceChangedEmitter.getPendingWorkingCopies()) {
@@ -143,14 +142,7 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
       OutlineTemplateOperation op = new OutlineTemplateOperation();
       op.setProperties(properties);
       op.init();
-      OperationJob job = new OperationJob(op);
-      job.schedule();
-      job.join();
-
-      buildWorkspace();
-
-      int severity = ScoutSeverityManager.getInstance().getSeverityOf(ResourcesPlugin.getWorkspace().getRoot());
-      Assert.assertTrue(severity < IMarker.SEVERITY_ERROR);
+      executeBuildAssertNoCompileErrors(op);
     }
     finally {
       clearWorkspace();

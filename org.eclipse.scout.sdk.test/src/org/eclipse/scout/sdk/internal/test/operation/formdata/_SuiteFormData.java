@@ -24,9 +24,11 @@ import org.junit.runners.Suite.SuiteClasses;
     FormWithTemplateTest.class,
     IgnoredFieldsFormTest.class,
     ListBoxFormTest.class,
-    ReplaceFormFiledTest.class,
+    ReplaceFormFiledTestNew.class,
     SimpleFormTest.class,
-    TableFieldFormTest.class})
+    TableFieldBeanTest.class,
+    TableFieldFormTest.class
+})
 public class _SuiteFormData {
 
 }

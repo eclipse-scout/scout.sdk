@@ -22,7 +22,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.NoSourceException;
@@ -454,23 +453,16 @@ public final class PropertyMethodSourceUtility {
    * @throws JavaModelException
    */
   public static String parseReturnParameterNlsKey(String input) throws CoreException {
-    return parseReturnParameterNlsKey(input, new BooleanHolder());
-  }
-
-  public static String parseReturnParameterNlsKey(String input, BooleanHolder isNlsText) throws CoreException {
-    isNlsText.setValue(false);
     if (input == null || input.trim().equals("null")) {
       return null;
     }
     Matcher m = REGEX_METHOD_RETURN_NON_NLS_TEXT.matcher(input);
     if (m.matches()) {
-      String s = m.group(1);
-      return s;
+      return null;
     }
     m = REGEX_METHOD_RETURN_NLS_TEXT.matcher(input);
     if (m.matches()) {
       String key = m.group(1);
-      isNlsText.setValue(true);
       return key;
     }
     throw new CustomImplementationException();

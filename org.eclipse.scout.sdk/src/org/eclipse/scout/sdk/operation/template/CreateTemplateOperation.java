@@ -22,9 +22,9 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -36,13 +36,14 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.annotation.FormDataAnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -116,9 +117,9 @@ public class CreateTemplateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutTypeNewOperation op = new ScoutTypeNewOperation(getTemplateName(), getPackageName(), getTemplateBundle()) {
+    ITypeSourceBuilder typeSourceBuilder = new TypeSourceBuilder(getTemplateName()) {
       @Override
-      protected void createContent(StringBuilder source, IImportValidator validator) {
+      protected void createTypeContent(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         try {
           int start = Integer.MAX_VALUE;
           int end = Integer.MIN_VALUE;
@@ -131,53 +132,42 @@ public class CreateTemplateOperation implements IOperation {
             }
           }
           if (start < end) {
-            source.append("\n");
-            source.append(getFormField().getCompilationUnit().getBuffer().getText(start, end - start));
-            source.append("\n");
+            source.append(lineDelimiter).append(getFormField().getCompilationUnit().getBuffer().getText(start, end - start)).append(lineDelimiter);
           }
         }
         catch (JavaModelException e) {
-
+          ScoutSdk.logWarning("Could not create template.");
         }
       }
     };
+    PrimaryTypeNewOperation op = new PrimaryTypeNewOperation(typeSourceBuilder, getPackageName(), ScoutUtility.getJavaProject(getTemplateBundle()));
 
     String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
+
     op.setSuperTypeSignature(superclassTypeSignature);
-    op.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
+    op.setFlags(Flags.AccAbstract | Flags.AccPublic);
     IScoutBundle sharedBundle = getTemplateBundle().getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    IType formDataType = null;
     if (isCreateExternalFormData() && sharedBundle != null) {
-      ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(getFormDataPackageSuffix()), sharedBundle);
-      formDataOp.setTypeModifiers(Flags.AccAbstract | Flags.AccPublic);
+      PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(getFormDataPackageSuffix()), sharedBundle.getJavaProject());
+      formDataOp.setFlags(Flags.AccAbstract | Flags.AccPublic);
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+      formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+      formDataOp.validate();
       formDataOp.run(monitor, workingCopyManager);
-
-      // add to exported packages
-      ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{formDataOp.getCreatedType().getPackageFragment()}, true);
-      manifestOp.run(monitor, workingCopyManager);
-
-      FormDataAnnotationCreateOperation formDataAnnotationOp = new FormDataAnnotationCreateOperation(null);
-      formDataAnnotationOp.setSdkCommand(SdkCommand.CREATE);
-      formDataAnnotationOp.setDefaultSubtypeCommand(DefaultSubtypeSdkCommand.CREATE);
-      formDataAnnotationOp.setFormDataSignature(SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName()));
-      op.addAnnotation(formDataAnnotationOp);
+      op.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation(SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName()), SdkCommand.CREATE, DefaultSubtypeSdkCommand.CREATE));
+      formDataType = op.getCreatedType();
     }
+    op.setPackageExportPolicy(ExportPolicy.AddPackage);
     op.validate();
     op.run(monitor, workingCopyManager);
     IType templateType = op.getCreatedType();
 
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{templateType.getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
-
-    JavaElementFormatOperation formatOp = new JavaElementFormatOperation(templateType, true);
-    formatOp.validate();
-    formatOp.run(monitor, workingCopyManager);
     workingCopyManager.reconcile(templateType.getCompilationUnit(), monitor);
 
     // form data
-    if (isCreateExternalFormData() && sharedBundle != null) {
-      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType);
+    if (isCreateExternalFormData() && sharedBundle != null && formDataType != null) {
+      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType, formDataType.getCompilationUnit());
       formDataUpdateOp.run(monitor, workingCopyManager);
     }
 
@@ -286,7 +276,7 @@ public class CreateTemplateOperation implements IOperation {
     if (TypeUtility.exists(type)) {
       if (hierarchy.isSubtype(iFormField, type)) {
         InnerTypeGetterCreateOperation op = new InnerTypeGetterCreateOperation(type, formType, true);
-        CompositeObject key = new CompositeObject(1, op.getMethodName());
+        CompositeObject key = new CompositeObject(1, op.getElementName());
         for (Entry<CompositeObject, IJavaElement> entry : siblings.entrySet()) {
           if (entry.getKey().compareTo(key) > 0) {
             op.setSibling(entry.getValue());

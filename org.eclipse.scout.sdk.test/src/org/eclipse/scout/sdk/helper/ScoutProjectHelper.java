@@ -16,7 +16,7 @@ import java.util.HashSet;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.operation.project.CreateUiSwingPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateUiSwtPluginOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -75,12 +75,10 @@ public final class ScoutProjectHelper {
     // execute scout project creation according to the properties defined
     ScoutProjectNewOperation mainOperation = new ScoutProjectNewOperation();
     mainOperation.setProperties(properties);
-    OperationJob job = new OperationJob(mainOperation);
-    job.schedule();
-    job.join();
+    TestWorkspaceUtility.executeAndBuildWorkspace(AbstractScoutSdkTest.SYSTEM_PROPERTIES_FORM_DATA_USER, mainOperation);
 
     // build and wait for silent workspace
-    AbstractScoutSdkTest.buildWorkspace();
+    TestWorkspaceUtility.buildWorkspace();
 
     // get scout workspace
     IScoutBundle[] rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());

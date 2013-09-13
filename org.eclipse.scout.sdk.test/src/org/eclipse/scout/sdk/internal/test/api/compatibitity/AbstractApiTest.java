@@ -10,11 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.api.compatibitity;
 
-import org.eclipse.jdt.core.IField;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.junit.BeforeClass;
 
 /**
@@ -26,7 +23,4 @@ public class AbstractApiTest extends AbstractScoutSdkTest {
     ScoutProjectHelper.setupNewProject("api.test.project", true, true, true);
   }
 
-  protected boolean hasFieldValue(IField field, int value) throws JavaModelException {
-    return CompareUtility.equals((Integer) field.getConstant(), Integer.valueOf(value));
-  }
 }

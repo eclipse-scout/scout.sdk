@@ -23,6 +23,7 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
@@ -393,7 +394,7 @@ public class ScoutStructuredType implements IStructuredType {
             m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
             break;
           case TYPE_COMPOSER_ENTRY:
-            visitTypeComposerEntry(unknownTypes);
+            visitTypeDataModelEntry(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_COMPOSER_ENTRY);
             m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
             break;
@@ -404,7 +405,7 @@ public class ScoutStructuredType implements IStructuredType {
             break;
         }
       }
-      catch (JavaModelException e) {
+      catch (CoreException e) {
         ScoutSdk.logError("could build sturucted type '" + m_type.getFullyQualifiedName() + "'.", e);
       }
     }
@@ -479,7 +480,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_CONSTRUCTOR, constructors.values().toArray(new IMethod[constructors.size()]));
   }
 
-  protected void visitMethodConfigExec(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+  protected void visitMethodConfigExec(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
     TreeMap<CompositeObject, IMethod> execMethods = new TreeMap<CompositeObject, IMethod>();
     IMethodFilter execMethodFilter = MethodFilters.getFilterWithAnnotation(TypeUtility.getType(RuntimeClasses.ConfigOperation));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -500,7 +501,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_CONFIG_EXEC, execMethods.values().toArray(new IMethod[execMethods.size()]));
   }
 
-  protected void visitMethodConfigProperty(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+  protected void visitMethodConfigProperty(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
     TreeMap<CompositeObject, IMethod> methods = new TreeMap<CompositeObject, IMethod>();
     IMethodFilter configPropertyMethodFilter = MethodFilters.getFilterWithAnnotation(TypeUtility.getType(RuntimeClasses.ConfigProperty));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -823,9 +824,9 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE, types.toArray(new IType[types.size()]));
   }
 
-  protected void visitTypeComposerEntry(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeDataModelEntry(ArrayList<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<IType>(TypeComparators.getTypeNameComparator());
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IComposerEntity), m_typeHierarchy));
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IDataModelEntity), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.accept(candidate)) {

@@ -28,6 +28,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -211,7 +212,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
     for (String fqn : defaults.values()) {
       IType t = TypeUtility.getType(fqn);
       if (TypeUtility.exists(t)) {
-        if (TypeUtility.isOnClasspath(t, context.getJavaProject())) {
+        if (TypeUtility.isOnClasspath(t, ScoutUtility.getJavaProject(context))) {
           return fqn;
         }
       }

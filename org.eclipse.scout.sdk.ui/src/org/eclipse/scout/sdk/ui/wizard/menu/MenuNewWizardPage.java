@@ -211,7 +211,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_formHandlerField = getFieldToolkit().createProposalField(groupBox, Texts.get("FormHandler"));
     m_formHandlerField.setEnabled(false);
-    m_formHandlerField.acceptProposal(getFormToOpen());
+    m_formHandlerField.acceptProposal(getHandler());
     m_formHandlerField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -231,10 +231,9 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     // create menu
-    MenuNewOperation operation = new MenuNewOperation(getDeclaringType(), true);
+    MenuNewOperation operation = new MenuNewOperation(getTypeName(), getDeclaringType(), true);
     // write back members
     operation.setNlsEntry(getNlsName());
-    operation.setTypeName(getTypeName());
     IType superType = getSuperType();
     if (superType != null) {
       String signature = SignatureCache.createTypeSignature(superType.getFullyQualifiedName());

@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.workspace;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.Activator;
 import org.eclipse.scout.sdk.internal.workspace.ScoutBundleGraph;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.AfterClass;
@@ -21,10 +24,11 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TestBundleGraph extends AbstractScoutSdkTest {
+
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     // workspace containing direct cycles and fragment cycles
-    setupWorkspace("bundleGraph",
+    TestWorkspaceUtility.setupWorkspace(Platform.getBundle(Activator.PLUGIN_ID), "resources/bundleGraph",
         "org.bundlegraph.test.client",
         "org.bundlegraph.test.server",
         "org.bundlegraph.test.shared",

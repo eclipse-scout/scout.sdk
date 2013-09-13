@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.TuningUtility;
-import org.eclipse.scout.sdk.operation.data.AutoUpdateManager;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdateHandler;
-import org.eclipse.scout.sdk.operation.page.pagedata.PageDataAutoUpdateHandler;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateHandler;
+import org.eclipse.scout.sdk.internal.workspace.dto.pagedata.PageDataAutoUpdateHandler;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.osgi.framework.BundleContext;
@@ -30,7 +31,7 @@ public class ScoutSdk extends Plugin {
   private static ScoutSdk plugin;
   private static SdkLogManager logManager;
 
-  private AutoUpdateManager m_autoUpdateManager;
+  private DtoAutoUpdateManager m_autoUpdateManager;
 
   /*
    * (non-Javadoc)
@@ -49,9 +50,10 @@ public class ScoutSdk extends Plugin {
 
     logInfo("Starting SCOUT SDK Plugin.");
 
-    m_autoUpdateManager = new AutoUpdateManager();
-    m_autoUpdateManager.addModelDataUpdateHandler(new FormDataAutoUpdateHandler());
+    m_autoUpdateManager = new DtoAutoUpdateManager();
+    m_autoUpdateManager.addModelDataUpdateHandler(new FormDataDtoUpdateHandler());
     m_autoUpdateManager.addModelDataUpdateHandler(new PageDataAutoUpdateHandler());
+
   }
 
   /*
@@ -132,11 +134,17 @@ public class ScoutSdk extends Plugin {
     logManager.log(level, message, t);
   }
 
-  public void setAutoUpdateEnabled(boolean enabled) {
-    m_autoUpdateManager.setEnabled(enabled);
+  public static void log(IStatus status) {
+    logManager.log(status);
   }
 
-  public boolean isAutoUpdateEnabled() {
+  public void setFormDataAutoUpdate(boolean autoUpdate) {
+    m_autoUpdateManager.setEnabled(autoUpdate);
+//    m_formDataUpdateSupport.setEnabled(autoUpdate);
+  }
+
+  public boolean isFormDataAutoUpdate() {
     return m_autoUpdateManager.isEnabled();
+//    return m_formDataUpdateSupport.isEnabled();
   }
 }

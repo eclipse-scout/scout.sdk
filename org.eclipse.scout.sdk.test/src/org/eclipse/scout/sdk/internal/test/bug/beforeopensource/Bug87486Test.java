@@ -12,12 +12,11 @@ package org.eclipse.scout.sdk.internal.test.bug.beforeopensource;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -39,7 +38,7 @@ public class Bug87486Test extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("bugsBeforeOpensource/87486", "a.shared", "a.client");
+    setupWorkspace("resources/bugsBeforeOpensource/87486", "a.shared", "a.client");
   }
 
   @Test
@@ -75,14 +74,13 @@ public class Bug87486Test extends AbstractScoutSdkTest {
   private void checkResolveName(String iconName, boolean assertIconExists) {
     ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());
 
-    IType icons = TypeUtility.getType("a.shared.Icons");
-    Assert.assertTrue(TypeUtility.exists(icons));
+    SdkAssert.assertTypeExists("a.shared.Icons");
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject("a.shared");
     IScoutBundle scoutProject = ScoutTypeUtility.getScoutBundle(project);
     IIconProvider projectIcons = scoutProject.getIconProvider();
     ScoutIconDesc iconDesc = projectIcons.getIcon(iconName);
 
-    Assert.assertNotNull(iconDesc);
+    Assert.assertNotNull("icon '" + iconName + "' dos not exist!", iconDesc);
     Assert.assertEquals(iconName, iconDesc.getIconName());
     if (assertIconExists) {
       Assert.assertNotNull(iconDesc.getImageDescriptor());

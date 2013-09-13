@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="sample.ui.swt.perspective.Perspective"
+            fixed="false"
+            icon="resources/icons/eclipse_scout.gif"
+            id="sample.ui.swt.perspective.Perspective"
+            name="sample"/>
+   </extension>
+   <extension
+            point="org.eclipse.ui.views">
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.CenterView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.CenterView"
+               name="Center View"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.WestView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.WestView"
+               name="West view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.NorthView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.NorthView"
+               name="North view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.NorthWestView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.NorthWestView"
+               name="North west view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.NorthEastView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.NorthEastView"
+               name="North east view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.EastView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.EastView"
+               name="East view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.SouthView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.SouthView"
+               name="South view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.SouthWestView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.SouthWestView"
+               name="South west view"
+               restorable="true">
+         </view>
+         <view
+               allowMultiple="true"
+               category="sample.ui.swt.viewCategory"
+               class="sample.ui.swt.views.SouthEastView"
+               icon="resources/icons/eclipse_scout.gif"
+               id="sample.ui.swt.views.SouthEastView"
+               name="South east view"
+               restorable="true">
+         </view>
+     	 <view
+               allowMultiple="false"
+               category="org.eclipse.ui"
+               class="org.eclipse.ui.ExtensionFactory:progressView"
+               icon="resources/icons/progress_view.gif"
+               id="org.eclipse.ui.views.ProgressView"
+               name="Progress View"
+               restorable="true">
+         </view>
+         <category
+               id="sample.ui.swt.viewCategory"
+               name="sample">
+         </category>
+   </extension>
+   <extension
+         point="org.eclipse.ui.startup">
+      <startup
+            class="sample.ui.swt.SwtStartup">
+      </startup>
+   </extension>
+   <extension id="application" name="Application" point="org.eclipse.core.runtime.applications">
+      <application>
+         <run class="sample.ui.swt.application.Application"/>
+      </application>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="sample.ui.swt.editor.ScoutEditorPart"
+            default="false"
+            icon="resources/icons/eclipse_scout.gif"
+            id="sample.ui.swt.editor.ScoutEditorPart"
+            matchingStrategy="org.eclipse.scout.rt.ui.swt.window.desktop.editor.ScoutEditorMatchingStrategy"
+            name="ScoutEditorPart">
+      </editor>
+   </extension>
+   <extension id="product" point="org.eclipse.core.runtime.products">
+      <product
+          application="sample.ui.swt.application"
+          name="">
+       <property
+             name="appName"
+             value="sample"/>
+       <property
+          name="windowImages"
+          value="resources/icons/eclipseScout16x16.gif,resources/icons/eclipseScout32x32.gif"/>
+      </product>
+   </extension>
+   <extension
+        point="org.eclipse.ui.menus">
+      <menuContribution
+           allPopups="false"
+           locationURI="menu:org.eclipse.ui.main.menu">
+        <dynamic
+              class="sample.ui.swt.application.menu.DesktopMenuBar"
+              id="org.eclipse.scout.swt.menu.dynamic">
+        </dynamic>
+      </menuContribution>
+   </extension>
+</plugin>

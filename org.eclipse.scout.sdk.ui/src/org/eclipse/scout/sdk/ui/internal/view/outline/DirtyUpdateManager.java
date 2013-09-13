@@ -16,11 +16,11 @@ import java.util.LinkedList;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineLabelsJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.IScoutSeverityListener;
-import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 
 /**
  * <h3>DirtyUpdateManager</h3> Only use this class from OutlineView to schedule dirty nodes to be refreshed.

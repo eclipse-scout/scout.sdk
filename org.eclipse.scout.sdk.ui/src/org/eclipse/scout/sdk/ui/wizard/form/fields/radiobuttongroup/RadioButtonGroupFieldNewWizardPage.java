@@ -146,14 +146,11 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    RadioButtonGroupFieldNewOperation operation = new RadioButtonGroupFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    RadioButtonGroupFieldNewOperation operation = new RadioButtonGroupFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {

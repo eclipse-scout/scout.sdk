@@ -13,20 +13,21 @@ package org.eclipse.scout.sdk.operation;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.field.FieldCreateOperation;
-import org.eclipse.scout.sdk.operation.method.ConstructorCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -62,61 +63,54 @@ public class CodeTypeNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getSharedBundle());
+    PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageName(), ScoutUtility.getJavaProject(getSharedBundle()));
     newOp.setSuperTypeSignature(getSuperTypeSignature());
+    newOp.setFlags(Flags.AccPublic);
+    newOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    // serial version UID
+    newOp.addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
+    // field ID
+    FieldSourceBuilder idFieldBuilder = new FieldSourceBuilder("ID") {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        super.createSource(source, lineDelimiter, ownerProject, validator);
+        if (StringUtility.isNullOrEmpty(getNextCodeId())) {
+          source.append(ScoutUtility.getCommentBlock("Auto-generated value"));
+        }
+      }
+
+    };
+
+    if (StringUtility.isNullOrEmpty(getNextCodeId())) {
+      idFieldBuilder.setValue("null");
+    }
+    else {
+      idFieldBuilder.setValue(getNextCodeId());
+    }
+    idFieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+    idFieldBuilder.setSignature(getGenericTypeSignature());
+    newOp.addFieldSourceBuilder(idFieldBuilder);
+    // constructor
+    IMethodSourceBuilder constructorSourceBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getTypeName());
+    constructorSourceBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    constructorSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
+    newOp.addMethodSourceBuilder(constructorSourceBuilder);
+
+    // nls
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
+      nlsSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addMethodSourceBuilder(nlsSourceBuilder);
+    }
+    // get id method
+    IMethodSourceBuilder getIdSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), "getId");
+    getIdSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return ID;"));
+    newOp.addMethodSourceBuilder(getIdSourceBuilder);
+
+    newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdType = newOp.getCreatedType();
     workingCopyManager.register(m_createdType.getCompilationUnit(), monitor);
-
-    FieldCreateOperation versionUidOp = new FieldCreateOperation(getCreatedType(), "serialVersionUID", false);
-    versionUidOp.setFlags(Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    versionUidOp.setSignature(Signature.SIG_LONG);
-    versionUidOp.setSimpleInitValue("1L");
-    versionUidOp.validate();
-    versionUidOp.run(monitor, workingCopyManager);
-
-    final boolean isCodeIdUndef = StringUtility.isNullOrEmpty(getNextCodeId());
-    final String todo = isCodeIdUndef ? ScoutUtility.getCommentBlock("Auto-generated value") : "";
-    final String codeId = isCodeIdUndef ? "null" : getNextCodeId();
-    FieldCreateOperation idOp = new FieldCreateOperation(getCreatedType(), "ID", false) {
-      @Override
-      public void buildSource(StringBuilder builder, IImportValidator validator) throws JavaModelException {
-        super.buildSource(builder, validator);
-        builder.append(todo);
-      }
-    };
-
-    idOp.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
-    idOp.setSignature(getGenericTypeSignature());
-    idOp.setSimpleInitValue(codeId);
-    idOp.validate();
-    idOp.run(monitor, workingCopyManager);
-
-    // constructor
-    ConstructorCreateOperation constructorOp = new ConstructorCreateOperation(getCreatedType(), false);
-    constructorOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-    constructorOp.setMethodFlags(Flags.AccPublic);
-    constructorOp.setSimpleBody("super();");
-    constructorOp.validate();
-    constructorOp.run(monitor, workingCopyManager);
-
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation confTextOp = new NlsTextMethodUpdateOperation(getCreatedType(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TEXT, false);
-      confTextOp.setNlsEntry(getNlsEntry());
-      confTextOp.validate();
-      confTextOp.run(monitor, workingCopyManager);
-    }
-    // getid method
-    MethodOverrideOperation getIdOp = new MethodOverrideOperation(getCreatedType(), "getId", false);
-    getIdOp.setSimpleBody("return ID;");
-    getIdOp.setReturnTypeSignature(getGenericTypeSignature());
-    getIdOp.validate();
-    getIdOp.run(monitor, workingCopyManager);
-
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY,
-        new IPackageFragment[]{m_createdType.getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
 
     if (isFormatSource()) {
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedType(), true);

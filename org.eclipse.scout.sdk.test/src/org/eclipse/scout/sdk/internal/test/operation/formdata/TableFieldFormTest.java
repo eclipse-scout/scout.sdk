@@ -10,121 +10,140 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.operation.formdata;
 
-import org.eclipse.core.resources.IProject;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
+import org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.junit.AfterClass;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
-public class TableFieldFormTest extends AbstractScoutSdkTest {
+public class TableFieldFormTest extends AbstractSdkTestWithFormDataProject {
 
-  private IType m_formData;
-
-  @BeforeClass
-  public static void setUpWorkspace() throws Exception {
-    setupWorkspace("operation/formData", "formdata.shared", "formdata.client");
-  }
-
-  @Before
+  @Test
   public void testCreateFormData() throws Exception {
-    if (m_formData == null) {
-      String formName = "TableFieldForm";
-      IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
-      Assert.assertTrue(TypeUtility.exists(form));
+    String formName = "TableFieldForm";
+    IType form = TypeUtility.getType("formdata.client.ui.forms." + formName);
+    Assert.assertTrue(TypeUtility.exists(form));
 
-      IProject sharedProject = getProject("formdata.shared");
-      Assert.assertNotNull(sharedProject);
+    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
+    FormDataUpdateOperation op = new FormDataUpdateOperation(form, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
 
-      FormDataUpdateOperation op = new FormDataUpdateOperation(form);
-      OperationJob job = new OperationJob(op);
-      job.schedule();
-      job.join();
-      buildWorkspace();
-      m_formData = op.getFormDataType();
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertTrue(TypeUtility.exists(m_formData));
-      Assert.assertEquals(m_formData.getFullyQualifiedName(), "formdata.shared.services.process." + formName + "Data");
-      Assert.assertEquals(m_formData.getSuperclassTypeSignature(), "QAbstractFormData;");
-    }
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    System.out.println(new ApiTestGenerator(op.getCreatedFormData()).buildSource());
+    testApiOfTableFieldFormData();
+
   }
 
-  @Test
-  public void testTableField() throws Exception {
-    IType tableField = m_formData.getType("PersonTable");
-    Assert.assertTrue(TypeUtility.exists(tableField));
-    Assert.assertEquals("QAbstractTableFieldData;", tableField.getSuperclassTypeSignature());
-    IMethod tableFieldGetter = TypeUtility.getMethod(m_formData, "getPersonTable");
-    Assert.assertTrue(TypeUtility.exists(tableFieldGetter));
-    Assert.assertEquals(tableFieldGetter.getReturnType(), "QPersonTable;");
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfTableFieldFormData() throws Exception {
+    // type TableFieldFormData
+    IType tableFieldFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.TableFieldFormData");
+    SdkAssert.assertHasFlags(tableFieldFormData, 1);
+    SdkAssert.assertHasSuperTypeSignature(tableFieldFormData, "QAbstractFormData;");
+
+    // fields of TableFieldFormData
+    SdkAssert.assertEquals("field count of 'TableFieldFormData'", 1, tableFieldFormData.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(tableFieldFormData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    SdkAssert.assertEquals("method count of 'TableFieldFormData'", 3, tableFieldFormData.getMethods().length);
+    IMethod tableFieldFormData1 = SdkAssert.assertMethodExist(tableFieldFormData, "TableFieldFormData", new String[]{});
+    SdkAssert.assertTrue(tableFieldFormData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(tableFieldFormData1, "V");
+    IMethod getCompanyTable = SdkAssert.assertMethodExist(tableFieldFormData, "getCompanyTable", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getCompanyTable, "QCompanyTable;");
+    IMethod getPersonTable = SdkAssert.assertMethodExist(tableFieldFormData, "getPersonTable", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getPersonTable, "QPersonTable;");
+
+    SdkAssert.assertEquals("inner types count of 'TableFieldFormData'", 2, tableFieldFormData.getTypes().length);
+    // type CompanyTable
+    IType companyTable = SdkAssert.assertTypeExists(tableFieldFormData, "CompanyTable");
+    SdkAssert.assertHasFlags(companyTable, 9);
+    SdkAssert.assertHasSuperTypeSignature(companyTable, "QAbstractCompanyTableFieldData;");
+
+    // fields of CompanyTable
+    SdkAssert.assertEquals("field count of 'CompanyTable'", 1, companyTable.getFields().length);
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(companyTable, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID1, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID1, "J");
+
+    SdkAssert.assertEquals("method count of 'CompanyTable'", 1, companyTable.getMethods().length);
+    IMethod companyTable1 = SdkAssert.assertMethodExist(companyTable, "CompanyTable", new String[]{});
+    SdkAssert.assertTrue(companyTable1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(companyTable1, "V");
+
+    SdkAssert.assertEquals("inner types count of 'CompanyTable'", 0, companyTable.getTypes().length);
+    // type PersonTable
+    IType personTable = SdkAssert.assertTypeExists(tableFieldFormData, "PersonTable");
+    SdkAssert.assertHasFlags(personTable, 9);
+    SdkAssert.assertHasSuperTypeSignature(personTable, "QAbstractTableFieldData;");
+
+    // fields of PersonTable
+    SdkAssert.assertEquals("field count of 'PersonTable'", 6, personTable.getFields().length);
+    IField serialVersionUID2 = SdkAssert.assertFieldExist(personTable, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID2, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID2, "J");
+    IField pERSON_NR_COLUMN_ID = SdkAssert.assertFieldExist(personTable, "PERSON_NR_COLUMN_ID");
+    SdkAssert.assertHasFlags(pERSON_NR_COLUMN_ID, 25);
+    SdkAssert.assertFieldSignature(pERSON_NR_COLUMN_ID, "I");
+    IField nAME_COLUMN_ID = SdkAssert.assertFieldExist(personTable, "NAME_COLUMN_ID");
+    SdkAssert.assertHasFlags(nAME_COLUMN_ID, 25);
+    SdkAssert.assertFieldSignature(nAME_COLUMN_ID, "I");
+    IField aN_OBJECT_COLUMN_ID = SdkAssert.assertFieldExist(personTable, "AN_OBJECT_COLUMN_ID");
+    SdkAssert.assertHasFlags(aN_OBJECT_COLUMN_ID, 25);
+    SdkAssert.assertFieldSignature(aN_OBJECT_COLUMN_ID, "I");
+    IField sMART_LONG_COLUMN_ID = SdkAssert.assertFieldExist(personTable, "SMART_LONG_COLUMN_ID");
+    SdkAssert.assertHasFlags(sMART_LONG_COLUMN_ID, 25);
+    SdkAssert.assertFieldSignature(sMART_LONG_COLUMN_ID, "I");
+    IField cUSTOM_COLUMN_ID = SdkAssert.assertFieldExist(personTable, "CUSTOM_COLUMN_ID");
+    SdkAssert.assertHasFlags(cUSTOM_COLUMN_ID, 25);
+    SdkAssert.assertFieldSignature(cUSTOM_COLUMN_ID, "I");
+
+    SdkAssert.assertEquals("method count of 'PersonTable'", 14, personTable.getMethods().length);
+    IMethod personTable1 = SdkAssert.assertMethodExist(personTable, "PersonTable", new String[]{});
+    SdkAssert.assertTrue(personTable1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(personTable1, "V");
+    IMethod getAnObject = SdkAssert.assertMethodExist(personTable, "getAnObject", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(getAnObject, "QObject;");
+    IMethod setAnObject = SdkAssert.assertMethodExist(personTable, "setAnObject", new String[]{"I", "QObject;"});
+    SdkAssert.assertMethodReturnTypeSignature(setAnObject, "V");
+    IMethod getCustom = SdkAssert.assertMethodExist(personTable, "getCustom", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(getCustom, "QSet<QMap<QString;QInteger;>;>;");
+    SdkAssert.assertAnnotation(getCustom, "java.lang.SuppressWarnings");
+    IMethod setCustom = SdkAssert.assertMethodExist(personTable, "setCustom", new String[]{"I", "QSet<QMap<QString;QInteger;>;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(setCustom, "V");
+    IMethod getName = SdkAssert.assertMethodExist(personTable, "getName", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(getName, "QString;");
+    IMethod setName = SdkAssert.assertMethodExist(personTable, "setName", new String[]{"I", "QString;"});
+    SdkAssert.assertMethodReturnTypeSignature(setName, "V");
+    IMethod getPersonNr = SdkAssert.assertMethodExist(personTable, "getPersonNr", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(getPersonNr, "QLong;");
+    IMethod setPersonNr = SdkAssert.assertMethodExist(personTable, "setPersonNr", new String[]{"I", "QLong;"});
+    SdkAssert.assertMethodReturnTypeSignature(setPersonNr, "V");
+    IMethod getSmartLong = SdkAssert.assertMethodExist(personTable, "getSmartLong", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(getSmartLong, "QLong;");
+    IMethod setSmartLong = SdkAssert.assertMethodExist(personTable, "setSmartLong", new String[]{"I", "QLong;"});
+    SdkAssert.assertMethodReturnTypeSignature(setSmartLong, "V");
+    IMethod getColumnCount = SdkAssert.assertMethodExist(personTable, "getColumnCount", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getColumnCount, "I");
+    SdkAssert.assertAnnotation(getColumnCount, "java.lang.Override");
+    IMethod getValueAt = SdkAssert.assertMethodExist(personTable, "getValueAt", new String[]{"I", "I"});
+    SdkAssert.assertMethodReturnTypeSignature(getValueAt, "QObject;");
+    SdkAssert.assertAnnotation(getValueAt, "java.lang.Override");
+    IMethod setValueAt = SdkAssert.assertMethodExist(personTable, "setValueAt", new String[]{"I", "I", "QObject;"});
+    SdkAssert.assertMethodReturnTypeSignature(setValueAt, "V");
+    SdkAssert.assertAnnotation(setValueAt, "java.lang.Override");
+    SdkAssert.assertAnnotation(setValueAt, "java.lang.SuppressWarnings");
+
+    SdkAssert.assertEquals("inner types count of 'PersonTable'", 0, personTable.getTypes().length);
   }
 
-  @Test
-  public void testColumns() throws Exception {
-    IType tableField = m_formData.getType("PersonTable");
-    Assert.assertTrue(TypeUtility.exists(tableField));
-    // personNr
-    IMethod setPersonNr = TypeUtility.getMethod(tableField, "setPersonNr");
-    Assert.assertTrue(TypeUtility.exists(setPersonNr));
-    IMethod getPersonNr = TypeUtility.getMethod(tableField, "getPersonNr");
-    Assert.assertTrue(TypeUtility.exists(getPersonNr));
-    Assert.assertEquals(getPersonNr.getReturnType(), "QLong;");
-
-    IMethod setName = TypeUtility.getMethod(tableField, "setName");
-    Assert.assertTrue(TypeUtility.exists(setName));
-    IMethod getName = TypeUtility.getMethod(tableField, "getName");
-    Assert.assertTrue(TypeUtility.exists(getName));
-    Assert.assertEquals(getName.getReturnType(), "QString;");
-
-    IMethod setObject = TypeUtility.getMethod(tableField, "setAnObject");
-    Assert.assertTrue(TypeUtility.exists(setObject));
-    IMethod getObject = TypeUtility.getMethod(tableField, "getAnObject");
-    Assert.assertTrue(TypeUtility.exists(getObject));
-    Assert.assertEquals(getObject.getReturnType(), "QObject;");
-
-    IMethod setSmartLongColumn = TypeUtility.getMethod(tableField, "setSmartLong");
-    Assert.assertTrue(TypeUtility.exists(setSmartLongColumn));
-    IMethod getSmartLongColumn = TypeUtility.getMethod(tableField, "getSmartLong");
-    Assert.assertTrue(TypeUtility.exists(getSmartLongColumn));
-    Assert.assertEquals(getSmartLongColumn.getReturnType(), "QLong;");
-
-    IMethod setCustom = TypeUtility.getMethod(tableField, "setCustom");
-    Assert.assertTrue(TypeUtility.exists(setCustom));
-    IMethod getCustom = TypeUtility.getMethod(tableField, "getCustom");
-    Assert.assertTrue(TypeUtility.exists(getCustom));
-    Assert.assertEquals(getCustom.getReturnType(), "QSet<QMap<QString;QInteger;>;>;");
-
-    // column count
-    IMethod columnCount = TypeUtility.getMethod(tableField, "getColumnCount");
-    Assert.assertTrue(TypeUtility.exists(columnCount));
-    Assert.assertTrue(columnCount.getSource().contains("return 5"));
-
-    // setValueAt
-    IMethod setValueAT = TypeUtility.getMethod(tableField, "setValueAt");
-    Assert.assertTrue(TypeUtility.exists(setValueAT));
-    // getValueAt
-    IMethod getValueAT = TypeUtility.getMethod(tableField, "getValueAt");
-    Assert.assertTrue(TypeUtility.exists(getValueAT));
-  }
-
-  @Test
-  public void testCompanyTableField() throws Exception {
-    IType tableField = m_formData.getType("Company");
-    Assert.assertTrue(TypeUtility.exists(tableField));
-    Assert.assertEquals("QAbstractCompanyTableFieldData;", tableField.getSuperclassTypeSignature());
-    IMethod[] methods = tableField.getMethods();
-    Assert.assertEquals(methods.length, 1);
-    Assert.assertTrue(methods[0].isConstructor());
-  }
-
-  @AfterClass
-  public static void cleanUp() throws Exception {
-    clearWorkspace();
-  }
 }

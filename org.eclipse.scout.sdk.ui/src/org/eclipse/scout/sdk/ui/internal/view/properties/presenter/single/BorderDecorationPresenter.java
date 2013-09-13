@@ -10,21 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BorderDecorationPresenter.BorderDecoration;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.FieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.StringFieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
@@ -34,26 +38,37 @@ import org.eclipse.swt.widgets.Composite;
  * @author mvi
  * @since 3.8.0 04.12.2012
  */
-public class BorderDecorationPresenter extends AbstractProposalPresenter<BorderDecoration> {
+public class BorderDecorationPresenter extends AbstractProposalPresenter<FieldProperty<String>> {
 
-  private final static String BORDER_DECORATION_EMPTY = "empty";
-  private final static String BORDER_DECORATION_LINE = "line";
-  private final static String BORDER_DECORATION_SECTION = "section";
-  private final static String BORDER_DECORATION_AUTO = "auto";
+  protected static final UiFieldProperty<String> BORDER_DECORATION_EMPTY;
+  protected static final UiFieldProperty<String> BORDER_DECORATION_LINE;
+  protected static final UiFieldProperty<String> BORDER_DECORATION_SECTION;
+  protected static final UiFieldProperty<String> BORDER_DECORATION_AUTO;
 
-  protected static enum BorderDecoration {
-    Empty,
-    Line,
-    Section,
-    Auto
+  protected static final List<FieldProperty<String>> PROPOSALS;
+  static {
+    IType iGroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
+    BORDER_DECORATION_EMPTY = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_EMPTY"), "empty");
+    BORDER_DECORATION_LINE = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_LINE"), "line");
+    BORDER_DECORATION_SECTION = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_SECTION"), "section");
+    BORDER_DECORATION_AUTO = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_AUTO"), "auto");
+    PROPOSALS = new ArrayList<FieldProperty<String>>();
+    PROPOSALS.add(BORDER_DECORATION_EMPTY);
+    PROPOSALS.add(BORDER_DECORATION_LINE);
+    PROPOSALS.add(BORDER_DECORATION_SECTION);
+    PROPOSALS.add(BORDER_DECORATION_AUTO);
   }
+
+  private final FieldReferencePropertyParser<String> m_parser;
 
   public BorderDecorationPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new StringFieldReferencePropertyParser(PROPOSALS);
   }
 
   @Override
   protected void createProposalFieldProviders(ProposalTextField proposalField) {
+
     ILabelProvider labelProvider = new SearchRangeStyledLabelProvider() {
       @Override
       public String getText(Object element) {
@@ -67,61 +82,37 @@ public class BorderDecorationPresenter extends AbstractProposalPresenter<BorderD
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(BorderDecoration.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new FieldProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  @Override
-  protected BorderDecoration parseInput(String input) throws CoreException {
-    String parsedString = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    if (BORDER_DECORATION_EMPTY.equals(parsedString)) {
-      return BorderDecoration.Empty;
-    }
-    else if (BORDER_DECORATION_LINE.equals(parsedString)) {
-      return BorderDecoration.Line;
-    }
-    else if (BORDER_DECORATION_SECTION.equals(parsedString)) {
-      return BorderDecoration.Section;
-    }
-    else if (BORDER_DECORATION_AUTO.equals(parsedString)) {
-      return BorderDecoration.Auto;
-    }
-    return null;
+  public FieldReferencePropertyParser<String> getParser() {
+    return m_parser;
   }
 
   @Override
-  protected synchronized void storeValue(BorderDecoration value) throws CoreException {
+  protected FieldProperty<String> parseInput(String input) throws CoreException {
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+  }
+
+  @Override
+  protected synchronized void storeValue(FieldProperty<String> value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+
+    try {
+      ConfigPropertyUpdateOperation<FieldProperty<String>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<String>>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      StringBuilder source = new StringBuilder("return ");
-      switch (value) {
-        case Empty:
-          source.append("BORDER_DECORATION_EMPTY");
-          break;
-        case Line:
-          source.append("BORDER_DECORATION_LINE");
-          break;
-        case Section:
-          source.append("BORDER_DECORATION_SECTION");
-          break;
-        case Auto:
-          source.append("BORDER_DECORATION_AUTO");
-          break;
-      }
-      source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
-    }
+
   }
+
 }

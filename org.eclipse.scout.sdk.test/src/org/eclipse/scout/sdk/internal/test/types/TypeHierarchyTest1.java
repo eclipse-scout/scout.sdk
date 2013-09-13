@@ -16,10 +16,10 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -47,19 +47,18 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("util/typeCache", BUNDLE_NAME_CLIENT, BUNDLE_NAME_SHARED, BUNDLE_NAME_SERVER);
+    setupWorkspace("resources/util/typeCache", BUNDLE_NAME_CLIENT, BUNDLE_NAME_SHARED, BUNDLE_NAME_SERVER);
   }
 
   @Test
   public void testPrimaryTypeHierarchy() {
-    IType companyForm = TypeUtility.getType("test.client.ui.forms.CompanyForm");
-    Assert.assertTrue(TypeUtility.exists(companyForm));
+    IType companyForm = SdkAssert.assertTypeExists("test.client.ui.forms.CompanyForm");
     IType iformField = TypeUtility.getType(RuntimeClasses.IFormField);
     IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iformField);
     ITypeHierarchy companyFormHierarchy = primaryFormFieldHierarchy.combinedTypeHierarchy(companyForm);
     Assert.assertTrue(primaryFormFieldHierarchy.isCreated());
-    IType mainBox = companyForm.getType("MainBox");
-    Assert.assertTrue(TypeUtility.exists(mainBox));
+
+    IType mainBox = SdkAssert.assertTypeExists(companyForm, "MainBox");
     IType[] formFields = TypeUtility.getInnerTypes(mainBox, TypeFilters.getSubtypeFilter(iformField, companyFormHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     Assert.assertTrue(formFields.length == 3);
     Assert.assertEquals(formFields[0].getElementName(), "NameField");
@@ -86,14 +85,10 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
       }
     });
     IScoutBundle client = ScoutTypeUtility.getScoutBundle(project.getProject());
-    FormNewOperation formOp = new FormNewOperation();
-    formOp.setTypeName("ANewForm");
-    formOp.setPackage(client.getPackageName(".ui.forms"));
-    formOp.setClientBundle(client);
+    SdkAssert.assertNotNull(client);
+    FormNewOperation formOp = new FormNewOperation("ANewForm", client.getPackageName(".ui.forms"), client.getJavaProject());
     formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, project));
-    OperationJob job = new OperationJob(formOp);
-    job.schedule();
-    job.join();
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, formOp);
     synchronized (formCountHolder) {
       if (formCountHolder.getValue() == -1) {
         formCountHolder.wait();
@@ -108,7 +103,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     final IType iService = TypeUtility.getType(RuntimeClasses.IService);
     final IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     IType[] subtypes = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter());
-    Assert.assertEquals(3, subtypes.length);
+    Assert.assertEquals(2, subtypes.length);
     final IntegerHolder serviceCountHolder = new IntegerHolder(-1);
     serviceHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
@@ -120,29 +115,28 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
       }
     });
     IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_CLIENT));
+    SdkAssert.assertNotNull(clientBundle);
     IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SHARED));
+    SdkAssert.assertNotNull(sharedBundle);
     IScoutBundle serverBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SERVER));
-    ServiceNewOperation serviceOp = new ServiceNewOperation();
-    serviceOp.addProxyRegistrationBundle(clientBundle);
-    serviceOp.addServiceRegistrationBundle(serverBundle);
-    serviceOp.setImplementationBundle(serverBundle);
-    serviceOp.setInterfaceBundle(sharedBundle);
-    serviceOp.setServiceInterfaceName("ITestService");
-    serviceOp.setServiceInterfaceSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
-    serviceOp.setServiceInterfacePackageName(sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES) + ".notexisting");
-    serviceOp.setServiceName("TestService");
-    serviceOp.setServicePackageName(serverBundle.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES) + ".notexisting");
-    serviceOp.setServiceSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
-    OperationJob job = new OperationJob(serviceOp);
-    job.schedule();
-    job.join();
+    SdkAssert.assertNotNull(serverBundle);
+    ServiceNewOperation serviceOp = new ServiceNewOperation("ITestService", "TestService");
+    serviceOp.addProxyRegistrationProject(clientBundle.getJavaProject());
+    serviceOp.addServiceRegistrationProject(serverBundle.getJavaProject());
+    serviceOp.setImplementationProject(serverBundle.getJavaProject());
+    serviceOp.setInterfaceProject(sharedBundle.getJavaProject());
+    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
+    serviceOp.setInterfacePackageName(sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES) + ".notexisting");
+    serviceOp.setImplementationPackageName(serverBundle.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES) + ".notexisting");
+    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, serviceOp);
     synchronized (serviceCountHolder) {
       if (serviceCountHolder.getValue() == -1) {
         serviceCountHolder.wait();
       }
     }
     // expect created form
-    Assert.assertEquals(5, serviceCountHolder.getValue().intValue());
+    Assert.assertEquals(4, serviceCountHolder.getValue().intValue());
   }
 
   @AfterClass

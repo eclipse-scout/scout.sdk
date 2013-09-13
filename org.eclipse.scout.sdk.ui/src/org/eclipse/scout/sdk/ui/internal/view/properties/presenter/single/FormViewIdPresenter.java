@@ -10,49 +10,87 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormViewIdPresenter.ViewId;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.FieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.StringFieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>FormViewIdPresenter</h3> ...
  */
-public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
+public class FormViewIdPresenter extends AbstractProposalPresenter<FieldProperty<String>> {
+  protected static final UiFieldProperty<String> VIEW_ID_N;
+  protected static final UiFieldProperty<String> VIEW_ID_NE;
+  protected static final UiFieldProperty<String> VIEW_ID_E;
+  protected static final UiFieldProperty<String> VIEW_ID_SE;
+  protected static final UiFieldProperty<String> VIEW_ID_S;
+  protected static final UiFieldProperty<String> VIEW_ID_SW;
+  protected static final UiFieldProperty<String> VIEW_ID_W;
+  protected static final UiFieldProperty<String> VIEW_ID_NW;
+  protected static final UiFieldProperty<String> VIEW_ID_CENTER;
+  protected static final UiFieldProperty<String> VIEW_ID_OUTLINE;
+  protected static final UiFieldProperty<String> VIEW_ID_OUTLINE_SELECTOR;
+  protected static final UiFieldProperty<String> VIEW_ID_PAGE_DETAIL;
+  protected static final UiFieldProperty<String> VIEW_ID_PAGE_SEARCH;
+  protected static final UiFieldProperty<String> VIEW_ID_PAGE_TABLE;
 
-  public static enum ViewId {
-    Outline,
-    OutlineSelector,
-    PageTable,
-    PageDetail,
-    PageSearch,
-    Editor,
-    North,
-    NorthEast,
-    East,
-    SouthEast,
-    South,
-    SouthWest,
-    West,
-    NothWest,
-    Center
+  protected static final List<FieldProperty<String>> PROPOSALS;
+  static {
+    IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
+    VIEW_ID_N = new UiFieldProperty<String>(iForm.getField("VIEW_ID_N"), "north");
+    VIEW_ID_NE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_NE"), "north-east");
+    VIEW_ID_E = new UiFieldProperty<String>(iForm.getField("VIEW_ID_E"), "east");
+    VIEW_ID_SE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_SE"), "south-east");
+    VIEW_ID_S = new UiFieldProperty<String>(iForm.getField("VIEW_ID_S"), "south");
+    VIEW_ID_SW = new UiFieldProperty<String>(iForm.getField("VIEW_ID_SW"), "south-west");
+    VIEW_ID_W = new UiFieldProperty<String>(iForm.getField("VIEW_ID_W"), "west");
+    VIEW_ID_NW = new UiFieldProperty<String>(iForm.getField("VIEW_ID_NW"), "noth-west");
+    VIEW_ID_CENTER = new UiFieldProperty<String>(iForm.getField("VIEW_ID_CENTER"), "center");
+    VIEW_ID_OUTLINE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_OUTLINE"), "outline");
+    VIEW_ID_OUTLINE_SELECTOR = new UiFieldProperty<String>(iForm.getField("VIEW_ID_OUTLINE_SELECTOR"), "outline-selector");
+    VIEW_ID_PAGE_DETAIL = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_DETAIL"), "page-detail");
+    VIEW_ID_PAGE_SEARCH = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_SEARCH"), "page-search");
+    VIEW_ID_PAGE_TABLE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_TABLE"), "page-table");
+
+    PROPOSALS = new ArrayList<FieldProperty<String>>();
+    PROPOSALS.add(VIEW_ID_N);
+    PROPOSALS.add(VIEW_ID_NE);
+    PROPOSALS.add(VIEW_ID_E);
+    PROPOSALS.add(VIEW_ID_SE);
+    PROPOSALS.add(VIEW_ID_S);
+    PROPOSALS.add(VIEW_ID_SW);
+    PROPOSALS.add(VIEW_ID_W);
+    PROPOSALS.add(VIEW_ID_NW);
+    PROPOSALS.add(VIEW_ID_CENTER);
+    PROPOSALS.add(VIEW_ID_OUTLINE);
+    PROPOSALS.add(VIEW_ID_OUTLINE_SELECTOR);
+    PROPOSALS.add(VIEW_ID_PAGE_DETAIL);
+    PROPOSALS.add(VIEW_ID_PAGE_SEARCH);
+    PROPOSALS.add(VIEW_ID_PAGE_TABLE);
   }
+
+  private final FieldReferencePropertyParser<String> m_parser;
 
   public FormViewIdPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new StringFieldReferencePropertyParser(PROPOSALS);
   }
 
   @Override
@@ -60,27 +98,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
     ILabelProvider labelProvider = new SearchRangeStyledLabelProvider() {
       @Override
       public String getText(Object element) {
-        ViewId value = (ViewId) element;
-        switch (value) {
-          case OutlineSelector:
-            return "Outline Selector";
-          case PageTable:
-            return "Page Table";
-          case PageDetail:
-            return "Page Detail";
-          case PageSearch:
-            return "Page Search";
-          case NorthEast:
-            return "Noth-East";
-          case SouthEast:
-            return "South-East";
-          case SouthWest:
-            return "South-West";
-          case NothWest:
-            return "Noth-West";
-          default:
-            return value.toString();
-        }
+        return element.toString();
       }
 
       @Override
@@ -90,130 +108,35 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(ViewId.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new FieldProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  @Override
-  protected ViewId parseInput(String input) throws CoreException {
-    String parsedId = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    if (parsedId == null) {
-      return null;
-    }
-    else if (parsedId.equals("OUTLINE")) {
-      return ViewId.Outline;
-    }
-    else if (parsedId.equals("OUTLINE_SELECTOR")) {
-      return ViewId.OutlineSelector;
-    }
-    else if (parsedId.equals("PAGE_TABLE")) {
-      return ViewId.PageTable;
-    }
-    else if (parsedId.equals("PAGE_DETAIL")) {
-      return ViewId.PageDetail;
-    }
-    else if (parsedId.equals("PAGE_SEARCH")) {
-      return ViewId.PageSearch;
-    }
-    else if (parsedId.equals("EDITOR")) {
-      return ViewId.Editor;
-    }
-    else if (parsedId.equals("N")) {
-      return ViewId.North;
-    }
-    else if (parsedId.equals("NE")) {
-      return ViewId.NorthEast;
-    }
-    else if (parsedId.equals("E")) {
-      return ViewId.East;
-    }
-    else if (parsedId.equals("SE")) {
-      return ViewId.SouthEast;
-    }
-    else if (parsedId.equals("S")) {
-      return ViewId.South;
-    }
-    else if (parsedId.equals("SW")) {
-      return ViewId.SouthWest;
-    }
-    else if (parsedId.equals("W")) {
-      return ViewId.West;
-    }
-    else if (parsedId.equals("NW")) {
-      return ViewId.NothWest;
-    }
-    else if (parsedId.equals("C")) {
-      return ViewId.Center;
-    }
-    return null;
+  public FieldReferencePropertyParser<String> getParser() {
+    return m_parser;
   }
 
   @Override
-  protected synchronized void storeValue(ViewId value) throws CoreException {
+  protected FieldProperty<String> parseInput(String input) throws CoreException {
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+  }
+
+  @Override
+  protected synchronized void storeValue(FieldProperty<String> value) throws CoreException {
     if (value == null) {
+      getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
-      getProposalField().acceptProposal(value);
     }
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+
+    try {
+      ConfigPropertyUpdateOperation<FieldProperty<String>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<String>>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      StringBuilder source = new StringBuilder("  return ");
-      switch (value) {
-        case Outline:
-          source.append("VIEW_ID_OUTLINE");
-          break;
-        case OutlineSelector:
-          source.append("VIEW_ID_OUTLINE_SELECTOR");
-          break;
-        case PageTable:
-          source.append("VIEW_ID_PAGE_TABLE");
-          break;
-        case PageDetail:
-          source.append("VIEW_ID_PAGE_DETAIL");
-          break;
-        case PageSearch:
-          source.append("VIEW_ID_PAGE_SEARCH");
-          break;
-        case Editor:
-          source.append("EDITOR_ID");
-          break;
-        case North:
-          source.append("VIEW_ID_N");
-          break;
-        case NorthEast:
-          source.append("VIEW_ID_NE");
-          break;
-        case East:
-          source.append("VIEW_ID_E");
-          break;
-        case SouthEast:
-          source.append("VIEW_ID_SE");
-          break;
-        case South:
-          source.append("VIEW_ID_S");
-          break;
-        case SouthWest:
-          source.append("VIEW_ID_SW");
-          break;
-        case West:
-          source.append("VIEW_ID_W");
-          break;
-        case NothWest:
-          source.append("VIEW_ID_NW");
-          break;
-        case Center:
-          source.append("VIEW_ID_CENTER");
-          break;
-      }
-      source.append(";");
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), source.toString(), true);
-    }
-    if (op != null) {
-      new OperationJob(op).schedule();
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
 
   }

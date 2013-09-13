@@ -126,13 +126,11 @@ public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    TreeBoxNewOperation operation = new TreeBoxNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    TreeBoxNewOperation operation = new TreeBoxNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String superTypeName = getSuperType().getFullyQualifiedName();
       if (TypeUtility.isGenericType(getSuperType())) {

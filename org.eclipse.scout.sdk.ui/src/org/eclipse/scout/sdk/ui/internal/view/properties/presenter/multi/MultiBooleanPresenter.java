@@ -14,17 +14,16 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiMethodPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.parser.BooleanPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -120,21 +119,9 @@ public class MultiBooleanPresenter extends AbstractMultiMethodPresenter<Boolean>
 
     ArrayList<IOperation> list = new ArrayList<IOperation>();
     for (MethodBean<Boolean> bean : beans) {
-      try {
-        String sourceValue = formatSourceValue(m_checkbox.getSelection());
-        ConfigurationMethod method = bean.getMethod();
-        if (UiUtility.equals(method.computeDefaultValue(), sourceValue)) {
-          if (method.isImplemented()) {
-            list.add(new ScoutMethodDeleteOperation(method.peekMethod()));
-          }
-        }
-        else {
-          list.add(new ConfigPropertyMethodUpdateOperation(method.getType(), method.getMethodName(), "return " + sourceValue + ";", true));
-        }
-      }
-      catch (CoreException e) {
-        ScoutSdkUi.logError("could not format source value", e);
-      }
+      ConfigurationMethod method = bean.getMethod();
+      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<Boolean>(ScoutTypeUtility.getConfigurationMethod(method.getType(), method.getMethodName()), new BooleanPropertySourceParser());
+      updateOp.setValue(m_checkbox.getSelection());
     }
     new OperationJob(list).schedule();
   }

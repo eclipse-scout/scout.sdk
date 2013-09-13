@@ -10,31 +10,29 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.page;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jface.text.Document;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.eclipse.text.edits.InsertEdit;
 
 /**
  * <h3> {@link PageNewOperation}</h3> ...
@@ -43,20 +41,18 @@ public class PageNewOperation extends AbstractPageOperation {
 
   final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 
-  private IScoutBundle m_clientBundle;
-  private String m_typeName;
+  private final String m_typeName;
+  private final String m_packageName;
+  private final IJavaProject m_javaProject;
   private String m_superTypeSignature;
   private INlsEntry m_nlsEntry;
   private IType m_createdPage;
   private boolean m_formatSource;
-  private String m_packageName;
 
-  public PageNewOperation() {
-    this(false);
-  }
-
-  public PageNewOperation(boolean formatSource) {
-    m_formatSource = formatSource;
+  public PageNewOperation(String pageName, String packageName, IJavaProject javaProject) {
+    m_typeName = pageName;
+    m_packageName = packageName;
+    m_javaProject = javaProject;
   }
 
   @Override
@@ -69,7 +65,7 @@ public class PageNewOperation extends AbstractPageOperation {
     if (StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
       throw new IllegalArgumentException("super type can not be null.");
     }
-    if (getClientBundle() == null) {
+    if (getJavaProject() == null) {
       throw new IllegalArgumentException("client bundle can not be null.");
     }
     if (getTypeName() == null) {
@@ -82,72 +78,52 @@ public class PageNewOperation extends AbstractPageOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getClientBundle());
+    PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageName(), getJavaProject());
+    newOp.setFlags(Flags.AccPublic);
     newOp.setSuperTypeSignature(getSuperTypeSignature());
+    // nls method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsTextMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TITLE);
+      nlsTextMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsTextMethodBuilder), nlsTextMethodBuilder);
+    }
+    // table inner type
+    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractPageWithTable) || CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractExtensiblePageWithTable)) {
+      ITypeSourceBuilder tableSourceBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE);
+      tableSourceBuilder.setFlags(Flags.AccPublic);
+      tableSourceBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getJavaProject()));
+      tableSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+      newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableSourceBuilder), tableSourceBuilder);
+      // update generic in supertype signature
+      StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
+      superTypeSigBuilder.append("<").append(newOp.getPackageName()).append(".").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE).append(">");
+      newOp.setSuperTypeSignature(Signature.createTypeSignature(superTypeSigBuilder.toString(), true));
+    }
+
+    newOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    newOp.setFormatSource(isFormatSource());
+    newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdPage = newOp.getCreatedType();
     workingCopyManager.register(getCreatedPage().getCompilationUnit(), monitor);
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(getCreatedPage(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TITLE, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
-    ITypeHierarchy superTypeHierarchy = getCreatedPage().newSupertypeHierarchy(monitor);
-    if (superTypeHierarchy.contains(iPageWithTable)) {
-      // create table
-      InnerTypeNewOperation tableOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE, getCreatedPage());
-      tableOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
-      tableOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getCreatedPage().getJavaProject()));
-      tableOp.run(monitor, workingCopyManager);
-
-      // generic type
-      Pattern p = Pattern.compile("extends\\s*" + superTypeHierarchy.getSuperclass(getCreatedPage()).getElementName(), Pattern.MULTILINE);
-      Matcher matcher = p.matcher(getCreatedPage().getSource());
-      if (matcher.find()) {
-        Document doc = new Document(getCreatedPage().getSource());
-        InsertEdit genericEdit = new InsertEdit(matcher.end(), "<" + getCreatedPage().getElementName() + "." + SdkProperties.TYPE_NAME_TABLEFIELD_TABLE + ">");
-        try {
-          genericEdit.apply(doc);
-          ScoutTypeUtility.setSource(getCreatedPage(), doc.get(), workingCopyManager, monitor);
-        }
-        catch (Exception e) {
-          ScoutSdk.logWarning("could not set the generic type of the table field.", e);
-        }
-      }
-    }
-
     addToHolder(getCreatedPage(), monitor, workingCopyManager);
-
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{getCreatedPage().getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
-
-    if (m_formatSource) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedPage(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
   }
 
   public IType getCreatedPage() {
     return m_createdPage;
   }
 
-  public void setClientBundle(IScoutBundle clientBundle) {
-    m_clientBundle = clientBundle;
-  }
-
-  public IScoutBundle getClientBundle() {
-    return m_clientBundle;
-  }
-
   public String getTypeName() {
     return m_typeName;
   }
 
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public IJavaProject getJavaProject() {
+    return m_javaProject;
   }
 
   public void setSuperTypeSignature(String superTypeSignature) {
@@ -174,11 +150,4 @@ public class PageNewOperation extends AbstractPageOperation {
     m_formatSource = formatSource;
   }
 
-  public String getPackageName() {
-    return m_packageName;
-  }
-
-  public void setPackageName(String packageName) {
-    m_packageName = packageName;
-  }
 }

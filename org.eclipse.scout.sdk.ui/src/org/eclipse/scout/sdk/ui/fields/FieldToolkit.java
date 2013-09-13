@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextSelectionHandler;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -94,7 +95,7 @@ public class FieldToolkit {
     SignatureLabelProvider labelProvider = new SignatureLabelProvider();
     field.setLabelProvider(labelProvider);
 
-    IJavaSearchScope jSearchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{bundle.getJavaProject()});
+    IJavaSearchScope jSearchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{ScoutUtility.getJavaProject(bundle)});
     SignatureProposalProvider proposalProvider = new SignatureProposalProvider(jSearchScope, labelProvider, mostlyUsed, false);
     field.setContentProvider(proposalProvider);
     return field;

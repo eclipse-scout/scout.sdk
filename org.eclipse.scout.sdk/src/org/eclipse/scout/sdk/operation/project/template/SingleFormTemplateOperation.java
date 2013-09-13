@@ -13,31 +13,37 @@ package org.eclipse.scout.sdk.operation.project.template;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.form.FormHandlerNewOperation;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceMethod;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -77,163 +83,176 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     final IScoutBundle shared = bundleGraph.getBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
 
     // formdata
-    ScoutTypeNewOperation formDataOp = new ScoutTypeNewOperation(FORM_NAME + "Data", shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES), shared);
+    PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(FORM_NAME + "Data", shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES), shared.getJavaProject());
+    formDataOp.setFlags(Flags.AccPublic);
     formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+    formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    formDataOp.validate();
     formDataOp.run(monitor, workingCopyManager);
     IType formData = formDataOp.getCreatedType();
+//    workingCopyManager.reconcile(formData.getCompilationUnit(), monitor);
 
-    // export formdata package
-    ManifestExportPackageOperation expFormDataPackage = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD, new IPackageFragment[]{formData.getPackageFragment()}, false);
-    expFormDataPackage.validate();
-    expFormDataPackage.run(monitor, workingCopyManager);
-    String formDataSignature = SignatureCache.createTypeSignature(formData.getFullyQualifiedName());
+    final String formDataSignature = SignatureCache.createTypeSignature(formData.getFullyQualifiedName());
+
+    // process service
+    final IType serviceInterface;
+    if (server != null) {
+      serviceInterface = createProcessService(client, shared, server, formData, monitor, workingCopyManager);
+    }
+    else {
+      serviceInterface = null;
+    }
 
     // form
-    FormNewOperation formOp = new FormNewOperation();
-    formOp.setPackage(client.getPackageName(".ui.forms"));
+    FormNewOperation formOp = new FormNewOperation(FORM_NAME, client.getPackageName(".ui.forms"), client.getJavaProject());
     formOp.setFormDataSignature(formDataSignature);
-    formOp.setClientBundle(client);
     formOp.setCreateButtonCancel(false);
     formOp.setCreateButtonOk(false);
     formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, client.getJavaProject()));
-    formOp.setTypeName(FORM_NAME);
-    formOp.setFormatSource(false);
-    formOp.run(monitor, workingCopyManager);
-    final IType form = formOp.getCreatedFormType();
-    workingCopyManager.reconcile(form.getCompilationUnit(), monitor);
-
+    formOp.setFormatSource(true);
+    // getConfiguredIconId method
     final ScoutIconDesc icon = client.getIconProvider().getIcon("eclipse_scout");
     if (icon != null) {
-      MethodOverrideOperation iconIdOverrideOp = new MethodOverrideOperation(form, "getConfiguredIconId", false) {
+      IMethodSourceBuilder getConfiguredIconSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(formOp.getSourceBuilder(), "getConfiguredIconId");
+      getConfiguredIconSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String iconRef = validator.getTypeName(SignatureCache.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName()));
-          return "  return " + iconRef + "." + icon.getConstantField().getElementName() + ";";
+          source.append("  return ").append(iconRef).append(".").append(icon.getConstantField().getElementName()).append(";");
         }
-      };
-      iconIdOverrideOp.run(monitor, workingCopyManager);
+      });
+      formOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredIconSourceBuilder), getConfiguredIconSourceBuilder);
     }
+    // getConfiguredDisplayHint method
+    IMethodSourceBuilder getConfiguredDisplayHintBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(formOp.getSourceBuilder(), "getConfiguredDisplayHint");
+    getConfiguredDisplayHintBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return DISPLAY_HINT_VIEW;"));
+    formOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredDisplayHintBuilder), getConfiguredDisplayHintBuilder);
 
-    MethodOverrideOperation displayHintOp = new MethodOverrideOperation(form, "getConfiguredDisplayHint", false);
-    displayHintOp.setSimpleBody("  return DISPLAY_HINT_VIEW;");
-    displayHintOp.validate();
-    displayHintOp.run(monitor, workingCopyManager);
+    // getConfiguredAskIfNeedSave method
+    IMethodSourceBuilder getConfiguredAskIfNeedSaveBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(formOp.getSourceBuilder(), "getConfiguredAskIfNeedSave");
+    getConfiguredAskIfNeedSaveBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return false;"));
+    formOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredAskIfNeedSaveBuilder), getConfiguredAskIfNeedSaveBuilder);
 
-    ConfigPropertyMethodUpdateOperation askIfSaveNeedMethodOp = new ConfigPropertyMethodUpdateOperation(form, "getConfiguredAskIfNeedSave", "  return false;", false);
-    askIfSaveNeedMethodOp.run(monitor, workingCopyManager);
-
-    ConfigPropertyMethodUpdateOperation displayViewIdMethodOp = new ConfigPropertyMethodUpdateOperation(form, "getConfiguredDisplayViewId", "  return VIEW_ID_CENTER;", false);
-    displayViewIdMethodOp.run(monitor, workingCopyManager);
-
-    WellformScoutTypeOperation wellformFormOp = new WellformScoutTypeOperation(form, true);
-    wellformFormOp.validate();
-    wellformFormOp.run(monitor, workingCopyManager);
-
-    // process service
-    IType serviceInterface = null;
-    if (server != null) {
-      ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation();
-      serviceOp.setClientServiceRegistryBundles(new IScoutBundle[]{client});
-      serviceOp.setServerServiceRegistryBundles(new IScoutBundle[]{server});
-      serviceOp.setServiceImplementationBundle(server);
-      serviceOp.setServicePackageName(server.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES));
-      serviceOp.setServiceImplementationName("DesktopService");
-      serviceOp.setServiceInterfaceBundle(shared);
-      serviceOp.setServiceInterfacePackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES));
-      serviceOp.setPermissionPackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SECURITY));
-      serviceOp.setServiceInterfaceName("IDesktopService");
-      serviceOp.run(monitor, workingCopyManager);
-      serviceInterface = serviceOp.getCreatedServiceInterface();
-
-      // process service load method
-      if (TypeUtility.exists(serviceInterface)) { /* service interface can be null on a client only project */
-        workingCopyManager.reconcile(serviceInterface.getCompilationUnit(), monitor);
-        MethodCreateOperation loadInterfaceOp = new MethodCreateOperation(serviceInterface, "load");
-        loadInterfaceOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-        loadInterfaceOp.setMethodFlags(Flags.AccInterface);
-        loadInterfaceOp.setReturnTypeSignature(SignatureCache.createTypeSignature(formData.getFullyQualifiedName()));
-        loadInterfaceOp.setParameterNames(new String[]{"formData"});
-        loadInterfaceOp.setParameterSignatures(new String[]{SignatureCache.createTypeSignature(formData.getFullyQualifiedName())});
-        loadInterfaceOp.setFormatSource(false);
-        loadInterfaceOp.validate();
-        loadInterfaceOp.run(monitor, workingCopyManager);
-
-        workingCopyManager.reconcile(serviceOp.getCreatedServiceImplementation().getCompilationUnit(), monitor);
-        MethodCreateOperation loadMethodOp = new MethodCreateOperation(serviceOp.getCreatedServiceImplementation(), "load");
-        loadMethodOp.addAnnotation(AnnotationCreateOperation.OVERRIDE_OPERATION);
-        loadMethodOp.setMethodFlags(Flags.AccPublic);
-        loadMethodOp.setReturnTypeSignature(SignatureCache.createTypeSignature(formData.getFullyQualifiedName()));
-        loadMethodOp.setParameterNames(new String[]{"formData"});
-        loadMethodOp.setParameterSignatures(new String[]{SignatureCache.createTypeSignature(formData.getFullyQualifiedName())});
-        loadMethodOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-        loadMethodOp.setSimpleBody(ScoutUtility.getCommentAutoGeneratedMethodStub() + "\nreturn formData;\n");
-        loadMethodOp.setFormatSource(false);
-        loadMethodOp.validate();
-        loadMethodOp.run(monitor, workingCopyManager);
-      }
-    }
+    // getConfiguredDisplayViewId method
+    IMethodSourceBuilder getConfiguredDisplayViewIdBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(formOp.getSourceBuilder(), "getConfiguredDisplayViewId");
+    getConfiguredDisplayViewIdBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return VIEW_ID_CENTER;"));
+    formOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredDisplayViewIdBuilder), getConfiguredDisplayViewIdBuilder);
 
     // form handler
-    FormHandlerNewOperation handlerOp = new FormHandlerNewOperation(form);
-    handlerOp.setTypeName("ViewHandler");
-    handlerOp.setFormatSource(false);
-    handlerOp.validate();
-    handlerOp.run(monitor, workingCopyManager);
-    IType handler = handlerOp.getCreatedHandler();
+    ITypeSourceBuilder viewHandlerBuilder = new TypeSourceBuilder("ViewHandler");
+    viewHandlerBuilder.setFlags(Flags.AccPublic);
+    viewHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, client.getJavaProject()));
+    formOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(viewHandlerBuilder), viewHandlerBuilder);
 
-    workingCopyManager.reconcile(handler.getCompilationUnit(), monitor);
-
-    final IType svcIfc = serviceInterface;
-    final String fqnFormData = formData.getFullyQualifiedName();
-    MethodOverrideOperation execLoadOp = new MethodOverrideOperation(handler, "execLoad", false) {
-      @Override
-      protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        StringBuilder builder = new StringBuilder();
-        if (TypeUtility.exists(svcIfc) && svcIfc != null) { /* service interface can be null on a client only project */
-          String servicesRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES));
-          String serviceRef = validator.getTypeName(SignatureCache.createTypeSignature(svcIfc.getFullyQualifiedName()));
-          String formDataRef = validator.getTypeName(SignatureCache.createTypeSignature(fqnFormData));
-          builder.append(serviceRef + " service = " + servicesRef + ".getService(" + serviceRef + ".class);\n");
-          builder.append(formDataRef + " formData = new " + formDataRef + "();\n");
-          builder.append("exportFormData(formData);\n");
-          builder.append("formData = service.load(formData);\n");
-          builder.append("importFormData(formData);\n");
+    // execLoad method
+    if (server != null && serviceInterface != null) {
+      IMethodSourceBuilder execLoadSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(viewHandlerBuilder, "execLoad");
+      execLoadSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(serviceInterface.getFullyQualifiedName()));
+          source.append(serviceInterfaceName).append(" service = ");
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          String formDataRef = validator.getTypeName(formDataSignature);
+          source.append(formDataRef).append(" formData = new ").append(formDataRef).append("();").append(lineDelimiter);
+          source.append("exportFormData(formData);").append(lineDelimiter);
+          source.append("formData = service.load(formData);").append(lineDelimiter);
+          source.append("importFormData(formData);").append(lineDelimiter);
         }
-        return builder.toString();
+      });
+      viewHandlerBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execLoadSourceBuilder), execLoadSourceBuilder);
+    }
+
+    // start view method
+    final String handlerFqn = formOp.getPackageName() + "." + formOp.getElementName() + "." + viewHandlerBuilder.getElementName();
+    IMethodSourceBuilder startHandlerMethodBuilder = new MethodSourceBuilder("start" + SdkProperties.TYPE_NAME_VIEW_HANDLER_PREFIX);
+    startHandlerMethodBuilder.setFlags(Flags.AccPublic);
+    startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqn, true))).append("());");
       }
-    };
-    execLoadOp.validate();
-    execLoadOp.run(monitor, workingCopyManager);
+    });
+    formOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);
+
+    formOp.run(monitor, workingCopyManager);
+    final IType form = formOp.getCreatedType();
+    workingCopyManager.reconcile(form.getCompilationUnit(), monitor);
 
     // formdata
-    FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(form);
+    FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(form, formData.getCompilationUnit());
+    formDataOp.validate();
     formDataUpdateOp.run(monitor, workingCopyManager);
 
     // desktop
     IType desktopType = TypeUtility.getType(client.getDefaultPackage(IDefaultTargetPackage.CLIENT_DESKTOP) + ".Desktop");
     if (TypeUtility.exists(desktopType)) {
-      MethodOverrideOperation execOpenOp = new MethodOverrideOperation(desktopType, "execOpened", false) {
+      MethodOverrideOperation execOpenOp = new MethodOverrideOperation("execOpened", desktopType, false);
+      execOpenOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          StringBuilder sourceBuilder = new StringBuilder();
-          sourceBuilder.append("//If it is a mobile or tablet device, the DesktopExtension in the mobile plugin takes care of starting the correct forms.\n");
-          sourceBuilder.append("if (!UserAgentUtility.isDesktopDevice()) {\n");
-          sourceBuilder.append("  return;\n");
-          sourceBuilder.append("}\n");
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append("//If it is a mobile or tablet device, the DesktopExtension in the mobile plugin takes care of starting the correct forms.\n");
+          source.append("if (!").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.UserAgentUtility)));
+          source.append(".isDesktopDevice()) {").append(lineDelimiter);
+          source.append("  return;").append(lineDelimiter);
+          source.append("}").append(lineDelimiter);
           String treeFormRef = validator.getTypeName(SignatureCache.createTypeSignature(form.getFullyQualifiedName()));
-          sourceBuilder.append(treeFormRef + " desktopForm = new " + treeFormRef + "();\n");
+          source.append(treeFormRef).append(" desktopForm = new ").append(treeFormRef).append("();").append(lineDelimiter);
           ScoutIconDesc icn = client.getIconProvider().getIcon("eclipse_scout");
           if (icn != null) {
             String iconsRef = validator.getTypeName(SignatureCache.createTypeSignature(icn.getConstantField().getDeclaringType().getFullyQualifiedName()));
-            sourceBuilder.append("desktopForm.setIconId(" + iconsRef + "." + icn.getConstantField().getElementName() + ");\n");
+            source.append("desktopForm.setIconId(").append(iconsRef).append(".").append(icn.getConstantField().getElementName()).append(");").append(lineDelimiter);
           }
-          sourceBuilder.append("desktopForm.startView();");
-          return sourceBuilder.toString();
+          source.append("desktopForm.startView();");
         }
-      };
+      });
       execOpenOp.setSibling(desktopType.getType("FileMenu"));
       execOpenOp.validate();
       execOpenOp.run(monitor, workingCopyManager);
     }
   }
+
+  /**
+   * @param iJavaProject3
+   * @param iJavaProject2
+   * @param iJavaProject
+   * @param monitor
+   * @param workingCopyManager
+   * @throws CoreException
+   * @throws IllegalArgumentException
+   */
+  private IType createProcessService(IScoutBundle client, IScoutBundle shared, IScoutBundle server, IType formData, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws IllegalArgumentException, CoreException {
+    ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation("DesktopService");
+    serviceOp.addProxyRegistrationProject(client.getJavaProject());
+    serviceOp.addServiceRegistrationProject(server.getJavaProject());
+    serviceOp.setImplementationProject(server.getJavaProject());
+    serviceOp.setImplementationPackageName(server.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES));
+    serviceOp.setInterfaceProject(shared.getJavaProject());
+    serviceOp.setInterfacePackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES));
+    // load method
+    ServiceMethod loadMethod = new ServiceMethod("load", serviceOp.getInterfacePackageName() + "." + serviceOp.getInterfaceName());
+    String formDataSignature = SignatureCache.createTypeSignature(formData.getFullyQualifiedName());
+    loadMethod.setReturnTypeSignature(formDataSignature);
+    loadMethod.addParameter(new MethodParameter("formData", formDataSignature));
+    loadMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append(ScoutUtility.getCommentAutoGeneratedMethodStub()).append(lineDelimiter);
+        source.append("return formData;");
+      }
+    });
+    serviceOp.addServiceMethodBuilder(loadMethod);
+
+    serviceOp.validate();
+    serviceOp.run(monitor, workingCopyManager);
+    IType serviceInterface = serviceOp.getCreatedServiceInterface();
+    return serviceInterface;
+
+  }
+
 }

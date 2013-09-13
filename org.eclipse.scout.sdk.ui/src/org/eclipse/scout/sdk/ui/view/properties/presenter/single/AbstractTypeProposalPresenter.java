@@ -11,58 +11,69 @@
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.TypePropertyParser;
 import org.eclipse.swt.widgets.Composite;
 
 public abstract class AbstractTypeProposalPresenter extends AbstractProposalPresenter<IType> {
 
+  private IPropertySourceParser<IType> m_parser;
+
   public AbstractTypeProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new TypePropertyParser();
+  }
+
+  public IPropertySourceParser<IType> getParser() {
+    return m_parser;
   }
 
   @Override
   protected IType parseInput(String input) throws CoreException {
-    IType referedType = PropertyMethodSourceUtility.parseReturnParameterClass(input, getMethod().peekMethod());
-    return referedType;
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+//    IType referedType = PropertyMethodSourceUtility.parseReturnParameterClass(input, getMethod().peekMethod());
+//    return referedType;
   }
 
   @Override
   protected synchronized void storeValue(final IType value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<IType> updateOp = new ConfigPropertyUpdateOperation<IType>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName()) {
-        @Override
-        protected String createMethodBody(IMethod methodToOverride, IImportValidator validator) throws JavaModelException {
-          StringBuilder source = new StringBuilder();
-          source.append("  return ");
-          if (value != null) {
-            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(value.getFullyQualifiedName()), validator) + ".class;");
-          }
-          else {
-            source.append("null;");
-          }
-          return source.toString();
-        }
-      };
-      ((ConfigPropertyMethodUpdateOperation) op).setFormatSource(true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    new OperationJob(op).schedule();
+
+//    IOperation op = null;
+//    if (UiUtility.equals(getDefaultValue(), value)) {
+//      if (getMethod().isImplemented()) {
+//        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
+//      }
+//    }
+//    else {
+//      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName()) {
+//        @Override
+//        protected void createMethodBody(IMethod methodToOverride, StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator) throws JavaModelException {
+//          sourceBuilder.append("  return ");
+//          if (value != null) {
+//            sourceBuilder.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(value.getFullyQualifiedName()), validator)).append(".class;");
+//          }
+//          else {
+//            sourceBuilder.append("null;");
+//          }
+//        }
+//      };
+//      ((ConfigPropertyMethodUpdateOperation) op).setFormatSource(true);
+//    }
+//    new OperationJob(op).schedule();
   }
 }

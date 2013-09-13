@@ -235,7 +235,6 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     else {
       op.setSibling(getSibling().getElement());
     }
-    op.setGenericTypeSignature(getGenericSignature());
     op.setNextCodeId(getNextCodeIdSource());
     op.run(monitor, workingCopyManager);
     m_createdCode = op.getCreatedCode();

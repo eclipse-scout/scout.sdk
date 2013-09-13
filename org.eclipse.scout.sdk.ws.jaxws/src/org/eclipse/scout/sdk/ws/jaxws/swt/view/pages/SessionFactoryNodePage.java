@@ -13,13 +13,13 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.ScoutSeverityManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 

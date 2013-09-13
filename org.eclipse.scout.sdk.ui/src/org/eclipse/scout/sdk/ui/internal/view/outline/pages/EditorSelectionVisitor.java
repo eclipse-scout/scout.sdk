@@ -295,13 +295,13 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof AttributeTablePage) {
-      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IComposerAttribute));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IDataModelAttribute));
     }
     else if (page instanceof AttributeNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof EntityTablePage) {
-      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IComposerEntity));
+      return visitTypeInHierarchyPage(TypeUtility.getType(RuntimeClasses.IDataModelEntity));
     }
     else if (page instanceof EntityNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);

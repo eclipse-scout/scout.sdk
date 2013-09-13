@@ -380,15 +380,15 @@
          </default>
       </element>
       <element
-            interface="org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute">
+            interface="org.eclipse.scout.rt.shared.data.model.IDataModelAttribute">
          <default
-               class="org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.AbstractComposerAttribute">
+               class="org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute">
          </default>
       </element>
       <element
-            interface="org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity">
+            interface="org.eclipse.scout.rt.shared.data.model.IDataModelEntity">
          <default
-               class="org.eclipse.scout.rt.client.ui.form.fields.composer.entity.AbstractComposerEntity">
+               class="org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity">
          </default>
       </element>
       <element

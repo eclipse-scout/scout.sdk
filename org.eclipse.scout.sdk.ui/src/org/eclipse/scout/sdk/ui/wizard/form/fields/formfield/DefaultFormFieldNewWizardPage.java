@@ -169,13 +169,11 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    DefaultFormFieldNewOperation operation = new DefaultFormFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    DefaultFormFieldNewOperation operation = new DefaultFormFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {

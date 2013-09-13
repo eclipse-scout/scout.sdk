@@ -13,15 +13,16 @@ package org.eclipse.scout.sdk.operation.dnd;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -47,19 +48,16 @@ public class TableColumnDndOperation extends AbstractTypeDndOperation {
 
   @Override
   protected IType createNewType(IType declaringType, String simpleName, String source, String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    IType newColumn = super.createNewType(declaringType, simpleName, source, fqImports, sibling, structuredType, monitor, manager);
+    final IType newColumn = super.createNewType(declaringType, simpleName, source, fqImports, sibling, structuredType, monitor, manager);
 
-    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(newColumn, declaringType, false) {
+    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(newColumn, declaringType, false);
+    getterOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
-      protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-        StringBuilder methodSource = new StringBuilder();
-        methodSource.append("return getColumnSet().getColumnByClass(");
-        methodSource.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getField().getFullyQualifiedName()), getDeclaringType(), validator) + ".class");
-        methodSource.append(");");
-        return methodSource.toString();
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder sourceBuilder, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        sourceBuilder.append("return getColumnSet().getColumnByClass(").append(validator.getTypeName(SignatureCache.createTypeSignature(newColumn.getFullyQualifiedName()))).append(".class);");
       }
-    };
-    getterOp.setSibling(structuredType.getSiblingMethodFieldGetter(getterOp.getMethodName()));
+    });
+    getterOp.setSibling(structuredType.getSiblingMethodFieldGetter(getterOp.getElementName()));
     getterOp.validate();
     getterOp.run(monitor, manager);
 

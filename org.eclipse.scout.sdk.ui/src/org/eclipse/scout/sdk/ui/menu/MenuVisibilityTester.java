@@ -27,9 +27,18 @@ public class MenuVisibilityTester extends PropertyTester {
 
   private static IContextMenuContributor getMenuContributor(Class<? extends IScoutHandler> menu, IPage p) {
     for (IContextMenuContributor c : ContextMenuContributorExtensionPoint.getContextMenuContributors(p)) {
-      Class<? extends IScoutHandler>[] menus = c.getSupportedMenuActionsFor(p);
-      if (contains(menus, menu)) return c;
+      try {
+        Class<? extends IScoutHandler>[] menus = c.getSupportedMenuActionsFor(p);
+        if (contains(menus, menu)) {
+          return c;
+        }
+      }
+      catch (Throwable t) {
+        ScoutSdkUi.logError("Could not get supported menues for extension '" + c.toString() + "'!");
+        // TODO: handle exception
+      }
     }
+
     return null;
   }
 

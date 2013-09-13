@@ -14,7 +14,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link MultipleFormDataUpdateOperation}</h3> ...
@@ -51,7 +53,13 @@ public class MultipleFormDataUpdateOperation implements IOperation {
     for (IType t : types) {
       i++;
       monitor.setTaskName("Updating Form Data " + i + " of " + types.length + " (" + t.getElementName() + ")");
-      new FormDataUpdateOperation(t).run(monitor, workingCopyManager);
+      FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(t, TypeUtility.getSuperTypeHierarchy(t));
+      if (annotation != null && FormDataAnnotation.isCreate(annotation)) {
+        IType formDataType = TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature());
+        if (TypeUtility.exists(formDataType)) {
+          new FormDataUpdateOperation(t, formDataType.getCompilationUnit()).run(monitor, workingCopyManager);
+        }
+      }
       monitor.worked(1);
     }
   }

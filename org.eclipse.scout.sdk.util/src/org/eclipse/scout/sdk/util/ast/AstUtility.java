@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.ast;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.ast.visitor.TypeSignatureResolveVisitor;
@@ -60,7 +60,7 @@ public final class AstUtility {
         }
       }
     }
-    catch (JavaModelException e) {
+    catch (CoreException e) {
       SdkUtilActivator.logError("could not parse return type of method '" + methodName + "' on type '" + typeSignature + "'");
     }
     return null;

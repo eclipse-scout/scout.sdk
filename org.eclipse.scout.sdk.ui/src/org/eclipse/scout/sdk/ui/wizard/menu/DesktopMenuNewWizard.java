@@ -61,10 +61,9 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
   @Override
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // create menu
-    m_operation = new MenuNewOperation(getDeclaringType(), true);
+    m_operation = new MenuNewOperation(m_page1.getTypeName(), getDeclaringType(), true);
     // write back members
     m_operation.setNlsEntry(m_page1.getNlsName());
-    m_operation.setTypeName(m_page1.getTypeName());
     IType superTypeProp = m_page1.getSuperType();
     if (superTypeProp != null) {
       String signature = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName());

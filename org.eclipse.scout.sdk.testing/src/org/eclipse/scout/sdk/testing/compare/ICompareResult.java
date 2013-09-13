@@ -30,5 +30,7 @@ public interface ICompareResult<T> {
     T getValue01();
 
     T getValue02();
+
   }
+
 }

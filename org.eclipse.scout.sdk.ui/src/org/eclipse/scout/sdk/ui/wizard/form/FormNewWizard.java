@@ -12,12 +12,15 @@ package org.eclipse.scout.sdk.ui.wizard.form;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
@@ -35,6 +38,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -68,7 +72,7 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
   private final IScoutBundle m_clientBundle;
   private FormNewWizardPage m_formPage;
   private BundleTreeWizardPage m_locationPage;
-  private FormStackNewOperation m_operation = new FormStackNewOperation(true);
+  private FormStackNewOperation m_operation;// = new FormStackNewOperation(true);
   private ITreeNode m_locationPageRoot;
 
   public FormNewWizard(IScoutBundle clientBundle) {
@@ -145,57 +149,63 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
   @Override
   protected boolean beforeFinish() throws CoreException {
     // fill operation before gui is disposed
+    IScoutBundle formBundle = m_locationPage.getLocationBundle(TYPE_FORM, true, true);
+    m_operation = new FormStackNewOperation(m_formPage.getTypeName(), formBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS)), formBundle.getJavaProject());
     m_formPage.fillOperation(m_operation);
     m_operation.setCreateButtonOk(m_locationPage.getTreeNode(TYPE_FORM_BUTTON_OK, true, true) != null);
     m_operation.setCreateButtonCancel(m_locationPage.getTreeNode(TYPE_FORM_BUTTON_CANCEL, true, true) != null);
     m_operation.setCreateModifyHandler(m_locationPage.getTreeNode(TYPE_HANDLER_MODIFY, true, true) != null);
     m_operation.setCreateNewHandler(m_locationPage.getTreeNode(TYPE_HANDLER_NEW, true, true) != null);
-    IScoutBundle formBundle = m_locationPage.getLocationBundle(TYPE_FORM, true, true);
-    if (formBundle != null) {
-      m_operation.setFormBundle(formBundle);
-      m_operation.setFormPackage(formBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS)));
-    }
     IScoutBundle formDataBundle = m_locationPage.getLocationBundle(TYPE_FORM_DATA, true, true);
     if (formDataBundle != null) {
-      m_operation.setFormDataBundle(formDataBundle);
+      m_operation.setFormDataProject(formDataBundle.getJavaProject());
       m_operation.setFormDataPackage(formDataBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)));
     }
-
-    m_operation.setClientServiceRegistryBundles(m_locationPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true));
+    IScoutBundle[] proxyRegistrationBundles = m_locationPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
+    List<IJavaProject> proxyRegistrationProjects = new ArrayList<IJavaProject>(proxyRegistrationBundles.length);
+    for (IScoutBundle b : proxyRegistrationBundles) {
+      proxyRegistrationProjects.add(ScoutUtility.getJavaProject(b));
+    }
+    m_operation.setServiceProxyRegistrationProjects(proxyRegistrationProjects);
 
     IScoutBundle permCreateBundle = m_locationPage.getLocationBundle(TYPE_PERMISSION_CREATE, true, true);
     if (permCreateBundle != null) {
-      m_operation.setPermissionCreateBundle(permCreateBundle);
+      m_operation.setPermissionCreateProject(permCreateBundle.getJavaProject());
       m_operation.setPermissionCreateName(m_locationPage.getTextOfNode(TYPE_PERMISSION_CREATE, true, true));
       m_operation.setPermissionCreatePackage(permCreateBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)));
     }
 
     IScoutBundle permReadBundle = m_locationPage.getLocationBundle(TYPE_PERMISSION_READ, true, true);
     if (permReadBundle != null) {
-      m_operation.setPermissionReadBundle(permReadBundle);
+      m_operation.setPermissionReadProject(permReadBundle.getJavaProject());
       m_operation.setPermissionReadName(m_locationPage.getTextOfNode(TYPE_PERMISSION_READ, true, true));
       m_operation.setPermissionReadPackage(permReadBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)));
     }
 
     IScoutBundle permUpdateBundle = m_locationPage.getLocationBundle(TYPE_PERMISSION_UPDATE, true, true);
     if (permUpdateBundle != null) {
-      m_operation.setPermissionUpdateBundle(permUpdateBundle);
+      m_operation.setPermissionUpdateProject(permUpdateBundle.getJavaProject());
       m_operation.setPermissionUpdateName(m_locationPage.getTextOfNode(TYPE_PERMISSION_UPDATE, true, true));
       m_operation.setPermissionUpdatePackage(permUpdateBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)));
     }
 
-    m_operation.setServerServiceRegistryBundles(m_locationPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true));
+    IScoutBundle[] serviceRegistrationBundles = m_locationPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
+    List<IJavaProject> serviceRegistrationProjects = new ArrayList<IJavaProject>(serviceRegistrationBundles.length);
+    for (IScoutBundle b : serviceRegistrationBundles) {
+      serviceRegistrationProjects.add(ScoutUtility.getJavaProject(b));
+    }
+    m_operation.setServiceRegistrationProjects(serviceRegistrationProjects);
 
     IScoutBundle serviceImplBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (serviceImplBundle != null) {
-      m_operation.setServiceImplementationBundle(serviceImplBundle);
+      m_operation.setServiceImplementationProject(serviceImplBundle.getJavaProject());
       m_operation.setServiceImplementationName(m_locationPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
       m_operation.setServiceImplementationPackage(serviceImplBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES)));
     }
 
     IScoutBundle serviceInterfaceBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
     if (serviceInterfaceBundle != null) {
-      m_operation.setServiceInterfaceBundle(serviceInterfaceBundle);
+      m_operation.setServiceInterfaceProject(serviceInterfaceBundle.getJavaProject());
       m_operation.setServiceInterfaceName(m_locationPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true));
       m_operation.setServiceInterfacePackage(serviceInterfaceBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)));
     }

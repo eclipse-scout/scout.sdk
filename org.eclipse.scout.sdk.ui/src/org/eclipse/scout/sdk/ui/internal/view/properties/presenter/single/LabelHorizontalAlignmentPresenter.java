@@ -1,34 +1,50 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LabelHorizontalAlignmentPresenter.HorizontalAlignment;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerSourcePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.SourcePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
-public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter<HorizontalAlignment> {
+public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter<SourceProperty<Integer>> {
 
-  protected static enum HorizontalAlignment {
-    Left,
-    Center,
-    Right,
-    Default
+  protected static final SourceProperty<Integer> LEFT;
+  protected static final SourceProperty<Integer> CENTER;
+  protected static final SourceProperty<Integer> RIGHT;
+  protected static final SourceProperty<Integer> DEFAULT;
+
+  protected static final List<SourceProperty<Integer>> PROPOSALS;
+  static {
+    LEFT = new UiSourceProperty<Integer>(Integer.valueOf(-1), "left");
+    CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
+    RIGHT = new UiSourceProperty<Integer>(Integer.valueOf(1), "right");
+    DEFAULT = new UiSourceProperty<Integer>(Integer.valueOf(1000), "default");
+    PROPOSALS = new ArrayList<SourceProperty<Integer>>();
+    PROPOSALS.add(LEFT);
+    PROPOSALS.add(CENTER);
+    PROPOSALS.add(RIGHT);
+    PROPOSALS.add(DEFAULT);
   }
+
+  private final SourcePropertyParser<Integer> m_parser;
 
   public LabelHorizontalAlignmentPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new IntegerSourcePropertyParser(PROPOSALS);
   }
 
   @Override
@@ -41,73 +57,49 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
 
       @Override
       public Image getImage(Object element) {
-        HorizontalAlignment value = (HorizontalAlignment) element;
-        switch (value) {
-          case Left:
-            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft);
-          case Center:
-            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalCenter);
-          case Right:
-            return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight);
+        if (CompareUtility.equals(LEFT, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalLeft);
+        }
+        else if (CompareUtility.equals(CENTER, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalCenter);
+        }
+        else if (CompareUtility.equals(RIGHT, element)) {
+          return ScoutSdkUi.getImage(ScoutSdkUi.HorizontalRight);
         }
         return ScoutSdkUi.getImage(ScoutSdkUi.Default);
       }
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(HorizontalAlignment.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new UiSourceProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  @Override
-  protected HorizontalAlignment parseInput(String input) throws CoreException {
-    int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    switch (parsedInt) {
-      case -1:
-        return HorizontalAlignment.Left;
-      case 0:
-        return HorizontalAlignment.Center;
-      case 1:
-        return HorizontalAlignment.Right;
-    }
-    return HorizontalAlignment.Default;
+  public SourcePropertyParser<Integer> getParser() {
+    return m_parser;
   }
 
   @Override
-  protected void storeValue(HorizontalAlignment value) throws CoreException {
+  protected SourceProperty<Integer> parseInput(String input) throws CoreException {
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+  }
+
+  @Override
+  protected synchronized void storeValue(SourceProperty<Integer> value) throws CoreException {
     if (value == null) {
-      // set to default
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
-    }
-    else {
-      String sourceValue;
-      switch (value) {
-        case Left:
-          sourceValue = "-1";
-          break;
-        case Center:
-          sourceValue = "0";
-          break;
-        case Right:
-          sourceValue = "1";
-          break;
-        default:
-          sourceValue = "1000";
-      }
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
-    }
-
-    if (op != null) {
-      OperationJob job = new OperationJob(op);
+    try {
+      ConfigPropertyUpdateOperation<SourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<SourceProperty<Integer>>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
       job.schedule();
     }
-  }
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
+    }
 
+  }
 }

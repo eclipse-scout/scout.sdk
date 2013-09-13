@@ -129,10 +129,9 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    OutlineToolbuttonNewOperation operation = new OutlineToolbuttonNewOperation(m_declaringType);
+    OutlineToolbuttonNewOperation operation = new OutlineToolbuttonNewOperation(getTypeName(), m_declaringType, true);
 
     // write back members
-    operation.setTypeName(getTypeName());
 
     ToolbuttonNewWizardPage1 previousPage = (ToolbuttonNewWizardPage1) getWizard().getPage(ToolbuttonNewWizardPage1.class.getName());
     if (previousPage.getSuperType() != null) {

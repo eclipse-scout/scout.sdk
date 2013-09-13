@@ -42,13 +42,13 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.ScoutResourceFilters;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper.ManifestPart;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.JavaElementComparator;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.osgi.framework.Version;
 
@@ -75,7 +75,7 @@ public class LibraryBundleCreateOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
-    IStatus nameStatus = JavaElementValidator.validateNewBundleName(getBundleName());
+    IStatus nameStatus = ScoutUtility.validateNewBundleName(getBundleName());
     if (nameStatus.matches(IStatus.ERROR)) {
       throw new IllegalArgumentException(nameStatus.getMessage());
     }

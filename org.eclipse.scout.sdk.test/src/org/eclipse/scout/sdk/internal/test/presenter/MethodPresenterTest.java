@@ -1,13 +1,18 @@
 package org.eclipse.scout.sdk.internal.test.presenter;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.TuningUtility;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.Activator;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BooleanPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonDisplayStylePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonSystemTypePresenter;
@@ -44,6 +49,7 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+//XXX Test failed
 public class MethodPresenterTest extends AbstractScoutSdkTest {
 
   private final static String SHARED_PROJECT = "presenter.test.shared";
@@ -56,7 +62,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("presenter", SHARED_PROJECT, SERVER_PROJECT, CLIENT_PROJECT);
+    setupWorkspace("resources/presenter", SHARED_PROJECT, SERVER_PROJECT, CLIENT_PROJECT);
 
     default_toolkit = new PropertyViewFormToolkit(Display.getDefault());
     default_parent = Display.getDefault().getActiveShell();
@@ -64,9 +70,9 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
     String hostname = InetAddress.getLocalHost().getHostName().toLowerCase();
     InputStream is = null;
     try {
-      is = getInputStream("presenter/refDurations/" + hostname + ".properties");
+      is = getInputStream("resources/presenter/refDurations/" + hostname + ".properties");
       if (is == null) {
-        is = getInputStream("presenter/refDurations/default.properties");
+        is = getInputStream("resources/presenter/refDurations/default.properties");
       }
       reference_max_durations = new Properties();
       reference_max_durations.load(is);
@@ -80,6 +86,15 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
         }
       }
     }
+  }
+
+  private static InputStream getInputStream(String pathToResource) throws IOException {
+    URL resource = FileLocator.find(Activator.getDefault().getBundle(), new Path(pathToResource), null);
+    InputStream is = null;
+    if (resource != null) {
+      is = resource.openStream();
+    }
+    return is;
   }
 
   @AfterClass

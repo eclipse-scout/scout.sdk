@@ -15,17 +15,19 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
@@ -59,7 +61,7 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
     if (selected) {
       IType menu = r.m_toolsMenuType.getType(EXCEL_EXPORT_MENU_TYPE_NAME);
       if (!TypeUtility.exists(menu)) {
-        MenuNewOperation mno = new MenuNewOperation(r.m_toolsMenuType, false);
+        MenuNewOperation mno = new MenuNewOperation(EXCEL_EXPORT_MENU_TYPE_NAME, r.m_toolsMenuType, false);
         INlsEntry nlsEntry = r.getBundle().getNlsProject().getEntry(EXCEL_EXPORT_NLS_KEY);
         if (nlsEntry == null) {
           // create
@@ -68,7 +70,6 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
           r.getBundle().getNlsProject().updateRow(newEntry, monitor);
         }
         mno.setNlsEntry(nlsEntry);
-        mno.setTypeName(EXCEL_EXPORT_MENU_TYPE_NAME);
         mno.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IMenu, r.getBundle()));
         mno.validate();
         mno.run(monitor, workingCopyManager);
@@ -78,33 +79,33 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
       }
 
       final String scoutXlsxSpreadsheetAdapterFqn = "org.eclipse.scout.rt.docx4j.client.ScoutXlsxSpreadsheetAdapter";
-      MethodOverrideOperation execAction = new MethodOverrideOperation(menu, "execAction") {
+
+      MethodOverrideOperation execAction = new MethodOverrideOperation("execAction", menu);
+      execAction.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String typeRef = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(scoutXlsxSpreadsheetAdapterFqn), validator);
           String ioFileRef = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature("java.io.File"), validator);
           String shellRef = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature("org.eclipse.scout.rt.shared.services.common.shell.IShellService"), validator);
           String svcRef = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature("org.eclipse.scout.service.SERVICES"), validator);
-
-          StringBuilder body = new StringBuilder();
-          body.append("if (getOutline() != null && getOutline().getActivePage() != null) {\n");
-          body.append("  ");
-          body.append(typeRef);
-          body.append(" s = new ");
-          body.append(typeRef);
-          body.append("();\n");
-          body.append("  ");
-          body.append(ioFileRef);
-          body.append(" xlsx = s.exportPage(null, 0, 0, getOutline().getActivePage());\n");
-          body.append("  ");
-          body.append(svcRef);
-          body.append(".getService(");
-          body.append(shellRef);
-          body.append(".class).shellOpen(xlsx.getAbsolutePath());\n");
-          body.append("}");
-          return body.toString();
+          source.append("if (getOutline() != null && getOutline().getActivePage() != null) {\n");
+          source.append("  ");
+          source.append(typeRef);
+          source.append(" s = new ");
+          source.append(typeRef);
+          source.append("();\n");
+          source.append("  ");
+          source.append(ioFileRef);
+          source.append(" xlsx = s.exportPage(null, 0, 0, getOutline().getActivePage());\n");
+          source.append("  ");
+          source.append(svcRef);
+          source.append(".getService(");
+          source.append(shellRef);
+          source.append(".class).shellOpen(xlsx.getAbsolutePath());\n");
+          source.append("}");
         }
-      };
+      });
       execAction.setFormatSource(false);
       execAction.validate();
       execAction.run(monitor, workingCopyManager);

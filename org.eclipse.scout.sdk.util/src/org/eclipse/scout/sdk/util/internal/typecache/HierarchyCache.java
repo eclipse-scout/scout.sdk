@@ -265,6 +265,17 @@ public final class HierarchyCache implements IHierarchyCache {
         if (e.getElementType() == IJavaElement.TYPE && e.getDeclaringType() == null) {
           handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
         }
+        else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+          try {
+            IType[] types = ((ICompilationUnit) e.getElement()).getTypes();
+            if (types.length > 0) {
+              handleTypeChange(types[0], e.getSuperTypeHierarchy());
+            }
+          }
+          catch (JavaModelException ex) {
+            SdkUtilActivator.logError(ex);
+          }
+        }
         break;
       }
       case IJavaElementDelta.REMOVED: {

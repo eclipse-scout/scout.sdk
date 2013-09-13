@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
@@ -30,7 +31,6 @@ import org.eclipse.scout.sdk.operation.project.FillClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.FillServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -43,7 +43,7 @@ import org.osgi.framework.Constants;
 
 /**
  * <h3>{@link ScoutProjectAddOperation}</h3> ...
- *
+ * 
  * @author mvi
  * @since 3.8.0 02.03.2012
  */
@@ -115,7 +115,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
 
   /**
    * Adds the additionalSymbolicName to all product files that already have the existingSymbolicName dependency.
-   *
+   * 
    * @param existingSymbolicName
    * @param additionalSymbolicName
    * @throws CoreException

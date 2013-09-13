@@ -6,10 +6,11 @@ import java.io.Reader;
 import java.io.StringWriter;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.internal.test.Activator;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.compare.CompareUtility;
+import org.eclipse.scout.sdk.testing.compare.ICompareResult;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -20,7 +21,7 @@ import org.junit.BeforeClass;
 public abstract class AbstractFieldNewOperationTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("operation/form/fields", "formfield.shared", "formfield.client");
+    setupWorkspace("resources/operation/form/fields", "formfield.shared", "formfield.client");
   }
 
   public abstract IType getCreatedField();
@@ -38,24 +39,13 @@ public abstract class AbstractFieldNewOperationTest extends AbstractScoutSdkTest
     IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(form);
 
     IOperation op = getOperation(form, structuredType);
-    runOperationAndWait(op);
+    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
     IType createdField = getCreatedField();
 
-    InputStream is = getInputStream(getReferenceFilePath());
-    try {
-      String ref = getContent(is);
-      String created = createdField.getSource().trim();
-      Assert.assertTrue(CompareUtility.equals(ref, created));
+    ICompareResult<String> result = CompareUtility.compareSource(createdField, Activator.getDefault().getBundle(), getReferenceFilePath(), true);
+    if (!result.isEqual()) {
+      Assert.fail(result.toString());
     }
-    finally {
-      is.close();
-    }
-  }
-
-  protected void runOperationAndWait(IOperation o) throws InterruptedException {
-    OperationJob job = new OperationJob(o);
-    job.schedule();
-    job.join();
   }
 
   protected String getContent(InputStream is) throws Exception {

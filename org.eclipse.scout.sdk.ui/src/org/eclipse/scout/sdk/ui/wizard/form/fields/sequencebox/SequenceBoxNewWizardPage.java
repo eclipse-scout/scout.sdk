@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields.sequencebox;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -21,7 +19,6 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.form.field.SequenceBoxNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -31,11 +28,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -59,8 +52,6 @@ public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
-
-  private IType m_createdType;
 
   public SequenceBoxNewWizardPage(IType declaringType) {
     super(SequenceBoxNewWizardPage.class.getName());
@@ -121,30 +112,6 @@ public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_siblingField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-  }
-
-  @Override
-  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SequenceBoxNewOperation operation = new SequenceBoxNewOperation(m_declaringType);
-    operation.setFormatSource(true);
-    // write back members
-    if (getNlsName() != null) {
-      operation.setNlsEntry(getNlsName());
-    }
-    operation.setTypeName(getTypeName());
-    if (getSuperType() != null) {
-      operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
-    }
-    if (getSibling() == SiblingProposal.SIBLING_END) {
-      IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
-      operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
-    }
-    else {
-      operation.setSibling(getSibling().getElement());
-    }
-    operation.run(monitor, workingCopyManager);
-    setCreatedType(operation.getCreatedField());
-    return true;
   }
 
   @Override
@@ -236,11 +203,4 @@ public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public IType getCreatedType() {
-    return m_createdType;
-  }
-
-  public void setCreatedType(IType createdType) {
-    m_createdType = createdType;
-  }
 }

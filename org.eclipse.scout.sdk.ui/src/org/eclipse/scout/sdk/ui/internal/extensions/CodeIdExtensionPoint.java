@@ -145,7 +145,7 @@ public final class CodeIdExtensionPoint {
           break;
         }
       }
-      catch (Exception e) {
+      catch (Throwable e) {
         ScoutSdkUi.logWarning("Exception in codeIdExtension '" + p.getClass().getName() + "'", e);
       }
     }

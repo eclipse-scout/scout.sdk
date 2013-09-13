@@ -50,7 +50,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iComposerAttribute = TypeUtility.getType(RuntimeClasses.IComposerAttribute);
+  final IType iDataModelAttribute = TypeUtility.getType(RuntimeClasses.IDataModelAttribute);
 
   public static final String PROP_NLS_NAME = "nlsName";
   public static final String PROP_TYPE_NAME = "typeName";
@@ -72,7 +72,7 @@ public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    m_defaultComposerAttribute = RuntimeClasses.getSuperType(RuntimeClasses.IComposerAttribute, m_declaringType.getJavaProject());
+    m_defaultComposerAttribute = RuntimeClasses.getSuperType(RuntimeClasses.IDataModelAttribute, m_declaringType.getJavaProject());
     setSuperTypeInternal(m_defaultComposerAttribute);
   }
 
@@ -112,7 +112,7 @@ public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iComposerAttribute, m_declaringType.getJavaProject(), m_defaultComposerAttribute));
+        new JavaElementAbstractTypeContentProvider(iDataModelAttribute, m_declaringType.getJavaProject(), m_defaultComposerAttribute));
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -132,13 +132,12 @@ public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ComposerAttributeNewOperation operation = new ComposerAttributeNewOperation(m_declaringType);
+    ComposerAttributeNewOperation operation = new ComposerAttributeNewOperation(getTypeName(), m_declaringType);
 
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));

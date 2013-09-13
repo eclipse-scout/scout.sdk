@@ -15,9 +15,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -28,8 +31,15 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class OperationJob extends AbstractWorkspaceBlockingJob {
 
+  public static final String SYSTEM_PROPERTY_USER_NAME = "user.name";
+  public static final String SCOUT_CODE_GEN_USER_NAME = "Scout robot";
+
   private List<IOperation> m_operations;
-  private Exception m_outherException;
+  private Properties m_systemProperties;
+
+  public OperationJob() {
+    this(Arrays.asList(new IOperation[0]));
+  }
 
   public OperationJob(IOperation... operations) {
     this((operations == null) ? Arrays.asList(new IOperation[0]) : Arrays.asList(operations));
@@ -38,6 +48,7 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   public OperationJob(Collection<IOperation> operations) {
     super("");
     m_operations = new ArrayList<IOperation>(operations.size());
+    m_systemProperties = new Properties();
     if (operations != null) {
       for (IOperation op : operations) {
         m_operations.add(op);
@@ -46,15 +57,8 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
     updateJobName();
   }
 
-  @Override
-  public boolean shouldSchedule() {
-    m_outherException = new Exception();
-    return super.shouldSchedule();
-  }
-
   private void updateJobName() {
     synchronized (m_operations) {
-
       StringBuilder nameBuilder = new StringBuilder();
       if (!m_operations.isEmpty()) {
         Iterator<IOperation> operationIt = m_operations.iterator();
@@ -83,38 +87,55 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   protected void validate() throws IllegalArgumentException {
     synchronized (m_operations) {
       for (IOperation op : m_operations) {
-        try {
-          op.validate();
-        }
-        catch (IllegalArgumentException e) {
-          ScoutSdk.logError("validation of operation '" + op.getOperationName() + "' failed.", e);
-          throw e;
-        }
+        op.validate();
       }
     }
   }
 
   @Override
-  protected void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    IOperation[] allOps;
-    synchronized (m_operations) {
-      allOps = getAllOperations();
-    }
-    for (IOperation op : allOps) {
-      try {
+  protected final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    Properties backupProperties = new Properties();
+    try {
+      for (Entry<Object, Object> e : m_systemProperties.entrySet()) {
+        backupProperties.put(e.getKey(), System.getProperty((String) e.getKey()));
+        System.setProperty((String) e.getKey(), (String) e.getValue());
+      }
+      // run ops
+      IOperation[] allOps;
+      synchronized (m_operations) {
+        allOps = getAllOperations();
+      }
+      for (IOperation op : allOps) {
         op.run(monitor, workingCopyManager);
       }
-      catch (CoreException e) {
-        ScoutSdk.logError("Error occured while running Operation job.", e);
-        ScoutSdk.logError("CALLED BY:", m_outherException);
-        throw e;
-      }
-      catch (IllegalArgumentException e) {
-        ScoutSdk.logError("Error occured while running Operation job.", e);
-        ScoutSdk.logError("CALLED BY:", m_outherException);
-        throw e;
+
+    }
+    finally {
+      // restore
+      for (Entry<Object, Object> e : backupProperties.entrySet()) {
+        System.setProperty((String) e.getKey(), (String) e.getValue());
       }
     }
+  }
+
+  public Job scheduleAndJoin() throws InterruptedException {
+    schedule();
+    join();
+    return this;
+  }
+
+  public void setOperations(Collection<IOperation> operations) {
+    switch (getState()) {
+      case RUNNING:
+      case SLEEPING:
+        throw new IllegalStateException("Job is already running!");
+    }
+    synchronized (m_operations) {
+      m_operations.clear();
+      m_operations.addAll(operations);
+    }
+    updateJobName();
+
   }
 
   public void addOperation(IOperation operation) throws IllegalStateException {
@@ -133,6 +154,22 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
     synchronized (m_operations) {
       return m_operations.toArray(new IOperation[m_operations.size()]);
     }
+  }
+
+  public int getOperationCount() {
+    return m_operations.size();
+  }
+
+  public void setSystemProperty(String key, String value) {
+    m_systemProperties.put(key, value);
+  }
+
+  public void removeSystemProperty(String key) {
+    m_systemProperties.remove(key);
+  }
+
+  public Properties getSystemProperties() {
+    return new Properties(m_systemProperties);
   }
 
 }

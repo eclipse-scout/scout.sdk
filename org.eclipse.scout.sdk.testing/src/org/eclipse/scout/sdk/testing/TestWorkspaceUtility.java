@@ -22,8 +22,12 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRunnable;
@@ -39,9 +43,12 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.jdt.compile.ICompileResult;
+import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -122,7 +129,16 @@ public final class TestWorkspaceUtility {
    * @throws Exception
    */
   public static void executeAndBuildWorkspace(IOperation... ops) throws Exception {
+    executeAndBuildWorkspace(null, ops);
+  }
+
+  public static void executeAndBuildWorkspace(Map<String, String> operationScopeSystemProperties, IOperation... ops) throws Exception {
     OperationJob job = new OperationJob(ops);
+    if (operationScopeSystemProperties != null) {
+      for (Entry<String, String> prop : operationScopeSystemProperties.entrySet()) {
+        job.setSystemProperty(prop.getKey(), prop.getValue());
+      }
+    }
     job.schedule();
     job.join();
     if (!job.getResult().isOK()) {
@@ -158,7 +174,12 @@ public final class TestWorkspaceUtility {
     builder.append(status.getMessage());
   }
 
-  /**
+  public static void buildWorkspaceAndAssertNoCompileErrors() throws CoreException {
+    buildWorkspace();
+    assertNoCompileErrors();
+  }
+  
+ /**
    * Recompiles the entire workspace. This method blocks until the build has been completed.
    * 
    * @throws CoreException
@@ -181,6 +202,42 @@ public final class TestWorkspaceUtility {
       }
     };
     ResourcesPlugin.getWorkspace().run(noop, null, IResource.NONE, null);
+  }
+
+  public static void assertNoCompileErrors() {
+    ICompileResult result = ScoutSeverityManager.getInstance().getCompileResult(ResourcesPlugin.getWorkspace().getRoot());
+    if (result.getSeverity() >= IMarker.SEVERITY_ERROR) {
+      StringBuilder builder = new StringBuilder("Compile errors:\n");
+      List<IMarker> errorMarkers = result.getErrorMarkers();
+      for (int i = 0; i < errorMarkers.size(); i++) {
+        if (i > 0) {
+          builder.append("\n");
+        }
+        IMarker m = errorMarkers.get(i);
+        int severity = m.getAttribute(IMarker.SEVERITY, -1);
+        switch (severity) {
+          case IMarker.SEVERITY_INFO:
+            builder.append("INFO: ");
+            break;
+          case IMarker.SEVERITY_WARNING:
+            builder.append("WARNING: ");
+            break;
+          case IMarker.SEVERITY_ERROR:
+            builder.append("ERROR: ");
+            break;
+          default:
+            builder.append("UNDEFINED SEVERITY: ");
+            break;
+        }
+        IResource resource = m.getResource();
+        if (ResourceUtility.exists(resource)) {
+          builder.append(resource.getName()).append(" - ").append(resource.getParent().getProjectRelativePath()).append(" - ");
+        }
+        builder.append("line:").append(m.getAttribute(IMarker.LINE_NUMBER, -1)).append(" - ");
+        builder.append(m.getAttribute(IMarker.MESSAGE, "")).append(" ");
+      }
+      Assert.fail(builder.toString());
+    }
   }
 
   protected static void copyProject(Bundle resourceBundle, String... pathElements) throws IOException {
@@ -338,4 +395,5 @@ public final class TestWorkspaceUtility {
       }
     }
   }
+  
 }

@@ -13,16 +13,14 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.ColorPropertySourceParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -48,9 +46,11 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
   private Canvas m_currentColorPresenter;
   private Color m_currentColor;
   private Button m_chooserButton;
+  private IPropertySourceParser<RGB> m_parser;
 
   public ColorPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, ".*");
+    m_parser = new ColorPropertySourceParser();
   }
 
   @Override
@@ -87,6 +87,10 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
     text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
     m_chooserButton.setLayoutData(new GridData(SdkProperties.TOOL_BUTTON_SIZE, SdkProperties.TOOL_BUTTON_SIZE));
     return rootPane;
+  }
+
+  public IPropertySourceParser<RGB> getParser() {
+    return m_parser;
   }
 
   @Override
@@ -146,11 +150,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
 
   @Override
   protected RGB parseSourceInput(String input) throws CoreException {
-    String value = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    if (value == null) {
-      value = "";
-    }
-    return parseDisplayInput(value);
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
   }
 
   @Override
@@ -163,18 +163,6 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
     }
     int i = Integer.parseInt(input, 16);
     return new RGB((i >> 16) & 0xff, (i >> 8) & 0xff, (i) & 0xff);
-  }
-
-  @Override
-  protected String formatSourceValue(RGB value) throws CoreException {
-    if (value == null) {
-      return "null";
-    }
-    String rgbSt = Integer.toHexString((value.red << 16) | (value.green << 8) | (value.blue));
-    while (rgbSt.length() < 6) {
-      rgbSt = "0" + rgbSt;
-    }
-    return "\"" + rgbSt.toUpperCase() + "\"";
   }
 
   @Override
@@ -191,18 +179,17 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
 
   @Override
   protected synchronized void storeValue(RGB value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
+    try {
+      ConfigPropertyUpdateOperation<RGB> updateOp = new ConfigPropertyUpdateOperation<RGB>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
-    else {
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + formatSourceValue(value) + ";", true);
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
-    }
+
   }
 
   private class P_ColorPresenter extends Canvas {

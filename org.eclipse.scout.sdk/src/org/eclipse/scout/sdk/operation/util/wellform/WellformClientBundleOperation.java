@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -49,8 +49,11 @@ public class WellformClientBundleOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
+    if (getBundle() == null) {
+      throw new IllegalArgumentException("Bundle can not be null.");
+    }
     if (!getBundle().getType().equals(IScoutBundle.TYPE_CLIENT)) {
-      throw new IllegalArgumentException("bundle must be a client bundle.");
+      throw new IllegalArgumentException("Bundle must be a client bundle.");
     }
   }
 

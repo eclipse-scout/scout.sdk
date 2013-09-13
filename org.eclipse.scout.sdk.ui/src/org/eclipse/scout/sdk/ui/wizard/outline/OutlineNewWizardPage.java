@@ -33,11 +33,11 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.validation.JavaElementValidator;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -70,20 +70,22 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_abstractOutline;
-  private OutlineNewOperation m_operation;
   private final IScoutBundle m_clientBundle;
 
-  public OutlineNewWizardPage(IScoutBundle clientBundle) {
+  private final IType m_desktopType;
+
+  public OutlineNewWizardPage(IScoutBundle clientBundle, IType desktopType) {
     super(OutlineNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
+    m_desktopType = desktopType;
     setTitle(Texts.get("NewOutline"));
     setDescription(Texts.get("CreateANewOutline"));
     setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES));
     // default values
     m_abstractOutline = RuntimeClasses.getSuperType(RuntimeClasses.IOutline, m_clientBundle.getJavaProject());
     m_superType = m_abstractOutline;
-    setAddToDesktopEnabled(false);
-    setOperation(new OutlineNewOperation());
+    setAddToDesktop(TypeUtility.exists(getDesktopType()));
+    setAddToDesktopEnabled(TypeUtility.exists(getDesktopType()));
   }
 
   @Override
@@ -167,23 +169,19 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-
-    getOperation().setClientBundle(getClientBundle());
-    getOperation().setFormatSource(true);
-
+    OutlineNewOperation op = new OutlineNewOperation(getTypeName(), getClientBundle().getPackageName(getTargetPackage()), getClientBundle().getJavaProject());
     // write back members
-    if (getNlsName() != null) {
-      getOperation().setNlsEntry(getNlsName());
-    }
-    getOperation().setPackageName(getClientBundle().getPackageName(getTargetPackage()));
-    getOperation().setTypeName(getTypeName());
+    op.setFormatSource(true);
+    op.setNlsEntry(getNlsName());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      getOperation().setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
-    getOperation().setAddToDesktop(isAddToDesktop());
+    if (isAddToDesktop()) {
+      op.setDesktopType(getDesktopType());
+    }
 
-    getOperation().run(monitor, workingCopyManager);
+    op.run(monitor, workingCopyManager);
     return true;
   }
 
@@ -203,16 +201,12 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     return m_clientBundle;
   }
 
-  public void setOperation(OutlineNewOperation operation) {
-    m_operation = operation;
-  }
-
-  public OutlineNewOperation getOperation() {
-    return m_operation;
+  public IType getDesktopType() {
+    return m_desktopType;
   }
 
   protected IStatus getStatusTargetPackge() {
-    return JavaElementValidator.validatePackageName(getTargetPackage());
+    return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {

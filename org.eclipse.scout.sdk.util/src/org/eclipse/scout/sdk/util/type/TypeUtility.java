@@ -17,11 +17,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
@@ -38,18 +42,29 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.internal.codeassist.impl.AssistOptions;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 @SuppressWarnings("restriction")
 public class TypeUtility {
+
+  public static final String DEFAULT_SOURCE_FOLDER_NAME = "src";
 
   private static final Pattern BEAN_METHOD_NAME = Pattern.compile("(get|set|is)([A-Z].*)");
 
@@ -78,6 +93,19 @@ public class TypeUtility {
 
   public static IJavaSearchScope newSearchScope(IJavaElement[] elements) {
     return SearchEngine.createJavaSearchScope(elements);
+  }
+
+  public static IPackageFragmentRoot getSrcPackageFragmentRoot(IJavaProject project) throws JavaModelException {
+    return project.findPackageFragmentRoot(new Path("/" + project.getElementName() + "/" + DEFAULT_SOURCE_FOLDER_NAME)); //TODO: src constant exists in SdkProperties class. move?
+  }
+
+  public static IPackageFragment getPackage(IJavaElement element) {
+    IPackageFragment packageFragment = (IPackageFragment) element.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
+    return packageFragment;
+  }
+
+  public static IPackageFragment getPackage(IJavaProject project, String packageName) throws JavaModelException {
+    return getSrcPackageFragmentRoot(project).getPackageFragment(packageName);
   }
 
   public static IPackageFragment[] getSubPackages(IPackageFragment packageFragment) {
@@ -173,13 +201,7 @@ public class TypeUtility {
   }
 
   public static IType getTypeBySignature(String signature) {
-    signature = Signature.getTypeErasure(signature);
-    int arrayCount = Signature.getArrayCount(signature);
-    if (arrayCount > 0) {
-      signature = signature.substring(arrayCount);
-    }
-    String fqn = Signature.toString(signature);
-    return getType(fqn);
+    return getType(SignatureUtility.getFullyQuallifiedName(signature));
   }
 
   /**
@@ -252,30 +274,31 @@ public class TypeUtility {
     return candidate != null && candidate.exists();
   }
 
-  public static ISourceRange getContentRange(IMethod method) throws JavaModelException {
-    SourceRange contentRange = null;
-    if (TypeUtility.exists(method)) {
-      ISourceRange methodRange = method.getSourceRange();
-      ISourceRange nameRange = method.getNameRange();
-      int contentOffset = nameRange.getOffset() - methodRange.getOffset();
-      contentRange = new SourceRange(contentOffset, methodRange.getLength() - contentOffset);
-      String regex = "\\A" + method.getElementName() + "[^{]*\\{(.*)\\}\\s*\\z";
-      CharSequence source = method.getSource().subSequence(contentRange.getOffset(), contentRange.getOffset() + contentRange.getLength());
-      Matcher matcher = Pattern.compile(regex, Pattern.DOTALL | Pattern.MULTILINE).matcher(source);
-      if (matcher.find()) {
-        contentRange.setOffset(methodRange.getOffset() + contentRange.getOffset() + matcher.start(1));
-        contentRange.setLength(matcher.end(1) - matcher.start(1));
-      }
-      else {
-        contentRange = null;
+  public static IMethod getMethod(IType declaringType, String methodName, String[] resolvedParameterSignatures) throws CoreException {
+    for (IMethod m : declaringType.getMethods()) {
+      if (CompareUtility.equals(m.getElementName(), methodName)) {
+        // signature compare
+        String[] parameterSignatures = SignatureUtility.getMethodParameterSignatureResolved(m);
+        if (parameterSignatures.length == resolvedParameterSignatures.length) {
+          boolean signatureEquals = true;
+          for (int i = 0; i < parameterSignatures.length; i++) {
+            if (!CompareUtility.equals(resolvedParameterSignatures[i], parameterSignatures[i])) {
+              signatureEquals = false;
+              break;
+            }
+          }
+          if (signatureEquals) {
+            return m;
+          }
+        }
       }
     }
-    return contentRange;
+    return null;
   }
 
-  public static IMethod findMethodInHierarchy(IType type, IMethodFilter filter) {
+  public static IMethod findMethodInSuperClassHierarchy(IType type, IMethodFilter filter) {
     try {
-      return findMethodInHierarchy(type, type.newSupertypeHierarchy(null), filter);
+      return findMethodInSuperClassHierarchy(type, type.newSupertypeHierarchy(null), filter);
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not create super type hierarchy of '" + type.getFullyQualifiedName() + "'.", e);
@@ -283,14 +306,14 @@ public class TypeUtility {
     }
   }
 
-  public static IMethod findMethodInHierarchy(IType type, org.eclipse.jdt.core.ITypeHierarchy hierarchy, IMethodFilter filter) {
+  public static IMethod findMethodInSuperClassHierarchy(IType type, org.eclipse.jdt.core.ITypeHierarchy hierarchy, IMethodFilter filter) {
     if (exists(type)) {
       IMethod method = getFirstMethod(type, filter);
       if (TypeUtility.exists(method)) {
         return method;
       }
       else {
-        findMethodInHierarchy(hierarchy.getSuperclass(type), hierarchy, filter);
+        return findMethodInSuperClassHierarchy(hierarchy.getSuperclass(type), hierarchy, filter);
       }
     }
     return null;
@@ -299,13 +322,14 @@ public class TypeUtility {
   public static IMethod getFirstMethod(IType type, IMethodFilter filter) {
     try {
       for (IMethod method : type.getMethods()) {
+
         if (filter == null || filter.accept(method)) {
           return method;
         }
       }
     }
-    catch (JavaModelException e) {
-      SdkUtilActivator.logWarning("could not get methods of '" + type.getFullyQualifiedName() + "'.", e);
+    catch (CoreException e) {
+      SdkUtilActivator.logWarning("could not get methods of '" + type.getFullyQualifiedName() + "' with filter '" + filter + "'.", e);
     }
     return null;
   }
@@ -395,10 +419,81 @@ public class TypeUtility {
       }
       return collector.toArray(new IMethod[collector.size()]);
     }
-    catch (JavaModelException e) {
-      SdkUtilActivator.logWarning("could not get methods of '" + type.getFullyQualifiedName() + "'.", e);
+    catch (CoreException e) {
+      SdkUtilActivator.logWarning("could not get methods of '" + type.getFullyQualifiedName() + "' with filter '" + filter + "'.", e);
       return new IMethod[]{};
     }
+  }
+
+  public static ISourceRange getContentSourceRange(IMethod method) throws JavaModelException {
+    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    parser.setCompilerOptions(JavaCore.getOptions());
+    parser.setKind(ASTParser.K_CLASS_BODY_DECLARATIONS);
+    parser.setSource(method.getSource().toCharArray());
+    ASTNode rootNode = parser.createAST(null);
+    final Holder<ISourceRange> rangeHolder = new Holder<ISourceRange>(ISourceRange.class);
+    rootNode.accept(new ASTVisitor() {
+      boolean a = false;
+
+      @Override
+      public boolean visit(MethodDeclaration node) {
+        a = true;
+        return true;
+      }
+
+      @Override
+      public boolean visit(Block node) {
+        if (a) {
+          rangeHolder.setValue(new SourceRange(node.getStartPosition(), node.getLength()));
+          return false;
+        }
+        return true;
+      }
+
+    });
+    ISourceRange methodRelativeRange = rangeHolder.getValue();
+    if (methodRelativeRange != null) {
+      return new SourceRange(methodRelativeRange.getOffset() + method.getSourceRange().getOffset() + 1, methodRelativeRange.getLength() - 2);
+    }
+    return null;
+  }
+
+  public static MethodParameter[] getMethodParameters(IMethod method, IType contextType) throws CoreException {
+    String[] paramNames = method.getParameterNames();
+    String[] resolvedParamSignatures = SignatureUtility.getMethodParameterSignatureResolved(method, contextType);
+    if (paramNames.length != resolvedParamSignatures.length) {
+      throw new IllegalArgumentException("Could not resolve method parameters of '" + method.getElementName() + "' in '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+    }
+    List<MethodParameter> params = new ArrayList<MethodParameter>();
+    for (int i = 0; i < paramNames.length; i++) {
+      params.add(new MethodParameter(paramNames[i], resolvedParamSignatures[i]));
+    }
+    return params.toArray(new MethodParameter[params.size()]);
+  }
+
+  public static MethodParameter[] getMethodParameters(IMethod method, Map<String, String> generics) throws CoreException {
+    String[] paramNames = method.getParameterNames();
+    String[] resolvedParamSignatures = SignatureUtility.getMethodParameterSignatureResolved(method, generics);
+    if (paramNames.length != resolvedParamSignatures.length) {
+      throw new IllegalArgumentException("Could not resolve method parameters of '" + method.getElementName() + "' in '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+    }
+    List<MethodParameter> params = new ArrayList<MethodParameter>();
+    for (int i = 0; i < paramNames.length; i++) {
+      params.add(new MethodParameter(paramNames[i], resolvedParamSignatures[i]));
+    }
+    return params.toArray(new MethodParameter[params.size()]);
+  }
+
+  public static String[] toSignatureArray(List<MethodParameter> parameters) {
+    if (parameters == null || parameters.isEmpty()) {
+      return new String[0];
+    }
+    String[] result = new String[parameters.size()];
+    int i = 0;
+    for (MethodParameter param : parameters) {
+      result[i++] = param.getSignature();
+    }
+    return result;
   }
 
   public static IType getAncestor(IType type, ITypeFilter filter) {
@@ -843,6 +938,16 @@ public class TypeUtility {
     }
   }
 
+  public static int getIndent(IJavaElement element) {
+    int indent = 0;
+    IJavaElement visitedElement = element;
+    while (visitedElement.getElementType() != IJavaElement.COMPILATION_UNIT) {
+      indent++;
+      visitedElement = element.getParent();
+    }
+    return indent;
+  }
+
   /**
    * Tries to find a method in the given type and all super types and super interfaces.<br>
    * If multiple methods with the same name exist in a type (overloads), the first is returned as they appear in the
@@ -860,25 +965,36 @@ public class TypeUtility {
    *         the source or class file.
    */
   public static IMethod findMethodInSuperHierarchy(String methodName, IType type, ITypeHierarchy superTypeHierarchy) {
-    IMethod method = getMethod(type, methodName);
-    if (TypeUtility.exists(method)) {
-      return method;
+    return findMethodInSuperTypeHierarchy(type, superTypeHierarchy, MethodFilters.getNameFilter(methodName));
+  }
+
+  public static IMethod findMethodInSuperTypeHierarchy(IType type, ITypeHierarchy superTypeHierarchy, IMethodFilter filter) {
+    IMethod[] methods = getMethods(type, filter);
+    IMethod method = null;
+    if (methods.length == 1) {
+      return methods[0];
     }
-    // super types
-    IType superType = superTypeHierarchy.getSuperclass(type);
-    if (TypeUtility.exists(superType) && !superType.getElementName().equals(Object.class.getName())) {
-      method = findMethodInSuperHierarchy(methodName, superType, superTypeHierarchy);
+    else if (methods.length > 1) {
+      SdkUtilActivator.logWarning("found more than one method in hierarchy");
+      return methods[0];
     }
-    if (TypeUtility.exists(method)) {
-      return method;
-    }
-    // interfaces
-    for (IType intType : superTypeHierarchy.getSuperInterfaces(type)) {
-      if (TypeUtility.exists(intType) && !intType.getElementName().equals(Object.class.getName())) {
-        method = findMethodInSuperHierarchy(methodName, intType, superTypeHierarchy);
+    else {
+      // super types
+      IType superType = superTypeHierarchy.getSuperclass(type);
+      if (TypeUtility.exists(superType) && !superType.getElementName().equals(Object.class.getName())) {
+        method = findMethodInSuperTypeHierarchy(superType, superTypeHierarchy, filter);
       }
       if (TypeUtility.exists(method)) {
         return method;
+      }
+      // interfaces
+      for (IType intType : superTypeHierarchy.getSuperInterfaces(type)) {
+        if (TypeUtility.exists(intType) && !intType.getElementName().equals(Object.class.getName())) {
+          method = findMethodInSuperTypeHierarchy(intType, superTypeHierarchy, filter);
+        }
+        if (TypeUtility.exists(method)) {
+          return method;
+        }
       }
     }
     return null;
@@ -943,4 +1059,5 @@ public class TypeUtility {
     }
     return Character.toLowerCase(s.charAt(0)) + s.substring(1);
   }
+
 }

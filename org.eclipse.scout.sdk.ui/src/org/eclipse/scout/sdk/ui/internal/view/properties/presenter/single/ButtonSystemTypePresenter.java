@@ -10,41 +10,68 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.ConfigPropertyMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonSystemTypePresenter.SystemType;
-import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.parser.FieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerFieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>ButtonSystemTypePresenter</h3> ...
  */
-public class ButtonSystemTypePresenter extends AbstractProposalPresenter<SystemType> {
+public class ButtonSystemTypePresenter extends AbstractProposalPresenter<FieldProperty<Integer>> {
 
-  protected static enum SystemType {
-    Cancel,
-    Close,
-    None,
-    Ok,
-    Reset,
-    Save,
-    SaveWithoutMarkerChange
+  protected static final UiFieldProperty<Integer> SYSTEM_TYPE_NONE;
+  protected static final UiFieldProperty<Integer> SYSTEM_TYPE_CANCEL;
+  protected static final UiFieldProperty<Integer> SYSTEM_TYPE_CLOSE;
+  protected static final UiFieldProperty<Integer> SYSTEM_TYPE_OK;
+  protected static final UiFieldProperty<Integer> SYSTEM_TYPE_RESET;
+  protected static final UiFieldProperty<Integer> SYSTEM_TYPE_SAVE;
+  protected static final UiFieldProperty<Integer> SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE;
+
+  protected static final List<FieldProperty<Integer>> PROPOSALS;
+  static {
+    IType iButton = TypeUtility.getType(IRuntimeClasses.IButton);
+    SYSTEM_TYPE_NONE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_NONE"), "none");
+    SYSTEM_TYPE_CANCEL = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_CANCEL"), "cancel");
+    SYSTEM_TYPE_CLOSE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_CLOSE"), "close");
+    SYSTEM_TYPE_OK = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_OK"), "ok");
+    SYSTEM_TYPE_RESET = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_RESET"), "ok");
+    SYSTEM_TYPE_SAVE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_SAVE"), "ok");
+    SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), "save without change marker");
+
+    PROPOSALS = new ArrayList<FieldProperty<Integer>>();
+    PROPOSALS.add(SYSTEM_TYPE_NONE);
+    PROPOSALS.add(SYSTEM_TYPE_CANCEL);
+    PROPOSALS.add(SYSTEM_TYPE_CLOSE);
+    PROPOSALS.add(SYSTEM_TYPE_OK);
+    PROPOSALS.add(SYSTEM_TYPE_RESET);
+    PROPOSALS.add(SYSTEM_TYPE_SAVE);
+    PROPOSALS.add(SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE);
+
   }
+
+  private final FieldReferencePropertyParser<Integer> m_parser;
 
   public ButtonSystemTypePresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_parser = new IntegerFieldReferencePropertyParser(PROPOSALS);
   }
 
   @Override
@@ -52,13 +79,7 @@ public class ButtonSystemTypePresenter extends AbstractProposalPresenter<SystemT
     ILabelProvider labelProvider = new SearchRangeStyledLabelProvider() {
       @Override
       public String getText(Object element) {
-        SystemType value = (SystemType) element;
-        switch (value) {
-          case SaveWithoutMarkerChange:
-            return "Save without marker change";
-          default:
-            return value.toString();
-        }
+        return element.toString();
       }
 
       @Override
@@ -68,73 +89,37 @@ public class ButtonSystemTypePresenter extends AbstractProposalPresenter<SystemT
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(SystemType.values(), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new FieldProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  @Override
-  protected SystemType parseInput(String input) throws CoreException {
-    int parsedInt = PropertyMethodSourceUtility.parseReturnParameterInteger(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    switch (parsedInt) {
-      case 0:
-        return SystemType.None;
-      case 1:
-        return SystemType.Cancel;
-      case 2:
-        return SystemType.Close;
-      case 3:
-        return SystemType.Ok;
-      case 4:
-        return SystemType.Reset;
-      case 5:
-        return SystemType.Save;
-      case 6:
-        return SystemType.SaveWithoutMarkerChange;
-    }
-    return null;
+  public FieldReferencePropertyParser<Integer> getParser() {
+    return m_parser;
   }
 
   @Override
-  protected synchronized void storeValue(SystemType value) throws CoreException {
-    IOperation op = null;
-    if (UiUtility.equals(getDefaultValue(), value)) {
-      if (getMethod().isImplemented()) {
-        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-      }
-    }
-    else {
-      String sourceValue = null;
-      switch (value) {
-        case Cancel:
-          sourceValue = "SYSTEM_TYPE_CANCEL";
-          break;
-        case Close:
-          sourceValue = "SYSTEM_TYPE_CLOSE";
-          break;
-        case None:
-          sourceValue = "SYSTEM_TYPE_NONE";
-          break;
-        case Ok:
-          sourceValue = "SYSTEM_TYPE_OK";
-          break;
-        case Reset:
-          sourceValue = "SYSTEM_TYPE_RESET";
-          break;
-        case Save:
-          sourceValue = "SYSTEM_TYPE_SAVE";
-          break;
-        case SaveWithoutMarkerChange:
-          sourceValue = "SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE";
-          break;
+  protected FieldProperty<Integer> parseInput(String input) throws CoreException {
+    return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+  }
 
-        default:
-          break;
-      }
-      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), "  return " + sourceValue + ";", true);
+  @Override
+  protected synchronized void storeValue(FieldProperty<Integer> value) throws CoreException {
+    if (value == null) {
+      getProposalField().acceptProposal(getDefaultValue());
+      value = getDefaultValue();
     }
-    if (op != null) {
-      new OperationJob(op).schedule();
+
+    try {
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
+      updateOp.setValue(value);
+      OperationJob job = new OperationJob(updateOp);
+      job.setDebug(true);
+      job.schedule();
     }
+    catch (Exception e) {
+      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
+    }
+
   }
 
 }

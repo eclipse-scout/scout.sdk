@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.form.field.RadioButtonNewOperation;
+import org.eclipse.scout.sdk.operation.form.field.ButtonFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -143,8 +143,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    RadioButtonNewOperation op = new RadioButtonNewOperation(getDeclaringType());
-    op.setTypeName(getTypeName());
+    ButtonFieldNewOperation op = new ButtonFieldNewOperation(getTypeName(), getDeclaringType(), true);
     if (getNlsName() != null) {
       op.setNlsEntry(getNlsName());
     }
@@ -161,7 +160,6 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       op.setSibling(siblingProposal.getElement());
     }
 
-    op.setFormatSource(true);
     op.validate();
     op.run(monitor, workingCopyManager);
     m_createdRadioButton = op.getCreatedButton();

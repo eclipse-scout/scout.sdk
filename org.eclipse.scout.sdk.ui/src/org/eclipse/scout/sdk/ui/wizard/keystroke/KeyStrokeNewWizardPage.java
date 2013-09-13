@@ -55,7 +55,6 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   private StyledTextField m_typeNameField;
   private StyledTextField m_keyStrokeField;
   private ProposalTextField m_superTypeField;
-  private KeyStrokeNewOperation m_operation;
 
   // process members
   private final IType m_declaringType;
@@ -70,7 +69,6 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
     m_abstractKeyStroke = RuntimeClasses.getSuperType(RuntimeClasses.IKeyStroke, m_declaringType.getJavaProject());
     m_superType = m_abstractKeyStroke;
-    setOperation(new KeyStrokeNewOperation(m_declaringType, true));
   }
 
   @Override
@@ -119,26 +117,18 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // write back members
-    m_operation.setTypeName(getTypeName());
+    KeyStrokeNewOperation op = new KeyStrokeNewOperation(getTypeName(), getDeclaringType());
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
-      m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
-    m_operation.setKeyStroke(getKeyStroke());
+    op.setKeyStroke(getKeyStroke());
     // sibling
     IStructuredType structuredType = ScoutTypeUtility.createStructuredForm(m_declaringType);
-    m_operation.setSibling(structuredType.getSiblingTypeKeyStroke(getTypeName()));
-    m_operation.run(monitor, workingCopyManager);
-    m_createdKeystroke = m_operation.getCreatedKeyStroke();
+    op.setSibling(structuredType.getSiblingTypeKeyStroke(getTypeName()));
+    op.run(monitor, workingCopyManager);
+    m_createdKeystroke = op.getCreatedKeyStroke();
     return true;
-  }
-
-  public KeyStrokeNewOperation getOperation() {
-    return m_operation;
-  }
-
-  public void setOperation(KeyStrokeNewOperation operation) {
-    m_operation = operation;
   }
 
   @Override
@@ -183,6 +173,10 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
    */
   public IType getCreatedKeystroke() {
     return m_createdKeystroke;
+  }
+
+  public IType getDeclaringType() {
+    return m_declaringType;
   }
 
   public String getTypeName() {

@@ -10,21 +10,38 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.testing;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotatable;
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.testing.internal.SdkTestingApi;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.FieldFilters;
+import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
@@ -112,6 +129,33 @@ public class SdkAssert extends Assert {
     if (!TypeUtility.exists(type)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Type '").append(fullyQualifiedTypeName).append("'");
+        messageBuilder.append(" does not exist!");
+        message = messageBuilder.toString();
+      }
+      fail(message);
+    }
+    return type;
+  }
+
+  /**
+   * @see SdkAssert#assertTypeExistsBySignature(String, String)
+   */
+  static public IType assertTypeExistsBySignature(String signature) {
+    return assertTypeExistsBySignature((String) null, signature);
+  }
+
+  /**
+   * fails if no type with the <code>signature</code> exists.
+   * 
+   * @param message
+   * @param signature
+   * @return the type if found.
+   */
+  static public IType assertTypeExistsBySignature(String message, String signature) {
+    IType type = TypeUtility.getTypeBySignature(signature);
+    if (!TypeUtility.exists(type)) {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Type '").append(signature).append("'");
         messageBuilder.append(" does not exist!");
         message = messageBuilder.toString();
       }
@@ -213,6 +257,62 @@ public class SdkAssert extends Assert {
     return method;
   }
 
+  static public IMethod assertMethodExist(IType type, String methodName, String[] parameterSignatures) {
+    return assertMethodExist(null, type, methodName, parameterSignatures);
+
+  }
+
+  /**
+   * fails if the <code>type</code> does not contain a method named <code>methodName</code>.
+   * 
+   * @param message
+   * @param type
+   * @param methodName
+   * @return the method if found
+   */
+  static public IMethod assertMethodExist(String message, IType type, final String methodName, final String[] parameterSignatures) {
+    IMethod method = TypeUtility.getFirstMethod(type, new IMethodFilter() {
+      @Override
+      public boolean accept(IMethod candidate) throws CoreException {
+        if (CompareUtility.equals(methodName, candidate.getElementName())) {
+          String[] refParameterSignatures = candidate.getParameterTypes();
+          if (parameterSignatures.length == refParameterSignatures.length) {
+            boolean matches = true;
+            for (int i = 0; i < parameterSignatures.length; i++) {
+              if (!CompareUtility.equals(SignatureUtility.getResolvedSignature(parameterSignatures[i], candidate.getDeclaringType()),
+                  SignatureUtility.getResolvedSignature(refParameterSignatures[i], candidate.getDeclaringType()))) {
+                matches = false;
+                break;
+              }
+            }
+            return matches;
+          }
+
+        }
+        return false;
+      }
+    });
+    if (!TypeUtility.exists(method)) {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append("'");
+        if (type != null) {
+          messageBuilder.append(" in type '").append(type.getElementName()).append("'");
+        }
+        messageBuilder.append(" does not exist! [parameters: ");
+        for (int i = 0; i < parameterSignatures.length; i++) {
+          messageBuilder.append("'").append(parameterSignatures[i]).append("'");
+          if (i < parameterSignatures.length - 1) {
+            messageBuilder.append(", ");
+          }
+        }
+        messageBuilder.append("]");
+        message = messageBuilder.toString();
+      }
+      fail(message);
+    }
+    return method;
+  }
+
   /**
    * @see SdkAssert#assertMethodExistInSuperTypeHierarchy(String, IType, String)
    */
@@ -246,6 +346,109 @@ public class SdkAssert extends Assert {
     return method;
   }
 
+  public static void assertMethodReturnTypeSignature(IMethod method, String expectedSignature) throws CoreException {
+    assertMethodReturnTypeSignature(null, method, expectedSignature);
+  }
+
+  public static void assertMethodReturnTypeSignature(String message, IMethod method, String expectedSignature) throws CoreException {
+    String signature = SignatureUtility.getResolvedSignature(method.getReturnType(), method.getDeclaringType());
+    expectedSignature = SignatureUtility.getResolvedSignature(expectedSignature, method.getDeclaringType());
+    if (!CompareUtility.equals(signature, expectedSignature)) {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Method return type not equal! [expected: '").append(expectedSignature).append("', actual: '").append(signature).append("'] '");
+        message = messageBuilder.toString();
+      }
+      fail(message);
+
+    }
+  }
+
+  public static void assertMethodParameterSignatures(IMethod method, String[] expectedSignatures) throws CoreException {
+    assertMethodParameterSignatures(null, method, expectedSignatures);
+  }
+
+  public static void assertMethodParameterSignatures(String message, IMethod method, String[] expectedSignatures) throws CoreException {
+    String[] parameterSignatures = method.getParameterTypes();
+    if (parameterSignatures.length == expectedSignatures.length) {
+      // resolve
+      for (int i = 0; i < parameterSignatures.length; i++) {
+        parameterSignatures[i] = SignatureUtility.getResolvedSignature(parameterSignatures[i], method.getDeclaringType());
+        expectedSignatures[i] = SignatureUtility.getResolvedSignature(expectedSignatures[i], method.getDeclaringType());
+      }
+      // sort
+      Arrays.sort(parameterSignatures);
+      Arrays.sort(expectedSignatures);
+      for (int i = 0; i < parameterSignatures.length; i++) {
+        if (!CompareUtility.equals(parameterSignatures[i], expectedSignatures[i])) {
+          if (message == null) {
+            StringBuilder messageBuilder = new StringBuilder("Method '").append(method.getElementName()).append("' does not have the same parameter signature! [expected '").append(expectedSignatures[i]).append("', actual '").append(parameterSignatures[i]).append("']");
+            message = messageBuilder.toString();
+          }
+          fail(message);
+          break;
+        }
+      }
+
+    }
+    else {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Method '").append(method.getElementName()).append("' does not have the same same amount of parameters! [expected: ").append(expectedSignatures.length).append(", actual: ").append(parameterSignatures.length).append("]");
+        message = messageBuilder.toString();
+      }
+      fail(message);
+    }
+  }
+
+  public static void assertMethodValidationRules(IMethod initValidationRulesMethod, String[] validationRuleLines, boolean superCall) throws JavaModelException {
+    ISourceRange range = TypeUtility.getContentSourceRange(initValidationRulesMethod);
+    String source = initValidationRulesMethod.getOpenable().getBuffer().getText(range.getOffset(), range.getLength());
+    assertNotNull(source);
+    Set<String> expectedLines = new HashSet<String>(Arrays.asList(validationRuleLines));
+    // parse
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new StringReader(source));
+      String line = reader.readLine();
+      while (line != null) {
+        line = line.trim();
+        if (StringUtility.hasText(line)) {
+          // super call
+          if (!line.matches("^super\\.initValidationRules\\([^\\)]*\\)\\;$")) {
+            if (!expectedLines.remove(line)) {
+              StringBuilder messageBuilder = new StringBuilder();
+              messageBuilder.append("Validation rules failer. Validation rule '").append(line).append("' was not expected!");
+              fail(messageBuilder.toString());
+            }
+          }
+        }
+        line = reader.readLine();
+      }
+      if (!expectedLines.isEmpty()) {
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append("Validation rules failer. The following expected validation rules are not found in code: [");
+        Iterator<String> expectedIt = expectedLines.iterator();
+        messageBuilder.append(expectedIt.next());
+        while (expectedIt.hasNext()) {
+          messageBuilder.append(", ").append(expectedIt.next());
+        }
+        messageBuilder.append("]");
+        fail(messageBuilder.toString());
+      }
+    }
+    catch (IOException e) {
+      if (reader != null) {
+        try {
+          reader.close();
+        }
+        catch (IOException e1) {
+          SdkTestingApi.logError("could not close reader.", e1);
+        }
+      }
+      SdkTestingApi.logError("could not parse initValidationRulesMethod on '" + initValidationRulesMethod.getDeclaringType().getFullyQualifiedName() + "'.", e);
+    }
+
+  }
+
   /**
    * @see SdkAssert#assertFieldExist(String, IType, String)
    */
@@ -277,6 +480,22 @@ public class SdkAssert extends Assert {
     return field;
   }
 
+  public static void assertFieldSignature(IField field, String expectedSignature) throws CoreException {
+    assertFieldSignature(null, field, expectedSignature);
+  }
+
+  public static void assertFieldSignature(String message, IField field, String expectedSignature) throws CoreException {
+    String resolvedSignature = SignatureUtility.getResolvedSignature(field.getTypeSignature(), field.getDeclaringType());
+    String expectedResolvedSignature = SignatureUtility.getResolvedSignature(expectedSignature, field.getDeclaringType());
+    if (!CompareUtility.equals(resolvedSignature, expectedResolvedSignature)) {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Field '").append(field.getElementName()).append("' does not have the expected type signature! [expected:'").append(expectedResolvedSignature).append("', actual:'").append(resolvedSignature).append("']");
+        message = messageBuilder.toString();
+      }
+      fail(message);
+    }
+  }
+
   /**
    * @see SdkAssert#assertHasSuperType(String, IType, String)
    */
@@ -303,6 +522,59 @@ public class SdkAssert extends Assert {
 
   }
 
+  public static void assertHasSuperTypeSignature(IType type, String superTypeSignature) throws JavaModelException, CoreException {
+    assertHasSuperTypeSignature(null, type, superTypeSignature);
+  }
+
+  public static void assertHasSuperTypeSignature(String message, IType type, String superTypeSignature) throws JavaModelException, CoreException {
+    String refSuperTypeSig = SignatureUtility.getResolvedSignature(type.getSuperclassTypeSignature(), type);
+    superTypeSignature = SignatureUtility.getResolvedSignature(superTypeSignature, type);
+    if (!CompareUtility.equals(refSuperTypeSig, superTypeSignature)) {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Type '").append(type.getFullyQualifiedName()).append("' does not have expected supertype! [expected '").append(superTypeSignature).append("', actual '").append(refSuperTypeSig).append("']");
+        message = messageBuilder.toString();
+      }
+      fail(message);
+
+    }
+  }
+
+  public static void assertHasSuperIntefaceSignatures(IType type, String[] interfaceSignatures) throws JavaModelException, CoreException {
+    assertHasSuperIntefaceSignatures(null, type, interfaceSignatures);
+  }
+
+  public static void assertHasSuperIntefaceSignatures(String message, IType type, String[] interfaceSignatures) throws JavaModelException, CoreException {
+    String[] refInterfaceSignatures = type.getSuperInterfaceTypeSignatures();
+    if (refInterfaceSignatures.length == interfaceSignatures.length) {
+      // resolve
+      for (int i = 0; i < interfaceSignatures.length; i++) {
+        interfaceSignatures[i] = SignatureUtility.getResolvedSignature(interfaceSignatures[i], type);
+        refInterfaceSignatures[i] = SignatureUtility.getResolvedSignature(refInterfaceSignatures[i], type);
+      }
+      // sort
+      Arrays.sort(interfaceSignatures);
+      Arrays.sort(refInterfaceSignatures);
+      for (int i = 0; i < interfaceSignatures.length; i++) {
+        if (!CompareUtility.equals(interfaceSignatures[i], refInterfaceSignatures[i])) {
+          if (message == null) {
+            StringBuilder messageBuilder = new StringBuilder("Type '").append(type.getFullyQualifiedName()).append("' does not have the same interfaces! [").append(refInterfaceSignatures[i]).append(", ").append(interfaceSignatures[i]).append("]");
+            message = messageBuilder.toString();
+          }
+          fail(message);
+          break;
+        }
+      }
+
+    }
+    else {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Type '").append(type.getElementName()).append("' does not have the same same amount of interfaces! [expected: ").append(interfaceSignatures.length).append(", actual: ").append(refInterfaceSignatures.length).append("]");
+        message = messageBuilder.toString();
+      }
+      fail(message);
+    }
+  }
+
   /**
    * @see SdkAssert#assertSerialVersionUidExists(String, IType)
    */
@@ -322,6 +594,23 @@ public class SdkAssert extends Assert {
     IField field = assertFieldExist(message, type, "serialVersionUID");
     assertPrivate(message, field).assertStatic().assertFinal();
     return field;
+  }
+
+  static public IAnnotation assertAnnotation(IAnnotatable annotatable, String fqAnnotationTypeName) {
+
+    IAnnotation annotation = JdtUtility.getAnnotation(annotatable, fqAnnotationTypeName);
+    if (annotation == null || !annotation.exists()) {
+      StringBuilder message = new StringBuilder("Element '");
+      if (annotatable instanceof IJavaElement) {
+        message.append(((IJavaElement) annotatable).getElementName());
+      }
+      else {
+        message.append(annotatable.toString());
+      }
+      message.append("' does not have the expected annotation '").append(fqAnnotationTypeName).append("'.");
+      fail(message.toString());
+    }
+    return annotation;
   }
 
   /**
@@ -644,6 +933,16 @@ public class SdkAssert extends Assert {
     return new FlagAssert(message, member).assertStatic();
   }
 
+  static public TypeAssert typeAssert(IType declaringType, String typeName) throws JavaModelException {
+    IType type = assertTypeExists(declaringType, typeName);
+    return new TypeAssert(type);
+  }
+
+  static public MethodAssert methodAssert(IType type, String methodname) throws JavaModelException {
+    IMethod method = assertMethodExist(type, methodname);
+    return new MethodAssert(method);
+  }
+
   public static class FlagAssert {
     private int m_flags;
     private final IMember m_member;
@@ -738,6 +1037,82 @@ public class SdkAssert extends Assert {
       else {
         fail(m_message);
       }
+    }
+  }
+
+  public static class TypeAssert {
+    private IType m_type;
+
+    public TypeAssert(IType type) {
+      m_type = type;
+    }
+
+    public TypeAssert assertExist() throws JavaModelException {
+      SdkAssert.assertExist(m_type);
+      return this;
+    }
+
+    public TypeAssert assertSuperClass(String fqn) throws JavaModelException {
+      SdkAssert.assertHasSuperType(m_type, fqn);
+      return this;
+    }
+
+    public FlagAssert flagAssert() throws JavaModelException {
+      return new FlagAssert(null, m_type);
+    }
+
+    public IType getType() {
+      return m_type;
+    }
+
+  }
+
+  public static class MethodAssert {
+    private IMethod m_method;
+
+    public MethodAssert(IMethod method) throws JavaModelException {
+      m_method = method;
+    }
+
+    public MethodAssert assertExits() {
+      SdkAssert.assertExist(m_method);
+      return this;
+    }
+
+    public MethodAssert assertParameterCount(int expected) throws JavaModelException {
+      ILocalVariable[] parameters = m_method.getParameters();
+      if (parameters.length != expected) {
+        StringBuilder messageBuilder = new StringBuilder();
+        messageBuilder.append("Parameter count of method '").append(m_method.getElementName()).append("': expected:'").append(expected).append("' actual:'").append(parameters.length).append("'.");
+        fail(messageBuilder.toString());
+      }
+      return this;
+    }
+
+    public MethodAssert assertConstructor() throws JavaModelException {
+      if (!m_method.isConstructor()) {
+        fail("method '" + m_method.getElementName() + "' is expected to be a constructor.");
+      }
+      return this;
+    }
+
+    public MethodAssert assertReturnType(String returnTypeFqn) throws JavaModelException {
+      String retSig = m_method.getReturnType();
+      String qualifier = Signature.getSignatureQualifier(retSig);
+      String simpleName = Signature.getSignatureSimpleName(retSig);
+      if (!StringUtility.isNullOrEmpty(qualifier)) {
+        assertEquals(qualifier, Signature.getQualifier(returnTypeFqn));
+      }
+      assertEquals(simpleName, Signature.getSimpleName(returnTypeFqn));
+      return this;
+    }
+
+    public FlagAssert flagAssert() throws JavaModelException {
+      return new FlagAssert(null, m_method);
+    }
+
+    public IMethod getMethod() {
+      return m_method;
     }
   }
 

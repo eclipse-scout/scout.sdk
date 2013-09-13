@@ -12,18 +12,18 @@ public class TableFieldFormData extends AbstractFormData {
   public TableFieldFormData() {
   }
 
-  public Company getCompany() {
-    return getFieldByClass(Company.class);
+  public CompanyTable getCompanyTable() {
+    return getFieldByClass(CompanyTable.class);
   }
 
   public PersonTable getPersonTable() {
     return getFieldByClass(PersonTable.class);
   }
 
-  public static class Company extends AbstractCompanyTableFieldData {
+  public static class CompanyTable extends AbstractCompanyTableFieldData {
     private static final long serialVersionUID = 1L;
 
-    public Company() {
+    public CompanyTable() {
     }
   }
 

@@ -22,6 +22,7 @@ import org.eclipse.ui.IStartup;
 public class RapStartup implements IStartup {
   @Override
   public void earlyStartup() {
+
     // ensure the plug-in is started and the variable is propagated
     RapTargetVariable.get().getValue();
   }

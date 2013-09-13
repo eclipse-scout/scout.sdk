@@ -15,9 +15,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -157,7 +157,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
             m_typeSignature = resolvedSignature;
           }
         }
-        catch (JavaModelException e) {
+        catch (CoreException e) {
           SdkUtilActivator.logError("could not resolve class instance creation of '" + signature + "' in '" + declaringType.getFullyQualifiedName() + "'.");
         }
         m_canceled = true;

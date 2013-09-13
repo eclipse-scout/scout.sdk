@@ -11,15 +11,23 @@
 package org.eclipse.scout.sdk.util;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
@@ -28,6 +36,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -48,6 +57,13 @@ public final class ScoutUtility {
 
   private static final Pattern REGEX_LINE_SEP_CLEAN = Pattern.compile("(\\n)\\r");
   private static final Pattern REGEX_LINE_SEP_CLEAN2 = Pattern.compile("\\r(\\n)");
+  private final static Pattern REGEX_PACKAGE_NAME = Pattern.compile("^[0-9a-zA-Z\\.\\_]*$");
+  private final static Pattern REGEX_PACKAGE_NAME_START = Pattern.compile("[a-zA-Z]{1}.*$");
+  private final static Pattern REGEX_PACKAGE_NAME_END = Pattern.compile("^.*[a-zA-Z]{1}$");
+  private final static Pattern REGEX_CONTAINS_UPPER_CASE = Pattern.compile(".*[A-Z].*");
+
+  private static Set<String> javaKeyWords = null;
+  private final static Object LOCK = new Object();
 
   private ScoutUtility() {
   }
@@ -92,21 +108,19 @@ public final class ScoutUtility {
   }
 
   public static String cleanLineSeparator(String buffer, ICompilationUnit icu) {
-    return cleanLineSeparatorImpl(buffer, ResourceUtility.getLineSeparator(icu));
+    return cleanLineSeparator(buffer, ResourceUtility.getLineSeparator(icu));
   }
 
   public static String cleanLineSeparator(String buffer, Document doc) {
-    return cleanLineSeparatorImpl(buffer, ResourceUtility.getLineSeparator(doc));
+    return cleanLineSeparator(buffer, ResourceUtility.getLineSeparator(doc));
   }
 
-  private static String cleanLineSeparatorImpl(String buffer, String separator) {
+  public static String cleanLineSeparator(String buffer, String separator) {
     buffer = REGEX_LINE_SEP_CLEAN.matcher(buffer).replaceAll("$1");
     buffer = REGEX_LINE_SEP_CLEAN2.matcher(buffer).replaceAll("$1");
-    int i;
-    for (i = buffer.length(); i > 0; i--) {
-      if (buffer.charAt(i - 1) != '\n') break;
-    }
-    return (buffer.substring(0, i) + "\n").replaceAll("\\n", separator);
+    // max 1 newline at the end
+    buffer = buffer.replaceAll("\\n+$", "\n");
+    return buffer.replaceAll("\\n", separator);
   }
 
   public static String getIndent(IType type) {
@@ -164,6 +178,36 @@ public final class ScoutUtility {
     attributes.put("class", className);
     h.PluginXml.removeSimpleExtension(extensionPoint, elemType, attributes);
     h.save();
+  }
+
+  public static String unboxPrimitiveSignature(String signature) {
+    if (Signature.getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE) {
+      if (Signature.SIG_BOOLEAN.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Boolean.class.getName());
+      }
+      else if (Signature.SIG_BYTE.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Byte.class.getName());
+      }
+      else if (Signature.SIG_CHAR.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Character.class.getName());
+      }
+      else if (Signature.SIG_DOUBLE.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Double.class.getName());
+      }
+      else if (Signature.SIG_FLOAT.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Float.class.getName());
+      }
+      else if (Signature.SIG_INT.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Integer.class.getName());
+      }
+      else if (Signature.SIG_LONG.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Long.class.getName());
+      }
+      else if (Signature.SIG_SHORT.equals(signature)) {
+        signature = SignatureCache.createTypeSignature(Short.class.getName());
+      }
+    }
+    return signature;
   }
 
   public static String getDefaultValueOf(String parameter) {
@@ -482,6 +526,13 @@ public final class ScoutUtility {
     return buf.toString();
   }
 
+  public static IJavaProject getJavaProject(IScoutBundle bundle) {
+    if (bundle != null) {
+      return bundle.getJavaProject();
+    }
+    return null;
+  }
+
   public static String[] getEntities(IScoutBundle p) throws JavaModelException {
     TreeSet<String> ret = new TreeSet<String>();
     IScoutBundle[] roots = p.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
@@ -521,5 +572,149 @@ public final class ScoutUtility {
       }
     }
     return ret.toArray(new String[ret.size()]);
+  }
+
+  public static String ensureStartWithUpperCase(String name) {
+    StringBuilder builder = new StringBuilder();
+    if (!StringUtility.isNullOrEmpty(name)) {
+      builder.append(Character.toUpperCase(name.charAt(0)));
+      if (name.length() > 1) {
+        builder.append(name.substring(1));
+      }
+    }
+    return builder.toString();
+  }
+
+  public static String ensureStartWithLowerCase(String name) {
+    StringBuilder builder = new StringBuilder();
+    if (!StringUtility.isNullOrEmpty(name)) {
+      builder.append(Character.toLowerCase(name.charAt(0)));
+      if (name.length() > 1) {
+        builder.append(name.substring(1));
+      }
+    }
+    return builder.toString();
+  }
+
+  public static String removeFieldSuffix(String fieldName) {
+
+    if (fieldName.endsWith(SdkProperties.SUFFIX_FORM_FIELD)) {
+      fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_FORM_FIELD + "$", "");
+    }
+    else if (fieldName.endsWith(SdkProperties.SUFFIX_BUTTON)) {
+      fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_BUTTON + "$", "");
+    }
+    else if (fieldName.endsWith(SdkProperties.SUFFIX_TABLE_COLUMN)) {
+      fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_TABLE_COLUMN + "$", "");
+    }
+    return fieldName;
+  }
+
+  public static String ensureValidParameterName(String parameterName) {
+    if (isReservedJavaKeyword(parameterName)) {
+      return parameterName + "Value";
+    }
+    return parameterName;
+  }
+
+  public static Set<String> getJavaKeyWords() {
+    if (javaKeyWords == null) {
+      synchronized (LOCK) {
+        if (javaKeyWords == null) {
+          String[] keyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum",
+              "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected",
+              "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
+          HashSet<String> tmp = new HashSet<String>(keyWords.length);
+          for (String s : keyWords) {
+            tmp.add(s);
+          }
+          javaKeyWords = Collections.unmodifiableSet(tmp);
+        }
+      }
+    }
+    return javaKeyWords;
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given word is a reserved java keyword. Otherwise <code>false</code>.
+   * @throws NullPointerException
+   *           if the given word is <code>null</code>.
+   * @since 3.8.3
+   */
+  public static boolean isReservedJavaKeyword(String word) {
+    return getJavaKeyWords().contains(word.toLowerCase());
+  }
+
+  public static IStatus validatePackageName(String pckName) {
+    if (StringUtility.isNullOrEmpty(pckName)) {
+      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("DefaultPackageIsDiscouraged"));
+    }
+    // no double points
+    if (pckName.contains("..")) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("PackageNameNotValid"));
+    }
+    // invalid characters
+    if (!REGEX_PACKAGE_NAME.matcher(pckName).matches()) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("PackageNameNotValid"));
+    }
+    // no start and end with number or special characters
+    if (!REGEX_PACKAGE_NAME_START.matcher(pckName).matches() || !REGEX_PACKAGE_NAME_END.matcher(pckName).matches()) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("PackageNameNotValid"));
+    }
+    // reserved java keywords
+    String jkw = getContainingJavaKeyWord(pckName);
+    if (jkw != null) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("PackageNotContainJavaKeyword", jkw));
+    }
+    // warn containing upper case characters
+    if (REGEX_CONTAINS_UPPER_CASE.matcher(pckName).matches()) {
+      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("PackageOnlyLowerCase"));
+    }
+    return Status.OK_STATUS;
+  }
+
+  private static String getContainingJavaKeyWord(String s) {
+    for (String keyWord : getJavaKeyWords()) {
+      if (s.startsWith(keyWord + ".") || s.endsWith("." + keyWord) || s.contains("." + keyWord + ".")) {
+        return keyWord;
+      }
+    }
+    return null;
+  }
+
+  public static IStatus validateNewBundleName(String bundleName) {
+    // validate name
+    if (StringUtility.isNullOrEmpty(bundleName)) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ProjectNameMissing"));
+    }
+    // no double points
+    if (bundleName.contains("..")) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("ProjectNameIsNotValid"));
+    }
+    // invalid characters
+    if (!REGEX_PACKAGE_NAME.matcher(bundleName).matches()) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheBundleNameContainsInvalidCharacters"));
+    }
+    // no start and end with number or special characters
+    if (!REGEX_PACKAGE_NAME_START.matcher(bundleName).matches() || !REGEX_PACKAGE_NAME_END.matcher(bundleName).matches()) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("BundleNameCanNotStartOrEndWithSpecialCharactersOrDigits"));
+    }
+    // reserved java keywords
+    String jkw = getContainingJavaKeyWord(bundleName);
+    if (jkw != null) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("TheProjectNameMayNotContainAReservedJavaKeyword", jkw));
+    }
+    // already existing bundle name
+    if (Platform.getBundle(bundleName) != null) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("BundleAlreadyExists", bundleName));
+    }
+    if (ResourcesPlugin.getWorkspace().getRoot().getProject(bundleName).exists()) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("BundleAlreadyExists", bundleName));
+    }
+    // warn containing upper case characters
+    if (REGEX_CONTAINS_UPPER_CASE.matcher(bundleName).matches()) {
+      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("ProjectNameShouldContainOnlyLowerCaseCharacters"));
+    }
+    return Status.OK_STATUS;
   }
 }

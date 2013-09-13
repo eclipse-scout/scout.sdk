@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -23,10 +24,13 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodUpdateContentOperation;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -59,6 +63,17 @@ public abstract class AbstractPageOperation implements IOperation {
     }
   }
 
+  private String getChildPageAddSource(IType pageType, String listName, String lineDelimiter, IImportValidator validator) {
+    String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
+    String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
+
+    StringBuilder bodyBuilder = new StringBuilder();
+    bodyBuilder.append(SdkProperties.TAB).append(SdkProperties.TAB).append(pageRef).append(" ").append(varName).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
+    bodyBuilder.append(SdkProperties.TAB).append(SdkProperties.TAB).append(listName).append(".add(").append(varName).append(");");
+
+    return bodyBuilder.toString();
+  }
+
   private void addToOutline(final IType pageType, IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String methodName = "execCreateChildPages";
     IMethod childPagesMethod = TypeUtility.getMethod(outlineType, methodName);
@@ -74,16 +89,17 @@ public abstract class AbstractPageOperation implements IOperation {
             listName = matcher.group(1);
           }
           if (index > 0) {
-            InsertEdit edit = new InsertEdit(index, "\n" + listName + ".add(new " + validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName())) + "());");
+            String lineDelimiter = ResourceUtility.getLineSeparator(methodBody);
+            InsertEdit edit = new InsertEdit(index, lineDelimiter + getChildPageAddSource(pageType, listName, lineDelimiter, validator));
             try {
               edit.apply(methodBody);
             }
             catch (Exception e) {
-              ScoutSdk.logError("could not update method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
+              ScoutSdk.logError("Could not update method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
             }
           }
           else {
-            ScoutSdk.logWarning("could find insert position for an additional page in method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.");
+            ScoutSdk.logWarning("Could find insert position for an additional page in method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.");
           }
         }
       };
@@ -91,22 +107,18 @@ public abstract class AbstractPageOperation implements IOperation {
       updateContentOp.run(monitor, workingCopyManager);
     }
     else {
-      MethodOverrideOperation overrideOp = new MethodOverrideOperation(outlineType, methodName) {
+      MethodOverrideOperation overrideOp = new MethodOverrideOperation(methodName, outlineType);
+      overrideOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
-          String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
-          StringBuilder bodyBuilder = new StringBuilder();
-          bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
-          return bodyBuilder.toString();
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append(getChildPageAddSource(pageType, "pageList", lineDelimiter, validator));
         }
-      };
+      });
       IStructuredType structuredType = ScoutTypeUtility.createStructuredOutline(outlineType);
       overrideOp.setSibling(structuredType.getSiblingMethodConfigExec(methodName));
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
     }
-
   }
 
   private void addToPageWithNodes(final IType pageType, IType pageWithNodes, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -115,12 +127,11 @@ public abstract class AbstractPageOperation implements IOperation {
     if (TypeUtility.exists(childPagesMethod)) {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(childPagesMethod) {
         @Override
-        protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
-          StringBuilder sourceBuilder = new StringBuilder(originalBody);
+        protected void createMethodBody(StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator, String originalBody) throws JavaModelException {
           String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
-          sourceBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
-          return sourceBuilder.toString();
+          sourceBuilder.append(pageRef).append(" ").append(varName).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
+          sourceBuilder.append("pageList.add(").append(varName).append(");").append(lineDelimiter);
         }
       };
       updateContentOp.setFormatSource(true);
@@ -128,16 +139,17 @@ public abstract class AbstractPageOperation implements IOperation {
       updateContentOp.run(monitor, workingCopyManager);
     }
     else {
-      MethodOverrideOperation overrideOp = new MethodOverrideOperation(pageWithNodes, methodName) {
+      MethodOverrideOperation overrideOp = new MethodOverrideOperation(methodName, pageWithNodes);
+      overrideOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
           String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
-          StringBuilder bodyBuilder = new StringBuilder();
-          bodyBuilder.append(pageRef + " " + varName + " = new " + pageRef + "();\n" + SdkProperties.TAB + "pageList.add(" + varName + ");\n");
-          return bodyBuilder.toString();
+          source.append(pageRef).append(" ").append(varName).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
+          source.append("pageList.add(").append(varName).append(");").append(lineDelimiter);
         }
-      };
+      });
       IStructuredType structuredType = ScoutTypeUtility.createStructuredPageWithNodes(pageWithNodes);
       overrideOp.setSibling(structuredType.getSiblingMethodConfigExec(methodName));
       overrideOp.validate();
@@ -151,13 +163,11 @@ public abstract class AbstractPageOperation implements IOperation {
     if (TypeUtility.exists(childPagesMethod)) {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(childPagesMethod) {
         @Override
-        protected String createMethodBody(String originalBody, IImportValidator validator) throws JavaModelException {
-          StringBuilder b = new StringBuilder();
+        protected void createMethodBody(StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator, String originalBody) throws JavaModelException {
           String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
-          b.append(pageRef + " " + CHILD_PAGE_VAR_NAME + "=new " + pageRef + "();\n");
-          createPageParameterSource(pageType, pageWithTable, validator, b);
-          b.append("return " + CHILD_PAGE_VAR_NAME + ";");
-          return b.toString();
+          sourceBuilder.append(pageRef).append(" ").append(CHILD_PAGE_VAR_NAME).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
+          createPageParameterSource(pageType, pageWithTable, validator, sourceBuilder);
+          sourceBuilder.append("return ").append(CHILD_PAGE_VAR_NAME).append(";");
         }
       };
       updateContentOp.setFormatSource(true);
@@ -165,17 +175,17 @@ public abstract class AbstractPageOperation implements IOperation {
       updateContentOp.run(monitor, workingCopyManager);
     }
     else {
-      MethodOverrideOperation overrideOp = new MethodOverrideOperation(pageWithTable, methodName) {
+      MethodOverrideOperation overrideOp = new MethodOverrideOperation(methodName, pageWithTable);
+      overrideOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
-          StringBuilder b = new StringBuilder();
-          b.append(pageRef + " " + CHILD_PAGE_VAR_NAME + "=new " + pageRef + "();\n");
-          createPageParameterSource(pageType, pageWithTable, validator, b);
-          b.append("return " + CHILD_PAGE_VAR_NAME + ";");
-          return b.toString();
+          source.append(pageRef).append(" ").append(CHILD_PAGE_VAR_NAME).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
+          createPageParameterSource(pageType, pageWithTable, validator, source);
+          source.append("return ").append(CHILD_PAGE_VAR_NAME).append(";");
         }
-      };
+      });
       IStructuredType structuredType = ScoutTypeUtility.createStructuredPageWithTable(pageWithTable);
       overrideOp.setSibling(structuredType.getSiblingMethodConfigExec(methodName));
       overrideOp.validate();

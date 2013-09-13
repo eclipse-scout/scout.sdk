@@ -128,13 +128,11 @@ public class CheckboxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    CheckboxFieldNewOperation operation = new CheckboxFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    CheckboxFieldNewOperation operation = new CheckboxFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

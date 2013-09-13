@@ -25,7 +25,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.TableColumnNewOperation;
+import org.eclipse.scout.sdk.operation.form.field.table.TableColumnNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.IButtonGroupListener;
@@ -196,7 +196,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       });
     }
 
-    TableColumnNewOperation operation = new TableColumnNewOperation(m_declaringType, true);
+    TableColumnNewOperation operation = new TableColumnNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     IType superTypeProp = getSuperType();
     if (superTypeProp != null) {
@@ -210,7 +210,6 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       operation.setSuperTypeSignature(sig);
     }
     operation.setNlsEntry(getNlsName());
-    operation.setTypeName(getTypeName());
     if (getSibling() == SiblingProposal.SIBLING_END) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_COLUMN));

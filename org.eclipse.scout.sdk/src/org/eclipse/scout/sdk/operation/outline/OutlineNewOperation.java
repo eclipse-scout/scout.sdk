@@ -16,10 +16,9 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -27,21 +26,24 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.method.MethodUpdateContentOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.util.OrderedInnerTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.ScoutTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodUpdateContentOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
@@ -51,19 +53,22 @@ import org.eclipse.text.edits.InsertEdit;
  */
 public class OutlineNewOperation implements IOperation {
   // in members
-  private IScoutBundle m_clientBundle;
-  private String m_typeName;
+  private final String m_typeName;
+  private final String m_packageName;
+  private final IJavaProject m_javaProject;
+
   private String m_superTypeSignature;
   private INlsEntry m_nlsEntry;
-  private boolean m_addToDesktop;
   private IType m_desktopType;
   private boolean m_formatSource;
-  private String m_packageName;
 
   // out members
   private IType m_createdOutline;
 
-  public OutlineNewOperation() {
+  public OutlineNewOperation(String outlineName, String packageName, IJavaProject javaProject) {
+    m_typeName = outlineName;
+    m_packageName = packageName;
+    m_javaProject = javaProject;
   }
 
   @Override
@@ -83,46 +88,35 @@ public class OutlineNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ScoutTypeNewOperation newOp = new ScoutTypeNewOperation(getTypeName(), getPackageName(), getClientBundle());
+    PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageName(), getJavaProject());
+    newOp.setFlags(Flags.AccPublic);
     if (getSuperTypeSignature() == null) {
-      setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IOutline, getClientBundle().getJavaProject()));
+      setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IOutline, getJavaProject()));
     }
     newOp.setSuperTypeSignature(getSuperTypeSignature());
+    // nls method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsTextMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TITLE);
+      nlsTextMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsTextMethodBuilder), nlsTextMethodBuilder);
+    }
+
+    newOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    newOp.setFormatSource(isFormatSource());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdOutline = newOp.getCreatedType();
-    boolean addToDesktop = TypeUtility.exists(getDesktopType()) && isAddToDesktop();
 
     workingCopyManager.register(m_createdOutline.getCompilationUnit(), monitor);
 
-    // nls text
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(getCreatedOutline(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TITLE, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
-
     // add to desktop
-    if (addToDesktop) {
+    if (TypeUtility.exists(getDesktopType())) {
       addOutlineToDesktop(getCreatedOutline(), monitor, workingCopyManager);
       addOutlineButtonToDesktop(getCreatedOutline(), monitor, workingCopyManager);
-    }
-
-    // add to exported packages
-    ManifestExportPackageOperation manifestOp = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{m_createdOutline.getPackageFragment()}, true);
-    manifestOp.run(monitor, workingCopyManager);
-
-    if (m_formatSource) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedOutline(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-
-      if (addToDesktop) {
-        JavaElementFormatOperation desktopFormatOp = new JavaElementFormatOperation(getDesktopType(), true);
-        desktopFormatOp.validate();
-        desktopFormatOp.run(monitor, workingCopyManager);
-      }
+      // format desktop type
+      JavaElementFormatOperation desktopFormatOp = new JavaElementFormatOperation(getDesktopType(), true);
+      desktopFormatOp.validate();
+      desktopFormatOp.run(monitor, workingCopyManager);
     }
   }
 
@@ -184,25 +178,21 @@ public class OutlineNewOperation implements IOperation {
       updateContentOp.run(monitor, workingCopyManager);
     }
     else {
-      MethodOverrideOperation overrideOp = new MethodOverrideOperation(getDesktopType(), methodName) {
+      IMethodSourceBuilder overrideBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(methodName, getDesktopType());
+      overrideBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
-        protected String createMethodBody(IImportValidator validator) throws JavaModelException {
-          StringBuilder builder = new StringBuilder();
-          String outlineRef = validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName()));
-          builder.append("return new Class[]{" + outlineRef + ".class};");
-          return builder.toString();
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append("return new Class[]{").append(validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName()))).append(".class};");
         }
-      };
+      });
+      MethodNewOperation overrideOp = new MethodNewOperation(overrideBuilder, getDesktopType());
       overrideOp.setFormatSource(true);
       IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getDesktopType());
       overrideOp.setSibling(structuredType.getSiblingMethodConfigGetConfigured(methodName));
+      overrideOp.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createSupressWarningUnchecked());
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
 
-      AnnotationCreateOperation createSuppressWarning = new AnnotationCreateOperation(overrideOp.getCreatedMethod(), SignatureCache.createTypeSignature(SuppressWarnings.class.getName()));
-      createSuppressWarning.addParameter("\"unchecked\"");
-      createSuppressWarning.validate();
-      createSuppressWarning.run(monitor, workingCopyManager);
     }
   }
 
@@ -218,51 +208,50 @@ public class OutlineNewOperation implements IOperation {
     workingCopyManager.reconcile(getDesktopType().getCompilationUnit(), monitor);
     ITypeHierarchy desktopSuperHierarchy = TypeUtility.getSuperTypeHierarchy(getDesktopType());
     final boolean isExtension = desktopSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension));
-    OrderedInnerTypeNewOperation outlineButtonOp = new OrderedInnerTypeNewOperation(className, getDesktopType(), false) {
+    OrderedInnerTypeNewOperation outlineButtonOp = new OrderedInnerTypeNewOperation(className, getDesktopType());
+    outlineButtonOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IViewButton));
+    outlineButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOutlineViewButton, getDesktopType().getJavaProject()));
+    outlineButtonOp.setFlags(Flags.AccPublic);
+
+    // constructor
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(className);
+    constructorBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+
       @Override
-      protected void createContent(StringBuilder source, IImportValidator validator) {
-        source.append("public ");
-        source.append(className);
-        source.append("() { super(");
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("super(");
         if (isExtension) {
           source.append("getCoreDesktop()");
         }
         else {
           source.append("Desktop.this");
         }
-        source.append(", ");
-        source.append(validator.getTypeName(SignatureCache.createTypeSignature(OutlineNewOperation.this.getTypeName())));
-        source.append(".class); }");
+        source.append(",").append(validator.getTypeName(SignatureCache.createTypeSignature(OutlineNewOperation.this.getTypeName()))).append(".class);");
       }
-    };
-    outlineButtonOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IViewButton));
-    outlineButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOutlineViewButton, getDesktopType().getJavaProject()));
-    outlineButtonOp.setTypeModifiers(Flags.AccPublic);
+    });
+    outlineButtonOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    // nls method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsTextMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(outlineButtonOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
+      nlsTextMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      outlineButtonOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsTextMethodBuilder), nlsTextMethodBuilder);
+    }
+
     outlineButtonOp.validate();
     outlineButtonOp.run(monitor, workingCopyManager);
 
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation nlsOp = new NlsTextMethodUpdateOperation(outlineButtonOp.getCreatedType(), NlsTextMethodUpdateOperation.GET_CONFIGURED_TEXT, false);
-      nlsOp.setNlsEntry(getNlsEntry());
-      nlsOp.validate();
-      nlsOp.run(monitor, workingCopyManager);
-    }
-  }
-
-  public void setClientBundle(IScoutBundle clientBundle) {
-    m_clientBundle = clientBundle;
-  }
-
-  public IScoutBundle getClientBundle() {
-    return m_clientBundle;
   }
 
   public String getTypeName() {
     return m_typeName;
   }
 
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
+  public String getPackageName() {
+    return m_packageName;
+  }
+
+  public IJavaProject getJavaProject() {
+    return m_javaProject;
   }
 
   public void setSuperTypeSignature(String superTypeSignature) {
@@ -285,14 +274,6 @@ public class OutlineNewOperation implements IOperation {
     return m_createdOutline;
   }
 
-  public void setAddToDesktop(boolean addToDesktop) {
-    m_addToDesktop = addToDesktop;
-  }
-
-  public boolean isAddToDesktop() {
-    return m_addToDesktop;
-  }
-
   public void setDesktopType(IType desktopType) {
     m_desktopType = desktopType;
   }
@@ -309,11 +290,4 @@ public class OutlineNewOperation implements IOperation {
     return m_formatSource;
   }
 
-  public String getPackageName() {
-    return m_packageName;
-  }
-
-  public void setPackageName(String packageName) {
-    m_packageName = packageName;
-  }
 }

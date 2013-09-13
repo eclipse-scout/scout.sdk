@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.testing.ApiAssert;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonDisplayStylePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonSystemTypePresenter;
 import org.eclipse.scout.sdk.util.type.FieldFilters;
@@ -45,11 +46,10 @@ public class ButtonApiTest extends AbstractApiTest {
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);
     }
-
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("DISPLAY_STYLE_DEFAULT"), 0));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("DISPLAY_STYLE_TOGGLE"), 1));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("DISPLAY_STYLE_RADIO"), 2));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("DISPLAY_STYLE_LINK"), 3));
+    ApiAssert.assertConstantValue(fieldMap.remove("DISPLAY_STYLE_DEFAULT"), 0);
+    ApiAssert.assertConstantValue(fieldMap.remove("DISPLAY_STYLE_TOGGLE"), 1);
+    ApiAssert.assertConstantValue(fieldMap.remove("DISPLAY_STYLE_RADIO"), 2);
+    ApiAssert.assertConstantValue(fieldMap.remove("DISPLAY_STYLE_LINK"), 3);
     if (!fieldMap.isEmpty()) {
       StringBuilder message = new StringBuilder("Fields are not considered of SDK '");
       Iterator<String> it = fieldMap.keySet().iterator();
@@ -77,13 +77,13 @@ public class ButtonApiTest extends AbstractApiTest {
       fieldMap.put(f.getElementName(), f);
     }
 
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("SYSTEM_TYPE_NONE"), 0));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("SYSTEM_TYPE_CANCEL"), 1));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("SYSTEM_TYPE_CLOSE"), 2));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("SYSTEM_TYPE_OK"), 3));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("SYSTEM_TYPE_RESET"), 4));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("SYSTEM_TYPE_SAVE"), 5));
-    Assert.assertTrue(hasFieldValue(fieldMap.remove("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), 6));
+    ApiAssert.assertConstantValue(fieldMap.remove("SYSTEM_TYPE_NONE"), 0);
+    ApiAssert.assertConstantValue(fieldMap.remove("SYSTEM_TYPE_CANCEL"), 1);
+    ApiAssert.assertConstantValue(fieldMap.remove("SYSTEM_TYPE_CLOSE"), 2);
+    ApiAssert.assertConstantValue(fieldMap.remove("SYSTEM_TYPE_OK"), 3);
+    ApiAssert.assertConstantValue(fieldMap.remove("SYSTEM_TYPE_RESET"), 4);
+    ApiAssert.assertConstantValue(fieldMap.remove("SYSTEM_TYPE_SAVE"), 5);
+    ApiAssert.assertConstantValue(fieldMap.remove("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), 6);
 
     if (!fieldMap.isEmpty()) {
       StringBuilder message = new StringBuilder("Fields are not considered of SDK '");

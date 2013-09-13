@@ -15,7 +15,6 @@ import java.util.HashMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.ui.fields.tooltip.CustomTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
@@ -77,7 +76,7 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
         ScoutSdkUi.logWarning("parse error in multi presenter. ", e);
       }
     }
-    catch (JavaModelException e) {
+    catch (CoreException e) {
       ScoutSdkUi.logWarning("could not compare method body with cached body of presenter '" + methodSet.getMethodName() + "'", e);
     }
     getContainer().layout(true);

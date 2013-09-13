@@ -125,13 +125,11 @@ public class BigdecimalFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    BigdecimalFieldNewOperation operation = new BigdecimalFieldNewOperation(m_declaringType);
-    operation.setFormatSource(true);
+    BigdecimalFieldNewOperation operation = new BigdecimalFieldNewOperation(getTypeName(), m_declaringType, true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }

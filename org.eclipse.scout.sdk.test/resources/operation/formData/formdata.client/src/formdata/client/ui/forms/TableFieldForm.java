@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 
-import formdata.client.ui.forms.TableFieldForm.MainBox.CompanyField;
+import formdata.client.ui.forms.TableFieldForm.MainBox.CompanyTableField;
 import formdata.client.ui.forms.TableFieldForm.MainBox.PersonTableField;
 import formdata.client.ui.template.formfield.AbstractCompanyTableField;
 import formdata.shared.services.process.TableFieldFormData;
@@ -29,8 +29,8 @@ public class TableFieldForm extends AbstractForm {
     super();
   }
 
-  public CompanyField getCompanyField() {
-    return getFieldByClass(CompanyField.class);
+  public CompanyTableField getCompanyField() {
+    return getFieldByClass(CompanyTableField.class);
   }
 
   public MainBox getMainBox() {
@@ -93,7 +93,7 @@ public class TableFieldForm extends AbstractForm {
     }
 
     @Order(20.0)
-    public class CompanyField extends AbstractCompanyTableField {
+    public class CompanyTableField extends AbstractCompanyTableField {
 
     }
 

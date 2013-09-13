@@ -57,7 +57,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
@@ -353,7 +352,7 @@ public class ScoutBundle implements IScoutBundle {
       synchronized (this) {
         result = m_rootPackage;
         if (result == null) {
-          Path src = new Path(IPath.SEPARATOR + getSymbolicName() + IPath.SEPARATOR + SdkProperties.DEFAULT_SOURCE_FOLDER_NAME);
+          Path src = new Path(IPath.SEPARATOR + getSymbolicName() + IPath.SEPARATOR + TypeUtility.DEFAULT_SOURCE_FOLDER_NAME);
           result = getJavaProject().findPackageFragmentRoot(src);
           m_rootPackage = result;
         }

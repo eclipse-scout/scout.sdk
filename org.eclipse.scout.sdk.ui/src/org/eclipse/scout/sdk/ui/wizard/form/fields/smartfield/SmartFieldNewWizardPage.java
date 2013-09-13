@@ -23,7 +23,6 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.SmartFieldNewOperation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUtility;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -152,14 +151,14 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
           if (TypeUtility.exists(m_codeType)) {
             String s;
             try {
-              s = FormDataUtility.computeFormFieldGenericType(m_codeType, TypeUtility.getSuperTypeHierarchy(m_codeType));
+              s = ScoutTypeUtility.computeFormFieldGenericType(m_codeType, TypeUtility.getSuperTypeHierarchy(m_codeType));
               if (s != null) {
                 m_codeTypeDefinesGenericType = true;
                 m_genericSignature = s;
                 m_genericTypeField.acceptProposal(getGenericSignature());
               }
             }
-            catch (JavaModelException e) {
+            catch (CoreException e) {
               ScoutSdkUi.logError("failed to get generic type of code type '" + m_codeType.getElementName() + "'.", e);
             }
           }
@@ -217,13 +216,12 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    SmartFieldNewOperation operation = new SmartFieldNewOperation(m_declaringType, true);
+    SmartFieldNewOperation operation = new SmartFieldNewOperation(getTypeName(), m_declaringType, true);
     operation.setFormatSource(true);
     // write back members
     if (getNlsName() != null) {
       operation.setNlsEntry(getNlsName());
     }
-    operation.setTypeName(getTypeName());
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {

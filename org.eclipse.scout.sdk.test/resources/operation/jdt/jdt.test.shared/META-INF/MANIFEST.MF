@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: jdt.test.shared
+Bundle-SymbolicName: jdt.test.shared;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: jdt.test.shared.Activator
+Export-Package: jdt.test.shared,
+ jdt.test.shared.services,
+ jdt.test.shared.services.code,
+ jdt.test.shared.services.common.text
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.shared;visibility:=reexport
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

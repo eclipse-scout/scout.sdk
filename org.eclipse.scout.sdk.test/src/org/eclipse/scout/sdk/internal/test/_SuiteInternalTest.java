@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test;
 
+import org.eclipse.scout.sdk.internal.test.api.compatibitity._SuiteApiCompatibility;
 import org.eclipse.scout.sdk.internal.test.bug.beforeopensource._SuiteBugsBeforeOpensource;
 import org.eclipse.scout.sdk.internal.test.jdt._SuiteJdt;
 import org.eclipse.scout.sdk.internal.test.operation._SuiteOperation;
@@ -23,6 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
+    _SuiteApiCompatibility.class,
     _SuiteBugsBeforeOpensource.class,
     _SuiteJdt.class,
     _SuiteOperation.class,

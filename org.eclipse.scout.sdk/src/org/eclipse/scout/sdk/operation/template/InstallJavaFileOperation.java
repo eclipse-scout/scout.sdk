@@ -23,7 +23,8 @@ import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
-import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.osgi.framework.Bundle;
@@ -33,9 +34,9 @@ import org.osgi.framework.Bundle;
  */
 public class InstallJavaFileOperation extends InstallTextFileOperation {
   public InstallJavaFileOperation(String srcPath, String rootPackageRelativeDestPath, IScoutBundle scoutBundle, Map<String, String> properties) {
-    this(srcPath, SdkProperties.DEFAULT_SOURCE_FOLDER_NAME + "/" + scoutBundle.getSymbolicName().replace('.', '/') + "/" + rootPackageRelativeDestPath, scoutBundle.getProject(), properties);
+    this(srcPath, TypeUtility.DEFAULT_SOURCE_FOLDER_NAME + "/" + scoutBundle.getSymbolicName().replace('.', '/') + "/" + rootPackageRelativeDestPath, scoutBundle.getProject(), properties);
   }
-
+  
   public InstallJavaFileOperation(String srcPath, String destPath, IProject project, Map<String, String> properties) {
     this(srcPath, destPath, Platform.getBundle(ScoutSdk.PLUGIN_ID), project, properties);
   }
@@ -56,7 +57,7 @@ public class InstallJavaFileOperation extends InstallTextFileOperation {
         // add package to exported packages
         IPackageFragment frag = (IPackageFragment) pck;
         ResourcesPlugin.getWorkspace().checkpoint(false);
-        ManifestExportPackageOperation op = new ManifestExportPackageOperation(ManifestExportPackageOperation.TYPE_ADD_WHEN_NOT_EMTPY, new IPackageFragment[]{frag}, true);
+        ManifestExportPackageOperation op = new ManifestExportPackageOperation(ExportPolicy.AddPackage, new IPackageFragment[]{frag}, true);
         op.validate();
         op.run(monitor, workingCopyManager);
       }

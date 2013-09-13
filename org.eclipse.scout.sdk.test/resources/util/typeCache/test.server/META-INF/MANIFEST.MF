@@ -12,8 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.http.servletfilter,
  org.eclipse.equinox.http.registry,
  org.eclipse.scout.rt.jdbc.derby
-Export-Package: test.server,
- test.server.services.process
+Export-Package: test.server
 Bundle-ClassPath: .
 Import-Package: javax.servlet;version="2.4.0",
  javax.servlet.http;version="2.4.0",
@@ -24,4 +23,4 @@ Import-Package: javax.servlet;version="2.4.0",
  javax.mail.internet;resolution:=optional,
  javax.mail.search;resolution:=optional,
  javax.mail.util;resolution:=optional
-Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6

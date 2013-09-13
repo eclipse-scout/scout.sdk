@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal.signature;
 
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -31,7 +31,7 @@ public class SignatureLabelProvider extends SelectionStateLabelProvider {
     try {
       return SignatureUtility.getTypeReference(signature, new SimpleImportValidator());
     }
-    catch (JavaModelException e) {
+    catch (CoreException e) {
       ScoutSdkUi.logWarning("unable to get text of signature '" + element + "'", e);
       return (String) element;
     }

@@ -16,17 +16,20 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.OrderAnnotationCreateOperation;
-import org.eclipse.scout.sdk.operation.method.MethodOverrideOperation;
-import org.eclipse.scout.sdk.operation.method.NlsTextMethodUpdateOperation;
-import org.eclipse.scout.sdk.operation.util.InnerTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -34,9 +37,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class PlannerFieldNewOperation implements IOperation {
 
+  private final String m_typeName;
   private final IType m_declaringType;
   private boolean m_formatSource;
-  private String m_typeName;
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
   private IJavaElement m_sibling;
@@ -44,8 +47,14 @@ public class PlannerFieldNewOperation implements IOperation {
   private IType m_createdActivityMapType;
   private IType m_createdPlannerTable;
 
-  public PlannerFieldNewOperation(IType declaringType) {
+  public PlannerFieldNewOperation(String typeName, IType declaringType) {
+    this(typeName, declaringType, true);
+  }
+
+  public PlannerFieldNewOperation(String typeName, IType declaringType, boolean formatSource) {
+    m_typeName = typeName;
     m_declaringType = declaringType;
+    m_formatSource = formatSource;
     // default
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IPlannerField, getDeclaringType().getJavaProject()));
   }
@@ -62,75 +71,83 @@ public class PlannerFieldNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    FormFieldNewOperation newOp = new FormFieldNewOperation(getDeclaringType());
-    newOp.setTypeName(getTypeName());
+    FormFieldNewOperationNew newOp = new FormFieldNewOperationNew(getTypeName(), getDeclaringType());
+    newOp.setSibling(getSibling());
+    newOp.setSuperTypeSignature(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractPlannerField)) {
+      // super type sig
+      StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
+      superTypeSigBuilder.append("<").append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE).append(",");
+      superTypeSigBuilder.append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP).append(",");
+      superTypeSigBuilder.append(Long.class.getName()).append(",").append(Long.class.getName()).append(">");
+      newOp.setSuperTypeSignature(Signature.createTypeSignature(superTypeSigBuilder.toString(), true));
+      createPlannerTable(newOp.getSourceBuilder(), monitor, workingCopyManager);
+      createActivityMap(newOp.getSourceBuilder(), monitor, workingCopyManager);
 
-    String superTypeName = Signature.toString(getSuperTypeSignature());
-    superTypeName += "<" + getTypeName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE + "," +
-        getTypeName() + "." + SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP + ", " + Long.class.getName() + ", " + Long.class.getName() + ">";
+    }
+    // getConfiguredLabel method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
+      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
+    }
 
-    newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName));
-    newOp.setSiblingField(getSibling());
+    newOp.setFormatSource(isFormatSource());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
-    m_createdField = newOp.getCreatedFormField();
+    m_createdField = newOp.getCreatedType();
 
-    if (getNlsEntry() != null) {
-      NlsTextMethodUpdateOperation labelOp = new NlsTextMethodUpdateOperation(getCreatedField(), NlsTextMethodUpdateOperation.GET_CONFIGURED_LABEL);
-      labelOp.setNlsEntry(getNlsEntry());
-      labelOp.validate();
-      labelOp.run(monitor, workingCopyManager);
-    }
-
-    // planner field table
-    m_createdPlannerTable = createPlannerTable(monitor, workingCopyManager);
-
-    // planner field activity map
-    m_createdActivityMapType = createActivityMap(monitor, workingCopyManager);
-
-    if (isFormatSource()) {
-      // format
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedField(), true);
-      formatOp.validate();
-      formatOp.run(monitor, workingCopyManager);
-    }
   }
 
-  protected IType createPlannerTable(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation plannerTableOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE, getCreatedField(), false);
-    plannerTableOp.setTypeModifiers(Flags.AccPublic);
-    plannerTableOp.setSibling(null);
-    plannerTableOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
-    plannerTableOp.addAnnotation(new OrderAnnotationCreateOperation(null, 10.0));
-    plannerTableOp.validate();
-    plannerTableOp.run(monitor, manager);
-    IType createdType = plannerTableOp.getCreatedType();
+  /**
+   * @param sourceBuilder
+   * @param monitor
+   * @param workingCopyManager
+   * @throws CoreException
+   */
+  private void createPlannerTable(ITypeSourceBuilder sourceBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    ITypeSourceBuilder tableBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE);
+    tableBuilder.setFlags(Flags.AccPublic);
+    tableBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
+    // order annotation
+    tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+    // getConfiguredAutoResizeColumns method
+    IMethodSourceBuilder getConfiguredAutoResizeColumnsBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(tableBuilder, "getConfiguredAutoResizeColumns");
+    getConfiguredAutoResizeColumnsBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return true;"));
+    tableBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredAutoResizeColumnsBuilder), getConfiguredAutoResizeColumnsBuilder);
 
-    MethodOverrideOperation autoResizeColumnMehtodOp = new MethodOverrideOperation(createdType, "getConfiguredAutoResizeColumns", false);
-    autoResizeColumnMehtodOp.setSimpleBody("return true;");
-    autoResizeColumnMehtodOp.validate();
-    autoResizeColumnMehtodOp.run(monitor, manager);
+    // getConfiguredSortEnabled method
+    IMethodSourceBuilder getConfiguredSortEnabledBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(tableBuilder, "getConfiguredSortEnabled");
+    getConfiguredSortEnabledBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return false;"));
+    tableBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredSortEnabledBuilder), getConfiguredSortEnabledBuilder);
 
-    MethodOverrideOperation sortEnabledMethodOp = new MethodOverrideOperation(createdType, "getConfiguredSortEnabled", false);
-    sortEnabledMethodOp.setSimpleBody("return false;");
-    sortEnabledMethodOp.validate();
-    sortEnabledMethodOp.run(monitor, manager);
-
-    return createdType;
+    sourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableBuilder), tableBuilder);
   }
 
-  protected IType createActivityMap(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    InnerTypeNewOperation activityMapOp = new InnerTypeNewOperation(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP, getCreatedField(), false);
-    activityMapOp.setTypeModifiers(Flags.AccPublic);
-    activityMapOp.setSibling(null);
+  /**
+   * @param sourceBuilder
+   * @param monitor
+   * @param workingCopyManager
+   */
+  private void createActivityMap(ITypeSourceBuilder sourceBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    ITypeSourceBuilder activityMapBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP);
+    activityMapBuilder.setFlags(Flags.AccPublic);
+    String activityMapSuperTypeSig = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IActivityMap, getDeclaringType().getJavaProject());
+    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(activityMapSuperTypeSig);
+    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractActivityMap) ||
+        CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractExtensibleActivityMap)) {
+      // super type sig
+      StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
+      superTypeSigBuilder.append("<").append(Long.class.getName()).append(",");
+      superTypeSigBuilder.append(Long.class.getName()).append(">");
+      activityMapSuperTypeSig = Signature.createTypeSignature(superTypeSigBuilder.toString(), true);
+    }
+    activityMapBuilder.setSuperTypeSignature(activityMapSuperTypeSig);
+    // order annotation
+    activityMapBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
 
-    String superTypeName = RuntimeClasses.getSuperTypeName(RuntimeClasses.IActivityMap, getDeclaringType().getJavaProject()) + Signature.C_GENERIC_START + Long.class.getName() + ", " + Long.class.getName() + Signature.C_GENERIC_END;
-    activityMapOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName));
-    activityMapOp.addAnnotation(new OrderAnnotationCreateOperation(null, 20.0));
-    activityMapOp.validate();
-    activityMapOp.run(monitor, manager);
-
-    return activityMapOp.getCreatedType();
+    sourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeActivityMapKey(activityMapBuilder), activityMapBuilder);
   }
 
   @Override
@@ -164,10 +181,6 @@ public class PlannerFieldNewOperation implements IOperation {
 
   public String getTypeName() {
     return m_typeName;
-  }
-
-  public void setTypeName(String typeName) {
-    m_typeName = typeName;
   }
 
   public INlsEntry getNlsEntry() {

@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -85,7 +86,8 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
     private void ensureCache() {
       if (getElements() == null) {
         if (getMethod() != null) {
-          setElements(TypeUtility.getPrimaryTypeHierarchy(iCodeType).getAllSubtypes(iCodeType, TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator()));
+          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeFilters.getClassFilter());
+          setElements(TypeUtility.getPrimaryTypeHierarchy(iCodeType).getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator()));
         }
         else {
           setElements(new IType[0]);

@@ -15,7 +15,11 @@ package org.eclipse.scout.sdk.internal.test.operation;
 
 import org.eclipse.scout.sdk.internal.test.operation.form._SuiteForm;
 import org.eclipse.scout.sdk.internal.test.operation.formdata._SuiteFormData;
+import org.eclipse.scout.sdk.internal.test.operation.jdt._SuiteJdtOperations;
+import org.eclipse.scout.sdk.internal.test.operation.lookupcall._SuiteLookupCall;
+import org.eclipse.scout.sdk.internal.test.operation.pagedata._SuitePageData;
 import org.eclipse.scout.sdk.internal.test.operation.project._SuiteProject;
+import org.eclipse.scout.sdk.internal.test.operation.service._SuiteService;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -28,12 +32,23 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    AnnotationTest.class,
-    MethodTest.class,
+    CodeNewOperationTest.class,
+    CodeTypeNewOperationTest.class,
+    OutlineNewOperationTest.class,
+    OutlineToolbuttonNewOperationTest.class,
+    PageNewOperationTest.class,
+    ToolbuttonNewOperationTest.class,
+    WizardNewOperationTest.class,
+    WizardStepNewOperationTest.class,
     /*suites*/
-    _SuiteFormData.class,
     _SuiteForm.class,
-    _SuiteProject.class})
+    _SuiteFormData.class,
+    _SuiteJdtOperations.class,
+    _SuiteLookupCall.class,
+    _SuitePageData.class,
+    _SuiteProject.class,
+    _SuiteService.class
+})
 public class _SuiteOperation {
 
 }
