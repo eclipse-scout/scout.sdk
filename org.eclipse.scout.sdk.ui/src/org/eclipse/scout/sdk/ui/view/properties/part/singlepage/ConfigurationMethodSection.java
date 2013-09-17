@@ -279,6 +279,14 @@ public class ConfigurationMethodSection {
     }
 
     @Override
+    public int hashCode() {
+      int hash = m_category.hashCode();
+      hash ^= m_order.hashCode();
+      hash ^= m_configMethod.getMethodName().hashCode();
+      return hash;
+    }
+
+    @Override
     public int compareTo(ConfigurationMethodEx o) {
       // sort first by category
       int catComp = Integer.valueOf(m_category.getOrder()).compareTo(o.m_category.getOrder());

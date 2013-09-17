@@ -60,15 +60,15 @@ public class StringVariableAssignmentVisitor extends DefaultAstVisitor {
       m_nextVarName = false;
     }
     else {
-      if (node.getFullyQualifiedName().equals(m_variableName)) {
-        // skip in order of collecting anything
-      }
-      else {
+      if (!node.getFullyQualifiedName().equals(m_variableName)) {
         // resolve
         StringVariableResolveVisitor resolveVisitor = new StringVariableResolveVisitor(node.getFullyQualifiedName(), node, m_rootNode);
         m_rootNode.accept(resolveVisitor);
         m_value.append(" " + resolveVisitor.getValue() + " ");
       }
+      //else {
+      // skip in order of collecting anything
+      //}
     }
     return false;
   }

@@ -19,7 +19,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.commons.annotations.SqlBindingIgnoreValidation;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.annotation.IgnoreSqlBindingAnnotationCreateOperation;
+import org.eclipse.scout.sdk.operation.jdt.annotation.IgnoreSqlBindingAnnotationCreateOperation;
 import org.eclipse.scout.sdk.sql.binding.SqlBindingMarkers;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;

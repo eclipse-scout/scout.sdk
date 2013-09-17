@@ -136,23 +136,19 @@ public class JavaCodeField extends Composite {
     while (m.find()) {
       String word = m.group(1);
       int offset = m.start(1);
-      int lenght = m.end(1) - offset;
+      int length = m.end(1) - offset;
 
-      if (!fullInput && cursorPosition >= offset && cursorPosition <= (offset + lenght)) {
-        // void
-      }
-      else {
+      if (fullInput || cursorPosition < offset || cursorPosition > (offset + length)) {
         JavaCodeRange range = oldRanges.get(word);
         if (range != null) {
-
           // update range
           range.offset = offset;
-          range.lenght = lenght;
+          range.lenght = length;
         }
         else {
           range = new JavaCodeRange(word);
           range.offset = offset;
-          range.lenght = lenght;
+          range.lenght = length;
           IContentProposal[] pros = m_contentProvider.findExactMatch(word);
           if (pros.length == 1) {
             // accept
@@ -164,7 +160,6 @@ public class JavaCodeField extends Composite {
             else {
               range.setType(JavaCodeRange.PRIMITIV_TYPE);
             }
-
           }
           else {
             // textlayout unknown

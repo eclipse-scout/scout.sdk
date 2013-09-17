@@ -45,6 +45,16 @@ public class TargetPackageModel implements Comparable<TargetPackageModel> {
   }
 
   @Override
+  public int hashCode() {
+    if (m_id == null) {
+      return 0;
+    }
+    else {
+      return m_id.hashCode();
+    }
+  }
+
+  @Override
   public int compareTo(TargetPackageModel o) {
     return m_id.compareTo(o.m_id);
   }

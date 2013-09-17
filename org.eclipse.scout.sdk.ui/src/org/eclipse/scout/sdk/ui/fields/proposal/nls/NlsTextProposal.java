@@ -187,6 +187,17 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
   }
 
   @Override
+  public int hashCode() {
+    String matchString = getMatchString();
+    if (matchString == null) {
+      return 0;
+    }
+    else {
+      return matchString.hashCode();
+    }
+  }
+
+  @Override
   public int compareTo(NlsTextProposal o) {
     return CompareUtility.compareTo(getMatchString(), o.getMatchString());
   }

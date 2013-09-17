@@ -57,7 +57,7 @@ public class DeleteServiceNlsProjectOperation implements IOperation {
 
       // collect resources to delete
       final LinkedList<IResource> filesToDelete = new LinkedList<IResource>();
-      if (propertiesFolder != null && propertiesFolder.exists()) {
+      if (propertiesFolder.exists()) {
         final boolean[] otherFilesExistInFolder = {false};
         propertiesFolder.accept(new IResourceVisitor() {
           @Override

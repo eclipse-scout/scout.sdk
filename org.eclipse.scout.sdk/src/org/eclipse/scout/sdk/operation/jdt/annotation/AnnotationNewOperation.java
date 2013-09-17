@@ -61,9 +61,8 @@ public class AnnotationNewOperation implements IOperation {
   /**
    * @param elementName
    */
-  public AnnotationNewOperation(String signature, IMember parentElement) {
-    this(new AnnotationSourceBuilder(signature), parentElement);
-
+  public AnnotationNewOperation(String signature, IMember declaringType) {
+    this(new AnnotationSourceBuilder(signature), declaringType);
   }
 
   public AnnotationNewOperation(IAnnotationSourceBuilder sourceBuilder, IMember declaringType) {
@@ -173,13 +172,10 @@ public class AnnotationNewOperation implements IOperation {
         String prefix = line.substring(0, replaceRange.getOffset() - lineInfo.getOffset());
         String postfix = line.substring(replaceRange.getOffset() - lineInfo.getOffset() + replaceRange.getLength(), line.length());
         CodeFormatter formatter = ToolFactory.createCodeFormatter(getDeclaringType().getJavaProject().getOptions(false));
-        if (PATTERN.matcher(prefix).matches() && PATTERN.matcher(postfix).matches()) {
-          // void
-        }
-        else if (PATTERN.matcher(prefix).matches()) {
+        if (PATTERN.matcher(prefix).matches() && !PATTERN.matcher(postfix).matches()) {
           builder.append(NL + formatter.createIndentationString(1));
         }
-        else if (PATTERN.matcher(postfix).matches()) {
+        else if (PATTERN.matcher(postfix).matches() && !PATTERN.matcher(prefix).matches()) {
           builder.insert(0, NL + formatter.createIndentationString(1));
         }
         return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());

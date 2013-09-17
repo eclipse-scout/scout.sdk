@@ -52,11 +52,11 @@ public class OutlineRootPagePresenter extends AbstractTypeProposalPresenter {
   protected void init(ConfigurationMethod method) throws CoreException {
     if (method != null) {
       getProposalField().setInput(method.getType());
+      super.init(method);
     }
     else {
       getProposalField().setInput(null);
     }
-    super.init(method);
   }
 
   /**

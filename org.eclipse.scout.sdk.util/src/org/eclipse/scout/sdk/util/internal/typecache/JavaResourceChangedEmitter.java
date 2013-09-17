@@ -311,7 +311,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       synchronized (m_resourceLock) {
         if (collector.hasEvents()) {
           long resourceModification = icu.getResource().getModificationStamp();
-          fireChanges = (icu == null) || resourceModification != collector.getLastModification();
+          fireChanges = resourceModification != collector.getLastModification();
           jdtEvents = collector.removeAllEvents(resourceModification);
         }
       }

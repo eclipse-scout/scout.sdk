@@ -155,11 +155,11 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
 
   @Override
   protected RGB parseDisplayInput(String input) throws CoreException {
+    if (input == null || input.trim().length() == 0) {
+      return null;
+    }
     if (!input.matches("(|[A-Fa-f0-9]{6})")) {
       throw new CoreException(new ScoutStatus(input));
-    }
-    if (input == null || input.length() == 0) {
-      return null;
     }
     int i = Integer.parseInt(input, 16);
     return new RGB((i >> 16) & 0xff, (i >> 8) & 0xff, (i) & 0xff);

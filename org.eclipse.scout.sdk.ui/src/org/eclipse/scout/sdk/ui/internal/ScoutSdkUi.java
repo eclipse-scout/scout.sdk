@@ -81,7 +81,6 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   private ColorRegistry m_colorRegistry;
   private FontRegistry m_fontRegistry;
-  private ServiceRegistration m_formDataServiceRegistration;
   private ServiceRegistration m_organizeImportServiceRegistration;
   private ServiceRegistration m_messageBoxServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
@@ -130,10 +129,6 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
       m_preferencesPropertyListener = null;
     }
     super.stop(context);
-    if (m_formDataServiceRegistration != null) {
-      m_formDataServiceRegistration.unregister();
-      m_formDataServiceRegistration = null;
-    }
     if (m_organizeImportServiceRegistration != null) {
       m_organizeImportServiceRegistration.unregister();
       m_organizeImportServiceRegistration = null;

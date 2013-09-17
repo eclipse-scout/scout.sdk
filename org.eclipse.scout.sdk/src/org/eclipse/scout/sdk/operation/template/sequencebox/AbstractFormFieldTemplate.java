@@ -74,7 +74,6 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     sourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(toFieldBuilder, order), toFieldBuilder);
     // create to getter
     createFormFieldGetter(Signature.createTypeSignature(sequenceBoxFqn + "." + toFieldBuilder.getElementName(), true), declaringType, monitor, manager);
-    order += 10;
 
     // nls text methods
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(declaringType.getJavaProject());

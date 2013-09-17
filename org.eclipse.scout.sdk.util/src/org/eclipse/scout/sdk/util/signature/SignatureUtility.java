@@ -650,11 +650,10 @@ public final class SignatureUtility {
     // interfaces
     if (interfaceSignatures != null) {
       for (String interfaceSignature : interfaceSignatures) {
-        String[] intefaceTypeParameterSignatures = new String[0];
         IType interfaceType = TypeUtility.getTypeBySignature(interfaceSignature);
         if (TypeUtility.exists(interfaceType)) {
           String[] typeParameters = Signature.getTypeParameters(interfaceSignature);
-          intefaceTypeParameterSignatures = new String[typeParameters.length];
+          String[] intefaceTypeParameterSignatures = new String[typeParameters.length];
           for (int i = 0; i < typeParameters.length; i++) {//String typeParameter: typeParameters){
             if (Signature.getTypeSignatureKind(typeParameters[i]) == Signature.TYPE_VARIABLE_SIGNATURE) {
               intefaceTypeParameterSignatures[i] = typeDesc.getParameterSignature(Signature.getSignatureSimpleName(typeParameters[i]));

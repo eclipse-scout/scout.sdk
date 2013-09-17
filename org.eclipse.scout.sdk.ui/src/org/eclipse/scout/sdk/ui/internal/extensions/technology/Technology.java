@@ -247,6 +247,14 @@ public class Technology implements Comparable<Technology> {
   }
 
   @Override
+  public int hashCode() {
+    int hash = m_id.hashCode();
+    hash ^= m_category.hashCode();
+    hash ^= m_name.hashCode();
+    return hash;
+  }
+
+  @Override
   public int compareTo(Technology o) {
     int ret = m_category.compareTo(o.m_category);
     if (ret == 0) {

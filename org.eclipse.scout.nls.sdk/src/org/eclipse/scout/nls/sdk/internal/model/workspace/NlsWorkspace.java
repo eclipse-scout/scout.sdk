@@ -39,8 +39,8 @@ public final class NlsWorkspace implements INlsWorkspace {
       for (IConfigurationElement element : elements) {
         if ("provider".equals(element.getName())) {
           INlsProjectProvider p = (INlsProjectProvider) element.createExecutableExtension("class");
-          INlsProject proj = p.getProject(args);
           if (p != null) {
+            INlsProject proj = p.getProject(args);
             if (proj != null) {
               return proj;
             }

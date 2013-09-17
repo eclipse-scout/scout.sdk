@@ -268,8 +268,11 @@ public class SunJaxWsBean {
     }
 
     ScoutXmlElement rootXml = document.getRoot();
+    if (rootXml == null) {
+      return null;
+    }
     String xmlEndpoint = StringUtility.join(":", rootXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT);
-    if (rootXml == null || !rootXml.hasChild(xmlEndpoint)) {
+    if (!rootXml.hasChild(xmlEndpoint)) {
       return null;
     }
 

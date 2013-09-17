@@ -25,8 +25,8 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.annotation.AnnotationNewOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -71,7 +71,7 @@ public class AnnotationUpdateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    AnnotationCreateOperation op = new AnnotationCreateOperation(m_declaringType, SignatureCache.createTypeSignature(m_annotationType.getFullyQualifiedName()));
+    AnnotationNewOperation op = new AnnotationNewOperation(SignatureCache.createTypeSignature(m_annotationType.getFullyQualifiedName()), m_declaringType);
     IAnnotation annotation = JaxWsSdkUtility.getAnnotation(m_declaringType, m_annotationType.getFullyQualifiedName(), false);
 
     Map<String, String> resolvedTypePropertyMap = new HashMap<String, String>();

@@ -42,18 +42,18 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   }
 
   public OperationJob(IOperation... operations) {
-    this((operations == null) ? Arrays.asList(new IOperation[0]) : Arrays.asList(operations));
+    this(operations == null ? null : Arrays.asList(operations));
   }
 
   public OperationJob(Collection<IOperation> operations) {
     super("");
-    m_operations = new ArrayList<IOperation>(operations.size());
-    m_systemProperties = new Properties();
-    if (operations != null) {
-      for (IOperation op : operations) {
-        m_operations.add(op);
-      }
+    if (operations == null) {
+      m_operations = new ArrayList<IOperation>();
     }
+    else {
+      m_operations = new ArrayList<IOperation>(operations);
+    }
+    m_systemProperties = new Properties();
     updateJobName();
   }
 

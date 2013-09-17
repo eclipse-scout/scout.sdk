@@ -229,16 +229,13 @@ public final class SearchFormFromTablePageHelper {
     if (lastBoxIndex > 0) {
       parentName = parentName.substring(0, lastBoxIndex);
     }
-    double order = 10;
     // from
     String fromFieldName = parentName + SdkProperties.SUFFIX_FROM;
-    ITypeSourceBuilder fromFieldBuilder = addFormField(fromFieldName, fromToSuperTypeSignature, order, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
-    order += 10;
+    ITypeSourceBuilder fromFieldBuilder = addFormField(fromFieldName, fromToSuperTypeSignature, 10, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
 
     // to
     String toFieldName = parentName + SdkProperties.SUFFIX_TO;
-    ITypeSourceBuilder toFieldBuilder = addFormField(toFieldName, fromToSuperTypeSignature, order, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
-    order += 10;
+    ITypeSourceBuilder toFieldBuilder = addFormField(toFieldName, fromToSuperTypeSignature, 20, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
 
     // nls text methods
     if (nlsProject != null) {

@@ -514,9 +514,9 @@ public class ControlDecoration {
               target.addMouseMoveListener(mouseMoveListener);
               moveListeningTarget = target;
             }
-            else {
-              // It is already installed on this control.
-            }
+            //else {
+            // It is already installed on this control.
+            //}
           }
         }
       }

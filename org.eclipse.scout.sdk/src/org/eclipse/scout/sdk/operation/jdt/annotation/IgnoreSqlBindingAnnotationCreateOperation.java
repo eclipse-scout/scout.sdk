@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.operation.annotation;
+package org.eclipse.scout.sdk.operation.jdt.annotation;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * @author Andreas Hoegger
  * @since 1.0.8 02.03.2011
  */
-public class IgnoreSqlBindingAnnotationCreateOperation extends AnnotationCreateOperation {
+public class IgnoreSqlBindingAnnotationCreateOperation extends AnnotationNewOperation {
 
   private HashSet<String> m_ignoredBindings;
 
@@ -39,14 +39,14 @@ public class IgnoreSqlBindingAnnotationCreateOperation extends AnnotationCreateO
    * @param signature
    */
   public IgnoreSqlBindingAnnotationCreateOperation(IMember annotationOwner, String signature, String[] bindVariable) {
-    super(annotationOwner, signature);
+    super(signature, annotationOwner);
     m_ignoredBindings = new HashSet<String>();
     m_ignoredBindings.addAll(Arrays.asList(bindVariable));
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    IAnnotation existingAnnotation = JdtUtility.getAnnotation((IAnnotatable) getAnnotationOwner(), SqlBindingIgnoreValidation.class.getName());
+    IAnnotation existingAnnotation = JdtUtility.getAnnotation((IAnnotatable) getDeclaringType(), SqlBindingIgnoreValidation.class.getName());
     if (TypeUtility.exists(existingAnnotation)) {
       if (existingAnnotation.getSource().startsWith("@")) {
         for (IMemberValuePair p : existingAnnotation.getMemberValuePairs()) {

@@ -148,13 +148,12 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     double nextOrderNr = 10;
     if (isCreateButtonOk()) {
       createOkButton(getSourceBuilder(), mainBoxBuilder, nextOrderNr);
-      nextOrderNr += 10;
     }
 
     // cancel button
     if (isCreateButtonCancel()) {
-      createCancelButton(getSourceBuilder(), mainBoxBuilder, nextOrderNr);
       nextOrderNr += 10;
+      createCancelButton(getSourceBuilder(), mainBoxBuilder, nextOrderNr);
     }
   }
 

@@ -372,7 +372,6 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // LabelColumn type
     ITypeSourceBuilder labelColumnBuilder = new TypeSourceBuilder("LabelColumn");
     labelColumnBuilder.setFlags(Flags.AccPublic);
-    superType = RuntimeClasses.getSuperType(RuntimeClasses.IColumn, mobileClient);
     labelColumnBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringColumn, mobileClient));
     labelColumnBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(20));
 

@@ -147,6 +147,11 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
   }
 
   @Override
+  public int hashCode() {
+    return label.hashCode();
+  }
+
+  @Override
   public int compareTo(DefaultSuperClassModel o) {
     return label.compareTo(o.label);
   }
