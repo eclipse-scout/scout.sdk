@@ -27,6 +27,7 @@
       <import feature="org.eclipse.pde" version="3.7.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="3.7.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.jdt" version="3.7.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.scout.commons"/>
    </requires>
 
    <plugin
@@ -119,13 +120,6 @@
 
    <plugin
          id="org.eclipse.scout.sdk.help"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.commons"
          download-size="0"
          install-size="0"
          version="0.0.0"
