@@ -57,7 +57,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertExist(String, IJavaElement)
    */
-  static public void assertExist(IJavaElement element) {
+  public static void assertExist(IJavaElement element) {
     assertExist(null, element);
   }
 
@@ -67,7 +67,7 @@ public class SdkAssert extends Assert {
    * @param message
    * @param element
    */
-  static public void assertExist(String message, IJavaElement element) {
+  public static void assertExist(String message, IJavaElement element) {
     if (!TypeUtility.exists(element)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Element does not exist");
@@ -85,7 +85,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertNotExist(String, IJavaElement)
    */
-  static public void assertNotExist(IJavaElement element) {
+  public static void assertNotExist(IJavaElement element) {
     assertNotExist(null, element);
   }
 
@@ -95,7 +95,7 @@ public class SdkAssert extends Assert {
    * @param message
    * @param element
    */
-  static public void assertNotExist(String message, IJavaElement element) {
+  public static void assertNotExist(String message, IJavaElement element) {
     if (TypeUtility.exists(element)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Element does exist");
@@ -113,7 +113,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertTypeExists(String, String)
    */
-  static public IType assertTypeExists(String fullyQualifiedTypeName) {
+  public static IType assertTypeExists(String fullyQualifiedTypeName) {
     return assertTypeExists((String) null, fullyQualifiedTypeName);
   }
 
@@ -124,7 +124,7 @@ public class SdkAssert extends Assert {
    * @param fullyQualifiedTypeName
    * @return the type if found.
    */
-  static public IType assertTypeExists(String message, String fullyQualifiedTypeName) {
+  public static IType assertTypeExists(String message, String fullyQualifiedTypeName) {
     IType type = TypeUtility.getType(fullyQualifiedTypeName);
     if (!TypeUtility.exists(type)) {
       if (message == null) {
@@ -140,7 +140,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertTypeExistsBySignature(String, String)
    */
-  static public IType assertTypeExistsBySignature(String signature) {
+  public static IType assertTypeExistsBySignature(String signature) {
     return assertTypeExistsBySignature((String) null, signature);
   }
 
@@ -151,7 +151,7 @@ public class SdkAssert extends Assert {
    * @param signature
    * @return the type if found.
    */
-  static public IType assertTypeExistsBySignature(String message, String signature) {
+  public static IType assertTypeExistsBySignature(String message, String signature) {
     IType type = TypeUtility.getTypeBySignature(signature);
     if (!TypeUtility.exists(type)) {
       if (message == null) {
@@ -167,26 +167,26 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertTypeExists(String, ICompilationUnit, String)
    */
-  static public IType assertTypeExists(ICompilationUnit icu, String typeName) {
+  public static IType assertTypeExists(ICompilationUnit icu, String typeName) {
     return assertTypeExists(null, icu, typeName);
   }
 
   /**
-   * fails if the <code>icu</code> does not contains an inner type named <code>typeName</code>.
+   * fails if the <code>icu</code> does not contain an inner type named <code>typeName</code>.
    * 
    * @param message
    * @param icu
    * @param typeName
    * @return the type if found.
    */
-  static public IType assertTypeExists(String message, ICompilationUnit icu, String typeName) {
+  public static IType assertTypeExists(String message, ICompilationUnit icu, String typeName) {
+    SdkAssert.assertNotNull(icu);
+
     IType type = icu.getType(typeName);
     if (!TypeUtility.exists(type)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Type '").append(typeName).append("'");
-        if (icu != null) {
-          messageBuilder.append(" in compilation unit '").append(icu.getElementName()).append("'");
-        }
+        messageBuilder.append(" in compilation unit '").append(icu.getElementName()).append("'");
         messageBuilder.append(" does not exist!");
         message = messageBuilder.toString();
       }
@@ -198,7 +198,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertTypeExists(String, IType, String)
    */
-  static public IType assertTypeExists(IType declaringType, String typeName) {
+  public static IType assertTypeExists(IType declaringType, String typeName) {
     return assertTypeExists(null, declaringType, typeName);
   }
 
@@ -210,14 +210,14 @@ public class SdkAssert extends Assert {
    * @param typeName
    * @return the type if found.
    */
-  static public IType assertTypeExists(String message, IType declaringType, String typeName) {
+  public static IType assertTypeExists(String message, IType declaringType, String typeName) {
+    SdkAssert.assertNotNull(declaringType);
+
     IType type = declaringType.getType(typeName);
     if (!TypeUtility.exists(type)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Type '").append(typeName).append("'");
-        if (declaringType != null) {
-          messageBuilder.append(" in type '").append(declaringType.getElementName()).append("'");
-        }
+        messageBuilder.append(" in type '").append(declaringType.getElementName()).append("'");
         messageBuilder.append(" does not exist!");
         message = messageBuilder.toString();
       }
@@ -229,7 +229,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertMethodExist(String, IType, String)
    */
-  static public IMethod assertMethodExist(IType type, String methodName) {
+  public static IMethod assertMethodExist(IType type, String methodName) {
     return assertMethodExist(null, type, methodName);
   }
 
@@ -241,7 +241,7 @@ public class SdkAssert extends Assert {
    * @param methodName
    * @return the method if found
    */
-  static public IMethod assertMethodExist(String message, IType type, String methodName) {
+  public static IMethod assertMethodExist(String message, IType type, String methodName) {
     IMethod method = TypeUtility.getMethod(type, methodName);
     if (!TypeUtility.exists(method)) {
       if (message == null) {
@@ -257,7 +257,7 @@ public class SdkAssert extends Assert {
     return method;
   }
 
-  static public IMethod assertMethodExist(IType type, String methodName, String[] parameterSignatures) {
+  public static IMethod assertMethodExist(IType type, String methodName, String[] parameterSignatures) {
     return assertMethodExist(null, type, methodName, parameterSignatures);
 
   }
@@ -270,7 +270,7 @@ public class SdkAssert extends Assert {
    * @param methodName
    * @return the method if found
    */
-  static public IMethod assertMethodExist(String message, IType type, final String methodName, final String[] parameterSignatures) {
+  public static IMethod assertMethodExist(String message, IType type, final String methodName, final String[] parameterSignatures) {
     IMethod method = TypeUtility.getFirstMethod(type, new IMethodFilter() {
       @Override
       public boolean accept(IMethod candidate) throws CoreException {
@@ -316,7 +316,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertMethodExistInSuperTypeHierarchy(String, IType, String)
    */
-  static public IMethod assertMethodExistInSuperTypeHierarchy(IType type, String methodName) {
+  public static IMethod assertMethodExistInSuperTypeHierarchy(IType type, String methodName) {
     return assertMethodExistInSuperTypeHierarchy(null, type, methodName);
   }
 
@@ -330,7 +330,7 @@ public class SdkAssert extends Assert {
    * @return the first method found in super type hierarchy. Each levels superclass is considered before all interfaces
    *         in no particular order.
    */
-  static public IMethod assertMethodExistInSuperTypeHierarchy(String message, IType type, String methodName) {
+  public static IMethod assertMethodExistInSuperTypeHierarchy(String message, IType type, String methodName) {
     IMethod method = TypeUtility.findMethodInSuperHierarchy(methodName, type, TypeUtility.getSuperTypeHierarchy(type));
     if (!TypeUtility.exists(method)) {
       if (message == null) {
@@ -452,7 +452,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertFieldExist(String, IType, String)
    */
-  static public IField assertFieldExist(IType type, String fieldName) {
+  public static IField assertFieldExist(IType type, String fieldName) {
     return assertFieldExist(null, type, fieldName);
   }
 
@@ -464,7 +464,7 @@ public class SdkAssert extends Assert {
    * @param fieldName
    * @return the field if it exists.
    */
-  static public IField assertFieldExist(String message, IType type, String fieldName) {
+  public static IField assertFieldExist(String message, IType type, String fieldName) {
     IField field = TypeUtility.getFirstField(type, FieldFilters.getNameFilter(fieldName));
     if (!TypeUtility.exists(field)) {
       if (message == null) {
@@ -578,7 +578,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertSerialVersionUidExists(String, IType)
    */
-  static public IField assertSerialVersionUidExists(IType type) throws JavaModelException {
+  public static IField assertSerialVersionUidExists(IType type) throws JavaModelException {
     return assertSerialVersionUidExists(null, type);
   }
 
@@ -590,13 +590,13 @@ public class SdkAssert extends Assert {
    * @return
    * @throws JavaModelException
    */
-  static public IField assertSerialVersionUidExists(String message, IType type) throws JavaModelException {
+  public static IField assertSerialVersionUidExists(String message, IType type) throws JavaModelException {
     IField field = assertFieldExist(message, type, "serialVersionUID");
     assertPrivate(message, field).assertStatic().assertFinal();
     return field;
   }
 
-  static public IAnnotation assertAnnotation(IAnnotatable annotatable, String fqAnnotationTypeName) {
+  public static IAnnotation assertAnnotation(IAnnotatable annotatable, String fqAnnotationTypeName) {
 
     IAnnotation annotation = JdtUtility.getAnnotation(annotatable, fqAnnotationTypeName);
     if (annotation == null || !annotation.exists()) {
@@ -616,7 +616,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertOrderAnnotation(String, IAnnotatable, Double)
    */
-  static public void assertOrderAnnotation(IAnnotatable annotatable, Double orderNr) throws JavaModelException {
+  public static void assertOrderAnnotation(IAnnotatable annotatable, Double orderNr) throws JavaModelException {
     assertOrderAnnotation(null, annotatable, orderNr);
   }
 
@@ -628,7 +628,7 @@ public class SdkAssert extends Assert {
    * @param orderNr
    * @throws JavaModelException
    */
-  static public void assertOrderAnnotation(String message, IAnnotatable annotatable, Double orderNr) throws JavaModelException {
+  public static void assertOrderAnnotation(String message, IAnnotatable annotatable, Double orderNr) throws JavaModelException {
     Double memberOrderNr = ScoutTypeUtility.getOrderAnnotationValue(annotatable);
     if (!CompareUtility.equals(orderNr, memberOrderNr)) {
       if (message == null) {
@@ -648,7 +648,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertSameParent(String, IJavaElement...)
    */
-  static public void assertSameParent(IJavaElement... elements) {
+  public static void assertSameParent(IJavaElement... elements) {
     assertSameParent(null, elements);
   }
 
@@ -658,7 +658,7 @@ public class SdkAssert extends Assert {
    * @param message
    * @param elements
    */
-  static public void assertSameParent(String message, IJavaElement... elements) {
+  public static void assertSameParent(String message, IJavaElement... elements) {
     if (elements != null) {
       IJavaElement parent = null;
       for (IJavaElement element : elements) {
@@ -675,7 +675,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertElementSequenceInSource(String, IMember...)
    */
-  static public void assertElementSequenceInSource(IMember... elements) throws JavaModelException {
+  public static void assertElementSequenceInSource(IMember... elements) throws JavaModelException {
     assertElementSequenceInSource(null, elements);
   }
 
@@ -686,7 +686,7 @@ public class SdkAssert extends Assert {
    * @param elements
    * @throws JavaModelException
    */
-  static public void assertElementSequenceInSource(String message, IMember... elements) throws JavaModelException {
+  public static void assertElementSequenceInSource(String message, IMember... elements) throws JavaModelException {
     assertSameParent(elements);
     if (elements != null) {
       int index = -1;
@@ -702,11 +702,11 @@ public class SdkAssert extends Assert {
     }
   }
 
-  static public void assertHasFlags(IMember member, int flags) throws JavaModelException {
+  public static void assertHasFlags(IMember member, int flags) throws JavaModelException {
     assertHasFlags(null, member, flags);
   }
 
-  static public void assertHasFlags(String message, IMember member, int flags) throws JavaModelException {
+  public static void assertHasFlags(String message, IMember member, int flags) throws JavaModelException {
     int memberFlags = member.getFlags();
     if ((flags & memberFlags) != flags) {
       if (message == null) {
@@ -724,7 +724,7 @@ public class SdkAssert extends Assert {
    * @param project
    * @param serviceInterface
    */
-  static public void assertServiceProxyRegistered(IProject project, IType serviceInterface) {
+  public static void assertServiceProxyRegistered(IProject project, IType serviceInterface) {
     IPluginElement[] simpleExtensions = new PluginModelHelper(project).PluginXml.getSimpleExtensions(
         "org.eclipse.scout.service.services", "proxy");
     for (IPluginElement element : simpleExtensions) {
@@ -741,7 +741,7 @@ public class SdkAssert extends Assert {
    * @param project
    * @param serviceInterface
    */
-  static public void assertServiceRegistered(IProject project, IType serviceInterface) {
+  public static void assertServiceRegistered(IProject project, IType serviceInterface) {
     IPluginElement[] simpleExtensions = new PluginModelHelper(project).PluginXml.getSimpleExtensions(
         "org.eclipse.scout.service.services", "service");
     for (IPluginElement element : simpleExtensions) {
@@ -768,7 +768,7 @@ public class SdkAssert extends Assert {
   /**
    * @see SdkAssert#assertPrivate(String, IMember)
    */
-  static public FlagAssert assertPrivate(IMember member) throws JavaModelException {
+  public static FlagAssert assertPrivate(IMember member) throws JavaModelException {
     return assertPrivate(null, member);
   }
 
@@ -785,14 +785,14 @@ public class SdkAssert extends Assert {
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
    */
-  static public FlagAssert assertPrivate(String message, IMember member) throws JavaModelException {
+  public static FlagAssert assertPrivate(String message, IMember member) throws JavaModelException {
     return new FlagAssert(message, member).assertPrivate();
   }
 
   /**
    * @see SdkAssert#assertProtected(String, IMember)
    */
-  static public FlagAssert assertProtected(IMember member) throws JavaModelException {
+  public static FlagAssert assertProtected(IMember member) throws JavaModelException {
     return assertProtected(null, member);
   }
 
@@ -809,14 +809,14 @@ public class SdkAssert extends Assert {
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
    */
-  static public FlagAssert assertProtected(String message, IMember member) throws JavaModelException {
+  public static FlagAssert assertProtected(String message, IMember member) throws JavaModelException {
     return new FlagAssert(message, member).assertProtected();
   }
 
   /**
    * @see SdkAssert#assertPublic(String, IMember)
    */
-  static public FlagAssert assertPublic(IMember member) throws JavaModelException {
+  public static FlagAssert assertPublic(IMember member) throws JavaModelException {
     return assertPublic(null, member);
   }
 
@@ -833,14 +833,14 @@ public class SdkAssert extends Assert {
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
    */
-  static public FlagAssert assertPublic(String message, IMember member) throws JavaModelException {
+  public static FlagAssert assertPublic(String message, IMember member) throws JavaModelException {
     return new FlagAssert(message, member).assertPublic();
   }
 
   /**
    * @see SdkAssert#assertAbstract(String, IMember)
    */
-  static public FlagAssert assertAbstract(IMember member) throws JavaModelException {
+  public static FlagAssert assertAbstract(IMember member) throws JavaModelException {
     return assertAbstract(null, member);
   }
 
@@ -857,14 +857,14 @@ public class SdkAssert extends Assert {
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
    */
-  static public FlagAssert assertAbstract(String message, IMember member) throws JavaModelException {
+  public static FlagAssert assertAbstract(String message, IMember member) throws JavaModelException {
     return new FlagAssert(message, member).assertAbstract();
   }
 
   /**
    * @see SdkAssert#assertFinal(String, IMember)
    */
-  static public FlagAssert assertFinal(IMember member) throws JavaModelException {
+  public static FlagAssert assertFinal(IMember member) throws JavaModelException {
     return assertFinal(null, member);
   }
 
@@ -881,14 +881,14 @@ public class SdkAssert extends Assert {
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
    */
-  static public FlagAssert assertFinal(String message, IMember member) throws JavaModelException {
+  public static FlagAssert assertFinal(String message, IMember member) throws JavaModelException {
     return new FlagAssert(message, member).assertFinal();
   }
 
   /**
    * @see SdkAssert#assertInterface(String, IMember)
    */
-  static public FlagAssert assertInterface(IMember member) throws JavaModelException {
+  public static FlagAssert assertInterface(IMember member) throws JavaModelException {
     return assertInterface(null, member);
   }
 
@@ -905,14 +905,14 @@ public class SdkAssert extends Assert {
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
    */
-  static public FlagAssert assertInterface(String message, IMember member) throws JavaModelException {
+  public static FlagAssert assertInterface(String message, IMember member) throws JavaModelException {
     return new FlagAssert(message, member).assertInterface();
   }
 
   /**
    * @see SdkAssert#assertStatic(String, IMember)
    */
-  static public FlagAssert assertStatic(IMember member) throws JavaModelException {
+  public static FlagAssert assertStatic(IMember member) throws JavaModelException {
     return assertStatic(null, member);
   }
 
@@ -929,16 +929,16 @@ public class SdkAssert extends Assert {
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
    */
-  static public FlagAssert assertStatic(String message, IMember member) throws JavaModelException {
+  public static FlagAssert assertStatic(String message, IMember member) throws JavaModelException {
     return new FlagAssert(message, member).assertStatic();
   }
 
-  static public TypeAssert typeAssert(IType declaringType, String typeName) throws JavaModelException {
+  public static TypeAssert typeAssert(IType declaringType, String typeName) throws JavaModelException {
     IType type = assertTypeExists(declaringType, typeName);
     return new TypeAssert(type);
   }
 
-  static public MethodAssert methodAssert(IType type, String methodname) throws JavaModelException {
+  public static MethodAssert methodAssert(IType type, String methodname) throws JavaModelException {
     IMethod method = assertMethodExist(type, methodname);
     return new MethodAssert(method);
   }

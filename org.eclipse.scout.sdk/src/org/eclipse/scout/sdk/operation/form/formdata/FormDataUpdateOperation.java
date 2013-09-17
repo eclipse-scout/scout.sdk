@@ -16,13 +16,14 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
 import org.eclipse.scout.sdk.operation.jdt.icu.CompilationUnitUpdateOperation;
+import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>{@link FormDataUpdateOperation}</h3> ...
+ * <h3>{@link FormDataUpdateOperation}</h3>
  * 
  * @author aho
  * @since 3.8.0 14.01.2013
@@ -54,9 +55,18 @@ public class FormDataUpdateOperation extends CompilationUnitUpdateOperation {
     FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getFormDataDefinitionType(), TypeUtility.getSuperTypeHierarchy(getFormDataDefinitionType()));
     ITypeSourceBuilder typeOp = FormDataUtility.createFormDataSourceBuilder(getFormDataDefinitionType(), formDataAnnotation);//FormDataFactory.createFormDataBuilder(getFormDataDefinitionType(), formDataAnnotation);
     addTypeSourceBuilder(typeOp);
-    super.run(monitor, workingCopyManager);
-    m_createdFormData = getCompilationUnit().getType(typeOp.getElementName());
 
+    super.run(monitor, workingCopyManager);
+
+    // organize import required to:
+    // 1. ensure the JDT settings for the imports are applied
+    // 2. resolve references e.g. in validation rules to classes holding constants.
+    //    see /org.eclipse.scout.sdk.test/resources/operation/formData/formdata.client/src/formdata/client/ui/template/formfield/AbstractLimitedStringField.java for an example.
+    OrganizeImportOperation o = new OrganizeImportOperation(getCompilationUnit());
+    o.validate();
+    o.run(monitor, workingCopyManager);
+
+    m_createdFormData = getCompilationUnit().getType(typeOp.getElementName());
   }
 
   public IType getFormDataDefinitionType() {

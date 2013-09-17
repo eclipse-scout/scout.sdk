@@ -39,7 +39,6 @@ public class FormWithTemplateTest extends AbstractSdkTestWithFormDataProject {
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
 
     testApiOfUsingTemplateFormData();
-
   }
 
   /**
@@ -57,7 +56,7 @@ public class FormWithTemplateTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'UsingTemplateFormData'", 4, usingTemplateFormData.getMethods().length);
+    SdkAssert.assertEquals("method count of 'UsingTemplateFormData'", 5, usingTemplateFormData.getMethods().length);
     IMethod usingTemplateFormData1 = SdkAssert.assertMethodExist(usingTemplateFormData, "UsingTemplateFormData", new String[]{});
     SdkAssert.assertTrue(usingTemplateFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(usingTemplateFormData1, "V");
@@ -67,8 +66,10 @@ public class FormWithTemplateTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(getInternalHtml, "QInternalHtml;");
     IMethod getTestCheckbox = SdkAssert.assertMethodExist(usingTemplateFormData, "getTestCheckbox", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTestCheckbox, "QTestCheckbox;");
+    IMethod getTestLimitedString = SdkAssert.assertMethodExist(usingTemplateFormData, "getTestLimitedString", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getTestLimitedString, "QTestLimitedString;");
 
-    SdkAssert.assertEquals("inner types count of 'UsingTemplateFormData'", 3, usingTemplateFormData.getTypes().length);
+    SdkAssert.assertEquals("inner types count of 'UsingTemplateFormData'", 4, usingTemplateFormData.getTypes().length);
     // type ExternalGroupBox
     IType externalGroupBox = SdkAssert.assertTypeExists(usingTemplateFormData, "ExternalGroupBox");
     SdkAssert.assertHasFlags(externalGroupBox, 9);
@@ -124,6 +125,26 @@ public class FormWithTemplateTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(testCheckbox1, "V");
 
     SdkAssert.assertEquals("inner types count of 'TestCheckbox'", 0, testCheckbox.getTypes().length);
-  }
+    // type TestLimitedString
+    IType testLimitedString = SdkAssert.assertTypeExists(usingTemplateFormData, "TestLimitedString");
+    SdkAssert.assertHasFlags(testLimitedString, 9);
+    SdkAssert.assertHasSuperTypeSignature(testLimitedString, "QAbstractValueFieldData<QString;>;");
 
+    // fields of TestLimitedString
+    SdkAssert.assertEquals("field count of 'TestLimitedString'", 1, testLimitedString.getFields().length);
+    IField serialVersionUID4 = SdkAssert.assertFieldExist(testLimitedString, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID4, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID4, "J");
+
+    SdkAssert.assertEquals("method count of 'TestLimitedString'", 2, testLimitedString.getMethods().length);
+    IMethod testLimitedString1 = SdkAssert.assertMethodExist(testLimitedString, "TestLimitedString", new String[]{});
+    SdkAssert.assertTrue(testLimitedString1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(testLimitedString1, "V");
+    IMethod initValidationRules1 = SdkAssert.assertMethodExist(testLimitedString, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(initValidationRules1, "V");
+    SdkAssert.assertAnnotation(initValidationRules1, "java.lang.Override");
+    SdkAssert.assertMethodValidationRules(initValidationRules1, new String[]{"ruleMap.put(ValidationRule.MAX_LENGTH, IConstants.MAX_LENGTH * 4);"}, true);
+
+    SdkAssert.assertEquals("inner types count of 'TestLimitedString'", 0, testLimitedString.getTypes().length);
+  }
 }

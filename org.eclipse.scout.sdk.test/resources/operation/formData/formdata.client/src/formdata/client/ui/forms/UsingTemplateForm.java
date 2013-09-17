@@ -1,11 +1,10 @@
 package formdata.client.ui.forms;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
-import org.eclipse.scout.rt.client.ui.form.fields.checkbox.AbstractCheckBox;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.htmlfield.AbstractHtmlField;
 
@@ -14,13 +13,15 @@ import formdata.client.ui.forms.UsingTemplateForm.MainBox.ExternalWithNoAnnotati
 import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox;
 import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox.InternalHtmlField;
 import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox.TestCheckboxField;
+import formdata.client.ui.forms.UsingTemplateForm.MainBox.InternalGroupBox.TestLimitedStringField;
 import formdata.client.ui.template.formfield.AbstractExternalGroupBox;
-import formdata.client.ui.template.formfield.AbstractExternalWithNoAnnotationBox;
 import formdata.client.ui.template.formfield.AbstractExternalGroupBox.ExternalStringField;
+import formdata.client.ui.template.formfield.AbstractExternalWithNoAnnotationBox;
 import formdata.client.ui.template.formfield.AbstractExternalWithNoAnnotationBox.NameField;
 import formdata.client.ui.template.formfield.AbstractExternalWithNoAnnotationBox.PlzField;
-import formdata.shared.services.process.UsingTemplateFormData;
+import formdata.client.ui.template.formfield.AbstractLimitedStringField;
 import formdata.client.ui.template.formfield.AbstractTestCheckboxField;
+import formdata.shared.services.process.UsingTemplateFormData;
 
 @FormData(value = UsingTemplateFormData.class, sdkCommand = SdkCommand.CREATE)
 public class UsingTemplateForm extends AbstractForm {
@@ -77,6 +78,10 @@ public class UsingTemplateForm extends AbstractForm {
     return getFieldByClass(MainBox.class);
   }
 
+  public TestLimitedStringField getTestLimitedStringField() {
+    return getFieldByClass(TestLimitedStringField.class);
+  }
+
   @Order(10.0)
   public class MainBox extends AbstractGroupBox {
 
@@ -89,6 +94,11 @@ public class UsingTemplateForm extends AbstractForm {
 
       @Order(20.0)
       public class TestCheckboxField extends AbstractTestCheckboxField {
+      }
+
+      @Order(30.0)
+      public class TestLimitedStringField extends AbstractLimitedStringField {
+
       }
     }
 

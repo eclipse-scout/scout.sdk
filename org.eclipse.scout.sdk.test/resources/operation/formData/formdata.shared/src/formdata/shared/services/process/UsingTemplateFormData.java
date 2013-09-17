@@ -1,10 +1,20 @@
 package formdata.shared.services.process;
 
-import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import java.util.Map;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 
+import formdata.shared.IConstants;
+
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ *
+ * @generated
+ */
 public class UsingTemplateFormData extends AbstractFormData {
+
   private static final long serialVersionUID = 1L;
 
   public UsingTemplateFormData() {
@@ -22,7 +32,12 @@ public class UsingTemplateFormData extends AbstractFormData {
     return getFieldByClass(TestCheckbox.class);
   }
 
+  public TestLimitedString getTestLimitedString() {
+    return getFieldByClass(TestLimitedString.class);
+  }
+
   public static class ExternalGroupBox extends AbstractExternalGroupBoxData {
+
     private static final long serialVersionUID = 1L;
 
     public ExternalGroupBox() {
@@ -30,6 +45,7 @@ public class UsingTemplateFormData extends AbstractFormData {
   }
 
   public static class InternalHtml extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public InternalHtml() {
@@ -39,16 +55,34 @@ public class UsingTemplateFormData extends AbstractFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, Integer.MAX_VALUE);
     }
   }
 
   public static class TestCheckbox extends AbstractTestCheckboxFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public TestCheckbox() {
+    }
+  }
+
+  public static class TestLimitedString extends AbstractValueFieldData<String> {
+
+    private static final long serialVersionUID = 1L;
+
+    public TestLimitedString() {
+    }
+
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_LENGTH, IConstants.MAX_LENGTH * 4);
     }
   }
 }

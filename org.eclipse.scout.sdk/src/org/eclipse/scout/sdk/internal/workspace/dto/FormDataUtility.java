@@ -52,7 +52,6 @@ public final class FormDataUtility {
       ITypeSourceBuilder formDataSourceBuilder = null;
       if (SignatureUtility.isEqualSignature(typeErasure, Signature.createTypeSignature(RuntimeClasses.AbstractTableFieldData, true))) {
         formDataSourceBuilder = new TableFieldFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation);
-
       }
       else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
         // fill table bean
