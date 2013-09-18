@@ -18,12 +18,30 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
  * <h3>{@link ISourceBuilder}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 07.03.2013
+ * @since 3.10.0 07.03.2013
  */
 public interface ISourceBuilder {
 
+  /**
+   * validates the receiver source builder.
+   * 
+   * @throws IllegalArgumentException
+   */
   void validate() throws IllegalArgumentException;
 
+  /**
+   * appends the source to the given builder.
+   * 
+   * @param source
+   *          The builder to append the source to.
+   * @param lineDelimiter
+   *          the line delimiter to use.
+   * @param ownerProject
+   *          the owner project
+   * @param validator
+   *          the import validator to use.
+   * @throws CoreException
+   */
   void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException;
 
 }

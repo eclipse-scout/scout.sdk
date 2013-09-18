@@ -24,7 +24,7 @@ import org.eclipse.jdt.core.JavaModelException;
  * <h3>{@link VirtualCompositeBuilderJavaElement}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 14.02.2013
+ * @since 3.10.0 14.02.2013
  */
 public class VirtualCompositeBuilderJavaElement implements IJavaElement {
 

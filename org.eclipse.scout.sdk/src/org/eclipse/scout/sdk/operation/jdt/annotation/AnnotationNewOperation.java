@@ -47,7 +47,7 @@ import org.eclipse.text.edits.TextEdit;
  * <h3>{@link AnnotationNewOperation}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 06.12.2012
+ * @since 3.10.0 06.12.2012
  */
 public class AnnotationNewOperation implements IOperation {
 

@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
  * <h3>{@link CompilationUnitSourceBuilder}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 07.03.2013
+ * @since 3.10.0 07.03.2013
  */
 public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuilder implements ICompilationUnitSourceBuilder {
 

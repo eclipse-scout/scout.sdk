@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * <h3>{@link PackageFragementNewOperation}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 06.02.2013
+ * @since 3.10.0 06.02.2013
  */
 public class PackageFragementNewOperation implements IOperation {
 

@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * <h3>{@link AbstractMethodNewOperation}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 13.03.2013
+ * @since 3.10.0 13.03.2013
  */
 public class AbstractMethodNewOperation implements IOperation {
 

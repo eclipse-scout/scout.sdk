@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
  * <h3>{@link MethodNewOperation}</h3> ...
  * 
  * @author Andreas Hoegger
- * @since 3.8.0 05.12.2012
+ * @since 3.10.0 05.12.2012
  */
 public class MethodNewOperation extends AbstractMethodNewOperation {
 

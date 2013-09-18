@@ -14,7 +14,7 @@ package org.eclipse.scout.sdk.operation.jdt.exception;
  * <h3>{@link JavaElementNotExistException}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 26.02.2013
+ * @since 3.10.0 26.02.2013
  */
 public class JavaElementNotExistException extends IllegalArgumentException {
 

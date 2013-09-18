@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.holders.Holder;
  * <h3>{@link BodyUpdateOperation}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 21.02.2013
+ * @since 3.10.0 21.02.2013
  */
 public class BodyUpdateOperation {
   private final IMethod m_method;

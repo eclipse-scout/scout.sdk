@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  * <h3>{@link MethodSourceBuilderFactory}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 07.03.2013
+ * @since 3.10.0 07.03.2013
  */
 public final class MethodSourceBuilderFactory {
   private MethodSourceBuilderFactory() {

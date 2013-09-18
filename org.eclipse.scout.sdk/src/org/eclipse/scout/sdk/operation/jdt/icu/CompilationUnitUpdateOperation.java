@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * <h3>{@link CompilationUnitUpdateOperation}</h3> ...
  * 
  * @author aho
- * @since 3.8.0 28.01.2013
+ * @since 3.10.0 28.01.2013
  */
 public class CompilationUnitUpdateOperation implements IOperation {
 

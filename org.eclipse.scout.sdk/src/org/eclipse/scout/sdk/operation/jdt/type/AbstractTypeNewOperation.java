@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
  * <h3>{@link AbstractTypeNewOperation}</h3> ...
  * 
  * @author Andreas Hoegger
- * @since 3.8.0 06.12.2012
+ * @since 3.10.0 06.12.2012
  */
 public abstract class AbstractTypeNewOperation implements ITypeNewOperation {
 
