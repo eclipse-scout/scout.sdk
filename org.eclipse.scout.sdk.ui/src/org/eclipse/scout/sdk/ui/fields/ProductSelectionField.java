@@ -114,9 +114,6 @@ public class ProductSelectionField extends TextField {
             setProductFileInternal(null);
           }
         }
-        catch (Exception ex) {
-          ex.printStackTrace();
-        }
         finally {
           m_inputLock.release();
         }

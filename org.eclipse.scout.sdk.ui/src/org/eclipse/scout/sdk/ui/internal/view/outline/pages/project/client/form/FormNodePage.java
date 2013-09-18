@@ -11,9 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -102,20 +100,7 @@ public class FormNodePage extends AbstractScoutTypePage {
       action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
     else if (menu instanceof FormDataUpdateAction) {
-      IType formDataType = null;
-      try {
-        FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getType(), TypeUtility.getSuperTypeHierarchy(getType()));
-        if (formDataAnnotation != null) {
-          String formDataTypeSignature = formDataAnnotation.getFormDataTypeSignature();
-          formDataType = TypeUtility.getTypeBySignature(formDataTypeSignature);
-
-        }
-      }
-      catch (JavaModelException e) {
-        e.printStackTrace();
-      }
       ((FormDataUpdateAction) menu).setFormDataOwner(getType());
-      ((FormDataUpdateAction) menu).setFormData(formDataType);
     }
   }
 

@@ -54,8 +54,8 @@ public class MultipleFormDataUpdateOperation implements IOperation {
       i++;
       monitor.setTaskName("Updating Form Data " + i + " of " + types.length + " (" + t.getElementName() + ")");
       FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(t, TypeUtility.getSuperTypeHierarchy(t));
-      if (annotation != null && FormDataAnnotation.isCreate(annotation)) {
-        IType formDataType = TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature());
+      if (FormDataAnnotation.isCreate(annotation)) {
+        IType formDataType = annotation.getFormDataType();
         if (TypeUtility.exists(formDataType)) {
           new FormDataUpdateOperation(t, formDataType.getCompilationUnit()).run(monitor, workingCopyManager);
         }

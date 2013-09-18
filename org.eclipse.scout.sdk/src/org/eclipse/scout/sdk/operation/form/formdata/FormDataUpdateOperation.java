@@ -53,7 +53,7 @@ public class FormDataUpdateOperation extends CompilationUnitUpdateOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getFormDataDefinitionType(), TypeUtility.getSuperTypeHierarchy(getFormDataDefinitionType()));
-    ITypeSourceBuilder typeOp = FormDataUtility.createFormDataSourceBuilder(getFormDataDefinitionType(), formDataAnnotation);//FormDataFactory.createFormDataBuilder(getFormDataDefinitionType(), formDataAnnotation);
+    ITypeSourceBuilder typeOp = FormDataUtility.createFormDataSourceBuilder(getFormDataDefinitionType(), formDataAnnotation);
     addTypeSourceBuilder(typeOp);
 
     super.run(monitor, workingCopyManager);

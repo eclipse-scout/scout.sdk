@@ -98,9 +98,6 @@ public class FileSelectionField extends TextField {
             }
           }
         }
-        catch (Exception ex) {
-          ex.printStackTrace();
-        }
         finally {
           m_inputLock.release();
         }

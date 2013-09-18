@@ -18,6 +18,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -57,6 +58,40 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
     m_multiSelectSupported = multiSelectSupported;
     if (cat == null) m_category = Category.OTHER;
     else m_category = cat;
+  }
+
+  /**
+   * use {@link IScoutHandler#isActive()} to calculate and return the enabled/disabled state of the context menu.
+   */
+  @Override
+  public final void setEnabled(Object evaluationContext) {
+    super.setEnabled(evaluationContext);
+    if (evaluationContext instanceof BooleanHolder) {
+      setBaseEnabled(((BooleanHolder) evaluationContext).getValue());
+    }
+  }
+
+  /**
+   * use {@link IScoutHandler#isActive()} to calculate and return the enabled/disabled state of the context menu.
+   * 
+   * @return if the current context menu is active or not.
+   */
+  @Override
+  public final boolean isEnabled() {
+    return super.isEnabled();
+  }
+
+  /**
+   * use {@link IScoutHandler#isActive()} to calculate and return the enabled/disabled state of the context menu.
+   */
+  @Override
+  protected final void setBaseEnabled(boolean state) {
+    super.setBaseEnabled(state);
+  }
+
+  @Override
+  public boolean isActive() {
+    return true;
   }
 
   @Override

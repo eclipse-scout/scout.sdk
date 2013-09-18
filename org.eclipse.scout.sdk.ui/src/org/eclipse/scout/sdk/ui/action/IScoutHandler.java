@@ -19,10 +19,18 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 /**
- *
+ * Represents a scout menu contribution
  */
 public interface IScoutHandler extends IHandler2 {
-  public enum Category {
+
+  /**
+   * <h3>{@link Category}</h3> Enum for the supported context menu categories. The grouping of the menus is according to
+   * the category.
+   * 
+   * @author mvi
+   * @since 3.10.0 18.09.2013
+   */
+  enum Category {
     OPEN("org.eclipse.scout.sdk.ui.menu.category.new", 5),
     NEW("org.eclipse.scout.sdk.ui.menu.category.new", 10),
     RENAME("org.eclipse.scout.sdk.ui.menu.category.rename", 20),
@@ -56,13 +64,27 @@ public interface IScoutHandler extends IHandler2 {
   /**
    * is evaluated after the menu has been prepared by the contributor.
    * 
-   * @return
+   * @return true if the menu should be visible. false otherwise.
    */
-  public boolean isVisible();
+  boolean isVisible();
 
-  public String getLabel();
+  /**
+   * is evaluated after the menu has been prepared by the contributor.
+   * 
+   * @return true if the menu should be enabled. false otherwise.
+   */
+  boolean isActive();
 
-  public void setLabel(String label);
+  /**
+   * @return the text shown on the context menu
+   */
+  String getLabel();
+
+  /**
+   * @param label
+   *          the text shown on the context menu.
+   */
+  void setLabel(String label);
 
   /**
    * Currently not supported.
@@ -70,32 +92,81 @@ public interface IScoutHandler extends IHandler2 {
    * @see {@link CommandContributionItemParameter#tooltip}
    * @param toolTip
    */
-  public void setToolTip(String toolTip);
+  void setToolTip(String toolTip);
 
-  public String getToolTip();
+  /**
+   * Currently not supported.
+   * 
+   * @see {@link CommandContributionItemParameter#tooltip}
+   * @param toolTip
+   */
+  String getToolTip();
 
-  public ImageDescriptor getImage();
+  /**
+   * @return the icon of the context menu.
+   */
+  ImageDescriptor getImage();
 
-  public void setImage(ImageDescriptor imageName);
+  /**
+   * @param imageName
+   *          the icon of the context menu
+   */
+  void setImage(ImageDescriptor imageName);
 
-  public String getKeyStroke();
+  /**
+   * @return the key stroke used for the context menu
+   */
+  String getKeyStroke();
 
-  public void setKeyStroke(String keyStroke);
+  /**
+   * @param keyStroke
+   *          the key stroke used for the context menu
+   */
+  void setKeyStroke(String keyStroke);
 
   /**
    * multi selection evaluation is done before the page has been prepared by the contributor.
    * 
-   * @return
+   * @return true if the context menu supports multi selection. If true, the context menu will also be shown, when
+   *         multiple pages supporting a context menu are selected.
    */
-  public boolean isMultiSelectSupported();
+  boolean isMultiSelectSupported();
 
-  public void setMultiSelectSupported(boolean multiSelectSupported);
+  /**
+   * sets if the context menu supports multi selection
+   * 
+   * @param multiSelectSupported
+   */
+  void setMultiSelectSupported(boolean multiSelectSupported);
 
-  public Category getCategory();
+  /**
+   * @return the category of the context menu.
+   * @see Category
+   */
+  Category getCategory();
 
-  public void setCategory(Category category);
+  /**
+   * @param category
+   *          The category of the context menu.
+   * @see Category
+   */
+  void setCategory(Category category);
 
-  public String getId();
+  /**
+   * @return the id of the context menu. must be unique over all context menus.
+   */
+  String getId();
 
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException;
+  /**
+   * called when the context menu is invoked by the user.
+   * 
+   * @param shell
+   *          the shell in which the menu exists.
+   * @param selection
+   *          the pages selected while invoking the menu.
+   * @param event
+   * @return
+   * @throws ExecutionException
+   */
+  Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException;
 }

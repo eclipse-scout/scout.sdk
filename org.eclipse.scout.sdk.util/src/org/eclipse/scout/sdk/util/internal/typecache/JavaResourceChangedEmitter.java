@@ -570,7 +570,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         visitDelta(event, event.getDelta(), event.getType());
       }
       catch (Exception e) {
-        e.printStackTrace();
+        SdkUtilActivator.logError(e);
       }
     }
 

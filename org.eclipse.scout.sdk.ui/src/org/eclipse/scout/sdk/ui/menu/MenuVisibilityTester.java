@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.expressions.PropertyTester;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -111,6 +112,9 @@ public class MenuVisibilityTester extends PropertyTester {
 
             // check if menu is visible
             if (!currentMenu.isVisible()) return false;
+
+            // evaluate the enabled state after the menu has been prepared
+            currentMenu.setEnabled(new BooleanHolder(currentMenu.isActive()));
 
             // if we come here, all selected rows support the current menu and the menu is visible and prepared: enable the handler
             IServiceLocator serviceLocator = (IServiceLocator) args[2];

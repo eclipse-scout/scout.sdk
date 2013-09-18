@@ -96,7 +96,8 @@ public final class TypeCache implements ITypeCache {
         return types.get(0);
       }
       if (types.size() > 1) {
-        SdkUtilActivator.logWarning("found more than one type match for '" + fullyQualifiedName + "' (matches: '" + types.size() + "').");
+        // can happen e.g. when multiple jre versions are used in the workspace (e.g. a jre1.5 and a jre1.6 for other bundles).
+        SdkUtilActivator.logInfo("found more than one type match for '" + fullyQualifiedName + "' (matches: '" + types.size() + "').");
         return types.get(0);
       }
     }

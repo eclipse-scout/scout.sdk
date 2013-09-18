@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class FormDataUpdateAction extends AbstractOperationAction {
   private IType m_formDataOwner;
-  private IType m_formData;
 
   public FormDataUpdateAction() {
     super(Texts.get("UpdateFormData"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
@@ -34,7 +33,7 @@ public class FormDataUpdateAction extends AbstractOperationAction {
 
   @Override
   public boolean isVisible() {
-    return getFormDataOwner() != null && getFormDataOwner().getDeclaringType() == null && isEditable(getFormDataOwner());
+    return TypeUtility.exists(getFormDataOwner()) && getFormDataOwner().getDeclaringType() == null && isEditable(getFormDataOwner());
   }
 
   public void setFormDataOwner(IType formDataOwner) {
@@ -45,46 +44,27 @@ public class FormDataUpdateAction extends AbstractOperationAction {
     return m_formDataOwner;
   }
 
-  public void setFormData(IType formData) {
-    m_formData = formData;
-  }
-
-  protected IType getFormData() {
-    return m_formData;
+  private IType findFormDataType() {
+    try {
+      FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getFormDataOwner(), TypeUtility.getSuperTypeHierarchy(getFormDataOwner()));
+      if (FormDataAnnotation.isCreate(formDataAnnotation)) {
+        return formDataAnnotation.getFormDataType();
+      }
+    }
+    catch (JavaModelException ex) {
+      ScoutSdkUi.logError("Unable to parse formdata annotation in type '" + getFormDataOwner().getFullyQualifiedName() + "'.", ex);
+    }
+    return null;
   }
 
   @Override
-  public void setEnabled(Object evaluationContext) {
-    if (!TypeUtility.exists(getFormDataOwner())) {
-      setBaseEnabled(false);
-      return;
+  public boolean isActive() {
+    IType formDataType = findFormDataType();
+    if (!TypeUtility.exists(formDataType)) {
+      return false;
     }
-    if (!TypeUtility.exists(getFormData())) {
-      // try to find
-      try {
-        FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getFormDataOwner(), TypeUtility.getSuperTypeHierarchy(getFormDataOwner()));
-        if (!FormDataAnnotation.isCreate(formDataAnnotation)) {
-          setBaseEnabled(false);
-          return;
-        }
-        IType formData = TypeUtility.getTypeBySignature(formDataAnnotation.getFormDataTypeSignature());
-        if (!TypeUtility.exists(formData)) {
-          setBaseEnabled(false);
-          return;
-        }
-        setFormData(formData);
-      }
-      catch (JavaModelException ex) {
-        setBaseEnabled(false);
-        ScoutSdkUi.logError(ex);
-        return;
-      }
-      setBaseEnabled(false);
-      return;
-    }
-    setOperation(new FormDataUpdateOperation(getFormDataOwner(), getFormData().getCompilationUnit()));
-    setBaseEnabled(true);
 
+    setOperation(new FormDataUpdateOperation(getFormDataOwner(), formDataType.getCompilationUnit()));
+    return true;
   }
-
 }

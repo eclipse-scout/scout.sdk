@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.formdata;
 
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  *
@@ -91,6 +93,21 @@ public class FormDataAnnotation {
   }
 
   /**
+   * Gets the form data type that is referenced in the receiver annotation.
+   * 
+   * @return The form data type or null if it could not be found.
+   */
+  public IType getFormDataType() {
+    if (getFormDataTypeSignature() != null) {
+      IType formData = TypeUtility.getTypeBySignature(getFormDataTypeSignature());
+      if (TypeUtility.exists(formData)) {
+        return formData;
+      }
+    }
+    return null;
+  }
+
+  /**
    * @param sdkCommand
    *          the sdkCommand to set
    */
@@ -149,5 +166,4 @@ public class FormDataAnnotation {
   public String getSuperTypeSignature() {
     return m_superTypeSignature;
   }
-
 }

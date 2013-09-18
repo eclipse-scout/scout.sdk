@@ -149,39 +149,4 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       ((ScoutBundleNewAction) menu).setScoutProject(getScoutBundle());
     }
   }
-
-//  @Override
-//  public void addDebugMenus(List<Action> debugActions) {
-//    debugActions.add(new Action("Dubug") {
-//      @Override
-//      public void run() {
-//        try {
-//          TypeNewOperation typeOp = new TypeNewOperation("AType09");
-//
-//          OperationJob job = new OperationJob(new CompilationUnitNewOperation(typeOp, TypeUtility.getPackage(getScoutResource().getJavaProject(), "org.eclipse.testapp.client")));
-//          job.schedule();
-//          job.join();
-//          IType createdType = typeOp.getCreatedType();
-//
-//          TypeNewOperation innerTypeOp = new TypeNewOperation("AnInnerType", createdType);
-//          MethodNewOperation methodOp = new MethodNewOperation("aMethod");
-//          methodOp.setFlags(Flags.AccPublic);
-//          methodOp.setReturnTypeSignature(Signature.SIG_VOID);
-//          methodOp.addParameter(new MethodParameter("aList", Signature.createTypeSignature(List.class.getName() + "<" + String.class.getName() + ">", true)));
-//          innerTypeOp.addMethodNewOperation(methodOp);
-//          innerTypeOp.setFormatSource(true);
-//          OperationJob job2 = new OperationJob(innerTypeOp);
-//          job2.schedule();
-//          job2.join();
-//
-//          System.out.println("method exist? " + methodOp.getCreatedMethod().exists());
-//        }
-//        catch (Exception e) {
-//          e.printStackTrace();
-//          // TODO: handle exception
-//        }
-//      }
-//    });
-//    super.addDebugMenus(debugActions);
-//  }
 }

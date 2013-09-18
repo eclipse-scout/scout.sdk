@@ -275,7 +275,7 @@ public final class JdtUtility {
         wasInterrupted = false;
       }
       catch (OperationCanceledException e) {
-        e.printStackTrace();
+        //nop
       }
       catch (InterruptedException e) {
         wasInterrupted = true;

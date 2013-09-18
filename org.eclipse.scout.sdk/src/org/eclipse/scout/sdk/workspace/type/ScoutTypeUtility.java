@@ -254,12 +254,20 @@ public class ScoutTypeUtility extends TypeUtility {
     return null;
   }
 
+  /**
+   * Gets the form data type that is referenced in the form data annotation of the given form.<br>
+   * If the annotation does not exist or points to an inexistent form data type, null is returned.
+   * 
+   * @param form
+   *          the form for which the form data should be returned.
+   * @return the form data type or null if it could not be found.
+   * @throws JavaModelException
+   */
   public static IType findFormDataForForm(IType form) throws JavaModelException {
-    FormDataAnnotation a = findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
-    if (a != null && StringUtility.hasText(a.getFormDataTypeSignature())) {
-      IType t = TypeUtility.getTypeBySignature(a.getFormDataTypeSignature());
-      if (TypeUtility.exists(t)) {
-        return t;
+    if (TypeUtility.exists(form)) {
+      FormDataAnnotation a = findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
+      if (a != null) {
+        return a.getFormDataType();
       }
     }
     return null;
