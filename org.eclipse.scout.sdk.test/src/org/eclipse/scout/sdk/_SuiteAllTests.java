@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.sdk.internal.test._SuiteInternalTest;
+import org.eclipse.scout.sdk.testing.TestUtility;
+import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -19,4 +22,10 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses({_SuiteInternalTest.class})
 public class _SuiteAllTests {
 
+  @BeforeClass
+  public static void setupTarget() throws Exception {
+    if (System.getProperty("buildingWithTycho") != null) {
+      TestUtility.loadRunningOsgiAsTarget("testingTarget", new NullProgressMonitor());
+    }
+  }
 }
