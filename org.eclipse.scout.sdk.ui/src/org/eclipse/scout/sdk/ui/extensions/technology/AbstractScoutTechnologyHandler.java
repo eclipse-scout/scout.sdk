@@ -283,7 +283,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   protected P_TechProductFile[] getProductFiles(IScoutBundle[] projects) throws CoreException {
     ArrayList<P_TechProductFile> list = new ArrayList<P_TechProductFile>();
     for (IScoutBundle element : projects) {
-      IResource[] productFiles = ResourceUtility.getAllResources(element.getProject(), ResourceFilters.getProductFilter());
+      IResource[] productFiles = ResourceUtility.getAllResources(element.getProject(), ResourceFilters.getProductFileFilter());
       for (int i = 0; i < productFiles.length; i++) {
         final IResource prodFile = productFiles[i];
         IScoutBundle b = ScoutTypeUtility.getScoutBundle(prodFile.getProject());

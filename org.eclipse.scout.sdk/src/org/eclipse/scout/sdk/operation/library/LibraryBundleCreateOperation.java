@@ -182,7 +182,7 @@ public class LibraryBundleCreateOperation implements IOperation {
 
         // add the dependencies to the product files
         // find all product files in the current scout project.
-        for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(libraryUser))) {
+        for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFileFilter(libraryUser))) {
           ProductFileModelHelper h = new ProductFileModelHelper((IFile) productFile);
           // add library bundle if there is already the library owner bundle in it.
           if (h.ProductFile.existsDependency(libraryUser.getSymbolicName())) {

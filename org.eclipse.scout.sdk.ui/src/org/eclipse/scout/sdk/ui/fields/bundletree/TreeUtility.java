@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -25,7 +26,8 @@ import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
-import org.eclipse.scout.sdk.util.ScoutResourceFilters;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -39,9 +41,10 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
  * @author Andreas Hoegger
  * @since 1.0.8 04.02.2010
  */
-public class TreeUtility {
+public final class TreeUtility {
 
   public static final String TYPE_PRODUCT_NODE = "zz_product_node";
+  public static final String TYPE_PROJECT_NODE = "zz_project_node";
 
   private TreeUtility() {
   }
@@ -112,7 +115,7 @@ public class TreeUtility {
     return createBundleTreeNode(parent, b, null);
   }
 
-  private static ITreeNode createBundleTreeNode(ITreeNode parent, IScoutBundle b, ITreeNodeFilter filter) {
+  public static ITreeNode createBundleTreeNode(ITreeNode parent, IScoutBundle b, ITreeNodeFilter filter) {
     ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(b.getType());
     TreeNode childNode = null;
     if (uiExt != null) {
@@ -151,15 +154,74 @@ public class TreeUtility {
   }
 
   public static ITreeNode createNode(ITreeNode parentNode, String type, String name, ImageDescriptor img, int orderNr, Object data, boolean bold) {
+    return createNode(parentNode, type, name, img, orderNr, data, true, true);
+  }
+
+  public static ITreeNode createNode(ITreeNode parentNode, String type, String name, ImageDescriptor img, int orderNr, Object data, boolean bold, boolean checkable) {
     TreeNode node = new TreeNode(type, name);
     node.setData(data);
     node.setOrderNr(orderNr);
     node.setImage(img);
     node.setBold(bold);
-    node.setCheckable(true);
+    node.setCheckable(checkable);
     node.setParent(parentNode);
     parentNode.addChild(node);
     return node;
+  }
+
+  private static boolean isProductFileContainingBundles(IFile productFile, IScoutBundle[] filter) {
+    try {
+      ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
+      for (IScoutBundle b : filter) {
+        if (pfmh.ProductFile.existsDependency(b.getSymbolicName())) {
+          return true;
+        }
+      }
+    }
+    catch (CoreException e) {
+      ScoutSdkUi.logError("Unable to parse product '" + productFile.getFullPath().toOSString() + "'.", e);
+    }
+    return false;
+  }
+
+  public static ITreeNode createProductFileTreeNode(ITreeNode parent, IFile file, ITreeNodeFilter filter, boolean checkable) {
+    TreeNode productNode = new TreeNode(TYPE_PRODUCT_NODE, file.getName() + " (" + file.getParent().getName() + ")", file);
+    if (filter != null && !filter.accept(productNode)) {
+      return null; // the created node does not match the filter
+    }
+
+    productNode.setCheckable(checkable);
+    productNode.setBold(true);
+
+    IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) file.getAdapter(IWorkbenchAdapter.class);
+    if (wbAdapter != null) {
+      ImageDescriptor imageDescriptor = wbAdapter.getImageDescriptor(file);
+      productNode.setImage(imageDescriptor);
+    }
+
+    parent.addChild(productNode);
+    productNode.setParent(parent);
+
+    return productNode;
+  }
+
+  public static ITreeNode createProjectTreeNode(ITreeNode parent, IProject project, ITreeNodeFilter filter) {
+    TreeNode childNode = new TreeNode(TYPE_PROJECT_NODE, project.getName(), project);
+    if (filter != null && !filter.accept(childNode)) {
+      return null; // the created node does not match the filter
+    }
+
+    childNode.setBold(false);
+
+    IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) project.getAdapter(IWorkbenchAdapter.class);
+    if (wbAdapter != null) {
+      ImageDescriptor imageDescriptor = wbAdapter.getImageDescriptor(project);
+      childNode.setImage(imageDescriptor);
+    }
+    parent.addChild(childNode);
+    childNode.setParent(parent);
+
+    return childNode;
   }
 
   public static ITreeNode createProductTree(IScoutBundle project, ITreeNodeFilter visibleFilter, boolean checkMode) throws CoreException {
@@ -171,41 +233,39 @@ public class TreeUtility {
         visibleFilter = NodeFilters.getAcceptAll();
       }
 
-      IResource[] productFiles = ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(project));
+      IScoutBundle[] containingScoutBundles = project.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
+
+      IResource[] productFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileFilter());
       ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
       rootNode.setVisible(false);
+
       for (IResource res : productFiles) {
         IFile file = (IFile) res;
-        IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(file.getProject());
-        TreeNode bundleNode = (TreeNode) TreeUtility.findNode(rootNode, NodeFilters.getByData(bundle));
-        if (bundleNode == null) {
-          bundleNode = new TreeNode(bundle.getType(), bundle.getSymbolicName(), bundle);
-          ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(bundle.getType());
-          if (uiExt != null) {
-            bundleNode.setImage(uiExt.getIcon());
-            bundleNode.setOrderNr(uiExt.getOrderNumber());
-          }
-          bundleNode.setCheckable(false);
-          if (visibleFilter.accept(bundleNode)) {
-            rootNode.addChild(bundleNode);
+        if (isProductFileContainingBundles(file, containingScoutBundles)) {
+          // create bundle node
+          IProject fileProject = file.getProject();
+          IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(fileProject);
+          ITreeNode bundleNode = null;
+          if (bundle == null) {
+            // the product is in any other project
+            bundleNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(fileProject));
+            if (bundleNode == null) {
+              bundleNode = createProjectTreeNode(rootNode, fileProject, visibleFilter);
+            }
           }
           else {
-            bundleNode = null;
-          }
-        }
-        if (bundleNode != null) {
-          TreeNode productNode = new TreeNode(TYPE_PRODUCT_NODE, file.getName() + " (" + file.getParent().getName() + ")", file);
-          productNode.setCheckable(checkMode);
-          productNode.setBold(true);
-
-          IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) file.getAdapter(IWorkbenchAdapter.class);
-          if (wbAdapter != null) {
-            ImageDescriptor imageDescriptor = wbAdapter.getImageDescriptor(file);
-            productNode.setImage(imageDescriptor);
+            // the product is inside a scout bundle
+            bundleNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(bundle));
+            if (bundleNode == null) {
+              bundleNode = createBundleTreeNode(rootNode, bundle, visibleFilter);
+            }
           }
 
-          if (visibleFilter.accept(productNode)) {
-            bundleNode.addChild(productNode);
+          // create node for the product
+          if (bundleNode != null) {
+            bundleNode.setCheckable(false);
+
+            createProductFileTreeNode(bundleNode, file, visibleFilter, checkMode);
           }
         }
       }

@@ -3,8 +3,10 @@ package org.eclipse.scout.sdk.util.pde;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -15,10 +17,15 @@ import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.State;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.TargetPlatformHelper;
+import org.eclipse.pde.internal.core.ifeature.IFeatureModel;
+import org.eclipse.pde.internal.core.ifeature.IFeaturePlugin;
 import org.eclipse.pde.internal.core.iproduct.IProduct;
+import org.eclipse.pde.internal.core.iproduct.IProductFeature;
 import org.eclipse.pde.internal.core.iproduct.IProductModel;
 import org.eclipse.pde.internal.core.iproduct.IProductPlugin;
+import org.eclipse.pde.internal.core.product.ProductFeature;
 import org.eclipse.pde.internal.core.product.ProductPlugin;
 import org.osgi.framework.Version;
 import org.w3c.dom.Element;
@@ -90,6 +97,29 @@ public final class ProductFileModelHelper {
     ProductFile = new ProductFilePart(m_model);
   }
 
+  /**
+   * <h3>{@link DependencyType}</h3>Specifies the type of dependency in a .product file.
+   * 
+   * @author mvi
+   * @since 3.10.0 19.09.2013
+   */
+  public static enum DependencyType {
+    /**
+     * Specifies a normal plug-in dependency.
+     */
+    Plugin,
+
+    /**
+     * Specifies a fragment dependency.
+     */
+    Fragment,
+
+    /**
+     * Specifies a dependency to a feature.
+     */
+    Feature
+  }
+
   public static class ProductFilePart {
     private final LazyProductFileModel m_model;
 
@@ -98,37 +128,51 @@ public final class ProductFileModelHelper {
     }
 
     /**
-     * Adds the given plugin id to the dependencies of this product.<br>
-     * If the given plugin is already in the list, this method does nothing.
+     * Adds the given plug-in id to the dependencies of this product.<br>
+     * If the given plug-in is already in the list, this method does nothing.
      * 
      * @param pluginId
-     *          The plugin id.
+     *          The plug-in id.
      * @throws CoreException
      */
     public void addDependency(String pluginId) throws CoreException {
-      addDependency(pluginId, false);
+      addDependency(pluginId, DependencyType.Plugin);
     }
 
     /**
-     * Adds the given plugin id to the dependencies of this product.<br>
-     * If the given plugin is already in the list, this method does nothing.
+     * Adds the given id to the dependencies of this product.<br>
+     * If the given dependency already exists, this method does nothing.
      * 
-     * @param pluginId
-     *          The plugin id.
-     * @param isFragment
-     *          specifies if the given plugin id identifies a fragment.
+     * @param id
+     *          The id to add (feature id, fragment or plug-in symbolic name).
+     * @param type
+     *          specifies the type of dependency.
      * @throws CoreException
+     * @see DependencyType
      */
-    public synchronized void addDependency(String pluginId, boolean isFragment) throws CoreException {
-      if (!existsDependency(pluginId)) {
-        P_ProductPlugin newPlugin = createPlugin(pluginId, isFragment);
-        m_model.getWorkspaceProductModel().getProduct().addPlugins(new IProductPlugin[]{newPlugin});
+    public synchronized void addDependency(String id, DependencyType type) throws CoreException {
+      if (!existsDependency(id)) {
+        if (DependencyType.Feature.equals(type)) {
+          ProductFeature pf = createFeature(id);
+          m_model.getWorkspaceProductModel().getProduct().addFeatures(new IProductFeature[]{pf});
+        }
+        else {
+          P_ProductPlugin newPlugin = createPlugin(id, DependencyType.Fragment.equals(type));
+          m_model.getWorkspaceProductModel().getProduct().addPlugins(new IProductPlugin[]{newPlugin});
+        }
       }
     }
 
+    private ProductFeature createFeature(String id) throws CoreException {
+      ProductFeature pf = new ProductFeature(m_model.getWorkspaceProductModel());
+      pf.setId(id);
+      return pf;
+    }
+
     /**
-     * TODO can be eliminated when <b>BUG 362398</b> is fixed.<br>
-     * When the bug is fixed use m_model.getWorkspaceProductModel().getFactory().createPlugin() to create instances.
+     * TODO can be eliminated when Eclipse 3.8 is the oldest version that the SDK supports (the bug was solved for
+     * Eclipse 3.8. Must be verified though).<br>
+     * Then use m_model.getWorkspaceProductModel().getFactory().createPlugin() to create instances.
      * 
      * @see <a href="http://bugs.eclipse.org/bugs/show_bug.cgi?id=362398">Bugzilla #362398</a>
      */
@@ -137,31 +181,70 @@ public final class ProductFileModelHelper {
     }
 
     /**
-     * Checks if the given plugin id is already in the dependencies of this product.
+     * Checks if the given id is already in the dependencies of this product.<br>
+     * The id can either be a feature id (for feature based products) or a bundle symbolic name (for plug-in based
+     * products). If a plug-in id is given, this plug-in is also searched within the features of feature based products.
      * 
-     * @param pluginId
-     *          The plugin id.
-     * @return true if the given plugin id is already in the list, false otherwise.
+     * @param pluginOrFeatureId
+     *          The feature id or plug-in symbolic name
+     * @return true if the given dependency is already in the product.
      * @throws CoreException
      */
-    public boolean existsDependency(String pluginId) throws CoreException {
+    public boolean existsDependency(String pluginOrFeatureId) throws CoreException {
+      // search in plug-ins
       for (IProductPlugin p : m_model.getWorkspaceProductModel().getProduct().getPlugins()) {
-        if (p.getId().equals(pluginId)) {
+        if (p.getId().equals(pluginOrFeatureId)) {
           return true;
+        }
+      }
+
+      IProductFeature[] features = m_model.getWorkspaceProductModel().getProduct().getFeatures();
+      if (features != null && features.length > 0) {
+        // search directly in features
+        for (IProductFeature feature : features) {
+          if (feature.getId().equals(pluginOrFeatureId)) {
+            return true;
+          }
+        }
+
+        // search plug-ins within features
+        Map<String, ? extends Set<String>> allBundlesInFeatures = getBundlesInFeatures();
+        for (IProductFeature f : features) {
+          Set<String> bundlesInCurrentFeature = allBundlesInFeatures.get(f.getId());
+          if (bundlesInCurrentFeature != null && bundlesInCurrentFeature.contains(pluginOrFeatureId)) {
+            return true;
+          }
         }
       }
       return false;
     }
 
+    private Map<String /*feature id*/, ? extends Set<String /*bundle symbolic name*/>> getBundlesInFeatures() {
+      IFeatureModel[] features = PDECore.getDefault().getFeatureModelManager().getModels();
+      HashMap<String, HashSet<String>> allBundlesInFeatures = new HashMap<String, HashSet<String>>(features.length);
+      for (IFeatureModel feature : features) {
+        for (IFeaturePlugin bundle : feature.getFeature().getPlugins()) {
+          HashSet<String> bundlesInFeature = allBundlesInFeatures.get(feature.getFeature().getId());
+          if (bundlesInFeature == null) {
+            bundlesInFeature = new HashSet<String>();
+            allBundlesInFeatures.put(feature.getFeature().getId(), bundlesInFeature);
+          }
+          bundlesInFeature.add(bundle.getId());
+        }
+      }
+      return allBundlesInFeatures;
+    }
+
     /**
-     * Removes the given plugin id from the dependency list of this product.
+     * Removes the given dependency (feature id or plug-in symbolic name) from the dependency list of this product.
      * 
-     * @param pluginId
-     *          The plugin id.
+     * @param id
+     *          The feature id or plug-in symbolic name.
      * @throws CoreException
      */
-    public void removeDependency(String pluginId) throws CoreException {
-      m_model.getWorkspaceProductModel().getProduct().removePlugins(new IProductPlugin[]{createPlugin(pluginId, false)});
+    public void removeDependency(String id) throws CoreException {
+      m_model.getWorkspaceProductModel().getProduct().removePlugins(new IProductPlugin[]{createPlugin(id, false)});
+      m_model.getWorkspaceProductModel().getProduct().removeFeatures(new IProductFeature[]{createFeature(id)});
     }
 
     /**
@@ -175,9 +258,9 @@ public final class ProductFileModelHelper {
     }
 
     /**
-     * Gets the plugin models of all plugins of the product associated with this helper.
+     * Gets the plug-in models of all plug-ins of the product associated with this helper.
      * 
-     * @return the plugin models of all plugins this product is dependent of.
+     * @return the plug-in models of all plug-ins this product is dependent of.
      * @throws CoreException
      */
     public BundleDescription[] getPluginModels() throws CoreException {
@@ -212,7 +295,6 @@ public final class ProductFileModelHelper {
     public IProduct getProduct() throws CoreException {
       return m_model.getWorkspaceProductModel().getProduct();
     }
-
   }
 
   /**
@@ -330,7 +412,9 @@ public final class ProductFileModelHelper {
   }
 
   /**
-   * TODO can be eliminated when <b>BUG 362398</b> is fixed.
+   * TODO can be eliminated when Eclipse 3.8 is the oldest version that the SDK supports (the bug was solved for Eclipse
+   * 3.8. Must be verified though).<br>
+   * Then use m_model.getWorkspaceProductModel().getFactory().createPlugin() to create instances.
    * 
    * @see <a href="http://bugs.eclipse.org/bugs/show_bug.cgi?id=362398">Bugzilla #362398</a>
    */

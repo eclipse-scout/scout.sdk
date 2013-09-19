@@ -87,7 +87,7 @@ public class LibraryBundleUnlinkOperation implements IOperation {
     helper.save();
     // grab product files
     if (!checkedScoutProjects.contains(bundle)) {
-      for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFiles(bundle))) {
+      for (IResource productFile : ResourceUtility.getAllResources(ScoutResourceFilters.getProductFileFilter(bundle))) {
         productsToCheck.add((IFile) productFile);
       }
     }

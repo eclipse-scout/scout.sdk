@@ -39,10 +39,6 @@ public class TreeNode implements ITreeNode {
   private ITreeNode m_parent;
   private List<ITreeNode> m_children = new ArrayList<ITreeNode>();
 
-  public TreeNode(String type) {
-    this(type, null);
-  }
-
   public TreeNode(String type, String text) {
     this(type, text, null);
   }

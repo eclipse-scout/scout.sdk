@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper.DependencyType;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
@@ -55,7 +56,7 @@ public abstract class AbstractEquinoxSecurityInstallOperation extends AbstractSc
     if (Platform.OS_MACOSX.equals(Platform.getOS()) || Platform.OS_WIN32.equals(Platform.getOS())) {
       for (IFile f : m_productFiles) {
         ProductFileModelHelper pfmh = new ProductFileModelHelper(f);
-        pfmh.ProductFile.addDependency(getFragmentName(), true);
+        pfmh.ProductFile.addDependency(getFragmentName(), DependencyType.Fragment);
         pfmh.save();
       }
     }

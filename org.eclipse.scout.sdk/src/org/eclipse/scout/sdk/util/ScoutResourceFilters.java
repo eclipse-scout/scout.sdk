@@ -33,7 +33,7 @@ public class ScoutResourceFilters extends ResourceFilters {
    * @param bundle
    * @return
    */
-  public static IResourceFilter getProductFiles(IScoutBundle bundle) {
+  public static IResourceFilter getProductFileFilter(IScoutBundle bundle) {
     final HashSet<IProject> projects = new HashSet<IProject>();
     for (IScoutBundle b : bundle.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
       projects.add(b.getProject());
@@ -44,6 +44,6 @@ public class ScoutResourceFilters extends ResourceFilters {
         return projects.contains(resource.getProject());
       }
     };
-    return getMultifilterAnd(getProductFilter(), projectFilter);
+    return getMultifilterAnd(getProductFileFilter(), projectFilter);
   }
 }

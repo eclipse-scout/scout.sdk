@@ -57,7 +57,7 @@ public class ScoutBundleAddWizard extends ScoutProjectNewWizard {
   public static Set<IFile> getProductFiles(String dependencyFilter) {
     LinkedHashSet<IFile> productFiles = new LinkedHashSet<IFile>();
     try {
-      for (IResource f : ResourceUtility.getAllResources(ResourceFilters.getProductFilter())) {
+      for (IResource f : ResourceUtility.getAllResources(ResourceFilters.getProductFileFilter())) {
         IFile prodFile = (IFile) f;
         if (ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(prodFile.getProject()) != null) {
           ProductFileModelHelper h = new ProductFileModelHelper(prodFile);

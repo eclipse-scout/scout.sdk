@@ -60,7 +60,7 @@ public class ResourceFilters {
     };
   }
 
-  public static IResourceFilter getProductFilter() {
+  public static IResourceFilter getProductFileFilter() {
     return new IResourceFilter() {
       @Override
       public boolean accept(IResource resource) {

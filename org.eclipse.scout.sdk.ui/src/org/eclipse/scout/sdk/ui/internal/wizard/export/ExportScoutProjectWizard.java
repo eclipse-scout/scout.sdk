@@ -111,7 +111,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
 
       for (IScoutBundle root : roots) {
         for (IScoutBundle b : root.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true)) {
-          IResource[] prodFiles = ResourceUtility.getAllResources(b.getProject(), ResourceFilters.getProductFilter());
+          IResource[] prodFiles = ResourceUtility.getAllResources(b.getProject(), ResourceFilters.getProductFileFilter());
           for (IResource f : prodFiles) {
             String alias = getAliasFromProductFile((IFile) f);
             if (alias != null) {

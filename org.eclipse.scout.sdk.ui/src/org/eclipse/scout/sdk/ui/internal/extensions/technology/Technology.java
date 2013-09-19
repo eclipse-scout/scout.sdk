@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
+import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -150,7 +151,7 @@ public class Technology implements Comparable<Technology> {
     for (Entry<String, ArrayList<IScoutTechnologyResource>> bundle : mapping.entrySet()) {
       if (bundle.getValue().size() > 0) {
         ImageDescriptor bundleImage = bundle.getValue().get(0).getBundleImage();
-        ITreeNode bundleNode = createNode(rootNode, TREE_TYPE_BUNDLE, bundle.getKey(), true, false, bundleImage, null);
+        ITreeNode bundleNode = TreeUtility.createNode(rootNode, TREE_TYPE_BUNDLE, bundle.getKey(), bundleImage, 0, null, true, false);
         for (IScoutTechnologyResource res : bundle.getValue()) {
           if (res.getResource().exists()) {
 
@@ -160,26 +161,13 @@ public class Technology implements Comparable<Technology> {
               imageDescriptor = wbAdapter.getImageDescriptor(res.getResource());
             }
 
-            createNode(bundleNode, TREE_TYPE_RESOURCE, res.getResource().getName(), false, true, imageDescriptor, res);
+            TreeUtility.createNode(bundleNode, TREE_TYPE_RESOURCE, res.getResource().getName(), imageDescriptor, 0, res, false, true);
           }
         }
       }
     }
 
     return rootNode;
-  }
-
-  private ITreeNode createNode(ITreeNode parent, String type, String text, boolean bold, boolean checkable, ImageDescriptor img, IScoutTechnologyResource data) {
-    TreeNode node = new TreeNode(type, text, data);
-    node.setCheckable(checkable);
-    node.setBold(bold);
-    if (img != null) {
-      node.setImage(img);
-    }
-
-    parent.addChild(node);
-    node.setParent(parent);
-    return node;
   }
 
   private List<IScoutTechnologyHandler> getHandlers(IScoutBundle project) {
