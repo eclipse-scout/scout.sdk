@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.jdt.annotation.AnnotationNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
@@ -121,21 +120,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
 
         // getter
         final String finalColumnName = getColumnConstantName(i, columnIdMap);
-        IMethodSourceBuilder columnGetterBuilder = new MethodSourceBuilder("get" + upperColName) {
-          @Override
-          public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-            boolean addSuppressUncheckedWarning = false;
-            if (!OBJECT_SIG.equals(colSignature)) {
-              if (SignatureUtility.isGenericSignature(colSignature)) {
-                addSuppressUncheckedWarning = true;
-              }
-            }
-            if (addSuppressUncheckedWarning) {
-              addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createSupressWarningUnchecked());
-            }
-            super.createSource(source, lineDelimiter, ownerProject, validator);
-          }
-        };
+        IMethodSourceBuilder columnGetterBuilder = new MethodSourceBuilder("get" + upperColName);
         columnGetterBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
           @Override
           public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
@@ -183,16 +168,6 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
           source.append("  }");
         }
       });
-
-      // check for unchecked
-      for (String colSignature : colunmSignatures) {
-        if (SignatureUtility.isGenericSignature(colSignature)) {
-          AnnotationNewOperation suppressUnchecked = new AnnotationNewOperation(SignatureCache.createTypeSignature(SuppressWarnings.class.getName()), null);
-          suppressUnchecked.addParameter("\"unchecked\"");
-          setValueAtBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createSupressWarningUnchecked());
-          break;
-        }
-      }
 
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(setValueAtBuilder), setValueAtBuilder);
 

@@ -13,12 +13,9 @@ package org.eclipse.scout.sdk.internal.test.operation.formdata;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Test;
 
 /**
@@ -33,16 +30,11 @@ public class TableFieldBeanTest extends AbstractSdkTestWithFormDataProject {
   public static final String TableFieldBaseForm = "formdata.client.ui.forms.replace.TableFieldBaseForm";
   public static final String TableFieldExForm = "formdata.client.ui.forms.replace.TableFieldExForm";
 
-  private IType createFormData(String typeName) throws Exception {
+  private void createFormData(String typeName) throws Exception {
     IType field = SdkAssert.assertTypeExists(typeName);
 
-    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(field, TypeUtility.getSuperTypeHierarchy(field));
-    FormDataUpdateOperation op = new FormDataUpdateOperation(field, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
-    op.setFormatSource(false);
+    FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(field);
     TestWorkspaceUtility.executeAndBuildWorkspace(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
-
-    IType formData = op.getCreatedFormData();
-    return formData;
   }
 
   @Test

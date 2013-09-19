@@ -53,7 +53,6 @@ public class ScoutSdk extends Plugin {
     m_autoUpdateManager = new DtoAutoUpdateManager();
     m_autoUpdateManager.addModelDataUpdateHandler(new FormDataDtoUpdateHandler());
     m_autoUpdateManager.addModelDataUpdateHandler(new PageDataAutoUpdateHandler());
-
   }
 
   /*
@@ -68,6 +67,7 @@ public class ScoutSdk extends Plugin {
     TypeCacheAccessor.getTypeCache().dispose();
     TypeCacheAccessor.getJavaResourceChangedEmitter().dispose();
 
+    m_autoUpdateManager = null;
     logManager = null;
     plugin = null;
     super.stop(context);

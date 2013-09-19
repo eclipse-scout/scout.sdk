@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.ui.action;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -64,7 +64,13 @@ public class FormDataUpdateAction extends AbstractOperationAction {
       return false;
     }
 
-    setOperation(new FormDataUpdateOperation(getFormDataOwner(), formDataType.getCompilationUnit()));
-    return true;
+    try {
+      setOperation(new FormDataDtoUpdateOperation(getFormDataOwner()));
+      return true;
+    }
+    catch (JavaModelException e) {
+      ScoutSdkUi.logError("unable to calculate visibility for form data update context menu.", e);
+      return false;
+    }
   }
 }

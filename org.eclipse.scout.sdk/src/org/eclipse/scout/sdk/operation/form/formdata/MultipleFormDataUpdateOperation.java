@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.operation.form.formdata;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -57,7 +58,9 @@ public class MultipleFormDataUpdateOperation implements IOperation {
       if (FormDataAnnotation.isCreate(annotation)) {
         IType formDataType = annotation.getFormDataType();
         if (TypeUtility.exists(formDataType)) {
-          new FormDataUpdateOperation(t, formDataType.getCompilationUnit()).run(monitor, workingCopyManager);
+          FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(t);
+          op.validate();
+          op.run(monitor, workingCopyManager);
         }
       }
       monitor.worked(1);

@@ -14,11 +14,9 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -33,9 +31,7 @@ public class FormWithTemplateTest extends AbstractSdkTestWithFormDataProject {
     IProject sharedProject = getProject("formdata.shared");
     Assert.assertNotNull(sharedProject);
 
-    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
-
-    FormDataUpdateOperation op = new FormDataUpdateOperation(form, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
+    FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(form);
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
 
     testApiOfUsingTemplateFormData();

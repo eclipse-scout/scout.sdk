@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
+import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.service.IMessageBoxService.YesNo;
 import org.eclipse.scout.sdk.service.MessageBoxServiceFactory;
@@ -197,16 +198,20 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
       try {
         icu.becomeWorkingCopy(monitor);
 
-        // store new formdata content to buffer
+        // store new form data content to buffer
         icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(m_icuSource, icu));
-
-//        // format buffer & organize imports
-//        JavaElementFormatOperation formatOp = new JavaElementFormatOperation(icu, true);
-//        formatOp.validate();
-//        formatOp.run(monitor, workingCopyManager);
 
         // save buffer
         icu.getBuffer().save(monitor, true);
+
+        // organize import required to:
+        // 1. ensure the JDT settings for the imports are applied
+        // 2. resolve references e.g. in validation rules to classes holding constants.
+        //    see /org.eclipse.scout.sdk.test/resources/operation/formData/formdata.client/src/formdata/client/ui/template/formfield/AbstractLimitedStringField.java for an example.
+        // Also see org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation
+        OrganizeImportOperation o = new OrganizeImportOperation(icu);
+        o.validate();
+        o.run(monitor, workingCopyManager);
 
         icu.commitWorkingCopy(true, monitor);
       }

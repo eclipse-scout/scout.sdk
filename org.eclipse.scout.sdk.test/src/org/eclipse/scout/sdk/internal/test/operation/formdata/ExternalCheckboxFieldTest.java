@@ -13,11 +13,9 @@ package org.eclipse.scout.sdk.internal.test.operation.formdata;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,12 +27,9 @@ public class ExternalCheckboxFieldTest extends AbstractSdkTestWithFormDataProjec
     IType template = TypeUtility.getType("formdata.client.ui.template.formfield." + templateName);
     Assert.assertTrue(TypeUtility.exists(template));
 
-    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(template, TypeUtility.getSuperTypeHierarchy(template));
-
-    FormDataUpdateOperation op = new FormDataUpdateOperation(template, TypeUtility.getTypeBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit());
+    FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(template);
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
     testApiOfAbstractTestCheckboxFieldData();
-
   }
 
   /**

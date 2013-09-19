@@ -11,15 +11,11 @@
 package org.eclipse.scout.sdk.internal.test.operation.formdata;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,9 +27,8 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     IProject sharedProject = getProject("formdata.shared");
     Assert.assertNotNull(sharedProject);
-    FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
-    ICompilationUnit formDataIcu = SdkAssert.assertTypeExistsBySignature(annotation.getFormDataTypeSignature()).getCompilationUnit();
-    FormDataUpdateOperation op = new FormDataUpdateOperation(form, formDataIcu);
+
+    FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(form);
 
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
 

@@ -35,8 +35,8 @@ import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
@@ -170,7 +170,8 @@ public class CreateTemplateOperation implements IOperation {
 
     // form data
     if (isCreateExternalFormData() && sharedBundle != null && formDataType != null) {
-      FormDataUpdateOperation formDataUpdateOp = new FormDataUpdateOperation(templateType, formDataType.getCompilationUnit());
+      FormDataDtoUpdateOperation formDataUpdateOp = new FormDataDtoUpdateOperation(templateType);
+      formDataUpdateOp.validate();
       formDataUpdateOp.run(monitor, workingCopyManager);
     }
 

@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 public abstract class AbstractDtoUpdateHandler implements IDtoAutoUpdateHandler {
 
   protected FormDataAnnotation ensurePropertyFormDataAnnotation(DtoUpdateProperties properties) throws CoreException {
-
     FormDataAnnotation annotation = properties.getFormDataAnnotation();
     if (annotation == null && !properties.contains(DtoUpdateProperties.PROP_FORM_DATA_ANNOTATION)) {
       annotation = ScoutTypeUtility.findFormDataAnnotation(properties.getType(), ensurePropertySuperTypeHierarchy(properties));

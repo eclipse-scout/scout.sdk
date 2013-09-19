@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.operation.jdt.icu.CompilationUnitUpdateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
@@ -21,6 +22,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link FormDataDtoUpdateOperation}</h3>
@@ -31,6 +33,10 @@ import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
 
   private final FormDataAnnotation m_formDataAnnotation;
+
+  public FormDataDtoUpdateOperation(IType modelType) throws JavaModelException {
+    this(modelType, ScoutTypeUtility.findFormDataAnnotation(modelType, TypeUtility.getSuperTypeHierarchy(modelType)));
+  }
 
   /**
    * @param modelType
