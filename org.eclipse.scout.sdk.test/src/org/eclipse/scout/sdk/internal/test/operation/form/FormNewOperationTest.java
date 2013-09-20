@@ -72,7 +72,7 @@ public class FormNewOperationTest extends AbstractSdkTestWithSampleProject {
     // check cancel button
     IType cancelButton = SdkAssert.assertTypeExists(formOp.getCreatedMainBox(), SdkProperties.TYPE_NAME_CANCEL_BUTTON);
     SdkAssert.assertPublic(cancelButton).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(cancelButton, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(cancelButton, Double.valueOf(20));
     IMethod cancelGetter = SdkAssert.assertMethodExist(formOp.getCreatedType(), "get" + SdkProperties.TYPE_NAME_CANCEL_BUTTON);
     SdkAssert.assertPublic(cancelGetter).assertNoMoreFlags();
 
@@ -149,5 +149,4 @@ public class FormNewOperationTest extends AbstractSdkTestWithSampleProject {
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(formOp.getCreatedType(), true);
     executeBuildAssertNoCompileErrors(delOp);
   }
-
 }

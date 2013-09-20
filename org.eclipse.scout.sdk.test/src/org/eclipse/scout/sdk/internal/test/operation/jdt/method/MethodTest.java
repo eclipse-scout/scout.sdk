@@ -145,39 +145,38 @@ public class MethodTest extends AbstractScoutSdkTest {
     IType t = SdkAssert.assertTypeExists("test.client.MethodBodyTest");
     IMethod m = TypeUtility.getMethod(t, "MethodBodyTest");
     ISourceRange bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(299, bodySourceRange.getOffset());
-    Assert.assertEquals(6, bodySourceRange.getLength());
+    Assert.assertEquals(287, bodySourceRange.getOffset());
+    Assert.assertEquals(4, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "doStaticStuff");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(352, bodySourceRange.getOffset());
-    Assert.assertEquals(6, bodySourceRange.getLength());
+    Assert.assertEquals(337, bodySourceRange.getOffset());
+    Assert.assertEquals(4, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "doFinalStuff");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(399, bodySourceRange.getOffset());
-    Assert.assertEquals(6, bodySourceRange.getLength());
+    Assert.assertEquals(380, bodySourceRange.getOffset());
+    Assert.assertEquals(4, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "methodWithLongContent");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(449, bodySourceRange.getOffset());
-    Assert.assertEquals(498, bodySourceRange.getLength());
+    Assert.assertEquals(426, bodySourceRange.getOffset());
+    Assert.assertEquals(475, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "methodWithException");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(1021, bodySourceRange.getOffset());
-    Assert.assertEquals(17, bodySourceRange.getLength());
+    Assert.assertEquals(973, bodySourceRange.getOffset());
+    Assert.assertEquals(15, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "methodWithComment");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(1093, bodySourceRange.getOffset());
-    Assert.assertEquals(6, bodySourceRange.getLength());
+    Assert.assertEquals(1041, bodySourceRange.getOffset());
+    Assert.assertEquals(4, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "returnAnInteger");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(1135, bodySourceRange.getOffset());
-    Assert.assertEquals(19, bodySourceRange.getLength());
-
+    Assert.assertEquals(1079, bodySourceRange.getOffset());
+    Assert.assertEquals(17, bodySourceRange.getLength());
   }
 
   /**

@@ -39,8 +39,6 @@ public class LookupServiceNewOperationTest extends AbstractSdkTestWithSampleProj
     executeBuildAssertNoCompileErrors(serviceOp);
     IType interfaceType = serviceOp.getCreatedServiceInterface();
     IType implementationType = serviceOp.getCreatedServiceImplementation();
-    System.out.println(interfaceType.getCompilationUnit().getSource());
-    System.out.println(implementationType.getCompilationUnit().getSource());
     SdkAssert.assertExist(interfaceType);
     SdkAssert.assertExist(implementationType);
     SdkAssert.assertEquals(interfaceType.getElementName(), implementationType.getSuperInterfaceNames()[0]);
@@ -61,8 +59,6 @@ public class LookupServiceNewOperationTest extends AbstractSdkTestWithSampleProj
     executeBuildAssertNoCompileErrors(serviceOp);
     IType interfaceType = serviceOp.getCreatedServiceInterface();
     IType implementationType = serviceOp.getCreatedServiceImplementation();
-    System.out.println(interfaceType.getCompilationUnit().getSource());
-    System.out.println(implementationType.getCompilationUnit().getSource());
     SdkAssert.assertExist(interfaceType);
     SdkAssert.assertExist(implementationType);
     SdkAssert.assertEquals(interfaceType.getElementName(), implementationType.getSuperInterfaceNames()[0]);

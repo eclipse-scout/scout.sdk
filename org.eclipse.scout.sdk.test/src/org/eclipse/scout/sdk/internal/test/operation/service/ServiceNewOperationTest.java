@@ -42,8 +42,6 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
     serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServerJavaProject()));
 
     executeBuildAssertNoCompileErrors(serviceOp);
-    System.out.println(serviceOp.getCreatedServiceInterface().getCompilationUnit().getSource());
-    System.out.println(serviceOp.getCreatedServiceImplementation().getCompilationUnit().getSource());
     SdkAssert.assertExist(serviceOp.getCreatedServiceInterface());
     SdkAssert.assertExist(serviceOp.getCreatedServiceImplementation());
     SdkAssert.assertEquals(serviceOp.getCreatedServiceInterface().getElementName(), serviceOp.getCreatedServiceImplementation().getSuperInterfaceNames()[0]);
@@ -102,10 +100,8 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
 
     executeBuildAssertNoCompileErrors(serviceOp);
     IType serviceInterface = serviceOp.getCreatedServiceInterface();
-    System.out.println(serviceInterface.getCompilationUnit().getSource());
     SdkAssert.assertExist(serviceInterface);
     IType serviceImplementation = serviceOp.getCreatedServiceImplementation();
-    System.out.println(serviceImplementation.getCompilationUnit().getSource());
     SdkAssert.assertExist(serviceImplementation);
     SdkAssert.assertEquals(serviceInterface.getElementName(), serviceImplementation.getSuperInterfaceNames()[0]);
 

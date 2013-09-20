@@ -145,15 +145,13 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
    * @param nextOrderNr
    */
   protected void fillMainBox(ITypeSourceBuilder formBuilder, ITypeSourceBuilder mainBoxBuilder) {
-    double nextOrderNr = 10;
     if (isCreateButtonOk()) {
-      createOkButton(getSourceBuilder(), mainBoxBuilder, nextOrderNr);
+      createOkButton(getSourceBuilder(), mainBoxBuilder, 10);
     }
 
     // cancel button
     if (isCreateButtonCancel()) {
-      nextOrderNr += 10;
-      createCancelButton(getSourceBuilder(), mainBoxBuilder, nextOrderNr);
+      createCancelButton(getSourceBuilder(), mainBoxBuilder, 20);
     }
   }
 

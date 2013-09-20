@@ -39,7 +39,6 @@ public class CalendarItemProviderNewOperationTest extends AbstractSdkTestWithSam
     calendarItemProviderOp.setSibling(TypeUtility.getType("sample.client.person.PersonForm.MainBox.CalendarField.Calendar.FirstItemProvider"));
     executeBuildAssertNoCompileErrors(calendarItemProviderOp);
     IType itemProvider = calendarItemProviderOp.getCreatedType();
-    System.out.println(itemProvider.getCompilationUnit().getSource());
     SdkAssert.assertExist(itemProvider);
     SdkAssert.assertPublic(itemProvider).assertNoMoreFlags();
 
@@ -64,7 +63,6 @@ public class CalendarItemProviderNewOperationTest extends AbstractSdkTestWithSam
     calendarItemProviderOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractHolidayItemProvider", true));
     executeBuildAssertNoCompileErrors(calendarItemProviderOp);
     IType itemProvider = calendarItemProviderOp.getCreatedType();
-    System.out.println(itemProvider.getCompilationUnit().getSource());
     SdkAssert.assertExist(itemProvider);
     SdkAssert.assertPublic(itemProvider).assertNoMoreFlags();
 

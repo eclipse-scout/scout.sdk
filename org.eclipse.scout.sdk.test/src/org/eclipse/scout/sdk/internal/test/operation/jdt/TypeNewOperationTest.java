@@ -189,7 +189,6 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
   @Test
   public void createInnerTypeTest() throws Exception {
     IType testType = createTestType("InnerTypeTest");
-    System.out.println(testType.exists());
     InnerTypeNewOperation typeOp = new InnerTypeNewOperation("InnerType", testType);
     typeOp.setFlags(Flags.AccPublic);
     typeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());

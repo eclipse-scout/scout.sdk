@@ -45,8 +45,6 @@ public class ProcessServiceNewOperationTest extends AbstractSdkTestWithSamplePro
     IType implementationType = serviceOp.getCreatedServiceImplementation();
     SdkAssert.assertExist(interfaceType);
     SdkAssert.assertExist(implementationType);
-    System.out.println(interfaceType.getCompilationUnit().getSource());
-    System.out.println(implementationType.getCompilationUnit().getSource());
     SdkAssert.assertEquals(interfaceType.getElementName(), implementationType.getSuperInterfaceNames()[0]);
 
     SdkAssert.assertTypeExists("sample.shared.services.test.output.CreateTest01Permission");

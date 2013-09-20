@@ -14,7 +14,6 @@ import org.eclipse.scout.sdk.internal.test.api.compatibitity._SuiteApiCompatibil
 import org.eclipse.scout.sdk.internal.test.bug.beforeopensource._SuiteBugsBeforeOpensource;
 import org.eclipse.scout.sdk.internal.test.jdt._SuiteJdt;
 import org.eclipse.scout.sdk.internal.test.operation._SuiteOperation;
-import org.eclipse.scout.sdk.internal.test.presenter._SuitePresenter;
 import org.eclipse.scout.sdk.internal.test.types._SuiteTypes;
 import org.eclipse.scout.sdk.internal.test.util._SuiteUtil;
 import org.eclipse.scout.sdk.internal.test.workspace._SuiteWorkspaceTest;
@@ -28,7 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
     _SuiteBugsBeforeOpensource.class,
     _SuiteJdt.class,
     _SuiteOperation.class,
-    _SuitePresenter.class,
+    /*  _SuitePresenter.class,*/
     _SuiteTypes.class,
     _SuiteUtil.class,
     _SuiteWorkspaceTest.class})

@@ -40,9 +40,6 @@ public class ScoutLibraryNature extends PlatformObject implements IProjectNature
 
   @Override
   public void setProject(IProject project) {
-    System.out.println("set scout library nature to '" + project.getName() + "'");
     m_project = project;
-
   }
-
 }

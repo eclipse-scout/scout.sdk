@@ -47,5 +47,4 @@ public class AbstractSdkTestWithFormDataProject extends AbstractScoutSdkTest {
   protected static IJavaProject getSharedJavaProject() {
     return JavaCore.create(getProject(SHARED_NAME));
   }
-
 }

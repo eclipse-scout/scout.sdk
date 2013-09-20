@@ -14,7 +14,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.OutlineToolbuttonNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
-import org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.junit.Test;
 
@@ -39,9 +38,5 @@ public class OutlineToolbuttonNewOperationTest extends AbstractSdkTestWithSample
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, newOp);
     IType outlineButton = newOp.getCreatedType();
     SdkAssert.assertExist(outlineButton);
-
-    System.out.println(outlineButton.getCompilationUnit().getSource());
-    System.out.println(new ApiTestGenerator(outlineButton).buildSource());
-
   }
 }

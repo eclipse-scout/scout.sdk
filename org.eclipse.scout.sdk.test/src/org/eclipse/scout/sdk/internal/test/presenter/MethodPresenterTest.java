@@ -49,7 +49,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-//XXX Test failed
 public class MethodPresenterTest extends AbstractScoutSdkTest {
 
   private final static String SHARED_PROJECT = "presenter.test.shared";

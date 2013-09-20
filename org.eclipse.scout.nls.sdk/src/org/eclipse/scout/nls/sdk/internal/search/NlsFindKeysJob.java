@@ -121,7 +121,6 @@ public class NlsFindKeysJob extends Job {
   private class P_NlsKeySearchRequestor extends TextSearchRequestor {
     @Override
     public boolean acceptPatternMatch(TextSearchMatchAccess matchAccess) throws CoreException {
-      System.out.println("found match '" + matchAccess.getFile().getName() + "'");
       return super.acceptPatternMatch(matchAccess);
     }
   }

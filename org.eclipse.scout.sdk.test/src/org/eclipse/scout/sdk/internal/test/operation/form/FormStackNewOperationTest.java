@@ -109,6 +109,5 @@ public class FormStackNewOperationTest extends AbstractSdkTestWithSampleProject 
 
     PluginModelHelper h = new PluginModelHelper(getClientProject());
     SdkAssert.assertTrue(h.Manifest.existsExportPackage(packageName));
-
   }
 }

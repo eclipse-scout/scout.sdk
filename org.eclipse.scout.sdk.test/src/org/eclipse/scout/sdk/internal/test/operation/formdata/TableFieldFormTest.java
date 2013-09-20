@@ -112,7 +112,6 @@ public class TableFieldFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(setAnObject, "V");
     IMethod getCustom = SdkAssert.assertMethodExist(personTable, "getCustom", new String[]{"I"});
     SdkAssert.assertMethodReturnTypeSignature(getCustom, "QSet<QMap<QString;QInteger;>;>;");
-    SdkAssert.assertAnnotation(getCustom, "java.lang.SuppressWarnings");
     IMethod setCustom = SdkAssert.assertMethodExist(personTable, "setCustom", new String[]{"I", "QSet<QMap<QString;QInteger;>;>;"});
     SdkAssert.assertMethodReturnTypeSignature(setCustom, "V");
     IMethod getName = SdkAssert.assertMethodExist(personTable, "getName", new String[]{"I"});
@@ -136,9 +135,7 @@ public class TableFieldFormTest extends AbstractSdkTestWithFormDataProject {
     IMethod setValueAt = SdkAssert.assertMethodExist(personTable, "setValueAt", new String[]{"I", "I", "QObject;"});
     SdkAssert.assertMethodReturnTypeSignature(setValueAt, "V");
     SdkAssert.assertAnnotation(setValueAt, "java.lang.Override");
-    SdkAssert.assertAnnotation(setValueAt, "java.lang.SuppressWarnings");
 
     SdkAssert.assertEquals("inner types count of 'PersonTable'", 0, personTable.getTypes().length);
   }
-
 }
