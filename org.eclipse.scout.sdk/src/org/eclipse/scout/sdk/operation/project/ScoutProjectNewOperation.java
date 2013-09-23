@@ -120,7 +120,12 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     // add all invalid nodes to the end assuming that no one depends on them but they may depend on others (which are not present)
     collector.addAll(invalidNodes);
 
-    // TODO workaround for bug 387958. Can be removed as soon as the bug is fixed.
+    /**
+     * Workaround: required because java files created with
+     * org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation do not fire all events!
+     * Also used in org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation
+     * Can be removed when InstallJavaFileOperation has been removed.
+     */
     try {
       for (IPrimaryTypeTypeHierarchy h : TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies()) {
         h.invalidate();

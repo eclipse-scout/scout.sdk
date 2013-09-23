@@ -56,7 +56,6 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
     super(modelType, elementName, false);
     m_formDataAnnotation = formDataAnnotation;
     setup();
-
   }
 
   @Override

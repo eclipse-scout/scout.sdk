@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -60,7 +61,9 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
     }
     finally {
       clearWorkspace();
-      Assert.assertEquals(0, ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter()).length);
+      IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
+      bundleGraph.waitFor();
+      Assert.assertEquals(0, bundleGraph.getBundles(ScoutBundleFilters.getRootBundlesFilter()).length);
     }
   }
 

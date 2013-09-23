@@ -63,7 +63,7 @@ public class SimpleImportValidator implements IImportValidator {
     String usedPackageName = m_newImports.get(simpleName);
     if (usedPackageName != null) {
       if (!usedPackageName.equals(packageName)) {
-        // fully quallified
+        // fully qualified
         return true;
       }
     }

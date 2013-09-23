@@ -89,16 +89,18 @@ public class LinksPresenter extends AbstractPresenter {
     link.addPropertyChangeListener(new PropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent evt) {
-        if (ILink.PROP_NAME.equals(evt.getPropertyName())) {
-          String newTxt = (String) evt.getNewValue();
-          if (newTxt == null) {
-            newTxt = "";
+        if (field != null && !field.isDisposed()) {
+          if (ILink.PROP_NAME.equals(evt.getPropertyName())) {
+            String newTxt = (String) evt.getNewValue();
+            if (newTxt == null) {
+              newTxt = "";
+            }
+            field.setText(newTxt);
           }
-          field.setText(newTxt);
-        }
-        else if (ILink.PROP_IMAGE.equals(evt.getPropertyName())) {
-          field.setImage((Image) evt.getNewValue());
-          field.redraw();
+          else if (ILink.PROP_IMAGE.equals(evt.getPropertyName())) {
+            field.setImage((Image) evt.getNewValue());
+            field.redraw();
+          }
         }
       }
     });

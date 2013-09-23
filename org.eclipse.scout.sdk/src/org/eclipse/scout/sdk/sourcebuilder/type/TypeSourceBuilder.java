@@ -128,7 +128,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
         }
       }
     }
-    // innertypes
+    // inner types
     List<ITypeSourceBuilder> innerTypes = getTypeSourceBuilder();
     if (!innerTypes.isEmpty()) {
       source.append(lineDelimiter);

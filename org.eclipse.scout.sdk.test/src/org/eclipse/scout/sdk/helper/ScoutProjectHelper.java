@@ -26,7 +26,9 @@ import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Assert;
 
@@ -81,7 +83,11 @@ public final class ScoutProjectHelper {
     TestWorkspaceUtility.buildWorkspace();
 
     // get scout workspace
-    IScoutBundle[] rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getRootBundlesFilter());
+    IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
+    bundleGraph.waitFor();
+    JdtUtility.waitForIndexesReady();
+
+    IScoutBundle[] rootProjects = bundleGraph.getBundles(ScoutBundleFilters.getRootBundlesFilter());
     Assert.assertEquals(1, rootProjects.length);
     IScoutBundle scoutProject = rootProjects[0];
     return scoutProject;

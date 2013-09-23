@@ -166,7 +166,23 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
     return SearchPattern.getMatchingRegions(pattern.getPattern(), text, pattern.getMatchKind()) != null;
   }
 
-  private String getMatchString() {
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof NlsTextProposal)) {
+      return false;
+    }
+    return CompareUtility.equals(m_entry, ((NlsTextProposal) obj).m_entry);
+  }
+
+  @Override
+  public int hashCode() {
+    if (m_entry == null) {
+      return 0;
+    }
+    return m_entry.hashCode();
+  }
+
+  private String getSortString() {
     if (getMatchKind() == MATCH_DEV_LANG_TRANSLATION) {
       return StringUtility.lowercase(getDevLangTranslation());
     }
@@ -179,27 +195,8 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof NlsTextProposal)) {
-      return false;
-    }
-    return CompareUtility.equals(getMatchString(), ((NlsTextProposal) obj).getMatchString());
-  }
-
-  @Override
-  public int hashCode() {
-    String matchString = getMatchString();
-    if (matchString == null) {
-      return 0;
-    }
-    else {
-      return matchString.hashCode();
-    }
-  }
-
-  @Override
   public int compareTo(NlsTextProposal o) {
-    return CompareUtility.compareTo(getMatchString(), o.getMatchString());
+    return CompareUtility.compareTo(getSortString(), o.getSortString());
   }
 
   public boolean isNewEntryProposal() {

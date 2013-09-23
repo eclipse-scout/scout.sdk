@@ -15,6 +15,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -55,6 +56,28 @@ public class NlsEntry implements INlsEntry {
   @Override
   public int getType() {
     return TYPE_LOCAL;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof NlsEntry)) {
+      return false;
+    }
+    NlsEntry other = (NlsEntry) obj;
+    return CompareUtility.equals(m_key, other.m_key) &&
+        CompareUtility.equals(m_translations, other.m_translations) &&
+        CompareUtility.equals(getType(), other.getType());
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = 0;
+    if (m_key != null) {
+      hash ^= m_key.hashCode();
+    }
+    hash ^= m_translations.hashCode();
+    hash ^= getType();
+    return hash;
   }
 
   /**

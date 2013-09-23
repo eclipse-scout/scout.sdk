@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 public class SimpleNlsProjectProvider implements INlsProjectProvider {
 
   private final HashMap<String, INlsProject> m_projects = new HashMap<String, INlsProject>();
+  private final static Object LOCK = new Object();
 
   public SimpleNlsProjectProvider() {
   }
@@ -37,15 +38,17 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
       return null;
     }
 
-    INlsProject nlsProject = m_projects.get(type.getFullyQualifiedName());
-    if (nlsProject == null) {
-      NlsType t = new NlsType(type);
-      if (t != null && t.getTranslationsFolderName() != null) {
-        nlsProject = new SimpleNlsProject(t);
-        m_projects.put(type.getFullyQualifiedName(), nlsProject);
+    synchronized (LOCK) {
+      INlsProject nlsProject = m_projects.get(type.getFullyQualifiedName());
+      if (nlsProject == null) {
+        NlsType t = new NlsType(type);
+        if (t != null && t.getTranslationsFolderName() != null) {
+          nlsProject = new SimpleNlsProject(t);
+          m_projects.put(type.getFullyQualifiedName(), nlsProject);
+        }
       }
+      return nlsProject;
     }
-    return nlsProject;
   }
 
   @Override
@@ -70,9 +73,13 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
             AbstractNlsFile nlsFile = AbstractNlsFile.loadNlsFile(f);
             if (PluginRegistry.findModel(nlsFile.getProject()) != null && nlsFile.getNlsTypeName() != null) {
               IType type = NlsTypeUtility.getType(nlsFile.getNlsTypeName());
-              if (TypeUtility.exists(type)) {
-                return getNlsProject(type);
+              INlsProject simpleProj = getNlsProject(type);
+              if (simpleProj != null) {
+                // fast pre-check: is it directly a simple project?
+                return simpleProj;
               }
+              // also give the other providers a chance to parse
+              return NlsCore.getNlsWorkspace().getNlsProject(new Object[]{type});
             }
           }
           catch (CoreException e) {

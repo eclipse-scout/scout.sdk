@@ -206,7 +206,12 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
 
     }
 
-    // TODO workaround for bug 387958. Can be removed as soon as the bug is fixed.
+    /**
+     * Workaround: required because java files created with
+     * org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation do not fire all events!
+     * Also used in org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation
+     * Can be removed when InstallJavaFileOperation has been removed.
+     */
     try {
       for (IPrimaryTypeTypeHierarchy h : TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies()) {
         h.invalidate();

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.internal.test.types;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -24,6 +25,7 @@ import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
@@ -189,8 +191,12 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       createOutlineOp.getCreatedType();
       assertEquals(1, outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter()).length);
       clearWorkspace();
+      ResourcesPlugin.getWorkspace().checkpoint(false);
+      JdtUtility.waitForIndexesReady();
+      ScoutSdkCore.getScoutWorkspace().getBundleGraph().waitFor();
       assertFalse(TypeUtility.exists(iOutline));
-      // secound project
+
+      // second project
       IScoutBundle project2 = ScoutProjectHelper.setupNewProject("zyx.test", true, true, true);
       assertFalse(TypeUtility.exists(iOutline));
       iOutline = SdkAssert.assertTypeExists(RuntimeClasses.IOutline);
