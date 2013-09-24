@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -33,6 +32,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -67,23 +68,22 @@ public final class ResourceUtility {
     return getAllResources(ResourcesPlugin.getWorkspace().getRoot(), filter);
   }
 
-  public static IResource[] getAllResources(IResource startResource, IResourceFilter filter) throws CoreException {
-    List<IResource> collector = new LinkedList<IResource>();
-    collectResourcesRec(startResource, collector, filter);
-    return collector.toArray(new IResource[collector.size()]);
-  }
-
-  private static void collectResourcesRec(IResource resource, Collection<IResource> collector, IResourceFilter filter) throws CoreException {
-    if (exists(resource)) {
-      if (filter.accept(resource)) {
-        collector.add(resource);
-      }
-      if (resource instanceof IContainer && resource.isAccessible()) {
-        for (IResource child : ((IContainer) resource).members()) {
-          collectResourcesRec(child, collector, filter);
+  public static IResource[] getAllResources(IResource startResource, final IResourceFilter filter) throws CoreException {
+    final List<IResource> collector = new LinkedList<IResource>();
+    startResource.accept(new IResourceProxyVisitor() {
+      @Override
+      public boolean visit(IResourceProxy proxy) throws CoreException {
+        if (proxy.isAccessible()) {
+          if (filter.accept(proxy)) {
+            collector.add(proxy.requestResource());
+          }
+          return true;
         }
+        return false;
       }
-    }
+    }, IResource.NONE);
+
+    return collector.toArray(new IResource[collector.size()]);
   }
 
   /**

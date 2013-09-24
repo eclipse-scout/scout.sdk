@@ -20,7 +20,7 @@ public class ExportRapWizardPage extends AbstractExportProductWizardPage {
   private final static String SETTINGS_WAR_FILE_NAME = "warFileNameRapSetting";
 
   public ExportRapWizardPage(IScoutBundle scoutProject) {
-    super(scoutProject, ExportRapWizardPage.class.getName(), Texts.get("ExportRapWebArchive"), IScoutSdkRapConstants.TYPE_UI_RAP,
+    super(scoutProject, ExportRapWizardPage.class.getName(), Texts.get("ExportRapWebArchive"), IScoutSdkRapConstants.ScoutUiRapBundleId,
         SETTINGS_PRODUCT_FILE, SETTINGS_WAR_FILE_NAME);
   }
 

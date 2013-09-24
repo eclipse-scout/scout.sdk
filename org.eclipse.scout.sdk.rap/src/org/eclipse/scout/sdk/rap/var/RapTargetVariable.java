@@ -27,7 +27,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
-import org.eclipse.scout.sdk.util.resources.IResourceFilter;
+import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 /**
@@ -192,19 +192,9 @@ public final class RapTargetVariable {
         return;
       }
 
-      for (IResource r : ResourceUtility.getAllResources(delta.getResource(), P_TargetFileFilter.instance)) {
+      for (IResource r : ResourceUtility.getAllResources(delta.getResource(), ResourceFilters.getTargetFileFilter())) {
         res.add((IFile) r);
       }
-    }
-  }
-
-  private static class P_TargetFileFilter implements IResourceFilter {
-
-    private static P_TargetFileFilter instance = new P_TargetFileFilter();
-
-    @Override
-    public boolean accept(IResource resource) {
-      return resource.getType() == IResource.FILE && resource.getName().toLowerCase().endsWith(".target");
     }
   }
 

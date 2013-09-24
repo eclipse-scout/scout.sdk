@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements IExportScoutProjectWizard {
   private final static Pattern ALIAS_REGEX = Pattern.compile(".*products.*/([^-]*)-.*.product");
@@ -106,22 +105,18 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
 
   private String findProjectAlias() {
     try {
-      IScoutBundle[] roots = getProject().getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
       HashMap<String, Integer> aliasList = new HashMap<String, Integer>();
 
-      for (IScoutBundle root : roots) {
-        for (IScoutBundle b : root.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true)) {
-          IResource[] prodFiles = ResourceUtility.getAllResources(b.getProject(), ResourceFilters.getProductFileFilter());
-          for (IResource f : prodFiles) {
-            String alias = getAliasFromProductFile((IFile) f);
-            if (alias != null) {
-              Integer i = aliasList.get(alias);
-              if (i == null) {
-                i = 0;
-              }
-              aliasList.put(alias, ++i);
-            }
+      // all product files that contain the selected project
+      IResource[] prodFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(false, getProject().getSymbolicName()));
+      for (IResource f : prodFiles) {
+        String alias = getAliasFromProductFile((IFile) f);
+        if (alias != null) {
+          Integer i = aliasList.get(alias);
+          if (i == null) {
+            i = 0;
           }
+          aliasList.put(alias, ++i);
         }
       }
 

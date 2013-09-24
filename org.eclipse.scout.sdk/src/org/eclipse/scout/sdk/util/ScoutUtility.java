@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -34,13 +35,16 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
+import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -507,6 +511,28 @@ public final class ScoutUtility {
       }
     }
     return buf.toString();
+  }
+
+  /**
+   * Gets the bundle type for the given product file. This is the type of first type-defining-bundle that is found in
+   * the dependencies of the given project.
+   * 
+   * @param productFile
+   *          The product file.
+   * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
+   *         the dependencies of the given product, this method returns null. Types can be added using the
+   *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
+   *         the {@link IScoutBundle}.TYPE* constants.
+   * @throws CoreException
+   */
+  public static String getProductFileType(IFile productFile) throws CoreException {
+    ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
+    BundleDescription[] plugins = pfmh.ProductFile.getPluginModels();
+    String[] symbolicNames = new String[plugins.length];
+    for (int i = 0; i < plugins.length; i++) {
+      symbolicNames[i] = plugins[i].getSymbolicName();
+    }
+    return RuntimeBundles.getBundleType(symbolicNames);
   }
 
   public static String removeSourceCodeIndent(String source, int indent) {

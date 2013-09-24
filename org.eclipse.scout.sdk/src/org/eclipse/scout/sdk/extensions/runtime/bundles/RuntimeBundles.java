@@ -32,6 +32,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link RuntimeBundles}</h3> ...
@@ -112,16 +113,47 @@ public final class RuntimeBundles {
     }
   }
 
+  /**
+   * Gets the bundle symbolic name that defines the given bundle type.
+   * 
+   * @param bundleType
+   *          one of the bundle types. Bundle types can be defined using the
+   *          <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
+   *          the {@link IScoutBundle}.TYPE* constants.
+   * @return the symbolic name of the bundle that defines the given type.
+   */
   public static String getBundleSymbolicName(String bundleType) {
     ensureCached();
     return typeToBundleMap.get(bundleType);
   }
 
+  /**
+   * Gets the bundle type for the given plug-in. This is the type of first type-defining-bundle that is found in the
+   * dependencies of the given project.
+   * 
+   * @param symbolicName
+   *          The bundle symbolic name. There must be a plug-in with the given name in the registry.
+   * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
+   *         the dependencies of the given bundle, this method returns null. types can be added using the
+   *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
+   *         the {@link IScoutBundle}.TYPE* constants.
+   */
   public static String getBundleType(String symbolicName) {
     IPluginModelBase model = PluginRegistry.findModel(symbolicName);
     return getBundleType(model);
   }
 
+  /**
+   * Gets the bundle type for the given plug-in project. This is the type of first type-defining-bundle that is found
+   * in the dependencies of the given project.
+   * 
+   * @param p
+   *          The project to get the bundle type for. Must be a plug-in project.
+   * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
+   *         the dependencies of the given bundle, this method returns null. types can be added using the
+   *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
+   *         the {@link IScoutBundle}.TYPE* constants.
+   */
   public static String getBundleType(IProject p) {
     if (p == null) {
       return null;
@@ -130,6 +162,17 @@ public final class RuntimeBundles {
     return getBundleType(model);
   }
 
+  /**
+   * Gets the bundle type for the given bundle. This is the type of first type-defining-bundle that is found in the
+   * dependencies of the given bundle.
+   * 
+   * @param bundle
+   *          The bundle to get the type for.
+   * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
+   *         the dependencies of the given bundle, this method returns null. types can be added using the
+   *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
+   *         the {@link IScoutBundle}.TYPE* constants.
+   */
   public static String getBundleType(IPluginModelBase bundle) {
     if (bundle == null) {
       return null;
@@ -138,14 +181,50 @@ public final class RuntimeBundles {
     return getBundleType(tmp);
   }
 
+  /**
+   * Gets the bundle type for the given scout bundle. This is the type of first type-defining-bundle that is found
+   * in the dependencies of the given bundle.
+   * 
+   * @param bundle
+   *          The bundle to get the type for.
+   * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
+   *         the dependencies of the given bundle, this method returns null. types can be added using the
+   *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
+   *         the {@link IScoutBundle}.TYPE* constants.
+   */
   public static String getBundleType(ScoutBundle bundle) {
     if (bundle == null) {
       return null;
     }
+    Set<IPluginModelBase> allDependencies = bundle.getAllDependencies();
+    String[] symbolicNames = new String[allDependencies.size()];
+    int i = 0;
+    for (IPluginModelBase dependency : allDependencies) {
+      symbolicNames[i] = dependency.getBundleDescription().getSymbolicName();
+      i++;
+    }
+    return getBundleType(symbolicNames);
+  }
+
+  /**
+   * Gets the bundle type for the given symbolic name list. This is the type of first type-defining-bundle that is found
+   * in the given list
+   * 
+   * @param symbolicNames
+   *          The list of bundle symbolic names for which the type should be evaluated.
+   * @return The type of the type-defining bundle with the lowest (first) order number. if no type-defining-bundle is in
+   *         the given list, this method returns null. types can be added using the
+   *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
+   *         the {@link IScoutBundle}.TYPE* constants.
+   */
+  public static String getBundleType(String[] symbolicNames) {
+    if (symbolicNames == null || symbolicNames.length < 1) {
+      return null;
+    }
     ensureCached();
     for (Entry<String, String> entry : bundleToTypeMap.entrySet()) {
-      for (IPluginModelBase dependency : bundle.getAllDependencies()) {
-        if (CompareUtility.equals(dependency.getBundleDescription().getSymbolicName(), entry.getKey())) {
+      for (String bundle : symbolicNames) {
+        if (CompareUtility.equals(bundle, entry.getKey())) {
           return entry.getValue();
         }
       }
@@ -153,21 +232,31 @@ public final class RuntimeBundles {
     return null;
   }
 
+  /**
+   * @return Gets all bundle types registered.
+   */
   public static String[] getTypes() {
     ensureCached();
     return bundleToTypeMap.values().toArray(new String[bundleToTypeMap.size()]);
   }
 
+  /**
+   * Checks if the given bundle is a type defining bundle.
+   * 
+   * @param symbolicName
+   * @return true if it is a type-defining-bundle. false otherwise.
+   */
   public static boolean containsTypeDefiningBundle(String symbolicName) {
     ensureCached();
     return bundleToTypeMap.containsKey(symbolicName);
   }
 
-  public static boolean contains(String symbolicName) {
-    ensureCached();
-    return allScoutRtBundles.contains(symbolicName);
-  }
-
+  /**
+   * Checks if the given bundle is a type defining bundle.
+   * 
+   * @param b
+   * @return true if it is a type-defining-bundle. false otherwise.
+   */
   public static boolean containsTypeDefiningBundle(BundleDescription b) {
     if (b == null) {
       return false;
@@ -175,10 +264,25 @@ public final class RuntimeBundles {
     return containsTypeDefiningBundle(b.getSymbolicName());
   }
 
+  /**
+   * @param b
+   *          the bundle to evaluate
+   * @return true if the given bundle is a scout runtime bundle.
+   */
   public static boolean contains(BundleDescription b) {
     if (b == null) {
       return false;
     }
     return contains(b.getSymbolicName());
+  }
+
+  /**
+   * @param symbolicName
+   *          the symbolic name to evaluate
+   * @return true if the given symbolic name is a scout runtime bundle.
+   */
+  public static boolean contains(String symbolicName) {
+    ensureCached();
+    return allScoutRtBundles.contains(symbolicName);
   }
 }

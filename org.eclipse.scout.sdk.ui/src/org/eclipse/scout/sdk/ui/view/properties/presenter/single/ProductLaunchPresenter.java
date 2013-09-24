@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -41,8 +38,8 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresen
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -52,7 +49,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.editors.text.EditorsUI;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
@@ -67,10 +63,10 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 @SuppressWarnings("restriction")
 public class ProductLaunchPresenter extends AbstractPresenter {
   private String m_curLaunchState;
-  private String m_productName;
+
+  private final String m_productName;
   private final IFile m_productFile;
-  private final IScoutBundle m_bundle;
-  private final static Object m_lock = new Object();
+  private final String m_productType;
 
   private ImageHyperlink m_runLink;
   private ImageHyperlink m_debugLink;
@@ -80,30 +76,25 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   private P_LaunchListener m_launchListener;
   private P_RecomputeLaunchStateJob m_stateUpdateJob;
 
-  private final static Pattern PATTERN = Pattern.compile("name\\s*\\=\\s*(\\\")?([^\\\"]*)\\\"", Pattern.MULTILINE);
+  private final static Object m_lock = new Object();
   private final static String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
   public final static String TERMINATED_MODE = "terminated";
 
   /**
    * @param toolkit
    * @param parent
+   * @throws CoreException
    */
-  public ProductLaunchPresenter(PropertyViewFormToolkit toolkit, Composite parent, IFile productFile, IScoutBundle bundle) {
+  public ProductLaunchPresenter(PropertyViewFormToolkit toolkit, Composite parent, IFile productFile) throws CoreException {
     super(toolkit, parent);
     m_productFile = productFile;
-    m_bundle = bundle;
-    String prodName = null;
-    String productFileContent = "";
-    Matcher m = PATTERN.matcher(productFileContent);
-    if (m.find()) {
-      prodName = m.group(2);
-    }
-    if (prodName == null) {
-      prodName = productFile.getParent().getName() + " " + productFile.getName();
-    }
-    m_productName = prodName;
-    create(getContainer(), productFile);
+    m_productName = productFile.getParent().getName() + " " + productFile.getName();
+    m_productType = ScoutUtility.getProductFileType(getProductFile());
+
+    create(getContainer());
+
     m_launchListener = new P_LaunchListener();
+
     DebugPlugin.getDefault().getLaunchManager().addLaunchListener(m_launchListener);
     getContainer().addDisposeListener(new DisposeListener() {
       @Override
@@ -111,6 +102,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
         dispose();
       }
     });
+
     m_stateUpdateJob = new P_RecomputeLaunchStateJob();
     m_stateUpdateJob.schedule();
   }
@@ -137,16 +129,9 @@ public class ProductLaunchPresenter extends AbstractPresenter {
    * @param container
    * @param productFile
    */
-  protected void create(Composite parent, IFile productFile) {
+  protected void create(Composite parent) {
     m_mainGroup = new Group(parent, SWT.SHADOW_ETCHED_OUT);
-    m_mainGroup.setText(productFile.getParent().getName());
-
-    Label l = getToolkit().createLabel(m_mainGroup, "");
-
-    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
-    if (uiExt != null && uiExt.getLauncherIconPath() != null) {
-      l.setImage(ScoutSdkUi.getDefault().getImageRegistry().get(uiExt.getLauncherIconPath()));
-    }
+    m_mainGroup.setText(getProductFile().getName());
 
     Control linkPart = createLinkPart(m_mainGroup);
     Control actionPart = createActionPart(m_mainGroup);
@@ -159,7 +144,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     layout.verticalSpacing = 0;
     layout.horizontalSpacing = 0;
     m_mainGroup.setLayout(layout);
-    l.setLayoutData(new GridData(GridData.FILL_VERTICAL));
     linkPart.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     GridData actionPartData = new GridData(GridData.FILL_VERTICAL | GridData.FILL_HORIZONTAL);
     actionPartData.minimumWidth = actionPart.computeSize(SWT.DEFAULT, SWT.DEFAULT).x;
@@ -183,7 +167,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     }
 
     try {
-      ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+      ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getProductType());
       if (uiExt != null && uiExt.getProductLauncherContributor() != null) {
         uiExt.getProductLauncherContributor().contributeLinks(getProductFile(), model);
       }
@@ -254,13 +238,6 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   }
 
   /**
-   * @return the bundle
-   */
-  public IScoutBundle getBundle() {
-    return m_bundle;
-  }
-
-  /**
    * @return the productName
    */
   public String getProductName() {
@@ -279,7 +256,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
           shortCut.launch(new StructuredSelection(m_productFile), (debug) ? (ILaunchManager.DEBUG_MODE) : (ILaunchManager.RUN_MODE));
         }
         catch (Exception e) {
-          ScoutSdkUi.logError("could not start product '" + getProductFile().getName() + "'", e);
+          ScoutSdkUi.logInfo("could not start product '" + getProductFile().getName() + "'", e);
         }
         return Status.OK_STATUS;
       }
@@ -363,17 +340,17 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       if (!m_stopLink.isDisposed() && !m_mainGroup.isDisposed()) {
         m_stopLink.setEnabled(!TERMINATED_MODE.equals(mode));
         if (TERMINATED_MODE.equals(mode)) {
-          m_mainGroup.setText(getProductFile().getParent().getName());
+          m_mainGroup.setText(getProductFile().getName());
         }
         else if (ILaunchManager.DEBUG_MODE.equals(mode)) {
-          m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("debugging") + "...");
+          m_mainGroup.setText(getProductFile().getName() + " - " + Texts.get("debugging") + "...");
         }
         else if (ILaunchManager.RUN_MODE.equals(mode)) {
-          m_mainGroup.setText(getProductFile().getParent().getName() + " - " + Texts.get("Running") + "...");
+          m_mainGroup.setText(getProductFile().getName() + " - " + Texts.get("Running") + "...");
         }
       }
       try {
-        ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+        ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getProductType());
         if (uiExt != null && uiExt.getProductLauncherContributor() != null) {
           uiExt.getProductLauncherContributor().refreshLaunchState(mode);
         }
@@ -411,6 +388,10 @@ public class ProductLaunchPresenter extends AbstractPresenter {
         });
       }
     }
+  }
+
+  public String getProductType() {
+    return m_productType;
   }
 
   private class P_LaunchListener implements ILaunchListener {

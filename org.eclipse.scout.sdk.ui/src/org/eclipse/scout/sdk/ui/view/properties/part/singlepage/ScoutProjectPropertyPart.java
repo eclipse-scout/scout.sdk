@@ -11,11 +11,12 @@
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import java.util.ArrayList;
-import java.util.Map.Entry;
-import java.util.TreeMap;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,13 +29,10 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressIndicator;
-import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.dialog.ProductSelectionDialog;
-import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ProjectVersionPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.TechnologyPresenter;
@@ -42,11 +40,9 @@ import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.Section;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.IMemento;
@@ -175,28 +171,25 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
       p.dispose();
     }
     m_launchPresenters.clear();
-    Composite sectionClient = section.getSectionClient();
-    TreeMap<CompositeObject, P_ProductFile> orderedProducts = new TreeMap<CompositeObject, P_ProductFile>();
-    for (IFile productFile : productFiles) {
-      if (productFile != null && productFile.exists()) {
-        IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(productFile.getProject());
-        int productType = -1;
-        if (scoutBundle != null) {
-          ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(scoutBundle.getType());
-          if (uiExt != null) {
-            productType = uiExt.getOrderNumber();
-          }
-        }
-        orderedProducts.put(new CompositeObject(productType, productFile.getName(), productFile), new P_ProductFile(productFile, scoutBundle));
+
+    Arrays.sort(productFiles, 0, productFiles.length, new Comparator<IFile>() {
+      @Override
+      public int compare(IFile o1, IFile o2) {
+        return o1.getName().compareTo(o2.getName());
       }
-    }
-    for (Entry<CompositeObject, P_ProductFile> entry : orderedProducts.entrySet()) {
-      P_ProductFile productFile = entry.getValue();
-      ProductLaunchPresenter presenter = new ProductLaunchPresenter(getFormToolkit(), sectionClient, productFile.getFile(), productFile.getBundle());
-      GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-      layoutData.widthHint = 200;
-      presenter.getContainer().setLayoutData(layoutData);
-      m_launchPresenters.add(presenter);
+    });
+
+    for (IFile prodFile : productFiles) {
+      try {
+        ProductLaunchPresenter presenter = new ProductLaunchPresenter(getFormToolkit(), section.getSectionClient(), prodFile);
+        GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+        layoutData.widthHint = 200;
+        presenter.getContainer().setLayoutData(layoutData);
+        m_launchPresenters.add(presenter);
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError("Unable to create product file presenter for file '" + prodFile.getFullPath().toOSString() + "'.", e);
+      }
     }
     getForm().layout(true, true);
     getForm().reflow(true);
@@ -267,29 +260,5 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
       }
     }
     return products.toArray(new IFile[products.size()]);
-  }
-
-  private class P_ProductFile {
-    private final IScoutBundle m_bundle;
-    private final IFile m_file;
-
-    public P_ProductFile(IFile file, IScoutBundle bundle) {
-      m_file = file;
-      m_bundle = bundle;
-    }
-
-    /**
-     * @return the bundleType
-     */
-    public IScoutBundle getBundle() {
-      return m_bundle;
-    }
-
-    /**
-     * @return the file
-     */
-    public IFile getFile() {
-      return m_file;
-    }
   }
 }

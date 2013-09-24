@@ -12,7 +12,10 @@ package org.eclipse.scout.sdk.util.resources;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 
 /**
  * <h3>{@link ResourceFilters}</h3> ...
@@ -22,51 +25,110 @@ import org.eclipse.scout.commons.StringUtility;
  */
 public class ResourceFilters {
 
+  private final static IResourceFilter PRODUCT_FILE_FILTER = getFileExtensionFilter("product");
+  private final static IResourceFilter TARGET_FILE_FILTER = getFileExtensionFilter("target");
+
+  /**
+   * @param fileExtension
+   *          The file extension that must be available (without dot).
+   * @return creates and returns a filter that only accepts files with the given extension. Consider using one of the
+   *         predefined file extension filters: {@link ResourceFilters#getProductFileFilter()},
+   *         {@link ResourceFilters#getTargetFileFilter()}.
+   */
+  public static IResourceFilter getFileExtensionFilter(String fileExtension) {
+    final String ext = "." + fileExtension.toLowerCase().trim();
+    return new IResourceFilter() {
+      @Override
+      public boolean accept(IResourceProxy resource) {
+        return resource.getType() == IResource.FILE && resource.getName().toLowerCase().endsWith(ext);
+      }
+    };
+  }
+
+  /**
+   * @param filters
+   *          all of these filters must be fulfilled
+   * @return Creates and returns a filter that is fulfilled if all of the given filters are accepted.
+   */
   public static IResourceFilter getMultifilterAnd(final IResourceFilter... filters) {
-    return new IResourceFilter() {
-      @Override
-      public boolean accept(IResource candidate) {
-        if (filters == null) {
-          return true;
-        }
-        else {
-          for (IResourceFilter f : filters) {
-            if (!f.accept(candidate)) {
-              return false;
-            }
-          }
-          return true;
-        }
-      }
-    };
+    return getMultifilter(false, filters);
   }
 
+  /**
+   * @param filters
+   *          at least one of this filter must be fulfilled
+   * @return Creates and returns a filter that is fulfilled if a least one of the given filters is accepted.
+   */
   public static IResourceFilter getMultifilterOr(final IResourceFilter... filters) {
+    return getMultifilter(true, filters);
+  }
+
+  private static IResourceFilter getMultifilter(final boolean or, final IResourceFilter... filters) {
+    if (filters == null || filters.length < 1) {
+      return null; /* no filter. not allowed. */
+    }
+
     return new IResourceFilter() {
       @Override
-      public boolean accept(IResource candidate) {
-        if (filters == null) {
-          return true;
-        }
-        else {
-          for (IResourceFilter f : filters) {
-            if (f.accept(candidate)) {
-              return true;
-            }
+      public boolean accept(IResourceProxy candidate) {
+        for (IResourceFilter f : filters) {
+          boolean accepted = f.accept(candidate);
+          if (or == accepted) {
+            return accepted;
           }
-          return false;
         }
+        return !or;
       }
     };
   }
 
+  /**
+   * @return Gets a filter that accepts all files that have "product" as file extension.<br>
+   *         Calling this method is faster than using {@link ResourceFilters#getFileExtensionFilter(String)}.
+   */
   public static IResourceFilter getProductFileFilter() {
-    return new IResourceFilter() {
+    return PRODUCT_FILE_FILTER;
+  }
+
+  /**
+   * @return Gets a filter that accepts all files that have "target" as file extension.<br>
+   *         Calling this method is faster than using {@link ResourceFilters#getFileExtensionFilter(String)}.
+   */
+  public static IResourceFilter getTargetFileFilter() {
+    return TARGET_FILE_FILTER;
+  }
+
+  /**
+   * Gets all product files that contain the given id as dependency.
+   * 
+   * @param or
+   *          if true, the list of ids is OR connected. Otherwise all of the given ids must be found in the product to
+   *          be accepted by this filter (AND).
+   * @param pluginOrFeatureIds
+   *          The feature ids or plug-in symbolic names
+   * @return a filter that returns all product files that fulfill the given criteria.
+   */
+  public static IResourceFilter getProductFileByContentFilter(final boolean or, final String... pluginOrFeatureIds) {
+    final IResourceFilter productFileContentFilter = new IResourceFilter() {
       @Override
-      public boolean accept(IResource resource) {
-        return ResourceUtility.exists(resource) && resource.getType() == IResource.FILE
-            && StringUtility.equalsIgnoreCase(((IFile) resource).getFileExtension(), "product");
+      public boolean accept(IResourceProxy resource) {
+        // resource must be a product file here
+        IFile productFile = (IFile) resource.requestResource();
+        try {
+          ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
+          for (String id : pluginOrFeatureIds) {
+            boolean exists = pfmh.ProductFile.existsDependency(id);
+            if (or == exists) {
+              return exists;
+            }
+          }
+        }
+        catch (CoreException e) {
+          SdkUtilActivator.logError("Unable to parse content of product file '" + productFile.getFullPath().toOSString() + "'.", e);
+        }
+        return !or;
       }
     };
+    return getMultifilterAnd(getProductFileFilter(), productFileContentFilter);
   }
 }

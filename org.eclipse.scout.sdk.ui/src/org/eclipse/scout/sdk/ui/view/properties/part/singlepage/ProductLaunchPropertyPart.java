@@ -10,12 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
@@ -23,6 +19,8 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
+import org.eclipse.scout.sdk.util.resources.ResourceFilters;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
@@ -36,7 +34,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedViewPart {
   private static final String SECTION_ID_LINKS = "section.links";
-  private static final String PRODUCT_FOLDER = "products";
 
   final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
   final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
@@ -55,43 +52,18 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
   protected void fillLinkSection(Composite parent) {
     IScoutBundle bundle = getPage().getScoutBundle();
     if (bundle != null && !bundle.isBinary()) {
-      IResource resource = bundle.getProject().findMember(PRODUCT_FOLDER);
-      if (resource != null && resource.exists() && resource.getType() == IResource.FOLDER) {
-        // spider products
-        IFolder productFolder = (IFolder) resource;
-        P_ProductResourceVisitor productVisitor = new P_ProductResourceVisitor();
-        try {
-          productFolder.accept(productVisitor);
-        }
-        catch (CoreException e) {
-          ScoutSdkUi.logError("error during visiting folder '" + productFolder.getFullPath() + "'.", e);
-        }
-        for (IFile productFile : productVisitor.getProductFiles()) {
-          ProductLaunchPresenter p = new ProductLaunchPresenter(getFormToolkit(), parent, productFile, bundle);
+      try {
+        IResource[] productFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(false, bundle.getSymbolicName()));
+        for (IResource productFile : productFiles) {
+          ProductLaunchPresenter p = new ProductLaunchPresenter(getFormToolkit(), parent, (IFile) productFile);
           GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
           layoutData.widthHint = 200;
           p.getContainer().setLayoutData(layoutData);
         }
       }
-    }
-  }
-
-  private class P_ProductResourceVisitor implements IResourceVisitor {
-    private ArrayList<IFile> m_productFiels = new ArrayList<IFile>();
-
-    @Override
-    public boolean visit(IResource resource) throws CoreException {
-      if (resource.getType() == IResource.FILE && resource.getName().matches(".*\\.product")) {
-        m_productFiels.add((IFile) resource);
+      catch (CoreException e) {
+        ScoutSdkUi.logError("Unable to find product files that contain the bundle '" + bundle.getSymbolicName() + "'.", e);
       }
-      else if (resource.getType() == IResource.FOLDER) {
-        return true;
-      }
-      return false;
-    }
-
-    private IFile[] getProductFiles() {
-      return m_productFiels.toArray(new IFile[m_productFiels.size()]);
     }
   }
 }

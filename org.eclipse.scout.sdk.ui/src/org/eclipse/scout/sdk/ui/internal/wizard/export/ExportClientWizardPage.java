@@ -11,6 +11,7 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.IFolderSelectedListener;
 import org.eclipse.scout.sdk.ui.fields.IProductSelectionListener;
 import org.eclipse.scout.sdk.ui.fields.ProductSelectionField;
@@ -22,6 +23,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -256,7 +258,17 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
   private class P_ClientProductFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
-      return TreeUtility.isOneOf(node.getType(), IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT, TreeUtility.TYPE_PRODUCT_NODE);
+      if (TreeUtility.TYPE_PRODUCT_NODE.equals(node.getType())) {
+        IFile productFile = (IFile) node.getData();
+        try {
+          ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
+          return pfmh.ProductFile.existsDependency(IRuntimeClasses.ScoutUiSwingBundleId) || pfmh.ProductFile.existsDependency(IRuntimeClasses.ScoutUiSwtBundleId);
+        }
+        catch (CoreException e) {
+          ScoutSdkUi.logError("Unable to parse product file '" + productFile.getFullPath().toOSString() + "'.", e);
+        }
+      }
+      return true;
     }
   }
 }

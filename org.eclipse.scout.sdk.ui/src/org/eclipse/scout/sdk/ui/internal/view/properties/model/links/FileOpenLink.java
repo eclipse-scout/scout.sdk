@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Resource;
@@ -46,7 +45,7 @@ public class FileOpenLink extends AbstractLink {
   }
 
   public FileOpenLink(IFile file, int order, String editorId) {
-    this(file, Texts.get("Open") + " " + file.getName(), order, editorId);
+    this(file, file.getName(), order, editorId);
   }
 
   public FileOpenLink(IFile file, String displayName, int order, String editorId) {

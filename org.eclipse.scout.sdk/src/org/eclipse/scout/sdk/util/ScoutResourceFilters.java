@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.util;
 import java.util.HashSet;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.scout.sdk.util.resources.IResourceFilter;
 import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -40,8 +40,8 @@ public class ScoutResourceFilters extends ResourceFilters {
     }
     final IResourceFilter projectFilter = new IResourceFilter() {
       @Override
-      public boolean accept(IResource resource) {
-        return projects.contains(resource.getProject());
+      public boolean accept(IResourceProxy resource) {
+        return projects.contains(resource.requestResource().getProject());
       }
     };
     return getMultifilterAnd(getProductFileFilter(), projectFilter);

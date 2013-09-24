@@ -32,7 +32,7 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
   private final static String PROP_WAR_FILE_NAME = "warFileName";
 
   private final IScoutBundle m_scoutProject;
-  private final String m_nodeTypeFilter;
+  private final String m_symbolicNameFilter;
   private final String m_settingsProductFile;
   private final String m_settingsWarFileName;
 
@@ -40,13 +40,12 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
   protected ProductSelectionField m_productField;
   protected IStatus m_productStatus = Status.OK_STATUS;
 
-  public AbstractExportProductWizardPage(IScoutBundle scoutProject, String pageName, String title, String nodeTypeFilter,
-      String prodFileSetting, String warFileNameSetting) {
+  public AbstractExportProductWizardPage(IScoutBundle scoutProject, String pageName, String title, String symbolicNameFilter, String prodFileSetting, String warFileNameSetting) {
     super(pageName);
     m_scoutProject = scoutProject;
     m_settingsProductFile = prodFileSetting;
     m_settingsWarFileName = warFileNameSetting;
-    m_nodeTypeFilter = nodeTypeFilter;
+    m_symbolicNameFilter = symbolicNameFilter;
     setTitle(title);
     setDescription(Texts.get("ExportProductDesc"));
   }
@@ -66,7 +65,7 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
 
     ITreeNode productTreeRoot = null;
     try {
-      productTreeRoot = TreeUtility.createProductTree(getScoutProject(), new DeployableProductFileNodeFilter(m_nodeTypeFilter), false);
+      productTreeRoot = TreeUtility.createProductTree(getScoutProject(), new DeployableProductFileNodeFilter(m_symbolicNameFilter), false);
     }
     catch (CoreException e1) {
       ScoutSdkUi.logError("unable to create product file list", e1);

@@ -910,5 +910,8 @@
       <bundle
             symbolicName="com.bsiag.scout.rt.ui.swing.rayo">
       </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.docx4j.client">
+      </bundle>
    </extension>
 </plugin>
