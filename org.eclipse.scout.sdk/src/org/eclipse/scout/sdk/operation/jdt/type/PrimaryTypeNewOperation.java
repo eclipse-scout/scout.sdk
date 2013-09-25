@@ -48,12 +48,13 @@ public class PrimaryTypeNewOperation extends AbstractTypeNewOperation {
 
   public PrimaryTypeNewOperation(ITypeSourceBuilder sourceBuilder, String packageName, IJavaProject project) throws JavaModelException {
     this(sourceBuilder, new CompilationUnitNewOperation(sourceBuilder.getElementName() + ".java", packageName, project));
-
+    sourceBuilder.setParentFullyQualifiedName(packageName);
   }
 
   private PrimaryTypeNewOperation(ITypeSourceBuilder sourceBuilder, CompilationUnitNewOperation icuOp) {
     super(sourceBuilder);
     m_compilationUnitNewOp = icuOp;
+    sourceBuilder.setParentFullyQualifiedName(icuOp.getPackageFragmentName());
   }
 
   @Override

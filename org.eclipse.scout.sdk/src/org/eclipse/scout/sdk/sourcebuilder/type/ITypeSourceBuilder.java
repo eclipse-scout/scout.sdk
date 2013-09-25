@@ -38,6 +38,11 @@ public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {
   String getSuperTypeSignature();
 
   /**
+   * @return Gets the fully qualified name this type will have after it has been created.
+   */
+  String getFullyQualifiedName();
+
+  /**
    * @return
    */
   List<IFieldSourceBuilder> getFieldSourceBuilders();
@@ -156,4 +161,23 @@ public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {
    */
   boolean removeTypeSourceBuilder(ITypeSourceBuilder builder);
 
+  /**
+   * @return
+   */
+  ITypeSourceBuilder getParentTypeSourceBuilder();
+
+  /**
+   * @param parentBuilder
+   */
+  void setParentTypeSourceBuilder(ITypeSourceBuilder parentBuilder);
+
+  /**
+   * @return
+   */
+  String getParentFullyQualifiedName();
+
+  /**
+   * @param parentFullyQualifiedName
+   */
+  void setParentFullyQualifiedName(String parentFullyQualifiedName);
 }

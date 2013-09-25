@@ -27,6 +27,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.sourcebuilder.AbstractAnnotatableSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -39,6 +40,8 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implements ITypeSourceBuilder {
 
   private String m_superTypeSignature;
+  private String m_parentFullyQualifiedName;
+  private ITypeSourceBuilder m_parentSourceBuilder;
   private final List<String> m_interfaceSignatures;
   private final List<IFieldSourceBuilder> m_fieldSourceBuilders;
   private final Map<CompositeObject, IFieldSourceBuilder> m_sortedFieldSourceBuilders;
@@ -49,6 +52,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
 
   /**
    * @param elementName
+   * @param parentBuilder
    */
   public TypeSourceBuilder(String elementName) {
     super(elementName);
@@ -76,6 +80,9 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
     source.append(Flags.toString(getFlags())).append(" ");
     source.append(((getFlags() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
     source.append(getElementName());
+
+    // add our own type name to the validator so that it cannot interfere with other types (e.g. in the jre) with the same name.
+    validator.getTypeName(SignatureCache.createTypeSignature(getFullyQualifiedName()));
 
     // super type (extends)
     if (!StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
@@ -273,6 +280,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
       throw new IllegalStateException("This builder has already sorted inner type builders. A mix between sorted and unsorted inner type builders is not supported.");
     }
     m_typeSourceBuilders.add(builder);
+    builder.setParentTypeSourceBuilder(this);
   }
 
   @Override
@@ -284,6 +292,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
       throw new IllegalStateException("This builder has already unsorted inner type builders. A mix between sorted and unsorted inner type builders is not supported.");
     }
     m_sortedTypeSourceBuilders.put(sortKey, builder);
+    builder.setParentTypeSourceBuilder(this);
   }
 
   @Override
@@ -308,5 +317,44 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
     typeBuilders.addAll(m_typeSourceBuilders);
     typeBuilders.addAll(m_sortedTypeSourceBuilders.values());
     return Collections.unmodifiableList(typeBuilders);
+  }
+
+  @Override
+  public String getFullyQualifiedName() {
+    ITypeSourceBuilder parentSourceBuilder = getParentTypeSourceBuilder();
+    StringBuilder sb = null;
+    if (parentSourceBuilder != null) {
+      sb = new StringBuilder(parentSourceBuilder.getFullyQualifiedName());
+    }
+    else {
+      String pfqn = getParentFullyQualifiedName();
+      if (pfqn != null) {
+        sb = new StringBuilder(pfqn);
+      }
+    }
+    if (sb == null) {
+      return null;
+    }
+    return sb.append('.').append(getElementName()).toString();
+  }
+
+  @Override
+  public ITypeSourceBuilder getParentTypeSourceBuilder() {
+    return m_parentSourceBuilder;
+  }
+
+  @Override
+  public void setParentTypeSourceBuilder(ITypeSourceBuilder parentBuilder) {
+    m_parentSourceBuilder = parentBuilder;
+  }
+
+  @Override
+  public String getParentFullyQualifiedName() {
+    return m_parentFullyQualifiedName;
+  }
+
+  @Override
+  public void setParentFullyQualifiedName(String parentFullyQualifiedName) {
+    m_parentFullyQualifiedName = parentFullyQualifiedName;
   }
 }

@@ -1,21 +1,25 @@
 package formdata.client.ui.forms;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
+import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
 import formdata.client.ui.forms.SimpleForm.MainBox.CancelButton;
+import formdata.client.ui.forms.SimpleForm.MainBox.DateField;
 import formdata.client.ui.forms.SimpleForm.MainBox.OkButton;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleComposerField;
+import formdata.client.ui.forms.SimpleForm.MainBox.SampleDateField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleDoubleField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleSmartField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleStringField;
@@ -44,6 +48,10 @@ public class SimpleForm extends AbstractForm {
     this.simpleNr = simpleNr;
   }
 
+  public DateField getDateField() {
+    return getFieldByClass(DateField.class);
+  }
+
   public MainBox getMainBox() {
     return getFieldByClass(MainBox.class);
   }
@@ -54,6 +62,10 @@ public class SimpleForm extends AbstractForm {
 
   public SampleComposerField getSampleComposerField() {
     return getFieldByClass(SampleComposerField.class);
+  }
+
+  public SampleDateField getSampleDateField() {
+    return getFieldByClass(SampleDateField.class);
   }
 
   public SampleDoubleField getSampleDoubleField() {
@@ -87,11 +99,25 @@ public class SimpleForm extends AbstractForm {
     public class SampleComposerField extends AbstractComposerField {
     }
 
+    /**
+     * Field that uses java.util.Date (simple name 'Date').
+     */
     @Order(50.0)
+    public class SampleDateField extends AbstractDateField {
+    }
+
+    /**
+     * Field to ensure the simple name 'Date' is already used in the form data.
+     */
+    @Order(60.0)
+    public class DateField extends AbstractIntegerField {
+    }
+
+    @Order(70.0)
     public class OkButton extends AbstractOkButton {
     }
 
-    @Order(60.0)
+    @Order(80.0)
     public class CancelButton extends AbstractCancelButton {
     }
   }

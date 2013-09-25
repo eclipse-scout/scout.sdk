@@ -102,6 +102,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
       throw new IllegalStateException("This builder has already sorted inner type builders. A mix between sorted and unsorted inner type builders is not supported.");
     }
     m_typeSourceBuilders.add(builder);
+    builder.setParentFullyQualifiedName(getPackageFragmentName());
   }
 
   @Override
@@ -113,6 +114,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
       throw new IllegalStateException("This builder has already unsorted inner type builders. A mix between sorted and unsorted inner type builders is not supported.");
     }
     m_sortedTypeSourceBuilders.put(sortKey, builder);
+    builder.setParentFullyQualifiedName(getPackageFragmentName());
   }
 
   @Override

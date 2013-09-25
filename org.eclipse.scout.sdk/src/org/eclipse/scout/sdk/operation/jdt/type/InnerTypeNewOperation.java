@@ -40,6 +40,7 @@ public class InnerTypeNewOperation extends AbstractTypeNewOperation {
 
   public InnerTypeNewOperation(ITypeSourceBuilder sourceBuilder, IType declaringType) {
     super(sourceBuilder);
+    sourceBuilder.setParentFullyQualifiedName(declaringType.getFullyQualifiedName());
     m_declaringType = declaringType;
   }
 
