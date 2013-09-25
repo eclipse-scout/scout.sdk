@@ -41,7 +41,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link ExportServerWarOperation}</h3> ...
- *
+ * 
  * @author Andreas Hoegger
  * @since 1.0.8 04.02.2011
  */
@@ -86,12 +86,13 @@ public class ExportServerWarOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IStatus result = null;
+    final String SERVLET_BRIDGE_JAR_NAME = "org.eclipse.equinox.servletbridge_1.3.0.v20130718-2032.jar";
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("warExportBuildDir");
       buildClientProduct(monitor, workingCopyManager);
       result = buildServerProduct(monitor);
       if (result.isOK()) {
-        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/org.eclipse.equinox.servletbridge_1.2.300.v20130508-1243.jar"), WEB_INF + "/lib/org.eclipse.equinox.servletbridge_1.2.300.v20130508-1243.jar");
+        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/" + SERVLET_BRIDGE_JAR_NAME), WEB_INF + "/lib/" + SERVLET_BRIDGE_JAR_NAME);
         installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/web.xml"), WEB_INF + "/web.xml");
         installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/eclipse/launch.ini"), WEB_INF + "/eclipse/launch.ini");
         m_resultingWarFile = packWar();
@@ -117,7 +118,7 @@ public class ExportServerWarOperation implements IOperation {
         throw (CoreException) e;
       }
       else {
-        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not create 'org.eclipse.equinox.servletbridge_1.2.300.v20130508-1243.jar' in temp folder", e));
+        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not create '" + SERVLET_BRIDGE_JAR_NAME + "' in temp folder", e));
       }
     }
   }
