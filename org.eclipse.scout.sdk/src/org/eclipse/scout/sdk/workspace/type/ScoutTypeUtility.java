@@ -57,7 +57,6 @@ import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.Regex;
-import org.eclipse.scout.sdk.util.ScoutMethodUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
@@ -1118,7 +1117,7 @@ public class ScoutTypeUtility extends TypeUtility {
             implementedMethod = annotatedMethod;
           }
           //found most specific override of new rule
-          ruleGeneratedSourceCode = ScoutMethodUtility.getMethodReturnValue(implementedMethod);
+          ruleGeneratedSourceCode = ScoutUtility.getMethodReturnValue(implementedMethod);
         }
         else {
           implementedMethod = annotatedMethod;

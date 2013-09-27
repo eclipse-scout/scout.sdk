@@ -25,16 +25,16 @@ public class SimpleFormData extends AbstractFormData {
     return getFieldByClass(Date.class);
   }
 
+  public Double getDouble() {
+    return getFieldByClass(Double.class);
+  }
+
   public SampleComposer getSampleComposer() {
     return getFieldByClass(SampleComposer.class);
   }
 
   public SampleDate getSampleDate() {
     return getFieldByClass(SampleDate.class);
-  }
-
-  public SampleDouble getSampleDouble() {
-    return getFieldByClass(SampleDouble.class);
   }
 
   public SampleSmart getSampleSmart() {
@@ -71,6 +71,24 @@ public class SimpleFormData extends AbstractFormData {
     }
   }
 
+  public static class Double extends AbstractValueFieldData<java.lang.Double> {
+
+    private static final long serialVersionUID = 1L;
+
+    public Double() {
+    }
+
+    /**
+     * list of derived validation rules.
+     */
+    @Override
+    protected void initValidationRules(Map<String, Object> ruleMap) {
+      super.initValidationRules(ruleMap);
+      ruleMap.put(ValidationRule.MAX_VALUE, -Double.MAX_VALUE);
+      ruleMap.put(ValidationRule.MIN_VALUE, 0.0);
+    }
+  }
+
   public static class SampleComposer extends AbstractComposerData {
 
     private static final long serialVersionUID = 1L;
@@ -84,14 +102,6 @@ public class SimpleFormData extends AbstractFormData {
     private static final long serialVersionUID = 1L;
 
     public SampleDate() {
-    }
-  }
-
-  public static class SampleDouble extends AbstractValueFieldData<Double> {
-
-    private static final long serialVersionUID = 1L;
-
-    public SampleDouble() {
     }
   }
 

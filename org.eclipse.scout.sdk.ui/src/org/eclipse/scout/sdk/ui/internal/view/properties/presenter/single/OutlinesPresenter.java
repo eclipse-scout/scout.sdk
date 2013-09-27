@@ -114,37 +114,6 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
     catch (Exception e) {
       ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-//    if (Arrays.equals(proposals, getSourceProps())) {
-//      return;
-//    }
-//
-//    ConfigPropertyMethodUpdateOperation op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName()) {
-//      @Override
-//      protected void createMethodBody(IMethod methodToOverride, StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator) throws JavaModelException {
-//        sourceBuilder.append("  return ");
-//        sourceBuilder.append("new Class[]{");
-//        if (proposals.length > 0) {
-//          for (int i = 0; i < proposals.length; i++) {
-//            sourceBuilder.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(((IType) proposals[i]).getFullyQualifiedName()), validator)).append(".class");
-//            if (i < (proposals.length - 1)) {
-//              sourceBuilder.append(",").append(lineDelimiter).append("  ");
-//            }
-//          }
-//        }
-//        sourceBuilder.append(lineDelimiter).append("};");
-//      }
-//
-//      @Override
-//      public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-//        super.run(monitor, workingCopyManager);
-//        AnnotationNewOperation createSuppressWarning = new AnnotationNewOperation(getUpdatedMethod(), SignatureCache.createTypeSignature(SuppressWarnings.class.getName()));
-//        createSuppressWarning.addParameter("\"unchecked\"");
-//        createSuppressWarning.validate();
-//        createSuppressWarning.run(monitor, workingCopyManager);
-//      }
-//    };
-//    op.setFormatSource(true);
-//    new OperationJob(op).schedule();
   }
 
   private class P_OutlineDialogPropertyListener implements PropertyChangeListener {
@@ -163,5 +132,4 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
       }
     }
   }
-
 }

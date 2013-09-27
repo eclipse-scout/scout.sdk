@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
-import org.eclipse.scout.sdk.util.ScoutMethodUtility;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -111,7 +111,7 @@ public final class SearchFormFromTablePageHelper {
         IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), tablePageHierarchy));
         for (IType column : columns) {
           ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable");
-          String retVal = ScoutMethodUtility.getMethodReturnValue(configurationMethod.peekMethod());
+          String retVal = ScoutUtility.getMethodReturnValue(configurationMethod.peekMethod());
           if ("true".equals(retVal)) {
             addSearchField(column, tablePageHierarchy, fieldOrder, fieldBoxFqn, fieldBoxBuilder, searchFormBuilder, searchFormProject, nlsProvider);
             fieldOrder += 10;
@@ -155,7 +155,7 @@ public final class SearchFormFromTablePageHelper {
     INlsEntry nlsEntry = null;
     IMethod nlsMethod = TypeUtility.getMethod(column, "getConfiguredHeaderText");
     if (TypeUtility.exists(nlsMethod)) {
-      nlsEntry = ScoutMethodUtility.getReturnNlsEntry(nlsMethod);
+      nlsEntry = ScoutUtility.getReturnNlsEntry(nlsMethod);
     }
     String fieldNamePlain = column.getElementName().replace(SdkProperties.SUFFIX_COLUMN, "");
     if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IBigDecimalColumn), column)) {

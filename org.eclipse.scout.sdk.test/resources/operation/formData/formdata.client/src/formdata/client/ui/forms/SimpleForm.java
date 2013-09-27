@@ -17,10 +17,10 @@ import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringFiel
 
 import formdata.client.ui.forms.SimpleForm.MainBox.CancelButton;
 import formdata.client.ui.forms.SimpleForm.MainBox.DateField;
+import formdata.client.ui.forms.SimpleForm.MainBox.DoubleField;
 import formdata.client.ui.forms.SimpleForm.MainBox.OkButton;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleComposerField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleDateField;
-import formdata.client.ui.forms.SimpleForm.MainBox.SampleDoubleField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleSmartField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleStringField;
 import formdata.shared.services.process.SimpleFormData;
@@ -68,8 +68,8 @@ public class SimpleForm extends AbstractForm {
     return getFieldByClass(SampleDateField.class);
   }
 
-  public SampleDoubleField getSampleDoubleField() {
-    return getFieldByClass(SampleDoubleField.class);
+  public DoubleField getDoubleField() {
+    return getFieldByClass(DoubleField.class);
   }
 
   public SampleSmartField getSampleSmartField() {
@@ -88,7 +88,17 @@ public class SimpleForm extends AbstractForm {
     }
 
     @Order(20.0)
-    public class SampleDoubleField extends AbstractDoubleField {
+    public class DoubleField extends AbstractDoubleField {
+
+      @Override
+      protected Double getConfiguredMaximumValue() {
+        return -Double.MAX_VALUE;
+      }
+
+      @Override
+      protected Double getConfiguredMinimumValue() {
+        return 0.0;
+      }
     }
 
     @Order(30.0)

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.form.SearchFormNewWizard;
-import org.eclipse.scout.sdk.util.ScoutMethodUtility;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -56,7 +56,7 @@ public class SearchFormNewAction extends AbstractWizardAction {
       IMethod titleMethod = TypeUtility.getMethod(m_type, "getConfiguredTitle");
       if (TypeUtility.exists(titleMethod)) {
         try {
-          wizard.setNlsEntry(ScoutMethodUtility.getReturnNlsEntry(titleMethod));
+          wizard.setNlsEntry(ScoutUtility.getReturnNlsEntry(titleMethod));
         }
         catch (CoreException e) {
           ScoutSdkUi.logWarning("could not parse nls entry for method '" + titleMethod.getElementName() + "'.", e);

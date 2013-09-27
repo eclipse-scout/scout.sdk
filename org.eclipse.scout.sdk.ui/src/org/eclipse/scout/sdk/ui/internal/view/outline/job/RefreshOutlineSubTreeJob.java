@@ -55,34 +55,34 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
     }
     //
     Display display = ScoutSdkUi.getDisplay();
-    final TreeViewer m_treeViewer = m_view.getTreeViewer();
-    final Control m_treeControl = m_treeViewer.getControl();
+    final TreeViewer treeViewer = m_view.getTreeViewer();
+    final Control treeControl = treeViewer.getControl();
     final Cursor waitCursor = new Cursor(display, SWT.CURSOR_WAIT);
     try {
       m_backupTree = new P_BackupNode[dirtyStructureRoots.length];
       if (dirtyStructureRoots.length > 0) {
-        if (m_treeControl == null || m_treeControl.isDisposed()) {
+        if (treeControl == null || treeControl.isDisposed()) {
           return;
         }
         // gui thread
         display.syncExec(new Runnable() {
           @Override
           public void run() {
-            if (m_treeControl == null || m_treeControl.isDisposed()) {
+            if (treeControl == null || treeControl.isDisposed()) {
               return;
             }
-            m_treeControl.setCursor(waitCursor);
+            treeControl.setCursor(waitCursor);
             m_view.getViewContentProvider().setAutoLoadChildren(false);
-            m_backupedSelection = (ITreeSelection) m_treeViewer.getSelection();
+            m_backupedSelection = (ITreeSelection) treeViewer.getSelection();
             for (int i = 0; i < m_backupTree.length; i++) {
               m_backupTree[i] = new P_BackupNode(null, dirtyStructureRoots[i]);
             }
             try {
-              m_treeViewer.setData(SELECTION_PREVENTER, this);
-              m_treeViewer.setSelection(null, false); // remove the selection. we will restore it later. prevents 'widget disposed' errors during refresh later on.
+              treeViewer.setData(SELECTION_PREVENTER, this);
+              treeViewer.setSelection(null, false); // remove the selection. we will restore it later. prevents 'widget disposed' errors during refresh later on.
             }
             finally {
-              m_treeViewer.setData(SELECTION_PREVENTER, null);
+              treeViewer.setData(SELECTION_PREVENTER, null);
             }
           }
         });
@@ -96,34 +96,34 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
     }
     finally {
       // gui thread
-      if (m_treeControl == null || m_treeControl.isDisposed()) {
+      if (treeControl == null || treeControl.isDisposed()) {
         return;
       }
       display.syncExec(new Runnable() {
         @Override
         public void run() {
-          if (m_treeControl == null || m_treeControl.isDisposed()) {
+          if (treeControl == null || treeControl.isDisposed()) {
             return;
           }
           if (dirtyStructureRoots.length > 0) {
             try {
-              m_treeViewer.setData(SELECTION_PREVENTER, this);
+              treeViewer.setData(SELECTION_PREVENTER, this);
 
               for (IPage p : dirtyStructureRoots) {
-                m_treeViewer.refresh(p, true);
+                treeViewer.refresh(p, true);
               }
               for (int i = 0; i < m_backupTree.length; i++) {
                 m_backupTree[i].restoreGui(dirtyStructureRoots[i]);
               }
             }
             finally {
-              m_treeViewer.setData(SELECTION_PREVENTER, null);
+              treeViewer.setData(SELECTION_PREVENTER, null);
             }
             // restore selection
             restoreSelectionInUiThread();
           }
           m_view.getViewContentProvider().setAutoLoadChildren(true);
-          m_treeControl.setCursor(null);
+          treeControl.setCursor(null);
         }
       });
       waitCursor.dispose();
@@ -151,8 +151,10 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
       }
       newPaths.add(new TreePath(newSegments.toArray()));
     }
-    if (!m_view.getTreeViewer().getTree().isDisposed()) {
-      m_view.getTreeViewer().setSelection(new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()])));
+
+    TreeViewer treeViewer = m_view.getTreeViewer();
+    if (!treeViewer.getControl().isDisposed() && !treeViewer.getTree().isDisposed()) {
+      treeViewer.setSelection(new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()])));
     }
   }
 

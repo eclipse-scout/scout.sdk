@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -29,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
@@ -37,6 +39,8 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
@@ -51,6 +55,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>ScoutUtility</h3>Contains scout specific utility methods.
@@ -742,5 +747,46 @@ public final class ScoutUtility {
       return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("ProjectNameShouldContainOnlyLowerCaseCharacters"));
     }
     return Status.OK_STATUS;
+  }
+
+  public static String getMethodReturnValue(IMethod method) {
+    try {
+      String src = method.getSource();
+      if (src != null) {
+        Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(src);
+        if (m.find()) {
+          return m.group(1).trim();
+        }
+        else {
+          ScoutSdk.logInfo("Could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+        }
+      }
+      else {
+        ScoutSdk.logWarning("Could not find source for method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logError("Could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+    }
+    return null;
+  }
+
+  public static INlsEntry getReturnNlsEntry(IMethod method) throws CoreException {
+    String value = getMethodReturnValue(method);
+    return getReturnNlsEntry(value, method);
+  }
+
+  private static INlsEntry getReturnNlsEntry(String value, IMethod method) throws CoreException {
+    String key = PropertyMethodSourceUtility.parseReturnParameterNlsKey(value);
+    if (!StringUtility.isNullOrEmpty(key)) {
+      INlsProject nlsProject = ScoutTypeUtility.findNlsProject(method);
+      if (nlsProject == null) {
+        ScoutSdk.logWarning("could not find nls project for method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'");
+      }
+      else {
+        return nlsProject.getEntry(key);
+      }
+    }
+    return null;
   }
 }
