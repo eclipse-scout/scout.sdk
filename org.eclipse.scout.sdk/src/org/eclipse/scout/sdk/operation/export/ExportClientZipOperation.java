@@ -25,6 +25,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
 import org.eclipse.pde.internal.core.exports.ProductExportOperation;
@@ -77,6 +78,9 @@ public class ExportClientZipOperation implements IOperation {
       m_tempBuildDir = IOUtility.createTempDirectory("clientZipExportBuildDir");
       IStatus result = buildClientProduct(monitor);
       if (result.isOK()) {
+        if (monitor.isCanceled()) {
+          return;
+        }
         try {
           IOUtility.deleteDirectory(m_tempBuildDir);
         }
@@ -119,6 +123,12 @@ public class ExportClientZipOperation implements IOperation {
     if (!result.isOK()) {
       return result;
     }
+    if (monitor.isCanceled()) {
+      return Status.CANCEL_STATUS;
+    }
+
+    File baseDir = new File(m_tempBuildDir.getAbsolutePath(), "client/buildDir/" + getZipName());
+    ExportServerWarOperation.overwriteConfigIniIfNecessary(pfmh, new Path(baseDir.getAbsolutePath()).append("configuration"));
 
     // create zip file
     m_clientZipFile = new File(getTargetDirectory(), getZipName());
@@ -126,11 +136,17 @@ public class ExportClientZipOperation implements IOperation {
       m_clientZipFile.getParentFile().mkdirs();
     }
 
-    ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(m_clientZipFile));
-    File baseDir = new File(m_tempBuildDir.getAbsolutePath(), "client/buildDir/" + getZipName());
-    ResourceUtility.addFolderToZip(baseDir, zipOut);
-    zipOut.flush();
-    zipOut.close();
+    ZipOutputStream zipOut = null;
+    try {
+      zipOut = new ZipOutputStream(new FileOutputStream(m_clientZipFile));
+      ResourceUtility.addFolderToZip(baseDir, zipOut);
+      zipOut.flush();
+    }
+    finally {
+      if (zipOut != null) {
+        zipOut.close();
+      }
+    }
 
     return Status.OK_STATUS;
   }

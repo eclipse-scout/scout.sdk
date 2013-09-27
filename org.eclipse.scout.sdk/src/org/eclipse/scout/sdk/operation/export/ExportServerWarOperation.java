@@ -10,10 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.export;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.zip.ZipOutputStream;
 
@@ -25,7 +27,6 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
 import org.eclipse.pde.internal.core.exports.ProductExportOperation;
@@ -49,6 +50,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class ExportServerWarOperation implements IOperation {
   public static final String BUNDLE_NAME_SERVLETBRIDGE = "org.eclipse.equinox.servletbridge";
   public static final String WEB_INF = "WEB-INF";
+  private static final String SUB_DIR = "eclipse";
 
   private IFile m_serverProduct;
   private IFile m_clientProduct;
@@ -90,6 +92,9 @@ public class ExportServerWarOperation implements IOperation {
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("warExportBuildDir");
       buildClientProduct(monitor, workingCopyManager);
+      if (monitor.isCanceled()) {
+        return;
+      }
       result = buildServerProduct(monitor);
       if (result.isOK()) {
         installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/" + SERVLET_BRIDGE_JAR_NAME), WEB_INF + "/lib/" + SERVLET_BRIDGE_JAR_NAME);
@@ -135,18 +140,22 @@ public class ExportServerWarOperation implements IOperation {
     getHtmlFolder().refreshLocal(IResource.DEPTH_INFINITE, monitor);
     m_clientZipFile = getHtmlFolder().getFile(exportClient.getZipName());
 
+    if (monitor.isCanceled()) {
+      return;
+    }
     IOUtility.deleteDirectory(new File(m_tempBuildDir.getAbsolutePath() + "/client"));
   }
 
   private IStatus buildServerProduct(IProgressMonitor monitor) throws Exception {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(getServerProduct());
+
     FeatureExportInfo featureInfo = new FeatureExportInfo();
     featureInfo.toDirectory = true;
     featureInfo.exportSource = false;
     featureInfo.exportSourceBundle = false;
     featureInfo.allowBinaryCycles = true;
     featureInfo.exportMetadata = false;
-    featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/" + WEB_INF + "/eclipse";
+    featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/" + WEB_INF + "/" + SUB_DIR;
     featureInfo.zipFileName = "export.zip";
     featureInfo.items = pfmh.ProductFile.getPluginModels();
 
@@ -158,12 +167,57 @@ public class ExportServerWarOperation implements IOperation {
     if (!result.isOK()) {
       return result;
     }
+    if (monitor.isCanceled()) {
+      return Status.CANCEL_STATUS;
+    }
+
+    overwriteConfigIniIfNecessary(pfmh, ResourceUtility.toPath(m_tempBuildDir.getAbsolutePath(), WEB_INF, SUB_DIR, "configuration"));
+    if (monitor.isCanceled()) {
+      return Status.CANCEL_STATUS;
+    }
+
     // clean up
-    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "config.ini");
-    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "eclipse.exe");
-    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, "eclipse", "eclipse.ini");
+    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, SUB_DIR, "config.ini");
+    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, SUB_DIR, "eclipse.exe");
+    deleteFile(m_tempBuildDir.getAbsolutePath(), WEB_INF, SUB_DIR, "eclipse.ini");
 
     return Status.OK_STATUS;
+  }
+
+  /**
+   * Workaround for PDE bug 284732
+   * 
+   * @param pfmh
+   * @param targetDirectory
+   * @throws CoreException
+   * @see <a href="https://bugs.eclipse.org/bugs/show_bug.cgi?id=284732">Bug 284732</a>
+   */
+  public static void overwriteConfigIniIfNecessary(ProductFileModelHelper pfmh, IPath targetDirectory) throws CoreException {
+    IFile configIni = pfmh.ConfigurationFile.getFile();
+    boolean isCustomConfigIniExisting = ResourceUtility.exists(configIni);
+    if (isCustomConfigIniExisting) {
+      String srcConfigIniPath = configIni.getLocation().toOSString();
+      String dstFolder = targetDirectory.toOSString();
+      String dstConfigIniPath = new File(dstFolder, configIni.getName()).getAbsolutePath();
+      OutputStream out = null;
+      try {
+        out = new BufferedOutputStream(new FileOutputStream(dstConfigIniPath));
+        ResourceUtility.copy(new File(srcConfigIniPath), out);
+      }
+      catch (IOException e) {
+        ScoutSdk.logError("Unable to copy config.ini '" + srcConfigIniPath + "' to target '" + dstConfigIniPath + "'.", e);
+      }
+      finally {
+        if (out != null) {
+          try {
+            out.close();
+          }
+          catch (IOException e) {
+            // nop
+          }
+        }
+      }
+    }
   }
 
   private File packWar() throws FileNotFoundException, IOException {
@@ -190,17 +244,9 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   private boolean deleteFile(String... segments) {
-    if (segments != null) {
-      IPath path = null;
-      if (segments.length > 0) {
-        path = new Path(segments[0]);
-        for (int i = 1; i < segments.length; i++) {
-          path = path.append(new Path(segments[i]));
-        }
-      }
-      if (path != null) {
-        return IOUtility.deleteFile(path.toOSString());
-      }
+    IPath path = ResourceUtility.toPath(segments);
+    if (path != null) {
+      return IOUtility.deleteFile(path.toOSString());
     }
     return false;
   }

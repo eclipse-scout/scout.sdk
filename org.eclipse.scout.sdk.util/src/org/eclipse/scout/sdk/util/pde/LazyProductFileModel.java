@@ -15,8 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.pde.internal.core.iproduct.IConfigurationFileInfo;
@@ -25,6 +25,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 @SuppressWarnings("restriction")
 public final class LazyProductFileModel {
@@ -64,18 +65,19 @@ public final class LazyProductFileModel {
   /**
    * gets the config.ini file specified in the product.
    * 
-   * @return the config file or null if no file is specified.
+   * @return the config.ini file or null if no file is specified for the running OS ({@link Platform#getOS()}).
    * @throws CoreException
    */
   public synchronized IFile getConfigIniFile() throws CoreException {
     if (m_configIniFile == null) {
       String osPath = getConfigurationFileInfo().getPath(Platform.getOS());
       if (osPath != null) {
-        IPath path = new Path(osPath).removeFirstSegments(1);
-        m_configIniFile = m_productFile.getProject().getFile(path);
-        if (m_configIniFile == null || !m_configIniFile.exists()) {
-          m_configIniFile = null;
-          throw new CoreException(new ScoutStatus("could not find product configuration file: " + path.toOSString()));
+        IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(osPath));
+        if (ResourceUtility.exists(configIniFile)) {
+          m_configIniFile = configIniFile;
+        }
+        else {
+          throw new CoreException(new ScoutStatus("could not find product configuration file: " + osPath));
         }
       }
     }

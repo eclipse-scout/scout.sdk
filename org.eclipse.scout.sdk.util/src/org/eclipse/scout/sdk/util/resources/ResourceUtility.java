@@ -37,7 +37,9 @@ import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IOpenable;
@@ -108,6 +110,25 @@ public final class ResourceUtility {
 
   public static boolean exists(IResource resource) {
     return resource != null && resource.exists();
+  }
+
+  /**
+   * Builds a Path containing the given elements.
+   * 
+   * @param segments
+   * @return
+   */
+  public static IPath toPath(String... segments) {
+    IPath path = null;
+    if (segments != null) {
+      if (segments.length > 0) {
+        path = new Path(segments[0]);
+        for (int i = 1; i < segments.length; i++) {
+          path = path.append(new Path(segments[i]));
+        }
+      }
+    }
+    return path;
   }
 
   /**
