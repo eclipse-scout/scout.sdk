@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -110,10 +111,7 @@ public class BindingFilePresenter extends FilePresenter {
     List<String> bindingFiles = properties.get(JaxWsConstants.OPTION_BINDING_FILE);
 
     if (bindingFiles != null && bindingFiles.size() > 0) {
-      while (bindingFiles.remove(bindingFileRaw)) {
-        // nop -> in case multiple entries have null as their value <property name="b" />
-      }
-
+      bindingFiles.removeAll(Collections.singletonList(bindingFileRaw));
       if (bindingFiles.size() == 0) {
         properties.remove(JaxWsConstants.OPTION_BINDING_FILE);
       }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2000, 2009 IBM Corporation and others.
+ * Copyright (c) 2000, 2011 IBM Corporation and others.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -7,18 +7,21 @@
  *
  * Contributors:
  *     IBM Corporation - initial API and implementation
- *     BSI Business Systems Integration AG - adapted to Scout SDK
  *******************************************************************************/
 package org.eclipse.scout.sdk.ui.util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.ui.forms.widgets.TableWrapLayout;
 
 /**
- * <h3>{@link TableWrapDataEx}</h3> ...
+ * Layout data used in conjunction with <code>TableWrapLayout</code>.
+ * Children in a composite that uses this layout should call <samp>setLayoutData
+ * </samp> and pass an instance of this class to control physical placement in
+ * the parent.
  * 
- * @author Andreas Hoegger
- * @since 1.0.8 25.11.2010
+ * @see TableWrapLayout
+ * @since 3.0
  */
 public final class TableWrapDataEx {
   /**
@@ -174,11 +177,11 @@ public final class TableWrapDataEx {
    */
   public TableWrapDataEx(int align, int valign, int rowspan, int colspan) {
     if (align != LEFT && align != CENTER && align != RIGHT && align != FILL
-        && align != FILL_GRAB) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, "align"); //$NON-NLS-1$
+        && align != FILL_GRAB) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"align\""); //$NON-NLS-1$
     if (valign != TOP && valign != MIDDLE && valign != BOTTOM
-        && valign != FILL && valign != FILL_GRAB) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, "valign"); //$NON-NLS-1$
-    if (rowspan < 1) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, "rowspan"); //$NON-NLS-1$
-    if (colspan < 1) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, "colspan"); //$NON-NLS-1$
+        && valign != FILL && valign != FILL_GRAB) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"valign\""); //$NON-NLS-1$
+    if (rowspan < 1) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"rowspan\""); //$NON-NLS-1$
+    if (colspan < 1) SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"colspan\""); //$NON-NLS-1$
     if (align == FILL_GRAB) {
       this.align = FILL;
       grabHorizontal = true;

@@ -2,6 +2,7 @@ package org.eclipse.scout.sdk.ui.internal.extensions;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,7 +19,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 public class ContextMenuContributorExtensionPoint {
 
   private final static Object contextMenuExtensionsCacheLock = new Object();
-  private static IScoutHandler[] contextMenuExtensions;
+  private static List<IScoutHandler> contextMenuExtensions;
 
   private final static Object contextMenuContributorExtensionsCacheLock = new Object();
   private static MenuContributionInfo[] contextMenuContributorExtensions;
@@ -115,11 +116,11 @@ public class ContextMenuContributorExtensionPoint {
               return true;
             }
           });
-          contextMenuExtensions = list.toArray(new IScoutHandler[list.size()]);
+          contextMenuExtensions = list;
         }
       }
     }
-    return contextMenuExtensions;
+    return contextMenuExtensions.toArray(new IScoutHandler[contextMenuExtensions.size()]);
   }
 
   public static Map<IScoutHandler.Category, ArrayList<IScoutHandler>> getAllRegisteredContextMenusByCategory() {

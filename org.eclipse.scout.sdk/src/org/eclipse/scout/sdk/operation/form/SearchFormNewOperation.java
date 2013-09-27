@@ -84,7 +84,6 @@ public class SearchFormNewOperation extends FormNewOperation {
       newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getJavaProject()));
       addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(newHandlerBuilder), newHandlerBuilder);
       handlerFqnHolder.setValue(getPackageName() + "." + getElementName() + "." + newHandlerBuilder.getElementName());
-
     }
     // start method
     IMethodSourceBuilder startHandlerMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), "startSearch");
@@ -123,7 +122,6 @@ public class SearchFormNewOperation extends FormNewOperation {
       mainBoxBuilder.setFlags(Flags.AccPublic);
       mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, getJavaProject()));
       formBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, 10.0), mainBoxBuilder);
-
     }
   }
 

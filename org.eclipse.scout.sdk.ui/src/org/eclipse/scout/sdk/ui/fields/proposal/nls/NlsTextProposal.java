@@ -31,7 +31,12 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider.Normaliz
  */
 public class NlsTextProposal implements Comparable<NlsTextProposal> {
 
-  public final static NlsTextProposal NEW_NLS_TEXT_PROPOSAL = new NlsTextProposal(null, null, true);
+  public final static NlsTextProposal NEW_NLS_TEXT_PROPOSAL = new NlsTextProposal(null, null, true) {
+    @Override
+    public String toString() {
+      return "NEW_NLS_TEXT_PROPOSAL";
+    }
+  };
 
   public final static int MATCH_DEV_LANG_TRANSLATION = 1;
   public final static int MATCH_KEY = 2;
@@ -192,6 +197,22 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
     else {
       return StringUtility.lowercase(getMatchedForeignLangTranslation());
     }
+  }
+
+  @Override
+  public String toString() {
+    final String NULL_STRING = "<NULL>";
+    if (m_entry == null) {
+      return NULL_STRING;
+    }
+    String txt = m_entry.getTranslation(m_entry.getProject().getDevelopmentLanguage());
+    if (txt == null) {
+      txt = NULL_STRING;
+    }
+    else {
+      txt = txt.replace('\r', '\n').replaceAll("\n", "");
+    }
+    return new StringBuilder().append(m_entry.getKey()).append('=').append(txt).toString();
   }
 
   @Override

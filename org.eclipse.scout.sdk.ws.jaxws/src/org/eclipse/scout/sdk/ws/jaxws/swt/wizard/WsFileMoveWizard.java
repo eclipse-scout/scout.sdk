@@ -93,7 +93,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
       elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_SUNJAXWS_REGISTRATION, String.format("Change WSDL file registration in sun-jaxws.xml to '%s'", m_destination.getProjectRelativePath().append(wsdlFile.getName())), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), true));
     }
     else {
-      elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_BUILDJAXWS_REGISTRATION, String.format("Change WSDL file registration in build-jaxws.xml to '%'", m_destination.getProjectRelativePath().append(wsdlFile.getName())), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), true));
+      elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_BUILDJAXWS_REGISTRATION, String.format("Change WSDL file registration in build-jaxws.xml to '%s'", m_destination.getProjectRelativePath().append(wsdlFile.getName())), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), true));
     }
     elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_FILE, Texts.get("MoveXToY", "WSDL file", m_destination.getProjectRelativePath().append(wsdlFile.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, true));
 

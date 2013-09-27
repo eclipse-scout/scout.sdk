@@ -90,7 +90,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, project));
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, formOp);
     synchronized (formCountHolder) {
-      if (formCountHolder.getValue() == -1) {
+      while (formCountHolder.getValue() == -1) {
         formCountHolder.wait();
       }
     }
@@ -131,7 +131,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
     executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, serviceOp);
     synchronized (serviceCountHolder) {
-      if (serviceCountHolder.getValue() == -1) {
+      while (serviceCountHolder.getValue() == -1) {
         serviceCountHolder.wait();
       }
     }

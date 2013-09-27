@@ -155,11 +155,10 @@ public final class PropertyMethodSourceUtility {
     if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
-    if (parameter.equals("Double.MAX_VALUE")) {
+    if ("Double.MAX_VALUE".equals(parameter)) {
       return Double.MAX_VALUE;
     }
-    // handle MIN_VAL / MAX_VAL
-    if (parameter.equals("-Double.MAX_VALUE")) {
+    if ("-Double.MAX_VALUE".equals(parameter)) {
       return -Double.MAX_VALUE;
     }
     Matcher infMatcher = REGEX_NUMBER_INFINITY.matcher(parameter);
@@ -388,7 +387,6 @@ public final class PropertyMethodSourceUtility {
         typeName = typeName.substring(0, typeName.length() - 1);
         IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
         if (referencedType == null) {
-          ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
           throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
         }
         String fieldValue = ScoutSourceUtility.findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);

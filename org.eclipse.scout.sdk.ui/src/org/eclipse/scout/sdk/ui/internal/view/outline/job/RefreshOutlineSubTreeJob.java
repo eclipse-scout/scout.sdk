@@ -151,7 +151,9 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
       }
       newPaths.add(new TreePath(newSegments.toArray()));
     }
-    m_view.getTreeViewer().setSelection(new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()])));
+    if (!m_view.getTreeViewer().getTree().isDisposed()) {
+      m_view.getTreeViewer().setSelection(new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()])));
+    }
   }
 
   private class P_BackupNode {

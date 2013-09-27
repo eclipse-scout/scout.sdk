@@ -10,13 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.simple.ui.dialog.language;
 
+import java.beans.PropertyChangeListener;
 import java.util.Locale;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
-import org.eclipse.scout.nls.sdk.internal.model.PropertyBasedModel;
 import org.eclipse.scout.nls.sdk.internal.ui.dialog.ITranslationLocationChooserModel;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.simple.model.ws.project.SimpleNlsProject;
@@ -26,7 +27,7 @@ import org.eclipse.scout.nls.sdk.simple.model.ws.project.SimpleNlsProject;
  * 
  * @see TranslationFileNewDialog
  */
-public class TranslationFileNewModel extends PropertyBasedModel implements ITranslationLocationChooserModel {
+public class TranslationFileNewModel implements ITranslationLocationChooserModel {
 
   public static final String PROP_LANGUAGE_ISO = "language";
   public static final String PROP_LANGUAGE_COUNTRY_ISO = "languageCountry";
@@ -34,11 +35,21 @@ public class TranslationFileNewModel extends PropertyBasedModel implements ITran
   public static final String PROP_FOLDER = "location";
   public static final String PROP_PATH = "path";
 
-  private SimpleNlsProject m_nlsProject;
+  private final SimpleNlsProject m_nlsProject;
+  private final BasicPropertySupport m_propertySupport;
 
   public TranslationFileNewModel(SimpleNlsProject project) {
     m_nlsProject = project;
+    m_propertySupport = new BasicPropertySupport(this);
     setPath(new Path(m_nlsProject.getNlsType().getTranslationsFolderName()));
+  }
+
+  public void addPropertyChangeListener(PropertyChangeListener listener) {
+    m_propertySupport.addPropertyChangeListener(listener);
+  }
+
+  public void removePropertyChangeListener(PropertyChangeListener listener) {
+    m_propertySupport.removePropertyChangeListener(listener);
   }
 
   @Override
@@ -52,27 +63,27 @@ public class TranslationFileNewModel extends PropertyBasedModel implements ITran
   }
 
   public void setLanguageIso(String isoLanguage) {
-    setPropertyString(PROP_LANGUAGE_ISO, isoLanguage);
+    m_propertySupport.setPropertyString(PROP_LANGUAGE_ISO, isoLanguage);
   }
 
   public String getLanguageIso() {
-    return getPropertyString(PROP_LANGUAGE_ISO);
+    return m_propertySupport.getPropertyString(PROP_LANGUAGE_ISO);
   }
 
   public void setCountryIso(String isoCountry) {
-    setPropertyString(PROP_LANGUAGE_COUNTRY_ISO, isoCountry);
+    m_propertySupport.setPropertyString(PROP_LANGUAGE_COUNTRY_ISO, isoCountry);
   }
 
   public String getCountryIso() {
-    return getPropertyString(PROP_LANGUAGE_COUNTRY_ISO);
+    return m_propertySupport.getPropertyString(PROP_LANGUAGE_COUNTRY_ISO);
   }
 
   public void setLanguageVariant(String languageVariant) {
-    setPropertyString(PROP_LANGUAGE_VARIANT, languageVariant);
+    m_propertySupport.setPropertyString(PROP_LANGUAGE_VARIANT, languageVariant);
   }
 
   public String getLanguageVariant() {
-    return getPropertyString(PROP_LANGUAGE_VARIANT);
+    return m_propertySupport.getPropertyString(PROP_LANGUAGE_VARIANT);
   }
 
   // commodity
@@ -90,19 +101,19 @@ public class TranslationFileNewModel extends PropertyBasedModel implements ITran
 
   @Override
   public INlsFolder getFolder() {
-    return (INlsFolder) getProperty(PROP_FOLDER);
+    return (INlsFolder) m_propertySupport.getProperty(PROP_FOLDER);
   }
 
   public void setFolder(INlsFolder folder) {
-    setProperty(PROP_FOLDER, folder);
+    m_propertySupport.setProperty(PROP_FOLDER, folder);
   }
 
   public void setPath(IPath path) {
-    setProperty(PROP_PATH, path);
+    m_propertySupport.setProperty(PROP_PATH, path);
   }
 
   @Override
   public IPath getPath() {
-    return (IPath) getProperty(PROP_PATH);
+    return (IPath) m_propertySupport.getProperty(PROP_PATH);
   }
 }

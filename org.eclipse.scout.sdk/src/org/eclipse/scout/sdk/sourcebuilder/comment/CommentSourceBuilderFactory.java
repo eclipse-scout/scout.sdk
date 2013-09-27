@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.sourcebuilder.comment;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
@@ -30,7 +31,13 @@ import org.osgi.framework.ServiceReference;
  * @since 3.10.0 07.03.2013
  */
 public final class CommentSourceBuilderFactory {
+
   private static IJavaElementCommentBuilderService javaElementCommentBuilderService;
+
+  private final static Pattern REGEX_COMMENT_PATTERN1 = Pattern.compile("^s*\\/\\*\\*s*$");
+  private final static Pattern REGEX_COMMENT_PATTERN2 = Pattern.compile("^s*\\*\\*\\/s*$");
+  private final static Pattern REGEX_COMMENT_PATTERN3 = Pattern.compile("^s*\\*.*$");
+
   private final static ICommentSourceBuilder emptyCommentSourceBuilder = new ICommentSourceBuilder() {
     @Override
     public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
@@ -96,7 +103,6 @@ public final class CommentSourceBuilderFactory {
   }
 
   public static final ICommentSourceBuilder createPreferencesFieldCommentBuilder() {
-
     if (javaElementCommentBuilderService != null) {
       return javaElementCommentBuilderService.createPreferencesFieldCommentBuilder();
     }
@@ -111,55 +117,6 @@ public final class CommentSourceBuilderFactory {
    */
   public static ICommentSourceBuilder createCustomCommentBuilder(final String comment) {
     return new ICommentSourceBuilder() {
-
-      public void createSource1(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        // normalize comment
-        StringBuilder commentBuilder = new StringBuilder();
-        BufferedReader inputReader = new BufferedReader(new StringReader(comment));
-        try {
-          // first line
-          String lastLine;
-          String line = inputReader.readLine();
-          if (line.matches("^s*\\/\\*\\*s*$")) {
-            commentBuilder.append(line);
-          }
-          else {
-            commentBuilder.append("/** ").append(lineDelimiter).append(line);
-          }
-          lastLine = line;
-          line = inputReader.readLine();
-          while (line != null) {
-            commentBuilder.append(lineDelimiter);
-            if (line.matches("^s*\\*.*$")) {
-              commentBuilder.append(line);
-            }
-            else {
-              commentBuilder.append("* ").append(line);
-            }
-            lastLine = line;
-            line = inputReader.readLine();
-          }
-          if (!lastLine.matches("\\*\\/s*$")) {
-            commentBuilder.append(lineDelimiter);
-            commentBuilder.append("*/");
-          }
-          String formattedComment = commentBuilder.toString();
-          source.append(formattedComment);
-        }
-        catch (IOException ex) {
-          ScoutSdk.logError("could not read commment '" + comment + "'.", ex);
-        }
-        finally {
-          try {
-            inputReader.close();
-          }
-          catch (IOException e) {
-            // void here
-          }
-        }
-
-      }
-
       @Override
       public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         // normalize comment
@@ -169,14 +126,14 @@ public final class CommentSourceBuilderFactory {
           commentBuilder.append("/**").append(lineDelimiter);
           String line = inputReader.readLine();
           while (line != null) {
-            if (line.matches("^s*\\/\\*\\*s*$")) {
+            if (REGEX_COMMENT_PATTERN1.matcher(line).matches()) {
               line = inputReader.readLine();
             }
-            else if (line.matches("^s*\\*\\*\\/s*$")) {
+            else if (REGEX_COMMENT_PATTERN2.matcher(line).matches()) {
               line = inputReader.readLine();
             }
             else {
-              if (line.matches("^s*\\*.*$")) {
+              if (REGEX_COMMENT_PATTERN3.matcher(line).matches()) {
                 commentBuilder.append(line);
               }
               else {
@@ -201,9 +158,7 @@ public final class CommentSourceBuilderFactory {
             // void here
           }
         }
-
       }
     };
   }
-
 }

@@ -35,11 +35,11 @@ public class DoublePropertySourceParser implements IPropertySourceParser<Double>
     if (value == null) {
       return "null";
     }
-    else if (value.intValue() == Double.MAX_VALUE) {
+    else if (value.doubleValue() == Double.MAX_VALUE) {
       return "Double.MAX_VALUE";
     }
-    else if (value.intValue() == -Double.MIN_VALUE) {
-      return "-Integer.MIN_VALUE";
+    else if (value.doubleValue() == -Double.MAX_VALUE) {
+      return "-Double.MAX_VALUE";
     }
     return value.toString();
   }

@@ -866,7 +866,20 @@ public class ProposalPopup extends Window {
       StringBuilder builder = new StringBuilder();
       builder.append("input[").append(getInput()).append("] ");
       builder.append("pattern[").append(getPattern()).append("] ");
-      builder.append("proposals[").append(getProposals()).append("] ");
+      builder.append("proposals[");
+      Object[] proposals = getProposals();
+      for (int i = 0; i < proposals.length; i++) {
+        if (proposals[i] == null) {
+          builder.append("null");
+        }
+        else {
+          builder.append(proposals[i].toString());
+        }
+        if (i < proposals.length - 1) {
+          builder.append(", ");
+        }
+      }
+      builder.append("] ");
       return builder.toString();
     }
 

@@ -67,7 +67,7 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
 
   private void cacheSectionExpansionState() {
     final Section[] sections = getSections();
-    HashMap<String, Boolean> pageCache = expansionSettings.get(getPage());
+    HashMap<String, Boolean> pageCache = expansionSettings.get(getPartKey());
     if (pageCache == null) {
       pageCache = new HashMap<String, Boolean>(sections.length);
       expansionSettings.put(getPartKey(), pageCache);

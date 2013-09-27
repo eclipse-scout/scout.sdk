@@ -26,7 +26,7 @@ public final class TechnologyExtensionPoint {
   public final static String ATTR_CLASS = "class";
   public final static String ATTR_CATEGORY = "category";
 
-  private static volatile Technology[] technologies;
+  private static volatile HashSet<Technology> technologies;
   private final static Object lock = new Object();
 
   private TechnologyExtensionPoint() {
@@ -87,10 +87,10 @@ public final class TechnologyExtensionPoint {
               }
             }
           }
-          technologies = techs.toArray(new Technology[techs.size()]);
+          technologies = techs;
         }
       }
     }
-    return technologies;
+    return technologies.toArray(new Technology[technologies.size()]);
   }
 }

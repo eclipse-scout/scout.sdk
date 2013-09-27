@@ -248,10 +248,7 @@ public class JavaCodeField extends Composite {
         close();
       }
       else {
-        if (range.equals(m_range) && m_shell != null) {
-          // void
-        }
-        else {
+        if (!range.equals(m_range) || m_shell == null) {
           if (m_shell != null) {
             close();
           }
@@ -287,5 +284,4 @@ public class JavaCodeField extends Composite {
       }
     }
   }
-
 }

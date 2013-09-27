@@ -25,6 +25,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlAdapter;
@@ -323,7 +324,6 @@ public class SmartDialog {
     @Override
     public void dispose() {
     }
-
   } // end class P_SmartFieldTableModel
 
   private class P_CompareableSmartItem implements Comparable<P_CompareableSmartItem> {
@@ -334,13 +334,18 @@ public class SmartDialog {
     }
 
     @Override
+    public int hashCode() {
+      return m_smartModel.getText(m_item).hashCode();
+    }
+
+    @Override
     public boolean equals(Object obj) {
       if (!(obj instanceof P_CompareableSmartItem)) {
         return false;
       }
       String me = m_smartModel.getText(m_item);
       String other = m_smartModel.getText(((P_CompareableSmartItem) obj).getItem());
-      return COLLATOR.equals(me, other);
+      return CompareUtility.equals(me, other);
     }
 
     @Override
@@ -352,5 +357,4 @@ public class SmartDialog {
       return m_item;
     }
   }
-
 }

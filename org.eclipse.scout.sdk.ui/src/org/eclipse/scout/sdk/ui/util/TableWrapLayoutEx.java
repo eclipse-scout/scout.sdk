@@ -1,5 +1,5 @@
 /*******************************************************************************
- *  Copyright (c) 2000, 2009 IBM Corporation and others.
+ *  Copyright (c) 2000, 2011 IBM Corporation and others.
  *  All rights reserved. This program and the accompanying materials
  *  are made available under the terms of the Eclipse Public License v1.0
  *  which accompanies this distribution, and is available at
@@ -7,7 +7,6 @@
  *
  *  Contributors:
  *     IBM Corporation - initial API and implementation
- *     BSI Business Systems Integration AG - adapted to Scout SDK
  *******************************************************************************/
 package org.eclipse.scout.sdk.ui.util;
 
@@ -30,7 +29,7 @@ import org.eclipse.ui.forms.widgets.SizeCache;
 
 /**
  * This implementation of the layout algorithm attempts to position controls in
- * the composite using a two-pass autolayout HTML table altorithm recommeded by
+ * the composite using a two-pass autolayout HTML table algorithm recommended by
  * HTML 4.01 W3C specification (see
  * http://www.w3.org/TR/html4/appendix/notes.html#h-B.5.2.2). The main
  * differences with GridLayout is that it has two passes and that width and
@@ -50,6 +49,7 @@ import org.eclipse.ui.forms.widgets.SizeCache;
  * @see TableWrapDataEx
  * @since 3.0
  */
+@SuppressWarnings("all")
 public final class TableWrapLayoutEx extends Layout implements ILayoutExtension {
   /**
    * Number of columns to use when positioning children (default is 1).
@@ -372,7 +372,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     int fixedPart = leftMargin + rightMargin + (numColumns - 1)
         * horizontalSpacing;
     int D = maxWidth - minWidth;
-    int W = tableWidth - fixedPart - minWidth;
+    int W = tableWidth - minWidth;
     int widths[] = new int[numColumns];
     int rem = 0;
     for (int i = 0; i < numColumns; i++) {
@@ -442,7 +442,6 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     control.setBounds(xloc, yloc, width, height);
   }
 
-  @SuppressWarnings("unchecked")
   void createGrid(Composite composite) {
     int row, column, rowFill, columnFill;
     Control[] children;
@@ -546,24 +545,22 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     }
   }
 
-  @SuppressWarnings("unchecked")
   private void updateGrowingColumns(Vector gc, TableWrapDataEx spec, int column) {
     int affectedColumn = column + spec.colspan - 1;
     for (int i = 0; i < gc.size(); i++) {
       Integer col = (Integer) gc.get(i);
       if (col.intValue() == affectedColumn) return;
     }
-    gc.add(new Integer(affectedColumn));
+    gc.add(Integer.valueOf(affectedColumn));
   }
 
-  @SuppressWarnings("unchecked")
   private void updateGrowingRows(Vector gr, TableWrapDataEx spec, int row) {
     int affectedRow = row + spec.rowspan - 1;
     for (int i = 0; i < gr.size(); i++) {
       Integer irow = (Integer) gr.get(i);
       if (irow.intValue() == affectedRow) return;
     }
-    gr.add(new Integer(affectedRow));
+    gr.add(Integer.valueOf(affectedRow));
   }
 
   private TableWrapDataEx[] createEmptyRow() {
@@ -709,7 +706,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   int internalGetMinimumWidth(Composite parent, boolean changed) {
     if (changed)
     //calculateMinimumColumnWidths(parent, true);
-    calculateColumnWidths(parent, minColumnWidths, false, true);
+    calculateColumnWidths(parent, minColumnWidths, false, true, makeColumnsEqualWidth);
     int minimumWidth = 0;
     widestColumnWidth = 0;
     if (makeColumnsEqualWidth) {
@@ -731,7 +728,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   int internalGetMaximumWidth(Composite parent, boolean changed) {
     if (changed)
     //calculateMaximumColumnWidths(parent, true);
-    calculateColumnWidths(parent, maxColumnWidths, true, true);
+    calculateColumnWidths(parent, maxColumnWidths, true, true, makeColumnsEqualWidth);
     int maximumWidth = 0;
     for (int i = 0; i < numColumns; i++) {
       if (i > 0) maximumWidth += horizontalSpacing;
@@ -753,8 +750,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     }
   }
 
-  void calculateColumnWidths(Composite parent, int[] columnWidths, boolean max, boolean changed) {
+  void calculateColumnWidths(Composite parent, int[] columnWidths, boolean max, boolean changed, boolean makeColumnsEqualWidth2) {
     boolean secondPassNeeded = false;
+    int widestColumnWidth = 0;
     for (int i = 0; i < grid.size(); i++) {
       TableWrapDataEx[] row = (TableWrapDataEx[]) grid.elementAt(i);
       for (int j = 0; j < numColumns; j++) {
@@ -776,6 +774,12 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
 
         width += td.indent;
         columnWidths[j] = Math.max(columnWidths[j], width);
+        widestColumnWidth = Math.max(widestColumnWidth, columnWidths[j]);
+      }
+    }
+    if (makeColumnsEqualWidth) {
+      for (int i = 0; i < numColumns; i++) {
+        columnWidths[i] = widestColumnWidth;
       }
     }
     if (!secondPassNeeded) return;
@@ -800,10 +804,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
           if (k > j) current += horizontalSpacing;
           current += columnWidths[k];
         }
-        if (width <= current) {
-          // we are ok - nothing to do here
-        }
-        else {
+        if (width > current) {
           int ndiv = 0;
           if (growingColumns != null) {
             for (int k = j; k < j + td.colspan; k++) {

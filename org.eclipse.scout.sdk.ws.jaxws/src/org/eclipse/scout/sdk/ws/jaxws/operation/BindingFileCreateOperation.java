@@ -213,7 +213,7 @@ public class BindingFileCreateOperation implements IOperation {
             bufferedWriter.write(ch);
           }
           else {
-            String escaped = ScoutXmlDocument.XML_ENTITIES.get(ch);
+            String escaped = ScoutXmlDocument.XML_ENTITIES.get("" + ch);
             if (escaped != null) {
               bufferedWriter.write(escaped);
             }

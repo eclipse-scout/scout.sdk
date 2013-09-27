@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
@@ -202,7 +202,7 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
             }
 
             HandlerPresenter p = new HandlerPresenter(m_bundle, getSection(sectionId).getSectionClient(), handlerIndex, handlerCount, getFormToolkit());
-            p.setPresenterId(PRESENTER_ID_HANDLER + new Random().nextInt());
+            p.setPresenterId(PRESENTER_ID_HANDLER + NumberUtility.randomInt());
             p.setMarkerGroupUUID(JaxWsSdkUtility.toMarkerGroupUUID(getPage().getMarkerGroupUUID(), handlerIndex));
             p.setXmlHandlerElement(xmlHandlerElement);
             p.setSunJaxWsBean(getPage().getSunJaxWsBean());

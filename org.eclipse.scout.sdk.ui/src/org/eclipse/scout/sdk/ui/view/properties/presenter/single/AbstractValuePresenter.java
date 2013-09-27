@@ -30,13 +30,19 @@ import org.eclipse.swt.widgets.Text;
 public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter {
 
   private Text m_textComponent;
-  private final String m_regexAllowedCharacters;
+  private final Pattern m_regexAllowedCharacters;
   private T m_currentSourceValue;
   private T m_defaultValue;
 
   public AbstractValuePresenter(PropertyViewFormToolkit toolkit, Composite parent, String regexAllowedCharacters) {
     super(toolkit, parent);
-    m_regexAllowedCharacters = regexAllowedCharacters;
+    if (regexAllowedCharacters == null) {
+      m_regexAllowedCharacters = null;
+    }
+    else
+    {
+      m_regexAllowedCharacters = Pattern.compile(regexAllowedCharacters);
+    }
   }
 
   @Override
@@ -160,7 +166,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
           if (m_regexAllowedCharacters != null) {
             String string = event.text;
             if (string != null) {
-              event.doit = Pattern.matches(m_regexAllowedCharacters, string);
+              event.doit = m_regexAllowedCharacters.matcher(string).matches();
               if (!event.doit) {
                 ScoutSdkUi.logInfo("not allowed input: " + string);
               }
