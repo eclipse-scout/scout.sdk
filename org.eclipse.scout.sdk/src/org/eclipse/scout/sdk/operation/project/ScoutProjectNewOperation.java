@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -27,7 +28,10 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
@@ -138,26 +142,9 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     // execute the operations
     execOperations(monitor, workingCopyManager, collector.toArray(new P_OperationElement[collector.size()]));
 
-    // format all projects so that they match the workspace settings
-    for (IJavaProject jp : getCreatedBundlesList()) {
-      formatProject(monitor, workingCopyManager, jp);
-    }
-  }
-
-  private static void formatProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaProject p) throws CoreException {
-    for (IPackageFragment pck : p.getPackageFragments()) {
-      for (ICompilationUnit u : pck.getCompilationUnits()) {
-
-        if (!workingCopyManager.register(u, monitor)) {
-          // it is already registered. perform a reconcile.
-          workingCopyManager.reconcile(u, monitor);
-        }
-
-        JavaElementFormatOperation fo = new JavaElementFormatOperation(u, true);
-        fo.validate();
-        fo.run(monitor, workingCopyManager);
-      }
-    }
+    // async post processing
+    OperationJob postProcessJob = new OperationJob(new P_PostProcessOperation(getCreatedBundlesList()));
+    postProcessJob.schedule(200);
   }
 
   private Collection<P_OperationElement> getRootOperations(Collection<P_OperationElement> nodes) {
@@ -234,6 +221,56 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
     catch (UnknownHostException e) {
       return null;
+    }
+  }
+
+  private static class P_PostProcessOperation implements IOperation {
+
+    private final List<IJavaProject> m_projectsToPostProcess;
+
+    private P_PostProcessOperation(List<IJavaProject> projectsToPostProcess) {
+      m_projectsToPostProcess = projectsToPostProcess;
+    }
+
+    @Override
+    public String getOperationName() {
+      return "Post Processing created projects...";
+    }
+
+    @Override
+    public void validate() throws IllegalArgumentException {
+    }
+
+    @Override
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+      try {
+        JdtUtility.waitForIndexesReady();
+        if (m_projectsToPostProcess != null && m_projectsToPostProcess.size() > 0) {
+          // format all projects so that they match the workspace settings
+          for (IJavaProject jp : m_projectsToPostProcess) {
+            formatProject(monitor, workingCopyManager, jp);
+          }
+        }
+      }
+      catch (Exception e) {
+        ScoutSdk.logError("Cannot post process projects.", e);
+      }
+    }
+
+    private static void formatProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, IJavaProject p) throws CoreException {
+      for (IPackageFragment pck : p.getPackageFragments()) {
+        for (ICompilationUnit u : pck.getCompilationUnits()) {
+
+          if (!workingCopyManager.register(u, monitor)) {
+            // it is already registered. perform a reconcile.
+            workingCopyManager.reconcile(u, monitor);
+          }
+
+          JavaElementFormatOperation fo = new JavaElementFormatOperation(u, true);
+          fo.validate();
+          fo.run(monitor, workingCopyManager);
+        }
+      }
     }
   }
 

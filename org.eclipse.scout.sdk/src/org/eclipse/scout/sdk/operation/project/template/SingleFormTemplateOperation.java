@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
@@ -82,7 +83,13 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     final IScoutBundle server = bundleGraph.getBundle(getProperties().getProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, String.class));
     final IScoutBundle shared = bundleGraph.getBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
 
-    // formdata
+    if (shared == null || client == null) {
+      // the projects could not be found. maybe the target platform could not be applied successfully
+      ScoutSdk.logWarning("Single Form Template could not applied because the scout bundles could not be found. Check that the target platform is valid and contains the scout runtime.");
+      return;
+    }
+
+    // form data
     PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(FORM_NAME + "Data", shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES), shared.getJavaProject());
     formDataOp.setFlags(Flags.AccPublic);
     formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
@@ -90,7 +97,6 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     formDataOp.validate();
     formDataOp.run(monitor, workingCopyManager);
     IType formData = formDataOp.getCreatedType();
-//    workingCopyManager.reconcile(formData.getCompilationUnit(), monitor);
 
     final String formDataSignature = SignatureCache.createTypeSignature(formData.getFullyQualifiedName());
 

@@ -55,7 +55,7 @@ import org.osgi.framework.Version;
 
 public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
-  private static final String[] RAP_PLUGIN_DETECTION_PREFIXES = new String[]{"org.eclipse.rap.rwt_2", "org.eclipse.scout.rt.ui.rap_3.9", "org.eclipse.scout.rt.ui.rap.mobile_3.9"};
+  private static final String[] RAP_PLUGIN_DETECTION_PREFIXES = new String[]{"org.eclipse.rap.rwt_2", "org.eclipse.scout.rt.ui.rap_3.10", "org.eclipse.scout.rt.ui.rap.mobile_3.10"};
   private static final String RAP_TARGET_DEFAULT_SUB_FOLDER = "rap_target";
 
   private static final String PROP_TARGET_STRATEGY = "propTargetStrategy";

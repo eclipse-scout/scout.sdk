@@ -70,6 +70,12 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
     final IScoutBundle server = bundleGraph.getBundle(getProperties().getProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, String.class));
     final IScoutBundle shared = bundleGraph.getBundle(getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class));
 
+    if (client == null) {
+      // the projects could not be found. maybe the target platform could not be applied successfully
+      ScoutSdk.logWarning("Outline Template could not applied because the client bundle could not be found. Check that the target platform is valid and contains the scout runtime.");
+      return;
+    }
+
     IType desktopType = TypeUtility.getType(client.getDefaultPackage(IDefaultTargetPackage.CLIENT_DESKTOP) + ".Desktop");
     if (TypeUtility.exists(desktopType)) {
       MethodOverrideOperation execOpenOp = new MethodOverrideOperation("execOpened", desktopType);
