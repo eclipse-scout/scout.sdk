@@ -24,7 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
     FormWithTemplateTest.class,
     IgnoredFieldsFormTest.class,
     ListBoxFormTest.class,
-    ReplaceFormFiledTestNew.class,
+    ReplaceFormFieldTest.class,
     SimpleFormTest.class,
     TableFieldBeanTest.class,
     TableFieldFormTest.class

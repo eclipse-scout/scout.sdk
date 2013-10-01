@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class ReplaceFormFiledTestNew extends AbstractSdkTestWithFormDataProject {
+public class ReplaceFormFieldTest extends AbstractSdkTestWithFormDataProject {
 
   private static final String BaseFormFqn = "formdata.client.ui.forms.replace.BaseForm";
   private static final String ExtendedFormFqn = "formdata.client.ui.forms.replace.ExtendedForm";
