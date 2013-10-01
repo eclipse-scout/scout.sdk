@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 public interface IMarketplaceConstants {
 
   // db drivers
-  String SCOUT_JDBC_FEATURE_URL = "http://tools.bsiag.com/marketplace/jdbc/3.9";
+  String SCOUT_JDBC_FEATURE_URL = "http://tools.bsiag.com/marketplace/jdbc/3.10";
   String SCOUT_MYSQL_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.mysql5117.source.feature.group";
   String MY_SQL_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.mysql5117";
   String MY_SQL_JDBC_FRAGMENT = "com.mysql.jdbc_5117.fragment";
@@ -35,13 +35,13 @@ public interface IMarketplaceConstants {
   String DERBY_JDBC_FRAGMENT = "org.apache.derby.jdbc_1091.fragment";
 
   // rayo swing look and feel
-  String SCOUT_RAYO_FEATURE_URL = "http://tools.bsiag.com/marketplace/rayo/3.9";
+  String SCOUT_RAYO_FEATURE_URL = "http://tools.bsiag.com/marketplace/rayo/3.10";
   String SCOUT_RAYO_LAF_FEATURE = "com.bsiag.scout.rt.ui.swing.laf.rayo.source.feature.group";
   String RAYO_LAF_PLUGIN = "com.bsiag.scout.rt.ui.swing.rayo";
   String RAYO_LAF_FRAGMENT = "com.bsiag.scout.rt.ui.swing.laf.rayo.fragment";
 
   // docx4j support
-  String SCOUT_DOCX4J_FEATURE_URL = "http://tools.bsiag.com/marketplace/docx4j/3.9";
+  String SCOUT_DOCX4J_FEATURE_URL = "http://tools.bsiag.com/marketplace/docx4j/3.10";
   String DOCX4J_FEATURE = "org.eclipse.scout.docx4j.source.feature.group";
   String DOCX4J_PLUGIN = "com.bsiag.org.docx4j";
   String DOCX4J_SCOUT_PLUGIN = "org.eclipse.scout.docx4j";
@@ -50,7 +50,7 @@ public interface IMarketplaceConstants {
   String DOCX4J_SDK_FEATURE = "org.eclipse.scout.sdk.docx4j.source.feature.group";
 
   // logging bridge
-  String SCOUT_LOGGING_BRIDGE_FEATURE_URL = "http://tools.bsiag.com/marketplace/logging_bridge/3.9";
+  String SCOUT_LOGGING_BRIDGE_FEATURE_URL = "http://tools.bsiag.com/marketplace/logging_bridge/3.10";
   String LOGGING_BRIDGE_FEATURE = "org.eclipse.scout.logging.bridges.source.feature.group";
   String LOGGING_BRIDGE_LOG4J_FRAGMENT = "org.eclipse.scout.commons.log4j.bridge.fragment";
 
