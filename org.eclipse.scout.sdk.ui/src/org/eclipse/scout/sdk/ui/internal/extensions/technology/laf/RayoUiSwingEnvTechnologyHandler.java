@@ -67,11 +67,17 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
   private void setSuperClass(IType swingEnv, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit cu = swingEnv.getCompilationUnit();
     workingCopyManager.register(cu, monitor);
+
     String source = cu.getSource();
     Document document = new Document(source);
     ASTParser parser = ASTParser.newParser(AST.JLS3);
     parser.setIgnoreMethodBodies(true);
-    parser.setSource(source.toCharArray());
+    parser.setKind(ASTParser.K_COMPILATION_UNIT);
+    parser.setCompilerOptions(swingEnv.getJavaProject().getOptions(true));
+    parser.setResolveBindings(false);
+    parser.setBindingsRecovery(false);
+    parser.setSource(cu);
+
     CompilationUnit root = (CompilationUnit) parser.createAST(monitor);
 
     root.recordModifications();

@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
-import java.util.regex.Matcher;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -26,7 +23,6 @@ import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodErrorPresenterContent;
-import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
@@ -266,21 +262,5 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
 
   protected void showJavaElementInEditor(IJavaElement e, boolean createNew) {
     UiUtility.showJavaElementInEditor(e, createNew);
-  }
-
-  protected final String readInitalValue() throws CoreException {
-    try {
-      Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(getMethod().peekMethod().getSource());
-      if (m.find()) {
-        return m.group(1);
-      }
-      else {
-        throw new CoreException(new ScoutStatus(getMethod().peekMethod().getSource()));
-      }
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError(e);
-      return null;
-    }
   }
 }

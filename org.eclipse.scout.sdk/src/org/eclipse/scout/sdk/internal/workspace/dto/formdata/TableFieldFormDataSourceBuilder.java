@@ -52,7 +52,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @since 3.10.0 27.08.2013
  */
 public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder {
-  private final static Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
+  private static final Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
   private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
   private static final String OBJECT_SIG = SignatureCache.createTypeSignature(Object.class.getName()); // Ljava.lang.Object;
 
@@ -203,7 +203,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
   @Override
   protected String computeSuperTypeSignature() throws JavaModelException {
     String superTypeSignature = null;
-    if (ScoutTypeUtility.isReplaceAnnotationPresent(getModelType())) {
+    if (ScoutTypeUtility.existsReplaceAnnotation(getModelType())) {
       IType replacedType = getLocalTypeHierarchy().getSuperclass(getModelType());
       IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
       if (replacedFormFieldDataType != null) {

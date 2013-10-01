@@ -19,12 +19,12 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
-import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 public class BoxDeleteOperation implements IOperation {
 
@@ -40,7 +40,7 @@ public class BoxDeleteOperation implements IOperation {
   public BoxDeleteOperation(IType boxType, boolean formatSource) {
     m_boxType = boxType;
     m_formatSource = formatSource;
-    m_name = Texts.get("Action_deleteTypeX", ScoutSourceUtility.getTranslatedMethodStringValue(boxType, "getConfiguredLabel"));
+    m_name = Texts.get("Action_deleteTypeX", PropertyMethodSourceUtility.getTranslatedMethodStringValue(boxType, "getConfiguredLabel"));
   }
 
   @Override

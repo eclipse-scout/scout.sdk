@@ -14,22 +14,23 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
 
 public class ValidationRuleMethod {
   private final IAnnotation m_annotation;
   private final IField m_ruleField;
   private final String m_ruleName;
-  private final String m_ruleGeneratedSourceCode;
+  private final MethodReturnExpression m_ruleReturnExpression;
   private final IMethod m_annotatedMethod;
   private final IMethod m_implementedMethod;
   private final ITypeHierarchy m_superTypeHierarchy;
   private boolean m_skipRule;
 
-  public ValidationRuleMethod(IAnnotation annotation, IField ruleField, String ruleName, String ruleGeneratedSourceCode, IMethod annotatedMethod, IMethod implementedMethod, ITypeHierarchy superTypeHierarchy, boolean skipRule) {
+  public ValidationRuleMethod(IAnnotation annotation, IField ruleField, String ruleName, MethodReturnExpression ruleReturnExpression, IMethod annotatedMethod, IMethod implementedMethod, ITypeHierarchy superTypeHierarchy, boolean skipRule) {
     m_annotation = annotation;
     m_ruleField = ruleField;
     m_ruleName = ruleName;
-    m_ruleGeneratedSourceCode = ruleGeneratedSourceCode;
+    m_ruleReturnExpression = ruleReturnExpression;
     m_annotatedMethod = annotatedMethod;
     m_implementedMethod = implementedMethod;
     m_superTypeHierarchy = superTypeHierarchy;
@@ -60,8 +61,8 @@ public class ValidationRuleMethod {
   /**
    * @return the ruleGeneratedSourceCode
    */
-  public String getRuleGeneratedSourceCode() {
-    return m_ruleGeneratedSourceCode;
+  public MethodReturnExpression getRuleReturnExpression() {
+    return m_ruleReturnExpression;
   }
 
   /**

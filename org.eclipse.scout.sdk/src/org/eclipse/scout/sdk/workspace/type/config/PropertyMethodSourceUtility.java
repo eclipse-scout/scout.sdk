@@ -22,15 +22,17 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.NoSourceException;
-import org.eclipse.scout.sdk.util.Regex;
-import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public final class PropertyMethodSourceUtility {
 
@@ -51,6 +53,8 @@ public final class PropertyMethodSourceUtility {
   private final static Pattern REGEX_SIMPLE_INTEGER = Pattern.compile("^[\\+\\-0-9eE']*$");
   private final static Pattern REGEX_SIMPLE_LONG = Pattern.compile("^[\\+\\-0-9eE']*[lL]?$");
   private final static Pattern REGEX_SIMPLE_BOOLEAN = Pattern.compile("^(false|true)$");
+  private static final Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(.*)\\s*\\;", Pattern.DOTALL);
+
   /**
    * with com.bsiag.Test.class
    * group1 = com.bsiag.Test.
@@ -93,19 +97,76 @@ public final class PropertyMethodSourceUtility {
    * @throws CoreException
    */
   public static String getMethodReturnValue(IMethod method) throws CoreException {
-    String source = method.getSource();
-    if (source == null) {
-      String type = method.getDeclaringType().getElementName();
-      throw new NoSourceException(type);
-    }
-    Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(source);
-    if (m.find()) {
-      return m.group(1).trim();
+    String methodReturnValue = ScoutUtility.getMethodReturnValue(method);
+    if (methodReturnValue != null) {
+      return methodReturnValue;
     }
     else {
       ScoutSdk.logInfo("could not find return value of method: " + method.getElementName());
       throw new CustomImplementationException();
     }
+  }
+
+  private static IMethod findMethodInHierarchy(IType type, String methodName) {
+    IMethod method = TypeUtility.getMethod(type, methodName);
+    if (TypeUtility.exists(method)) {
+      return method;
+    }
+    try {
+      ITypeHierarchy superTypeHierarchy = type.newSupertypeHierarchy(null);
+      IType declaringType = superTypeHierarchy.getSuperclass(type);
+      while (declaringType != null) {
+        method = TypeUtility.getMethod(declaringType, methodName);
+        if (TypeUtility.exists(method)) {
+          return method;
+        }
+        declaringType = superTypeHierarchy.getSuperclass(declaringType);
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logWarning("could not find method '" + methodName + "' on super type hierarchy of '" + type.getFullyQualifiedName() + "'.", e);
+    }
+    return null;
+  }
+
+  /**
+   * @param type
+   * @param methodName
+   * @return simpleName (translatedName)
+   */
+  public static String getTranslatedMethodStringValue(IType type, String methodName) {
+    String name = type.getElementName();
+    if (StringUtility.hasText(methodName)) {
+      IMethod method = findMethodInHierarchy(type, methodName);
+      if (TypeUtility.exists(method)) {
+        String retValue = ScoutUtility.getMethodReturnValue(method);
+        if (StringUtility.hasText(retValue) && !"null".equals(retValue)) {
+          String nlsKey = null;
+          try {
+            nlsKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(retValue);
+          }
+          catch (CustomImplementationException e) {
+            // ignore
+          }
+          if (nlsKey == null) {
+            return name + " (" + retValue + ")";
+          }
+          else {
+            INlsProject nlsProject = ScoutTypeUtility.findNlsProject(type);
+            if (nlsProject != null) {
+              INlsEntry entry = nlsProject.getEntry(nlsKey);
+              String translation = nlsKey;
+              if (entry != null) {
+                translation = entry.getTranslation(nlsProject.getDevelopmentLanguage(), true);
+              }
+              return name + " (" + translation + ")";
+            }
+          }
+        }
+      }
+    }
+
+    return name;
   }
 
   /**
@@ -389,15 +450,65 @@ public final class PropertyMethodSourceUtility {
         if (referencedType == null) {
           throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
         }
-        String fieldValue = ScoutSourceUtility.findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
+        String fieldValue = findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
         return fieldValue;
       }
       else {
-        String fieldValue = ScoutSourceUtility.findReferencedFieldValue(method.getDeclaringType(), matcher.group(3), superTypeHierarchy);
+        String fieldValue = findReferencedFieldValue(method.getDeclaringType(), matcher.group(3), superTypeHierarchy);
         return fieldValue;
       }
     }
     throw new CustomImplementationException();
+  }
+
+  private static String findReferencedFieldValue(IType type, String value, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+    String retVal = findFieldValueInDeclaringHierarchy(type, value);
+    if (retVal == null) {
+      retVal = findFieldValueInHierarchy(type, value, superTypeHierarchy);
+    }
+    return retVal;
+  }
+
+  private static String findFieldValueInHierarchy(IType type, String name, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
+    IField field = type.getField(name);
+    if (TypeUtility.exists(field)) {
+      String source = field.getSource();
+      if (source == null) {
+        throw new NoSourceException(type.getElementName());
+      }
+      Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(source));
+      if (matcher.find()) {
+        return matcher.group(1);
+      }
+    }
+    String value = null;
+    for (IType supertype : superTypeHierarchy.getSupertypes(type)) {
+      value = findFieldValueInHierarchy(supertype, name, superTypeHierarchy);
+      if (value != null) {
+        return value;
+      }
+    }
+    return null;
+  }
+
+  private static String findFieldValueInDeclaringHierarchy(IType type, String value) throws JavaModelException {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
+    IField field = type.getField(value);
+    if (!TypeUtility.exists(field)) {
+      return findFieldValueInDeclaringHierarchy(type.getDeclaringType(), value);
+    }
+    else {
+      Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(field.getSource()));
+      if (matcher.find()) {
+        return matcher.group(1);
+      }
+    }
+    return null;
   }
 
   public static String parseReturnParameterIcon(String input, IMethod method) throws CoreException {
@@ -430,28 +541,27 @@ public final class PropertyMethodSourceUtility {
   }
 
   /**
-   * Tries to find a text value in the method body:
-   * <xmp>
-   * public String a(){
-   * return "abc";
-   * }
-   * // a.getConfiguredTextValue() returns abc
-   * public String b(){
-   * return Texts.get("abc");
-   * }
-   * // b.getConfiguredTextValue() returns the translation of abc
-   * public String c(){
-   * return TEXTS.get("abc");
-   * }
-   * // c.getConfiguredTextValue() returns the translation of the value abc
-   * </xmp>
+   * Tries to find a NLS key in the input string.<br>
+   * <br>
+   * <code>
+   * Input: "" or null<br>
+   * Output: null<br><br>
+   * Input "abc"<br>
+   * Output: null<br><br>
+   * Input: Texts.get("abc")<br>
+   * Output: abc<br><br>
+   * Input: TEXTS.get("abc")<br>
+   * Output: abc
+   * </code>
    * 
-   * @param defaultValue
+   * @param input
+   *          The String to parse.
    * @return
-   * @throws JavaModelException
+   * @throws CustomImplementationException
+   *           When the content could not be parsed.
    */
-  public static String parseReturnParameterNlsKey(String input) throws CoreException {
-    if (input == null || input.trim().equals("null")) {
+  public static String parseReturnParameterNlsKey(String input) throws CustomImplementationException {
+    if (input == null || "null".equals(input.trim())) {
       return null;
     }
     Matcher m = REGEX_METHOD_RETURN_NON_NLS_TEXT.matcher(input);

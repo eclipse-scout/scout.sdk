@@ -12,13 +12,11 @@ package org.eclipse.scout.sdk.workspace.type;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,7 +27,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
@@ -39,12 +36,8 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
@@ -58,6 +51,8 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
+import org.eclipse.scout.sdk.util.ast.visitor.MethodBodyAstVisitor;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -74,12 +69,10 @@ import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
-import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
 public class ScoutTypeUtility extends TypeUtility {
 
   private static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
-  private static final Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
   private static final Pattern RETURN_TRUE_PATTERN = Pattern.compile("return\\s*true", Pattern.MULTILINE);
   private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
   private final static Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
@@ -188,42 +181,10 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType[] getTypeOccurenceInMethod(final IMethod member) throws JavaModelException {
-    ISourceRange r = member.getSourceRange();
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
-    parser.setKind(ASTParser.K_COMPILATION_UNIT);
-    parser.setCompilerOptions(member.getJavaProject().getOptions(true));
-    parser.setIgnoreMethodBodies(false);
-    parser.setSourceRange(r.getOffset(), r.getLength());
-    parser.setResolveBindings(true);
-    if (member.isBinary()) {
-      parser.setSource(member.getClassFile());
-    }
-    else {
-      parser.setSource(member.getCompilationUnit());
-    }
-    ASTNode ast = parser.createAST(null);
-
     final HashSet<IType> types = new HashSet<IType>();
-    ast.accept(new ASTVisitor() {
-
-      private boolean process = false;
-
-      @Override
-      public boolean visit(MethodDeclaration node) {
-        process = node.resolveBinding().getJavaElement().equals(member);
-        return process;
-      }
-
-      @Override
-      public void endVisit(MethodDeclaration node) {
-        process = false;
-      }
-
+    AstUtility.visitMember(member, new MethodBodyAstVisitor(member, new ASTVisitor() {
       @Override
       public boolean visit(TypeLiteral node) {
-        if (!process) {
-          return false;
-        }
         ITypeBinding b = node.getType().resolveBinding();
         if (b != null) {
           IJavaElement e = b.getJavaElement();
@@ -233,7 +194,7 @@ public class ScoutTypeUtility extends TypeUtility {
         }
         return false;
       }
-    });
+    }));
     return types.toArray(new IType[types.size()]);
   }
 
@@ -276,7 +237,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @return Returns <code>true</code> if the given type exists and if it is annotated with an
    *         {@link IRuntimeClasses#Replace} annotation.
    */
-  public static boolean isReplaceAnnotationPresent(IAnnotatable element) {
+  public static boolean existsReplaceAnnotation(IAnnotatable element) {
     IAnnotation annotation = JdtUtility.getAnnotation(element, RuntimeClasses.Replace);
     return TypeUtility.exists(annotation);
   }
@@ -387,12 +348,12 @@ public class ScoutTypeUtility extends TypeUtility {
 
   private static void parseFormDataAnnotationReq(FormDataAnnotation annotation, IType type, ITypeHierarchy hierarchy, boolean isOwner) {
     if (TypeUtility.exists(type)) {
-      boolean replaceAnnotationPresent = isReplaceAnnotationPresent(type);
+      boolean replaceAnnotationPresent = existsReplaceAnnotation(type);
       IType superType = hierarchy.getSuperclass(type);
       parseFormDataAnnotationReq(annotation, superType, hierarchy, replaceAnnotationPresent);
 
       if (replaceAnnotationPresent) {
-        if (!isReplaceAnnotationPresent(superType)) {
+        if (!existsReplaceAnnotation(superType)) {
           // super type is the original field that is going to be replaced by the given type
           // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
           try {
@@ -976,164 +937,6 @@ public class ScoutTypeUtility extends TypeUtility {
       ScoutSdk.logError("could not build ConfigPropertyType for '" + methodName + "' in type '" + declaringType.getFullyQualifiedName() + "'.", e);
     }
     return newMethod;
-  }
-
-  /**
-   * @see #getValidationRuleMethods(IType, ITypeHierarchy)
-   */
-  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType) throws JavaModelException {
-    return getValidationRuleMethods(declaringType, null);
-  }
-
-  /**
-   * @return a map with all validation rule names mapped to the method on the most specific declaring type
-   * @throws JavaModelException
-   */
-  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) throws JavaModelException {
-    TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
-    if (superTypeHierarchy == null) {
-      try {
-        superTypeHierarchy = declaringType.newSupertypeHierarchy(null);
-      }
-      catch (JavaModelException e) {
-        ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'", e);
-        return Collections.emptyList();
-      }
-    }
-
-    ArrayList<IType> targetTypeList = new ArrayList<IType>(5);
-    targetTypeList.add(0, declaringType);
-    IType[] superClasses = superTypeHierarchy.getAllSuperclasses(declaringType);
-    for (IType t : superClasses) {
-      if (TypeUtility.exists(t) && !t.getFullyQualifiedName().equals(Object.class.getName())) {
-        targetTypeList.add(t);
-      }
-    }
-    IType[] targetTypes = targetTypeList.toArray(new IType[targetTypeList.size()]);
-    IMethod[][] targetMethods = new IMethod[targetTypes.length][];
-    for (int i = 0; i < targetTypes.length; i++) {
-      targetMethods[i] = targetTypes[i].getMethods();
-    }
-    HashSet<String> visitedMethodNames = new HashSet<String>();
-    for (int i = 0; i < targetTypes.length; i++) {
-      for (IMethod annotatedMethod : targetMethods[i]) {
-        if (!TypeUtility.exists(annotatedMethod)) {
-          continue;
-        }
-        if (visitedMethodNames.contains(annotatedMethod.getElementName())) {
-          continue;
-        }
-        IAnnotation validationRuleAnnotation = JdtUtility.getAnnotation(annotatedMethod, RuntimeClasses.ValidationRule);
-        if (!TypeUtility.exists(validationRuleAnnotation)) {
-          continue;
-        }
-        //extract rule name and generated code order
-        visitedMethodNames.add(annotatedMethod.getElementName());
-        IMemberValuePair[] pairs = validationRuleAnnotation.getMemberValuePairs();
-        if (pairs == null) {
-          continue;
-        }
-        String ruleString = null;
-        Boolean ruleSkip = false;
-        String ruleGeneratedSourceCode = "";
-        for (IMemberValuePair pair : pairs) {
-          if ("value".equals(pair.getMemberName())) {
-            if (pair.getValue() instanceof String) {
-              ruleString = (String) pair.getValue();
-            }
-          }
-          else if ("generatedSourceCode".equals(pair.getMemberName())) {
-            if (pair.getValue() instanceof String) {
-              ruleGeneratedSourceCode = (String) pair.getValue();
-            }
-          }
-          else if ("skip".equals(pair.getMemberName())) {
-            if (pair.getValue() instanceof Boolean) {
-              ruleSkip = (Boolean) pair.getValue();
-            }
-          }
-        }
-        if (ruleString == null) {
-          continue;
-        }
-        //find out the annotated source code field name (constant declaration)
-        //this is either ValidationRule(value=text ) or simply ValidationRule(text)
-        IField ruleField = null;
-        Matcher annotationMatcher = VALIDATION_RULE_PATTERN.matcher("" + annotatedMethod.getSource());
-        if (annotationMatcher.find()) {
-          String fieldSource = annotationMatcher.group(2).trim();
-          int lastDot = fieldSource.lastIndexOf('.');
-          //fast check if scout rule
-          if (fieldSource.startsWith("ValidationRule")) {
-            IType fieldBaseType = TypeUtility.getType(RuntimeClasses.ValidationRule);
-            if (fieldBaseType != null) {
-              ruleField = fieldBaseType.getField(fieldSource.substring(lastDot + 1));
-              if (!TypeUtility.exists(ruleField)) {
-                ruleField = null;
-              }
-            }
-          }
-          else if (!fieldSource.startsWith("\"") && lastDot > 0) {
-            IType fieldBaseType = ScoutUtility.getReferencedType(annotatedMethod.getDeclaringType(), fieldSource.substring(0, lastDot));
-            if (fieldBaseType != null) {
-              ruleField = fieldBaseType.getField(fieldSource.substring(lastDot + 1));
-              if (!TypeUtility.exists(ruleField)) {
-                ruleField = null;
-              }
-            }
-          }
-        }
-        if (ruleField != null) {
-          Object val = TypeUtility.getFieldConstant(ruleField);
-          if (val instanceof String) {
-            ruleString = (String) val;
-          }
-        }
-        String hashKey = ruleString;
-        if (ruleMap.containsKey(hashKey)) {
-          continue;
-        }
-        //found new rule annotation, now find most specific method in subclasses to generate source code
-        if (ruleGeneratedSourceCode != null && ruleGeneratedSourceCode.length() == 0) {
-          ruleGeneratedSourceCode = null;
-        }
-        IMethod implementedMethod = null;
-        if (ruleGeneratedSourceCode == null) {
-          for (int k = 0; k < i; k++) {
-            for (IMethod tst : targetMethods[k]) {
-              if (!TypeUtility.exists(tst)) {
-                continue;
-              }
-              if (tst.getElementName().equals(annotatedMethod.getElementName())) {
-                implementedMethod = tst;
-                break;
-              }
-            }
-            if (implementedMethod != null) {
-              break;
-            }
-          }
-          if (implementedMethod == null) {
-            implementedMethod = annotatedMethod;
-          }
-          //found most specific override of new rule
-          ruleGeneratedSourceCode = ScoutUtility.getMethodReturnValue(implementedMethod);
-        }
-        else {
-          implementedMethod = annotatedMethod;
-        }
-        //new rule is sufficiently parsed
-        ValidationRuleMethod vm = new ValidationRuleMethod(validationRuleAnnotation, ruleField, ruleString, ruleGeneratedSourceCode, annotatedMethod, implementedMethod, superTypeHierarchy, ruleSkip);
-        ruleMap.put(hashKey, vm);
-      }
-    }
-    ArrayList<ValidationRuleMethod> list = new ArrayList<ValidationRuleMethod>(ruleMap.size());
-    for (ValidationRuleMethod v : ruleMap.values()) {
-      if (v != null) {
-        list.add(v);
-      }
-    }
-    return list;
   }
 
   public static IType getFistProcessButton(IType declaringType, ITypeHierarchy hierarchy) {

@@ -259,7 +259,6 @@ public class SdkAssert extends Assert {
 
   public static IMethod assertMethodExist(IType type, String methodName, String[] parameterSignatures) {
     return assertMethodExist(null, type, methodName, parameterSignatures);
-
   }
 
   /**

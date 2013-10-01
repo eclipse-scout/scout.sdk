@@ -15,9 +15,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
-import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -47,7 +47,7 @@ public class FormFieldRenameAction extends AbstractRenameAction {
       return inheritedStatus;
     }
     try {
-      if (ScoutSourceUtility.findInnerType(getFormField().getCompilationUnit().getAllTypes()[0], newName, true) != null) {
+      if (findInnerType(getFormField().getCompilationUnit().getAllTypes()[0], newName, true) != null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
       }
     }
@@ -60,6 +60,23 @@ public class FormFieldRenameAction extends AbstractRenameAction {
 
   public IType getFormField() {
     return m_formField;
+  }
+
+  public static IType findInnerType(IType declaringType, String simpleName, boolean ignoreCase) throws JavaModelException {
+    if (ignoreCase) {
+      if (declaringType.getElementName().equalsIgnoreCase(simpleName)) {
+        return declaringType;
+      }
+    }
+    else {
+      if (declaringType.getElementName().equals(simpleName)) {
+        return declaringType;
+      }
+    }
+    for (IType innerType : declaringType.getTypes()) {
+      return findInnerType(innerType, simpleName, ignoreCase);
+    }
+    return null;
   }
 
   public void setFormField(IType formField) {

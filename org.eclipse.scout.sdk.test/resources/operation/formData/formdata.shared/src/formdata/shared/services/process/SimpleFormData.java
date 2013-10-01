@@ -11,7 +11,7 @@ import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 /**
  * <b>NOTE:</b><br>
  * This class is auto generated, no manual modifications recommended.
- * 
+ *
  * @generated
  */
 public class SimpleFormData extends AbstractFormData {
@@ -84,7 +84,7 @@ public class SimpleFormData extends AbstractFormData {
     @Override
     protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
-      ruleMap.put(ValidationRule.MAX_VALUE, -Double.MAX_VALUE);
+      ruleMap.put(ValidationRule.MAX_VALUE, -java.lang.Double.MAX_VALUE);
       ruleMap.put(ValidationRule.MIN_VALUE, 0.0);
     }
   }

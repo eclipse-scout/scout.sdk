@@ -21,10 +21,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
-import org.eclipse.scout.sdk.util.ScoutSourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 public class CodeTypeNodePage extends AbstractScoutTypePage {
 
@@ -34,7 +34,7 @@ public class CodeTypeNodePage extends AbstractScoutTypePage {
     setParent(parent);
     setType(type);
 
-    setName(ScoutSourceUtility.getTranslatedMethodStringValue(getType(), "getConfiguredText"));
+    setName(PropertyMethodSourceUtility.getTranslatedMethodStringValue(getType(), "getConfiguredText"));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeType));
   }
 

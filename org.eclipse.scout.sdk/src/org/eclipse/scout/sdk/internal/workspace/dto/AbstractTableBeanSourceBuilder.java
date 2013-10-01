@@ -104,7 +104,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
 
     for (int i = 0; i < columns.length; i++) {
       IType column = columns[i];
-      if (ScoutTypeUtility.isReplaceAnnotationPresent(column)) {
+      if (ScoutTypeUtility.existsReplaceAnnotation(column)) {
         // replaced columns already have a column data
         continue;
       }

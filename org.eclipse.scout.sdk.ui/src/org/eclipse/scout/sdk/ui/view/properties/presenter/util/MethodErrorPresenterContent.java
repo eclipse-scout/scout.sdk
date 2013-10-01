@@ -10,6 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.util;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -22,7 +28,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.tooltip.CustomTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.ScoutSourceUtility;
+import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
@@ -218,11 +224,54 @@ public class MethodErrorPresenterContent extends Composite {
     if (methodBody == null) {
       return null;
     }
-    String newBody = ScoutSourceUtility.removeLeadingCommentAndAnnotationLines(methodBody);
+    String newBody = removeLeadingCommentAndAnnotationLines(methodBody);
     String newLine = ResourceUtility.getLineSeparator(getMethod().getType().getOpenable());
-    newBody = ScoutSourceUtility.removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody, newLine);
+    newBody = removeLineLeadingTab(ScoutUtility.getIndent(getMethod().getType()).length() + 1, newBody, newLine);
     newBody = newBody.replaceAll("\t", SdkProperties.TAB);
     return newBody;
+  }
+
+  private static String removeLeadingCommentAndAnnotationLines(String methodBody) {
+    Matcher matcherMethodDefinition = Regex.REGEX_METHOD_DEFINITION.matcher(methodBody);
+    if (matcherMethodDefinition.find()) {
+      methodBody = methodBody.substring(matcherMethodDefinition.start());
+    }
+    return methodBody;
+  }
+
+  private static String removeLineLeadingTab(int i, String methodBlock, final String newLine) {
+    Pattern p = Pattern.compile("^[\\t]{" + i + "}");
+    BufferedReader reader = null;
+    StringBuilder newBody = new StringBuilder();
+    try {
+      reader = new BufferedReader(new StringReader(methodBlock));
+      String line = reader.readLine();
+      boolean addNewLine = false;
+      while (line != null) {
+        if (addNewLine) {
+          newBody.append(newLine);
+        }
+        else {
+          addNewLine = true;
+        }
+        Matcher matcher = p.matcher(line);
+        if (matcher.find()) {
+          line = line.substring(matcher.end());
+        }
+        newBody.append(line);
+        line = reader.readLine();
+      }
+    }
+    catch (IOException e) {
+    }
+    finally {
+      try {
+        if (reader != null) reader.close();
+      }
+      catch (IOException e1) {
+      }
+    }
+    return newBody.toString();
   }
 
   protected Font getFont(String symbolicName, boolean bold) {

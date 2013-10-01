@@ -11,10 +11,17 @@
 package org.eclipse.scout.sdk.util.ast;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.ast.visitor.TypeSignatureResolveVisitor;
 import org.eclipse.scout.sdk.util.ast.visitor.VariableResolveVisitor;
@@ -29,6 +36,9 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  * @since 1.0.8 27.02.2011
  */
 public final class AstUtility {
+
+  private AstUtility() {
+  }
 
   public static VariableType getTypeSignature(ASTNode node, ASTNode rootNode, IJavaElement containerElement) {
     TypeSignatureResolveVisitor visitor = new TypeSignatureResolveVisitor(rootNode, containerElement);
@@ -46,6 +56,57 @@ public final class AstUtility {
     var.addAssignedSignatures(visitor.getAssignedTypesSignatures());
     var.setTypeSignature(visitor.getVariableTypeSignature());
     return var;
+  }
+
+  /**
+   * Visits the given member using the given ast visitor.
+   * 
+   * @param member
+   * @param visitor
+   */
+  public static void visitMember(final IMember member, final ASTVisitor visitor) {
+    visitMember(member, visitor, null);
+  }
+
+  /**
+   * Visits the given member using the given ast visitor.
+   * 
+   * @param member
+   * @param visitor
+   * @param monitor
+   */
+  public static void visitMember(final IMember member, final ASTVisitor visitor, final IProgressMonitor monitor) {
+    ISourceRange r = null;
+    try {
+      r = member.getSourceRange();
+    }
+    catch (JavaModelException e) {
+      // could not find source range
+      SdkUtilActivator.logWarning("Could not calculate source range for member '" + member.toString() + "'.", e);
+    }
+    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    parser.setKind(ASTParser.K_COMPILATION_UNIT);
+    parser.setCompilerOptions(member.getJavaProject().getOptions(true));
+    parser.setIgnoreMethodBodies(false);
+    if (r != null) {
+      parser.setSourceRange(r.getOffset(), r.getLength());
+    }
+    parser.setResolveBindings(true);
+    if (member.isBinary()) {
+      parser.setSource(member.getClassFile());
+    }
+    else {
+      parser.setSource(member.getCompilationUnit());
+    }
+    if (monitor != null && monitor.isCanceled()) {
+      return;
+    }
+    ASTNode ast = parser.createAST(monitor);
+    if (monitor != null && monitor.isCanceled()) {
+      return;
+    }
+
+    ast.accept(visitor);
   }
 
   public static String resolveReturnValueSignature(String typeSignature, String methodName) {

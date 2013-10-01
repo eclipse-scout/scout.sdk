@@ -53,7 +53,7 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
   @Override
   protected String computeSuperTypeSignature() throws JavaModelException {
     String superTypeSignature = null;
-    if (ScoutTypeUtility.isReplaceAnnotationPresent(getModelType())) {
+    if (ScoutTypeUtility.existsReplaceAnnotation(getModelType())) {
       IType replacedType = getLocalTypeHierarchy().getSuperclass(getModelType());
       IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
       if (replacedFormFieldDataType != null) {

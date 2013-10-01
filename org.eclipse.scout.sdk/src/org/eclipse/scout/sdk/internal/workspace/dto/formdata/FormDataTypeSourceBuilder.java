@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -32,6 +33,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -45,6 +47,9 @@ import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
  * @since 3.10.0 27.08.2013
  */
 public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
+
+  private final static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
+  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
 
   private FormDataAnnotation m_formDataAnnotation;
 
@@ -73,7 +78,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
   @Override
   protected String computeSuperTypeSignature() throws JavaModelException {
     String superTypeSignature = null;
-    if (ScoutTypeUtility.isReplaceAnnotationPresent(getModelType())) {
+    if (ScoutTypeUtility.existsReplaceAnnotation(getModelType())) {
       IType replacedType = getLocalTypeHierarchy().getSuperclass(getModelType());
       IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
       if (replacedFormFieldDataType != null) {
@@ -90,22 +95,26 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
   protected void collectValidationRules() throws CoreException {
     // validation rules
-    boolean replaceAnnotationPresent = ScoutTypeUtility.isReplaceAnnotationPresent(getModelType());
+    boolean replaceAnnotationPresent = ScoutTypeUtility.existsReplaceAnnotation(getModelType());
 
-    ITypeHierarchy hierarchy = TypeUtility.getSuperTypeHierarchy(getModelType());
+    ITypeHierarchy hierarchy = getLocalTypeHierarchy();
     if (hierarchy == null) {
-      return;
+      hierarchy = TypeUtility.getSuperTypeHierarchy(getModelType());
+      if (hierarchy == null) {
+        ScoutSdk.logError("Cannot collect validation rules for form data. Unable to create super type hierarchy for type '" + getModelType().getFullyQualifiedName() + "'.");
+        return;
+      }
     }
 
-    // If the replace annotation is available, we have to check whether the replaced field
-    // is not associated to a form field data
+    // If the replace annotation is available, we have to check whether the replaced field is not associated to a form field data
     boolean superTypeHasNoFormFieldData = false;
     if (replaceAnnotationPresent) {
       IType superType = hierarchy.getSuperclass(getModelType());
       superTypeHasNoFormFieldData = ScoutTypeUtility.getFormDataType(superType, hierarchy) == null;
     }
 
-    final List<ValidationRuleMethod> list = ScoutTypeUtility.getValidationRuleMethods(getModelType(), hierarchy.getJdtHierarchy());
+    final List<ValidationRuleMethod> list = FormDataUtility.getValidationRuleMethods(getModelType(), hierarchy.getJdtHierarchy());
+
     if (list.size() > 0) {
       for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
         ValidationRuleMethod vm = it.next();
@@ -127,8 +136,8 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
         }
 
         // skip validation rules having return value null or false
-        String generatedSourceCode = vm.getRuleGeneratedSourceCode();
-        if ("null".equals(generatedSourceCode) || "false".equals(generatedSourceCode)) {
+        String simpleSourceCode = vm.getRuleReturnExpression().getReturnStatement(); // pre calculate a return statement without import validation. Is sufficient for the check that is done here.
+        if ("null".equals(simpleSourceCode) || "false".equals(simpleSourceCode)) {
           if (replaceAnnotationPresent && !superTypeHasNoFormFieldData) {
             // replace annotation is present and super type has already a form field data. Hence rule must be overridden in the generated method.
             vm.setSkipRule(true);
@@ -140,28 +149,27 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
           continue;
         }
       }
+
       if (list.size() > 0) {
         IMethodSourceBuilder initValidationRulesBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "initValidationRules");
         initValidationRulesBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-          private Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
-
           @Override
           public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
             source.append("super.initValidationRules(ruleMap);");
             for (ValidationRuleMethod vm : list) {
               try {
-                String generatedSourceCode = vm.getRuleGeneratedSourceCode();
-                //filter
-                generatedSourceCode = filterGeneratedSourceCode(vm.getImplementedMethod(), generatedSourceCode, validator);
+                // filter out code that contains references to types that are not accessible from our bundle.
+                String generatedSourceCode = generateValidationRuleSourceCode(vm, validator);
+
                 if (!vm.isSkipRule() && (generatedSourceCode == null || containsBrackets(generatedSourceCode))) {
                   //add javadoc warning
                   String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
                   source.append("/**");
                   source.append(lineDelimiter);
                   source.append(" * XXX not processed ValidationRule(" + vm.getRuleName() + ")");
-                  if (vm.getRuleGeneratedSourceCode() != null) {
+                  if (vm.getRuleReturnExpression() != null) {
                     source.append(lineDelimiter);
-                    source.append(" * '" + vm.getRuleGeneratedSourceCode() + "' is not accessible from here.");
+                    source.append(" * '" + vm.getRuleReturnExpression() + "' is not accessible from here.");
                   }
                   source.append(lineDelimiter);
                   source.append(" * generatedSourceCode: ");
@@ -170,30 +178,32 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                   source.append(" * at " + fqn);
                   source.append(lineDelimiter);
                   source.append("*/");
-                  continue;
-                }
-                //
-                String ruleDecl;
-                if (vm.getRuleField() != null) {
-                  validator.addImport(vm.getRuleField().getDeclaringType().getFullyQualifiedName());
-                  ruleDecl = vm.getRuleField().getDeclaringType().getElementName() + "." + vm.getRuleField().getElementName();
                 }
                 else {
-                  ruleDecl = "\"" + vm.getRuleName() + "\"";
-                }
-                //
-                source.append(lineDelimiter);
-                if (vm.isSkipRule()) {
-                  source.append("ruleMap.remove(");
-                  source.append(ruleDecl);
-                  source.append(");");
-                }
-                else {
-                  source.append("ruleMap.put(");
-                  source.append(ruleDecl);
-                  source.append(", ");
-                  source.append(generatedSourceCode);
-                  source.append(");");
+
+                  String ruleDecl;
+                  if (vm.getRuleField() != null) {
+                    validator.getTypeName(SignatureCache.createTypeSignature(vm.getRuleField().getDeclaringType().getFullyQualifiedName())); // add to imports if necessary
+                    ruleDecl = vm.getRuleField().getDeclaringType().getElementName() + "." + vm.getRuleField().getElementName();
+                  }
+                  else {
+                    ruleDecl = "\"" + vm.getRuleName() + "\"";
+                  }
+
+                  source.append(lineDelimiter);
+
+                  if (vm.isSkipRule()) {
+                    source.append("ruleMap.remove(");
+                    source.append(ruleDecl);
+                    source.append(");");
+                  }
+                  else {
+                    source.append("ruleMap.put(");
+                    source.append(ruleDecl);
+                    source.append(", ");
+                    source.append(generatedSourceCode);
+                    source.append(");");
+                  }
                 }
               }
               catch (Exception e) {
@@ -203,36 +213,50 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
             }
           }
 
-          private String filterGeneratedSourceCode(IMethod sourceMethod, String sourceSnippet, IImportValidator targetValidator) throws CoreException {
+          private String generateValidationRuleSourceCode(ValidationRuleMethod vrm, IImportValidator validator) throws CoreException {
+            if (vrm.getRuleReturnExpression() == null) {
+              return null;
+            }
+            String sourceSnippet = vrm.getRuleReturnExpression().getReturnStatement(validator);
             if (sourceSnippet != null) {
-              IType[] refTypes = ScoutTypeUtility.getTypeOccurenceInMethod(sourceMethod);
-              for (IType refType : refTypes) {
+              Collection<IType> referencedTypes = vrm.getRuleReturnExpression().getReferencedTypes().values();
+              for (IType refType : referencedTypes) {
                 //if the type is a form field type it is transformed to the corresponding form data field
                 ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);
-                if (h.contains(TypeUtility.getType(RuntimeClasses.IFormField))) {
+                if (h.contains(iFormField)) {
                   String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(refType.getElementName()));
                   return formDataFieldName + ".class";
                 }
-                //other client types are not supported
-                if (!TypeUtility.isOnClasspath(refType, sourceMethod.getJavaProject())) {
+
+                // check if the referenced type is accessible from the bundle that contains the form data
+                IMethod implementedMethod = vrm.getImplementedMethod();
+                if (TypeUtility.exists(implementedMethod) && !TypeUtility.isOnClasspath(refType, implementedMethod.getJavaProject())) {
+                  // the referenced type is not accessible -> remove the rule
                   return null;
                 }
-                targetValidator.addImport(refType.getFullyQualifiedName());
+              }
+
+              // if we come here all referenced types are valid and accessible -> add them to the imports
+              for (IType refType : referencedTypes) {
+                validator.getTypeName(SignatureCache.createTypeSignature(refType.getFullyQualifiedName())); // add to imports if necessary
               }
             }
             return sourceSnippet;
           }
 
           private boolean containsBrackets(String genSource) {
+            if (genSource == null) {
+              return false;
+            }
             String srcWithoutStrings = REGEX_STRING_LITERALS.matcher(genSource).replaceAll("");
-            return srcWithoutStrings != null && srcWithoutStrings.contains("(");
+            return srcWithoutStrings.contains("(");
           }
         });
+
         initValidationRulesBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("list of derived validation rules."));
         addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormDataValidationKey(initValidationRulesBuilder), initValidationRulesBuilder);
       }
     }
-
   }
 
   public FormDataAnnotation getFormDataAnnotation() {

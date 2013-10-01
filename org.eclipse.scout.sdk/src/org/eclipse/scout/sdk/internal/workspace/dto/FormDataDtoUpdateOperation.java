@@ -71,7 +71,8 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
   protected String createDerivedTypeSource(IProgressMonitor monitor) throws CoreException {
     FormDataAnnotation formDataAnnotation = getFormDataAnnotation();
 
-    ITypeSourceBuilder formDataNewOp = FormDataUtility.createFormDataSourceBuilder(getModelType(), formDataAnnotation);
+    // collect all source builders for the whole form data.
+    ITypeSourceBuilder formDataSourceBuilder = FormDataUtility.createFormDataSourceBuilder(getModelType(), formDataAnnotation);
 
     IType formDataType = ensureDerivedType();
     if (!TypeUtility.exists(formDataType)) {
@@ -80,9 +81,12 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     ICompilationUnit formDataIcu = formDataType.getCompilationUnit();
 
     CompilationUnitUpdateOperation icuUpdateOp = new CompilationUnitUpdateOperation(formDataIcu);
-    icuUpdateOp.addTypeSourceBuilder(formDataNewOp);
+    icuUpdateOp.addTypeSourceBuilder(formDataSourceBuilder);
 
     SimpleImportValidator validator = new SimpleImportValidator(TypeUtility.getPackage(formDataIcu).getElementName());
+    // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
+    consumeAllTypeNamesRec(formDataSourceBuilder, validator);
+
     StringBuilder sourceBuilder = new StringBuilder();
     icuUpdateOp.getSourceBuilder().createSource(sourceBuilder, ResourceUtility.getLineSeparator(formDataIcu), formDataIcu.getJavaProject(), validator);
     String source = sourceBuilder.toString();

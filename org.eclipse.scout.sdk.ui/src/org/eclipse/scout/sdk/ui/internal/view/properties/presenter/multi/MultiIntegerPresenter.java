@@ -96,7 +96,6 @@ public class MultiIntegerPresenter extends AbstractMultiValuePresenter<Integer> 
 
   @Override
   protected Integer parseDisplayInput(String input) throws CoreException {
-
     Integer d = PropertyMethodSourceUtility.parseReturnParameterInteger(input);
     return d;
   }

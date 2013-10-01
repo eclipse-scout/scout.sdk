@@ -31,8 +31,10 @@ import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.service.IMessageBoxService.YesNo;
 import org.eclipse.scout.sdk.service.MessageBoxServiceFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -91,6 +93,14 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
           job.schedule();
         }
       }
+    }
+  }
+
+  protected void consumeAllTypeNamesRec(ITypeSourceBuilder builder, IImportValidator validator) {
+    String fqn = builder.getFullyQualifiedName();
+    validator.getTypeName(SignatureCache.createTypeSignature(fqn));
+    for (ITypeSourceBuilder child : builder.getTypeSourceBuilder()) {
+      consumeAllTypeNamesRec(child, validator);
     }
   }
 

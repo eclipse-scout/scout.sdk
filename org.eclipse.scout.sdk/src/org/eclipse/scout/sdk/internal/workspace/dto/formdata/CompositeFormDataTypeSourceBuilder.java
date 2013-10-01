@@ -106,5 +106,4 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
       }
     }
   }
-
 }

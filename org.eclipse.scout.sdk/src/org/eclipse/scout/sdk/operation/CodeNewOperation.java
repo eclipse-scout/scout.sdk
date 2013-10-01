@@ -20,7 +20,9 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -87,43 +89,43 @@ public class CodeNewOperation implements IOperation {
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static void setStaticModifierRec(TypeDeclaration td) {
-    @SuppressWarnings("rawtypes")
-    List l = td.modifiers();
-    Modifier modStatic = td.getAST().newModifier(Modifier.ModifierKeyword.STATIC_KEYWORD);
-    boolean isStatic = false;
-    for (Object o : l) { // check if a static modifier is already present (contains does not work)
-      if (o instanceof Modifier) {
-        if (((Modifier) o).isStatic()) {
-          isStatic = true;
-          break;
-        }
-      }
-    }
-    if (!isStatic) {
-      td.modifiers().add(modStatic);
-    }
-    for (TypeDeclaration child : td.getTypes()) {
-      setStaticModifierRec(child);
-    }
-  }
-
   private void setStaticModifierForAllCodes() throws CoreException {
     ICompilationUnit cu = getDeclaringType().getCompilationUnit();
     String source = cu.getSource();
     Document document = new Document(source);
     ASTParser parser = ASTParser.newParser(AST.JLS3);
-    parser.setSource(source.toCharArray());
-    CompilationUnit root = (CompilationUnit) parser.createAST(null);
+    parser.setKind(ASTParser.K_COMPILATION_UNIT);
+    parser.setCompilerOptions(cu.getJavaProject().getOptions(true));
+    parser.setIgnoreMethodBodies(true);
+    parser.setResolveBindings(false);
+    parser.setSource(cu);
 
+    CompilationUnit root = (CompilationUnit) parser.createAST(null);
     root.recordModifications();
-    for (Object type : root.types()) {
-      if (type instanceof TypeDeclaration) {
-        for (TypeDeclaration c : ((TypeDeclaration) type).getTypes())
-          setStaticModifierRec(c);
+
+    root.accept(new ASTVisitor() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public boolean visit(TypeDeclaration node) {
+        if (!isStatic(node) && node.getParent().getNodeType() != ASTNode.COMPILATION_UNIT) {
+          Modifier modStatic = node.getAST().newModifier(Modifier.ModifierKeyword.STATIC_KEYWORD);
+          node.modifiers().add(modStatic);
+        }
+        return true;
       }
-    }
+
+      private boolean isStatic(TypeDeclaration td) {
+        List l = td.modifiers();
+        for (Object o : l) { // check if a static modifier is already present (contains does not work)
+          if (o instanceof Modifier) {
+            if (((Modifier) o).isStatic()) {
+              return true;
+            }
+          }
+        }
+        return false;
+      }
+    });
 
     TextEdit edits = root.rewrite(document, cu.getJavaProject().getOptions(true));
     try {

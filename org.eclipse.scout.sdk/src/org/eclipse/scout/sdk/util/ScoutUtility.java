@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -47,9 +46,12 @@ import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.method.IMethodReturnValueParser;
+import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
@@ -749,26 +751,22 @@ public final class ScoutUtility {
     return Status.OK_STATUS;
   }
 
+  public static String getMethodReturnValue(IMethod method, IImportValidator validator) {
+    return getMethodReturnExpression(method).getReturnStatement(validator);
+  }
+
   public static String getMethodReturnValue(IMethod method) {
-    try {
-      String src = method.getSource();
-      if (src != null) {
-        Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(src);
-        if (m.find()) {
-          return m.group(1).trim();
-        }
-        else {
-          ScoutSdk.logInfo("Could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
-        }
-      }
-      else {
-        ScoutSdk.logWarning("Could not find source for method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
+    return getMethodReturnExpression(method).getReturnStatement();
+  }
+
+  public static MethodReturnExpression getMethodReturnExpression(IMethod method) {
+    for (IMethodReturnValueParser parser : IMethodReturnValueParser.INSTANCES) {
+      MethodReturnExpression returnExpression = parser.parse(method);
+      if (returnExpression != null) {
+        return returnExpression;
       }
     }
-    catch (JavaModelException e) {
-      ScoutSdk.logError("Could not find return value of method '" + method.getElementName() + "' in type '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
-    }
-    return null;
+    return null; // no parser was able to calculate a value
   }
 
   public static INlsEntry getReturnNlsEntry(IMethod method) throws CoreException {

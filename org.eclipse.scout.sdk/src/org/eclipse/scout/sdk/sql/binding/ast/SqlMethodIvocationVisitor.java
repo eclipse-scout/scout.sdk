@@ -57,7 +57,6 @@ public class SqlMethodIvocationVisitor extends DefaultAstVisitor {
   public SqlMethodIvocationVisitor(ASTNode methodNode, IMethod serviceMethod) {
     m_methodNode = methodNode;
     m_serviceMethod = serviceMethod;
-
     m_statements = new ArrayList<SqlStatement>();
   }
 

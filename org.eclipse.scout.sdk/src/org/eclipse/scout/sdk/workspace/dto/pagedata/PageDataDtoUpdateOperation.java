@@ -79,6 +79,9 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     icuUpdateOp.addTypeSourceBuilder(pageDataSourceBuilder);
 
     SimpleImportValidator validator = new SimpleImportValidator(TypeUtility.getPackage(dtoIcu).getElementName());
+    // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
+    consumeAllTypeNamesRec(pageDataSourceBuilder, validator);
+
     StringBuilder sourceBuilder = new StringBuilder();
     icuUpdateOp.getSourceBuilder().createSource(sourceBuilder, ResourceUtility.getLineSeparator(dtoIcu), dtoIcu.getJavaProject(), validator);
     String source = sourceBuilder.toString();

@@ -56,12 +56,12 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(simpleFormData1, "V");
     IMethod getDate = SdkAssert.assertMethodExist(simpleFormData, "getDate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getDate, "QDate;");
+    IMethod getDouble = SdkAssert.assertMethodExist(simpleFormData, "getDouble", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getDouble, "QDouble;");
     IMethod getSampleComposer = SdkAssert.assertMethodExist(simpleFormData, "getSampleComposer", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSampleComposer, "QSampleComposer;");
     IMethod getSampleDate = SdkAssert.assertMethodExist(simpleFormData, "getSampleDate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSampleDate, "QSampleDate;");
-    IMethod getSampleDouble = SdkAssert.assertMethodExist(simpleFormData, "getSampleDouble", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(getSampleDouble, "QSampleDouble;");
     IMethod getSampleSmart = SdkAssert.assertMethodExist(simpleFormData, "getSampleSmart", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSampleSmart, "QSampleSmart;");
     IMethod getSampleString = SdkAssert.assertMethodExist(simpleFormData, "getSampleString", new String[]{});
@@ -91,6 +91,27 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(date1, "V");
 
     SdkAssert.assertEquals("inner types count of 'Date'", 0, date.getTypes().length);
+    // type Double
+    IType doubleType = SdkAssert.assertTypeExists(simpleFormData, "Double");
+    SdkAssert.assertHasFlags(doubleType, 9);
+    SdkAssert.assertHasSuperTypeSignature(doubleType, "QAbstractValueFieldData<Qjava.lang.Double;>;");
+
+    // fields of Double
+    SdkAssert.assertEquals("field count of 'Double'", 1, doubleType.getFields().length);
+    IField serialVersionUID2 = SdkAssert.assertFieldExist(doubleType, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID2, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID2, "J");
+
+    SdkAssert.assertEquals("method count of 'Double'", 2, doubleType.getMethods().length);
+    IMethod double1 = SdkAssert.assertMethodExist(doubleType, "Double", new String[]{});
+    SdkAssert.assertTrue(double1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(double1, "V");
+    IMethod initValidationRules = SdkAssert.assertMethodExist(doubleType, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(initValidationRules, "V");
+    SdkAssert.assertAnnotation(initValidationRules, "java.lang.Override");
+    SdkAssert.assertMethodValidationRules(initValidationRules, new String[]{"ruleMap.put(ValidationRule.MAX_VALUE, -java.lang.Double.MAX_VALUE);", "ruleMap.put(ValidationRule.MIN_VALUE, 0.0);"}, true);
+
+    SdkAssert.assertEquals("inner types count of 'Double'", 0, doubleType.getTypes().length);
     // type SampleComposer
     IType sampleComposer = SdkAssert.assertTypeExists(simpleFormData, "SampleComposer");
     SdkAssert.assertHasFlags(sampleComposer, 9);
@@ -98,9 +119,9 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     // fields of SampleComposer
     SdkAssert.assertEquals("field count of 'SampleComposer'", 1, sampleComposer.getFields().length);
-    IField serialVersionUID2 = SdkAssert.assertFieldExist(sampleComposer, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID2, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID2, "J");
+    IField serialVersionUID3 = SdkAssert.assertFieldExist(sampleComposer, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID3, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
     SdkAssert.assertEquals("method count of 'SampleComposer'", 1, sampleComposer.getMethods().length);
     IMethod sampleComposer1 = SdkAssert.assertMethodExist(sampleComposer, "SampleComposer", new String[]{});
@@ -115,9 +136,9 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     // fields of SampleDate
     SdkAssert.assertEquals("field count of 'SampleDate'", 1, sampleDate.getFields().length);
-    IField serialVersionUID3 = SdkAssert.assertFieldExist(sampleDate, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID3, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID3, "J");
+    IField serialVersionUID4 = SdkAssert.assertFieldExist(sampleDate, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID4, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
     SdkAssert.assertEquals("method count of 'SampleDate'", 1, sampleDate.getMethods().length);
     IMethod sampleDate1 = SdkAssert.assertMethodExist(sampleDate, "SampleDate", new String[]{});
@@ -125,23 +146,6 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(sampleDate1, "V");
 
     SdkAssert.assertEquals("inner types count of 'SampleDate'", 0, sampleDate.getTypes().length);
-    // type SampleDouble
-    IType sampleDouble = SdkAssert.assertTypeExists(simpleFormData, "SampleDouble");
-    SdkAssert.assertHasFlags(sampleDouble, 9);
-    SdkAssert.assertHasSuperTypeSignature(sampleDouble, "QAbstractValueFieldData<QDouble;>;");
-
-    // fields of SampleDouble
-    SdkAssert.assertEquals("field count of 'SampleDouble'", 1, sampleDouble.getFields().length);
-    IField serialVersionUID4 = SdkAssert.assertFieldExist(sampleDouble, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID4, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID4, "J");
-
-    SdkAssert.assertEquals("method count of 'SampleDouble'", 1, sampleDouble.getMethods().length);
-    IMethod sampleDouble1 = SdkAssert.assertMethodExist(sampleDouble, "SampleDouble", new String[]{});
-    SdkAssert.assertTrue(sampleDouble1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(sampleDouble1, "V");
-
-    SdkAssert.assertEquals("inner types count of 'SampleDouble'", 0, sampleDouble.getTypes().length);
     // type SampleSmart
     IType sampleSmart = SdkAssert.assertTypeExists(simpleFormData, "SampleSmart");
     SdkAssert.assertHasFlags(sampleSmart, 9);
@@ -157,10 +161,10 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     IMethod sampleSmart1 = SdkAssert.assertMethodExist(sampleSmart, "SampleSmart", new String[]{});
     SdkAssert.assertTrue(sampleSmart1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(sampleSmart1, "V");
-    IMethod initValidationRules = SdkAssert.assertMethodExist(sampleSmart, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
-    SdkAssert.assertMethodReturnTypeSignature(initValidationRules, "V");
-    SdkAssert.assertAnnotation(initValidationRules, "java.lang.Override");
-    SdkAssert.assertMethodValidationRules(initValidationRules, new String[]{"ruleMap.put(ValidationRule.ZERO_NULL_EQUALITY, true);"}, true);
+    IMethod initValidationRules1 = SdkAssert.assertMethodExist(sampleSmart, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(initValidationRules1, "V");
+    SdkAssert.assertAnnotation(initValidationRules1, "java.lang.Override");
+    SdkAssert.assertMethodValidationRules(initValidationRules1, new String[]{"ruleMap.put(ValidationRule.ZERO_NULL_EQUALITY, true);"}, true);
 
     SdkAssert.assertEquals("inner types count of 'SampleSmart'", 0, sampleSmart.getTypes().length);
     // type SampleString
@@ -178,10 +182,10 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     IMethod sampleString1 = SdkAssert.assertMethodExist(sampleString, "SampleString", new String[]{});
     SdkAssert.assertTrue(sampleString1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(sampleString1, "V");
-    IMethod initValidationRules1 = SdkAssert.assertMethodExist(sampleString, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
-    SdkAssert.assertMethodReturnTypeSignature(initValidationRules1, "V");
-    SdkAssert.assertAnnotation(initValidationRules1, "java.lang.Override");
-    SdkAssert.assertMethodValidationRules(initValidationRules1, new String[]{"ruleMap.put(ValidationRule.MAX_LENGTH, 4000);"}, true);
+    IMethod initValidationRules2 = SdkAssert.assertMethodExist(sampleString, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(initValidationRules2, "V");
+    SdkAssert.assertAnnotation(initValidationRules2, "java.lang.Override");
+    SdkAssert.assertMethodValidationRules(initValidationRules2, new String[]{"ruleMap.put(ValidationRule.MAX_LENGTH, 4000);"}, true);
 
     SdkAssert.assertEquals("inner types count of 'SampleString'", 0, sampleString.getTypes().length);
     // type SimpleNrProperty

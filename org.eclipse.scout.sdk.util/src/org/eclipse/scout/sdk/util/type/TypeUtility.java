@@ -427,9 +427,11 @@ public class TypeUtility {
 
   public static ISourceRange getContentSourceRange(IMethod method) throws JavaModelException {
     ASTParser parser = ASTParser.newParser(AST.JLS3);
-    parser.setCompilerOptions(JavaCore.getOptions());
+    parser.setCompilerOptions(method.getJavaProject().getOptions(true));
     parser.setKind(ASTParser.K_CLASS_BODY_DECLARATIONS);
     parser.setSource(method.getSource().toCharArray());
+    parser.setResolveBindings(false);
+    parser.setBindingsRecovery(false);
     ASTNode rootNode = parser.createAST(null);
     final Holder<ISourceRange> rangeHolder = new Holder<ISourceRange>(ISourceRange.class);
     rootNode.accept(new ASTVisitor() {

@@ -13,27 +13,37 @@ package org.eclipse.scout.sdk.internal.test.util;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.method.SimpleMethodReturnValueParser;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class RegexTest {
 
   @Test
-  public void testMethodPresenterValue() {
-    checkMethodPresenter("{ int a=0; return abcdefg.aaa; } ", "abcdefg.aaa");
-    checkMethodPresenter("{ int a=0; return \"abcdefg;aaa\"; } ", "\"abcdefg;aaa\"");
-    checkMethodPresenter("{ int a=0; return \"abcdefg.aaa\"; } ", "\"abcdefg.aaa\"");
-    checkMethodPresenter("{ int a=0; return \"abcdefg.aaa; } ", null);
-    checkMethodPresenter("{ int a=0; return abcdefg.aaa\"; } ", null);
-    checkMethodPresenter("{ int a=0; return \"abcde\\\"fg.aaa\"; } ", "\"abcde\\\"fg.aaa\"");
-    checkMethodPresenter("{ int a=0; return \"abcde\\\"jk\\\".aaa\"; } ", "\"abcde\\\"jk\\\".aaa\"");
-    checkMethodPresenter("{ int a=0; return TEXTS.get(\"InvalidPhoneNumberMessageX\"); } ", "TEXTS.get(\"InvalidPhoneNumberMessageX\")");
-    checkMethodPresenter("{ int a=0; return TEXTS.get(\"InvalidPhoneNumber;MessageX\"); } ", "TEXTS.get(\"InvalidPhoneNumber;MessageX\")");
+  public void testTypeReferenceRegex() {
+    checkRegex("-Double.MAX_VALUE", SimpleMethodReturnValueParser.REGEX_TYPE_REFERENCE, "Double");
+    checkRegex("TestClass.methodcall();", SimpleMethodReturnValueParser.REGEX_TYPE_REFERENCE, "TestClass");
+    checkRegex("45.43", SimpleMethodReturnValueParser.REGEX_TYPE_REFERENCE, null);
+    checkRegex("m_member.getValue()", SimpleMethodReturnValueParser.REGEX_TYPE_REFERENCE, "m_member");
+    checkRegex("true", SimpleMethodReturnValueParser.REGEX_TYPE_REFERENCE, null);
+    checkRegex("null", SimpleMethodReturnValueParser.REGEX_TYPE_REFERENCE, null);
   }
 
-  private void checkMethodPresenter(String valToCheck, String expectedVal) {
-    Matcher m = Regex.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(valToCheck);
+  @Test
+  public void testMethodPresenterValue() {
+    checkRegex("{ int a=0; return abcdefg.aaa; } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, "abcdefg.aaa");
+    checkRegex("{ int a=0; return \"abcdefg;aaa\"; } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, "\"abcdefg;aaa\"");
+    checkRegex("{ int a=0; return \"abcdefg.aaa\"; } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, "\"abcdefg.aaa\"");
+    checkRegex("{ int a=0; return \"abcdefg.aaa; } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, null);
+    checkRegex("{ int a=0; return abcdefg.aaa\"; } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, null);
+    checkRegex("{ int a=0; return \"abcde\\\"fg.aaa\"; } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, "\"abcde\\\"fg.aaa\"");
+    checkRegex("{ int a=0; return \"abcde\\\"jk\\\".aaa\"; } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, "\"abcde\\\"jk\\\".aaa\"");
+    checkRegex("{ int a=0; return TEXTS.get(\"InvalidPhoneNumberMessageX\"); } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, "TEXTS.get(\"InvalidPhoneNumberMessageX\")");
+    checkRegex("{ int a=0; return TEXTS.get(\"InvalidPhoneNumber;MessageX\"); } ", SimpleMethodReturnValueParser.REGEX_PROPERTY_METHOD_REPRESENTER_VALUE, "TEXTS.get(\"InvalidPhoneNumber;MessageX\")");
+  }
+
+  private void checkRegex(String valToCheck, Pattern regex, String expectedVal) {
+    Matcher m = regex.matcher(valToCheck);
     boolean found = m.find();
     Assert.assertTrue(found || expectedVal == null);
     if (found) {
