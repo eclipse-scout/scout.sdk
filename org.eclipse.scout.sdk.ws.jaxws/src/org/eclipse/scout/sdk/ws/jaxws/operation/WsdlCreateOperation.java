@@ -36,7 +36,6 @@ import javax.xml.namespace.QName;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -149,7 +148,7 @@ public class WsdlCreateOperation implements IOperation {
       // Binding > Binding operation > Soap operation
       SOAPOperation soapOperation = (SOAPOperation) definition.getExtensionRegistry().createExtension(BindingOperation.class, new QName(definition.getNamespace("soap"), "operation"));
       bindingOperation.addExtensibilityElement(soapOperation);
-      soapOperation.setSoapActionURI(new Path(targetNamespace).append(m_serviceOperationName).removeTrailingSeparator().toString());
+      soapOperation.setSoapActionURI(PathNormalizer.removeTrailingSeparatorFromTargetNamespace(targetNamespace + m_serviceOperationName));
 
       // Binding > Binding operation > Binding input
       BindingInput bindingInput = definition.createBindingInput();
@@ -182,7 +181,7 @@ public class WsdlCreateOperation implements IOperation {
 
       // Port > Soap address
       SOAPAddress httpAddress = new SOAPAddressImpl();
-      httpAddress.setLocationURI(new Path(targetNamespace).removeTrailingSeparator().toString());
+      httpAddress.setLocationURI(PathNormalizer.removeTrailingSeparatorFromTargetNamespace(targetNamespace));
       httpAddress.setElementType(new QName(definition.getNamespace("soap"), "address"));
       port.addExtensibilityElement(httpAddress);
 
