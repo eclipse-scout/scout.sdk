@@ -60,6 +60,7 @@
       <plugin id="org.eclipse.scout.rt.client"/>
       <plugin id="org.eclipse.scout.rt.extension.client"/>
       <plugin id="org.eclipse.scout.rt.shared"/>
+      <plugin id="org.eclipse.scout.rt.servicetunnel"/>
       <plugin id="org.eclipse.scout.rt.ui.swt"/>
       <plugin id="org.eclipse.scout.service"/>
       <plugin id="org.eclipse.scout.svg.client"/>

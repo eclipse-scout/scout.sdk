@@ -871,6 +871,9 @@
             symbolicName="org.eclipse.scout.net">
       </bundle>
       <bundle
+            symbolicName="org.eclipse.scout.rt.servicetunnel">
+      </bundle>
+      <bundle
             symbolicName="org.eclipse.scout.rt.client.mobile">
       </bundle>
       <bundle

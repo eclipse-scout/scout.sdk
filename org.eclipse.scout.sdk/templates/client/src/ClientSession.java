@@ -25,7 +25,7 @@ public class ClientSession extends AbstractClientSession{
 
   @Override
   public void execLoadSession() throws ProcessingException{
-    setServiceTunnel(new HttpServiceTunnel(this,getBundle().getBundleContext().getProperty("server.url")));
+    setServiceTunnel(new ClientHttpServiceTunnel(this, UriUtility.toUrl(getBundle().getBundleContext().getProperty("server.url"))));
 
     //pre-load all known code types
     CODES.getAllCodeTypes(@@BUNDLE_SHARED_NAME@@.Activator.PLUGIN_ID);
