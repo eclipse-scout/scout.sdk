@@ -59,6 +59,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 @SuppressWarnings("restriction")
 public class JavaElementCommentBuilderService implements IJavaElementCommentBuilderService {
   private static final String[] EMPTY = new String[0];
+  private static final String UNDEFINED_VAR_VALUE = "undefined";
 
   private static final int METHOD_TYPE_NORMAL = 1 << 1;
   private static final int METHOD_TYPE_GETTER = 1 << 2;
@@ -80,7 +81,10 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         context.setVariable(CodeTemplateContextType.PACKAGENAME, icuSourceBuilder.getPackageFragmentName());
         context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
         context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(icuSourceBuilder.getElementName()));
-        source.append(evaluateTemplate(context, template));
+        String comment = evaluateTemplate(context, template);
+        if (comment != null) {
+          source.append(comment);
+        }
       }
     }
   };
@@ -98,8 +102,8 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       }
       CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
 //      context.setCompilationUnitVariables(cu);
-      context.setVariable(CodeTemplateContextType.FILENAME, "");
-      context.setVariable(CodeTemplateContextType.PACKAGENAME, "");//typeSourceBuilder.ge.getPackageFragmentName());
+      context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
+      context.setVariable(CodeTemplateContextType.PACKAGENAME, Signature.getQualifier(typeSourceBuilder.getFullyQualifiedName()));
       context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
       context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, Signature.getQualifier(typeSourceBuilder.getElementName()));
       context.setVariable(CodeTemplateContextType.TYPENAME, Signature.getSimpleName(typeSourceBuilder.getElementName()));
@@ -121,7 +125,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
 
       TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
       if (position == null) {
-        source.append(str);
+        if (str != null) {
+          source.append(str);
+        }
         return;
       }
 
@@ -135,7 +141,11 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
           throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
         }
       }
-      source.append(document.get());
+
+      String comment = document.get();
+      if (comment != null) {
+        source.append(comment);
+      }
     }
   };
 
@@ -157,9 +167,12 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         context.setVariable(CodeTemplateContextType.FIELD_TYPE, Signature.getSignatureSimpleName(fieldSourceBuilder.getSignature()));
         context.setVariable(CodeTemplateContextType.FIELD, fieldSourceBuilder.getElementName());
         context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
-        context.setVariable(CodeTemplateContextType.PACKAGENAME, "");
-        context.setVariable(CodeTemplateContextType.FILENAME, "");
-        source.append(evaluateTemplate(context, template));
+        context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
+        context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
+        String comment = evaluateTemplate(context, template);
+        if (comment != null) {
+          source.append(comment);
+        }
       }
     }
   };
@@ -182,11 +195,11 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         if (template != null) {
           CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
 //          context.setVariable(CodeTemplateContextType.M, icuSourceBuilder.getElementName());
-          context.setVariable(CodeTemplateContextType.PACKAGENAME, "undefined");
+          context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
           context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
-          context.setVariable(CodeTemplateContextType.FILENAME, "undefined");
+          context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
           context.setVariable(CodeTemplateContextType.ENCLOSING_METHOD, methodSourceBuilder.getElementName());
-          context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, "enclosingType");
+          context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, UNDEFINED_VAR_VALUE);
 
           // @see
           StringBuilder seeBuilder = new StringBuilder("@see ");
@@ -201,7 +214,10 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
           seeBuilder.append(")");
           context.setVariable(CodeTemplateContextType.SEE_TO_OVERRIDDEN_TAG, seeBuilder.toString());
 //          context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(icuSourceBuilder.getElementName()));
-          source.append(evaluateTemplate(context, template));
+          String comment = evaluateTemplate(context, template);
+          if (comment != null) {
+            source.append(comment);
+          }
         }
       }
     };
@@ -278,7 +294,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         }
         TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
         if (position == null) {
-          source.append(str);
+          if (str != null) {
+            source.append(str);
+          }
           return;
         }
 
@@ -297,7 +315,10 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
             throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
           }
         }
-        source.append(document.get());
+        String comment = document.get();
+        if (comment != null) {
+          source.append(comment);
+        }
       }
     };
   }
