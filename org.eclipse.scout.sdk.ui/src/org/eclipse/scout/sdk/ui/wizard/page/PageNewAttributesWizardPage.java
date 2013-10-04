@@ -200,6 +200,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
       op.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
     op.setHolderType(getHolderType());
+    op.setFormatSource(true);
     op.validate();
     op.run(monitor, workingCopyManager);
     return true;

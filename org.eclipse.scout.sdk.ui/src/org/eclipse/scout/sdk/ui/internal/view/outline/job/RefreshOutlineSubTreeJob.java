@@ -95,46 +95,54 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
       }
     }
     finally {
-      // gui thread
-      if (treeControl == null || treeControl.isDisposed()) {
-        return;
-      }
-      display.syncExec(new Runnable() {
-        @Override
-        public void run() {
-          if (treeControl == null || treeControl.isDisposed()) {
-            return;
-          }
-          if (dirtyStructureRoots.length > 0) {
+      try {
+        // gui thread
+        if (treeControl == null || treeControl.isDisposed()) {
+          return;
+        }
+        display.syncExec(new Runnable() {
+          @Override
+          public void run() {
             try {
-              treeViewer.setData(SELECTION_PREVENTER, this);
+              if (treeControl == null || treeControl.isDisposed()) {
+                return;
+              }
+              if (dirtyStructureRoots.length > 0) {
+                try {
+                  treeViewer.setData(SELECTION_PREVENTER, this);
 
-              for (IPage p : dirtyStructureRoots) {
-                treeViewer.refresh(p, true);
+                  for (IPage p : dirtyStructureRoots) {
+                    treeViewer.refresh(p, true);
+                  }
+                  for (int i = 0; i < m_backupTree.length; i++) {
+                    m_backupTree[i].restoreGui(dirtyStructureRoots[i]);
+                  }
+                }
+                finally {
+                  treeViewer.setData(SELECTION_PREVENTER, null);
+                }
+                // restore selection
+                restoreSelectionInUiThread();
               }
-              for (int i = 0; i < m_backupTree.length; i++) {
-                m_backupTree[i].restoreGui(dirtyStructureRoots[i]);
-              }
+              m_view.getViewContentProvider().setAutoLoadChildren(true);
             }
             finally {
-              treeViewer.setData(SELECTION_PREVENTER, null);
+              treeControl.setCursor(null);
             }
-            // restore selection
-            restoreSelectionInUiThread();
           }
-          m_view.getViewContentProvider().setAutoLoadChildren(true);
-          treeControl.setCursor(null);
-        }
-      });
-      waitCursor.dispose();
+        });
+      }
+      finally {
+        waitCursor.dispose();
+      }
     }
   }
 
   private void restoreSelectionInUiThread() {
     TreePath[] paths = m_backupedSelection.getPaths();
-    ArrayList<TreePath> newPaths = new ArrayList<TreePath>();
+    ArrayList<TreePath> newPaths = new ArrayList<TreePath>(paths.length);
     for (TreePath p : paths) {
-      ArrayList<Object> newSegments = new ArrayList<Object>();
+      ArrayList<Object> newSegments = new ArrayList<Object>(p.getSegmentCount());
       for (int i = 0; i < p.getSegmentCount(); i++) {
         Object segment = p.getSegment(i);
         if (segment instanceof ITypePage) {

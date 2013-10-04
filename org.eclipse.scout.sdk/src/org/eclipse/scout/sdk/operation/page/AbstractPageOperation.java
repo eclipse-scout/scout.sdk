@@ -40,10 +40,12 @@ import org.eclipse.text.edits.InsertEdit;
 
 public abstract class AbstractPageOperation implements IOperation {
 
-  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
-  final IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
-  final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+  private final static Pattern REGEX_LIST_ADD_ENTRY_POINT = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(.+\\)\\;", Pattern.MULTILINE);
+
+  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+  private final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+  private final IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
+  private final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 
   private IType m_holderType;
   private final static String CHILD_PAGE_VAR_NAME = "childPage";
@@ -74,6 +76,32 @@ public abstract class AbstractPageOperation implements IOperation {
     return bodyBuilder.toString();
   }
 
+  private void addPageToList(Document methodBody, IType pageTypeToAdd, IMethod methodToUpdate, IImportValidator validator) {
+    // find entry point and list variable name
+    Matcher matcher = REGEX_LIST_ADD_ENTRY_POINT.matcher(methodBody.get());
+    int index = -1;
+    String listVarName = null;
+    while (matcher.find()) {
+      index = matcher.end();
+      listVarName = matcher.group(1);
+    }
+
+    // add our page if we could find an entry point.
+    if (index > 0) {
+      String lineDelimiter = ResourceUtility.getLineSeparator(methodBody);
+      InsertEdit edit = new InsertEdit(index, lineDelimiter + getChildPageAddSource(pageTypeToAdd, listVarName, lineDelimiter, validator));
+      try {
+        edit.apply(methodBody);
+      }
+      catch (Exception e) {
+        ScoutSdk.logError("Could not update method '" + methodToUpdate.getElementName() + "' in type '" + methodToUpdate.getDeclaringType().getFullyQualifiedName() + "'.", e);
+      }
+    }
+    else {
+      ScoutSdk.logWarning("Could find insert position for an additional page in method '" + methodToUpdate.getElementName() + "' in type '" + methodToUpdate.getDeclaringType().getFullyQualifiedName() + "'.");
+    }
+  }
+
   private void addToOutline(final IType pageType, IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String methodName = "execCreateChildPages";
     IMethod childPagesMethod = TypeUtility.getMethod(outlineType, methodName);
@@ -81,26 +109,7 @@ public abstract class AbstractPageOperation implements IOperation {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(childPagesMethod) {
         @Override
         protected void updateMethodBody(Document methodBody, IImportValidator validator) throws CoreException {
-          Matcher matcher = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(.+\\)\\;", Pattern.MULTILINE).matcher(methodBody.get());
-          int index = -1;
-          String listName = null;
-          while (matcher.find()) {
-            index = matcher.end();
-            listName = matcher.group(1);
-          }
-          if (index > 0) {
-            String lineDelimiter = ResourceUtility.getLineSeparator(methodBody);
-            InsertEdit edit = new InsertEdit(index, lineDelimiter + getChildPageAddSource(pageType, listName, lineDelimiter, validator));
-            try {
-              edit.apply(methodBody);
-            }
-            catch (Exception e) {
-              ScoutSdk.logError("Could not update method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
-            }
-          }
-          else {
-            ScoutSdk.logWarning("Could find insert position for an additional page in method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.");
-          }
+          addPageToList(methodBody, pageType, getMethod(), validator);
         }
       };
       updateContentOp.validate();
@@ -127,11 +136,8 @@ public abstract class AbstractPageOperation implements IOperation {
     if (TypeUtility.exists(childPagesMethod)) {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(childPagesMethod) {
         @Override
-        protected void createMethodBody(StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator, String originalBody) throws JavaModelException {
-          String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
-          String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
-          sourceBuilder.append(pageRef).append(" ").append(varName).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
-          sourceBuilder.append("pageList.add(").append(varName).append(");").append(lineDelimiter);
+        protected void updateMethodBody(Document methodBody, IImportValidator validator) throws CoreException {
+          addPageToList(methodBody, pageType, getMethod(), validator);
         }
       };
       updateContentOp.setFormatSource(true);
@@ -139,9 +145,8 @@ public abstract class AbstractPageOperation implements IOperation {
       updateContentOp.run(monitor, workingCopyManager);
     }
     else {
-      MethodOverrideOperation overrideOp = new MethodOverrideOperation(methodName, pageWithNodes);
+      MethodOverrideOperation overrideOp = new MethodOverrideOperation(methodName, pageWithNodes, true);
       overrideOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
@@ -175,7 +180,7 @@ public abstract class AbstractPageOperation implements IOperation {
       updateContentOp.run(monitor, workingCopyManager);
     }
     else {
-      MethodOverrideOperation overrideOp = new MethodOverrideOperation(methodName, pageWithTable);
+      MethodOverrideOperation overrideOp = new MethodOverrideOperation(methodName, pageWithTable, true);
       overrideOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
         @Override
