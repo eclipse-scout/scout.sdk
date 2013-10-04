@@ -42,12 +42,6 @@ public class FormStackNewOperation extends FormNewOperation {
 
   private boolean m_createNewHandler = false;
   private boolean m_createModifyHandler = false;
-  private boolean m_createExecStore = true;
-  private boolean m_createExecLoad = true;
-  private boolean m_createPrepareCreateMethod = true;
-  private boolean m_createCreateMethod = true;
-  private boolean m_createLoadMethod = true;
-  private boolean m_createStoreMethod = true;
   private IJavaProject m_formDataProject;
   private String m_formDataPackage;
 

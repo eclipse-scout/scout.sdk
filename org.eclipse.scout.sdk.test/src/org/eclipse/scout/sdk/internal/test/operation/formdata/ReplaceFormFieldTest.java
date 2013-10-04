@@ -39,7 +39,7 @@ public class ReplaceFormFieldTest extends AbstractSdkTestWithFormDataProject {
     Assert.assertNotNull(sharedProject);
 
     FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(form);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    executeBuildAssertNoCompileErrors(op);
 
     testApiOfBaseFormData();
   }
@@ -52,7 +52,7 @@ public class ReplaceFormFieldTest extends AbstractSdkTestWithFormDataProject {
 
     FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(form);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    executeBuildAssertNoCompileErrors(op);
 
     testApiOfExtendedFormData();
   }
@@ -65,7 +65,7 @@ public class ReplaceFormFieldTest extends AbstractSdkTestWithFormDataProject {
 
     FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(form);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    executeBuildAssertNoCompileErrors(op);
 
     testApiOfExtendedExtendedFormData();
   }

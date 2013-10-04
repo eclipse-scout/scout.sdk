@@ -50,7 +50,7 @@ public class SmartFieldTest extends AbstractScoutSdkTest {
   public void testExecParseValue01() throws Exception {
     IType field = createSmartField("ExecParseValueField");
     MethodOverrideOperation mop = new MethodOverrideOperation("execParseValue", field);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, mop);
+    executeBuildAssertNoCompileErrors(mop);
     SdkAssert.assertExist(mop.getCreatedMethod());
 
     Assert.assertEquals(Signature.createTypeSignature(Long.class.getName(), true), SignatureUtility.getResolvedSignature(mop.getCreatedMethod().getReturnType(), field));
@@ -62,7 +62,7 @@ public class SmartFieldTest extends AbstractScoutSdkTest {
   public void testExecFormatValue01() throws Exception {
     IType field = createSmartField("ExecFormatValueField01");
     MethodOverrideOperation mop = new MethodOverrideOperation("execFormatValue", field);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, mop);
+    executeBuildAssertNoCompileErrors(mop);
     SdkAssert.assertExist(mop.getCreatedMethod());
 
     Assert.assertTrue(Flags.isProtected(mop.getCreatedMethod().getFlags()));
@@ -74,7 +74,7 @@ public class SmartFieldTest extends AbstractScoutSdkTest {
   public void testExecFormatValue02() throws Exception {
     IType field = createSmartField("ExecFormatValueField02", Signature.createTypeSignature(AbstractSmartFieldTypeName + "<" + Map.class.getName() + "<" + List.class.getName() + "<" + String.class.getName() + ">," + File.class.getName() + ">>", true));
     MethodOverrideOperation mop = new MethodOverrideOperation("execFormatValue", field);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, mop);
+    executeBuildAssertNoCompileErrors(mop);
     SdkAssert.assertExist(mop.getCreatedMethod());
     Assert.assertTrue(Flags.isProtected(mop.getCreatedMethod().getFlags()));
     Assert.assertEquals(1, mop.getCreatedMethod().getParameterTypes().length);
@@ -89,7 +89,7 @@ public class SmartFieldTest extends AbstractScoutSdkTest {
     IType mainBox = TypeUtility.getType("formfield.client.ui.forms.DesktopForm.MainBox");
     SmartFieldNewOperation fieldOp = new SmartFieldNewOperation(name, mainBox);
     fieldOp.setSuperTypeSignature(superTypeSignature);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, fieldOp);
+    executeBuildAssertNoCompileErrors(fieldOp);
     return fieldOp.getCreatedField();
   }
 

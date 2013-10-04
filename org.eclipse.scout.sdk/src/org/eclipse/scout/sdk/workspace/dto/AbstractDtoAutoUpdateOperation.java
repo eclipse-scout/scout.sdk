@@ -54,7 +54,6 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
 
   public AbstractDtoAutoUpdateOperation(IType modelType) {
     m_modelType = modelType;
-
   }
 
   @Override
@@ -71,6 +70,17 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    String backup = ScoutUtility.getUsername();
+    try {
+      ScoutUtility.setUsernameForThread("Scout robot");
+      runImpl(monitor, workingCopyManager);
+    }
+    finally {
+      ScoutUtility.setUsernameForThread(backup);
+    }
+  }
+
+  protected void runImpl(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IType derivedType = ensureDerivedType();
     if (TypeUtility.exists(derivedType)) {
       String oldSource = derivedType.getCompilationUnit().getSource();
@@ -182,7 +192,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     }
   }
 
-  private class P_FormDataStoreOperation implements IOperation {
+  private static class P_FormDataStoreOperation implements IOperation {
     private final String m_icuSource;
     private final ICompilationUnit m_derivedType;
     private final IType m_type;
@@ -214,11 +224,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
         // save buffer
         icu.getBuffer().save(monitor, true);
 
-        // organize import required to:
-        // 1. ensure the JDT settings for the imports are applied
-        // 2. resolve references e.g. in validation rules to classes holding constants.
-        //    see /org.eclipse.scout.sdk.test/resources/operation/formData/formdata.client/src/formdata/client/ui/template/formfield/AbstractLimitedStringField.java for an example.
-        // Also see org.eclipse.scout.sdk.operation.form.formdata.FormDataUpdateOperation
+        // organize import required to ensure the JDT settings for the imports are applied
         OrganizeImportOperation o = new OrganizeImportOperation(icu);
         o.validate();
         o.run(monitor, workingCopyManager);
@@ -233,5 +239,4 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
       }
     }
   }
-
 }

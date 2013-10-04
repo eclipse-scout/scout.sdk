@@ -62,9 +62,9 @@ public class NlsExportImportExtensionPoints {
           String attWizard = element.getAttribute("wizard");
           if (!StringUtility.isNullOrEmpty(attWizard)) {
             Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
-            Class wizard = contributerBundle.loadClass(attWizard);
+            Class<?> wizard = contributerBundle.loadClass(attWizard);
             if (AbstractImportExportWizard.class.isAssignableFrom(wizard)) {
-              wizardExt.setWizard(wizard);
+              wizardExt.setWizard((Class<? extends AbstractImportExportWizard>) wizard);
             }
             else {
               NlsCore.logError("extension '" + extension.getExtensionPointUniqueIdentifier() + "' has a wizard not instance of '" + AbstractImportExportWizard.class.getName() + "'. Ignoring extension.");

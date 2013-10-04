@@ -31,8 +31,8 @@ public abstract class SourceProperty<T> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof SourceProperty) {
-      return CompareUtility.equals(((SourceProperty) obj).getValue(), getValue());
+    if (obj instanceof SourceProperty<?>) {
+      return CompareUtility.equals(((SourceProperty<?>) obj).getValue(), getValue());
     }
     return false;
   }

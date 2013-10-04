@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
@@ -46,13 +45,10 @@ public class TableFieldNewOperation implements IOperation {
   private String m_superTypeSignature;
   private String m_tableSuperTypeSignature;
   private IJavaElement m_sibling;
-  private IJavaElement m_getterMethodSibling;
-  private IType m_formType;
   private double m_orderNr;
 
   private IType m_createdField;
   private IType m_createdTable;
-  private IMethod m_createdFieldGetterMethod;
 
   public TableFieldNewOperation(String typeName, IType declaringType) {
     this(typeName, declaringType, true);

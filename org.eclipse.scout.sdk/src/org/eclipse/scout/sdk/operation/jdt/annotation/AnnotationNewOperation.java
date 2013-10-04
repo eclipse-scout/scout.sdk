@@ -53,7 +53,6 @@ public class AnnotationNewOperation implements IOperation {
 
   private static final Pattern PATTERN = Pattern.compile("\\s*");
 
-  private boolean m_formatSource;
   private IAnnotationSourceBuilder m_sourceBuilder;
 
   private final IMember m_declaringType;

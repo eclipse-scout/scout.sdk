@@ -39,7 +39,7 @@ public abstract class AbstractFieldNewOperationTest extends AbstractScoutSdkTest
     IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(form);
 
     IOperation op = getOperation(form, structuredType);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    executeBuildAssertNoCompileErrors(op);
     IType createdField = getCreatedField();
 
     ICompareResult<String> result = CompareUtility.compareSource(createdField, Activator.getDefault().getBundle(), getReferenceFilePath(), true);

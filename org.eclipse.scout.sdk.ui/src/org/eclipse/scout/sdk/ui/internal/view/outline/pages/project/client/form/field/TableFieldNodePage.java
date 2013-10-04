@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
@@ -50,8 +49,8 @@ public class TableFieldNodePage extends AbstractFormFieldNodePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ShowJavaReferencesAction.class, FormDataUpdateAction.class,
-        CreateTemplateAction.class, FormFieldRenameAction.class, FormFieldDeleteAction.class, TableColumnWidthsPasteAction.class};
+    return new Class[]{ShowJavaReferencesAction.class, CreateTemplateAction.class, FormFieldRenameAction.class,
+        FormFieldDeleteAction.class, TableColumnWidthsPasteAction.class};
   }
 
   @Override

@@ -49,7 +49,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
     PackageFragementNewOperation packageOp = new PackageFragementNewOperation(packageName, javaProject);
     packageOp.setExportPackagePolicy(ExportPolicy.AddPackageWhenNotEmpty);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, packageOp);
+    executeBuildAssertNoCompileErrors(packageOp);
 
     IPackageFragment createdPackageFragment = packageOp.getCreatedPackageFragment();
     Assert.assertTrue(TypeUtility.exists(createdPackageFragment));
@@ -70,7 +70,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
     PackageFragementNewOperation packageOp = new PackageFragementNewOperation(packageName, javaProject);
     packageOp.setExportPackagePolicy(ExportPolicy.AddPackageWhenNotEmpty);
     packageOp.setNoErrorWhenPackageAlreadyExist(true);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, packageOp);
+    executeBuildAssertNoCompileErrors(packageOp);
 
     SdkAssert.assertExist(packageOp.getCreatedPackageFragment());
   }
@@ -84,7 +84,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
     PackageFragementNewOperation packageOp = new PackageFragementNewOperation(packageName, javaProject);
     packageOp.setExportPackagePolicy(ExportPolicy.AddPackage);
 
-    TestWorkspaceUtility.executeAndBuildWorkspace(SYSTEM_PROPERTIES_FORM_DATA_USER, packageOp);
+    TestWorkspaceUtility.executeAndBuildWorkspace(packageOp);
 
     IPackageFragment createdPackageFragment = packageOp.getCreatedPackageFragment();
     Assert.assertTrue(TypeUtility.exists(createdPackageFragment));
@@ -97,7 +97,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
     PrimaryTypeNewOperation typeOp = new PrimaryTypeNewOperation("AbcType", createdPackageFragment);
     typeOp.setFlags(Flags.AccPublic);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeOp);
+    executeBuildAssertNoCompileErrors(typeOp);
 
   }
 

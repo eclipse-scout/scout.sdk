@@ -15,6 +15,10 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
@@ -196,8 +200,22 @@ public class ScoutPropertyView extends ViewPart {
 
   private class P_SelectionListener implements ISelectionListener {
     @Override
-    public void selectionChanged(IWorkbenchPart part, ISelection selection) {
-      handleSelectionChanged((ScoutExplorerPart) part, selection);
+    public void selectionChanged(final IWorkbenchPart part, final ISelection selection) {
+      Job j = new Job("update scout property view to selection") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          part.getSite().getShell().getDisplay().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+              handleSelectionChanged((ScoutExplorerPart) part, selection);
+            }
+          });
+          return Status.OK_STATUS;
+        }
+      };
+      j.setUser(false);
+      j.setSystem(true);
+      j.schedule(50);
     }
   } // end class P_SelectionListener
 

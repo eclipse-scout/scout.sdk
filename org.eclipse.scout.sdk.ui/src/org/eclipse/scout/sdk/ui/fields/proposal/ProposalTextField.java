@@ -52,7 +52,6 @@ public class ProposalTextField extends TextField {
   private P_ProposalFieldListener m_proposalFieldListener;
   private IProposalPopupListener m_popupListener;
   private Object m_selectedProposal = null;
-  private Object m_lastFiredProposal = null;
   private Object m_input;
 
   private final EventListenerList m_eventListeners = new EventListenerList();
@@ -220,7 +219,6 @@ public class ProposalTextField extends TextField {
     for (IProposalAdapterListener l : m_eventListeners.getListeners(IProposalAdapterListener.class)) {
       l.proposalAccepted(event);
     }
-    m_lastFiredProposal = proposal;
   }
 
   public synchronized void acceptProposal(Object proposal) {

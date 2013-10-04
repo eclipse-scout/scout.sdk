@@ -28,7 +28,7 @@ public class ExternalCheckboxFieldTest extends AbstractSdkTestWithFormDataProjec
     Assert.assertTrue(TypeUtility.exists(template));
 
     FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(template);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    executeBuildAssertNoCompileErrors(op);
     testApiOfAbstractTestCheckboxFieldData();
   }
 

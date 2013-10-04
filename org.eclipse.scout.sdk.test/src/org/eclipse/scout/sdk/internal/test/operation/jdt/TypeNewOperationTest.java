@@ -57,7 +57,7 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     typeOp.setFlags(Flags.AccPublic);
     typeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     typeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeOp);
+    executeBuildAssertNoCompileErrors(typeOp);
 
     ICompilationUnit createdCompilationUnit = typeOp.getCreatedCompilationUnit();
     Assert.assertTrue(TypeUtility.exists(createdCompilationUnit));
@@ -71,7 +71,7 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     // delete again
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
     delOp.addMember(createdType);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, delOp);
+    executeBuildAssertNoCompileErrors(delOp);
     SdkAssert.assertNotExist(createdCompilationUnit);
 
   }
@@ -212,7 +212,7 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     methodOp.setReturnTypeSignature(Signature.SIG_VOID);
     methodOp.addParameter(new MethodParameter("aList", Signature.createTypeSignature(List.class.getName() + "<" + String.class.getName() + ">", true)));
     typeOp.addMethodSourceBuilder(methodOp);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeOp);
+    executeBuildAssertNoCompileErrors(typeOp);
     SdkAssert.assertExist(typeOp.getCreatedType());
 
     IType createdType = typeOp.getCreatedType();
@@ -230,7 +230,7 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     innerTypeOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.placeholder.AbstractPlaceholderField", true));
     innerTypeOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IFormField));
     innerTypeOp.setSibling(TypeUtility.getType("jdt.test.client.TestForm.MainBox.StringField"));
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, innerTypeOp);
+    executeBuildAssertNoCompileErrors(innerTypeOp);
     IAnnotation annotation = innerTypeOp.getCreatedType().getAnnotation("Order");
     Assert.assertTrue(TypeUtility.exists(annotation));
     IMemberValuePair[] memberValuePairs = annotation.getMemberValuePairs();

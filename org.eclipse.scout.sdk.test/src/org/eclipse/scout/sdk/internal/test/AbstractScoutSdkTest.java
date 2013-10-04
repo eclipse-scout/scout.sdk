@@ -10,14 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.testing.TestUtility;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
@@ -25,12 +21,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 public abstract class AbstractScoutSdkTest {
-
-  public static Map<String, String> SYSTEM_PROPERTIES_FORM_DATA_USER;
-  static {
-    SYSTEM_PROPERTIES_FORM_DATA_USER = new HashMap<String, String>();
-    SYSTEM_PROPERTIES_FORM_DATA_USER.put(OperationJob.SYSTEM_PROPERTY_USER_NAME, OperationJob.SCOUT_CODE_GEN_USER_NAME);
-  }
 
   @BeforeClass
   public static void setup() throws CoreException {
@@ -62,12 +52,7 @@ public abstract class AbstractScoutSdkTest {
   }
 
   protected static void executeBuildAssertNoCompileErrors(IOperation... ops) throws Exception {
-    executeBuildAssertNoCompileErrors(null, ops);
-  }
-
-  protected static void executeBuildAssertNoCompileErrors(Map<String, String> operationScopeSystemProperties, IOperation... ops) throws Exception {
-    TestWorkspaceUtility.executeAndBuildWorkspace(operationScopeSystemProperties, ops);
+    TestWorkspaceUtility.executeAndBuildWorkspace(ops);
     TestWorkspaceUtility.assertNoCompileErrors();
   }
-
 }

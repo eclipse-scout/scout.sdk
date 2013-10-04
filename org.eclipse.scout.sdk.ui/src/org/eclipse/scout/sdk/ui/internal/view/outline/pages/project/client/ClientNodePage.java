@@ -14,9 +14,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
-import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
+import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -129,7 +129,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, FormDataUpdateAction.class, InstallClientSessionAction.class, ScoutBundleNewAction.class};
+    return new Class[]{WellformAction.class, MultipleUpdateFormDataAction.class, InstallClientSessionAction.class, ScoutBundleNewAction.class};
   }
 
   @Override
@@ -139,8 +139,8 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       action.setOperation(new WellformClientBundleOperation(getScoutBundle()));
       action.setScoutBundle(getScoutBundle());
     }
-    else if (menu instanceof FormDataUpdateAction) {
-      ((FormDataUpdateAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutBundle()));
+    else if (menu instanceof MultipleUpdateFormDataAction) {
+      ((MultipleUpdateFormDataAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutBundle()));
     }
     else if (menu instanceof InstallClientSessionAction) {
       ((InstallClientSessionAction) menu).init(m_clientSessionHierarchy, getScoutBundle());

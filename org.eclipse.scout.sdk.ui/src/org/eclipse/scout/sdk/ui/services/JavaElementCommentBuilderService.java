@@ -30,10 +30,13 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.templates.GlobalTemplateVariables;
 import org.eclipse.jface.text.templates.Template;
 import org.eclipse.jface.text.templates.TemplateBuffer;
+import org.eclipse.jface.text.templates.TemplateContext;
 import org.eclipse.jface.text.templates.TemplateException;
 import org.eclipse.jface.text.templates.TemplateVariable;
+import org.eclipse.jface.text.templates.TemplateVariableResolver;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.ISourceBuilder;
@@ -42,6 +45,7 @@ import org.eclipse.scout.sdk.sourcebuilder.compilationunit.ICompilationUnitSourc
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
@@ -56,32 +60,118 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 public class JavaElementCommentBuilderService implements IJavaElementCommentBuilderService {
   private static final String[] EMPTY = new String[0];
 
-  @Override
-  public ICommentSourceBuilder createCompilationUnitCommentBuilder() {
-    return new ICommentSourceBuilder() {
-      @Override
-      public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        if (!(sourceBuilder instanceof ICompilationUnitSourceBuilder)) {
-          throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an compilation unit comment the source builder must be an instance of 'ICompilationUnitSourceBuilder'."));
+  private static final int METHOD_TYPE_NORMAL = 1 << 1;
+  private static final int METHOD_TYPE_GETTER = 1 << 2;
+  private static final int METHOD_TYPE_SETTER = 1 << 3;
+
+  private static final UsernameResolver USERNAME_RESOLVER = new UsernameResolver();
+
+  private final static ICommentSourceBuilder COMPILATION_UNIT_COMMENT_BUILDER = new ICommentSourceBuilder() {
+    @Override
+    public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+      if (!(sourceBuilder instanceof ICompilationUnitSourceBuilder)) {
+        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an compilation unit comment the source builder must be an instance of 'ICompilationUnitSourceBuilder'."));
+      }
+      ICompilationUnitSourceBuilder icuSourceBuilder = (ICompilationUnitSourceBuilder) sourceBuilder;
+      Template template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
+      if (template != null) {
+        CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+        context.setVariable(CodeTemplateContextType.FILENAME, icuSourceBuilder.getElementName());
+        context.setVariable(CodeTemplateContextType.PACKAGENAME, icuSourceBuilder.getPackageFragmentName());
+        context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+        context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(icuSourceBuilder.getElementName()));
+        source.append(evaluateTemplate(context, template));
+      }
+    }
+  };
+
+  private final static ICommentSourceBuilder TYPE_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
+    @Override
+    public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+      if (!(sourceBuilder instanceof ITypeSourceBuilder)) {
+        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create a type comment the source builder must be an instance of 'ITypeSourceBuilder'."));
+      }
+      ITypeSourceBuilder typeSourceBuilder = (ITypeSourceBuilder) sourceBuilder;
+      Template template = getCodeTemplate(CodeTemplateContextType.TYPECOMMENT_ID, ownerProject);
+      if (template == null) {
+        return;
+      }
+      CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+//      context.setCompilationUnitVariables(cu);
+      context.setVariable(CodeTemplateContextType.FILENAME, "");
+      context.setVariable(CodeTemplateContextType.PACKAGENAME, "");//typeSourceBuilder.ge.getPackageFragmentName());
+      context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+      context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, Signature.getQualifier(typeSourceBuilder.getElementName()));
+      context.setVariable(CodeTemplateContextType.TYPENAME, Signature.getSimpleName(typeSourceBuilder.getElementName()));
+
+      TemplateBuffer buffer;
+      try {
+        buffer = context.evaluate(template);
+      }
+      catch (BadLocationException e) {
+        throw new CoreException(Status.CANCEL_STATUS);
+      }
+      catch (TemplateException e) {
+        throw new CoreException(Status.CANCEL_STATUS);
+      }
+      String str = buffer.getString();
+      if (Strings.containsOnlyWhitespaces(str)) {
+        return;
+      }
+
+      TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
+      if (position == null) {
+        source.append(str);
+        return;
+      }
+
+      IDocument document = new Document(str);
+      int[] tagOffsets = position.getOffsets();
+      for (int i = tagOffsets.length - 1; i >= 0; i--) { // from last to first
+        try {
+          insertTag(document, tagOffsets[i], position.getLength(), EMPTY, EMPTY, null, EMPTY, false, lineDelimiter);
         }
-        ICompilationUnitSourceBuilder icuSourceBuilder = (ICompilationUnitSourceBuilder) sourceBuilder;
-        Template template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
-        if (template != null) {
-          CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
-          context.setVariable(CodeTemplateContextType.FILENAME, icuSourceBuilder.getElementName());
-          context.setVariable(CodeTemplateContextType.PACKAGENAME, icuSourceBuilder.getPackageFragmentName());
-          context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
-          context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(icuSourceBuilder.getElementName()));
-          source.append(evaluateTemplate(context, template));
+        catch (BadLocationException e) {
+          throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
         }
       }
-    };
+      source.append(document.get());
+    }
+  };
+
+  private final static ICommentSourceBuilder METHOD_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_NORMAL);
+  private final static ICommentSourceBuilder METHOD_GETTER_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_GETTER);
+  private final static ICommentSourceBuilder METHOD_SETTER_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_SETTER);
+
+  private final static ICommentSourceBuilder FIELD_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
+    @Override
+    public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+      if (!(sourceBuilder instanceof IFieldSourceBuilder)) {
+        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an field comment the source builder must be an instance of 'IFieldSourceBuilder'."));
+      }
+      IFieldSourceBuilder fieldSourceBuilder = (IFieldSourceBuilder) sourceBuilder;
+      Template template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
+      if (template != null) {
+        CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
+//        context.setCompilationUnitVariables(cu);
+        context.setVariable(CodeTemplateContextType.FIELD_TYPE, Signature.getSignatureSimpleName(fieldSourceBuilder.getSignature()));
+        context.setVariable(CodeTemplateContextType.FIELD, fieldSourceBuilder.getElementName());
+        context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+        context.setVariable(CodeTemplateContextType.PACKAGENAME, "");
+        context.setVariable(CodeTemplateContextType.FILENAME, "");
+        source.append(evaluateTemplate(context, template));
+      }
+    }
+  };
+
+  @Override
+  public ICommentSourceBuilder createPreferencesCompilationUnitCommentBuilder() {
+    return COMPILATION_UNIT_COMMENT_BUILDER;
   }
 
   @Override
   public ICommentSourceBuilder createPreferencesMethodOverrideComment(final String interfaceFqn) {
     return new ICommentSourceBuilder() {
-
       @Override
       public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         if (!(sourceBuilder instanceof IMethodSourceBuilder)) {
@@ -117,66 +207,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     };
   }
 
-  @Override
-  public ICommentSourceBuilder createPreferencesTypeCommentBuilder() {
-    return new ICommentSourceBuilder() {
-      @Override
-      public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        if (!(sourceBuilder instanceof ITypeSourceBuilder)) {
-          throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create a type comment the source builder must be an instance of 'ITypeSourceBuilder'."));
-        }
-        ITypeSourceBuilder typeSourceBuilder = (ITypeSourceBuilder) sourceBuilder;
-        Template template = getCodeTemplate(CodeTemplateContextType.TYPECOMMENT_ID, ownerProject);
-        if (template == null) {
-          return;
-        }
-        CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
-//        context.setCompilationUnitVariables(cu);
-        context.setVariable(CodeTemplateContextType.FILENAME, "");
-        context.setVariable(CodeTemplateContextType.PACKAGENAME, "");//typeSourceBuilder.ge.getPackageFragmentName());
-        context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
-
-        context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, Signature.getQualifier(typeSourceBuilder.getElementName()));
-        context.setVariable(CodeTemplateContextType.TYPENAME, Signature.getSimpleName(typeSourceBuilder.getElementName()));
-
-        TemplateBuffer buffer;
-        try {
-          buffer = context.evaluate(template);
-        }
-        catch (BadLocationException e) {
-          throw new CoreException(Status.CANCEL_STATUS);
-        }
-        catch (TemplateException e) {
-          throw new CoreException(Status.CANCEL_STATUS);
-        }
-        String str = buffer.getString();
-        if (Strings.containsOnlyWhitespaces(str)) {
-          return;
-        }
-
-        TemplateVariable position = findVariable(buffer, CodeTemplateContextType.TAGS); // look if Javadoc tags have to be added
-        if (position == null) {
-          source.append(str);
-          return;
-        }
-
-        IDocument document = new Document(str);
-        int[] tagOffsets = position.getOffsets();
-        for (int i = tagOffsets.length - 1; i >= 0; i--) { // from last to first
-          try {
-            insertTag(document, tagOffsets[i], position.getLength(), EMPTY, EMPTY, null, EMPTY, false, lineDelimiter);
-          }
-          catch (BadLocationException e) {
-            throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
-          }
-        }
-        source.append(document.get());
-      }
-    };
-  }
-
-  @Override
-  public ICommentSourceBuilder createPreferencesMethodCommentBuilder() {
+  private static ICommentSourceBuilder createMethodSourceBuilder(final int type) {
     return new ICommentSourceBuilder() {
       @Override
       public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
@@ -193,13 +224,28 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
           paramNames[j] = param.getName();
           j++;
         }
-        List<String> exceptionSignatures = methodSourceBuilder.getExceptionSignatures();
 
-        String templateName = CodeTemplateContextType.METHODCOMMENT_ID;
+        List<String> exceptionSignatures = methodSourceBuilder.getExceptionSignatures();
         String returnTypeSignature = methodSourceBuilder.getReturnTypeSignature();
-        if (returnTypeSignature == null) {
-          templateName = CodeTemplateContextType.CONSTRUCTORCOMMENT_ID;
+
+        String templateName = null;
+        switch (type) {
+          case METHOD_TYPE_GETTER:
+            templateName = CodeTemplateContextType.GETTERCOMMENT_ID;
+            break;
+          case METHOD_TYPE_SETTER:
+            templateName = CodeTemplateContextType.SETTERCOMMENT_ID;
+            break;
+          default:
+            if (returnTypeSignature == null) {
+              templateName = CodeTemplateContextType.CONSTRUCTORCOMMENT_ID;
+            }
+            else {
+              templateName = CodeTemplateContextType.METHODCOMMENT_ID;
+            }
+            break;
         }
+
         Template template = getCodeTemplate(templateName, ownerProject);
         if (template == null) {
           return;
@@ -257,27 +303,44 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
   }
 
   @Override
-  public ICommentSourceBuilder createPreferencesFieldCommentBuilder() {
-    return new ICommentSourceBuilder() {
-      @Override
-      public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        if (!(sourceBuilder instanceof IFieldSourceBuilder)) {
-          throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an field comment the source builder must be an instance of 'IFieldSourceBuilder'."));
-        }
-        IFieldSourceBuilder fieldSourceBuilder = (IFieldSourceBuilder) sourceBuilder;
-        Template template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
-        if (template != null) {
-          CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
-//          context.setCompilationUnitVariables(cu);
-          context.setVariable(CodeTemplateContextType.FIELD_TYPE, Signature.getSignatureSimpleName(fieldSourceBuilder.getSignature()));
-          context.setVariable(CodeTemplateContextType.FIELD, fieldSourceBuilder.getElementName());
-          source.append(evaluateTemplate(context, template));
-        }
-      }
-    };
+  public ICommentSourceBuilder createPreferencesTypeCommentBuilder() {
+    return TYPE_COMMENT_SOURCE_BUILDER;
   }
 
-  private String evaluateTemplate(CodeTemplateContext context, Template template) throws CoreException {
+  @Override
+  public ICommentSourceBuilder createPreferencesMethodCommentBuilder() {
+    return METHOD_COMMENT_SOURCE_BUILDER;
+  }
+
+  @Override
+  public ICommentSourceBuilder createPreferencesMethodGetterCommentBuilder() {
+    return METHOD_GETTER_COMMENT_SOURCE_BUILDER;
+  }
+
+  @Override
+  public ICommentSourceBuilder createPreferencesMethodSetterCommentBuilder() {
+    return METHOD_SETTER_COMMENT_SOURCE_BUILDER;
+  }
+
+  @Override
+  public ICommentSourceBuilder createPreferencesFieldCommentBuilder() {
+    return FIELD_COMMENT_SOURCE_BUILDER;
+  }
+
+  @SuppressWarnings("unchecked")
+  private static String evaluateTemplate(CodeTemplateContext context, Template template) throws CoreException {
+
+    // replace the user name resolver with our own to ensure we can respect the scout specific user names.
+    Iterator<TemplateVariableResolver> resolvers = (Iterator<TemplateVariableResolver>) context.getContextType().resolvers();
+    while (resolvers.hasNext()) {
+      TemplateVariableResolver resolver = resolvers.next();
+      if (resolver instanceof GlobalTemplateVariables.User) {
+        context.getContextType().removeResolver(resolver); // remove the JDT resolver
+        context.getContextType().addResolver(USERNAME_RESOLVER); // add our own
+        break;
+      }
+    }
+
     TemplateBuffer buffer;
     try {
       buffer = context.evaluate(template);
@@ -296,7 +359,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     return str;
   }
 
-  private Template getCodeTemplate(String id, IJavaProject project) {
+  private static Template getCodeTemplate(String id, IJavaProject project) {
     if (project == null) return JavaPlugin.getDefault().getCodeTemplateStore().findTemplateById(id);
     ProjectTemplateStore projectStore = new ProjectTemplateStore(project.getProject());
     try {
@@ -308,7 +371,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     return projectStore.findTemplateById(id);
   }
 
-  private TemplateVariable findVariable(TemplateBuffer buffer, String variable) {
+  private static TemplateVariable findVariable(TemplateBuffer buffer, String variable) {
     TemplateVariable[] positions = buffer.getVariables();
     for (int i = 0; i < positions.length; i++) {
       TemplateVariable curr = positions[i];
@@ -383,4 +446,10 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     return true;
   }
 
+  private final static class UsernameResolver extends GlobalTemplateVariables.User {
+    @Override
+    protected String resolve(TemplateContext context) {
+      return ScoutUtility.getUsername();
+    }
+  }
 }

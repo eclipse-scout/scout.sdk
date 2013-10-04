@@ -1,5 +1,6 @@
 package org.eclipse.scout.sdk.compatibility.internal;
 
+import java.util.Collection;
 import java.util.Hashtable;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -98,25 +99,25 @@ public class ScoutCompatibilityActivator extends Plugin {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public <T extends Object> T acquireCompatibilityService(Class<T> type) {
-    ServiceReference[] references = null;
+    Collection<ServiceReference<T>> references = null;
     try {
-      references = m_context.getServiceReferences(type.getName(), null);
+      references = m_context.getServiceReferences(type, null);
     }
     catch (InvalidSyntaxException e) {
     }
-    if (references == null || references.length < 1) return null;
-    if (references.length != 1) {
+    if (references == null || references.size() < 1) return null;
+    if (references.size() != 1) {
       throw new RuntimeException("more than one service found for " + type.getName());
     }
 
-    ServiceReference reference = references[0];
-    Object service = m_context.getService(reference);
-    if (service != null) {
+    ServiceReference<T> reference = references.iterator().next();
+    try {
+      return m_context.getService(reference);
+    }
+    finally {
       m_context.ungetService(reference);
     }
-    return (T) service;
   }
 
   public <T extends Object> void registerService(Class<T> type, T service) {

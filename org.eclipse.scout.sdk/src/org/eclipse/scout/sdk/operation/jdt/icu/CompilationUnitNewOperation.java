@@ -91,21 +91,16 @@ public class CompilationUnitNewOperation implements IOperation {
     }
 
     // create icu
-    // needed to ensure jdt events getting fired at this point. Otherwise some events getting lost.
-//    ResourcesPlugin.getWorkspace().checkpoint(false);
     StringBuilder source = new StringBuilder();
     createSource(source, ResourceUtility.getLineSeparator(getPackageFragment()), getPackageFragment().getJavaProject(), new SimpleImportValidator(getPackageFragment().getElementName()));
 
     ICompilationUnit createdCompilationUnit = getPackageFragment().createCompilationUnit(getSourceBuilder().getElementName(), source.toString(), true, monitor);
     workingCopyManager.register(createdCompilationUnit, monitor);
     setCreatedCompilationUnit(createdCompilationUnit);
-
-//    workingCopyManager.reconcile(m_createdCompilationUnit, monitor);
   }
 
   protected void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
     getSourceBuilder().createSource(source, lineDelimiter, ownerProject, validator);
-
   }
 
   public IJavaProject getJavaProject() {

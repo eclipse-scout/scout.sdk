@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.sourcebuilder.ICommentSourceBuilder;
  */
 public interface IJavaElementCommentBuilderService {
 
-  ICommentSourceBuilder createCompilationUnitCommentBuilder();
+  ICommentSourceBuilder createPreferencesCompilationUnitCommentBuilder();
 
   ICommentSourceBuilder createPreferencesMethodOverrideComment(final String interfaceFqn);
 
@@ -29,5 +29,9 @@ public interface IJavaElementCommentBuilderService {
   ICommentSourceBuilder createPreferencesMethodCommentBuilder();
 
   ICommentSourceBuilder createPreferencesFieldCommentBuilder();
+
+  ICommentSourceBuilder createPreferencesMethodGetterCommentBuilder();
+
+  ICommentSourceBuilder createPreferencesMethodSetterCommentBuilder();
 
 }

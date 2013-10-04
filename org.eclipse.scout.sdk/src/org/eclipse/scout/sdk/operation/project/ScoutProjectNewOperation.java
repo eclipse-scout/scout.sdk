@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -196,7 +197,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     getProperties().setProperty(PROP_ARCH, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_ARCH));
     getProperties().setProperty(PROP_LOCALHOST, getHostName());
     getProperties().setProperty(PROP_CURRENT_DATE, SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT).format(new Date()));
-    getProperties().setProperty(PROP_USER_NAME, System.getProperty("user.name"));
+    getProperties().setProperty(PROP_USER_NAME, ScoutUtility.getUsername());
     getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, "Default");
   }
 

@@ -23,8 +23,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
@@ -129,16 +127,7 @@ public final class TestWorkspaceUtility {
    * @throws Exception
    */
   public static void executeAndBuildWorkspace(IOperation... ops) throws Exception {
-    executeAndBuildWorkspace(null, ops);
-  }
-
-  public static void executeAndBuildWorkspace(Map<String, String> operationScopeSystemProperties, IOperation... ops) throws Exception {
     OperationJob job = new OperationJob(ops);
-    if (operationScopeSystemProperties != null) {
-      for (Entry<String, String> prop : operationScopeSystemProperties.entrySet()) {
-        job.setSystemProperty(prop.getKey(), prop.getValue());
-      }
-    }
     job.schedule();
     job.join();
     if (!job.getResult().isOK()) {
@@ -178,8 +167,8 @@ public final class TestWorkspaceUtility {
     buildWorkspace();
     assertNoCompileErrors();
   }
-  
- /**
+
+  /**
    * Recompiles the entire workspace. This method blocks until the build has been completed.
    * 
    * @throws CoreException
@@ -395,5 +384,5 @@ public final class TestWorkspaceUtility {
       }
     }
   }
-  
+
 }

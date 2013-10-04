@@ -34,7 +34,7 @@ public class TableFieldBeanTest extends AbstractSdkTestWithFormDataProject {
     IType field = SdkAssert.assertTypeExists(typeName);
 
     FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(field);
-    TestWorkspaceUtility.executeAndBuildWorkspace(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    TestWorkspaceUtility.executeAndBuildWorkspace(op);
   }
 
   @Test

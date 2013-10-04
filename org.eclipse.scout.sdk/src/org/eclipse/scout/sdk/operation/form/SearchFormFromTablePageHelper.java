@@ -216,9 +216,6 @@ public final class SearchFormFromTablePageHelper {
     else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IStringColumn), column)) {
       return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringField, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ITimeColumn), column)) {
-      return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateTimeField"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
-    }
     return null;
   }
 

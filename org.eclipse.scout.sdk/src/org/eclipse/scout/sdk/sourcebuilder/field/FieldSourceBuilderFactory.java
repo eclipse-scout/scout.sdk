@@ -24,11 +24,7 @@ public final class FieldSourceBuilderFactory {
   }
 
   public static IFieldSourceBuilder createSerialVersionUidBuilder() {
-    FieldSourceBuilder serialVersionUidFieldBuilder = new FieldSourceBuilder("serialVersionUID");
-    serialVersionUidFieldBuilder.setFlags(Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal);
-    serialVersionUidFieldBuilder.setSignature(Signature.SIG_LONG);
-    serialVersionUidFieldBuilder.setValue("1L");
-    return serialVersionUidFieldBuilder;
+    return createFieldSourceBuilder("serialVersionUID", Signature.SIG_LONG, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal, "1L");
   }
 
   /**
@@ -40,11 +36,10 @@ public final class FieldSourceBuilderFactory {
    * @return
    */
   public static IFieldSourceBuilder createFieldSourceBuilder(String fieldName, String signature, int flags, String value) {
-    FieldSourceBuilder serialVersionUidFieldBuilder = new FieldSourceBuilder(fieldName);
-    serialVersionUidFieldBuilder.setFlags(flags);
-    serialVersionUidFieldBuilder.setSignature(signature);
-    serialVersionUidFieldBuilder.setValue(value);
-    return serialVersionUidFieldBuilder;
+    FieldSourceBuilder fieldSourceBuilder = new FieldSourceBuilder(fieldName);
+    fieldSourceBuilder.setFlags(flags);
+    fieldSourceBuilder.setSignature(signature);
+    fieldSourceBuilder.setValue(value);
+    return fieldSourceBuilder;
   }
-
 }

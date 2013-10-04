@@ -41,26 +41,16 @@ public class FieldNewOperation implements IOperation {
   private IJavaElement m_sibling;
 
   private final IFieldSourceBuilder m_sourceBuilder;
-  private boolean m_formatSource;
 
   private IField m_createdField;
 
   public FieldNewOperation(String fieldName, IType declaringType) {
-    this(fieldName, declaringType, true);
-  }
-
-  public FieldNewOperation(String fieldName, IType declaringType, boolean formatSource) {
-    this(new FieldSourceBuilder(fieldName), declaringType, formatSource);
+    this(new FieldSourceBuilder(fieldName), declaringType);
   }
 
   public FieldNewOperation(IFieldSourceBuilder sourceBuilder, IType declaringType) {
-    this(sourceBuilder, declaringType, true);
-  }
-
-  public FieldNewOperation(IFieldSourceBuilder sourceBuilder, IType declaringType, boolean formatSource) {
     m_sourceBuilder = sourceBuilder;
     m_declaringType = declaringType;
-    m_formatSource = formatSource;
   }
 
   @Override

@@ -125,7 +125,6 @@ public interface IRuntimeClasses {
   String ICalendarItemProvider = "org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider"; // NO_UCD
   String ICalendarService = "org.eclipse.scout.rt.shared.services.common.calendar.ICalendarService"; // NO_UCD
   String IChartBox = "org.eclipse.scout.rt.client.ui.form.fields.chartbox.IChartBox"; // NO_UCD
-  String IChartField = "org.eclipse.scout.rt.client.ui.form.fields.chartfield.IChartField"; // NO_UCD
   String ICheckBox = "org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox"; // NO_UCD
   String IClientSession = "org.eclipse.scout.rt.client.IClientSession"; // NO_UCD
   String ICode = "org.eclipse.scout.rt.shared.services.common.code.ICode"; // NO_UCD
@@ -190,7 +189,6 @@ public interface IRuntimeClasses {
   String ITable = "org.eclipse.scout.rt.client.ui.basic.table.ITable"; // NO_UCD
   String ITableRow = "org.eclipse.scout.rt.client.ui.basic.table.ITableRow"; // NO_UCD
   String ITableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField"; // NO_UCD
-  String ITimeField = "org.eclipse.scout.rt.client.ui.form.fields.timefield.ITimeField"; // NO_UCD
   String IToolButton = "org.eclipse.scout.rt.client.ui.action.tool.IToolButton"; // NO_UCD
   String ITree = "org.eclipse.scout.rt.client.ui.basic.tree.ITree"; // NO_UCD
   String ITreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"; // NO_UCD
@@ -208,7 +206,6 @@ public interface IRuntimeClasses {
   String ILongColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.ILongColumn"; // NO_UCD
   String ISmartColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.ISmartColumn"; // NO_UCD
   String IStringColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IStringColumn"; // NO_UCD
-  String ITimeColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.ITimeColumn"; // NO_UCD
 
 //CHECKSTYLE:ON
 }

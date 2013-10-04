@@ -33,7 +33,7 @@ public class PageNewOperationTest extends AbstractSdkTestWithSampleProject {
     newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractPageWithTable));
     newOp.setFormatSource(true);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, newOp);
+    executeBuildAssertNoCompileErrors(newOp);
 
     IType page = newOp.getCreatedPage();
     SdkAssert.assertExist(page);
@@ -48,7 +48,7 @@ public class PageNewOperationTest extends AbstractSdkTestWithSampleProject {
     newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractExtensiblePageWithTable));
     newOp.setFormatSource(true);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, newOp);
+    executeBuildAssertNoCompileErrors(newOp);
 
     IType page = newOp.getCreatedPage();
     SdkAssert.assertExist(page);
@@ -63,7 +63,7 @@ public class PageNewOperationTest extends AbstractSdkTestWithSampleProject {
     newOp.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes"));
     newOp.setFormatSource(true);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, newOp);
+    executeBuildAssertNoCompileErrors(newOp);
 
     IType page = newOp.getCreatedPage();
     SdkAssert.assertExist(page);

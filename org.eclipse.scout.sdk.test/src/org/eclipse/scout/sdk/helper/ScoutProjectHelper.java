@@ -16,7 +16,6 @@ import java.util.HashSet;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
-import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
@@ -77,7 +76,7 @@ public final class ScoutProjectHelper {
     // execute scout project creation according to the properties defined
     ScoutProjectNewOperation mainOperation = new ScoutProjectNewOperation();
     mainOperation.setProperties(properties);
-    TestWorkspaceUtility.executeAndBuildWorkspace(AbstractScoutSdkTest.SYSTEM_PROPERTIES_FORM_DATA_USER, mainOperation);
+    TestWorkspaceUtility.executeAndBuildWorkspace(mainOperation);
 
     // build and wait for silent workspace
     TestWorkspaceUtility.buildWorkspace();

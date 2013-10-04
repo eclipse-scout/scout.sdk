@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal;
 
 import java.util.HashMap;
-import java.util.Iterator;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
@@ -30,8 +29,7 @@ public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
   @Override
   public void dispose() {
     super.dispose();
-    for (Iterator iter = m_registry.values().iterator(); iter.hasNext();) {
-      Image image = (Image) iter.next();
+    for (Image image : m_registry.values()) {
       image.dispose();
     }
     m_registry.clear();

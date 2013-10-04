@@ -75,7 +75,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       IScoutBundle clientBundle = project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       SdkAssert.assertNotNull(clientBundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
-      executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
+      executeBuildAssertNoCompileErrors(createOutlineOp);
       IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
       subtypes = outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter());
@@ -102,7 +102,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       IScoutBundle clientBundle = project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       SdkAssert.assertNotNull(clientBundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
-      executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
+      executeBuildAssertNoCompileErrors(createOutlineOp);
 
       IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
@@ -130,7 +130,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       IScoutBundle clientBundle = project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       SdkAssert.assertNotNull(clientBundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
-      executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
+      executeBuildAssertNoCompileErrors(createOutlineOp);
 
       IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
@@ -158,7 +158,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       IScoutBundle clientBundle = project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       SdkAssert.assertNotNull(clientBundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
-      executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
+      executeBuildAssertNoCompileErrors(createOutlineOp);
 
       IType outline = createOutlineOp.getCreatedType();
       TestWorkspaceUtility.buildWorkspace();
@@ -187,7 +187,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       IScoutBundle clientBundle = project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       SdkAssert.assertNotNull(clientBundle);
       OutlineNewOperation createOutlineOp = new OutlineNewOperation("Test1Outline", DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle.getJavaProject());
-      executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp);
+      executeBuildAssertNoCompileErrors(createOutlineOp);
       createOutlineOp.getCreatedType();
       assertEquals(1, outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter()).length);
       clearWorkspace();
@@ -206,7 +206,7 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
       IScoutBundle clientBundle2 = project2.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false);
       SdkAssert.assertNotNull(clientBundle2);
       OutlineNewOperation createOutlineOp2 = new OutlineNewOperation("Test2Outline", DefaultTargetPackage.get(clientBundle2, IDefaultTargetPackage.CLIENT_OUTLINES), clientBundle2.getJavaProject());
-      executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, createOutlineOp2);
+      executeBuildAssertNoCompileErrors(createOutlineOp2);
       TestWorkspaceUtility.buildWorkspace();
       assertEquals(1, outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter()).length);
     }

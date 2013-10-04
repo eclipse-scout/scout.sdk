@@ -97,7 +97,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     // field
     String memberName;
     if (m_correctSpelling) {
-      memberName = getBeanName(false); 
+      memberName = getBeanName(false);
     }
     else {
       memberName = getBeanName();
@@ -109,7 +109,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     if (isUseHungarianNotation()) {
       memberName = "m_" + memberName;
     }
-    FieldNewOperation fieldOp = new FieldNewOperation(memberName, getDeclaringType(), false);
+    FieldNewOperation fieldOp = new FieldNewOperation(memberName, getDeclaringType());
     fieldOp.setSibling(getSiblingField());
     fieldOp.setSignature(getBeanTypeSignature());
     fieldOp.setFlags(Flags.AccPrivate);

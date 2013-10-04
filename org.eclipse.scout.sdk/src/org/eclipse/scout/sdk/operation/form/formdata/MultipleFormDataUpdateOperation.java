@@ -63,6 +63,9 @@ public class MultipleFormDataUpdateOperation implements IOperation {
           op.run(monitor, workingCopyManager);
         }
       }
+      if (monitor.isCanceled()) {
+        return;
+      }
       monitor.worked(1);
     }
   }

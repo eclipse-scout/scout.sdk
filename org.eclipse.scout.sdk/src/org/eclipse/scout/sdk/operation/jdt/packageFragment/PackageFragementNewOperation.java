@@ -30,9 +30,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class PackageFragementNewOperation implements IOperation {
 
-  private boolean m_exportPackage;
   private final IJavaProject m_javaProject;
   private final String m_packageName;
+
   private ExportPolicy m_exportPackagePolicy;
   private boolean m_noErrorWhenPackageAlreadyExist;
 

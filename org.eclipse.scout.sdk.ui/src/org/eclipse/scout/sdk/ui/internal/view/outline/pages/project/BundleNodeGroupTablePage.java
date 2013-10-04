@@ -17,8 +17,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.formdata.ScoutBundlesUpdateFormDataOperation;
-import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
+import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.action.export.ExportScoutProjectAction;
@@ -86,7 +86,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{OrganizeAllImportsAction.class, FormDataUpdateAction.class,
+    return new Class[]{OrganizeAllImportsAction.class, MultipleUpdateFormDataAction.class,
         FormDataSqlBindingValidateAction.class, ExportScoutProjectAction.class, ScoutBundleNewAction.class};
   }
 
@@ -95,8 +95,8 @@ public class BundleNodeGroupTablePage extends AbstractPage {
     if (menu instanceof OrganizeAllImportsAction) {
       ((OrganizeAllImportsAction) menu).setScoutProject(getScoutBundle());
     }
-    else if (menu instanceof FormDataUpdateAction) {
-      ((FormDataUpdateAction) menu).setOperation(new ScoutBundlesUpdateFormDataOperation(getScoutBundle()));
+    else if (menu instanceof MultipleUpdateFormDataAction) {
+      ((MultipleUpdateFormDataAction) menu).setOperation(new ScoutBundlesUpdateFormDataOperation(getScoutBundle()));
     }
     else if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {

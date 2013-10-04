@@ -47,12 +47,12 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
     StringBuilder fqSuperTypeBuilder = new StringBuilder("jdt.test.client.type.Hierarchy01<");
     fqSuperTypeBuilder.append(List.class.getName()).append("<").append(File.class.getName()).append(">>");
     typeop.setSuperTypeSignature(Signature.createTypeSignature(fqSuperTypeBuilder.toString(), true));
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeop);
+    executeBuildAssertNoCompileErrors(typeop);
     Assert.assertTrue(TypeUtility.exists(typeop.getCreatedType()));
 
     // create method
     MethodOverrideOperation overrideOp = new MethodOverrideOperation("getValue", typeop.getCreatedType());
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, overrideOp);
+    executeBuildAssertNoCompileErrors(overrideOp);
     Assert.assertTrue(TypeUtility.exists(overrideOp.getCreatedMethod()));
     Assert.assertEquals("QList<QFile;>;", overrideOp.getCreatedMethod().getReturnType());
   }
@@ -71,12 +71,12 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
     StringBuilder fqSuperTypeBuilder = new StringBuilder("jdt.test.client.type.Hierarchy02<");
     fqSuperTypeBuilder.append(List.class.getName()).append("<").append(File.class.getName()).append(">>");
     typeop.setSuperTypeSignature(Signature.createTypeSignature(fqSuperTypeBuilder.toString(), true));
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeop);
+    executeBuildAssertNoCompileErrors(typeop);
     Assert.assertTrue(TypeUtility.exists(typeop.getCreatedType()));
 
     // create method
     MethodOverrideOperation overrideOp = new MethodOverrideOperation("getValue", typeop.getCreatedType());
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, overrideOp);
+    executeBuildAssertNoCompileErrors(overrideOp);
     Assert.assertTrue(TypeUtility.exists(overrideOp.getCreatedMethod()));
     Assert.assertEquals("QList<QFile;>;", overrideOp.getCreatedMethod().getReturnType());
   }
@@ -99,13 +99,13 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
     typeop.setFlags(Flags.AccPublic);
     StringBuilder fqSuperTypeBuilder = new StringBuilder("jdt.test.client.type.Hierarchy03");
     typeop.setSuperTypeSignature(Signature.createTypeSignature(fqSuperTypeBuilder.toString(), true));
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeop);
+    executeBuildAssertNoCompileErrors(typeop);
     Assert.assertTrue(TypeUtility.exists(typeop.getCreatedType()));
 
     // create method
     MethodOverrideOperation overrideOp = new MethodOverrideOperation("getValue", typeop.getCreatedType());
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, overrideOp);
+    executeBuildAssertNoCompileErrors(overrideOp);
     Assert.assertTrue(TypeUtility.exists(overrideOp.getCreatedMethod()));
     Assert.assertEquals("QString;", overrideOp.getCreatedMethod().getReturnType());
   }
@@ -132,7 +132,7 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
     methodSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(genericTypeFqn, true));
     typeop.addMethodSourceBuilder(methodSourceBuilder);
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, typeop);
+    executeBuildAssertNoCompileErrors(typeop);
     IType type04 = typeop.getCreatedType();
     Assert.assertTrue(TypeUtility.exists(type04));
 

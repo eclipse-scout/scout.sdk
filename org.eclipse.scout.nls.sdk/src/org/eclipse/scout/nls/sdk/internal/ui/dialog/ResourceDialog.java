@@ -81,7 +81,7 @@ public class ResourceDialog extends TitleAreaDialog {
           }
           m_result = new IResource[selection.size()];
           int i = 0;
-          for (Iterator it = selection.iterator(); it.hasNext(); i++) {
+          for (Iterator<?> it = selection.iterator(); it.hasNext(); i++) {
             Object o = it.next();
             if (o instanceof IResource) {
               m_result[i] = (IResource) o;

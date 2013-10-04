@@ -88,7 +88,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     SdkAssert.assertNotNull(client);
     FormNewOperation formOp = new FormNewOperation("ANewForm", client.getPackageName(".ui.forms"), client.getJavaProject());
     formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, project));
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, formOp);
+    executeBuildAssertNoCompileErrors(formOp);
     synchronized (formCountHolder) {
       while (formCountHolder.getValue() == -1) {
         formCountHolder.wait();
@@ -129,7 +129,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     serviceOp.setInterfacePackageName(sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES) + ".notexisting");
     serviceOp.setImplementationPackageName(serverBundle.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES) + ".notexisting");
     serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, serviceOp);
+    executeBuildAssertNoCompileErrors(serviceOp);
     synchronized (serviceCountHolder) {
       while (serviceCountHolder.getValue() == -1) {
         serviceCountHolder.wait();

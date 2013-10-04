@@ -16,7 +16,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -55,7 +54,6 @@ import org.eclipse.swt.widgets.Shell;
 public class SimpleNlsProject extends AbstractNlsProject {
   private NlsType m_nlsClass;
   private PropertyChangeListener m_nlsClassPropertyListener;
-  private final static Pattern PATTERN = Pattern.compile("^([^_]*)_[0-9]+\\.[0-9]+\\.[0-9]+(\\.[^.]+)?\\.jar$");
 
   public SimpleNlsProject(NlsType type) {
     super(type.getType());

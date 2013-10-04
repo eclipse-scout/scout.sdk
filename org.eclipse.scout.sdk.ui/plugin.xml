@@ -594,6 +594,7 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.FormDataUpdateAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.InstallClientSessionAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.TypeResolverFormDataAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.PageLinkAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction"></contextMenu>

@@ -35,7 +35,7 @@ public class OutlineToolbuttonNewOperationTest extends AbstractSdkTestWithSample
     OutlineToolbuttonNewOperation newOp = new OutlineToolbuttonNewOperation("OutlineToolButton01", desktop, true);
     newOp.setOutlineType(TypeUtility.getType("sample.client.ui.desktop.outlines.FirstOutline"));
 
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, newOp);
+    executeBuildAssertNoCompileErrors(newOp);
     IType outlineButton = newOp.getCreatedType();
     SdkAssert.assertExist(outlineButton);
   }

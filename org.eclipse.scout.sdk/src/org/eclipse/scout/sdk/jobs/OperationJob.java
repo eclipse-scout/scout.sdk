@@ -15,8 +15,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map.Entry;
-import java.util.Properties;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,11 +29,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class OperationJob extends AbstractWorkspaceBlockingJob {
 
-  public static final String SYSTEM_PROPERTY_USER_NAME = "user.name";
-  public static final String SCOUT_CODE_GEN_USER_NAME = "Scout robot";
-
   private List<IOperation> m_operations;
-  private Properties m_systemProperties;
 
   public OperationJob() {
     this(Arrays.asList(new IOperation[0]));
@@ -53,7 +47,6 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
     else {
       m_operations = new ArrayList<IOperation>(operations);
     }
-    m_systemProperties = new Properties();
     updateJobName();
   }
 
@@ -94,27 +87,12 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
 
   @Override
   protected final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    Properties backupProperties = new Properties();
-    try {
-      for (Entry<Object, Object> e : m_systemProperties.entrySet()) {
-        backupProperties.put(e.getKey(), System.getProperty((String) e.getKey()));
-        System.setProperty((String) e.getKey(), (String) e.getValue());
-      }
-      // run ops
-      IOperation[] allOps;
-      synchronized (m_operations) {
-        allOps = getAllOperations();
-      }
-      for (IOperation op : allOps) {
-        op.run(monitor, workingCopyManager);
-      }
-
+    IOperation[] allOps;
+    synchronized (m_operations) {
+      allOps = getAllOperations();
     }
-    finally {
-      // restore
-      for (Entry<Object, Object> e : backupProperties.entrySet()) {
-        System.setProperty((String) e.getKey(), (String) e.getValue());
-      }
+    for (IOperation op : allOps) {
+      op.run(monitor, workingCopyManager);
     }
   }
 
@@ -135,7 +113,6 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
       m_operations.addAll(operations);
     }
     updateJobName();
-
   }
 
   public void addOperation(IOperation operation) throws IllegalStateException {
@@ -159,17 +136,4 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   public int getOperationCount() {
     return m_operations.size();
   }
-
-  public void setSystemProperty(String key, String value) {
-    m_systemProperties.put(key, value);
-  }
-
-  public void removeSystemProperty(String key) {
-    m_systemProperties.remove(key);
-  }
-
-  public Properties getSystemProperties() {
-    return new Properties(m_systemProperties);
-  }
-
 }

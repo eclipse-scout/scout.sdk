@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSearchFormsOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
+import org.eclipse.scout.sdk.ui.action.TypeResolverFormDataAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
@@ -88,7 +88,7 @@ public class SearchFormTablePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, SearchFormNewAction.class, MultipleUpdateFormDataAction.class};
+    return new Class[]{WellformAction.class, SearchFormNewAction.class, TypeResolverFormDataAction.class};
   }
 
   @Override
@@ -102,8 +102,8 @@ public class SearchFormTablePage extends AbstractPage {
     else if (menu instanceof SearchFormNewAction) {
       ((SearchFormNewAction) menu).init(getScoutBundle());
     }
-    else if (menu instanceof MultipleUpdateFormDataAction) {
-      ((MultipleUpdateFormDataAction) menu).init(new ITypeResolver() {
+    else if (menu instanceof TypeResolverFormDataAction) {
+      ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
           return resolveSearchForms();

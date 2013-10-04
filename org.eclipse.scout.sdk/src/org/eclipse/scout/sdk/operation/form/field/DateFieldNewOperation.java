@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -68,7 +67,6 @@ public class DateFieldNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutSdk.logInfo("run operation: [" + getOperationName() + "]");
     FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSibling(getSibling());
@@ -83,7 +81,6 @@ public class DateFieldNewOperation implements IOperation {
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdField = newOp.getCreatedType();
-
   }
 
   public IType getCreatedField() {
@@ -129,5 +126,4 @@ public class DateFieldNewOperation implements IOperation {
   public void setSibling(IJavaElement sibling) {
     m_sibling = sibling;
   }
-
 }

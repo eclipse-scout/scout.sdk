@@ -632,20 +632,22 @@ public final class SignatureUtility {
     collector.put(typeDesc.getFullyQuallifiedName(), typeDesc);
 
     // super type
-    String[] superTypeParameterSignatures = new String[0];
-    IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
-    if (TypeUtility.exists(superType)) {
-      String[] typeParameters = Signature.getTypeArguments(superTypeSignature);
-      superTypeParameterSignatures = new String[typeParameters.length];
-      for (int i = 0; i < typeParameters.length; i++) {//String typeParameter: typeParameters){
-        if (Signature.getTypeSignatureKind(typeParameters[i]) == Signature.TYPE_VARIABLE_SIGNATURE) {
-          superTypeParameterSignatures[i] = typeDesc.getParameterSignature(Signature.getSignatureSimpleName(typeParameters[i]));
+    if (superTypeSignature != null) {
+      String[] superTypeParameterSignatures = new String[0];
+      IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
+      if (TypeUtility.exists(superType)) {
+        String[] typeParameters = Signature.getTypeArguments(superTypeSignature);
+        superTypeParameterSignatures = new String[typeParameters.length];
+        for (int i = 0; i < typeParameters.length; i++) {//String typeParameter: typeParameters){
+          if (Signature.getTypeSignatureKind(typeParameters[i]) == Signature.TYPE_VARIABLE_SIGNATURE) {
+            superTypeParameterSignatures[i] = typeDesc.getParameterSignature(Signature.getSignatureSimpleName(typeParameters[i]));
+          }
+          else {
+            superTypeParameterSignatures[i] = typeParameters[i];
+          }
         }
-        else {
-          superTypeParameterSignatures[i] = typeParameters[i];
-        }
+        resolveGenericParametersInSuperHierarchy(superType, superTypeParameterSignatures, superType.newSupertypeHierarchy(new NullProgressMonitor()), collector);
       }
-      resolveGenericParametersInSuperHierarchy(superType, superTypeParameterSignatures, superType.newSupertypeHierarchy(new NullProgressMonitor()), collector);
     }
     // interfaces
     if (interfaceSignatures != null) {

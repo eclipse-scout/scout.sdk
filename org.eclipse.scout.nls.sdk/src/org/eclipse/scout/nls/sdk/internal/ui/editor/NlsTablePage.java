@@ -217,7 +217,7 @@ public class NlsTablePage extends Composite {
     public void menuAboutToShow(IMenuManager manager) {
       IStructuredSelection selection = (IStructuredSelection) m_table.getViewer().getSelection();
       ArrayList<NlsEntry> entries = new ArrayList<NlsEntry>(selection.size());
-      for (Iterator it = selection.iterator(); it.hasNext();) {
+      for (Iterator<?> it = selection.iterator(); it.hasNext();) {
         entries.add((NlsEntry) it.next());
       }
       MenuManager menuManager = (MenuManager) manager;

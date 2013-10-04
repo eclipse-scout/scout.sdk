@@ -32,7 +32,7 @@ public class FormWithGroupboxesTest extends AbstractSdkTestWithFormDataProject {
     Assert.assertNotNull(sharedProject);
 
     FormDataDtoUpdateOperation op = new FormDataDtoUpdateOperation(form);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, op);
+    executeBuildAssertNoCompileErrors(op);
 
     testApiOfFormWithGroupBoxesFormData();
   }

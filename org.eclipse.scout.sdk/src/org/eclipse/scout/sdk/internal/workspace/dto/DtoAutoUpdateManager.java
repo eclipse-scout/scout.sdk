@@ -192,7 +192,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
 
     public P_AutoUpdateOperationsJob() {
       super("Auto-updating derived resources");
-      setRule(new DtoAutoUpdateJobRule());
+      setRule(DtoAutoUpdateJobRule.INSTANCE);
       setPriority(Job.DECORATE);
     }
 
@@ -248,7 +248,13 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     }
   }
 
-  public static class DtoAutoUpdateJobRule implements ISchedulingRule {
+  public final static class DtoAutoUpdateJobRule implements ISchedulingRule {
+
+    public final static DtoAutoUpdateJobRule INSTANCE = new DtoAutoUpdateJobRule();
+
+    private DtoAutoUpdateJobRule() {
+    }
+
     @Override
     public boolean contains(ISchedulingRule rule) {
       if (rule instanceof DtoAutoUpdateJobRule) {

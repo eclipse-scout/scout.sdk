@@ -81,10 +81,10 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   private ColorRegistry m_colorRegistry;
   private FontRegistry m_fontRegistry;
-  private ServiceRegistration m_organizeImportServiceRegistration;
-  private ServiceRegistration m_messageBoxServiceRegistration;
+  private ServiceRegistration<IOrganizeImportService> m_organizeImportServiceRegistration;
+  private ServiceRegistration<IMessageBoxService> m_messageBoxServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
-  private ServiceRegistration<?> m_javaElementCommentBuilderService;
+  private ServiceRegistration<IJavaElementCommentBuilderService> m_javaElementCommentBuilderService;
 
   /**
    * The constructor
@@ -99,13 +99,13 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     logManager = new SdkLogManager(this);
 
     if (m_organizeImportServiceRegistration == null) {
-      m_organizeImportServiceRegistration = context.registerService(IOrganizeImportService.class.getName(), new OrganizeImportService(), null);
+      m_organizeImportServiceRegistration = context.registerService(IOrganizeImportService.class, new OrganizeImportService(), null);
     }
     if (m_messageBoxServiceRegistration == null) {
-      m_messageBoxServiceRegistration = context.registerService(IMessageBoxService.class.getName(), new SwtMessageBoxService(), null);
+      m_messageBoxServiceRegistration = context.registerService(IMessageBoxService.class, new SwtMessageBoxService(), null);
     }
     if (m_javaElementCommentBuilderService == null) {
-      m_javaElementCommentBuilderService = context.registerService(IJavaElementCommentBuilderService.class.getName(), new JavaElementCommentBuilderService(), null);
+      m_javaElementCommentBuilderService = context.registerService(IJavaElementCommentBuilderService.class, new JavaElementCommentBuilderService(), null);
     }
 
     if (m_preferencesPropertyListener == null) {

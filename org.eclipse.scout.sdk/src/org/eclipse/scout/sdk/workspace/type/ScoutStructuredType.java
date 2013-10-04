@@ -272,13 +272,11 @@ public class ScoutStructuredType implements IStructuredType {
             visitMethodConstructors(unknownMethods);
             m_visitedCategories.add(CATEGORIES.METHOD_CONSTRUCTOR);
             m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
-
             break;
           case METHOD_CONFIG_PROPERTY:
             visitMethodConfigProperty(unknownMethods, m_typeHierarchy);
             m_visitedCategories.add(CATEGORIES.METHOD_CONFIG_PROPERTY);
             m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
-
             break;
           case METHOD_CONFIG_EXEC:
             visitMethodConfigExec(unknownMethods, m_typeHierarchy);
@@ -294,19 +292,16 @@ public class ScoutStructuredType implements IStructuredType {
             visitMethodOverridden(unknownMethods, m_typeHierarchy);
             m_visitedCategories.add(CATEGORIES.METHOD_OVERRIDDEN);
             m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
-
             break;
           case METHOD_START_HANDLER:
             visitMethodStartHandler(unknownMethods);
             m_visitedCategories.add(CATEGORIES.METHOD_START_HANDLER);
             m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
-
             break;
           case METHOD_INNER_TYPE_GETTER:
             visitMethodInnerTypeGetter(unknownMethods);
             m_visitedCategories.add(CATEGORIES.METHOD_INNER_TYPE_GETTER);
             m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
-
             break;
           case METHOD_LOCAL_BEAN:
             visitMethodLocalBean(unknownMethods);
@@ -402,6 +397,14 @@ public class ScoutStructuredType implements IStructuredType {
             visitTypeFormHandlers(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_FORM_HANDLER);
             m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            break;
+          case FIELD_UNKNOWN:
+        	break;
+          case METHOD_UNCATEGORIZED:
+            break;
+          case TYPE_UNCATEGORIZED:
+            break;
+          case ENUM:
             break;
         }
       }

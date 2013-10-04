@@ -52,7 +52,8 @@ public final class SimpleMethodReturnValueParser implements IMethodReturnValuePa
             Matcher typeRefCheck = REGEX_TYPE_REFERENCE.matcher(returnClause);
             if (typeRefCheck.find()) {
               // a reference to another type was found
-              if ("TEXTS".equals(typeRefCheck.group(1).trim())) {
+              String typeRefName = typeRefCheck.group(1).trim();
+              if ("TEXTS".equals(typeRefName) || "ScoutTexts".equals(typeRefName)) {
                 // it is the nls texts class -> directly parse
                 return createExpression(returnClause);
               }

@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility.CustomImplementationException;
 import org.eclipse.scout.sdk.workspace.type.config.parser.NlsPropertySourceParser;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -102,35 +101,14 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
     try {
       storeValueLock.acquire();
-      // check text only
-      try {
+      m_currentSourceTuple = getParser().parseSourceValue(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+      if (m_currentSourceTuple == null) {
         String simpleText = PropertyMethodSourceUtility.parseReturnParameterString(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
         if (simpleText != null) {
           throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + simpleText + "'.", null));
         }
       }
-      catch (CustomImplementationException e) {
-        // void try to resolve nls entry
-        m_currentSourceTuple = getParser().parseSourceValue(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-        m_proposalField.acceptProposal(m_currentSourceTuple);
-      }
-//      if (currentSourceValueKey != null) {
-//        if (isNlsText.getValue()) {
-//          m_currentSourceTuple = getNlsProject().getEntry(currentSourceValueKey);
-//          if (m_currentSourceTuple == null) {
-//            throw new CoreException(new ScoutStatus(Status.WARNING, "Key '" + currentSourceValueKey + "' not found!", null));
-//          }
-//          else {
-//            m_proposalField.acceptProposal(m_currentSourceTuple);
-//          }
-//        }
-//        else {
-//          throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + currentSourceValueKey + "'.", null));
-//        }
-//      }
-//      else {
-//        m_proposalField.acceptProposal(null);
-//      }
+      m_proposalField.acceptProposal(m_currentSourceTuple);
       m_proposalField.setEnabled(true);
     }
     finally {

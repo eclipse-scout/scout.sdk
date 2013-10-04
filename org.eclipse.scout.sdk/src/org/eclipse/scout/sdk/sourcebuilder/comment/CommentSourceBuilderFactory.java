@@ -68,7 +68,7 @@ public final class CommentSourceBuilderFactory {
 
   public static final ICommentSourceBuilder createPreferencesCompilationUnitCommentBuilder() {
     if (javaElementCommentBuilderService != null) {
-      return javaElementCommentBuilderService.createCompilationUnitCommentBuilder();
+      return javaElementCommentBuilderService.createPreferencesCompilationUnitCommentBuilder();
     }
     else {
       return emptyCommentSourceBuilder;
@@ -96,6 +96,24 @@ public final class CommentSourceBuilderFactory {
   public static ICommentSourceBuilder createPreferencesMethodCommentBuilder() {
     if (javaElementCommentBuilderService != null) {
       return javaElementCommentBuilderService.createPreferencesMethodCommentBuilder();
+    }
+    else {
+      return emptyCommentSourceBuilder;
+    }
+  }
+
+  public static ICommentSourceBuilder createPreferencesMethodGetterCommentBuilder() {
+    if (javaElementCommentBuilderService != null) {
+      return javaElementCommentBuilderService.createPreferencesMethodGetterCommentBuilder();
+    }
+    else {
+      return emptyCommentSourceBuilder;
+    }
+  }
+
+  public static ICommentSourceBuilder createPreferencesMethodSetterCommentBuilder() {
+    if (javaElementCommentBuilderService != null) {
+      return javaElementCommentBuilderService.createPreferencesMethodSetterCommentBuilder();
     }
     else {
       return emptyCommentSourceBuilder;

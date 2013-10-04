@@ -11,8 +11,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.debug.view;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
@@ -65,7 +63,6 @@ public class JdtEventLoggerView extends ViewPart {
   private Button m_stopButton;
   private Button m_resetButton;
   private Object writeLock = new Object();
-  private ArrayList<String> m_events = new ArrayList<String>();
   private IElementChangedListener m_elementChangedListener;
   private IResourceChangeListener m_resourceChangeListener;
   private FormToolkit m_toolkit;

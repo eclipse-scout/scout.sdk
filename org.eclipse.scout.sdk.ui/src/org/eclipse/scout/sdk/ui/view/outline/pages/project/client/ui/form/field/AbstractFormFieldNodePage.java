@@ -42,7 +42,7 @@ public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
   public void prepareMenuAction(IScoutHandler menu) {
     super.prepareMenuAction(menu);
     if (menu instanceof FormDataUpdateAction) {
-      ((FormDataUpdateAction) menu).setEnabled(getType());
+      ((FormDataUpdateAction) menu).setFormDataOwner(getType());
     }
     else if (menu instanceof CreateTemplateAction) {
       CreateTemplateAction action = (CreateTemplateAction) menu;

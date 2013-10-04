@@ -18,6 +18,8 @@ import org.eclipse.ui.services.IServiceLocator;
 
 public class MenuVisibilityTester extends PropertyTester {
 
+  private final static int MENU_PREPARATION_MAX_DURATION = 10; // ms
+
   private static <T> boolean contains(T[] list, T toSearch) {
     if (list == null) return false;
     for (T t : list) {
@@ -36,7 +38,6 @@ public class MenuVisibilityTester extends PropertyTester {
       }
       catch (Throwable t) {
         ScoutSdkUi.logError("Could not get supported menues for extension '" + c.toString() + "'!");
-        // TODO: handle exception
       }
     }
 
@@ -110,11 +111,17 @@ public class MenuVisibilityTester extends PropertyTester {
             // prepare the menu
             prepareMenu(currentMenu, contributors);
 
+            long menuPreparationStartTime = System.currentTimeMillis();
             // check if menu is visible
             if (!currentMenu.isVisible()) return false;
 
             // evaluate the enabled state after the menu has been prepared
             currentMenu.setEnabled(new BooleanHolder(currentMenu.isActive()));
+            long duration = System.currentTimeMillis() - menuPreparationStartTime;
+            if (duration > MENU_PREPARATION_MAX_DURATION) {
+              // preparation of a menu should not take longer than 10ms
+              ScoutSdkUi.logWarning("Context menu '" + currentMenuClass.getName() + "' took longer than " + MENU_PREPARATION_MAX_DURATION + "ms to calculate its state (enabled/disabled & visible/invisible).");
+            }
 
             // if we come here, all selected rows support the current menu and the menu is visible and prepared: enable the handler
             IServiceLocator serviceLocator = (IServiceLocator) args[2];
@@ -122,7 +129,6 @@ public class MenuVisibilityTester extends PropertyTester {
 
             // register the key stroke
             ScoutMenuContributionItemFactory.registerKeyStroke(currentMenu.getKeyStroke(), cmd);
-
             return true;
           }
           catch (Exception e) {

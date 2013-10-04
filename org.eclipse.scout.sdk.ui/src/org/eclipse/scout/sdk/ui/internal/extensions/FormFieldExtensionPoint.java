@@ -36,8 +36,8 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Bundle;
 
-public class FormFieldExtensionPoint {
-  private static FormFieldExtensionPoint instance = new FormFieldExtensionPoint();
+public final class FormFieldExtensionPoint {
+  private final static FormFieldExtensionPoint instance = new FormFieldExtensionPoint();
 
   private List<IFormFieldExtension> m_extensions;
 
@@ -167,14 +167,14 @@ public class FormFieldExtensionPoint {
         if ("true".equalsIgnoreCase(element.getAttribute("active"))) {
           String name = element.getAttribute("name");
           String modClassName = element.getAttribute("model");
-          IType modelType = TypeUtility.getType(modClassName);
-          if (modelType == null) {
-            ScoutSdkUi.logError("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
-            break;
-          }
-          if (modClassName == null) {
+          if (!StringUtility.hasText(modClassName)) {
             ScoutSdkUi.logWarning("Could not find model in '" + extension.getUniqueIdentifier() + "'. Skiping this extension.");
             continue;
+          }
+          IType modelType = TypeUtility.getType(modClassName);
+          if (!TypeUtility.exists(modelType)) {
+            ScoutSdkUi.logError("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
+            break;
           }
           ITypeHierarchy superTypeHierarchy = null;
           try {
@@ -220,7 +220,6 @@ public class FormFieldExtensionPoint {
     for (IFormFieldExtension ext : formFieldExtensions.values()) {
       m_extensions.add(ext);
     }
-    formFieldExtensions.clear();
   }
 
   @SuppressWarnings("unchecked")

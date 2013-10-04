@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
+import org.eclipse.scout.sdk.ui.action.TypeResolverFormDataAction;
 import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
@@ -88,8 +88,8 @@ public class FormFieldTemplateTablePage extends AbstractPage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof MultipleUpdateFormDataAction) {
-      ((MultipleUpdateFormDataAction) menu).init(new ITypeResolver() {
+    if (menu instanceof TypeResolverFormDataAction) {
+      ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
           return resolveFormFieldTemplates();
@@ -101,7 +101,7 @@ public class FormFieldTemplateTablePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{MultipleUpdateFormDataAction.class};
+    return new Class[]{TypeResolverFormDataAction.class};
   }
 
   @Override

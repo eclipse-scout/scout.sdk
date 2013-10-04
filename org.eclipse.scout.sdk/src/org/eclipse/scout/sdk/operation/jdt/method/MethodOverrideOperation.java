@@ -35,7 +35,6 @@ public class MethodOverrideOperation extends MethodNewOperation {
 
   public MethodOverrideOperation(IMethod methodToOverride, IType declaringType, boolean formatSource) throws CoreException {
     super(MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(methodToOverride, declaringType), declaringType, formatSource);
-
   }
 
   @Override
@@ -45,5 +44,4 @@ public class MethodOverrideOperation extends MethodNewOperation {
     }
     super.validate();
   }
-
 }

@@ -46,13 +46,12 @@ public class OrganizeImportOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     BundleContext context = ScoutSdk.getDefault().getBundle().getBundleContext();
-    ServiceReference reference = context.getServiceReference(IOrganizeImportService.class.getName());
+    ServiceReference<IOrganizeImportService> reference = context.getServiceReference(IOrganizeImportService.class);
     try {
       if (reference != null) {
-        @SuppressWarnings("unchecked")
-        Object service = context.getService(reference);
-        if (service instanceof IOrganizeImportService) {
-          ((IOrganizeImportService) service).organize(getCompilationUnit(), monitor);
+        IOrganizeImportService service = context.getService(reference);
+        if (service != null) {
+          service.organize(getCompilationUnit(), monitor);
         }
         else {
           ScoutSdk.logWarning("No valid Organize Imports Service has been registered.");

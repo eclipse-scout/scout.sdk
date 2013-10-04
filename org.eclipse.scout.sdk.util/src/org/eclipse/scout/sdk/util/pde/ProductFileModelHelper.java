@@ -258,7 +258,17 @@ public final class ProductFileModelHelper {
     }
 
     /**
-     * Gets the plug-in models of all plug-ins of the product associated with this helper.
+     * Gets the plug-in models of all plug-ins of the product associated with this helper.<br>
+     * <br>
+     * Plug-ins that exist in the product file but cannot be found in the current target platform
+     * (marked red in the product file editor) will not be part of the result.<br>
+     * Use {@link ProductFilePart#getPluginSymbolicNames()} to get the names of all plugins referenced in the product
+     * file independent if they can be found or not.<br>
+     * <br>
+     * If the product file contains version constraints for the plug-ins, only models that fulfill the version
+     * constraints are returned.<br>
+     * <br>
+     * If the product is feature based, this method returns an empty array.
      * 
      * @return the plug-in models of all plug-ins this product is dependent of.
      * @throws CoreException
@@ -284,6 +294,22 @@ public final class ProductFileModelHelper {
       }
 
       return list.toArray(new BundleDescription[list.size()]);
+    }
+
+    /**
+     * Gets the symbolic names of all plug-ins of the product associated with this helper.<br>
+     * If the product is feature based, this method returns an empty array.
+     * 
+     * @return The symbolic names of all plug-ins in the product.
+     * @throws CoreException
+     */
+    public String[] getPluginSymbolicNames() throws CoreException {
+      IProductPlugin[] plugins = m_model.getWorkspaceProductModel().getProduct().getPlugins();
+      String[] result = new String[plugins.length];
+      for (int i = 0; i < result.length; i++) {
+        result[i] = plugins[i].getId();
+      }
+      return result;
     }
 
     /**

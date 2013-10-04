@@ -45,7 +45,7 @@ public class CompilationUnitNewOperationTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(clientProject));
 
     CompilationUnitNewOperation icuNewOp = new CompilationUnitNewOperation("SimpleIcu.java", "jdt.test.client.icu.output", clientProject);
-    executeBuildAssertNoCompileErrors(SYSTEM_PROPERTIES_FORM_DATA_USER, icuNewOp);
+    executeBuildAssertNoCompileErrors(icuNewOp);
 
     Assert.assertTrue(TypeUtility.exists(icuNewOp.getCreatedCompilationUnit()));
     Assert.assertEquals(0, icuNewOp.getCreatedCompilationUnit().getTypes().length);

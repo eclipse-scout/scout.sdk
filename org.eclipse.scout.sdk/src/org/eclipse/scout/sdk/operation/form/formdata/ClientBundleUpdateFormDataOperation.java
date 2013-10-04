@@ -36,7 +36,6 @@ public class ClientBundleUpdateFormDataOperation implements IOperation {
 
   public ClientBundleUpdateFormDataOperation(IScoutBundle clientBundle) {
     m_clientBundle = clientBundle;
-
   }
 
   @Override
