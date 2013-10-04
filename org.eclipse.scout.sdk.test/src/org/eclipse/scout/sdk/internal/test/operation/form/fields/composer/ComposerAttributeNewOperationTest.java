@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.operation.form.fields.composer;
 
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -35,21 +36,37 @@ public class ComposerAttributeNewOperationTest extends AbstractSdkTestWithSample
     ComposerAttributeNewOperation composerAttributeNewOp = new ComposerAttributeNewOperation("NewAttribute", composerField);
     composerAttributeNewOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute", true));
     executeBuildAssertNoCompileErrors(composerAttributeNewOp);
-    IType attribute = composerAttributeNewOp.getCreatedAttribute();
+    IType attribute = composerAttributeNewOp.getCreatedType();
     SdkAssert.assertExist(attribute);
-    SdkAssert.assertPublic(attribute).assertNoMoreFlags();
-    SdkAssert.assertSerialVersionUidExists(attribute);
 
-    IType[] attributes = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelAttribute), ScoutTypeComparators.getOrderAnnotationComparator());
-    SdkAssert.assertEquals(2, attributes.length);
-    SdkAssert.assertEquals(composerAttributeNewOp.getTypeName(), attributes[1].getElementName());
+    testApiOfNewAttribute();
 
     // clean up
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
     delOp.addMember(attribute);
     executeBuildAssertNoCompileErrors(delOp);
-    attributes = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelAttribute), ScoutTypeComparators.getOrderAnnotationComparator());
+    IType[] attributes = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelAttribute), ScoutTypeComparators.getTypeNameComparator());
     SdkAssert.assertEquals(1, attributes.length);
+  }
+
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfNewAttribute() throws Exception {
+    // type NewAttribute
+    IType newAttribute = SdkAssert.assertTypeExists("sample.client.person.PersonForm$MainBox$ComposerField$NewAttribute");
+    SdkAssert.assertHasFlags(newAttribute, 1);
+    SdkAssert.assertHasSuperTypeSignature(newAttribute, "QAbstractDataModelAttribute;");
+
+    // fields of NewAttribute
+    SdkAssert.assertEquals("field count of 'NewAttribute'", 1, newAttribute.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(newAttribute, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    SdkAssert.assertEquals("method count of 'NewAttribute'", 0, newAttribute.getMethods().length);
+
+    SdkAssert.assertEquals("inner types count of 'NewAttribute'", 0, newAttribute.getTypes().length);
   }
 
 }

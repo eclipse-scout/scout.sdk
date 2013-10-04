@@ -145,7 +145,7 @@ public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
     IStructuredType structuredType = ScoutTypeUtility.createStructuredComposer(m_declaringType);
     operation.setSibling(structuredType.getSiblingComposerAttribute(getTypeName()));
     operation.run(monitor, workingCopyManager);
-    m_createdAttribtue = operation.getCreatedAttribute();
+    m_createdAttribtue = operation.getCreatedType();
     return true;
   }
 

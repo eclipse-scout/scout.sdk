@@ -143,7 +143,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     IStructuredType structuredType = ScoutTypeUtility.createStructuredComposer(m_declaringType);
     operation.setSibling(structuredType.getSiblingComposerEntity(getTypeName()));
     operation.run(monitor, workingCopyManager);
-    m_createdEntity = operation.getCreatedEntry();
+    m_createdEntity = operation.getCreatedType();
     return true;
   }
 

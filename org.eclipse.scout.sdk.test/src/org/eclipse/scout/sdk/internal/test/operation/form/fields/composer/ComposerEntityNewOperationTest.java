@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.operation.form.fields.composer;
 
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -35,21 +36,36 @@ public class ComposerEntityNewOperationTest extends AbstractSdkTestWithSamplePro
     ComposerEntityNewOperation composerEntityNewOp = new ComposerEntityNewOperation("NewEntity", composerField);
     composerEntityNewOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity", true));
     executeBuildAssertNoCompileErrors(composerEntityNewOp);
-    IType entity = composerEntityNewOp.getCreatedEntry();
+    IType entity = composerEntityNewOp.getCreatedType();
     SdkAssert.assertExist(entity);
-    SdkAssert.assertPublic(entity).assertNoMoreFlags();
-    SdkAssert.assertSerialVersionUidExists(entity);
 
-    IType[] entities = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelEntity), ScoutTypeComparators.getOrderAnnotationComparator());
-    SdkAssert.assertEquals(2, entities.length);
-    SdkAssert.assertEquals(composerEntityNewOp.getTypeName(), entities[1].getElementName());
+    testApiOfNewEntity();
 
     // clean up
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
     delOp.addMember(entity);
     executeBuildAssertNoCompileErrors(delOp);
-    entities = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelEntity), ScoutTypeComparators.getOrderAnnotationComparator());
+    IType[] entities = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelEntity), ScoutTypeComparators.getTypeNameComparator());
     SdkAssert.assertEquals(1, entities.length);
   }
 
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfNewEntity() throws Exception {
+    // type NewEntity
+    IType newEntity = SdkAssert.assertTypeExists("sample.client.person.PersonForm$MainBox$ComposerField$NewEntity");
+    SdkAssert.assertHasFlags(newEntity, 1);
+    SdkAssert.assertHasSuperTypeSignature(newEntity, "QAbstractDataModelEntity;");
+
+    // fields of NewEntity
+    SdkAssert.assertEquals("field count of 'NewEntity'", 1, newEntity.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(newEntity, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    SdkAssert.assertEquals("method count of 'NewEntity'", 0, newEntity.getMethods().length);
+
+    SdkAssert.assertEquals("inner types count of 'NewEntity'", 0, newEntity.getTypes().length);
+  }
 }
