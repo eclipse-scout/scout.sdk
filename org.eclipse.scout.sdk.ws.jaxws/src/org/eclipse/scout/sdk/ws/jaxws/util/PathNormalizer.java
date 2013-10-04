@@ -17,6 +17,7 @@ import org.eclipse.scout.commons.StringUtility;
  * Ensures leading and trailing file separators for the given file type.
  */
 public class PathNormalizer {
+  public static final String SLASH_SUFFIX = "/";
 
   private PathNormalizer() {
   }
@@ -49,11 +50,38 @@ public class PathNormalizer {
     return new Path(wsdlPath).makeRelative().removeTrailingSeparator().toString();
   }
 
+  /**
+   * Appends a "/" at the end of the given non-empty target namespace if it does not exist.
+   * 
+   * @param targetNamespace
+   *          name of the target namespace
+   * @return target namespace with a "/" at the end.
+   */
   public static String toTargetNamespace(String targetNamespace) {
     if (!StringUtility.hasText(targetNamespace)) {
       return null;
     }
-    return new Path(targetNamespace).addTrailingSeparator().toString();
+    if (!targetNamespace.endsWith(SLASH_SUFFIX)) {
+      return targetNamespace + SLASH_SUFFIX;
+    }
+    return targetNamespace;
+  }
+
+  /**
+   * Removes the "/" at the end of a non-empty target namespace if one exists.
+   * 
+   * @param targetNamespace
+   *          name of the target namespace
+   * @return target namespace without a trailing "/" at the end.
+   */
+  public static String removeTrailingSeparatorFromTargetNamespace(String targetNamespace) {
+    if (!StringUtility.hasText(targetNamespace)) {
+      return null;
+    }
+    if (targetNamespace.endsWith(SLASH_SUFFIX)) {
+      return targetNamespace.substring(0, targetNamespace.length() - 2);
+    }
+    return targetNamespace;
   }
 
   public static String toJarPath(String jarPath) {

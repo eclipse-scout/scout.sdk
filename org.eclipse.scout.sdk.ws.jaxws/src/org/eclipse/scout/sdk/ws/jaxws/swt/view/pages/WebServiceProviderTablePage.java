@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
@@ -118,9 +120,17 @@ public class WebServiceProviderTablePage extends AbstractPage {
   }
 
   private class P_SunJaxWsResourceListener implements IResourceListener {
+    private boolean isContentAvailable(IFile file) {
+      File osFile = file.getRawLocation().makeAbsolute().toFile();
+      return osFile.length() > 0;
+    }
 
     @Override
     public void changed(String element, int event) {
+      if (!isContentAvailable(getSunJaxWsResource().getFile())) {
+        return;
+      }
+
       m_sunJaxWsXml = getSunJaxWsResource().loadXml();
 
       // if endpoint was added or removed, mark structure dirty
