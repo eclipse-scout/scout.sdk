@@ -105,6 +105,9 @@ public class ScoutPropertyView extends ViewPart {
       // the event comes from the refresh outline job which clears the selection to re-apply it later on. we are not interested in the clear-event.
       return;
     }
+    if (part == null) {
+      return;
+    }
 
     // clear old
     IPage[] pagesa = getPagesOfSelection(selection);

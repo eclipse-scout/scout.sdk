@@ -5,6 +5,7 @@
    <extension-point id="runtimeClasses" name="runtimeClass" schema="schema/runtimeClasses.exsd"/>
    <extension-point id="targetPackage" name="targetPackage" schema="schema/targetPackage.exsd"/>
    <extension-point id="runtimeBundles" name="runtimeBundles" schema="schema/runtimeBundles.exsd"/>
+   <extension-point id="dtoUpdateEventFilter" name="dtoUpdateEventFilter" schema="schema/dtoUpdateEventFilter.exsd"/>
    <extension
          id="formPropertyBean"
          name="Scout Problem"

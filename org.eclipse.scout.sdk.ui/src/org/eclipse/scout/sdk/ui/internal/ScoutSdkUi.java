@@ -234,11 +234,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   private IScoutExplorerPart getExplorerImpl(boolean createIfNotOpen) {
     IWorkbenchPage activePage = getWorkbench().getActiveWorkbenchWindow().getActivePage();
     IScoutExplorerPart part = null;
-    if (activePage == null) {
-      logWarning("no active part found.");
-      return part;
-    }
-    else {
+    if (activePage != null) {
       IViewPart view = activePage.findView(IScoutConstants.SCOUT_EXPLORER_VIEW);
       if (view == null && createIfNotOpen) {
         try {

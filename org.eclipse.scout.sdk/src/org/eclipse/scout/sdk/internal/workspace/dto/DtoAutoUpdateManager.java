@@ -36,6 +36,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateEventFilter;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 
 /**
@@ -75,22 +76,33 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     m_updateHandlers.add(factory);
   }
 
-  private void handleCompilationUnitSaved(ICompilationUnit icu) throws CoreException {
-    Set<IDtoAutoUpdateOperation> operations = createAutoUpdateOperations(icu);
-    if (operations == null) {
-      // nothing to create
-      return;
+  protected boolean acceptUpdateEvent(ICompilationUnit icu) throws CoreException {
+    for (IDtoAutoUpdateEventFilter filter : DtoUpdateEventFilter.getFilters()) {
+      if (!filter.accept(icu)) {
+        return false;
+      }
     }
-    synchronized (pendingJobsLock) {
-      if (m_pendingCompilationUnits.add(icu)) {
-        m_pendingAutoUpdateOperations.addAll(operations);
-        if (m_updateJob == null) {
-          m_updateJob = new P_AutoUpdateOperationsJob();
+    return true;
+  }
+
+  private void handleCompilationUnitSaved(ICompilationUnit icu) throws CoreException {
+    if (acceptUpdateEvent(icu)) {
+      Set<IDtoAutoUpdateOperation> operations = createAutoUpdateOperations(icu);
+      if (operations == null) {
+        // nothing to create
+        return;
+      }
+      synchronized (pendingJobsLock) {
+        if (m_pendingCompilationUnits.add(icu)) {
+          m_pendingAutoUpdateOperations.addAll(operations);
+          if (m_updateJob == null) {
+            m_updateJob = new P_AutoUpdateOperationsJob();
+          }
+          else {
+            m_updateJob.cancel();
+          }
+          m_updateJob.schedule(500);
         }
-        else {
-          m_updateJob.cancel();
-        }
-        m_updateJob.schedule(500);
       }
     }
   }

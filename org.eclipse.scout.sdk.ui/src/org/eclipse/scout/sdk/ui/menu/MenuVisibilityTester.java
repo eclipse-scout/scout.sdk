@@ -18,7 +18,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 public class MenuVisibilityTester extends PropertyTester {
 
-  private final static int MENU_PREPARATION_MAX_DURATION = 10; // ms
+  private final static int MENU_PREPARATION_MAX_DURATION = 15; // ms
 
   private static <T> boolean contains(T[] list, T toSearch) {
     if (list == null) return false;
@@ -120,7 +120,7 @@ public class MenuVisibilityTester extends PropertyTester {
             long duration = System.currentTimeMillis() - menuPreparationStartTime;
             if (duration > MENU_PREPARATION_MAX_DURATION) {
               // preparation of a menu should not take longer than 10ms
-              ScoutSdkUi.logWarning("Context menu '" + currentMenuClass.getName() + "' took longer than " + MENU_PREPARATION_MAX_DURATION + "ms to calculate its state (enabled/disabled & visible/invisible).");
+              ScoutSdkUi.logWarning("Context menu '" + currentMenuClass.getName() + "' took longer than " + MENU_PREPARATION_MAX_DURATION + "ms to calculate its state (" + duration + "ms).");
             }
 
             // if we come here, all selected rows support the current menu and the menu is visible and prepared: enable the handler
